@@ -1,2 +1,0 @@
-# PhysiCell
-PhysiCell mirror (source)
