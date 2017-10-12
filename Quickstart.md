@@ -147,10 +147,9 @@ is to suggest and offer guidance on using other tools, e.g. your browser, [Image
 At a bare minimum, you should be able to use your browser to `File -> Open` any .svg (scalable vector graphics) file 
 that your simulation generates. PhysiCell simulates transmitted light microscopy to create virtual H&E 
 (hematoxylin and eosin) images for the .svg files. Even for 3D models, 2D cell images (.svg files) are generated, by 
-default, as slices through the Z=0 plane.
+default, as slices through the Z=0 plane, as depicted in the following image (from the cancer-immune-sample project).
 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
-
+![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/cancer_immune_snapshot00000574_small.png "SVG slice from 3D cancer-immune-sample project")
 <hr> <!---------------------------------------------->
 
 ## Community Support
