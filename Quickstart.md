@@ -59,7 +59,8 @@ build PhysiCell using this option.
 Unfortunately, the C++ compiler provided by the latest version of XCode on OSX does not support OpenMP.
 To resolve this, we recommend using the `brew` package manager to install a recent version of `gcc`. Follow the [brew 
 installation instructions](https://docs.brew.sh/Installation.html) (Note: this will still require that you have 
-[XCode](https://developer.apple.com/xcode/) installed].
+[XCode](https://developer.apple.com/xcode/) installed. See the link related to homebrew in the References below
+for more details).
 
 After installing brew, you should be able to open a Terminal and type `brew install gcc` from the command line. This 
 should install a recent version of gcc/g++ (supporting OpenMP) into `/usr/local/bin`. You can verify this with:
@@ -164,4 +165,5 @@ default, as slices through the Z=0 plane.
 * http://www.mathcancer.org/blog/setting-up-a-64-bit-gcc-environment-on-windows
 * http://www.mathcancer.org/blog/setting-up-gcc-openmp-on-osx-homebrew-edition/
 * http://www.mathcancer.org/blog/physicell-tutorials/
+* http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/
 * https://github.com/MathCancer/PhysiCell/blob/master/documentation/User_Guide.pdf
