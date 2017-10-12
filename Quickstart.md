@@ -41,7 +41,6 @@ The one <b>requirement is that your compiler support OpenMP</b>. If, during your
 a message like: `error: unsupported option '-fopenmp'`, you'll know your Makefile is trying to use a compiler
 that doesn't support OpenMP. You may need to edit the Makefile to reference the desired C++ compiler.
 
-
 ### Windows
 
 There are (at least) two options for building PhysiCell on Windows:
@@ -69,7 +68,7 @@ $ ls -l /usr/local/bin/g++*
 lrwxr-xr-x  1 heiland  admin  29 Oct  3 14:38 /usr/local/bin/g++-7@ -> ../Cellar/gcc/7.2.0/bin/g++-7
 ```
 
-It will be <b>this version of gcc</b> you'll need to use in the Makefile:
+It will be <b>this version of gcc</b> you'll need to reference in the Makefile, e.g.:
 ```
 CC := /usr/local/bin/g++-7
 ```
@@ -83,7 +82,86 @@ building PhysiCell. If not, contact us!
 
 ## Build: sample projects
 
+In the current release of PhysiCell, we provide four sample projects to help get you started using PhysiCell. Three
+of the projects are 2D models (<i>biorobots, anti-cancer biorobots, and cancer heterogeneity</i>); the fourth project
+is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of these projects follows the same
+pattern, for example, from your Terminal, in the root PhysiCell directory/folder:
+```
+$ make biorobots-sample
+$ make project
+```
+
+Note: the first `make` command silently copies over project-specific files, including the Makefile. The 
+second `make` command attempts to compile the (new) code. Since the Makefile is being overwritten, any edits you
+may have done to the previous Makefile (e.g., changing `CC` to point to `g++-7` on OSX) will be lost. You'll need
+to edit it again or find another workaround.
+
+Assuming the project builds without errors, you should now have an executable called `biorobots`. To keep your
+root directory tidy, we recommend creating a project-specific subdirectory and running the project from there since
+several output files will be generated. For example (actual command syntax may vary slightly on Windows):
+```
+$ mkdir run-biorobots1
+$ cd run-biorobots1
+$ ../biorobots
+```
+will generate several output files of types `.svg`, `.xml`, and `.mat`. More about those below.
+
+For the remaining three example projects provided with PhysiCell, you would follow similar steps:
+```
+$ cd ..   # make sure you're in the root directory of PhysiCell
+$ make cancer-biorobots-sample
+$ make project
+$ mkdir run-cancer-biorobots1
+$ cd run-cancer-biorobots1
+$ ../cancer_biorobots
+```
+and
+```
+$ cd ..   # make sure you're in the root directory of PhysiCell
+$ make heterogeneity-sample
+$ make project
+$ mkdir run-heterogeneity1
+$ cd run-heterogeneity1
+$ ../heterogeneity
+```
+and
+```
+$ cd ..   # make sure you're in the root directory of PhysiCell
+$ make cancer-immune-sample
+$ make project
+$ mkdir run-cancer-immune1
+$ cd run-cancer-immune1
+$ ../cancer_immune_3D
+```
+
+<hr> <!---------------------------------------------->
+
+## Visualizing Output
+
+PhysiCell does not currently provide a GUI for visualizing output results. Our approach, at least for now,
+is to suggest and offer guidance on using other tools, e.g. your browser, [ImageMagick](https://www.imagemagick.org), 
+[MATLAB](https://www.mathworks.com/products/matlab.html), [Octave](https://octave.sourceforge.io/), 
+[ParaView](https://www.paraview.org/) (more generally, [VTK](https://www.vtk.org/)), and more.
+
+At a bare minimum, you should be able to use your browser to `File -> Open` any .svg (scalable vector graphics) file 
+that your simulation generates. PhysiCell simulates transmitted light microscopy to create virtual H&E 
+(hematoxylin and eosin) images for the .svg files. Even for 3D models, 2D cell images (.svg files) are generated, by 
+default, as slices through the Z=0 plane.
+
+![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+
+<hr> <!---------------------------------------------->
+
+## Community Support
+
+**we need an email list**
+
 <hr> <!---------------------------------------------->
 
 ## References
-[http://www.mathcancer.org/blog/physicell-tutorials/]
+
+* http://physicell.mathcancer.org/
+* http://www.mathcancer.org/blog/setting-up-a-64-bit-gcc-environment-on-windows
+* http://www.mathcancer.org/blog/setting-up-gcc-openmp-on-osx-homebrew-edition/
+* http://www.mathcancer.org/blog/physicell-tutorials/
+* https://github.com/MathCancer/PhysiCell/blob/master/documentation/User_Guide.pdf
