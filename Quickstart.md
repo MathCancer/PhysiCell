@@ -155,9 +155,10 @@ If you have access to MATLAB (or Octave), we already have a detailed tutorial on
 MultiCellDS digital snapshots (.xml and .mat files) at http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/.
 
 If you are able to install ImageMagick (with SVG support) on your computer, you will have access to several image processing command line
-tools that will let you filter and arrange images. For example, the following command:
+tools that will let you filter and arrange images. For example, the following commands:
 ```
-$ montage -tile 4x1 snapshot00000100.svg snapshot00000200.svg snapshot00000300.svg snapshot00000400.svg out.png
+$ montage -geometry +0+0 -tile 4x1 snapshot00000100.svg snapshot00000200.svg snapshot00000300.svg snapshot00000400.svg tmp.png
+$ convert -resize 15% tmp.png out.png
 ```
 will generate a tiled horizontal sequence of images:
 
