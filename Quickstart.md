@@ -39,7 +39,7 @@ and/or also http://www.mathcancer.org/blog/physicell-tutorials/.
 PhysiCell is written in C++ and should build on any of the three major operating systems. 
 The one <b>requirement is that your compiler support OpenMP</b>. If, during your build (make) process, you get
 a message like: `error: unsupported option '-fopenmp'`, you'll know your Makefile is trying to use a compiler
-that doesn't support OpenMP. You may need to edit the Makefile to reference the desired C++ compiler.
+that doesn't support OpenMP. You may need to install an OpenMP-supported compiler and/or edit the Makefile to use it.
 
 ### Windows
 
