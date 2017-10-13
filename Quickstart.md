@@ -144,6 +144,8 @@ is to suggest and offer guidance on using other tools, e.g. your browser, [Image
 [MATLAB](https://www.mathworks.com/products/matlab.html), [Octave](https://octave.sourceforge.io/), 
 [ParaView](https://www.paraview.org/) (more generally, [VTK](https://www.vtk.org/)), and more.
 
+### Browser
+
 At a bare minimum, you should be able to use your browser to `File -> Open` any .svg (scalable vector graphics) file 
 that your simulation generates. PhysiCell simulates transmitted light microscopy to create virtual H&E 
 (hematoxylin and eosin) images for the .svg files. Even for 3D models, 2D cell images (.svg files) are generated, by 
@@ -151,8 +153,12 @@ default, using a slice through the Z=0 plane, as depicted in the following image
 
 ![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/cancer_immune_snapshot00000574_small.png "SVG slice from 3D cancer-immune-sample project")
 
+### MATLAB/Octave
+
 If you have access to MATLAB (or Octave), we already have a detailed tutorial on how to visualize the
 MultiCellDS digital snapshots (.xml and .mat files) at http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/.
+
+### ImageMagick
 
 If you are able to install ImageMagick (with SVG support) on your computer, you will have access to several image processing command line
 tools that will let you filter and arrange images. For example, the following commands:
@@ -163,6 +169,18 @@ $ convert -resize 15% tmp.png out.png
 will generate a tiled horizontal sequence of images:
 
 ![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/cancer_immune_seq4x1_small.png "ImageMagick can tile images")
+
+ImageMagick will also let you generate an animated gif of your results, e.g.:
+```
+$ convert snapshot000034*.svg foo.gif
+$ magick animate foo.gif    # may be huge, if original SVGs were; downsize in following steps
+$ convert foo.gif -coalesce tmp.gif
+$ identify snapshot00003471.svg    # get size of a single image (e.g. 1500x1605)
+$ convert -size 1500x1605 tmp.gif -resize 20% small.gif
+$ magick animate small.gif
+```
+
+### ParaView
 
 If you install ParaView, you can visualize and interact with output from 3D models. We will be providing a detailed
 tutorial for this.
