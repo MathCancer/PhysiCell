@@ -86,7 +86,7 @@ building PhysiCell. If not, contact us!
 In the current release of PhysiCell, we provide four sample projects to help you get started using PhysiCell. Three
 of the projects are 2D models (<i>biorobots, anti-cancer biorobots, and cancer heterogeneity</i>); the fourth project
 is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of these projects follows the same
-pattern, for example, from your Terminal, in the root PhysiCell directory/folder:
+pattern. For example, from your Terminal, in the root PhysiCell directory/folder:
 ```
 $ make biorobots-sample
 $ make project
