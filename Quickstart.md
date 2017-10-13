@@ -18,9 +18,9 @@ We currently provide 3 options for downloading PhysiCell:
 <!-- https://sourceforge.net/projects/physicell/files/PhysiCell/PhysiCell%201.2.1 -->
 
 2) We have recently begun migrating our code to GitHub. So, you can `git clone` or download a .zip from 
-https://github.com/MathCancer/PhysiCell. Keep in mind, this will be our master branch of PhysiCell and therefore
+https://github.com/MathCancer/PhysiCell. This will be our master branch of PhysiCell and therefore
 should always be deployable, but keep in mind it is not a release version. (We're still deciding on whether to
-continue using sourceforge or to use GitHub for our releases).
+continue using sourceforge or use GitHub for our releases).
 
 3) If you'd rather not build the code yourself, we provide a virtual appliance (.ova) file (~400MB)
 at the [1.2.1 release on sourceforge](https://sourceforge.net/projects/physicell/files/PhysiCell/PhysiCell%201.2.1/). 
