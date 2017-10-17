@@ -90,10 +90,10 @@ $ make biorobots-sample
 $ make project
 ```
 
-Note: the first `make` command silently copies over project-specific files, including the Makefile. The 
+<!-- Note: the first `make` command silently copies over project-specific files, including the Makefile. The 
 second `make` command attempts to compile the (new) code. Since the Makefile is being overwritten, any edits you
 may have done to the previous Makefile (e.g., changing `CC` to point to `g++-7` on OSX) will be lost. You'll need
-to edit it again or find another workaround.
+to edit it again or find another workaround. -->
 
 Assuming the project builds without errors, you should now have an executable called `biorobots`. To keep your
 root directory tidy, we recommend creating a project-specific subdirectory and running the project from there since
