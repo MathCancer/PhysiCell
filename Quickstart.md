@@ -45,9 +45,9 @@ The currently preferred way to use PhysiCell on Windows is to install [MinGW-w64
 a version of GCC that supports OpenMP. For more detailed information, 
 [see our blog post](http://www.mathcancer.org/blog/setting-up-a-64-bit-gcc-environment-on-windows).
 
-(Sometime in the near future, we plan to provide an option to use native Windows (not MinGW) and a recent 
+(Sometime in the near future, we plan to provide an option to use native Windows and a recent 
 [Microsoft Visual C++](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) compiler,
-using [CMake](https://cmake.org/download/) to build PhysiCell).
+using [CMake](https://cmake.org/download/) to build PhysiCell. If you want to be a beta-tester, contact us).
 
 ### OSX
 
