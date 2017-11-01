@@ -57,7 +57,7 @@ installation instructions](https://docs.brew.sh/Installation.html) (Note: this w
 [XCode](https://developer.apple.com/xcode/) installed. See the link related to homebrew in the References below
 for more details).
 
-After installing brew, you should be able to open a Terminal and type `brew install gcc` from the command line. This 
+After installing brew, type `brew install gcc` from a Terminal command line. This 
 should install a recent version of gcc/g++ (supporting OpenMP) into `/usr/local/bin`. You can verify this with:
 ```
 $ ls -l /usr/local/bin/g++*
