@@ -183,7 +183,7 @@ $ magick animate small.gif
 If you install ParaView, you can visualize and interact with output from 3D models. We will be providing a detailed
 tutorial for this.
 
-![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/ParaView_clipping_histo.png "ParaView after clip and barchart")
+![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/PhysiCell_ParaView_quickstart.png "ParaView w clipping planes and barchart")
 
 <hr> <!---------------------------------------------->
 
