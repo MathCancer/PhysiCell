@@ -43,16 +43,13 @@ that doesn't support OpenMP. You may need to install an OpenMP-supported compile
 
 ### Windows
 
-There are (at least) two options for building PhysiCell on Windows:
-
-1) Install [MinGW-w64](https://sourceforge.net/projects/mingw-w64/) which will let you use 
+The currently preferred way to use PhysiCell on Windows is to install [MinGW-w64](https://sourceforge.net/projects/mingw-w64/) which will let you use 
 a version of GCC that supports OpenMP. For more detailed information, 
-[see our blog](http://www.mathcancer.org/blog/setting-up-a-64-bit-gcc-environment-on-windows).
+[see our blog post](http://www.mathcancer.org/blog/setting-up-a-64-bit-gcc-environment-on-windows).
 
-2) Use native Windows (not MinGW) and a recent 
-[Microsoft Visual C++](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) compiler.
-Unless you're a proficient Windows developer, we recommend [installing CMake](https://cmake.org/download/) to 
-build PhysiCell using this option.
+(Sometime in the near future, we plan to provide an option to use native Windows (not MinGW) and a recent 
+[Microsoft Visual C++](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) compiler,
+using [CMake](https://cmake.org/download/) to build PhysiCell).
 
 ### OSX
 
@@ -69,10 +66,11 @@ $ ls -l /usr/local/bin/g++*
 lrwxr-xr-x  1 heiland  admin  29 Oct  3 14:38 /usr/local/bin/g++-7@ -> ../Cellar/gcc/7.2.0/bin/g++-7
 ```
 
-It will be <b>this version of gcc</b> you'll need to reference in the Makefile, e.g.:
+Set the following environment variable in your Terminal's shell, e.g., in the bash shell: 
 ```
-CC := /usr/local/bin/g++-7
+export PHYSICELL_CPP=/usr/local/bin/g++-7
 ```
+and the Makefile will use it. You probably want to permanently define this env var in your `~/.profile` and/or `~/.bashrc` file also.
 
 ### Linux
 
@@ -83,7 +81,7 @@ building PhysiCell. If not, contact us!
 
 ## Build: sample projects
 
-In the current release of PhysiCell, we provide four sample projects to help you get started using PhysiCell. Three
+In the current release of PhysiCell, we provide four sample projects to help you get started. Three
 of the projects are 2D models (<i>biorobots, anti-cancer biorobots, and cancer heterogeneity</i>); the fourth project
 is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of these projects follows the same
 pattern. For example, from your Terminal, in the root PhysiCell directory/folder:
@@ -92,10 +90,10 @@ $ make biorobots-sample
 $ make project
 ```
 
-Note: the first `make` command silently copies over project-specific files, including the Makefile. The 
+<!-- Note: the first `make` command silently copies over project-specific files, including the Makefile. The 
 second `make` command attempts to compile the (new) code. Since the Makefile is being overwritten, any edits you
 may have done to the previous Makefile (e.g., changing `CC` to point to `g++-7` on OSX) will be lost. You'll need
-to edit it again or find another workaround.
+to edit it again or find another workaround. -->
 
 Assuming the project builds without errors, you should now have an executable called `biorobots`. To keep your
 root directory tidy, we recommend creating a project-specific subdirectory and running the project from there since
