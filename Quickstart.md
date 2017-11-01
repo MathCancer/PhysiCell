@@ -1,8 +1,6 @@
 # Quickstart Guide to PhysiCell 
 
 October 2017
- 
-** re-do README.txt and copy old README to Release_history?
 
 <b>WARNING:</b> If you're a savvy software developer and are accustomed to just typing `make` whenever you 
 see a `Makefile`, DON'T. For the current version of PhysiCell, we are trying to make it easy for
