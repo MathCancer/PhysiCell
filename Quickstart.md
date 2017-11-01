@@ -140,7 +140,7 @@ $ ../cancer_immune_3D
 PhysiCell does not currently provide a GUI for visualizing output results. Our approach, at least for now,
 is to suggest and offer guidance on using other tools, e.g. your browser, [ImageMagick](https://www.imagemagick.org), 
 [MATLAB](https://www.mathworks.com/products/matlab.html), [Octave](https://octave.sourceforge.io/), 
-[ParaView](https://www.paraview.org/) (more generally, [VTK](https://www.vtk.org/)), and more.
+[ParaView](https://www.paraview.org/), and more.
 
 ### Browser
 
