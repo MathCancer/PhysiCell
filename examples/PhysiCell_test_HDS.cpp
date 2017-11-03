@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based simulator for multicellular systemssimulator, 	#
-#	 J. Comput. Biol., 2016 (submitted). 									# 
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based multicellular simulator, J. Comput. Biol., 2016   # 
-#   (submitted).                                                            #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -67,10 +67,10 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
-#include <time.h>
 
-#include "PhysiCell.h"
-#include "BioFVM.h" 
+
+#include "../core/PhysiCell.h"
+#include "../BioFVM/BioFVM.h" 
 
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -79,9 +79,8 @@ using namespace PhysiCell;
 int omp_num_threads = 8; // set number of threads for parallel computing
 // set this to # of CPU cores x 2 (for hyperthreading)
 
-double o2_conc=7.1930;   //check this value to make sure it has support from literature
+double o2_conc=38.0;   //check this value to make sure it has support from literature
 
-double duct_radius= 158.75;
 double min_voxel_size=30;
 
 std::vector<std::vector<double>> create_sphere(double cell_radius, double sphere_radius)
@@ -112,41 +111,6 @@ std::vector<std::vector<double>> create_sphere(double cell_radius, double sphere
 	
 }
 
-
-double distance_to_membrane_duct(Cell* pCell)
-{
-	//Note that this function assumes that duct cap center is located at <0, 0, 0>
-	if(pCell->position[0]>=0)
-	{
-		double temp= sqrt(pCell->position[1]* pCell->position[1] + pCell->position[2]*pCell->position[2]);
-		if(temp==0)
-		{
-			pCell->displacement[0]=0; pCell->displacement[1]=0; pCell->displacement[1]=0;
-		}
-		else
-		{
-			pCell->displacement[0]=0; 
-			pCell->displacement[1]= -pCell->position[1]/ temp; 
-			pCell->displacement[2]= -pCell->position[2]/ temp; 
-		}
-		return fabs(duct_radius- temp);
-	}
-	
-	double temp= dist(pCell->position, {0.0,0.0,0.0});
-		
-	if(temp==0)
-	{
-		pCell->displacement[0]=0;pCell->displacement[1]=0;pCell->displacement[1]=0;
-	}
-	else
-	{
-		pCell->displacement[0]= -pCell->position[0]/ temp; 
-		pCell->displacement[1]= -pCell->position[1]/ temp; 
-		pCell->displacement[2]= -pCell->position[2]/ temp; 
-	}
-	return fabs(duct_radius- temp);
-}
-
 int main( int argc, char* argv[] )
 {
 	bool DEBUG=false;
@@ -155,7 +119,7 @@ int main( int argc, char* argv[] )
 	double mechanics_dt= 0.1;
 	double cell_cycle_dt= 6;
 	
-	double t_output_interval = 60.0; // 1.0; 
+	double t_output_interval = 600.0; // 1.0; 
 	double t_max = 365*24*60;
 	double t_next_output_time = 0; 
 	int next_output_index = 0; 
@@ -172,9 +136,9 @@ int main( int argc, char* argv[] )
 	
 	// figure out the bounding box 
 	std::vector<double> bounding_box( 6, 0.0 );
-	bounding_box[PhysiCell_constants::mesh_min_x_index] = -200; bounding_box[PhysiCell_constants::mesh_max_x_index] = 1000; 
-	bounding_box[PhysiCell_constants::mesh_min_y_index] = -200; bounding_box[PhysiCell_constants::mesh_max_y_index] = 200; 
-	bounding_box[PhysiCell_constants::mesh_min_z_index] = -200; bounding_box[PhysiCell_constants::mesh_max_z_index] = 200; 
+	bounding_box[PhysiCell_constants::mesh_min_x_index] = -1000; bounding_box[PhysiCell_constants::mesh_max_x_index] = 1000; 
+	bounding_box[PhysiCell_constants::mesh_min_y_index] = -1000; bounding_box[PhysiCell_constants::mesh_max_y_index] = 1000; 
+	bounding_box[PhysiCell_constants::mesh_min_z_index] = -1000; bounding_box[PhysiCell_constants::mesh_max_z_index] = 1000; 
 	dx=20; dy=20; dz=20;
 	
 	int number_of_voxels = ((bounding_box[PhysiCell_constants::mesh_max_x_index]-bounding_box[PhysiCell_constants::mesh_min_x_index])/dx) * ((bounding_box[PhysiCell_constants::mesh_max_y_index]-bounding_box[PhysiCell_constants::mesh_min_y_index])/dy) * ((bounding_box[PhysiCell_constants::mesh_max_z_index]-bounding_box[PhysiCell_constants::mesh_min_z_index])/dz);
@@ -225,7 +189,7 @@ int main( int argc, char* argv[] )
 	cancer.display_information( std::cout );
 		
 	double cell_radius=10;
-	double sphere_radius = duct_radius - 10;;
+	double sphere_radius = 150;
 	// std::cout << __FILE__ << " custom " << __LINE__ << std::endl; 
 	std::vector<std::vector<double>> cell_positions;
 	cell_positions= create_sphere(cell_radius, sphere_radius);
@@ -233,65 +197,44 @@ int main( int argc, char* argv[] )
 	//add Dirichlet node for all the voxels located outside of the duct
 	std::vector<double> dirichlet_o2( 1 , o2_conc );
 	
+	double min_x=microenvironment.mesh.bounding_box[0];
+	double max_x=microenvironment.mesh.bounding_box[3];
+	double min_y=microenvironment.mesh.bounding_box[1];
+	double max_y=microenvironment.mesh.bounding_box[4];
+	double min_z=microenvironment.mesh.bounding_box[2];
+	double max_z=microenvironment.mesh.bounding_box[5];
+	double strip_width=40;	
+
 	for( int i=0; i < microenvironment.number_of_voxels() ; i++ )
 	{
-		if(microenvironment.voxels(i).center[0]>=0)
-		{
-			if(sqrt(microenvironment.voxels(i).center[1]* microenvironment.voxels(i).center[1] + microenvironment.voxels(i).center[2]*microenvironment.voxels(i).center[2])>duct_radius)
-				microenvironment.add_dirichlet_node( i , dirichlet_o2 );
-		}
-		else
-		{
-			if(dist(microenvironment.voxels(i).center, {0.0,0.0,0.0})>duct_radius)
-				microenvironment.add_dirichlet_node( i , dirichlet_o2 );
-		}
+		if( abs(max_x-microenvironment.voxels(i).center[0]) < strip_width || abs(microenvironment.voxels(i).center[0]- min_x)< strip_width  
+			|| abs(max_y-microenvironment.voxels(i).center[1]) < strip_width || abs(microenvironment.voxels(i).center[1]- min_y)< strip_width  
+				|| abs(max_z-microenvironment.voxels(i).center[2]) < strip_width || abs(microenvironment.voxels(i).center[2]- min_z)< strip_width )
+				{
+					microenvironment.add_dirichlet_node( i , dirichlet_o2 );
+				}		
 	}
+
 	
 	Cell* pCell;
-	if(DEBUG)
+
+	for(int i=0;i<cell_positions.size();i++)
+	// for(int i=0;i<2;i++)
 	{
-		std::vector<std::vector<double>> cells_data;
-		cells_data= read_matlab( "cells_debug8.mat" );
-		
-		for(int i=0;i<cells_data.size();i++)
-		{	
-			if(!microenvironment.mesh.is_position_valid(cells_data[i][2], cells_data[i][3], cells_data[i][4]))
-				continue;
-			pCell = create_cell();
-			pCell->register_microenvironment(&microenvironment);
-			pCell->assign_position(cells_data[i][2], cells_data[i][3], cells_data[i][4]);
-			// pCell->assign_position({0,65,0});
-			pCell->advance_cell_current_phase= ki67_advanced_cycle_model;
-			pCell->set_phenotype(cancer.phenotypes[0]);
-			pCell->phenotype.set_current_phase(cells_data[i][12]);
-			pCell->set_total_volume((4.0/3.0)*PhysiCell_constants::pi* pow(cells_data[i][5], 3));
-			pCell->type=PhysiCell_constants::TUMOR_TYPE;		
-			pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time= cells_data[i][13];
-			pCell->distance_to_membrane= distance_to_membrane_duct;
-		}
+		pCell = create_cell();
+		pCell->register_microenvironment(&microenvironment);
+		pCell->assign_position(cell_positions[i]);
+		// pCell->assign_position({0,65,0});
+		pCell->advance_cell_current_phase= ki67_advanced_cycle_model_legacy;
+		pCell->set_phenotype(cancer.phenotypes[0]);
+		pCell->phenotype.set_current_phase(PhysiCell_constants::Ki67_negative);	
+		pCell->type=PhysiCell_constants::TUMOR_TYPE;
+		pCell->parameters.necrosis_type= PhysiCell_constants::deterministic_necrosis;
 	}
-	else
-	{
-		for(int i=0;i<cell_positions.size();i++)
-		// for(int i=0;i<2;i++)
-		{
-			if(cell_positions[i][0]>0)
-				continue;
-			pCell = create_cell();
-			pCell->register_microenvironment(&microenvironment);
-			pCell->assign_position(cell_positions[i]);
-			// pCell->assign_position({0,65,0});
-			pCell->advance_cell_current_phase= ki67_advanced_cycle_model;
-			pCell->set_phenotype(cancer.phenotypes[0]);
-			pCell->phenotype.set_current_phase(PhysiCell_constants::Ki67_negative);	
-			pCell->type=PhysiCell_constants::TUMOR_TYPE;		
-			pCell->distance_to_membrane= distance_to_membrane_duct;
-	}
-	}
+
 	for(int i=0;i<all_basic_agents.size();i++){
 		all_basic_agents[i]->set_internal_uptake_constants(dt); 
 	}
-	
 	
 	std::cout << (*all_cells).size() <<" agents created successfully." <<std::endl;
 	
@@ -303,20 +246,8 @@ int main( int argc, char* argv[] )
 	int output_index =0; 
 	BioFVM::RUNTIME_TIC();
 	BioFVM::TIC();
-	std::cout << "CLOCKS_PER_SEC = " << CLOCKS_PER_SEC << "\n";
 	
-/*	clock_t begin = clock();
-	double sum=0;
-  for(int i=0;i<1000000000;i++)
-  {
-	  sum+= sqrt((double)i);
-  }
-	std::cout<<"sum: "<<sum<<std::endl;
-  clock_t end = clock();
-  double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
- */
-  
-	std::ofstream report_file ("report.txt");
+	std::ofstream report_file ("report_spheroid.txt");
 	report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	try 
 	{		
@@ -327,7 +258,6 @@ int main( int argc, char* argv[] )
 				log_output(t, output_index, microenvironment, report_file);
 				t_next_output_time += t_output_interval;						
 			}
-			// std::cout<<__LINE__<<std::endl;			
 			microenvironment.simulate_cell_sources_and_sinks( dt );
 			microenvironment.simulate_diffusion_decay( dt );
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells(t, cell_cycle_dt, mechanics_dt);		

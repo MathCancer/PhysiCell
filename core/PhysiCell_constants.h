@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based simulator for multicellular systemssimulator, 	#
-#	 J. Comput. Biol., 2016 (submitted). 									# 
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based multicellular simulator, J. Comput. Biol., 2016   # 
-#   (submitted).                                                            #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -69,10 +69,13 @@ namespace PhysiCell{
 		public:
 			static constexpr double pi=3.1415926535897932384626433832795;
 			
-			static constexpr double cell_removal_threshold_volume = 1; // 50 cubic microns -- about 1% of typical cell 
+			static constexpr double cell_removal_threshold_volume = 20; // 20 cubic microns -- about 1% of typical cell 
 			static const int keep_pushed_out_cells_in_outer_voxel=1;
-			static const int solid_boundary=2;
-			static const int default_boundary_condition_for_pushed_out_agents=keep_pushed_out_cells_in_outer_voxel;		
+			static const int solid_boundary = 2;
+			static const int default_boundary_condition_for_pushed_out_agents = keep_pushed_out_cells_in_outer_voxel;		
+			
+			static const int deterministic_necrosis = 0;
+			static const int stochastic_necrosis = 1;
 			
 			static const int oxygen_index = 0; 
 			static const int glucose_index = 1; 

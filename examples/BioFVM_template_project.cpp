@@ -1,25 +1,11 @@
 /*
 #############################################################################
-# If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
-# sion number, such as below:                                               #
+# If you use BioFVM in your project, please cite BioFVM and the version     #
+# number, such as below:                                                    #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1].  #
+# We solved the diffusion equations using BioFVM (Version 1.1.2) [1]        #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based simulator for multicellular systemssimulator, 	#
-#	 J. Comput. Biol., 2016 (submitted). 									# 
-#                                                                           #
-# Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
-#     BioFVM as below:                                                      #
-#                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1],  #
-# with BioFVM [2] to solve the transport equations.                         #
-#                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based multicellular simulator, J. Comput. Biol., 2016   # 
-#   (submitted).                                                            #
-#                                                                           #
-# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
+# [1] A. Ghaffarizaeh, S.H. Friedman, and P. Macklin, BioFVM: an efficient  #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
 #    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730 #
 #                                                                           #
@@ -27,7 +13,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2016, Paul Macklin and the BioFVM Project              #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -60,74 +46,142 @@
 #############################################################################
 */
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <cmath>
-
-#include "./BioFVM/BioFVM.h"
-#include "./core/PhysiCell.h" 
-
-#include "./modules/PhysiCell_SVG.h"
-#include "./modules/PhysiCell_pathology.h"
+#include "BioFVM.h"
 
 #include <omp.h>
 
 using namespace BioFVM; 
-using namespace PhysiCell; 
+
+void supply_function( Microenvironment* microenvironment, int voxel_index, std::vector<double>* write_here )
+{
+	// use this syntax to access the jth substrate write_here
+	// (*write_here)[j]
+	// use this syntax to access the jth substrate in voxel voxel_index of microenvironment: 
+	// microenvironment->density_vector(voxel_index)[j]
+
+	return; 
+}
+
+void supply_target_function( Microenvironment* microenvironment, int voxel_index, std::vector<double>* write_here )
+{
+	// use this syntax to access the jth substrate write_here
+	// (*write_here)[j]
+	// use this syntax to access the jth substrate in voxel voxel_index of microenvironment: 
+	// microenvironment->density_vector(voxel_index)[j]
+
+	return; 
+}
+
+void uptake_function( Microenvironment* microenvironment, int voxel_index, std::vector<double>* write_here )
+{
+	// use this syntax to access the jth substrate write_here
+	// (*write_here)[j]
+	// use this syntax to access the jth substrate in voxel voxel_index of microenvironment: 
+	// microenvironment->density_vector(voxel_index)[j]
+
+	return; 
+}
 
 int main( int argc, char* argv[] )
 {
 	RUNTIME_TIC();
 	omp_set_num_threads( 8 );
 	
-	seed_random();
-	
 	std::cout << "Starting program ... " << std::endl;
+	
+	// create a microenvironment, and set units 
+		
+	Microenvironment M; 
+	M.name = "microenvironment"; 
+	M.time_units = "min"; 
+	M.spatial_units = "micron"; 
+	M.mesh.units = M.spatial_units;
+	
+	// set up and add all the densities you plan 
 
-	// now, biofvm setup
+	M.set_density( 0 , "oxygen" , "mmHg" ); 
 	
-	set_program_metadata(); 
-	set_save_biofvm_cell_data( true ); 	
-	set_save_biofvm_cell_data_as_custom_matlab( true );	
+	// here's how you add a new substrate 
+	M.add_density( "crayons" , "Megacrayola" ); 
 	
-	// display summary information 	
-	M.display_information( std::cout ); 	
 	
-  // PhysiCell SVG options 
-	PhysiCell_SVG_options.length_bar = 1000; 
-	PhysiCell_SVG_options.font_color = "black";
-	PhysiCell_SVG_options.font = "Arial";
-	PhysiCell_SVG_options.plot_nuclei = false; 
+	// set the properties of the diffusing substrates 
 	
+	M.diffusion_coefficients[0] = 1e5;   
+	M.decay_rates[0] = 10; // 100 micron length scale 
+	M.diffusion_coefficients[1] = 1e4;   
+	M.decay_rates[1] = 1.0/9.0; // 300 micron length scale 
+	
+	// set the mesh size 
+	
+	double dx = 20; // 
+	M.resize_space( 0 , 1000.0 , 0, 1000.0 , 0.0 , 1000.0 , dx, dx, dx );  
+	
+	// display summary information 
+	
+	M.display_information( std::cout ); 
+	
+	// set up metadata 
+
+	BioFVM_metadata.program.user.surname = "Kirk";
+	BioFVM_metadata.program.user.given_names = "James T.";
+	BioFVM_metadata.program.user.email = "Jimmy.Kirk@starfleet.mil";
+	BioFVM_metadata.program.user.organization = "Starfleet";
+	BioFVM_metadata.program.user.department = "U.S.S. Enterprise (NCC 1701)";
+
+	BioFVM_metadata.program.creator.surname = "Roykirk";
+	BioFVM_metadata.program.creator.given_names = "Jackson";
+	BioFVM_metadata.program.creator.organization = "Yoyodyne Corporation";
+	
+	BioFVM_metadata.program.program_name = "Nomad";
+	BioFVM_metadata.program.program_version = "MK-15c";
+	BioFVM_metadata.program.program_URL = "";
+
+	// set initial conditions 
+	
+	// use this syntax to create a zero vector of length 3
+	// std::vector<double> zero(3,0.0); 
+	
+	// use this syntax for a parallelized loop over all the 
+	// voxels in your mesh: 	
+	#pragma omp parallel for 
+	for( int i=0 ; i < M.number_of_voxels() ; i++ )
+	{
+		// use this syntax to access the coordinates (as a vector) of 
+		// the ith voxel; 
+		// M.mesh.voxels[i].center 
+		
+		// use this access the jth substrate at the ith voxel
+		// M.density_vector(i)[j]
+		
+	}
+
 	// save the initial profile 
 	
 	// M.write_to_matlab( "initial.mat" ); // barebones 
-	SVG_plot( "initial.svg", M , 0.0, 0 , liver_coloring_function ) ; // hematoxylin_and_eosin_cell_coloring ); // simple_cell_coloring );
 	save_BioFVM_to_MultiCellDS_xml_pugi( "initial" , M , 0.0 ); // MultiCellDS digital snapshot
+
+	// set up the diffusion solver, sources and sinks 
+	
+	M.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D;
+	
+	M.bulk_supply_rate_function = supply_function;
+	M.bulk_supply_target_densities_function = supply_target_function;
+	M.bulk_uptake_rate_function = uptake_function;
 	
 	double t     = 0.0; 
-	double t_max = 480; // 1 * 24 * 60;
-	double dt    = 0.01; 
+	double t_max = 100.0;
+	double dt    = 0.1; 
 	
-	double output_interval  = 60;  // how often you save data 
+	double output_interval  = 10.0;  // how often you save data 
 	double next_output_time = t;     // next time you save data 
 	
-	double cell_cycle_dt = 6; 
-	double mechanics_dt = 0.1; 
-
-	TIC();
 	while( t < t_max )
 	{
-		// std::cout << t << std::endl; 
-		
 		// if it's time, save the simulation 
 		if( fabs( t - next_output_time ) < dt/2.0 )
 		{
 			std::cout << "simulation time: " << t << " " << M.time_units << " (" << t_max << " " << M.time_units << " max)" << std::endl; 
-			TOC();
-			display_stopwatch_value( std::cout , stopwatch_value() ); 
-			std::cout << std::endl; 
 			
 			char* filename; 
 			filename = new char [1024];
@@ -137,32 +191,23 @@ int main( int argc, char* argv[] )
 
 			sprintf( filename, "output_%6f" , next_output_time ); 
 			save_BioFVM_to_MultiCellDS_xml_pugi( filename , M , 0.0 ); // MultiCellDS digital snapshot
-			// sprintf( filename , "%s.svg" , filename );
-			SVG_plot( filename , M , 0.0, next_output_time , liver_coloring_function ) ;
-			char szCommand [1024]; 
-			sprintf( szCommand , "cp %s final.svg" , filename );
-			system( szCommand );
 			
 			delete [] filename; 
 			next_output_time += output_interval; 
-			
-			TIC();
 		}
-//		M.simulate_bulk_sources_and_sinks( dt );
+		
+		M.simulate_bulk_sources_and_sinks( dt );
 		M.simulate_diffusion_decay( dt );
 		M.simulate_cell_sources_and_sinks( dt ); 
-		((Cell_Container *)M.agent_container)->update_all_cells(t, cell_cycle_dt, mechanics_dt);	// crashes ??
 		
 		t += dt;
 	}
 	
 	// M.write_to_matlab( "final.mat"); // barebones 
-	SVG_plot( "final.svg", M , 0.0, t_max , liver_coloring_function ) ; // hematoxylin_and_eosin_cell_coloring ); // simple_cell_coloring );
-	save_BioFVM_to_MultiCellDS_xml_pugi( "final" , M , t_max ); // MultiCellDS digital snapshot
+	save_BioFVM_to_MultiCellDS_xml_pugi( "final" , M , 0.0 ); // MultiCellDS digital snapshot
 
 	RUNTIME_TOC();
 	std::cout << std::endl << "Program wall time: "; 
-	std::cout << runtime_stopwatch_value() << std::endl; 
 	display_stopwatch_value( std::cout , runtime_stopwatch_value() ); 
 	std::cout << std::endl << "Done!" << std::endl; 
 	

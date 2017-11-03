@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based simulator for multicellular systemssimulator, 	#
-#	 J. Comput. Biol., 2016 (submitted). 									# 
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based multicellular simulator, J. Comput. Biol., 2016   # 
-#   (submitted).                                                            #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -66,8 +66,9 @@
 #include "../custom_modules/PhysiCell_custom.h" 
 
 #include "../BioFVM/BioFVM.h"
-#include "./PhysiCell_digital_cell_line.h"
-#include "./PhysiCell_cell_container.h"
+#include "PhysiCell_digital_cell_line.h"
+#include "PhysiCell_cell_container.h"
+#include "PhysiCell_constants.h"
 
 using namespace BioFVM; 
 
@@ -86,7 +87,8 @@ typedef struct
 	double o2_saturation = 38; // mmHg
 	
 	double max_necrosis_rate=1 / (24*60.0); // 1 day^-1
-
+	
+	int necrosis_type= PhysiCell_constants::deterministic_necrosis;
 	
 	double glucose_necrosis_threshold = 0.1;  // dimensionless 
 	double maximum_stretch; 
@@ -98,7 +100,6 @@ typedef struct
 	double Cccr= 10.0; //used in calculating cell-cell repulsion			
 	double Ccba= 1.70577155519015; //used in calculating cell-basement membrane repulsion	
 	double Ccbr= 10.0; //used in calculating cell-basement membrane repulsion	
-	
 	
 } Cell_Parameters; 
 
@@ -117,6 +118,7 @@ class Cell : public Basic_Agent
 		std::vector<double> motility;  
 		double polarity;            	  // A number between 1 and 0, showing how polarized the cell is
 		void add_potentials(Cell*);       // Add repulsive and adhesive forces.
+		void set_previous_velocity(double xV, double yV, double zV);
 		int get_current_mechanics_voxel_index();
 		void turn_off_reactions(double); 		  // Turn off all the reactions of the cell
 		
@@ -176,6 +178,7 @@ void add_basement_membrane_interactions_default( Cell* pCell, double dt );
 void update_cell_and_death_parameters_O2_based( Cell* pCell, double dt ); 
 void update_cell_and_death_parameters_O2_based_density_arrest( Cell* pCell, double dt ); 
 void update_cell_and_death_parameters_O2_based_volume_arrest( Cell* pCell, double dt ); 
+void set_3D_random_motility( Cell* pCell, double dt );
 // void distance_to_membrane_2D(Cell* pCell);
 bool is_neighbor_voxel(Cell* pCell, std::vector<double> myVoxelCenter, std::vector<double> otherVoxelCenter, int otherVoxelIndex);  //function to check if a neighbor voxel contains any cell that can interact with me
 };

@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based simulator for multicellular systemssimulator, 	#
-#	 J. Comput. Biol., 2016 (submitted). 									# 
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based multicellular simulator, J. Comput. Biol., 2016   # 
-#   (submitted).                                                            #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -60,12 +60,10 @@
 #############################################################################
 */
 
-
-
-#include "./PhysiCell_cell.h"
-#include "./PhysiCell_cell_container.h"
-#include "./PhysiCell_standard_models.h"
-#include "./PhysiCell_constants.h"
+#include "PhysiCell_cell.h"
+#include "PhysiCell_cell_container.h"
+#include "PhysiCell_standard_models.h"
+#include "PhysiCell_constants.h"
 #include <random>
 #include <unordered_map>
 
@@ -79,8 +77,10 @@ void do_nothing( Cell* pCell, double dt)
 bool check_necrosis( Cell* pCell, double dt)
 {
 	double probability_necrosis = dt*pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].necrosis_rate; 
-	if( uniform_random() < probability_necrosis )  //for an instant death necrosis model:
-	// if((pCell->nearest_density_vector())[PhysiCell_constants::oxygen_index]<5)
+	if( (pCell->parameters.necrosis_type== PhysiCell_constants::stochastic_necrosis && uniform_random() < probability_necrosis)
+		|| 
+		(pCell->parameters.necrosis_type== PhysiCell_constants::deterministic_necrosis && 
+		(pCell->nearest_density_vector())[PhysiCell_constants::oxygen_index]< pCell->parameters.o2_necrotic  ) ) 
 	{
 		pCell->phenotype.set_current_phase(PhysiCell_constants::necrotic_swelling); 
 		//pCell->phenotype.phase_model_initialized = false; 
@@ -91,7 +91,7 @@ bool check_necrosis( Cell* pCell, double dt)
 	return false;
 }
 
-bool check_apoptosis( Cell* pCell, double dt)
+bool check_apoptosis( Cell* pCell, double dt, bool stoc_A)
 {
 	double probability_apoptosis = dt*pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].death_rate; 
 	if( uniform_random() < probability_apoptosis )
@@ -99,14 +99,14 @@ bool check_apoptosis( Cell* pCell, double dt)
 		// set the current phase to apoptotic 
 		pCell->phenotype.set_current_phase(PhysiCell_constants::apoptotic); 
 		//pCell->phenotype.phase_model_initialized = false; 
-		pCell->advance_cell_current_phase = death_apoptosis_model; 
+		pCell->advance_cell_current_phase = stoc_A ? death_apoptosis_model_stochastic: death_apoptosis_model_deterministic; 
 		pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time = 0.0; 
 		return true; 
 	}	
 	return false;
 }
 
-void ki67_basic_cycle_model( Cell* pCell, double dt)
+void ki67_basic_cycle_model( Cell* pCell, double dt, bool stoc_K, bool stoc_Q, bool stoc_A)
 {
 	// necrotic death? 
 	bool is_necrotic = check_necrosis(pCell, dt);
@@ -114,7 +114,7 @@ void ki67_basic_cycle_model( Cell* pCell, double dt)
 		return;
 	
 	// apoptotic death? 
-	bool is_apoptotic = check_apoptosis(pCell, dt);
+	bool is_apoptotic = check_apoptosis(pCell, dt, stoc_A);
 	if (is_apoptotic)
 		return;
 	
@@ -130,8 +130,9 @@ void ki67_basic_cycle_model( Cell* pCell, double dt)
 			
 		}
 		
+		double probability_K_Q = dt /pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration;		
 		// advance to Q phase? 
-		if( pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time > pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration )
+		if( (!stoc_K && pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time >= pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration-0.001 ) ||  (stoc_K && uniform_random() < probability_K_Q ) )
 		{
 			// flag the cell for division 
 			pCell->get_container()->flag_cell_for_division( pCell ); 
@@ -154,8 +155,8 @@ void ki67_basic_cycle_model( Cell* pCell, double dt)
 		}
 		
 		// advance to K phase? 
-		double probability = (dt / pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration); 
-		if( uniform_random() < probability )
+		double probability_Q_K = (dt / pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration); 
+		if( (!stoc_Q && pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time >= pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration-0.001 ) ||  (stoc_Q && uniform_random() < probability_Q_K ) )
 		{
 			pCell->phenotype.set_current_phase(PhysiCell_constants::Ki67_positive_premitotic); 
 			pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time = 0.0;
@@ -167,7 +168,22 @@ void ki67_basic_cycle_model( Cell* pCell, double dt)
 	pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time += dt;  
 }
 
-void ki67_advanced_cycle_model( Cell* pCell, double dt)
+void ki67_basic_cycle_model_deterministic( Cell* pCell, double dt)
+{
+	ki67_basic_cycle_model( pCell, dt, false, false, false);
+}
+
+void ki67_basic_cycle_model_stochastic( Cell* pCell, double dt)
+{
+	ki67_basic_cycle_model( pCell, dt, true, true, true);
+}
+
+void ki67_basic_cycle_model_legacy( Cell* pCell, double dt)
+{
+	ki67_basic_cycle_model( pCell, dt, false, true, false);
+}
+
+void ki67_advanced_cycle_model( Cell* pCell, double dt, bool stoc_K1, bool stoc_K2, bool stoc_Q, bool stoc_A)
 {
 	// necrotic death? 
 	bool is_necrotic = check_necrosis(pCell, dt);
@@ -175,10 +191,9 @@ void ki67_advanced_cycle_model( Cell* pCell, double dt)
 		return;
 	
 	// apoptotic death? 
-	bool is_apoptotic = check_apoptosis(pCell, dt);
+	bool is_apoptotic = check_apoptosis(pCell, dt, stoc_A);
 	if (is_apoptotic)
 		return;
-
 	
 	// K1 phase
 	if( pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].code == PhysiCell_constants::Ki67_positive_premitotic )
@@ -192,8 +207,9 @@ void ki67_advanced_cycle_model( Cell* pCell, double dt)
 			
 		}
 		
+		double probability_K1_K2 = dt /pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration;		
 		// advance to K2 phase? 
-		if( pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time > pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration )
+		if( (!stoc_K1 && pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time >= pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration-0.001 ) ||  (stoc_K1 && uniform_random() < probability_K1_K2 ) )
 		{
 			// flag the cell for division 
 			pCell->get_container()->flag_cell_for_division( pCell ); 
@@ -215,8 +231,10 @@ void ki67_advanced_cycle_model( Cell* pCell, double dt)
 			pCell->phenotype.phase_model_initialized = true; 
 		}
 		
+		double probability_K2_Q = dt /pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration;
+			
 		// advance to Q phase? 
-		if( pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time > pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration )
+		if( (!stoc_K2 && pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time >= pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration -0.001 ) || (stoc_K2 && uniform_random() < probability_K2_Q))
 		{
 			pCell->phenotype.set_current_phase(PhysiCell_constants::Ki67_negative); 
 			pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time = 0.0;
@@ -236,8 +254,9 @@ void ki67_advanced_cycle_model( Cell* pCell, double dt)
 		}
 		
 		// advance to K1 phase? 
-		double probability = (dt / pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration); 
-		if( uniform_random() < probability )
+		double probability_Q_K1 = (dt / pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration); 
+		
+		if( (!stoc_Q && pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time >= pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration -0.001 ) || (stoc_Q && uniform_random() < probability_Q_K1))
 		{
 			pCell->phenotype.set_current_phase(PhysiCell_constants::Ki67_positive_premitotic); 
 			pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time = 0.0;
@@ -250,6 +269,21 @@ void ki67_advanced_cycle_model( Cell* pCell, double dt)
 	return; 
 }
 
+void ki67_advanced_cycle_model_deterministic( Cell* pCell, double dt)
+{
+	ki67_advanced_cycle_model(pCell, dt, false, false, false, false);
+}
+
+void ki67_advanced_cycle_model_legacy( Cell* pCell, double dt)
+{
+	ki67_advanced_cycle_model(pCell, dt, false, false, true, false);
+}
+
+void ki67_advanced_cycle_model_stochastic( Cell* pCell, double dt)
+{
+	ki67_advanced_cycle_model(pCell, dt, true, true, true, true);
+}
+
 void live_apoptotic_cycle_model( Cell* pCell , double dt )
 {
 	// necrotic death? 
@@ -258,7 +292,7 @@ void live_apoptotic_cycle_model( Cell* pCell , double dt )
 		return;
 	
 	// apoptotic death? 
-	bool is_apoptotic = check_apoptosis(pCell, dt);
+	bool is_apoptotic = check_apoptosis(pCell, dt, false);
 	if (is_apoptotic)
 		return;
 	
@@ -291,7 +325,7 @@ void total_cells_cycle_model( Cell* pCell, double dt )
 	pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time += dt; 
 }
 
-void death_apoptosis_model( Cell* pCell, double dt)
+void death_apoptosis_model( Cell* pCell, double dt, bool stochastic)
 {
 	if( pCell->phenotype.phase_model_initialized == false )
 	{
@@ -311,13 +345,26 @@ void death_apoptosis_model( Cell* pCell, double dt)
 	// std::cout<<pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time<<", "<<pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration<<std::endl;
 	// if too small, flag for deletion 	
 	//if( pCell->phenotype.volume.total < PhysiCell_constants::cell_removal_threshold_volume )
-	if( pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time > pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration )
+		
+	double probability_removal = dt/pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration ; 
+		
+	if((!stochastic && pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time >= pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration - 0.001 ) || (stochastic && uniform_random() < probability_removal))
 	{
 		pCell->get_container()->flag_cell_for_removal( pCell ); 
 		return; 
 	}
 	pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time += dt; 
 	return;
+}
+
+void death_apoptosis_model_stochastic( Cell* pCell, double dt)
+{
+	death_apoptosis_model(pCell, dt, true);
+}
+
+void death_apoptosis_model_deterministic( Cell* pCell, double dt)
+{
+	death_apoptosis_model(pCell, dt, false);
 }
 
 void death_necrosis_swelling_model( Cell* pCell, double dt )
@@ -357,4 +404,6 @@ void death_necrosis_lysed_model( Cell* pCell, double dt )
 		pCell->phenotype.volume.target_fluid_fraction=0; 
 	}
 	pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time += dt; 
+	if( pCell->phenotype.volume.total < PhysiCell_constants::cell_removal_threshold_volume )
+		pCell->get_container()->flag_cell_for_removal( pCell ); 
 }

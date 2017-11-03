@@ -3,9 +3,9 @@
 # If you use BioFVM in your project, please cite BioFVM and the version     #
 # number, such as below:                                                    #
 #                                                                           #
-# We solved the diffusion equations using BioFVM (Version 1.1.4) [1]        #
+# We solved the diffusion equations using BioFVM (Version 1.1.5) [1]        #
 #                                                                           #
-# [1] A. Ghaffarizaeh, S.H. Friedman, and P. Macklin, BioFVM: an efficient  #
+# [1] A. Ghaffarizadeh, S.H. Friedman, and P. Macklin, BioFVM: an efficient #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
 #    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730 #
 #                                                                           #
@@ -104,9 +104,7 @@ class Basic_Agent
 	// if no microenvironment indicated, use the currently selected microenvironment. 
 	void simulate_secretion_and_uptake( Microenvironment* M, double dt ); 
 
-	// get the index of current voxel for the indicated microenvironment 
-	int get_nearest_voxel_index( int microenvironment_index ); 
-	int get_nearest_voxel_index( void ); 
+	int get_current_voxel_index( void ); 
 	// directly access the substrate vector at the nearest voxel at the indicated microenvironment 
 	std::vector<double>& nearest_density_vector( int microenvironment_index ); 
 	std::vector<double>& nearest_density_vector( void );

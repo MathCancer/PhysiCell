@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based simulator for multicellular systemssimulator, 	#
-#	 J. Comput. Biol., 2016 (submitted). 									# 
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based multicellular simulator, J. Comput. Biol., 2016   # 
-#   (submitted).                                                            #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -69,59 +69,34 @@
 #include <fstream>
 
 
-#include "PhysiCell.h"
-#include "BioFVM.h" 
+#include "../core/PhysiCell.h"
+#include "../BioFVM/BioFVM.h" 
 
 using namespace BioFVM;
 using namespace PhysiCell;
 
 
+Cell_Container *cell_container; 
+ 
 int omp_num_threads = 8; // set number of threads for parallel computing
 // set this to # of CPU cores x 2 (for hyperthreading)
+double pi=3.1415926535897932384626433832795;
 
-double o2_conc=38.0;   //check this value to make sure it has support from literature
-
-double duct_radius= 158.75;
+double o2_conc=38.0;
 double min_voxel_size=30;
-
-std::vector<std::vector<double>> create_sphere(double cell_radius, double sphere_radius)
-{
-	std::vector<std::vector<double>> cells;
-	int xc=0,yc=0,zc=0;
-	double x_spacing= cell_radius*sqrt(3);
-	double y_spacing= cell_radius*2;
-	double z_spacing= cell_radius*sqrt(3);
-	
-	std::vector<double> tempPoint(3,0.0);
-	// std::vector<double> cylinder_center(3,0.0);
-	
-	for(double z=-sphere_radius;z<sphere_radius;z+=z_spacing, zc++)
-		for(double x=-sphere_radius;x<sphere_radius;x+=x_spacing, xc++)
-			for(double y=-sphere_radius;y<sphere_radius;y+=y_spacing, yc++)
-			{
-				tempPoint[0]=x + (zc%2) * 0.5 * cell_radius;
-				tempPoint[1]=y + (xc%2) * cell_radius;
-				tempPoint[2]=z;
-				
-				if(sqrt(norm_squared(tempPoint))< sphere_radius)
-				{
-					cells.push_back(tempPoint);
-				}
-			}
-	return cells;
-	
-}
 
 int main( int argc, char* argv[] )
 {
-	bool DEBUG=false;
+	if(argc<=1)
+	{
+		std::cout<<"you need to provide dt as an argument"<<std::endl;
+		return 0;
+	}
+
 	double t = 0.0; 
-	double dt = 0.01; // reaction-diffusion time-step
-	double mechanics_dt= 0.1;
-	double cell_cycle_dt= 6;
-	
-	double t_output_interval = 600.0; // 1.0; 
-	double t_max = 365*24*60;
+	double dt = strtod(argv[1],NULL);
+	double t_output_interval = 1; // 1.0; 
+	double t_max = 60;
 	double t_next_output_time = 0; 
 	int next_output_index = 0; 
 	
@@ -137,9 +112,9 @@ int main( int argc, char* argv[] )
 	
 	// figure out the bounding box 
 	std::vector<double> bounding_box( 6, 0.0 );
-	bounding_box[PhysiCell_constants::mesh_min_x_index] = -1000; bounding_box[PhysiCell_constants::mesh_max_x_index] = 1000; 
-	bounding_box[PhysiCell_constants::mesh_min_y_index] = -1000; bounding_box[PhysiCell_constants::mesh_max_y_index] = 1000; 
-	bounding_box[PhysiCell_constants::mesh_min_z_index] = -1000; bounding_box[PhysiCell_constants::mesh_max_z_index] = 1000; 
+	bounding_box[PhysiCell_constants::mesh_min_x_index] = 0; bounding_box[PhysiCell_constants::mesh_max_x_index] = 2000; 
+	bounding_box[PhysiCell_constants::mesh_min_y_index] = 0; bounding_box[PhysiCell_constants::mesh_max_y_index] = 2000; 
+	bounding_box[PhysiCell_constants::mesh_min_z_index] = 0; bounding_box[PhysiCell_constants::mesh_max_z_index] = 2000; 
 	dx=20; dy=20; dz=20;
 	
 	int number_of_voxels = ((bounding_box[PhysiCell_constants::mesh_max_x_index]-bounding_box[PhysiCell_constants::mesh_min_x_index])/dx) * ((bounding_box[PhysiCell_constants::mesh_max_y_index]-bounding_box[PhysiCell_constants::mesh_min_y_index])/dy) * ((bounding_box[PhysiCell_constants::mesh_max_z_index]-bounding_box[PhysiCell_constants::mesh_min_z_index])/dz);
@@ -159,11 +134,12 @@ int main( int argc, char* argv[] )
 	microenvironment.spatial_units = "microns";
 	microenvironment.time_units = "minutes";
 	microenvironment.mesh.units = "microns";
-	Cell_Container* cell_container = new Cell_Container;
+	// Cell_Container * 
+	cell_container = new Cell_Container;
 	cell_container->initialize(bounding_box[0] , bounding_box[3] , bounding_box[1], bounding_box[4] , bounding_box[2] , bounding_box[5], min_voxel_size );
 	microenvironment.agent_container= (Agent_Container *) cell_container; // cell_container;
 	// microenvironment[0].agent_container->initialize(number_of_voxels);
-	std::cout<<"num voxels4: "<<cell_container->underlying_mesh.voxels.size()<<std::endl;
+	
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
 		microenvironment.density_vector(n)[0] = o2_conc; 	
@@ -172,122 +148,105 @@ int main( int argc, char* argv[] )
 	// register the diffusion solver 
 	microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D; 
 	
-	// register substrates properties 
-	microenvironment.diffusion_coefficients[0] = 1.0e5; // microns^2 / min 
-	microenvironment.decay_rates[0] = 0.1;
-
-	microenvironment.display_information( std::cout );
-
-	
 	Cell_Line cancer; 
 	// Cell_Line endothelial; 
 	set_cancer_cell_line_MCF7( cancer ); 
-	cancer.phenotypes[0].secretion_rates.rates.resize( microenvironment.number_of_densities() , 0.0 );
-	cancer.phenotypes[0].uptake_rates.rates.resize( microenvironment.number_of_densities() , 0.0 ) ;
-	cancer.phenotypes[0].saturation_densities.densities.resize( microenvironment.number_of_densities() , 0.0 );
-	cancer.phenotypes[0].uptake_rates.rates[0] = 10; 
-	
+	// set_endothelial_cell_line( endothelial ); 
 	cancer.display_information( std::cout );
 		
-	double cell_radius=10;
-	double sphere_radius = 150;
+	microenvironment.display_information( std::cout );
+
+	
 	// std::cout << __FILE__ << " custom " << __LINE__ << std::endl; 
 	std::vector<std::vector<double>> cell_positions;
-	cell_positions= create_sphere(cell_radius, sphere_radius);
+	std::vector<double> point1(3), point2(3);
 
-	//add Dirichlet node for all the voxels located outside of the duct
-	std::vector<double> dirichlet_o2( 1 , o2_conc );
+	double a1, a2;
+	a1=100;
+	a2= 105.73;
+	double volume=4188.790204786391;
+	point1[0]= a1; point1[1]= a1; point1[2]= a1; 
+	point2[0]= a2; point2[1]= a2; point2[2]= a2; 
 	
-	double min_x=microenvironment.mesh.bounding_box[0];
-	double max_x=microenvironment.mesh.bounding_box[3];
-	double min_y=microenvironment.mesh.bounding_box[1];
-	double max_y=microenvironment.mesh.bounding_box[4];
-	double min_z=microenvironment.mesh.bounding_box[2];
-	double max_z=microenvironment.mesh.bounding_box[5];
-	double strip_width=40;	
-
-	for( int i=0; i < microenvironment.number_of_voxels() ; i++ )
-	{
-		if( abs(max_x-microenvironment.voxels(i).center[0]) < strip_width || abs(microenvironment.voxels(i).center[0]- min_x)< strip_width  
-			|| abs(max_y-microenvironment.voxels(i).center[1]) < strip_width || abs(microenvironment.voxels(i).center[1]- min_y)< strip_width  
-				|| abs(max_z-microenvironment.voxels(i).center[2]) < strip_width || abs(microenvironment.voxels(i).center[2]- min_z)< strip_width )
-				{
-					microenvironment.add_dirichlet_node( i , dirichlet_o2 );
-				}		
-	}
-
 	
-	Cell* pCell;
-	if(DEBUG)
-	{
-		std::vector<std::vector<double>> cells_data;
-		cells_data= read_matlab( "cells_debug7.mat" );
-		
-		for(int i=0;i<cells_data.size();i++)
-		{	
-			if(!microenvironment.mesh.is_position_valid(cells_data[i][2], cells_data[i][3], cells_data[i][4]))
-				continue;
-			pCell = create_cell();
-			pCell->register_microenvironment(&microenvironment);
-			pCell->assign_position(cells_data[i][2], cells_data[i][3], cells_data[i][4]);
-			// pCell->assign_position({0,65,0});
-			pCell->advance_cell_current_phase= ki67_advanced_cycle_model;
-			pCell->set_phenotype(cancer.phenotypes[0]);
-			pCell->phenotype.set_current_phase(cells_data[i][12]);
-			pCell->set_total_volume((4.0/3.0)*PhysiCell_constants::pi* pow(cells_data[i][5], 3));
-			pCell->type=PhysiCell_constants::TUMOR_TYPE;		
-			pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time= cells_data[i][13];
-		}
-	}
-	else
-	{
-		for(int i=0;i<cell_positions.size();i++)
-		// for(int i=0;i<2;i++)
-		{
-			pCell = create_cell();
-			pCell->register_microenvironment(&microenvironment);
-			pCell->assign_position(cell_positions[i]);
-			// pCell->assign_position({0,65,0});
-			pCell->advance_cell_current_phase= ki67_advanced_cycle_model;
-			pCell->set_phenotype(cancer.phenotypes[0]);
-			pCell->phenotype.set_current_phase(PhysiCell_constants::Ki67_negative);	
-			pCell->type=PhysiCell_constants::TUMOR_TYPE;
-		}
-	}
+	Cell* pCell1 = create_cell();
+	pCell1->register_microenvironment(&microenvironment);
+	pCell1->assign_position(point1);
+	pCell1->advance_cell_current_phase=do_nothing;
+	pCell1->set_phenotype(cancer.phenotypes[0]);
+	pCell1->phenotype.set_current_phase(PhysiCell_constants::Ki67_negative);
+	//NOTE: for this experiment, you need to disable update_volume function 
+	// to make sure that volume change are not affecting the distance we measure for the cells.
+	pCell1->update_volume=do_nothing;
+	pCell1->set_total_volume(volume);
+	pCell1->type=PhysiCell_constants::TUMOR_TYPE;
+	
+	Cell* pCell2 = create_cell();
+	pCell2->register_microenvironment(&microenvironment);
+	pCell2->assign_position(point2);
+	pCell2->advance_cell_current_phase=do_nothing;
+	pCell2->update_volume=do_nothing;
+	pCell2->set_phenotype(cancer.phenotypes[0]);
+	pCell2->phenotype.set_current_phase(PhysiCell_constants::Ki67_negative);
+	pCell2->set_total_volume(volume);
+	pCell2->type=PhysiCell_constants::TUMOR_TYPE;
+	
+	
 	for(int i=0;i<all_basic_agents.size();i++){
 		all_basic_agents[i]->set_internal_uptake_constants(dt); 
 	}
 	
+	std::cout << pCell1->phenotype.geometry.radius<<std::endl;
+	
 	std::cout << (*all_cells).size() <<" agents created successfully." <<std::endl;
 	
-	std::vector<double> position (3, 0.0);
-	position[0]=0;
-	position[1]=0;
-	position[2]=0;
-	
-	int output_index =0; 
 	BioFVM::RUNTIME_TIC();
 	BioFVM::TIC();
 	
-	std::ofstream report_file ("report_spheroid.txt");
-	report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
+	std::string filename; 
+	filename.resize( 1024 ); 
+	sprintf( (char*) filename.c_str() , "mechanics_test1_result_dt=%f.txt" , dt ); 
+	std::ofstream report_file (filename.c_str(), std::ofstream::out);
+	
+	pCell1->update_velocity(pCell1, dt);
+	pCell2->update_velocity(pCell2, dt);
+	
+	pCell1->set_previous_velocity(pCell1->velocity[0],pCell1->velocity[1],pCell1->velocity[2]);
+	pCell2->set_previous_velocity(pCell2->velocity[0],pCell2->velocity[1],pCell2->velocity[2]);
+	
+	std::cout<<pCell1->velocity<<std::endl;
+	std::cout<<pCell2->velocity<<std::endl;
+	
+	for(int i=0;i<10;i++)
+	{
+		pCell1->position += (dt/10.0)*pCell1->velocity; 
+		pCell2->position += (dt/10.0)*pCell2->velocity;
+		t+=dt/10.0;
+	}
+	std::cout<<"time: "<< t<<std::endl;
+	t_next_output_time=t_output_interval;
 	try 
 	{		
 		while( t < t_max )
 		{
-			if(  fabs( t - t_next_output_time ) < 0.0001 )
+			
+			if(  fabs( t - t_next_output_time ) < dt/10.0 )
 			{
-				log_output(t, output_index, microenvironment, report_file);
-				t_next_output_time += t_output_interval;						
+				report_file<<t<<"\t"<<dist(pCell1->position,pCell2->position)<<"\n";
+				t_next_output_time += t_output_interval; 
 			}
-			microenvironment.simulate_cell_sources_and_sinks( dt );
-			microenvironment.simulate_diffusion_decay( dt );
-			((Cell_Container *)microenvironment.agent_container)->update_all_cells(t, cell_cycle_dt, mechanics_dt);		
+			
+			((Cell_Container *)microenvironment.agent_container)->update_all_cells(t, dt, dt);
 			t += dt; 
-			output_index++;
 		}
-		log_output(t, output_index, microenvironment, report_file);
 		report_file.close();
+		std::cout<<pCell1->position<<"  "<< pCell2->position<< ", dist: " <<dist(pCell1->position,pCell2->position)<<  std::endl;
+		double scale=1000;
+		//writePov(*all_cells, t_max, scale);
+		//writeCellReport(*all_cells, t_max);
+		std::cout << "total number of agents: " << (*all_cells).size()<<std::endl << std::endl;
+		BioFVM::RUNTIME_TOC();
+		BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() );
 	}
 	catch( const std::exception& e ) { // reference to the base of a polymorphic object
 		std::cout << e.what(); // information from length_error printed

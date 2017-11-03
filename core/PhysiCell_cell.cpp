@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based simulator for multicellular systemssimulator, 	#
-#	 J. Comput. Biol., 2016 (submitted). 									# 
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based multicellular simulator, J. Comput. Biol., 2016   # 
-#   (submitted).                                                            #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -60,10 +60,10 @@
 #############################################################################
 */
 
-#include "./PhysiCell_cell.h"
-#include "./PhysiCell_cell_container.h"
-#include "./PhysiCell_utilities.h"
-#include "./PhysiCell_constants.h"
+#include "PhysiCell_cell.h"
+#include "PhysiCell_cell_container.h"
+#include "PhysiCell_utilities.h"
+#include "PhysiCell_constants.h"
 #include "../BioFVM/BioFVM_vector.h"
 #include<limits.h>
 
@@ -121,6 +121,7 @@ Cell* Cell::divide( )
 	kid->copy_data( this );	
 	kid->copy_function_pointers(this);
 	kid->parameters = parameters;
+	kid->register_microenvironment(get_microenvironment());
 	// randomly place the new agent close to me
 	double temp_angle = 6.28318530717959*UniformRandom();
 	double temp_phi = 3.1415926535897932384626433832795*UniformRandom();
@@ -155,6 +156,11 @@ Cell* Cell::divide( )
 bool Cell::assign_position(std::vector<double> new_position)
 {
 	return assign_position(new_position[0], new_position[1], new_position[2]);
+}
+
+void Cell::set_previous_velocity(double xV, double yV, double zV)
+{
+	previous_velocity[0]=xV; previous_velocity[1]=yV; previous_velocity[2]=zV; 
 }
 
 bool Cell::assign_position(double x, double y, double z)
@@ -577,6 +583,21 @@ void add_basement_membrane_interactions_default(Cell* pCell, double dt)
 		pCell->velocity[i] += pCell->displacement[i] * temp_r;
 	}
 	return;	
+}
+
+void set_3D_random_motility( Cell* pCell, double dt )
+{
+	double probability= UniformRandom();
+	
+	if(probability< dt/pCell->custom_data.motility_t_persistence)
+	{
+		double temp_angle = 6.28318530717959*UniformRandom();
+		double temp_phi = 3.1415926535897932384626433832795*UniformRandom();
+		
+		pCell->motility[0]= pCell->custom_data.motility_magnitude * cos( temp_angle ) * sin( temp_phi );
+		pCell->motility[1]= pCell->custom_data.motility_magnitude * sin( temp_angle ) * sin( temp_phi );
+		pCell->motility[2]= pCell->custom_data.motility_magnitude * cos( temp_phi );
+	}
 }
 
 void update_cell_and_death_parameters_O2_based( Cell* pCell, double dt )

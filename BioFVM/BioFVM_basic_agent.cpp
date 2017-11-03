@@ -3,9 +3,9 @@
 # If you use BioFVM in your project, please cite BioFVM and the version     #
 # number, such as below:                                                    #
 #                                                                           #
-# We solved the diffusion equations using BioFVM (Version 1.1.4) [1]        #
+# We solved the diffusion equations using BioFVM (Version 1.1.5) [1]        #
 #                                                                           #
-# [1] A. Ghaffarizaeh, S.H. Friedman, and P. Macklin, BioFVM: an efficient  #
+# [1] A. Ghaffarizadeh, S.H. Friedman, and P. Macklin, BioFVM: an efficient #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
 #    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730 #
 #                                                                           #
@@ -202,7 +202,7 @@ void delete_basic_agent( Basic_Agent* pDelete )
 	return; 
 }
 
-int Basic_Agent::get_nearest_voxel_index( void )
+int Basic_Agent::get_current_voxel_index( void )
 {
 	return current_voxel_index;
 }

@@ -1,22 +1,21 @@
-VERSION := 0.5.0
+VERSION := 1.0.0
 
-# Change this flag if compiling and running at home on mingw
-# Hopefully we'll get a 64-bit version soon!
-
-PROGRAM_NAME := liver_simulator
+PROGRAM_NAME := make_lib
 
 CC := g++
+# CC := g++-mp-5 # typical macports compiler name
+# CC := g++-5 # typical homebrew compiler name 
 
 ARCH := core2 # a reasonably safe default for most CPUs since 2007
 # ARCH := corei7
 # ARCH := corei7-avx # earlier i7 
-ARCH := core-avx-i # i7 ivy bridge or newer 
+# ARCH := core-avx-i # i7 ivy bridge or newer 
 # ARCH := core-avx2 # i7 with Haswell or newer
 # ARCH := nehalem
 # ARCH := westmere
 # ARCH := sandybridge
 # ARCH := ivybridge
-ARCH := haswell
+# ARCH := haswell
 # ARCH := broadwell
 # ARCH := bonnell
 # ARCH := silvermont
@@ -32,59 +31,50 @@ PhysiCell_custom.o PhysiCell_utilities.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o
 
-# ./modules/background_oxygen.o
-
-PhysiCell_custom_module_OBJECTS := liver_setup.o liver_misc.o liver_model.o 
+PhysiCell_custom_module_OBJECTS :=  # put your custom objects here
 
 pugixml_OBJECTS := pugixml.o
 
 liver_OBJECTS := main.o
 
-ALL_OBJECTS := $(BioFVM_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS) $(pugixml_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(liver_OBJECTS)
+ALL_OBJECTS := $(BioFVM_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS) $(pugixml_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
-# UTILITY_OBJECTS := tinyxml2.o 
+
+EXAMPLES := ./examples/PhysiCell_test_mechanics_1.cpp ./examples/PhysiCell_test_mechanics_2.cpp \
+./examples/PhysiCell_test_DCIS.cpp ./examples/PhysiCell_test_HDS.cpp \
+./examples/PhysiCell_test_cell_cycle.cpp ./examples/physicell_test_volume.cpp 
 
 COMPILE_COMMAND := $(CC) $(CFLAGS) 
 
-all: $(ALL_OBJECTS) main.o
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS)
+all: make_lib
 
-main.o: main.cpp
-	$(COMPILE_COMMAND) -c main.cpp
+make_lib: $(ALL_OBJECTS)
+
+physicell_test_mech1: $(ALL_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
+	$(COMPILE_COMMAND) -o test_mech1 $(ALL_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp
+
+physicell_test_mech2: $(ALL_OBJECTS) ./examples/PhysiCell_test_mechanics_2.cpp 
+	$(COMPILE_COMMAND) -o test_mech2 $(ALL_OBJECTS) ./examples/PhysiCell_test_mechanics_2.cpp
 	
-physicell_debug: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_deubg.cpp 
-	$(COMPILE_COMMAND) -o test_debug $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) PhysiCell_test_deubg.cpp
+physicell_test_DCIS: $(ALL_OBJECTS) ./examples/PhysiCell_test_DCIS.cpp 
+	$(COMPILE_COMMAND) -o test_DCIS $(ALL_OBJECTS) ./examples/PhysiCell_test_DCIS.cpp
 
-physicell_test_m1: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_mechanics_1.cpp 
-	$(COMPILE_COMMAND) -o m1_test $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) PhysiCell_test_mechanics_1.cpp
+physicell_test_HDS: $(ALL_OBJECTS) ./examples/PhysiCell_test_HDS.cpp 
+	$(COMPILE_COMMAND) -o test_HDS $(ALL_OBJECTS) ./examples/PhysiCell_test_HDS.cpp
 
-physicell_test_m2: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_mechanics_2.cpp 
-	$(COMPILE_COMMAND) -o m2_test $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) PhysiCell_test_mechanics_2.cpp
+physicell_test_cell_cycle: $(ALL_OBJECTS) ./examples/PhysiCell_test_cell_cycle.cpp 
+	$(COMPILE_COMMAND) -o test_cycle $(ALL_OBJECTS) ./examples/PhysiCell_test_cell_cycle.cpp
+
+physicell_test_volume: $(ALL_OBJECTS) ./examples/physicell_test_volume.cpp 
+	$(COMPILE_COMMAND) -o test_volume $(ALL_OBJECTS) ./examples/physicell_test_volume.cpp
 	
-physicell_test_duct: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_duct.cpp 
-	$(COMPILE_COMMAND) -o duct_test $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) PhysiCell_test_duct.cpp
-
-# physicell_test_spheroid: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_spheroid.cpp 
-physicell_test_spheroid: $(ALL_OBJECTS) PhysiCell_test_spheroid.cpp 
-	$(COMPILE_COMMAND) -o spheroid_test $(ALL_OBJECTS) PhysiCell_test_spheroid.cpp
-
-physicell_test_2D: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_2D.cpp 
-	$(COMPILE_COMMAND) -o test_2D $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) PhysiCell_test_2D.cpp
-
-physicell_test_cell_cycle: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_cell_cycle.cpp 
-	$(COMPILE_COMMAND) -o test_cycle $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) PhysiCell_test_cell_cycle.cpp
-
-physicell_test_volume1: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) physicell_test_volume1.cpp 
-	$(COMPILE_COMMAND) -o test_volume1 $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) physicell_test_volume1.cpp
-
-physicell_test_cycle_timing: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_transition_time.cpp 
-	$(COMPILE_COMMAND) -o test_timing $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) PhysiCell_test_transition_time.cpp
-		
-test_open_mp: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) test_open_mp.cpp 
-	$(COMPILE_COMMAND) -o test_open_mp $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) test_open_mp.cpp
-
-test_open_mp2: $(pugixml_OBJECTS) $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) PhysiCell_test_data_structure_comparison.cpp 
-	$(COMPILE_COMMAND) -o test_open_mp2 $(BioFVM_OBJECTS) $(PhysiCell_OBJECTS) $(UTILITY_OBJECTS) $(pugixml_OBJECTS) PhysiCell_test_data_structure_comparison.cpp	
+examples: $(ALL_OBJECTS) $(EXAMPLES)
+	$(COMPILE_COMMAND) -o ./examples/test_mech1 ./examples/PhysiCell_test_mechanics_1.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_mech2 ./examples/PhysiCell_test_mechanics_2.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_DCIS ./examples/PhysiCell_test_DCIS.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_HDS ./examples/PhysiCell_test_HDS.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_cycle ./examples/PhysiCell_test_cell_cycle.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_volume ./examples/physicell_test_volume.cpp $(ALL_OBJECTS)
 
 # PhysiCell core components	
 	
@@ -160,6 +150,7 @@ liver_model.o: ./custom_modules/liver_model.cpp
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME).exe
+	rm -f ./examples/test_* 
 	
 zip:
 	zip $$(date +%b_%d_%Y_%H%M).zip */*.cpp */*.h *akefile* *.cpp *.h */*.hpp *.xml *.tex *.bib *hanges*.txt config/*.xml *.txt

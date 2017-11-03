@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based simulator for multicellular systemssimulator, 	#
-#	 J. Comput. Biol., 2016 (submitted). 									# 
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 0.5.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, and P Macklin, PhysiCell: an open       #
-#    source physics-based multicellular simulator, J. Comput. Biol., 2016   # 
-#   (submitted).                                                            #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2016 (in preparation).                         #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -61,10 +61,9 @@
 */
 
 #include "../BioFVM/BioFVM_agent_container.h"
-#include "./PhysiCell_constants.h"
-
+#include "PhysiCell_constants.h"
 #include "../BioFVM/BioFVM_vector.h"
-#include "./PhysiCell_cell.h"
+#include "PhysiCell_cell.h"
 
 using namespace BioFVM;
 namespace PhysiCell{
@@ -112,6 +111,8 @@ void Cell_Container::update_all_cells(double t, double cell_cycle_dt, double mec
 	//if it is the time for running cell cycle, do it!
 	double time_since_last_cycle= t- last_cell_cycle_time;
 	// std::cout<<"time_since_last_cycle: "<<time_since_last_cycle<<", time: "<<t<<std::endl;
+	//std::cout<<"time_since_last_cycle: "<<time_since_last_cycle<<", time: "<<t<<", volume:"<<(*all_cells)[0]->get_total_volume()<<std::endl;
+	
 	if( fabs(time_since_last_cycle- cell_cycle_dt)<0.0001 || !initialzed)
 	{
 		// Reset the max_radius in each voxel. It will be filled in set_total_volume
