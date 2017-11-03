@@ -1,11 +1,6 @@
 # Quickstart Guide to PhysiCell 
 
-October 2017
-
-<b>WARNING:</b> If you're a savvy software developer and are accustomed to just typing `make` whenever you 
-see a `Makefile`, DON'T. For the current version of PhysiCell, we are trying to make it easy for
-users to build example projects using a 2-step build process: `make <example project>` followed by `make project`. More
-details below.
+Nov 3, 2017
 
 ## Download
 
@@ -19,12 +14,6 @@ We currently provide 3 options for downloading PhysiCell:
 https://github.com/MathCancer/PhysiCell. This will be our master branch of PhysiCell and therefore
 should always be deployable, but keep in mind it is not a release version. (We're still deciding on whether to
 continue using sourceforge or use GitHub for our releases).
-
-3) If you'd rather not build the code yourself, we provide a virtual appliance (.ova) file (~400MB)
-at the [1.2.1 release on sourceforge](https://sourceforge.net/projects/physicell/files/PhysiCell/PhysiCell%201.2.1/). 
-You can use whatever virtualization application that can import that appliance, e.g. 
-[VirtualBox](http://www.oracle.com/technetwork/server-storage/virtualbox/downloads/index.html).
-
 
 For more detailed information, see Section 3 of the 
 [User Guide](https://github.com/MathCancer/PhysiCell/blob/master/documentation/User_Guide.pdf) 
@@ -68,7 +57,7 @@ Set the following environment variable in your Terminal's shell, e.g., in the ba
 ```
 export PHYSICELL_CPP=/usr/local/bin/g++-7
 ```
-and the Makefile will use it. You probably want to permanently define this env var in your `~/.profile` and/or `~/.bashrc` file also.
+and the Makefile will use it. You probably want to permanently define this env var in your `~/.bash_profile` file also.
 
 ### Linux
 
@@ -81,11 +70,11 @@ building PhysiCell. If not, contact us!
 
 In the current release of PhysiCell, we provide four sample projects to help you get started. Three
 of the projects are 2D models (<i>biorobots, anti-cancer biorobots, and cancer heterogeneity</i>); the fourth project
-is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of these projects follows the same
+is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of the sample projects follows the same
 pattern. For example, from your Terminal, in the root PhysiCell directory/folder:
 ```
 $ make biorobots-sample
-$ make project
+$ make
 ```
 
 <!-- Note: the first `make` command silently copies over project-specific files, including the Makefile. The 
@@ -93,42 +82,35 @@ second `make` command attempts to compile the (new) code. Since the Makefile is 
 may have done to the previous Makefile (e.g., changing `CC` to point to `g++-7` on OSX) will be lost. You'll need
 to edit it again or find another workaround. -->
 
-Assuming the project builds without errors, you should now have an executable called `biorobots`. To keep your
-root directory tidy, we recommend creating a project-specific subdirectory and running the project from there since
-several output files will be generated. For example (actual command syntax may vary slightly on Windows):
+Assuming the project builds without errors, you should now have an executable called `biorobots` which you can execute:
 ```
-$ mkdir run-biorobots1
-$ cd run-biorobots1
-$ ../biorobots
+$ ./biorobots
 ```
-will generate several output files of types `.svg`, `.xml`, and `.mat`. More about those below.
+This will begin the simulation, write information to your terminal, and generate output files of types `.svg`, `.xml`, and `.mat`. More about those below. You can hit `Control-c` to kill the simulation early, if you want.
 
-For the remaining three example projects provided with PhysiCell, you would follow similar steps:
+For the remaining three example projects provided with PhysiCell, you would follow similar steps, but first clean out the previous simulation's output and prepare for the new one:
 ```
-$ cd ..   # make sure you're in the root directory of PhysiCell
+$ make data-cleanup   # optionally, delete all output data (otherwise, you can manuall copy to another directory to keep)
+$ make reset
 $ make cancer-biorobots-sample
-$ make project
-$ mkdir run-cancer-biorobots1
-$ cd run-cancer-biorobots1
-$ ../cancer_biorobots
+$ make
+$ ./cancer_biorobots
 ```
 and
 ```
-$ cd ..   # make sure you're in the root directory of PhysiCell
+$ make data-cleanup
+$ make reset
 $ make heterogeneity-sample
-$ make project
-$ mkdir run-heterogeneity1
-$ cd run-heterogeneity1
-$ ../heterogeneity
+$ make 
+$ ./heterogeneity
 ```
 and
 ```
-$ cd ..   # make sure you're in the root directory of PhysiCell
+$ make data-cleanup
+$ make reset
 $ make cancer-immune-sample
-$ make project
-$ mkdir run-cancer-immune1
-$ cd run-cancer-immune1
-$ ../cancer_immune_3D
+$ make
+$ ./cancer_immune_3D
 ```
 
 <hr> <!---------------------------------------------->
