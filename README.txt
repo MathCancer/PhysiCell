@@ -184,21 +184,24 @@ Bugfixes:
 + Includes a sneak preview of BioFVM 1.1.7, which includes bugfixes 
   mentioned above. 
   
-Minor new features and changes:
+Notices for intended changes that may affect backwards compatibility:
 
-+ none to report: bugfixes: 
++ None at this time
 
-* minor updates
-  + Need aproval to put this
-
-Future: 
-+ angiogenesis example 
+Planned future improvements: 
 
 + parse XML configuration files
 
-+ move attach/detach to a standard module 
++ "mainline" prototype cell attach/detach mechanics as standard models 
+  (currently in the biorobots and immune examples)
 
-+ angiogenesis to a standard module 
++ integrate SBML-encoded systems of ODEs as custom data and functions 
+  for molecular-scale modeling 
+
++ create an angiogenesis sample project 
+
++ create a small library of angiogenesis and vascularization codes as 
+  an optional standard module in ./modules (but not as a core component)
 
 
 
