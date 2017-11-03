@@ -192,6 +192,8 @@ Planned future improvements:
 
 + parse XML configuration files
 
++ read saved simulation states (as MultiCellDS digital snapshots)
+
 + "mainline" prototype cell attach/detach mechanics as standard models 
   (currently in the biorobots and immune examples)
 
