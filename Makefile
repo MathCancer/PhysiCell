@@ -1,9 +1,15 @@
-VERSION := 1.2.1
+VERSION := 1.2.2
 PROGRAM_NAME := project
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
 # CC := g++-7 # typical homebrew compiler name 
+
+# Check for environment definitions of compiler 
+# e.g., on CC = g++-7 on OSX
+ifdef PHYSICELL_CPP 
+	CC := $(PHYSICELL_CPP)
+endif
 
 ARCH := native # best auto-tuning
 # ARCH := core2 # a reasonably safe default for most CPUs since 2007
@@ -48,25 +54,27 @@ EXAMPLES := ./examples/PhysiCell_test_mechanics_1.cpp ./examples/PhysiCell_test_
  ./examples/PhysiCell_test_DCIS.cpp ./examples/PhysiCell_test_HDS.cpp \
  ./examples/PhysiCell_test_cell_cycle.cpp ./examples/PhysiCell_test_volume.cpp 
 
-# template projects 
+all: 
+	make heterogeneity-sample
+	make 
 
-all: main.cpp $(PhysiCell_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(PhysiCell_OBJECTS) main.cpp 
+# template projects 	
 	
-project: main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
-
-template2D: ./template_projects/template2D.cpp
-	cp ./template_projects/template2D.cpp main.cpp 
-	cp Makefile ./template_projects/Makefile.backup
-	cp ./template_projects/Makefile . 
-
-template3D: ./template_projects/template3D.cpp
-	cp ./template_projects/template3D.cpp main.cpp 	
-	cp Makefile ./template_projects/Makefile.backup
-	cp ./template_projects/Makefile . 
+template2D: 
+	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template2D/main-2D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template2D/Makefile .
 	
-# new sample projects 
+template3D: 	
+	cp ./sample_projects/template3D/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template3D/main-3D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template3D/Makefile .
+	
+# sample projects 
 
 biorobots-sample:
 	cp ./sample_projects/biorobots/custom_modules/* ./custom_modules/
@@ -96,7 +104,8 @@ cancer-immune-sample:
 	cp Makefile Makefile-backup
 	cp ./sample_projects/cancer_immune/Makefile .
 	
-# examples 
+	
+# early examples for convergence testing 
 
 physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
 	$(COMPILE_COMMAND) -o test_mech1 $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp
@@ -196,23 +205,40 @@ PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 # user-defined PhysiCell modules
 
 
-# cleanup and archiving 
+
+
+# cleanup
+
+reset:
+	rm -f *.cpp 
+	cp ./sample_projects/Makefile-default Makefile 
+	rm -f ./custom_modules/*
+	touch ./custom_modules/empty.txt 
 	
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 	
+data-cleanup:
+	rm -f *.mat
+	rm -f *.xml
+	rm -f *.svg
+	rm -f ./output/*
+	
+# archival 
+	
 zip:
-	zip latest.zip */*.cpp */*.h Makefile* *.cpp *.h */*.hpp config/* documentation/* matlab/* README.txt
+	zip -r latest.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* sample_projects/* 
 	cp latest.zip $$(date +%b_%d_%Y_%H%M).zip
 	cp latest.zip VERSION_$(VERSION).zip 
 	mv *.zip archives/
 	
 tar:
-	tar --ignore-failed-read -czf latest.tar */*.cpp */*.h Makefile* *.cpp */*.hpp config/* documentation/* matlab/* README.txt
+	tar --ignore-failed-read -czf latest.tar Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* sample_projects/* 
 	cp latest.tar $$(date +%b_%d_%Y_%H%M).tar
 	cp latest.tar VERSION_$(VERSION).tar
 	mv *.tar archives/
+
 
 unzip: 
 	cp ./archives/latest.zip . 
