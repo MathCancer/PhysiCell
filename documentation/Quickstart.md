@@ -48,9 +48,11 @@ lrwxr-xr-x  1 heiland  admin  29 Oct  3 14:38 /usr/local/bin/g++-7@ -> ../Cellar
 
 Set the following environment variable in your Terminal's shell, e.g., in the bash shell: 
 ```
-export PHYSICELL_CPP=/usr/local/bin/g++-7
+$ export PHYSICELL_CPP=/usr/local/bin/g++-7
 ```
-and the Makefile will use it. You probably want to permanently define this environment variable in your `~/.bash_profile` file also.
+and the Makefile will use it. You should permanently set this in your environment via: 
+
+`$ echo export PHYSICELL_CPP=g++-7 >> ~/.bash_profile`.
 
 ### Linux
 
@@ -66,8 +68,8 @@ of the projects are 2D models (<i>biorobots, anti-cancer biorobots, and cancer h
 is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of the sample projects follows the same
 pattern. For example, from your Terminal, in the root PhysiCell directory/folder:
 ```
-$ make biorobots-sample
-$ make
+$ make biorobots-sample     # populate the biorobots sample project
+$ make                      # compile the project
 ```
 
 <!-- Note: the first `make` command silently copies over project-specific files, including the Makefile. The 
@@ -84,9 +86,9 @@ This will begin the simulation, write information to your terminal, and generate
 For the remaining three example projects provided with PhysiCell, you would follow similar steps, but first, you may want to clean out the previous simulation's output and prepare for the new one:
 ```
 $ make data-cleanup   # Delete output data. (Optionally, manually move it to another directory to keep it)
-$ make reset
-$ make cancer-biorobots-sample
-$ make
+$ make reset          # clear out the sample project / clean slate
+$ make cancer-biorobots-sample    # populate the new project
+$ make                            # compile the project
 $ ./cancer_biorobots
 ```
 and
@@ -118,8 +120,7 @@ is to suggest and offer guidance on using other tools, e.g. your browser, [Image
 ### Browser
 
 At a bare minimum, you should be able to use your browser to `File -> Open` any .svg (scalable vector graphics) file 
-that your simulation generates. PhysiCell simulates transmitted light microscopy to create virtual H&E 
-(hematoxylin and eosin) images for the .svg files. Even for 3D models, 2D cell images (.svg files) are generated, by 
+that your simulation generates. PhysiCell simulates transmitted light microscopy to create virtual pathology images for the .svg files. Even for 3D models, 2D cross-section images (.svg files) are generated, by 
 default, using a slice through the Z=0 plane, as depicted in the following image (from the cancer-immune-sample project).
 
 ![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/cancer_immune_snapshot00000574_small.png "SVG slice from 3D cancer-immune-sample project")
@@ -162,7 +163,7 @@ tutorial for this. Until then, please ask questions.
 
 ## Support
 
-Until we decide on a mailing list, please email us directly (macklinp@iu.edu, heiland@iu.edu) and follow us on Twitter  (https://twitter.com/MathCancer).
+Until we set up a mailing list, please email us directly (macklinp@iu.edu, heiland@iu.edu) and follow us on Twitter  (https://twitter.com/MathCancer).
 
 <hr> <!---------------------------------------------->
 
