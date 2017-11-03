@@ -3,7 +3,7 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.1) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
@@ -12,7 +12,7 @@
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.1) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
@@ -176,7 +176,7 @@ int main( int argc, char* argv[] )
 
 	cancer.display_information( std::cout );
 	
-	// create some cells near the origin, and place them in the first phase 
+	// create some cells near the origin, and place them in various phases
 	// of the Ki67 advanced model 
 	
 	Cell* pC;

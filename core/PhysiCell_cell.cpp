@@ -3,7 +3,7 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.1) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
@@ -12,7 +12,7 @@
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.1) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
@@ -180,11 +180,11 @@ void Cell::assign_orientation()
 
 Cell* Cell::divide( )
 {
-	Cell* kid = create_cell();
-	kid->copy_data( this );	
-	kid->copy_function_pointers(this);
-	kid->parameters = parameters;
-	kid->register_microenvironment(get_microenvironment());
+	Cell* child = create_cell();
+	child->copy_data( this );	
+	child->copy_function_pointers(this);
+	child->parameters = parameters;
+	child->register_microenvironment(get_microenvironment());
 	// randomly place the new agent close to me
 	double temp_angle = 6.28318530717959*UniformRandom();
 	double temp_phi = 3.1415926535897932384626433832795*UniformRandom();
@@ -199,21 +199,21 @@ Cell* Cell::divide( )
 	if(norm(rand_vec)==0)
 		std::cout<<"************ERROR********************"<<std::endl;
 	rand_vec/= norm(rand_vec);
-	kid->assign_position(position[0] + 0.5 * radius*rand_vec[0],
+	child->assign_position(position[0] + 0.5 * radius*rand_vec[0],
 						 position[1] + 0.5 * radius*rand_vec[1],
 						 position[2] + 0.5 * radius*rand_vec[2]);
-	// get_container()->register_agent(kid); //assign_position takes care of this
+	// get_container()->register_agent(child); //assign_position takes care of this
 	//change my position to keep the center of mass intact and then see if I need to update my voxel index
 	position[0] -= 0.5*radius*rand_vec[0];
 	position[1] -= 0.5*radius*rand_vec[1]; 
 	position[2] -= 0.5*radius*rand_vec[2]; 
 	update_voxel_in_container();
 	phenotype.volume.divide(); 
-	kid->phenotype.volume.divide();
-	kid->set_total_volume(kid->phenotype.volume.total);
+	child->phenotype.volume.divide();
+	child->set_total_volume(child->phenotype.volume.total);
 	set_total_volume(phenotype.volume.total);
-	kid->set_phenotype(phenotype, base_phenotype);	
-	return kid;
+	child->set_phenotype(phenotype, base_phenotype);	
+	return child;
 }
 
 bool Cell::assign_position(std::vector<double> new_position)

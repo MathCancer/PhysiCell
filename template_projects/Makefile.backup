@@ -34,8 +34,7 @@ PhysiCell_custom.o PhysiCell_utilities.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o
 
-# put your custom objects here (they should be in the custom_modules directory)
-
+# put your custom objects here
 PhysiCell_custom_module_OBJECTS :=  
 
 pugixml_OBJECTS := pugixml.o
@@ -59,7 +58,7 @@ template2D: ./template_projects/template2D.cpp
 
 template3D: ./template_projects/template3D.cpp
 	cp ./template_projects/template3D.cpp main.cpp 	
-	cp Makefile ./template_projects/Makefile.backup
+	cp Makefile ./template_projects/
 	
 # examples 
 
@@ -88,6 +87,20 @@ examples: $(ALL_OBJECTS) $(EXAMPLES)
 	$(COMPILE_COMMAND) -o ./examples/test_HDS ./examples/PhysiCell_test_HDS.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o ./examples/test_cycle ./examples/PhysiCell_test_cell_cycle.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o ./examples/test_volume ./examples/physicell_test_volume.cpp $(ALL_OBJECTS)
+
+# template projects 
+	
+#2D: $(ALL_OBJECTS) main2D.o
+# 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME)2D $(ALL_OBJECTS) main2D.o
+
+# 3D: $(ALL_OBJECTS) main3D.o
+# 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME)3D $(ALL_OBJECTS) main3D.o
+	
+# main2D.o: main2D.cpp
+# 	$(COMPILE_COMMAND) -c main2D.cpp
+	
+# main3D.o: main3D.cpp
+# 	$(COMPILE_COMMAND) -c main3D.cpp
 
 # PhysiCell core components	
 	
@@ -158,7 +171,7 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 	
 clean:
 	rm -f *.o
-	rm -f $(PROGRAM_NAME)*
+	rm -f $(PROGRAM_NAME).exe
 	
 zip:
 	zip latest.zip */*.cpp */*.h Makefile* *.cpp *.h */*.hpp config/* documentation/* matlab/* README.txt

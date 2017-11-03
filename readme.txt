@@ -1,7 +1,66 @@
 PhysiCell: PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
 Multicellular Systems.
 
-Version:      1.1.0
+Version:      1.1.1
+Release date: 18 May 2017
+
+Homepage:     http://PhysiCell.MathCancer.org
+Downloads:    http://PhysiCell.sf.net
+
+Summary: 
+This release includes minor bugfixes and corrections. 
+
+PhysiCell is currently under scientific peer review. 
+
+Major new features and changes:
++ none
+
+Minor new features and changes: 
++ none
+ 
+Bugfixes and Corrections: 
++ Changed "#include "../biofvm/BioFVM_MultiCellDS.h" to 
+  #include "../BioFVM/BioFVM_MultiCellDS.h" in modules/PhysiCell_MultiCellDS.h 
+  to fix compile errors. (Thanks, Randy Heiland!)
+  
++ Replaced instances of "kid" to the more customary "child" (parent and child 
+  objects) in core/PhysiCell_cell.cpp
+  
++ Modified the "make clean" rule in the Makefile to work better across 
+  platforms. (Previously worked fine on the object files, but only deleted 
+  $(PROGRAM_NAME).exe on Windows platforms. 
+  
++ Modified the "template2D" and "template3D" rules in the Makefile to 
+  copy the current Makefile to template_projects/Makefile.backup  
+  
++ Corrected the comments in template2D.cpp and template3D.cpp to more 
+  accurately note that we are seeding the three initial cells in all the 
+  states of the Ki67 advanced model. (Ki67+ premitotic, Ki67+ postmitotic, 
+  and Ki67-).   
+
+Notices for intended changes that may affect backwards compatibility: 
+
++ Will rename the current "Phenotype" class to "Full_Phenotype"
+
++ Will introduce a new Phenotype class with a much simpler structure. 
+
++ Will rewrite the represetation of cell cycle and death phases. 
+
++ Will rewrite the standard phenotype models in the simpler 
+  representation. 
+
++ Will stop requiring use of the Digital_Cell_Line class for initializing 
+  simulations. 
+
++ Will deprecate update_cell_and_death_parameters, and instead use 
+  update_phenotype_parameters. 
+  
++ Will stop using the oxygen-dependent phenotype rule as default. 
+
+----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
+----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- 
+
+Version:      1.1.1
 Release date: 16 May 2017
 
 Homepage:     http://PhysiCell.MathCancer.org
@@ -179,7 +238,7 @@ Notices for intended changes that may affect backwards compatibility:
   
 + Will stop using the oxygen-dependent phenotype rule as default. 
 
-PhysiCell 1.1.0 includes an advance copy of BioFVM 1.1.5. Here are the changes: 
+PhysiCell 1.1.1 includes an advance copy of BioFVM 1.1.5. Here are the changes: 
 	
 /* fixes in BioFVM 1.1.5  */
 

@@ -1,4 +1,4 @@
-VERSION := 1.1.0
+VERSION := 1.1.1
 
 PROGRAM_NAME := project
 
@@ -34,7 +34,8 @@ PhysiCell_custom.o PhysiCell_utilities.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o
 
-# put your custom objects here
+# put your custom objects here (they should be in the custom_modules directory)
+
 PhysiCell_custom_module_OBJECTS :=  
 
 pugixml_OBJECTS := pugixml.o
@@ -54,11 +55,11 @@ all: main.cpp $(ALL_OBJECTS)
 
 template2D: ./template_projects/template2D.cpp
 	cp ./template_projects/template2D.cpp main.cpp 
-	cp Makefile ./template_projects/
+	cp Makefile ./template_projects/Makefile.backup
 
 template3D: ./template_projects/template3D.cpp
 	cp ./template_projects/template3D.cpp main.cpp 	
-	cp Makefile ./template_projects/
+	cp Makefile ./template_projects/Makefile.backup
 	
 # examples 
 
@@ -87,20 +88,6 @@ examples: $(ALL_OBJECTS) $(EXAMPLES)
 	$(COMPILE_COMMAND) -o ./examples/test_HDS ./examples/PhysiCell_test_HDS.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o ./examples/test_cycle ./examples/PhysiCell_test_cell_cycle.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o ./examples/test_volume ./examples/physicell_test_volume.cpp $(ALL_OBJECTS)
-
-# template projects 
-	
-#2D: $(ALL_OBJECTS) main2D.o
-# 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME)2D $(ALL_OBJECTS) main2D.o
-
-# 3D: $(ALL_OBJECTS) main3D.o
-# 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME)3D $(ALL_OBJECTS) main3D.o
-	
-# main2D.o: main2D.cpp
-# 	$(COMPILE_COMMAND) -c main2D.cpp
-	
-# main3D.o: main3D.cpp
-# 	$(COMPILE_COMMAND) -c main3D.cpp
 
 # PhysiCell core components	
 	
@@ -171,16 +158,16 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 	
 clean:
 	rm -f *.o
-	rm -f $(PROGRAM_NAME).exe
+	rm -f $(PROGRAM_NAME)*
 	
 zip:
-	zip latest.zip */*.cpp */*.h *akefile* *.cpp *.h */*.hpp config/* documentation/* README.txt
+	zip latest.zip */*.cpp */*.h Makefile* *.cpp *.h */*.hpp config/* documentation/* matlab/* README.txt
 	cp latest.zip $$(date +%b_%d_%Y_%H%M).zip
 	cp latest.zip VERSION_$(VERSION).zip 
 	mv *.zip archives/
 	
 tar:
-	tar --ignore-failed-read -czf latest.tar */*.cpp */*.h *akefile* *.cpp */*.hpp config/* documentation/* README.txt
+	tar --ignore-failed-read -czf latest.tar */*.cpp */*.h Makefile* *.cpp */*.hpp config/* documentation/* matlab/* README.txt
 	cp latest.tar $$(date +%b_%d_%Y_%H%M).tar
 	cp latest.tar VERSION_$(VERSION).tar
 	mv *.tar archives/
