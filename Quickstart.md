@@ -38,9 +38,7 @@ using [CMake](https://cmake.org/download/) to build PhysiCell. If you want to be
 
 Unfortunately, the C++ compiler provided by the latest version of XCode on OSX does not support OpenMP.
 To resolve this, we recommend using the `brew` package manager to install a recent version of `gcc`. Follow the [brew 
-installation instructions](https://docs.brew.sh/Installation.html) (Note: this will still require that you have 
-[XCode](https://developer.apple.com/xcode/) installed. See the link related to homebrew in the References below
-for more details).
+installation instructions](https://docs.brew.sh/Installation.html).
 
 After installing brew, type `brew install gcc` from a Terminal command line. This 
 should install a recent version of gcc/g++ (supporting OpenMP) into `/usr/local/bin`. You can verify this with:
@@ -53,7 +51,7 @@ Set the following environment variable in your Terminal's shell, e.g., in the ba
 ```
 export PHYSICELL_CPP=/usr/local/bin/g++-7
 ```
-and the Makefile will use it. You probably want to permanently define this env var in your `~/.bash_profile` file also.
+and the Makefile will use it. You probably want to permanently define this environment variable in your `~/.bash_profile` file also.
 
 ### Linux
 
@@ -84,9 +82,9 @@ $ ./biorobots
 ```
 This will begin the simulation, write information to your terminal, and generate output files of types `.svg`, `.xml`, and `.mat`. More about those below. You can `Control-c` to kill the simulation early, if you want.
 
-For the remaining three example projects provided with PhysiCell, you would follow similar steps, but first clean out the previous simulation's output and prepare for the new one:
+For the remaining three example projects provided with PhysiCell, you would follow similar steps, but first, you may want to clean out the previous simulation's output and prepare for the new one:
 ```
-$ make data-cleanup   # optionally, delete all output data (otherwise, you can manuall copy to another directory to keep)
+$ make data-cleanup   # Delete output data. (Optionally, manually move it to another directory to keep it)
 $ make reset
 $ make cancer-biorobots-sample
 $ make
