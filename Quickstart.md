@@ -4,19 +4,15 @@ Nov 3, 2017
 
 ## Download
 
-We currently provide 3 options for downloading PhysiCell:
+We currently provide 2 options for downloading PhysiCell:
 
 1) Downloaded source code as a .zip file from http://physicell.mathcancer.org/ 
 (the link there takes you to the latest release on sourceforge).
 <!-- https://sourceforge.net/projects/physicell/files/PhysiCell/PhysiCell%201.2.1 -->
 
-2) We have recently begun migrating our code to GitHub. So, you can `git clone` or download a .zip from 
-https://github.com/MathCancer/PhysiCell. This will be our master branch of PhysiCell and therefore
-should always be deployable, but keep in mind it is not a release version. (We're still deciding on whether to
-continue using sourceforge or use GitHub for our releases).
+2) We have recently begun migrating our code to GitHub. So, you can also download from https://github.com/MathCancer/PhysiCell/releases.
 
-For more detailed information, see Section 3 of the 
-[User Guide](https://github.com/MathCancer/PhysiCell/blob/master/documentation/User_Guide.pdf) 
+For more detailed information, see Section 3 of the User Guide (in `/documentation`)
 and/or also http://www.mathcancer.org/blog/physicell-tutorials/.
 
 <hr> <!---------------------------------------------->
@@ -161,15 +157,15 @@ $ magick animate small.gif
 ### ParaView
 
 If you install ParaView, you can visualize and interact with output from 3D models. We will be providing a detailed
-tutorial for this.
+tutorial for this. Until then, please ask questions.
 
 ![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/PhysiCell_ParaView_quickstart.png "ParaView w clipping planes and barchart")
 
 <hr> <!---------------------------------------------->
 
-## Community Support
+## Support
 
-**we need an email list**
+Until we decide on a mailing list, please email us directly (macklinp@iu.edu, heiland@iu.edu) and follow us on Twitter  (https://twitter.com/MathCancer).
 
 <hr> <!---------------------------------------------->
 
