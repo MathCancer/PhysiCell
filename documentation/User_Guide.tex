@@ -98,7 +98,7 @@ urlcolor=blue
 
 \author{PhysiCell Project (Lead: Paul Macklin)}
 \title{PhysiCell User Guide (Version \Version)}
-\date{Revision: July 30, 2017}%\today}
+\date{Revision: November 3, 2017}%\today}
 
 \maketitle
 
@@ -119,8 +119,9 @@ If you use PhysiCell, please cite it as:
 \hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
 We built our model using PhysiCell (Version \Version) [1]. \\
 
-[1] A. Ghaffarizadeh, S.H. Friedman, S.M. Mumenthaler, and P. Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems, 
-bioRxiv 088773, 2016. DOI: 
+
+[1] A. Ghaffarizadeh, R. Heiland, S.H. Friedman, S.M. Mumenthaler, and P. Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems, 
+bioRxiv 088773, 2017. DOI: 
 \href{http://dx.doi.org/10.1101/088773}{10.1101/088773}. \\
 }
 
@@ -182,6 +183,30 @@ can be found at:
 Most linux users should already have a 64-bit \v|g++| environment installed by default. 
 
 \TOClink
+
+\subsection{Special notes for OSX users}
+\label{sec:osx_setup_note}
+As of Version 1.2.2, OSX users no longer need to modify the \v|CC| definition in the makefiles--this 
+represents a significant simplification for those users. However, OSX users (including those who 
+have already installed \v|g++| by Homebrew of MacPorts) need to perform a one-time setup 
+of an environment variable. Open your terminal, and run the following commands: 
+
+\begin{verbatim}
+export PHYSICELL_CPP=your_compiler_name
+echo export PHYSICELL_CPP=your_compiler_name >> ~/.bash_profile
+\end{verbatim}
+
+\v|your_compiler_name| will be something like \v|g++-7| for Homebrew installations, 
+and something like \v|g++-mp-7| for MacPorts installations. 
+
+See the tutorials at 
+\href{http://www.mathcancer.org/blog/physicell-tutorials/}{http://www.MathCancer.org/blog/physicell-tutorials/}
+for more details. Also, if you have compiler crashes, see the FAQ (frequently asked questions) at:
+
+\href{http://www.mathcancer.org/blog/common-problems-and-solutions/}{http://www.mathcancer.org/blog/common-problems-and-solutions/}
+
+\TOClink
+
 \subsection{Virtual Machine option \DONE}
 Starting with the 1.2.x releases, we began distributing PhysiCell as zipped source (preferred),  
 \href{https://www.docker.com/}{Docker} containers, and virtual appliances 
