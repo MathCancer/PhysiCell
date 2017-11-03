@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -75,33 +75,73 @@ using namespace BioFVM;
 namespace PhysiCell{
 	class Cell_Container;
 
-typedef struct
+class Cell_Parameters
 {
-	double o2_necrotic = 5; // mmHg
-	//double o2_critical = 0.076; // mmHg
-	double o2_critical = 2.5; // mmHg
+	private:
 	
-	double o2_no_proliferation = 5; // mmHg
-	double o2_hypoxic = 15; // mmHg
-	double o2_ref = 6.06; // mmHg
-	double o2_saturation = 38; // mmHg
-	
-	double max_necrosis_rate=1 / (24*60.0); // 1 day^-1
-	
-	int necrosis_type= PhysiCell_constants::deterministic_necrosis;
-	
-	double glucose_necrosis_threshold = 0.1;  // dimensionless 
-	double maximum_stretch; 
-	double cell_adhesion_parameter; 
-	double cell_repulsion_parameter=1;
-	double max_interaction_distance_factor = 1.5;
+	public:
+		// oxygen values (in mmHg) for critical phenotype changes
+		double o2_necrotic;
+		double o2_critical;
+		
+		double o2_no_proliferation;
+		double o2_hypoxic;
+		double o2_reference;
+		double o2_saturation;
 
-	double Ccca= 0.170577155519015; //used in calculating cell-cell adhesion
-	double Cccr= 10.0; //used in calculating cell-cell repulsion			
-	double Ccba= 1.70577155519015; //used in calculating cell-basement membrane repulsion	
-	double Ccbr= 10.0; //used in calculating cell-basement membrane repulsion	
-	
-} Cell_Parameters; 
+		// necrosis parameters 
+		
+		double max_necrosis_rate;
+		int necrosis_type;
+		
+		// double maximum_stretch; // not used 
+		// cell_adhesion_parameter; // not used 
+		// cell_repulsion_parameter=1; // not used 
+		
+		// mechanics parameters 
+
+		double Ccca; //used in calculating cell-cell adhesion
+		double Cccr; //used in calculating cell-cell repulsion
+		double Ccba; //used in calculating cell-basement membrane repulsion	
+		double Ccbr; //used in calculating cell-basement membrane repulsion	
+
+		double max_interaction_distance_factor;
+		
+		double diffusion_dt; // reaction-diffusion time step
+		double mechanics_dt; // mechanics time step 
+		double cell_cycle_dt; // phenotype time step 
+		
+		Cell_Parameters(); 
+}; 
+
+class Cell_Defaults
+{
+	private:
+	public: 
+		Microenvironment* pMicroenvironment; 
+		Cell_Parameters parameters; 
+		
+		bool defaults_set; 
+		
+		void (*advance_cell_current_phase)( Cell* pCell, double); 
+		void (*set_motility)( Cell* pCell, double ); 
+		void (*custom_cell_rule)( Cell* pCell, double); 
+		
+		void (*update_volume)( Cell* pCell, double); 
+		void (*update_phenotype)( Cell* pCell, double); // never used 
+		void (*update_velocity)( Cell* pCell, double); 
+		
+		void (*add_cell_basement_membrane_interactions)(Cell* pCell, double);
+		double (*distance_to_membrane)(Cell* pCell);
+		
+		void (*update_cell_and_death_parameters)(Cell* pCell, double); // hidden in container 
+		void (*update_phenotype_parameters)(Cell* pCell, double); // never used 
+		void (*set_orientation)(Cell* pCell, double);
+
+		Cell_Defaults(); 
+};
+
+extern Cell_Defaults cell_defaults; 
 
 class Cell : public Basic_Agent 
 {
@@ -138,11 +178,8 @@ class Cell : public Basic_Agent
 		// mechanics 
 		void update_position( double dt ); //
 		std::vector<double> displacement; 
-
-		void intialize_functions( void ); 		
 		
 		void (*advance_cell_current_phase)( Cell* pCell, double); 
-		// void (*advance_cell_death)( Cell* pCell, double); 
 		void (*set_motility)( Cell* pCell, double ); 
 		void (*custom_cell_rule)( Cell* pCell, double); 
 		void (*update_volume)( Cell* pCell, double); 
@@ -152,9 +189,10 @@ class Cell : public Basic_Agent
 		double (*distance_to_membrane)(Cell* pCell);
 		void (*update_cell_and_death_parameters)(Cell* pCell, double);
 		void (*update_phenotype_parameters)(Cell* pCell, double);
-		void (*set_orientation)(Cell* pCell);
+		void (*set_orientation)(Cell* pCell, double);
 		void assign_orientation();  // if set_orientaion is defined, uses it to assign the orientation
 									// otherwise, it assigns a random orientation to the cell.
+									
 		void copy_function_pointers(Cell*);
 		void update_voxel_in_container(void);
 		void copy_data(Cell *);
@@ -162,9 +200,7 @@ class Cell : public Basic_Agent
 		void set_phenotype(Phenotype, Phenotype);
 		void update_radius();
 		Cell_Container * get_container();
-		
 };
-
 
 Cell* create_cell( void );  
 void delete_cell( int ); 
@@ -173,8 +209,10 @@ void save_all_cells_to_matlab( std::string filename );
 void update_volume_default( Cell* pCell, double dt ); 
 void update_volume_default_old( Cell* pCell, double dt ); 
 void update_velocity_default( Cell* pCell, double dt );
-void update_velocity_default( Cell* pCell, double dt );
 void add_basement_membrane_interactions_default( Cell* pCell, double dt );
+
+// these belong in standard models 
+
 void update_cell_and_death_parameters_O2_based( Cell* pCell, double dt ); 
 void update_cell_and_death_parameters_O2_based_density_arrest( Cell* pCell, double dt ); 
 void update_cell_and_death_parameters_O2_based_volume_arrest( Cell* pCell, double dt ); 

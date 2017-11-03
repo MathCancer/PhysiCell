@@ -13,7 +13,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the BioFVM Project              #
+# Copyright (c) 2015-2017, Paul Macklin and the BioFVM Project              #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -51,8 +51,8 @@
 #include "BioFVM_MultiCellDS.h"
 
 namespace BioFVM{
-std::string BioFVM_Version = "1.1.4";
-std::string BioFVM_URL = "http://BioFVM.MathCancer.org"; 	
+std::string BioFVM_Version = "1.1.5";
+std::string BioFVM_URL = "http://BioFVM.MathCancer.org"; 
 		
 bool biofvm_dom_initialized = false; 
 pugi::xml_document biofvm_doc; 
@@ -845,6 +845,10 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 			pugi::xml_node node1 = node.append_child( "simplified_data" ); 
 			pugi::xml_attribute attrib = node1.append_attribute( "type" ); 
 			attrib.set_value( "matlab" ) ; 
+			
+			attrib = node1.append_attribute( "source" ); 
+			attrib.set_value("BioFVM"); 
+			
 		}
 		node = node.child( "simplified_data" ); 
 		
@@ -1058,7 +1062,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 	int microenvironment_index = -1; 
 	while( root )
 	{
-		M_destination.name= root.attribute("name").value(); 
+		M_destination.name = root.attribute("name").value(); 
 		
 		// read the mesh 
 		bool cartesian = true; 

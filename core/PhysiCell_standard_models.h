@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -64,13 +64,17 @@
 #include "PhysiCell_cell_container.h"
 #include "PhysiCell_utilities.h" 
 
-
 using namespace BioFVM; 
 using namespace PhysiCell;
+
+// why aren't these in the PhysiCell namespace? (May 15, 2017)
 
 bool check_necrosis( Cell* pCell, double dt); 
 bool check_apoptosis( Cell* pCell, double dt, bool stoc_A); 
 void do_nothing( Cell* pCell, double dt); 
+
+/* cell cycle models */ 
+
 void ki67_advanced_cycle_model( Cell* pCell, double dt, bool stoc_K1, bool stoc_K2, bool stoc_Q, bool stoc_A); 
 void ki67_advanced_cycle_model_deterministic( Cell* pCell, double dt); 
 void ki67_advanced_cycle_model_legacy( Cell* pCell, double dt); 
@@ -82,8 +86,18 @@ void ki67_basic_cycle_model_legacy( Cell* pCell, double dt);
 void live_apoptotic_cycle_model( Cell* pCell , double dt );
 void total_cells_cycle_model( Cell* pCell, double dt );
 
+/* cell death models */ 
+
 void death_apoptosis_model( Cell* pCell, double dt, bool stochastic);
 void death_apoptosis_model_deterministic( Cell* pCell, double dt);
 void death_apoptosis_model_stochastic( Cell* pCell, double dt);
 void death_necrosis_swelling_model( Cell* pCell, double dt );
 void death_necrosis_lysed_model( Cell* pCell, double dt );
+
+/* mechanics, motility, and other models */ 
+
+void up_orientation( Cell* pCell, double dt );
+
+
+
+

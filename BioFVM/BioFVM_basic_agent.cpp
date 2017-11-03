@@ -13,7 +13,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the BioFVM Project              #
+# Copyright (c) 2015-2017, Paul Macklin and the BioFVM Project              #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -135,6 +135,8 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 	cell_source_sink_solver_temp2.assign( (*secretion_rates).size() , 1.0 ); 
 	axpy( &(cell_source_sink_solver_temp2) , internal_constant_to_discretize_the_delta_approximation , *secretion_rates );
 	axpy( &(cell_source_sink_solver_temp2) , internal_constant_to_discretize_the_delta_approximation , *uptake_rates );	
+	
+	volume_is_changed = false; 
 }
 
 void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )
@@ -214,8 +216,8 @@ std::vector<double>& Basic_Agent::nearest_density_vector( void )
 
 void Basic_Agent::set_total_volume(double volume)
 {
-	this->volume=volume;
-	volume_is_changed=true;
+	this->volume = volume;
+	volume_is_changed = true;
 }
 
 double Basic_Agent::get_total_volume()
@@ -227,10 +229,10 @@ void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt
 	if(!is_active)
 	{ return; }
 	
-	if(volume_is_changed)
+	if( volume_is_changed )
 	{
 		set_internal_uptake_constants(dt);
-		volume_is_changed=false;
+		volume_is_changed = false;
 	}
 	(*pS)(current_voxel_index) += cell_source_sink_solver_temp1; 
 	(*pS)(current_voxel_index) /= cell_source_sink_solver_temp2; 

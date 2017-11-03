@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -67,16 +67,15 @@
 #include "PhysiCell_cell.h"
 #include "../BioFVM/BioFVM_agent_container.h"
 #include "../BioFVM/BioFVM_mesh.h"
+#include "../BioFVM/BioFVM_microenvironment.h"
 
 namespace PhysiCell{
 
 typedef struct 
 {
-	double cell_cylce_dt_default=6;
-	double mechanics_dt_default=0.1;
+	double cell_cycle_dt_default = 6;
+	double mechanics_dt_default = 0.1;
 } Time_Settings;
-
-
 
 class Cell; 
 
@@ -87,7 +86,6 @@ class Cell_Container : public BioFVM::Agent_Container
 	std::vector<Cell*> cells_ready_to_die;
 	int boundary_condition_for_pushed_out_agents; 	// what to do with pushed out cells
 	bool initialzed = false;
-	
 	
  public:
 	BioFVM::Cartesian_Mesh underlying_mesh;
@@ -121,6 +119,8 @@ class Cell_Container : public BioFVM::Agent_Container
 
 int find_escaping_face_index(Cell* agent);
 extern std::vector<Cell*> *all_cells; 
+
+Cell_Container* create_cell_container_for_microenvironment( BioFVM::Microenvironment& m , double mechanics_voxel_size );
 	
 };
 #endif

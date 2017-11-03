@@ -3,21 +3,23 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, PloS Comput. Biol. 2017 (in revision).         #
+#     preprint DOI: 10.1101/088773                                          #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, PloS Comput. Biol. 2017 (in revision).         #
+#     preprint DOI: 10.1101/088773                                          #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +29,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -66,8 +68,8 @@
 #include <cstdlib>
 #include <string>
 
-#ifndef _SVG_h_
-#define _SVG_h_
+#ifndef _PhysiCell_SVG_h_
+#define _PhysiCell_SVG_h_
 
 bool Write_SVG_start( std::ostream& os, double width, double height );
 bool Write_SVG_end( std::ostream& os );
@@ -79,7 +81,6 @@ bool Write_SVG_rect( std::ostream& os , double UL_corner_x, double UL_corner_y, 
                      double stroke_size, std::string stroke_color , std::string fill_color );
 
 bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
-                    std::string stroke_color );  					 
-					 
+                    std::string stroke_color );  
 
 #endif

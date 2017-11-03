@@ -13,7 +13,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the BioFVM Project              #
+# Copyright (c) 2015-2017, Paul Macklin and the BioFVM Project              #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -266,6 +266,7 @@ void one_function( std::vector<double>& position, std::vector<double>& input , s
 void zero_function( Microenvironment* pMicroenvironment, int voxel_index, std::vector<double>* write_destination );
 void one_function( Microenvironment* pMicroenvironment, int voxel_index, std::vector<double>* write_destination );
 
+void set_default_microenvironment( Microenvironment* M );
 Microenvironment* get_default_microenvironment( void ); 
 
 };

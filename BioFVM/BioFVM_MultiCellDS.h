@@ -13,7 +13,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the BioFVM Project              #
+# Copyright (c) 2015-2017, Paul Macklin and the BioFVM Project              #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -73,6 +73,14 @@ extern int MultiCellDS_simulation_snapshot_code;
 
 extern std::string MultiCellDS_digital_cell_line_type_string; 
 extern int MultiCellDS_digital_cell_line_code; 
+
+/* options */ 
+
+extern bool save_mesh_as_matlab; 
+extern bool save_density_data_as_matlab;
+extern bool save_cells_as_custom_matlab; 
+extern bool save_cell_data; 
+
 
 class Microenvironment; 
 

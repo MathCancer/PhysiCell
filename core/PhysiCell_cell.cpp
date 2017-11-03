@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -72,36 +72,97 @@ namespace PhysiCell{
 void empty_function( Cell* pCell, double dt )
 { return; }
 
-Cell::Cell()
+Cell_Parameters::Cell_Parameters()
 {
+	o2_necrotic = 5; 
+	o2_critical = 2.5; 
+	
+	o2_no_proliferation = 5; 
+	o2_hypoxic = 15; 
+	
+	o2_reference = 6.06; 
+	o2_saturation = 38; 
+	
+	max_necrosis_rate = 1.0 / (24*60.0); 
+	
+	necrosis_type = PhysiCell_constants::deterministic_necrosis;
+	
+	max_interaction_distance_factor = 1.5;
+
+	Ccca = 0.170577155519015; 
+	Cccr = 10.0; 
+	Ccba = 10*Ccca; 
+	Ccbr = Cccr; 
+	
+	diffusion_dt = 0.01;
+	mechanics_dt = 0.1;
+	cell_cycle_dt = 6; // phenotype time step 
+	
+	
+}
+
+Cell_Defaults cell_defaults; 
+
+Cell_Defaults::Cell_Defaults()
+{
+	pMicroenvironment = NULL;
+	if( BioFVM::get_default_microenvironment() != NULL )
+	{ pMicroenvironment = BioFVM::get_default_microenvironment(); }
+
 	advance_cell_current_phase = empty_function;
-	// advance_cell_death = empty_function; 
 	set_motility = empty_function;
 	custom_cell_rule = empty_function; 
-	update_phenotype = empty_function; 
+	
 	update_volume = update_volume_default;
+	update_phenotype = empty_function; 
 	update_velocity = update_velocity_default;
+	
 	add_cell_basement_membrane_interactions = add_basement_membrane_interactions_default;
-	update_cell_and_death_parameters = update_cell_and_death_parameters_O2_based;
+	distance_to_membrane = NULL;
+
+	update_cell_and_death_parameters = empty_function;
+	update_phenotype_parameters = empty_function; 
+	set_orientation = NULL;
+	
+	defaults_set = true; 
+	
+	return; 
+}
+
+Cell::Cell()
+{
+	// set all the functions to the current defaults 
+	advance_cell_current_phase = cell_defaults.advance_cell_current_phase;
+	set_motility = cell_defaults.set_motility;
+	custom_cell_rule = cell_defaults.custom_cell_rule; 
+	update_volume = cell_defaults.update_volume;
+	update_phenotype = cell_defaults.update_phenotype; 
+	update_velocity = cell_defaults.update_velocity; 
+	add_cell_basement_membrane_interactions = cell_defaults.add_cell_basement_membrane_interactions; 
+	distance_to_membrane = cell_defaults.distance_to_membrane; 
+	update_cell_and_death_parameters = cell_defaults.update_cell_and_death_parameters; 
+	update_phenotype_parameters = cell_defaults.update_phenotype_parameters; 
+	set_orientation = cell_defaults.set_orientation;
+	// set parameters to the current defaults 
+	parameters = cell_defaults.parameters; 
+	
 	current_mechanics_voxel_index=-1;
 	polarity=0;
-	set_orientation=NULL;
-	distance_to_membrane= NULL;
-	is_moving=true;
-	is_out_of_domain=false;
-	displacement.resize(3,0);
-	motility.resize(3,0);
-	assign_orientation();
-	container=NULL;
 	
+	is_moving = true;
+	is_out_of_domain = false;
+	displacement.resize(3,0.0);
+	motility.resize(3,0.0);
+	assign_orientation();
+	container = NULL;
 }
 
 void Cell::assign_orientation()
 {
-	orientation.resize(3);
-	if(set_orientation!=NULL)
+	orientation.resize(3,0.0);
+	if(set_orientation != NULL)
 	{
-		set_orientation(this);
+		set_orientation(this, 0.0 );
 	}
 	else
 	{
@@ -112,6 +173,8 @@ void Cell::assign_orientation()
 		orientation[0]= temp * cos(theta);
 		orientation[1]= temp * sin(theta);
 		orientation[2]= z;
+		
+		polarity = 0.0; 
 	}
 }
 
@@ -160,12 +223,14 @@ bool Cell::assign_position(std::vector<double> new_position)
 
 void Cell::set_previous_velocity(double xV, double yV, double zV)
 {
-	previous_velocity[0]=xV; previous_velocity[1]=yV; previous_velocity[2]=zV; 
+	previous_velocity[0]=xV;
+	previous_velocity[1]=yV;
+	previous_velocity[2]=zV; 
 }
 
 bool Cell::assign_position(double x, double y, double z)
 {
-	if( !get_container()->underlying_mesh.is_position_valid(x,y,z))
+	if( !get_container()->underlying_mesh.is_position_valid(x,y,z) )
 	{	
 		return false;
 	}
@@ -190,18 +255,24 @@ void Cell::set_total_volume(double volume)
 		phenotype.volume.multiply_by_ratio(ratio);
 	}
 	phenotype.update_radius();
-	if(get_container()->max_cell_interactive_ditstance_in_voxel[get_current_mechanics_voxel_index()]< phenotype.geometry.radius * parameters.max_interaction_distance_factor )
+	if(get_container()->max_cell_interactive_ditstance_in_voxel[get_current_mechanics_voxel_index()] < phenotype.geometry.radius * parameters.max_interaction_distance_factor )
+	{
 		get_container()->max_cell_interactive_ditstance_in_voxel[get_current_mechanics_voxel_index()]= phenotype.geometry.radius*parameters.max_interaction_distance_factor;
 	}
+}
 
 void Cell::set_phenotype(Phenotype phenotype, Phenotype base_phenotype)
 {
-	this->phenotype=phenotype;	
-	this->base_phenotype= base_phenotype;
-	secretion_rates= & this->phenotype.secretion_rates.rates;
-	uptake_rates= & this->phenotype.uptake_rates.rates;
-	saturation_densities= & this->phenotype.saturation_densities.densities;
+	this->phenotype = phenotype;	
+	this->base_phenotype = base_phenotype;
+	
+	secretion_rates = & this->phenotype.secretion_rates.rates;
+	uptake_rates = & this->phenotype.uptake_rates.rates;
+	saturation_densities = & this->phenotype.saturation_densities.densities;
+	
 	set_total_volume(phenotype.volume.total);
+	
+	set_internal_uptake_constants( parameters.diffusion_dt );
 }
 
 void Cell::set_phenotype(Phenotype phenotype)
@@ -215,20 +286,27 @@ void Cell::turn_off_reactions(double dt)
 	
 	// Reduce all the uptake and secretion rates by a factor of 10
 	for(int i=0;i< phenotype.uptake_rates.rates.size();i++)
-		phenotype.uptake_rates.rates[i]/=10.0;  
+	{
+		phenotype.uptake_rates.rates[i] /= 10.0;  
+	}
+	
 	for(int i=0;i< phenotype.secretion_rates.rates.size();i++)
-		phenotype.secretion_rates.rates[i]/=10.0;  
+	{
+		phenotype.secretion_rates.rates[i] /= 10.0; 
+	}
 	set_internal_uptake_constants(dt);
 }
 
 Cell_Container * Cell::get_container()
 {
 	if(container==NULL)
-		container= (Cell_Container *)get_microenvironment()->agent_container;
+	{
+		container = (Cell_Container *)get_microenvironment()->agent_container;
+	}
 	return container;
 }
 
-void Cell:: die()
+void Cell::die()
 {
 	delete_cell(this);
 } 
@@ -315,11 +393,11 @@ void Cell::update_voxel_in_container()
 void Cell::copy_data(Cell* copy_me)
 {
 	// phenotype=copyMe-> phenotype; //it is taken care in set_phenotype
-	type=copy_me->type;
+	type = copy_me->type;
 	velocity = copy_me->velocity; 
 	// expected_phenotype = copy_me-> expected_phenotype; //it is taken care in set_phenotype
-	cell_source_sink_solver_temp1= std::vector<double>(copy_me->cell_source_sink_solver_temp1);
-	cell_source_sink_solver_temp2= std::vector<double>(copy_me->cell_source_sink_solver_temp2);
+	cell_source_sink_solver_temp1 = std::vector<double>(copy_me->cell_source_sink_solver_temp1);
+	cell_source_sink_solver_temp2 = std::vector<double>(copy_me->cell_source_sink_solver_temp2);
 }
 
 void Cell::copy_function_pointers(Cell* copy_me)
@@ -337,9 +415,10 @@ void Cell::copy_function_pointers(Cell* copy_me)
 	update_cell_and_death_parameters= copy_me->update_cell_and_death_parameters;
 }
 
-void Cell::add_potentials(Cell* other_agent) {
+void Cell::add_potentials(Cell* other_agent)
+{
 	if( this->ID == other_agent->ID )
-		return;	
+	{ return; }
 
 	double distance = 0; 
 	for( int i = 0 ; i < 3 ; i++ ) 
@@ -357,7 +436,9 @@ void Cell::add_potentials(Cell* other_agent) {
 	double RN = phenotype.geometry.nuclear_radius + (*other_agent).phenotype.geometry.nuclear_radius;	
 	double temp_r, c;
 	if( distance > R ) 
-		temp_r=0; 
+	{
+		temp_r=0;
+	}
 	// else if( distance < RN ) 
 	// {
 		// double M = 1.0; 
@@ -389,7 +470,7 @@ void Cell::add_potentials(Cell* other_agent) {
 	}
 	/////////////////////////////////////////////////////////////////
 	if(temp_r==0)
-		return;
+	{ return; }
 	temp_r/=distance;
 	for( int i = 0 ; i < 3 ; i++ ) 
 	{
@@ -405,6 +486,32 @@ Cell* create_cell( void )
 	pNew = new Cell;		
 	(*all_cells).push_back( pNew ); 
 	pNew->index=(*all_cells).size()-1;
+	
+	// new usability enhancements in May 2017 
+	
+	if( BioFVM::get_default_microenvironment() )
+	{
+		pNew->register_microenvironment( BioFVM::get_default_microenvironment() );
+	}
+	
+	if( cell_defaults.defaults_set == true )
+	{
+		// set all the functions to the current defaults 
+		pNew->advance_cell_current_phase = cell_defaults.advance_cell_current_phase;
+		pNew->set_motility = cell_defaults.set_motility;
+		pNew->custom_cell_rule = cell_defaults.custom_cell_rule; 
+		pNew->update_volume = cell_defaults.update_volume;
+		pNew->update_phenotype = cell_defaults.update_phenotype; 
+		pNew->update_velocity = cell_defaults.update_velocity; 
+		pNew->add_cell_basement_membrane_interactions = cell_defaults.add_cell_basement_membrane_interactions; 
+		pNew->distance_to_membrane = cell_defaults.distance_to_membrane; 
+		pNew->update_cell_and_death_parameters = cell_defaults.update_cell_and_death_parameters; 
+		pNew->update_phenotype_parameters = cell_defaults.update_phenotype_parameters; 
+		pNew->set_orientation = cell_defaults.set_orientation;
+		// set parameters to the current defaults 
+		pNew->parameters = cell_defaults.parameters; 
+	}
+	
 	return pNew; 
 }
 
@@ -607,10 +714,10 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, double dt )
 	if((pCell->nearest_density_vector())[PhysiCell_constants::oxygen_index] > pCell->parameters.o2_no_proliferation)
 	{
 		if((pCell->nearest_density_vector())[PhysiCell_constants::oxygen_index] <= pCell->parameters.o2_saturation )
-			factor= (pCell->parameters.o2_ref - pCell->parameters.o2_no_proliferation)/ 
+			factor= (pCell->parameters.o2_reference - pCell->parameters.o2_no_proliferation)/ 
 			((pCell->nearest_density_vector())[PhysiCell_constants::oxygen_index] - pCell->parameters.o2_no_proliferation);
 		else
-			factor= ( pCell->parameters.o2_ref- pCell->parameters.o2_no_proliferation)/ 
+			factor= ( pCell->parameters.o2_reference - pCell->parameters.o2_no_proliferation)/ 
 			(pCell->parameters.o2_saturation - pCell->parameters.o2_no_proliferation);
 				
 		pCell->phenotype.cycle.phases[pCell->phenotype.get_phase_index(PhysiCell_constants::Ki67_negative)].duration= 

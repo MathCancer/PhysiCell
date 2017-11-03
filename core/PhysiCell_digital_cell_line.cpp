@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -245,7 +245,6 @@ void set_cancer_cell_line( Cell_Line& DCL )
 	DCL.microenvironment_samples[i].densities[0] = 160.0; 
 	DCL.phenotypes[i].set_phase_maps(&phase_hashmap);
 }	
-
 
 void set_cancer_cell_line_MCF7( Cell_Line& DCL )
 {
@@ -584,6 +583,11 @@ void set_endothelial_cell_line( Cell_Line& DCL )
 	DCL.phenotypes[i].volume.cytoplasmic_fluid = DCL.phenotypes[i].volume.fluid_fraction * 	DCL.phenotypes[i].volume.cytoplasmic; 
 	DCL.phenotypes[i].volume.cytoplasmic_solid = DCL.phenotypes[i].volume.cytoplasmic -  DCL.phenotypes[i].volume.cytoplasmic_fluid;  
 
+}
+
+int Phenotype::get_current_phase_code(void)
+{
+	return cycle.phases[current_phase_index].code; 
 }
 
 };

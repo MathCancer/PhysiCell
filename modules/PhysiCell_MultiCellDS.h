@@ -1,24 +1,23 @@
-<!--
 /*
 #############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -28,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -60,18 +59,40 @@
 #                                                                           #
 #############################################################################
 */
---> 
-<?xml version="1.0" encoding="UTF-8"?>
-<user_details />
 
-<PhysiCell_settings version="1.0.0">
+#ifndef __PhysiCell_MultiCellDS_h__
+#define __PhysiCell_MultiCellDS_h__
+
+#include <iostream>
+#include <ctime>
+#include <cmath>
+#include <string>
+#include <vector>
+#include <random>
+#include <chrono>
+
+#include "../core/PhysiCell.h"
+#include "../biofvm/BioFVM_MultiCellDS.h"
+
+namespace PhysiCell{
+/*	
+	long SeedRandom( long input );
+	long SeedRandom( void );
+	double UniformRandom( void );
+	double dist_squared(std::vector<double> p1, std::vector<double> p2);
+	double dist(std::vector<double> p1, std::vector<double> p2);	
+	int writePov(std::vector<Cell*> all_cells, double timepoint, double scale);
+	int writeCellReport(std::vector<Cell*> all_cells, double timepoint);
+	void log_output(double t, int output_index, Microenvironment microenvironment, std::ofstream& report_file);
+*/
+
+void add_PhysiCell_cell_to_open_xml_pugi(  pugi::xml_document& xml_dom, Cell& C ); // not implemented -- future edition 
+void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M  ); 
+void add_PhysiCell_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M );
+
 	
+void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double current_simulation_time); 
 	
-	
-	
-	
-	
-	
-	
-	
-</PhysiCell_settings>
+};
+
+#endif

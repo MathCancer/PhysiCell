@@ -1,11 +1,25 @@
 /*
 #############################################################################
-# If you use BioFVM in your project, please cite BioFVM and the version     #
-# number, such as below:                                                    #
+# If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
+# sion number, such as below:                                               #
 #                                                                           #
-# We solved the diffusion equations using BioFVM (Version 1.1.5) [1]        #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
-# [1] A. Ghaffarizadeh, S.H. Friedman, and P. Macklin, BioFVM: an efficient #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2017 (in revision).                            #
+#                                                                           #
+# Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
+#     BioFVM as below:                                                      #
+#                                                                           #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
+# with BioFVM [2] to solve the transport equations.                         #
+#                                                                           #
+# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
+#     Multicellular Systems, 2017 (in revision).                            #
+#                                                                           #
+# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
 #    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730 #
 #                                                                           #
@@ -13,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2017, Paul Macklin and the BioFVM Project              #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -46,24 +60,88 @@
 #############################################################################
 */
 
-#ifndef __BioFVM_h__
-#define __BioFVM_h__
+#ifndef __PhysiCell_basic_phenotype_h__
+#define __PhysiCell_basic_phenotype_h__
 
-#include <iostream>
-#include <fstream>
+#include <vector>
+#include <string>
 
-namespace BioFVM{
-extern std::string BioFVM_Version; 
-extern std::string BioFVM_URL; 
+namespace PhysiCell{
+	
+class Cell; 
+class Cycle_Phase_Link;
+
+class Cycle_Phase
+{
+ private:
+ public:
+	int code;
+	std::string name; 
+	std::vector< Cycle_Phase_Link > cycle_phase_links; 
 };
 
-#include "BioFVM_utilities.h" 
-#include "BioFVM_vector.h" 
-#include "BioFVM_vector.h" 
-#include "BioFVM_mesh.h"
-#include "BioFVM_microenvironment.h"
-#include "BioFVM_solvers.h"
-#include "BioFVM_basic_agent.h" 
+class Cycle_Phase_Link
+{
+ private:
+ public:  
+	Cycle_Phase *p_linked_cycle_phase; 
+	double transition_rate; 
+	bool is_deterministic; 
+};
 
+class Cell_Volumes
+{
+ public: 
+	double total; 
+	double nuclear; 
+	double cytoplasmic; 
+	double fluid_fraction; 
+	double calcified_fraction; 
+
+	void (*volume_model)(Cell* pCell, double dt); 
+};
+
+class Basic_Phenotype
+{
+ private:
+ public:
+	// cell cycle information 
+ 
+	void (*cycle_model)(Cell* pCell, double dt);
+	int current_phase; 
+	std::vector< int > allowed_cycle_phases; 
+	
+	double elapsed_time_in_current_phase; 
+	
+	// cell death information 
+	
+	std::vector< void (*)(Cell* pCell, double dt) > death_models; 
+	
+	// volume and subvolumes 
+	
+	Cell_Volumes current_volumes; 
+	Cell_Volumes target_volumes; 
+	
+	// volume change parameters 
+	
+	// orientation 
+	
+	std::vector< double > orientation; 
+	double polarity; 
+	
+	// motility 
+	
+	double maximum_speed; 
+	
+	// adhesion 
+	
+	// mechanics 
+	
+	
+	
+};
+
+
+};
 
 #endif

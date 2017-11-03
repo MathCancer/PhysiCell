@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -66,6 +66,7 @@ namespace PhysiCell{
 
 PhysiCell_SVG_options_struct PhysiCell_SVG_options;
 
+// cyto_color, cyto_outline , nuclear_color, nuclear_outline
 std::vector<std::string> simple_cell_coloring( Cell* pCell )
 {
 	static std::vector< std::string > output( 4 , "rgb(0,0,0)" ); 
@@ -75,13 +76,85 @@ std::vector<std::string> simple_cell_coloring( Cell* pCell )
 	return output; 
 }
 
-std::vector<std::string> false_cell_coloring_LiveDead( Cell* pCell )
+// works for any Ki67-based cell cycle model 
+std::vector<std::string> false_cell_coloring_Ki67( Cell* pCell )
 {
-	static std::vector< std::string > output( 4 , "rgb(0,0,0)" ); 
+	static std::vector< std::string > output( 4 , "rgb(0,0,0)" );
+    
+    // output[0] = cyto_color, output[1] = cyto_outline , output[2] = nuclear_color, output[3] = nuclear_outline
+
+	// positive_premitotic - Green
+	if (pCell->phenotype.get_current_phase_code() == PhysiCell_constants::Ki67_positive_premitotic || 
+		pCell->phenotype.get_current_phase_code() == PhysiCell_constants::Ki67_positive )  
+	{
+		output[0] = "rgb(0,255,0)";
+		output[2] = "rgb(0,125,0)";
+	}
+
+    if (pCell->phenotype.get_current_phase_code() == PhysiCell_constants::Ki67_positive_postmitotic )  // postive_postmitotic - Magenta
+    {
+        output[0] = "rgb(255,0,255)";
+        output[2] = "rgb(125,0,125)";
+    }
+
+    if (pCell->phenotype.get_current_phase_code() == PhysiCell_constants::Ki67_negative )  // Ki-67 negative/Quiescent - Blue
+    {
+        output[0] = "rgb(40,200,255)";
+        output[2] = "rgb(20,100,255)";
+    }
+
+    if (pCell->phenotype.get_current_phase_code() == PhysiCell_constants::apoptotic )  // Apoptotic - Red
+    {
+        output[0] = "rgb(255,0,0)";
+        output[2] = "rgb(125,0,0)";
+    }
 	
+	// Necrotic - Brown
+	if( pCell->phenotype.get_current_phase_code() == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.get_current_phase_code() == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.get_current_phase_code() == PhysiCell_constants::necrotic )
+	{
+		output[0] = "rgb(250,138,38)";
+		output[2] = "rgb(139,69,19)";
+    }
+    
+    return output;
+}
+
+std::vector<std::string> false_cell_coloring_live_dead( Cell* pCell )
+{
+	static std::vector< std::string > output( 4 , "rgb(0,0,0)" );
+    
+  // output[0] = cyto_color, output[1] = cyto_outline , output[2] = nuclear_color, output[3] = nuclear_outline
+
+	// live cell - Green
+	if (pCell->phenotype.get_current_phase_code() == PhysiCell_constants::live )  
+	{
+		output[0] = "rgb(0,255,0)";
+		output[2] = "rgb(0,125,0)";
+		return output; 
+	}
+	
+	// if not, dead colors 
+	
+	if (pCell->phenotype.get_current_phase_code() == PhysiCell_constants::apoptotic )  // Apoptotic - Red
+	{
+		output[0] = "rgb(255,0,0)";
+		output[2] = "rgb(125,0,0)";
+	}
+	
+	// Necrotic - Brown
+	if( pCell->phenotype.get_current_phase_code() == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.get_current_phase_code() == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.get_current_phase_code() == PhysiCell_constants::necrotic )
+	{
+		output[0] = "rgb(250,138,38)";
+		output[2] = "rgb(139,69,19)";
+  }	
 	
 	return output; 
 }
+
 
 std::vector<double> transmission( std::vector<double>& incoming_light, std::vector<double>& absorb_color, double thickness , double stain )
 {
@@ -150,13 +223,17 @@ std::string formatted_minutes_to_DDHHMM( double minutes )
 {
 	static std::string output; 
 	output.resize( 1024 ); 
-
-	int nDays = (int) floor( (double) (minutes / (60.0*24.0)) );
-	int nHours = (int) floor( (double) ( (minutes - nDays*60*24) / (60.0)) );
-	double dMinutes = minutes - nDays*60*24 - nHours*60;
-
+	
+	int nMinutes = round( minutes ); 
+	int nDays = minutes / 1440; 
+	nMinutes -= nDays*1440; 
+	
+	int nHours = nMinutes / 60;
+	double dMinutes = minutes - 60*( nDays*24 + nHours ); 
+	if( dMinutes < 0 )
+	{ dMinutes = 0.0; }
 	sprintf( (char*) output.c_str(),"%d days, %d hours, and %2.2f minutes", nDays,nHours,dMinutes);
-
+	
 	return output ;
 }
 
@@ -353,8 +430,10 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	szString = new char [1024];
 	sprintf( szString , "%u %s" , (int) round( temp ) , bar_units.c_str() );
  
-	Write_SVG_rect( os , plot_width - bar_margin - bar_width  , plot_height + top_margin - bar_margin - bar_height ,  bar_width , bar_height , 0.002 * plot_height , "rgb(255,255,255)", "rgb(0,0,0)" );
-  Write_SVG_text( os, szString , plot_width - bar_margin - bar_width + 0.25*font_size , plot_height + top_margin - bar_margin - bar_height - 0.25*font_size , 
+	Write_SVG_rect( os , plot_width - bar_margin - bar_width  , plot_height + top_margin - bar_margin - bar_height , 
+		bar_width , bar_height , 0.002 * plot_height , "rgb(255,255,255)", "rgb(0,0,0)" );
+  Write_SVG_text( os, szString , plot_width - bar_margin - bar_width + 0.25*font_size , 
+		plot_height + top_margin - bar_margin - bar_height - 0.25*font_size , 
 		font_size , PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() ); 
 	
 	delete [] szString; 
@@ -376,6 +455,5 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
  
 	return; 
 }
-
 
 };

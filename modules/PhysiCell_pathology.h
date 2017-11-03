@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -82,40 +82,35 @@ struct PhysiCell_SVG_options_struct {
 	
 	std::string label_time_units = "days"; 
 	
-  double font_size = 200; 
+	double font_size = 200; 
 	std::string font_color = "black";
 	std::string font = "Arial";
 
-	double length_bar = 1000; 
+	double length_bar = 100; 
 }; 
 
 extern PhysiCell_SVG_options_struct PhysiCell_SVG_options;
 
-// done 	
+// done 
 std::vector<double> transmission( std::vector<double>& incoming_light, std::vector<double>& absorb_color, double thickness , double stain );
 
 // these give (in order) the cytoplasm color, cytoplasm outline color, nuclear color, nuclear outline color, 
 // each string is either rgb(R,G,B) or none 
 
-// done 
-std::vector<std::string> simple_cell_coloring( Cell* pCell );
+std::vector<std::string> simple_cell_coloring( Cell* pCell ); // done 
+std::vector<std::string> false_cell_coloring_Ki67( Cell* pCell ); // done 
+std::vector<std::string> false_cell_coloring_live_dead( Cell* pCell ); // done 
 
-std::vector<std::string> false_cell_coloring_Ki67( Cell* pCell );
-std::vector<std::string> false_cell_coloring_LiveDead( Cell* pCell );
-
-// done 
-std::vector<std::string> hematoxylin_and_eosin_cell_coloring( Cell* pCell );
-
-std::vector<std::string> hematoxylin_and_eosin_stroma_coloring( double& ECM_fraction , double& blood_vessel_fraction);
+std::vector<std::string> hematoxylin_and_eosin_cell_coloring( Cell* pCell ); // done 
+std::vector<std::string> hematoxylin_and_eosin_stroma_coloring( double& ECM_fraction , double& blood_vessel_fraction); // planned 
 
 std::string formatted_minutes_to_DDHHMM( double minutes ); 
 
-// done 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) );
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) ); // done
 
-// future work: 
-// set options for svg font sizes, time units, space units, scale bar size 
-// more intelligent sizing -- percentage of the plot area. 
+void SVG_plot_with_stroma( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) , 
+	int ECM_index, std::vector<std::string> (*ECM_coloring_function)(double) ); // planned
+
 
 
 };

@@ -3,21 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
 # sion number, such as below:                                               #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1].  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1].  #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
 #     BioFVM as below:                                                      #
 #                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.0.0) [1],  #
+# We implemented and solved the model using PhysiCell (Version 1.1.0) [1],  #
 # with BioFVM [2] to solve the transport equations.                         #
 #                                                                           #
 # [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, 2016 (in preparation).                         #
+#     Multicellular Systems, 2017 (in revision).                            #
 #                                                                           #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
 #    parallelized diffusive transport solver for 3-D biological simulations,#
@@ -27,7 +27,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2016, Paul Macklin and the PhysiCell Project           #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -110,13 +110,13 @@ void ki67_basic_cycle_model( Cell* pCell, double dt, bool stoc_K, bool stoc_Q, b
 {
 	// necrotic death? 
 	bool is_necrotic = check_necrosis(pCell, dt);
-	if (is_necrotic)
-		return;
+	if( is_necrotic )
+	{	return; }
 	
 	// apoptotic death? 
 	bool is_apoptotic = check_apoptosis(pCell, dt, stoc_A);
-	if (is_apoptotic)
-		return;
+	if( is_apoptotic )
+	{ return; }
 	
 	// K phase
 	if( pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].code == PhysiCell_constants::Ki67_positive)
@@ -130,7 +130,7 @@ void ki67_basic_cycle_model( Cell* pCell, double dt, bool stoc_K, bool stoc_Q, b
 			
 		}
 		
-		double probability_K_Q = dt /pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration;		
+		double probability_K_Q = dt / pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration;		
 		// advance to Q phase? 
 		if( (!stoc_K && pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time >= pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].duration-0.001 ) ||  (stoc_K && uniform_random() < probability_K_Q ) )
 		{
@@ -406,4 +406,15 @@ void death_necrosis_lysed_model( Cell* pCell, double dt )
 	pCell->phenotype.cycle.phases[pCell->phenotype.current_phase_index].elapsed_time += dt; 
 	if( pCell->phenotype.volume.total < PhysiCell_constants::cell_removal_threshold_volume )
 		pCell->get_container()->flag_cell_for_removal( pCell ); 
+}
+
+void up_orientation( Cell* pCell, double dt )
+{
+	pCell->orientation[0] = 0.0; 
+	pCell->orientation[1] = 0.0;
+	pCell->orientation[2] = 1.0; 
+	
+	pCell->polarity = 1.0; 
+
+	return; 
 }

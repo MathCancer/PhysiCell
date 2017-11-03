@@ -174,13 +174,13 @@ clean:
 	rm -f $(PROGRAM_NAME).exe
 	
 zip:
-	zip latest.zip */*.cpp */*.h Makefile* *.cpp *.h */*.hpp config/* documentation/* matlab/* README.txt
+	zip latest.zip */*.cpp */*.h *akefile* *.cpp *.h */*.hpp config/* documentation/* README.txt
 	cp latest.zip $$(date +%b_%d_%Y_%H%M).zip
 	cp latest.zip VERSION_$(VERSION).zip 
 	mv *.zip archives/
 	
 tar:
-	tar --ignore-failed-read -czf latest.tar */*.cpp */*.h Makefile* *.cpp */*.hpp config/* documentation/* matlab/* README.txt
+	tar --ignore-failed-read -czf latest.tar */*.cpp */*.h *akefile* *.cpp */*.hpp config/* documentation/* README.txt
 	cp latest.tar $$(date +%b_%d_%Y_%H%M).tar
 	cp latest.tar VERSION_$(VERSION).tar
 	mv *.tar archives/
