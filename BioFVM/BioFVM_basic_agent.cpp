@@ -72,10 +72,9 @@ Basic_Agent::Basic_Agent()
 	secretion_rates= new std::vector<double>(0);
 	uptake_rates= new std::vector<double>(0);
 	saturation_densities= new std::vector<double>(0);
-	extern Microenvironment* default_microenvironment;
-	
-	register_microenvironment( default_microenvironment ); 
-
+	// extern Microenvironment* default_microenvironment;
+	// register_microenvironment( default_microenvironment ); 
+	register_microenvironment( get_default_microenvironment() );
 	return;	
 }
 

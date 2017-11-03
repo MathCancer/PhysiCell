@@ -1,5 +1,5 @@
 VERSION := 1.2.2
-PROGRAM_NAME := cancer_biorobots
+PROGRAM_NAME := project3D
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -43,7 +43,7 @@ PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_Mult
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := cancer_biorobots.o
+PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -126,8 +126,8 @@ PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	
 # user-defined PhysiCell modules
 
-cancer_biorobots.o: ./custom_modules/cancer_biorobots.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/cancer_biorobots.cpp
+custom.o: ./custom_modules/custom.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 # cleanup
 

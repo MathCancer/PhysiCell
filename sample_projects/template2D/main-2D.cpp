@@ -61,163 +61,141 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_cell_h__
-#define __PhysiCell_cell_h__
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
+#include <ctime>
+#include <cmath>
+#include <omp.h>
+#include <fstream>
 
-#include "./PhysiCell_custom.h" 
+#include "./core/PhysiCell.h"
+#include "./modules/PhysiCell_standard_modules.h" 
 
-#include "../BioFVM/BioFVM.h"
-#include "./PhysiCell_phenotype.h"
-#include "./PhysiCell_cell_container.h"
-#include "./PhysiCell_constants.h"
+// put custom code modules here! 
 
-using namespace BioFVM; 
+#include "./custom_modules/custom.h" 
+	
+using namespace BioFVM;
+using namespace PhysiCell;
 
-namespace PhysiCell{
-class Cell_Container;
+// set number of threads for OpenMP (parallel computing)
+int omp_num_threads = 8; // set this to # of CPU cores x 2 (for hyperthreading)
 
-class Cell_Parameters
+int main( int argc, char* argv[] )
 {
- private:
- public:
-	// oxygen values (in mmHg) for critical phenotype changes
-	double o2_hypoxic_threshold; // value at which hypoxic signaling starts
-	double o2_hypoxic_response; // value at which omics changes are observed 
-	double o2_hypoxic_saturation; // value at which hypoxic signalign saturates 
-	// o2_hypoxic_saturation < o2_hypoxic_threshold
+	// OpenMP setup
+	omp_set_num_threads(omp_num_threads);
 	
-	double o2_proliferation_saturation; // value at which extra o2 does not increase proliferation
-	double o2_proliferation_threshold; // value at which o2 is sufficient for proliferation
+	// PNRG setup 
+	SeedRandom(); 
+	
+	// time setup 
+	std::string time_units = "min"; 
+	double t = 0.0; // current simulation time 
+	
+	double t_output_interval = 60.0; 
+	double t_max = 60*24*30; // 30 days 
+	double t_next_output_time = t; 
+	int output_index = 0; // used for creating unique output filenames 
 
-	double o2_reference; // physioxic reference value, in the linked reference Phenotype
-	// o2_proliferation_threshold < o2_reference < o2_proliferation_saturation; 
+	/* Microenvironment setup */ 
 	
-	double o2_necrosis_threshold; // value at which cells start experiencing necrotic death 
-	double o2_necrosis_max; // value at which necrosis reaches its maximum rate 
-	// o2_necrosis_max < o2_necrosis_threshold
+	setup_microenvironment(); // modify this in the custom code 
 	
-	Phenotype* pReference_live_phenotype; // reference live phenotype (typically physioxic) 
-	// Phenotype* pReference_necrotic_phenotype; // reference live phenotype (typically physioxic) 
+	/* PhysiCell setup */ 
+ 	
+	// set mechanics voxel size, and match the data structure to BioFVM
+	double mechanics_voxel_size = 30; 
+	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+	
+	/* Users typically start modifying here. START USERMODS */ 
+	
+	create_cell_types();
+	
+	setup_tissue();
 
-	// necrosis parameters (may evenually be moved into a reference necrotic phenotype 
-	double max_necrosis_rate; // deprecate
-	int necrosis_type; // deprecate 
+	/* Users typically stop modifying here. END USERMODS */ 
 	
-	Cell_Parameters(); 
-}; 
+	// set MultiCellDS save options 
 
-class Cell_Definition
-{
- private:
- public: 
-	int type; 
-	std::string name; 
- 
-	Microenvironment* pMicroenvironment; 
+	set_save_biofvm_mesh_as_matlab( true ); 
+	set_save_biofvm_data_as_matlab( true ); 
+	set_save_biofvm_cell_data( true ); 
+	set_save_biofvm_cell_data_as_custom_matlab( true );
 	
-	Cell_Parameters parameters; 
-	Custom_Cell_Data custom_data; 
-	Cell_Functions functions; 
-	Phenotype phenotype; 
+	// save a simulation snapshot 
 
-	Cell_Definition();  // done 
-	Cell_Definition( Cell_Definition& cd ); // copy constructor 
-	Cell_Definition& operator=( const Cell_Definition& cd ); // copy assignment 
-};
+	save_PhysiCell_to_MultiCellDS_xml_pugi( "initial" , microenvironment , t ); 
+	
+	// save a quick SVG cross section through z = 0, after setting its 
+	// length bar to 200 microns 
 
-extern Cell_Definition cell_defaults; 
+	PhysiCell_SVG_options.length_bar = 200; 
 
-class Cell_State
-{
- public:
-	std::vector<Cell*> neighbors; // not currently tracked! 
-	std::vector<double> orientation;
+	// for simplicity, set a pathology coloring function 
 	
-	double simple_pressure; 
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
 	
-	Cell_State(); 
-};
+	SVG_plot( "initial.svg" , microenvironment, 0.0 , t, cell_coloring_function );
+	
+	// set the performance timers 
 
-class Cell : public Basic_Agent 
-{
- private: 
-	Cell_Container * container;
-	int current_mechanics_voxel_index;
-	int updated_current_mechanics_voxel_index; // keeps the updated voxel index for later adjusting of current voxel index
-		
- public:
-	std::string type_name; 
- 
-	Custom_Cell_Data custom_data;
-	Cell_Parameters parameters;
-	Cell_Functions functions; 
+	BioFVM::RUNTIME_TIC();
+	BioFVM::TIC();
+	
+	std::ofstream report_file ("simulation_report.txt"); 	// create the data log file 
+	report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
+	
+	// main loop 
+	
+	try 
+	{		
+		while( t < t_max )
+		{
+			// save data if it's time. 
+			if(  fabs( t - t_next_output_time ) < 0.01 * diffusion_dt )
+			{
+				log_output(t, output_index, microenvironment, report_file);
+				
+				char filename[1024]; 
+				sprintf( filename , "output%08u" , output_index ); 
+				
+				save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , t ); 
+				
+				sprintf( filename , "snapshot%08u.svg" , output_index ); 
+				SVG_plot( filename , microenvironment, 0.0 , t, cell_coloring_function );
+				
+				output_index++; 
+				t_next_output_time += t_output_interval;
+			}
+			// update the microenvironment
+			microenvironment.simulate_diffusion_decay( diffusion_dt );
+			if( default_microenvironment_options.calculate_gradients )
+			{ microenvironment.compute_all_gradient_vectors(); }
+			
+			// run PhysiCell 
+			((Cell_Container *)microenvironment.agent_container)->update_all_cells(t);
+			
+			t += diffusion_dt; 
+		}
+		log_output(t, output_index, microenvironment, report_file);
+		report_file.close();
+	}
+	catch( const std::exception& e )
+	{ // reference to the base of a polymorphic object
+		std::cout << e.what(); // information from length_error printed
+	}
+	
+	// save a final simulation snapshot 
+	
+	save_PhysiCell_to_MultiCellDS_xml_pugi( "final" , microenvironment , t ); 
+	SVG_plot( "final.svg" , microenvironment, 0.0 , t, cell_coloring_function );
+	
+	// timer 
+	
+	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
+	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
 
-	Cell_State state; 
-	Phenotype phenotype; 
-	
-	void update_motility_vector( double dt_ );
-	void advance_bundled_phenotype_functions( double dt_ ); 
-	
-	void add_potentials(Cell*);       // Add repulsive and adhesive forces.
-	void set_previous_velocity(double xV, double yV, double zV);
-	int get_current_mechanics_voxel_index();
-	void turn_off_reactions(double); 		  // Turn off all the reactions of the cell
-	
-	bool is_out_of_domain;
-	bool is_movable;
-	
-	void flag_for_division( void ); // done 
-	void flag_for_removal( void ); // done 
-	
-	void start_death( int death_model_index ); 
-
-	Cell* divide( void );
-	void die( void );
-	void step(double dt);
-	Cell();
-	
-	bool assign_position(std::vector<double> new_position);
-	bool assign_position(double, double, double);
-	void set_total_volume(double);
-	
-	double& get_total_volume(void); // NEW
-	
-	// mechanics 
-	void update_position( double dt ); //
-	std::vector<double> displacement; // this should be moved to state, or made private  
-
-	
-	void assign_orientation();  // if set_orientaion is defined, uses it to assign the orientation
-								// otherwise, it assigns a random orientation to the cell.
-	
-	void copy_function_pointers(Cell*);
-	
-	void update_voxel_in_container(void);
-	void copy_data(Cell *);
-
-	// I want to eventually deprecate this, by ensuring that 
-	// critical BioFVM and PhysiCell data elements are synced when they are needed 
-	
-	void set_phenotype( Phenotype& phenotype ); // no longer needed?
-	void update_radius();
-	Cell_Container * get_container();
-	
-	std::vector<Cell*>& cells_in_my_container( void ); 
-	
-	void convert_to_cell_definition( Cell_Definition& cd ); 
-};
-
-Cell* create_cell( void );  
-Cell* create_cell( Cell_Definition& cd );  
-
-
-void delete_cell( int ); 
-void delete_cell( Cell* ); 
-void save_all_cells_to_matlab( std::string filename ); 
-
-//function to check if a neighbor voxel contains any cell that can interact with me
-bool is_neighbor_voxel(Cell* pCell, std::vector<double> myVoxelCenter, std::vector<double> otherVoxelCenter, int otherVoxelIndex);  
-
-};
-
-#endif
+	return 0; 
+}

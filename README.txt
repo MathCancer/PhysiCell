@@ -1,5 +1,155 @@
-PhysiCell: PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
+PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
 Multicellular Systems.
+
+Version:      1.2.2
+Release date: 3 November 2017
+
+Overview: 
+PhysiCell is a flexible open source framework for building 
+agent-based multicellular models in 3-D tissue environments. 
+
+Reference: Ghaffarizadeh et al., PLoS Comput Biol (2017)
+   preprint URL: https://doi.org/10.1101/088773
+
+Visit http://MathCancer.org/blog for the latest tutorials and help. 
+
+Key makefile rules: 
+
+make               : compiles the current project. If no 
+                     project has been defined, it first 
+                     populates the cancer heterogeneity 2D 
+                     sample project and compiles it 
+   
+make <project-name>: populates the indicated sample project. 
+                     Use "make" to compile it. 
+
+  <project_name> choices:
+    template2D 
+    template3D
+    biorobots-sample
+    cancer-biorobots-sample
+    heterogeneity-sample
+    cancer-immune-sample 
+
+make clean         : removes all .o files and the executable, so that 
+                     the next "make" recompiles the entire project 
+
+make data-cleanup  : clears out all simulation data 
+
+make reset         : de-populates the sample project and returns to
+                     the original PhysiCell state. Use this when 
+                     switching to a new PhysiCell sample project. 
+
+
+Homepage:     http://PhysiCell.MathCancer.org
+Downloads:    http://PhysiCell.sf.net
+Support:      https://sourceforge.net/p/physicell/tickets/
+
+Quick Start:  Load at QuickStart.pdf in the documentation folder. 
+User Guide:   Look at UserGuide.pdf in the documentation folder. 
+ 
+Tutorials:    http://www.mathcancer.org/blog/physicell-tutorials/
+
+Latest info:  follow @MathCancer on Twitter (http://twitter.com/MathCancer)
+
+See changes.txt for the full change log. 
+
+---- still revising 
+
+Summary: 
+This release introduces a improved MultiCellDS outputs, new matlab 
+functions to read the MultiCellDS outputs, experimental functions 
+for povray routines (for 3-D raytracing), some bugfixes, and 
+new sample projects in cancer heterogeneity, synthetic multicellular 
+bioengineering, and cancer immunology. 
+
+PhysiCell is currently under scientific peer review. 
+
+Major new features and changes:
++ Updated save_PhysiCell_to_MultiCellDS_xml_pugi() to save much more 
+  phenotype information and all custom variables for each cell. 
+
++ Updated read_MultiCellDS_XML.m (in ./matlab) to read these 
+  newly expanded data files. 
+
++ Included new matlab functions for fast 3-D data exploration: 
+
+  simple_plot.m  -- quickly plots (as a surface) all the cells 
+  simple_cutaway_plot.m -- same as above, but with a cutaway view
+  composite_cutaway_plot.m -- plots cutaway view of live and dead
+     cells, colored separately. 
+
++ Wrote new POV-ray functions for future raytracing utilities. See 
+  ./modules/PhysiCell_POV.*
+
++ Add the following new sample projects: 
+
+  biorobots: simulates a system of director, worker, and cargo 
+   cells that coordinate to deliver cellular cargo to the 
+   directors. Uses motility, custom mechanics, and other functions. 
+  
+       build via: make biorobots-sample && make project 
+
+  cancer biorobots: modifies the above project so that worker 
+    cells take cargo to hypoxic tumor regions. cargo cells 
+    release a drug once they are detached from worker cells. 
+    tumor cells have a damage and apoptosis model. 
+
+       build via: make cancer-biorobots-sample && make project 
+
+  heterogeneity: simulates proliferation of a heterogeneous 
+    tumor. Note the loss of symmetry and selection/evolution.  
+
+       build via: make heterogeneity-sample && make project 
+
+  cancer immunology: simulates an immune system attack on a 
+    tumor with heterogeneous proliferation and immunogenicity 
+    characteristics. In 3D!  
+
+       build via: make cancer-immune-sample && make project 
+
+Minor new features and changes:
+
++ Added double NormalRandom( double mean, double standard_deviation ) 
+  to PhysiCell_utilities.* This will generate normally-distributed 
+  random numbers. 
+
++ Includes a sneak preview of BioFVM 1.1.7, which includes bugfixes on 
+  how boundary conditions were initialized. 
+
+bugfixes: 
+
++ Removed annoying "cout" lines in:
+
+  void standard_live_phase_entry_function(Cell*,Phenotype&,double). 
+
+  They were leftover from debugging. Sorry! 
+
++ In the templates, we updated to: 
+
+		while( t < t_max + 0.1*diffusion_dt )
+		{
+
+  so that the simulations run all the way to the final time, 
+  instead of exiting too early by dt time. 
+
++ Fixed a bug in Motility::Motility() where the migration bias was 
+  initialized to (1,0,0). 
+
++ Made adhesion and repulsion symmetric across cells (in add_potentials)
+
++ got rid of debug_temp_a in  (in add_potentials)
+
++ if default_microenvironment_options.simulate_2D == true, we now 
+  set velocity[2] = 0.0 in the velocity functions. 
+
+-=-=-
+
+
+
+
+
+
 
 Version:      1.2.1
 Release date: 1 September 2017

@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.2.0} 
+\newcommand{\Version}{1.2.2} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -33,7 +33,7 @@
 \usepackage{bold-extra}
   
 \hypersetup{
-pdftitle={PhysiCell User Guide 1.2.0}, 
+pdftitle={PhysiCell User Guide 1.2.2}, 
 pdfauthor={Paul Macklin and the PhysiCell Project}, 
 pdfsubject={PhysiCell},
 pdfproducer={http://MathCancer.org}, 
@@ -164,22 +164,22 @@ Lastly, users can support help tickets at SourceForge:
 
 \section{Preparing your development environment \DONE}
 PhysiCell was designed to be cross-platform compatible, without need for a package manager system or any other 
-complex installation. In principle, any C++11 compliant compiler with OpenMP support should work. In 
-practice, we use g++ as our ``gold standard.'' You'll also want to ensure that your build environment supports 
+complex installation. In principle, any \v|C++11| compliant compiler with OpenMP support should work. In 
+practice, we use \v|g++| as our ``gold standard.'' You'll also want to ensure that your build environment supports 
 makefiles. Command-line zip/unzip is also helpful, but not required. 
 
 Please note that OSX (and its associated developer tools) 
-ships with ``g++'' instead of g++: it uses LLVM/Clang and an alias to \emph{pretend} to be g++. Unfortunately, 
-the version of LLVM/Clang that Apple ships does not fully support OpenMP, and so compiling can 
+ships with ``\v|g++|'' instead of \v|g++|: it uses LLVM/Clang and an alias to \emph{pretend} to be \v|g++|. 
+Unfortunately, the version of LLVM/Clang that Apple ships does not fully support OpenMP, and so compiling can 
 fail on those platforms without further setup. For OSX, we recommend following our 
-Homebrew-based tutorial to install real g++. 
+Homebrew-based tutorial to install real \v|g++|. 
 
-Full tutorials on installing a 64-bit g++/OpenMP environment (on Windows via mingw-w64 and on OSX using Homebrew) 
+Full tutorials on installing a 64-bit \v|g++|/OpenMP environment (on Windows via mingw-w64 and on OSX using Homebrew) 
 can be found at: 
 
 \href{http://www.mathcancer.org/blog/physicell-tutorials/}{http://www.MathCancer.org/blog/physicell-tutorials/}
 
-Linux users should already have a 64-bit g++ environment installed by default. 
+Most linux users should already have a 64-bit \v|g++| environment installed by default. 
 
 \TOClink
 \subsection{Virtual Machine option \DONE}
@@ -187,11 +187,11 @@ Starting with the 1.2.x releases, we began distributing PhysiCell as zipped sour
 \href{https://www.docker.com/}{Docker} containers, and virtual appliances 
 for use in \href{http://virtualbox.org}{VirtualBox} and other virtual machine software, 
 allowing us to distribute a full PhysiCell 
-development environment (including 64-bit g++, support for makefiles, zip/unzip, 
+development environment (including 64-bit \v|g++|, support for makefiles, zip/unzip, 
 ImageMagick, mencoder, eog, a text editor, and the most up-to-date 
 version of PhysiCell). This should make it simpler to start learning and using PhysiCell, even in cases 
 where developers are not free to install or modify their own build environments, 
-or have difficulty installing and configuring g++. 
+or have difficulty installing and configuring \v|g++|. 
 
 Please visit the 
 \href{http:/PhysiCell.MathCancer.org/blog/physicell-tutorials}{PhysiCell blog} 
@@ -199,22 +199,22 @@ for information on running VirtualDub and using the virtual appliance.
 (Section \ref{sec:blog_and_help}). 
 \TOClink
 
-\subsection{Docker option \DONE}
-Starting with the 1.2.x releases, we began distributing PhysiCell as zipped source (preferred) and 
-\href{https://www.docker.com/}{Docker} containers of PhysiCell, allowing us to distribute a full PhysiCell 
-development environment (including 64-bit g++, support for makefiles, zip/unzip, a text editor, and the most up-to-date 
-version of PhysiCell). This should make it simpler to start learning and using PhysiCell, even in cases 
-where developers are not free to install or modify their own build environments, 
-or have difficulty installing and configuring g++. 
-
-Please visit the 
-\href{http:/PhysiCell.MathCancer.org/blog/physicell-tutorials}{PhysiCell blog} 
-to check for blog posts on running Docker. 
-(Section \ref{sec:blog_and_help}). 
-\TOClink
+%\subsection{Docker option \DONE}
+%Starting with the 1.2.x releases, we began distributing PhysiCell as zipped source (preferred) and 
+%\href{https://www.docker.com/}{Docker} containers of PhysiCell, allowing us to distribute a full PhysiCell 
+%development environment (including 64-bit \v|g++|, support for makefiles, zip/unzip, a text editor, and the most up-to-date 
+%version of PhysiCell). This should make it simpler to start learning and using PhysiCell, even in cases 
+%where developers are not free to install or modify their own build environments, 
+%or have difficulty installing and configuring \v|g++|. 
+%
+%Please visit the 
+%\href{http:/PhysiCell.MathCancer.org/blog/physicell-tutorials}{PhysiCell blog} 
+%to check for blog posts on running Docker. 
+%(Section \ref{sec:blog_and_help}). 
+%\TOClink
 
 \subsection{Suggested tutorials and resources\DONE}
-Working in PhysiCell requires some knowledge of C++, Makefiles, and command-line routines in Unix-like systems. 
+Working in PhysiCell requires some knowledge of \v|C++|, Makefiles, and command-line routines in Unix-like systems. 
 If you are not familiar with these skillsets, we recommend the following resources:
 
 \subsubsection{Linux and Makefile tutorials}
@@ -258,27 +258,27 @@ May not work in Windows/MinGW.)
 \TOClink 
 
 \subsubsection{C++ references}
-The following websites are good references for C++: 
+The following websites are good references for \v|C++|: 
 \begin{enumerate}
 \item 
 \textbf{CPlusPlus.com:} 
 \href{http://www.cplusplus.com/}{http://www.cplusplus.com/}\\
-Excellent, detailed documentation on C++, as well as tutorials. 
+Excellent, detailed documentation on \v|C++|, as well as tutorials. 
 
 \item 
 \textbf{C++ Reference:}
 \href{http://en.cppreference.com/w/}{http://en.cppreference.com/w/}\\
-Another good reference guide to C++. 
+Another good reference guide to \v|C++|. 
 
 \item 
 \textbf{LearnCpp.com:} 
 \href{http://www.learncpp.com/}{http://www.learncpp.com/} \\
-A series of tutorials on C++. 
+A series of tutorials on \v|C++|. 
 
 \item 
 \textbf{StackOverflow (C++ tag):} 
 \href{https://stackoverflow.com/questions/tagged/c%2b%2b}{https://stackoverflow.com/questions/tagged/c\%2b\%2b}\\
-A sometimes overwhelming resource for problem solving in C++. 
+A sometimes overwhelming resource for problem solving in \v|C++|. 
 
 \item 
 \textbf{C++ section on CodeGuru:} 
@@ -456,9 +456,43 @@ and any other (BSD-compatible) dependencies are kept here.
 \item 
 \smallcode{povray} This includes some basic utilities for visulization by povray (an open source raytracing package) \cite{ref:povray}. 
 \item 
-\smallcode{template\_projects} This directory stores basic templates for 2D and 3D projects. A good start to a new 
-project is to use the \v|make template2D| or \v|make template3D| makefile rules, which will copy the appropriate template 
-to main.cpp. See Section \ref{sec:templates}.
+\smallcode{template\_projects} This directory once stored template projects for 2D and 3D. These have been 
+moved to the sample projects as of Version 1.2.2. This directory will be deprecated. 
+\item 
+\smallcode{sample\_projects} This directory includes sample projects, including 2D and 3D template projects 
+and at least the four sample projects in \cite{ref:PhysiCell}.  A good start to a new 
+project is to use the \v|make template2D| or \v|make template3D| makefile rules, 
+which will populate the \v|main.cpp|, \v|Makefile|, and \v|./custom_modules| with appropriate 
+codes to get started. See Section \ref{sec:templates}.
+
+Here are the sample projects included as of Version 1.2.2: 
+\begin{enumerate}
+\item 
+\smallcode{biorobots} is a 2-D example of 3 cell types: cargo cells, worker cells (which seek out cargo cells and 
+haul them to a destination), and director cells (which attract worker cells). 
+
+\item 
+\smallcode{cancer\_biorobots} extends the biorobots example to (1) simulate a 2-D tumor that develops a necrotic 
+core, (2) so that cargo cells are hauled towards hypoxic tumor regions, and (3) so that released cargo cells secrete 
+a chemotherapeutic compounds. 
+
+\item
+\smallcode{heterogeneity} simulates a 2-D tumor with heterogeneous ``genetics'' that drive differential proliferation. 
+
+\item 
+\smallcode{cancer\_immune} extends the heterogeneity example to 3D, and introduces a new immune 
+cell type (modeling T cells) that migrate towards tumor cells, temporarily adhere, test for immunogenicity, 
+and initiate apoptosis. 
+
+\item 
+\smallcode{template2D} is the template for a 2-D project. See the description above and 
+Section \ref{sec:templates}. 
+
+\item 
+\smallcode{template3D} is the template for a 3-D project. See the description above and 
+Section \ref{sec:templates}. 
+\end{enumerate}
+
 \end{enumerate}
 
 \TOClink
@@ -474,20 +508,57 @@ and run:
 
 \v|make template2D|
 
-This will copy \v|template_projects/template2D.cpp| to \v|main.cpp| in the root directory. From here, modify main.cpp 
-as you see fit, add new custom codes in the \v|custom_modules| directory, and edit the \v|Makefile| as needed to include 
-these codes. Once you're ready, type 
+This will populate a starting project from the files in \v|./sample_projects/template2D/|. In particular, 
+it will overwrite the \v|Makefile|, copy \v|template_projects/template2D.cpp| to \v|main.cpp| in the root directory, 
+and copy the contents of \v|./sample_projects/template2D/custom_modules/| to \v|./custom_modules|. 
+Note that the \v|Makefile| has been modified to include the custom modules: 
+\begin{verbatim}
+# put your custom objects here (they should be in the custom_modules directory)
+
+PhysiCell_custom_module_OBJECTS := custom.o
+
+##### and later in the Makefile ... 
+
+# user-defined PhysiCell modules
+
+custom.o: ./custom_modules/custom.cpp 
+    $(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
+\end{verbatim}
+In general, your project should modify main.cpp, but primarily add custom codes to 
+\v|./custom_modules|, just as this example. (For example, you might define your own
+angiogenesis functions in \break 
+\v|./custom_modules/angiogenesis.h|, implement the functions 
+in \v|./custom_modules/angiogenesis.cpp|, and then modify the \v|Makefile| to include 
+it:
+\begin{verbatim}
+# put your custom objects here (they should be in the custom_modules directory)
+
+PhysiCell_custom_module_OBJECTS := custom.o angiogenesis.o
+
+##### and later in the Makefile ... 
+
+# user-defined PhysiCell modules
+
+custom.o: ./custom_modules/custom.cpp 
+    $(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
+
+angiogenesis.o: ./custom_modules/angiogenesis.cpp 
+    $(COMPILE_COMMAND) -c ./custom_modules/angiogenesis.cpp
+\end{verbatim}
+This is the recommended structure for a project. 
+
+Once you're ready, build the project by typing 
 
 \v|make|
 
-to build your new project. By default, the executable will be called \v|project| (\v|project.exe| on windows). To 
+By default, the executable will be called \v|project2D| (\v|project2D.exe| on windows). To 
 change the name of the executable, modify the \v|PROJECT_NAME| variable in the \v|Makefile|. 
 
 To start a new 3-D project based on a template, type \v|make template3D| and continue as before. 
 
 Now, run the code: 
 
-\v|./project|
+\v|./project2D|
 
 (in Windows, omit the ``\v|./|''.) This will generate (among other things) a series of \href{https://en.wikipedia.org/wiki/Scalable_Vector_Graphics}{SVG} images  
 that visualize the simulation once per hour. 
@@ -512,13 +583,81 @@ using namespace BioFVM;
 using namespace PhysiCell;
 \end{verbatim}
 
+\subsection{A brief note on the microenvironment}
+\label{sec:about_BioFVM_microenvironment}
+BioFVM divides the simulation domain into a collection of non-intersecting \textbf{voxels}: volumetric 
+pixels. Each voxel has a unique integer \textbf{index}: this is its unique address, 
+for quickly accessing its information. As particularly notable information, each 
+voxel stores its own position (center) and volume. 
+
+BioFVM adds one or more diffusible substrates to this microenvironment. Each substrate has a 
+diffusion coefficient and decay rate. At present, these are homogeneous throughout the microenvironment, 
+although improvements are planned for BioFVM to have spatially variable diffusion coefficients. In 
+BioFVM, each substrate diffuses and decays, and can be secreted or uptaken by individual 
+cells (see Section \ref{sec:Secretion}) at their individual positions. You can also set bulk uptake and secretion 
+functions, which are applied in each voxel. These are not used in the current template and sample 
+PhysiCell projects. See \cite{ref:BioFVM} for more information. 
+
+For each voxel, we store a vector of chemical substrates (densities), and a vector of gradients (one 
+gradient vector for each substrate). Moreover, users can use ``Dirichlet nodes'' to overwrite the 
+substrate values at any voxel within the simulation domain. This is useful for modeling biotransport 
+in irregular domains, setting substrate values along blood vessels, or applying classical Dirichlet conditions 
+along the outer edges of the simulation domain. Note that without specifying Dirichlet conditions, 
+BioFVM applies Neumann (no flux) conditions at the outer simulation boundaries. 
+
+\TOClink 
+
+
 \subsection{Setting up and using the microenvironment}
 \label{sec:set_up_BioFVM}
 
 Within your main program loop (\v|int main( int argc, char* argv[])|), you need to declare and 
 set up a Microenvironment. (Here, we also include some useful tips for setting space and time 
 units.) We make use of BioFVM 1.1.5 improvements that 
-include simplified setup functions:
+include simplified setup functions. 
+
+\subsubsection{Setting BioFVM options}
+\label{sec:BioFVM_options}
+BioFVM 1.1.5 and later versions includes a data structure 
+(\verb+default_microenvironment_options+, of type 
+\verb+Microenvironment_Options+) for setup options. 
+This data type is defined in \verb+BioFVM_microenvironment.h+ as: 
+\begin{verbatim}
+class Microenvironment_Options
+{
+ private:
+ 
+ public: 
+    Microenvironment* pMicroenvironment;
+    std::string name; 
+ 
+    std::string time_units; 
+    std::string spatial_units; 
+    double dx;
+    double dy; 
+    double dz; 
+    
+    bool outer_Dirichlet_conditions; 
+    std::vector<double> Dirichlet_condition_vector; 
+    std::vector<bool> Dirichlet_activation_vector; 
+    
+    bool simulate_2D; 
+    std::vector<double> X_range; 
+    std::vector<double> Y_range; 
+    std::vector<double> Z_range; 
+    
+    Microenvironment_Options(); 
+    
+    bool calculate_gradients; 
+    
+    bool use_oxygen_as_first_field;
+};
+\end{verbatim}
+
+You can set these options either towards the top of your main program source 
+file (e.g., in \verb+main.cpp+) or in a standalone setup function. See 
+the sample projects for examples. Here is sample use, to set the tissue name to 
+``liver'' and set up to 3D with Dirichlet conditions of oxygen = 38 mmHg: 
 
 \begin{verbatim}
 /* Microenvironment setup */ 
@@ -546,7 +685,72 @@ default_microenvironment_options.Z_range = {-100, 100};
 	
 // turn off gradient calculations 
 default_microenvironment_options.bool calculate_gradients = false; 
+\end{verbatim}
 
+
+\TOClink 
+\subsubsection{Adding new diffusing substrates to the tissue environment}
+\label{sec:BioFVM_add_substrates}
+By default, the BioFVM microenvironment has a single substrate (with index 0). 
+To add (append) a new substrate to the microenvironment, use one of these functions: 
+
+\begin{enumerate}
+\item 
+\smallcode{void Microenvironment::add\_density( void )} Use this to add a new diffusing 
+substrate (density), without setting any of its properties. 
+
+\item 
+\smallcode{void Microenvironment::add\_density( std::string name , std::string units )} Use this 
+to add a new substrate called \v|name| with units \v|units|. (e.g., crayons with units Megacrayolas). 
+
+\item 
+\smallcode{void Microenvironment::add\_density( std::string name , std::string units, double diffusion\_constant, double decay\_rate )} acts similarly as above, but also sets the diffusion coefficient and decay rate. Generally, 
+these shoudl be in the same units as the simulation: by default, $\micron^2/\textrm{min}$ for diffusion 
+and $1/\textrm{min}$ for decay. 
+\end{enumerate}
+
+You can also change the name, units, and properties for an existing substrate: 
+\begin{enumerate}
+\item 
+\smallcode{void Microenvironment::set\_density( int index , std::string name , std::string units )} This 
+function renames the substrate with index \v|index| to \v|name|, and sets its units to \v|units|. 
+
+\item 
+\smallcode{void Microenvironment::set\_density( int index , std::string name , std::string units , 
+double diffusion\_constant , double decay\_rate )} works as above, but 
+also sets the diffusion coefficient and decay rate. 
+\end{enumerate}
+
+For example, 
+\begin{verbatim}
+// add a chemoattractant 
+
+microenvironment.add_density( "chemoattractant", "dimensionless" ); 
+microenvironment.diffusion_coefficients[1] = 1e3; 
+microenvironment.decay_rates[1] = .1; 	
+	
+// add a therapeutic compound
+	
+microenvironment.add_density( "drug", "dimensionless" ); 
+microenvironment.diffusion_coefficients[2] = 1e3; 
+microenvironment.decay_rates[2] = 0.15625; 	
+	
+// rename the first density to be glucose, and change parameters 
+	
+microenvironment.set_density( "glucose", "dimensionless" ); 
+microenvironment.diffusion_coefficients[0] = 1e3; 
+microenvironment.decay_rates[0] = 0.05625; 	
+\end{verbatim}
+
+You should always add or modify your substrates prior to initializing the microenvironment. See 
+Section \ref{sec:BioFVM_initialize}
+
+\TOClink 
+
+\subsubsection{Initializing the BioFVM tissue microenvironment}
+\label{sec:BioFVM_initialize}
+
+\begin{verbatim}
 // initialize BioFVM with these options
 initialize_microenvironment(); 	
 \end{verbatim}
@@ -555,14 +759,14 @@ BioFVM defaults to a 1 mm${}^3$ domain centered at
 (0,0,0) with $\Delta x = \Delta y = \Delta z = 20 \:\micron$, simulating 3D with no Dirichlet conditions 
 and no gradient calculations, and minutes time units 
 and micron space units. If you call 
-\v|initialize_microenvironment()| without setting units, 
+\v|initialize_microenvironment()| without setting units (see Section \ref{sec:BioFVM_options}), 
 these defaults will be used. 
 
 The code also automatically chooses the correct 
 2D/3D diffusion solver, and sets the single diffusing 
 field to oxygen with diffusion coefficient 
 $10^5 \micron^2/\textrm{min}$ and decay coefficient 
-$0.1 1/\micron$ (for a 1 mm diffusion length scale 
+$0.1 \: 1/\textrm{min}$ (for a 1 mm diffusion length scale 
 in the absence of cells). 
 
 % \begin{verbatim}
@@ -661,9 +865,10 @@ while( t < t_max )
 }
 \end{verbatim}
 
-As of Version 1.2.0, PhysiCell has automated cell secretions/uptake, so there is no need to explicitly call the BioFVM cell-based functions in the main program loop.
+As of Version 1.2.0, PhysiCell has automated cell secretions/uptake as part of its phenotype 
+updates. There is no need to explicitly call the BioFVM cell-based functions in the main program loop.
 
-Note that the PhysiCell templates already include these critical setup commands. 
+Note that the PhysiCell template projects and sample projects already include these critical setup commands. 
 See Section \ref{sec:templates}. 
 
 \TOClink 
@@ -675,8 +880,32 @@ at any cell's location, BioFVM 1.1.5 added the following function:
 
 \smallcode{int Microenvironment::find\_density\_index( std::string name )}
 This allows you to find the index of the substrate named \v|name|. Note that this 
-function is case sensitive. Here's 
-an example of this function in action:
+function is case sensitive. 
+
+The following functions can access the substrates and their gradients in
+space: 
+
+\smallcode{int nearest\_voxel\_index( std::vector<double>\& position )} This 
+returns the integer that identifies the microenvironment voxel containing the 
+point at \verb+position+. 
+
+\smallcode{std::vector<double>\& nearest\_density\_vector( std::vector<double>\& position )} 
+This function returns the vector of substrates located nearest to \verb+position+. 
+
+\smallcode{std::vector<double>\& nearest\_density\_vector( int voxel\_index )} 
+This function returns the vector of substrates stored in the voxel with index 
+\verb+voxel_index+. See the \verb+nearest_voxel_index+ 
+
+\smallcode{std::vector<double>\& operator()( int n )} This function 
+can directly access the density vector stored at voxel index \verb+n+. 
+
+\smallcode{std::vector<gradient>\& gradient\_vector(int n )} This function 
+accesses the vector of gradient vectors at voxel index \verb+n+. 
+	
+\smallcode{std::vector<gradient>\& gradient\_vector(std::vector<double>\& position )}
+This function accesses the vector of gradient vectors at \verb+position+.
+
+Here's an example of these functions in action:
 
 \begin{verbatim}
 bool bad_conditions( Microenvironment& M , int voxel_index )
@@ -685,15 +914,24 @@ bool bad_conditions( Microenvironment& M , int voxel_index )
     static int oxygen_index  = M.find_density_index( "oxygen" ); 
     static int glucose_index = M.find_density_index( "glucose" ); 
 
+    // find the oxygen gradient 
+    
+    std::vector<double> gradient = M.gradient_vector(voxel_index)[oxygen_index]; 
+
     static double oxygen_threshold = 2.5; // mmHg 
     static double glucose_threshold = 0.05; // dimensionless 
  
     if( M(voxel_index)[oxygen_index]  < oxygen_threshold && 
         M(voxel_index)[glucose_index] < glucose_threshold )
     { return true; }
+    
     return false; 
 }
 \end{verbatim}
+
+There are several functions to help sample the microenvironment  
+at a cell's position. See Section \ref{sec:Cells}.
+
 
 \TOClink 
 
@@ -714,7 +952,7 @@ are:
 \item 
 \smallcode{void Microenvironment::update\_dirichlet\_node( int voxel\_index ,
  \\ \phantom{void }std::vector<double>\& new\_value )} overwrites the (vector) 
- value of the Dirichlet node at \v|voxel\_index|, so that 
+ value of the Dirichlet node at \v|voxel_index|, so that 
 
 \v|M(voxel_index) = new_value|.  
 
@@ -736,7 +974,44 @@ returns \v|true| if there is a Dirichlet node at voxel
 \end{enumerate}
  
 BioFVM applies these Dirichlet conditions every time it 
-evaluates the diffusion solver. 
+evaluates the diffusion solver.
+
+\TOClink
+
+\subsubsection{Refined control of Dirchlet conditions}
+\label{sec:refined_Dirichlet_conditions}
+
+As of Version 1.2.1, you can now now control Dirichlet conditions on a 
+substrate-by-substrate basis. That is, you can apply the Dirichlet condition to just one or two 
+substrates (e.g., oxygen in index 0 and doxorubicin in index 12), while not applying them 
+to the remaining substrates. For a microenvironment \v|M|, you can set these options 
+in the \v|default_microenvironment_options| (see Section \ref{sec:BioFVM_options}) prior to initializing 
+the microenvironment, or at later times using the function 
+
+\smallcode{void Microenvironment::set\_substrate\_dirichlet\_activation( int substrate\_index , bool new\_value )} 
+This function sets the substrate at index \v|substrate_index| to have/not have a Dirichlet condition 
+based on the \v|true|/\v|false| value of \v|new_value|.
+
+
+For example: 
+\begin{verbatim}
+\\ set options for the substrate with index 2 to false 
+
+default_microenvironment_options.Dirichlet_activation_vector[2] = false; 
+
+\\ initialize the microenvironment with the currently set options 
+
+initialize_microenvironment(); 
+
+\\ set the Dirichlet conditions in substrate 1 to true. 
+
+get_default_microenvironment()->set_substrate_dirichlet_activation(1,true); 
+\end{verbatim}
+
+Note that turning on or off a Dirichlet condition for a substrate applies it at all Dirichlet nodes for 
+which \v|is_dirichlet_node(int voxel_index)| is \v|true|. 
+
+\TOClink
 
 \subsection{Other BioFVM resources}
 \label{sec:BioFVM_further_reading}
@@ -883,8 +1158,10 @@ class Cell : public Basic_Agent
     void set_phenotype( Phenotype& phenotype );  
     void update_radius();
     Cell_Container * get_container();
-    	
+    
     std::vector<Cell*>& cells_in_my_container( void ); 
+    
+    void Cell::convert_to_cell_definition( Cell_Definition& cd )
 };
 \end{verbatim}
 
@@ -1148,6 +1425,17 @@ data structures, rather than copies. It is critical that users do not alter the 
 array of \texttt{Cell*}.}}} Future releases of PhysiCell will provide more refined 
 access functions, including better lists of neighbors and lists of 
 nearby mechanics voxels. 
+
+\item 
+\smallcode{void convert\_to\_cell\_definition( Cell\_Definition\& cd )} converts 
+the cell to match the name, type, custom data, parameters, function, and phenotype 
+stored in the Cell Definition in \verb+cd+. (See Section \ref{sec:Cell_Definition} for more 
+information on cell definitions.) As of Version 1.2.2, this function does not overwrite 
+the \v|is_movable|, \v|is_out_of_domain|, and \v|displacement| data of the cell. 
+
+This function is particularly useful if you want to do thinks like stem cell heirarchies, where you 
+might ``convert'' a stem cell to a differentiated cell, each of which has been defined 
+separately. 
 
 \end{enumerate} 
 
@@ -1465,7 +1753,7 @@ with all contents equal to \v|ccd|.
  
 \item 
 \textbf{Streaming:} You can display a custom variable to any 
-C++ streaming operator. 
+\v|C++| streaming operator. 
 
 \underline{Example:} We'll create a custom cell data structure called \v|my_custom_data|, 
 add some scalar and vector variables, and display it. 

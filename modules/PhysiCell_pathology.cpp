@@ -1,65 +1,64 @@
 /*
-#############################################################################
-# If you use PhysiCell in your project, please cite PhysiCell and the ver-  #
-# sion number, such as below:                                               #
-#                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.2.1) [1].  #
-#                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
-#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, PLoS Comput. Biol. 2017 (in revision).         #
-#     preprint DOI: 10.1101/088773                                          #
-#                                                                           #
-# Because PhysiCell extensively uses BioFVM, we suggest you also cite       #
-#     BioFVM as below:                                                      #
-#                                                                           #
-# We implemented and solved the model using PhysiCell (Version 1.2.1) [1],  #
-# with BioFVM [2] to solve the transport equations.                         #
-#                                                                           #
-# [1] A Ghaffarizadeh, SH Friedman, SM Mumenthaler, and P Macklin,          #
-#     PhysiCell: an Open Source Physics-Based Cell Simulator for            #
-#     Multicellular Systems, PLoS Comput. Biol. 2017 (in revision).         #
-#     preprint DOI: 10.1101/088773                                          #
-#                                                                           #
-# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient     #
-#    parallelized diffusive transport solver for 3-D biological simulations,#
-#    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730 #
-#                                                                           #
-#############################################################################
-#                                                                           #
-# BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
-#                                                                           #
-# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project           #
-# All rights reserved.                                                      #
-#                                                                           #
-# Redistribution and use in source and binary forms, with or without        #
-# modification, are permitted provided that the following conditions are    #
-# met:                                                                      #
-#                                                                           #
-# 1. Redistributions of source code must retain the above copyright notice, #
-# this list of conditions and the following disclaimer.                     #
-#                                                                           #
-# 2. Redistributions in binary form must reproduce the above copyright      #
-# notice, this list of conditions and the following disclaimer in the       #
-# documentation and/or other materials provided with the distribution.      #
-#                                                                           #
-# 3. Neither the name of the copyright holder nor the names of its          #
-# contributors may be used to endorse or promote products derived from this #
-# software without specific prior written permission.                       #
-#                                                                           #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS       #
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED #
-# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A           #
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER #
-# OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,  #
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,       #
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR        #
-# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF    #
-# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING      #
-# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS        #
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              #
-#                                                                           #
-#############################################################################
+###############################################################################
+# If you use PhysiCell in your project, please cite PhysiCell and the version #
+# number, such as below:                                                      #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version 1.2.2) [1].    #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
+#     preprint DOI: 10.1101/088773                                            #
+#                                                                             #
+# Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
+#     as below:                                                               #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version 1.2.2) [1],    #
+# with BioFVM [2] to solve the transport equations.                           #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
+#     preprint DOI: 10.1101/088773                                            #
+#                                                                             #
+# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
+#    llelized diffusive transport solver for 3-D biological simulations,      #
+#    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730   #
+#                                                                             #
+###############################################################################
+#                                                                             #
+# BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
+#                                                                             #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project             #
+# All rights reserved.                                                        #
+#                                                                             #
+# Redistribution and use in source and binary forms, with or without          #
+# modification, are permitted provided that the following conditions are met: #
+#                                                                             #
+# 1. Redistributions of source code must retain the above copyright notice,   #
+# this list of conditions and the following disclaimer.                       #
+#                                                                             #
+# 2. Redistributions in binary form must reproduce the above copyright        #
+# notice, this list of conditions and the following disclaimer in the         #
+# documentation and/or other materials provided with the distribution.        #
+#                                                                             #
+# 3. Neither the name of the copyright holder nor the names of its            #
+# contributors may be used to endorse or promote products derived from this   #
+# software without specific prior written permission.                         #
+#                                                                             #
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" #
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE   #
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE  #
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE   #
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR         #
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF        #
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS    #
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN     #
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)     #
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE  #
+# POSSIBILITY OF SUCH DAMAGE.                                                 #
+#                                                                             #
+###############################################################################
 */
 
 #include "./PhysiCell_pathology.h"
@@ -263,10 +262,36 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	// draw the background 
 	Write_SVG_rect( os , 0 , 0 , plot_width, plot_height + top_margin , 0.002 * plot_height , "white", "white" );
 
+	// write the simulation time to the top of the plot
+ 
+	char* szString; 
+	szString = new char [1024]; 
+ 
+	int total_cell_count = all_cells->size(); 
+ 
+	double temp_time = time; 
+
+	std::string time_label = formatted_minutes_to_DDHHMM( temp_time ); 
+ 
+	sprintf( szString , "Current time: %s, z = %3.2f %s", time_label.c_str() ,  z_slice , PhysiCell_SVG_options.simulation_space_units.c_str() ); 
+	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1), font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+	sprintf( szString , "%u agents" , total_cell_count ); 
+	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1+.2+.9) , 0.95*font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+	
+	delete [] szString; 
+
+
+	// add an outer "g" for coordinate transforms 
+	
+	os << " <g id=\"tissue\" " << std::endl 
+	   << "    transform=\"translate(0," << plot_height+top_margin << ") scale(1,-1)\">" << std::endl; 
+	   
+	// prepare to do mesh-based plot (later)
+	
 	double dx_stroma = M.mesh.dx; 
 	double dy_stroma = M.mesh.dy; 
 	
-	os << " <g id=\"ECM\">" << std::endl; 
+	os << "  <g id=\"ECM\">" << std::endl; 
   
 	int ratio = 1; 
 	double voxel_size = dx_stroma / (double) ratio ; 
@@ -313,7 +338,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
  
  }
 */
-	os << " </g>" << std::endl; 
+	os << "  </g>" << std::endl; 
  
 	// Now draw vessels
 
@@ -327,26 +352,10 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	 *Offset(1) = Y_lower-top_margin;
 	*/
  
-	// write the simulation time to the top of the plot
- 
-	char* szString; 
-	szString = new char [1024]; 
- 
-	int total_cell_count = all_cells->size(); 
- 
-	double temp_time = time; 
 
-	std::string time_label = formatted_minutes_to_DDHHMM( temp_time ); 
- 
-	sprintf( szString , "Current time: %s, z = %3.2f %s", time_label.c_str() ,  z_slice , PhysiCell_SVG_options.simulation_space_units.c_str() ); 
-	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1), font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
-	sprintf( szString , "%u agents" , total_cell_count ); 
-	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1+.2+.9) , 0.95*font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
-	
-	delete [] szString; 
  
 	// plot intersecting cells 
-	os << " <g id=\"cells\">" << std::endl; 
+	os << "  <g id=\"cells\">" << std::endl; 
 	for( int i=0 ; i < total_cell_count ; i++ )
 	{
 		Cell* pC = (*all_cells)[i]; // global_cell_list[i]; 
@@ -360,26 +369,30 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
    
 			Colors = cell_coloring_function( pC ); 
 
-			os << "  <g id=\"cell" << pC->ID << "\">" << std::endl; 
+			os << "   <g id=\"cell" << pC->ID << "\">" << std::endl; 
   
 			// figure out how much of the cell intersects with z = 0 
    
 			double plot_radius = sqrt( r*r - z*z ); 
 
-			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]+top_margin-Y_lower, 
+//			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]+top_margin-Y_lower, 
+//				plot_radius , 0.5, Colors[1], Colors[0] ); 
+			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
 				plot_radius , 0.5, Colors[1], Colors[0] ); 
 
 			// plot the nucleus if it, too intersects z = 0;
 			if( fabs(z) < rn && PhysiCell_SVG_options.plot_nuclei == true )
 			{   
 				plot_radius = sqrt( rn*rn - z*z ); 
-			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]+top_margin-Y_lower, 
+//			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]+top_margin-Y_lower, 
+//					plot_radius, 0.5, Colors[3],Colors[2]); 
+			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
 					plot_radius, 0.5, Colors[3],Colors[2]); 
 			}					  
-			os << "  </g>" << std::endl;
+			os << "   </g>" << std::endl;
 		}
 	}
-	os << "</g>" << std::endl; 
+	os << "  </g>" << std::endl; 
 	
 	// plot intersecting BM points
 	/* 
@@ -402,6 +415,9 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 		// pC = pC->pNextCell;
 	 }
 	*/ 
+	
+	// end of the <g ID="tissue">
+	os << " </g>" << std::endl; 
  
 	// draw a scale bar
  

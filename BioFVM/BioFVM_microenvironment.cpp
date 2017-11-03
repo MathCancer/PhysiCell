@@ -428,7 +428,7 @@ void Microenvironment::resize_densities( int new_size )
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
 	dirichlet_activation_vector.assign( new_size, true ); 
 
-	default_microenvironment_options.Dirichlet_condition_vector = one; 
+	default_microenvironment_options.Dirichlet_condition_vector.assign( new_size , 1.0 );  
 	default_microenvironment_options.Dirichlet_activation_vector.assign( new_size, true ); 
 	
 	return; 
@@ -436,7 +436,8 @@ void Microenvironment::resize_densities( int new_size )
 
 void Microenvironment::add_density( void )
 {
-	default_microenvironment_options.use_oxygen_as_first_field = false; 
+	// fix in PhysiCell preview November 2017 
+	// default_microenvironment_options.use_oxygen_as_first_field = false; 
 	
 	// update 1, 0 
 	zero.push_back( 0.0 ); 
@@ -478,15 +479,17 @@ void Microenvironment::add_density( void )
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
 	dirichlet_activation_vector.assign( number_of_densities(), true ); 
 	
-	default_microenvironment_options.Dirichlet_condition_vector = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.assign( number_of_densities(), true ); 
+	// Fixes in PhysiCell preview November 2017
+	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
+	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
 	
 	return; 
 }
 
 void Microenvironment::add_density( std::string name , std::string units )
 {
-	default_microenvironment_options.use_oxygen_as_first_field = false; 
+	// fix in PhysiCell preview November 2017 
+	// default_microenvironment_options.use_oxygen_as_first_field = false; 
 	
 	// update 1, 0 
 	zero.push_back( 0.0 ); 
@@ -527,15 +530,17 @@ void Microenvironment::add_density( std::string name , std::string units )
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
 	dirichlet_activation_vector.assign( number_of_densities(), true ); 
 	
-	default_microenvironment_options.Dirichlet_condition_vector = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.assign( number_of_densities(), true ); 
+	// fix in PhysiCell preview November 2017 
+	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
+	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
 
 	return; 
 }
 
 void Microenvironment::add_density( std::string name , std::string units, double diffusion_constant, double decay_rate )
 {
-	default_microenvironment_options.use_oxygen_as_first_field = false; 
+	// fix in PhysiCell preview November 2017 
+	// default_microenvironment_options.use_oxygen_as_first_field = false; 
 	
 	// update 1, 0 
 	zero.push_back( 0.0 ); 
@@ -576,8 +581,9 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
 	dirichlet_activation_vector.assign( number_of_densities(), true ); 
 	
-	default_microenvironment_options.Dirichlet_condition_vector = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.assign( number_of_densities(), true ); 
+	// fix in PhysiCell preview November 2017 
+	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); // = one; 
+	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
 	
 	return; 
 }
@@ -594,7 +600,9 @@ int Microenvironment::find_density_index( std::string name )
 
 void Microenvironment::set_density( int index , std::string name , std::string units )
 {
-	default_microenvironment_options.use_oxygen_as_first_field = false; 
+	// fix in PhysiCell preview November 2017 
+	if( index == 0 )
+	{ default_microenvironment_options.use_oxygen_as_first_field = false; }
 	
 	density_names[index] = name; 
 	density_units[index] = units; 
@@ -603,7 +611,9 @@ void Microenvironment::set_density( int index , std::string name , std::string u
 
 void Microenvironment::set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate )
 {
-	default_microenvironment_options.use_oxygen_as_first_field = false; 
+	// fix in PhysiCell preview November 2017 
+	if( index == 0 )
+	{ default_microenvironment_options.use_oxygen_as_first_field = false; }
 	
 	density_names[index] = name; 
 	density_units[index] = units; 
@@ -1030,7 +1040,7 @@ Microenvironment_Options::Microenvironment_Options()
 	dz = 20; 
 	
 	outer_Dirichlet_conditions = false; 
-	Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 0.0 ); 
+	Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 1.0 ); 
 	Dirichlet_activation_vector.assign( pMicroenvironment->number_of_densities() , true ); 
 	
 	// set a far-field value for oxygen (assumed to be in the first field)
@@ -1056,10 +1066,12 @@ Microenvironment_Options default_microenvironment_options;
 
 void initialize_microenvironment( void )
 {
+	/*
 	if( default_microenvironment_options.use_oxygen_as_first_field == false )
 	{
 		std::cout << "wha???" << std::endl; 
 	}
+	*/
 	
 	// create and name a microenvironment; 
 	microenvironment.name = default_microenvironment_options.name;
@@ -1097,7 +1109,7 @@ void initialize_microenvironment( void )
 	microenvironment.time_units = default_microenvironment_options.time_units;
 	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
 
-	// set the initial oxygenation to 38 mmHg (a typical normoxic tissue value of 5% O2)
+	// set the initial densities to the values set in the Dirichlet_condition_vector
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{ microenvironment.density_vector(n) = default_microenvironment_options.Dirichlet_condition_vector; }
 	

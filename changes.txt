@@ -1,0 +1,106 @@
+todo:
+
+1) restructure 2D template more like a typical project. with setup functions, etc. [done]
+update Makefile with make rest 
+ 
+2) restructure 3D template more like a typical project. with setup functions, etc. [done]
+update Makefile with make reset 
+
+3) simpler makefiles 
+
+base Makefile [done, but fix with updates below]
+
+base Makefile::
+make: populates heterogeneity example, compiles it [done]
+
+make <project_name>: populates a sample project 
+make: compiles the project 
+make data-cleanup: cleans up data [done]
+
+make reset : revert to original Makefile [done]
+make reset : clear out custom_modules/*, touch empty.txt [done]
+
+
+<project_name>:
+template2D 
+template3D
+biorobots-sample
+cancer-biorobots-sample
+heterogeneity-sample
+cancer-immune-sample
+
+
+4) update Makefiles in the sample projects [done]
+
+<project_name>:
+template2D [done]
+template3D [done]
+biorobots-sample [done]
+cancer-biorobots-sample [done]
+heterogeneity-sample [done]
+cancer-immune-sample [done]
+
+4') Update Makefile-default [done]
+
+5) SVG y-axis is inverted [done] 
+
+6) Randy's BioFVM fix (in BioFVM_basic_agent.cpp)  [done]
+
+// extern Microenvironment* default_microenvironment;
+// register_microenvironment( default_microenvironment ); 
+register_microenvironment( get_default_microenvironment() );
+
+
+
+7) copy constructor and copy assignment fixes for Cell_Definition [done]
+
+8) remove unneeded "wha???" message from BioFVM_microenvironment.cpp [done] 
+
+9) look at how we add substrates to BioFVM. safe with dirichlet? safe with options? [done]
+
+10) update documentation to include how to add new substrates. [done]
+
+11) update documentation on dirichlet nodes to include optoins on applying Dirichlet conditions to 
+only specific substrates  [done]
+
+12) add the add/set density functions set the "use oxygen as first to false". [done]
+a) remove this logic?
+b) set_density sets the flag as false if index == 0 
+[done] on the add functions. See (16) below. 
+[done] on the set functions. See (17) below. 
+
+13) add/set density functions set dirichlet to true?? [nofix] [done]
+a) It's okay, they don't set outer_Dirichlet_conditions == true 
+
+
+
+14) Update Dirichlet_condition_vector = ones (instead of zeros) in Microenvironment_Options::Microenvironment_Options() default constructor [done]
+
+15) Microenvironment::resize_densities( int new_size ) no longer overwrites previous dirichlet values when extending the size. [done] 
+
+16)  Microenvironment::add_density(), Microenvironment::add_density(std::string,std::string), and 
+Microenvironment::add_density(std::string,std::string,double,double) 
+
+no longer overwrite existing Dirichlet_condition_vector elements or set default_microenvironment_options.use_oxygen_as_first_field to false. 
+[done]
+
+17) Microenvironment::set_density(int,std::string,std::string) and 
+Microenvironment::set_density(int,std::string,std::string,double,double) 
+only set default_microenvironment_options.use_oxygen_as_first_field = false if index = 0. 
+[done]
+
+
+18) added new function void Cell::convert_to_cell_definition( Cell_Definition& cd )	[done] 
+	
+
+
+n-1) angiogenesis example 
+
+
+n) future:
+
+parse XML configuration files
+read saved MultiCellXML file 
+
+move attach/detach to a standard module 
+angiogenesis to a standard module 
