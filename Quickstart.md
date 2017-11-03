@@ -1,6 +1,5 @@
 # Quickstart Guide to PhysiCell 
 
-Nov 3, 2017
 
 ## Download
 
