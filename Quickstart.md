@@ -82,7 +82,7 @@ Assuming the project builds without errors, you should now have an executable ca
 ```
 $ ./biorobots
 ```
-This will begin the simulation, write information to your terminal, and generate output files of types `.svg`, `.xml`, and `.mat`. More about those below. You can hit `Control-c` to kill the simulation early, if you want.
+This will begin the simulation, write information to your terminal, and generate output files of types `.svg`, `.xml`, and `.mat`. More about those below. You can `Control-c` to kill the simulation early, if you want.
 
 For the remaining three example projects provided with PhysiCell, you would follow similar steps, but first clean out the previous simulation's output and prepare for the new one:
 ```
