@@ -78,7 +78,7 @@ second `make` command attempts to compile the (new) code. Since the Makefile is 
 may have done to the previous Makefile (e.g., changing `CC` to point to `g++-7` on OSX) will be lost. You'll need
 to edit it again or find another workaround. -->
 
-Assuming the project builds without errors, you should now have an executable called `biorobots` which you can execute:
+Assuming the project builds without errors, you should now have an executable called `biorobots` which you can run, e.g.:
 ```
 $ ./biorobots
 ```
