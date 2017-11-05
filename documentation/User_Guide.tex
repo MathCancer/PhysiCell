@@ -98,7 +98,7 @@ urlcolor=blue
 
 \author{PhysiCell Project (Lead: Paul Macklin)}
 \title{PhysiCell User Guide (Version \Version)}
-\date{Revision: November 3, 2017}%\today}
+\date{Revision: November 4, 2017}%\today}
 
 \maketitle
 
@@ -139,6 +139,22 @@ DOI: \href{http://dx.doi.org/10.1016/j.jtbi.2012.02.002}{10.1016/j.jtbi.2012.02.
 
 \TOClink
 
+\section{Getting started: The Quickstart and your First Simulation}
+\label{sec:getting_started}
+As of Version 1.2.2, every download of PhysiCell includes a \v|Quickstart.pdf| guide in the root 
+directory. If you follow the instructions in that guide (along with instructions to 
+set up your compiler and environment; see Section \ref{sec:preparing_environment}), you should 
+be able to run and visualize your first PhysiCell simulation (heterogeneous tumor growth) 
+in less than 30 minutes. 
+
+You should also watch the \href{https://twitter.com/search?f=tweets&vertical=default&q=PhysiCell&src=typd}{\#PhysiCell hashtag} 
+on Twitter for updates on PhysiCell and new tricks, tips, and tutorials. 
+Tutorials and other blog posts can be found at 
+\href{http://mathcancer.org/blog/physicell-tutorials/}{http://MathCancer.org/blog/physicell-tutorials/}. 
+See Section \ref{sec:blog_and_help} for resources for help, including support tickets and the PhysiCell blog. 
+
+\TOClink 
+
 \section{Further resources for help}
 \label{sec:blog_and_help}
 The PhysiCell project posts tips and tutorials at its blog: 
@@ -164,6 +180,7 @@ Lastly, users can support help tickets at SourceForge:
 \TOClink 
 
 \section{Preparing your development environment \DONE}
+\label{sec:preparing_environment}
 PhysiCell was designed to be cross-platform compatible, without need for a package manager system or any other 
 complex installation. In principle, any \v|C++11| compliant compiler with OpenMP support should work. In 
 practice, we use \v|g++| as our ``gold standard.'' You'll also want to ensure that your build environment supports 
@@ -208,9 +225,9 @@ for more details. Also, if you have compiler crashes, see the FAQ (frequently as
 \TOClink
 
 \subsection{Virtual Machine option \DONE}
-Starting with the 1.2.x releases, we began distributing PhysiCell as zipped source (preferred),  
-\href{https://www.docker.com/}{Docker} containers, and virtual appliances 
-for use in \href{http://virtualbox.org}{VirtualBox} and other virtual machine software, 
+Starting with the 1.2.x releases, we began distributing PhysiCell as zipped source (preferred) %,  
+% \href{https://www.docker.com/}{Docker} containers, 
+and virtual appliances for use in \href{http://virtualbox.org}{VirtualBox} and other virtual machine software, 
 allowing us to distribute a full PhysiCell 
 development environment (including 64-bit \v|g++|, support for makefiles, zip/unzip, 
 ImageMagick, mencoder, eog, a text editor, and the most up-to-date 
@@ -384,20 +401,20 @@ We use the XFCE4 desktop environment in our virtual appliance, so this may be he
 \end{enumerate}
 \TOClink 
 
-\subsubsection{Docker resources}
-If you use Docker, we suggest the following tutorials: 
-
-\begin{enumerate}
-\item 
-\textbf{Docker user introduction:} \href{https://docs.docker.com/get-started/}{https://docs.docker.com/get-started/}
-
-\item 
-\textbf{Docker for beginners:} \href{https://prakhar.me/docker-curriculum/}{https://prakhar.me/docker-curriculum/}
-
-\item 
-\textbf{Docker tutorial:} \href{https://www.tutorialspoint.com/docker/}{https://www.tutorialspoint.com/docker/}
-\end{enumerate}
-\TOClink 
+% \subsubsection{Docker resources}
+% If you use Docker, we suggest the following tutorials: 
+% 
+% \begin{enumerate}
+% \item 
+% \textbf{Docker user introduction:} \href{https://docs.docker.com/get-started/}{https://docs.docker.com/get-started/}
+% 
+% \item 
+% \textbf{Docker for beginners:} \href{https://prakhar.me/docker-curriculum/}{https://prakhar.me/docker-curriculum/}
+% 
+% \item 
+% \textbf{Docker tutorial:} \href{https://www.tutorialspoint.com/docker/}{https://www.tutorialspoint.com/docker/}
+% \end{enumerate}
+% \TOClink 
 
 \subsubsection{Recommended additional tools}
 Lastly, we find the following tools and resources very useful for postprocessing 
@@ -520,7 +537,7 @@ Section \ref{sec:templates}.
 
 \end{enumerate}
 
-\TOClink
+\TOClink 
 
 \section{Using project templates \DONE}
 \label{sec:templates}
@@ -593,6 +610,17 @@ Section \ref{sec:blog_and_help}.
 % are introduced in Section \ref{sec:examples}, including a tutorial that modifies the 2-D template project . 
 
 \TOClink
+
+\section{Using the Sample Projects}
+\label{sec:sample_projects}
+
+
+\TOClink 
+
+\subsection{A note on Makefiles}
+\label{sec:makefiles}
+
+\TOClink 
 
 \section{The BioFVM microenvironment \DONE}
 PhysiCell is built upon BioFVM \cite{ref:BioFVM}, and so it uses the (bio)chemical microenvironment from BioFVM, 
