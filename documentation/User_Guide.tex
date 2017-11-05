@@ -145,7 +145,7 @@ As of Version 1.2.2, every download of PhysiCell includes a \v|Quickstart.pdf| g
 directory. If you follow the instructions in that guide (along with instructions to 
 set up your compiler and environment; see Section \ref{sec:preparing_environment}), you should 
 be able to run and visualize your first PhysiCell simulation (heterogeneous tumor growth) 
-in less than 30 minutes. 
+in well under an hour. 
 
 You should also watch the \href{https://twitter.com/search?f=tweets&vertical=default&q=PhysiCell&src=typd}{\#PhysiCell hashtag} 
 on Twitter for updates on PhysiCell and new tricks, tips, and tutorials. 
@@ -653,8 +653,9 @@ For example, to run the cancer biorobots example, the executable name is
 
 \v|./cancer_biorobots|
 
-The project will create a series of SVG files, as well as MultiCellDS save files 
-(a combination of matlab and XML files). See \ref{}
+The project will create a series of SVG images files, as well as MultiCellDS save files 
+(a combination of matlab and XML files). See \ref{sec:matlab_data} and 
+the PhysiCell blog.
 
 \item 
 \textbf{(Optional) Clear out the project / return to a clean slate:} If you want 
@@ -4561,6 +4562,7 @@ and so forth.
 \TOClink 
 
 \subsubsection{Reading PhysiCell snapshots in MATLAB}
+\label{sec:matlab_data}
 In the \v|./matlab| directory, we include a few MATLAB functions to 
 parse the PhysiCell MultiCellDS XML files and associated .mat files. 
 We recommend copying them to your path, or to the same directory as 
