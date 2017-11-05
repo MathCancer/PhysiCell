@@ -505,35 +505,37 @@ moved to the sample projects as of Version 1.2.2. This directory will be depreca
 and at least the four sample projects in \cite{ref:PhysiCell}.  A good start to a new 
 project is to use the \v|make template2D| or \v|make template3D| makefile rules, 
 which will populate the \v|main.cpp|, \v|Makefile|, and \v|./custom_modules| with appropriate 
-codes to get started. See Section \ref{sec:templates}.
+codes to get started. See Section \ref{sec:templates} for more information on the 
+template projects, and Section \ref{sec:sample_projects} for the full list of sample 
+projects and instructions to build them. 
 
-Here are the sample projects included as of Version 1.2.2: 
-\begin{enumerate}
-\item 
-\smallcode{biorobots} is a 2-D example of 3 cell types: cargo cells, worker cells (which seek out cargo cells and 
-haul them to a destination), and director cells (which attract worker cells). 
+% Here are the sample projects included as of Version 1.2.2: 
+% \begin{enumerate}
+% \item 
+% \smallcode{biorobots} is a 2-D example of 3 cell types: cargo cells, worker cells (which seek out cargo cells and 
+% haul them to a destination), and director cells (which attract worker cells). 
 
-\item 
-\smallcode{cancer\_biorobots} extends the biorobots example to (1) simulate a 2-D tumor that develops a necrotic 
-core, (2) so that cargo cells are hauled towards hypoxic tumor regions, and (3) so that released cargo cells secrete 
-a chemotherapeutic compounds. 
+% \item 
+% \smallcode{cancer\_biorobots} extends the biorobots example to (1) simulate a 2-D tumor that develops a necrotic 
+% core, (2) so that cargo cells are hauled towards hypoxic tumor regions, and (3) so that released cargo cells secrete 
+% a chemotherapeutic compounds. 
 
-\item
-\smallcode{heterogeneity} simulates a 2-D tumor with heterogeneous ``genetics'' that drive differential proliferation. 
+% \item
+% \smallcode{heterogeneity} simulates a 2-D tumor with heterogeneous ``genetics'' that drive differential proliferation. 
 
-\item 
-\smallcode{cancer\_immune} extends the heterogeneity example to 3D, and introduces a new immune 
-cell type (modeling T cells) that migrate towards tumor cells, temporarily adhere, test for immunogenicity, 
-and initiate apoptosis. 
+% \item 
+% \smallcode{cancer\_immune} extends the heterogeneity example to 3D, and introduces a new immune 
+% cell type (modeling T cells) that migrate towards tumor cells, temporarily adhere, test for immunogenicity, 
+% and initiate apoptosis. 
 
-\item 
-\smallcode{template2D} is the template for a 2-D project. See the description above and 
-Section \ref{sec:templates}. 
+% \item 
+% \smallcode{template2D} is the template for a 2-D project. See the description above and 
+% Section \ref{sec:templates}. 
 
-\item 
-\smallcode{template3D} is the template for a 3-D project. See the description above and 
-Section \ref{sec:templates}. 
-\end{enumerate}
+% \item 
+% \smallcode{template3D} is the template for a 3-D project. See the description above and 
+% Section \ref{sec:templates}. 
+% \end{enumerate}
 
 \end{enumerate}
 
@@ -613,12 +615,93 @@ Section \ref{sec:blog_and_help}.
 
 \section{Using the Sample Projects}
 \label{sec:sample_projects}
+PhysiCell includes several sample projects to illustrate capabilities and 
+suggest modeling possibilities. In general, building and running these projects 
+consists of the following steps:
 
+\begin{enumerate}
+\item 
+\textbf{Populate a project:} Use the following Makefile rule (from a terminal / command 
+project in your PhysiCell root directory): 
+
+\v|make [project_name]|
+
+where \v|[project_name]| is one of the sample projects listed below. For example, to 
+populate the ``cancer biorobots'' sample project: 
+
+\v|make cancer-biorobots-sample|
+
+\item 
+\textbf{Build the project:} Just run make:
+
+\v|make|
+
+\item 
+\textbf{Run the project:} Run the executable created by the compiler. If the name 
+of the program is \v|[PROGRAM_NAME]|, run 
+
+\v|./[PROGRAM_NAME]|
+
+(Windows users should omit the \v|./|.) 
+
+One simple way to determine the name of the executable is to use grep on the Makefile: 
+
+\v|grep PROGRAM_NAME Makefile| 
+
+For example, to run the cancer biorobots example, the executable name is 
+\v|cancer_biorobots|, so you run: 
+
+\v|./cancer_biorobots|
+
+The project will create a series of SVG files, as well as MultiCellDS save files 
+(a combination of matlab and XML files). See \ref{}
+
+\item 
+\textbf{(Optional) Clear out the project / return to a clean slate:} If you want 
+to build and run a different sample project, or clear out the sample materials 
+to create your own, you need to ``de-populate'' the sample project: 
+
+\v|make reset|
+
+\end{enumerate}
+
+Here are the sample projects included as of Version 1.2.2: 
+\begin{enumerate}
+\item 
+\smallcode{biorobots-sample} is a 2-D example of 3 cell types: cargo cells, worker cells (which seek out cargo cells and 
+haul them to a destination), and director cells (which attract worker cells). 
+
+\item 
+\smallcode{cancer-biorobots-sample} extends the biorobots example to (1) simulate a 2-D tumor that develops a necrotic 
+core, (2) so that cargo cells are hauled towards hypoxic tumor regions, and (3) so that released cargo cells secrete 
+a chemotherapeutic compounds. 
+
+\item
+\smallcode{heterogeneity-sample} simulates a 2-D tumor with heterogeneous ``genetics'' that drive differential proliferation. 
+
+\item 
+\smallcode{cancer-immune-sample} extends the heterogeneity example to 3D, and introduces a new immune 
+cell type (modeling T cells) that migrate towards tumor cells, temporarily adhere, test for immunogenicity, 
+and initiate apoptosis. 
+
+\item 
+\smallcode{template2D} is the template for a 2-D project. See Section \ref{sec:templates}. 
+
+\item 
+\smallcode{template3D} is the template for a 3-D project. See Section \ref{sec:templates}. 
+\end{enumerate}
 
 \TOClink 
 
-\subsection{A note on Makefiles}
+\subsection{Extra makefile rules}
 \label{sec:makefiles}
+To clear out the data generated in a simulation: 
+
+\v|make data-cleanup|
+
+To clear out the compiler-generated objects (which would allow you to recompile the entire project): 
+
+\v|make clean| 
 
 \TOClink 
 
