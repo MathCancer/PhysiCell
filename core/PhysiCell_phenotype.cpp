@@ -65,6 +65,7 @@
 
 #include "../BioFVM/BioFVM.h"
 #include "./PhysiCell_constants.h"
+#include "./PhysiCell_utilities.h"
 
 using namespace BioFVM; 
 
@@ -305,7 +306,7 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 			else
 			{
 				double prob = phenotype.cycle.data.transition_rates[i][k]*dt; 
-				if( uniform_random() <= prob )
+				if( UniformRandom() <= prob )
 				{
 					continue_transition = true; 
 				}
@@ -440,7 +441,7 @@ bool Death::check_for_death( double dt )
 	int i = 0; 
 	while( !dead && i < rates.size() )
 	{
-		if( uniform_random() < rates[i]*dt )
+		if( UniformRandom() < rates[i]*dt )
 		{
 			// update the Death data structure 
 			dead = true; 
