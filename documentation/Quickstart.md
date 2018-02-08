@@ -163,7 +163,7 @@ tutorial for this. Until then, please ask questions.
 
 ## Support
 
-Until we set up a mailing list, please email us directly (macklinp@iu.edu, heiland@iu.edu) and follow us on Twitter  (https://twitter.com/MathCancer).
+Please join the [PhysiCell Users](https://groups.google.com/forum/#!forum/physicell-users) forum and follow us on Twitter  (https://twitter.com/MathCancer).
 
 <hr> <!---------------------------------------------->
 
