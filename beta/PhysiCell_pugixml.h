@@ -76,21 +76,24 @@
 
 namespace PhysiCell{
 	
+extern pugi::xml_node physicell_config_root; 
 
-bool open_PhysiCell_config_file( std::string filename );
+bool load_PhysiCell_config_file( std::string filename ); // done 
 bool close_PhysiCell_config_file( void ); 
 	
 // find the first <find_me> child in <parent_node> 
-pugi::xml_node find_node( pugi::xml_node& parent_node , std::string find_me ); 
+pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me ); // done 
+
+// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me ); // done 
 
 // get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
-double get_double_value( pugi::xml_node& parent_node , std::string find_me ); 
+double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me ); // done 
 
-// get the first integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-int get_int_value( pugi::xml_node& parent_node , std::string find_me ); 
+// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
+int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me ); // done 
 
-// get the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-int get_string_value( pugi::xml_node& parent_node , std::string find_me ); 
+
 
 // get the string attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
 std::string get_string_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 

@@ -70,20 +70,8 @@ bool physicell_config_dom_initialized = false;
 pugi::xml_document physicell_config_doc; 	
 pugi::xml_node physicell_config_root; 
 	
-bool open_PhysiCell_config_file( std::string filename )
+bool load_PhysiCell_config_file( std::string filename )
 {
-/*
-		pugi::xml_node root = xml_dom.child( "MultiCellDS" ); 
-	if( !root )
-	{
-		root = xml_dom.append_child( "MultiCellDS" ); 
-		pugi::xml_attribute attrib = root.append_attribute( "version" ); 
-		attrib.set_value( MultiCellDS_version_string.c_str() ); 
-		attrib = root.append_attribute( "type" ); 
-		attrib.set_value( MultiCellDS_simulation_snapshot_type_string.c_str() ); 
-	}
-*/	
-	
 	std::cout << "Using config file " << filename << " ... " << std::endl ; 
 	pugi::xml_parse_result result = physicell_config_doc.load_file( filename.c_str()  );
 	
@@ -96,15 +84,35 @@ bool open_PhysiCell_config_file( std::string filename )
 	
 	physicell_config_root = physicell_config_doc.child("PhysiCell_settings");
 	physicell_config_dom_initialized = true; 
-	
-	
-//	read_microenvironment_from_MultiCellDS_xml( M_destination , doc ); 	
 
-	
 	return true; 	
 }
 
+// find the first <find_me> child in <parent_node> 
+pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me )
+{
+	return parent_node.child( find_me.c_str() ); 
+}
+
+// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me )
+{
+	return parent_node.child( find_me.c_str() ).text().get(); 
+}
 	
 	
+// get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
+double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me )
+{
+	return strtod( parent_node.child( find_me.c_str() ).text().get() , NULL ); 
+}
+
+
+// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
+int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me )
+{
+	return atoi( parent_node.child( find_me.c_str() ).text().get() ); 
+}
+ 
 	
 };
