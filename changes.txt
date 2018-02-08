@@ -1,3 +1,71 @@
+PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
+Multicellular Systems.
+
+Version:      1.2.3
+Release date: ? February 2018
+
+Overview: 
+PhysiCell is a flexible open source framework for building 
+agent-based multicellular models in 3-D tissue environments. 
+
+Reference: Ghaffarizadeh et al., PLoS Comput Biol (2017)
+   preprint URL: https://doi.org/10.1101/088773
+
+Visit http://MathCancer.org/blog for the latest tutorials and help. 
+
+Summary: 
+This release ... 
+
+NOTE: OSX users must now define PHYSICELL_CPP system variable. 
+      See the documentation.
+
+PhysiCell is currently in press at PLoS Comput. Biol. 
+
+Major new features and changes:
++ none 
+
+Minor new features and changes: 
++ Added "beta" directory where we will put new features that are still
+  undergoing testing 
+
+Bugfixes: 
+
++ Changed instances of uniform_random() (from BioFVM) to 
+  UniformRandom() (from PhysiCell) so that all calls to the PRNG
+  used the same random seed and same PRNG. Thanks, olliemcdonald!
+
++ Fixed typo in "Dirichlet" in user documentation. Thanks, luissv7! 
+  
+Notices for intended changes that may affect backwards compatibility:
+
++ None at this time
+
+Planned future improvements: 
+
++ parse XML configuration files
+
++ read saved simulation states (as MultiCellDS digital snapshots)
+
++ "mainline" prototype cell attach/detach mechanics as standard models 
+  (currently in the biorobots and immune examples)
+
++ integrate SBML-encoded systems of ODEs as custom data and functions 
+  for molecular-scale modeling 
+
++ create an angiogenesis sample project 
+
++ create a small library of angiogenesis and vascularization codes as 
+  an optional standard module in ./modules (but not as a core component)
+
+
+Todo before releasing 1.2.3:
++ create easy script to update version numbers recursively 
++ update reference information to reflect "accepted" status at 
+  PLoS Comput. Biol. 
+
+
+
+
 =======================================================================
 
 PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
