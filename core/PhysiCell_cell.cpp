@@ -192,11 +192,11 @@ void Cell::update_motility_vector( double dt_ )
 		return; 
 	}
 	
-	if( uniform_random() < dt_ / phenotype.motility.persistence_time || phenotype.motility.persistence_time < dt_ )
+	if( UniformRandom() < dt_ / phenotype.motility.persistence_time || phenotype.motility.persistence_time < dt_ )
 	{
 		// choose a uniformly random unit vector 
-		double temp_angle = 6.28318530717959*uniform_random();
-		double temp_phi = 3.1415926535897932384626433832795*uniform_random();
+		double temp_angle = 6.28318530717959*UniformRandom();
+		double temp_phi = 3.1415926535897932384626433832795*UniformRandom();
 		
 		double sin_phi = sin(temp_phi);
 		double cos_phi = cos(temp_phi);
