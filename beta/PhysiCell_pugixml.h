@@ -3,7 +3,7 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.3) [1].    #
+# We implemented and solved the model using PhysiCell (Version ?????) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
@@ -13,7 +13,7 @@
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1],    #
+# We implemented and solved the model using PhysiCell (Version ?????) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
@@ -74,27 +74,34 @@
 
 #include "../BioFVM/pugixml.hpp"
 
+namespace PhysiCell{
+	
+
+bool open_PhysiCell_config_file( std::string filename );
+bool close_PhysiCell_config_file( void ); 
+	
 // find the first <find_me> child in <parent_node> 
-pugi::xml_node find_node( pugi::xml_node& parent_node , std::string& find_me ); 
+pugi::xml_node find_node( pugi::xml_node& parent_node , std::string find_me ); 
 
 // get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
-double get_double_value( pugi::xml_node& parent_node , std::string& find_me ); 
+double get_double_value( pugi::xml_node& parent_node , std::string find_me ); 
 
 // get the first integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-int get_int_value( pugi::xml_node& parent_node , std::string& find_me ); 
+int get_int_value( pugi::xml_node& parent_node , std::string find_me ); 
 
 // get the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-int get_string_value( pugi::xml_node& parent_node , std::string& find_me ); 
+int get_string_value( pugi::xml_node& parent_node , std::string find_me ); 
 
 // get the string attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-std::string get_string_attribute_value( pugi::xml_node& parent_node , std::string& find_me , std::string& attribute ); 
+std::string get_string_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
 
 // get the int attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-int get_int_attribute_value( pugi::xml_node& parent_node , std::string& find_me , std::string& attribute ); 
+int get_int_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
 
 // get the double attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-double get_double_attribute_value( pugi::xml_node& parent_node , std::string& find_me , std::string& attribute ); 
+double get_double_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
 
+};
 
 #endif 
 
