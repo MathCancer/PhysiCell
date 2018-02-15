@@ -61,50 +61,74 @@
 ###############################################################################
 */
 
+#ifndef __PhysiCell_settings_h__
+#define __PhysiCell_settings_h__
+
+#include <iostream>
+#include <ctime>
+#include <cmath>
+#include <string>
+#include <vector>
+#include <random>
+#include <chrono>
 
 #include "../beta/PhysiCell_pugixml.h"
 
 namespace PhysiCell{
-	
+ 	
+extern pugi::xml_node physicell_config_root; 
 
-// find the first <find_me> child in <parent_node> 
-pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me )
-{
-	return parent_node.child( find_me.c_str() ); 
-}
+bool load_PhysiCell_config_file( std::string filename );
 
-// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me )
+class PhysiCell_Settings
 {
-	return parent_node.child( find_me.c_str() ).text().get(); 
-}
-	
-	
-// get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
-double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	// return strtod( parent_node.child( find_me.c_str() ).text().get() , NULL ); // classic 
-	
-	return parent_node.child( find_me.c_str() ).text().as_double(); // using pugixml conversion 
-}
+ private:
+ public:
+	// overall 
+	double max_time = 60*24*45;   
 
-
-// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	//	return atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic 
-	
-	return parent_node.child( find_me.c_str() ).text().as_int(); // using pugixml conversion 
-}
-
-// get the Boolean value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	//	return (bool) atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic (untested)
-	
-	return parent_node.child( find_me.c_str() ).text().as_bool(); // using pugixml conversion 
-}
+	// units
+	std::string time_units = "min"; 
+	std::string space_units = "micron"; 
  
- 
+	// parallel options 
+	int omp_num_threads = 2; 
 	
+	// save options
+	std::string folder = "."; 
+
+	double full_save_interval = 60;  
+	bool enable_full_saves = true; 
+	bool enable_legacy_saves = false; 
+	
+	double SVG_save_interval = 60; 
+	bool enable_SVG_saves = true; 
+	
+	
+	
+	
+	PhysiCell_Settings();
+	
+	void read_from_pugixml( void ); 
 };
+
+class PhysiCell_Globals
+{
+ private:
+ public:
+	double current_time = 0.0; 
+	double next_full_save_time = 0.0; 
+	double next_SVG_save_time = 0.0; 
+	int full_output_index = 0; 
+	int SVG_output_index = 0; 
+};
+
+extern PhysiCell_Globals PhysiCell_globals; 
+
+extern PhysiCell_Settings PhysiCell_settings; 
+
+
+} 
+
+#endif 
+

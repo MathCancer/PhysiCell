@@ -79,6 +79,8 @@ namespace PhysiCell{
 
 int writePov(std::vector<Cell*> all_cells, double timepoint, double scale);
 int writeCellReport(std::vector<Cell*> all_cells, double timepoint);
+
+void display_simulation_status( std::ostream& os ); 
 void log_output(double t, int output_index, Microenvironment microenvironment, std::ofstream& report_file);
 	
 };

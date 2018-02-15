@@ -3,22 +3,22 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version ?????) [1].    #
+# We implemented and solved the model using PhysiCell (Version 1.2.2) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2018 (accepted).                        #
+#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
 #     preprint DOI: 10.1101/088773                                            #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version ?????) [1],    #
+# We implemented and solved the model using PhysiCell (Version 1.2.2) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2018 (accepted).                        #
+#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
 #     preprint DOI: 10.1101/088773                                            #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
@@ -29,7 +29,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -61,50 +61,22 @@
 ###############################################################################
 */
 
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-#include "../beta/PhysiCell_pugixml.h"
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-namespace PhysiCell{
-	
+// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-// find the first <find_me> child in <parent_node> 
-pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me )
-{
-	return parent_node.child( find_me.c_str() ); 
-}
+// set the tumor cell properties, then call the function 
+// to set up the tumor cells 
+void create_cell_types( void );
 
-// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	return parent_node.child( find_me.c_str() ).text().get(); 
-}
-	
-	
-// get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
-double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	// return strtod( parent_node.child( find_me.c_str() ).text().get() , NULL ); // classic 
-	
-	return parent_node.child( find_me.c_str() ).text().as_double(); // using pugixml conversion 
-}
+void setup_tissue(); 
 
+// set up the microenvironment to include the immunostimulatory factor 
+void setup_microenvironment( void );  // done 
 
-// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	//	return atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic 
-	
-	return parent_node.child( find_me.c_str() ).text().as_int(); // using pugixml conversion 
-}
-
-// get the Boolean value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	//	return (bool) atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic (untested)
-	
-	return parent_node.child( find_me.c_str() ).text().as_bool(); // using pugixml conversion 
-}
- 
- 
-	
-};
+std::vector<std::string> heterogeneity_coloring_function( Cell* );

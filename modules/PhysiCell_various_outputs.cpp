@@ -64,13 +64,16 @@
 #include "../core/PhysiCell.h"
 #include "./PhysiCell_various_outputs.h"
 
+#include "../beta/PhysiCell_settings.h"
+
 namespace PhysiCell{
 
 int writePov(std::vector<Cell*> all_cells, double timepoint, double scale)
 {
 	std::string filename; 
 	filename.resize( 1024 ); 
-	sprintf( (char*) filename.c_str() , "output//cells_%i.pov" , (int)round(timepoint) ); 
+//	sprintf( (char*) filename.c_str() , "output//cells_%i.pov" , (int)round(timepoint) ); 
+	sprintf( (char*) filename.c_str() , "%s/cells_%i.pov" , PhysiCell_settings.folder.c_str() ,  (int)round(timepoint) ); 
 	std::ofstream povFile (filename.c_str(), std::ofstream::out);
 	povFile<<"#include \"colors.inc\" \n";
 	povFile<<"#include \"header.inc\" \n";
@@ -113,7 +116,8 @@ int writeCellReport(std::vector<Cell*> all_cells, double timepoint)
 {
 	std::string filename; 
 	filename.resize( 1024 ); 
-	sprintf( (char*) filename.c_str() , "output//cells_%i.txt" , (int)round(timepoint) ); 
+//	sprintf( (char*) filename.c_str() , "output//cells_%i.txt" , (int)round(timepoint) ); 
+	sprintf( (char*) filename.c_str() , "%s/cells_%i.txt" , PhysiCell_settings.folder.c_str() , (int)round(timepoint) ); 
 	std::ofstream povFile (filename.c_str(), std::ofstream::out);
 	povFile<<"\tID\tx\ty\tz\tradius\tvolume_total\tvolume_nuclear_fluid\tvolume_nuclear_solid\tvolume_cytoplasmic_fluid\tvolume_cytoplasmic_solid\tvolume_calcified_fraction\tphenotype\telapsed_time\n";
 	int phenotype_code;
@@ -132,20 +136,39 @@ int writeCellReport(std::vector<Cell*> all_cells, double timepoint)
 	return 0;
 }
 
+void display_simulation_status( std::ostream& os )
+{
+	os << "current simulated time: " << PhysiCell_globals.current_time << " " << 
+		PhysiCell_settings.time_units << " (max: " << 
+		PhysiCell_settings.max_time << " " << 
+		PhysiCell_settings.time_units << ")" << std::endl; 
+	
+	os << "interval wall time: ";
+	BioFVM::TOC();
+	BioFVM::display_stopwatch_value( os , BioFVM::stopwatch_value() ); 
+	os << std::endl; 
+	os << "total wall time: "; 
+	BioFVM::RUNTIME_TOC();
+	BioFVM::display_stopwatch_value( os , BioFVM::runtime_stopwatch_value() ); 
+	os << std::endl << std::endl; 
+	
+	return;
+}
+
 void log_output(double t, int output_index, Microenvironment microenvironment, std::ofstream& report_file)
 {
 	double scale=1000;
 	int num_new_cells= 0;
 	int num_deaths=0;
-	std::cout << "current simulated time: " << t   << " minutes " << std::endl; 
-	std::cout << "interval wall time: ";
+//	std::cout << "current simulated time: " << t   << " minutes " << std::endl; 
+//	std::cout << "interval wall time: ";
 	BioFVM::TOC();
-	BioFVM::display_stopwatch_value( std::cout , BioFVM::stopwatch_value() ); 
-	std::cout << std::endl; 
-	std::cout << "total wall time: "; 
+//	BioFVM::display_stopwatch_value( std::cout , BioFVM::stopwatch_value() ); 
+//	std::cout << std::endl; 
+//	std::cout << "total wall time: "; 
 	BioFVM::RUNTIME_TOC();
-	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
-	std::cout << std::endl;
+//	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
+//	std::cout << std::endl;
 	
 	std::cout << "time: "<<t<<std::endl;
 	num_new_cells=t==0?all_basic_agents.size():((Cell_Container *)microenvironment.agent_container)->num_divisions_in_current_step;

@@ -60,51 +60,109 @@
 #                                                                             #
 ###############################################################################
 */
-
-
-#include "../beta/PhysiCell_pugixml.h"
+ 
+#include "PhysiCell_settings.h"
 
 namespace PhysiCell{
 	
+PhysiCell_Settings PhysiCell_settings; 
 
-// find the first <find_me> child in <parent_node> 
-pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me )
+bool physicell_config_dom_initialized = false; 
+pugi::xml_document physicell_config_doc; 	
+pugi::xml_node physicell_config_root; 
+	
+bool load_PhysiCell_config_file( std::string filename )
 {
-	return parent_node.child( find_me.c_str() ); 
+	std::cout << "Using config file " << filename << " ... " << std::endl ; 
+	pugi::xml_parse_result result = physicell_config_doc.load_file( filename.c_str()  );
+	
+	if( result.status != pugi::xml_parse_status::status_ok )
+	{
+		std::cout << "Error loading " << filename << "!" << std::endl; 
+		return false;
+	}
+	
+	physicell_config_root = physicell_config_doc.child("PhysiCell_settings");
+	physicell_config_dom_initialized = true; 
+	
+	PhysiCell_settings.read_from_pugixml(); 
+	
+	return true; 	
 }
 
-// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me )
+PhysiCell_Settings::PhysiCell_Settings()
 {
-	return parent_node.child( find_me.c_str() ).text().get(); 
+	// units 
+	time_units = "min"; 
+	space_units = "micron"; 
+	
+	// save options
+	folder = "."; 
+	max_time = 60*24*45;   
+
+	full_save_interval = 60;  
+	enable_full_saves = true; 
+	enable_legacy_saves = false; 
+	
+	SVG_save_interval = 60; 
+	enable_SVG_saves = true; 
+	
+	// parallel options 
+	
+	omp_num_threads = 4; 
+	 
+	return; 
 }
-	
-	
-// get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
-double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me )
+ 	
+void PhysiCell_Settings::read_from_pugixml( void )
 {
-	// return strtod( parent_node.child( find_me.c_str() ).text().get() , NULL ); // classic 
+	pugi::xml_node node; 
 	
-	return parent_node.child( find_me.c_str() ).text().as_double(); // using pugixml conversion 
+	// overall options 
+	
+	node = xml_find_node( physicell_config_root , "overall" );
+	max_time = xml_get_double_value( node , "max_time" );
+	node = node.parent(); 
+	
+	// save options 
+	
+	node = xml_find_node( physicell_config_root , "save" ); 
+	
+	folder = xml_get_string_value( node, "folder" ) ;
+	
+	node = xml_find_node( node , "full_data" ); 
+	full_save_interval = xml_get_double_value( node , "interval" );
+	enable_full_saves = xml_get_bool_value( node , "enable" ); 
+	node = node.parent(); 
+	
+	node = xml_find_node( node , "SVG" ); 
+	SVG_save_interval = xml_get_double_value( node , "interval" );
+	enable_SVG_saves = xml_get_bool_value( node , "enable" ); 
+	node = node.parent(); 
+	
+	node = xml_find_node( node , "legacy_data" ); 
+	enable_legacy_saves = xml_get_bool_value( node , "enable" );
+	std::cout << (int) enable_legacy_saves << std::endl; 
+	node = node.parent(); 
+
+	// parallel options 
+	
+	node = xml_find_node( physicell_config_root , "parallel" ); 		
+	omp_num_threads = xml_get_int_value( node, "omp_num_threads" ); 
+
+	// random seed options 
+	
+	
+	
+	return; 
 }
 
 
-// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	//	return atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic 
-	
-	return parent_node.child( find_me.c_str() ).text().as_int(); // using pugixml conversion 
-}
+PhysiCell_Globals PhysiCell_globals; 
 
-// get the Boolean value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	//	return (bool) atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic (untested)
-	
-	return parent_node.child( find_me.c_str() ).text().as_bool(); // using pugixml conversion 
-}
  
+
+}; 
  
-	
-};
+
+ 

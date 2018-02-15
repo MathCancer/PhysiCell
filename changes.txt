@@ -28,6 +28,40 @@ Minor new features and changes:
 + Added "beta" directory where we will put new features that are still
   undergoing testing 
 
++ Minor updates to the Quickstart guide. 
+
++ Added new function: to display the simulation status: 
+
+     void display_simulation_status( std::ostream& os ); 
+	 
+     e.g., display_simulation_status( std::cout ); 
+
+void display_simulation_status( std::ofstream& of ); 
+
++ writePov() uses a user-specified output folder.
+
++ log_output() uses a user-specified output folder. 
+
++ added "beta-testing" sample project. Populate it by the rule: 
+     make beta-testing
+
+Beta features (not fully supported):
++ Added PhysiCell_pugixml.* for easier extraction of parameter 
+  arguments from XML files
+
++ Added PhysiCell_settings.* to include parsing of XML parameter 
+  files, and parameter values stored in a unified data structure. 
+  
++ Added parsing of settings file to separately set frequency of 
+  saving full output (MultiCellDS), SVG outputs, and "legacy" 
+  outputs from USC era.
+  
++ Added options to specify the folder of saved data.
+
++ Added option to read the number of OMP threads from a setting file.
+
++ 
+
 Bugfixes: 
 
 + Changed instances of uniform_random() (from BioFVM) to 
@@ -35,6 +69,10 @@ Bugfixes:
   used the same random seed and same PRNG. Thanks, olliemcdonald!
 
 + Fixed typo in "Dirichlet" in user documentation. Thanks, luissv7! 
+
++ Removed .git directory that was accidentally included in releases
+
+
   
 Notices for intended changes that may affect backwards compatibility:
 
