@@ -121,7 +121,11 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	// overall options 
 	
 	node = xml_find_node( physicell_config_root , "overall" );
+
 	max_time = xml_get_double_value( node , "max_time" );
+	time_units = xml_get_string_value( node, "time_units" ) ;
+	space_units = xml_get_string_value( node, "space_units" ) ;
+
 	node = node.parent(); 
 	
 	// save options 
@@ -142,7 +146,6 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	
 	node = xml_find_node( node , "legacy_data" ); 
 	enable_legacy_saves = xml_get_bool_value( node , "enable" );
-	std::cout << (int) enable_legacy_saves << std::endl; 
 	node = node.parent(); 
 
 	// parallel options 
