@@ -104,6 +104,12 @@ cancer-immune-sample:
 	cp Makefile Makefile-backup
 	cp ./sample_projects/cancer_immune/Makefile .
 	
+beta-testing:
+	cp ./sample_projects/beta_testing/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/beta_testing/main-beta.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/beta_testing/Makefile .
 	
 # early examples for convergence testing 
 

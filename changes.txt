@@ -44,6 +44,16 @@ void display_simulation_status( std::ofstream& of );
 
 + added "beta-testing" sample project. Populate it by the rule: 
      make beta-testing
+	 
++ added flow_cytometry_separated_cycle_model to the PhysiCell constants. 
+
++ added G1pm_phase and G1ps_phase to the PhysiCell constants. 
+
++ implemnted new cell cycle models: 
+
+     flow_cytometry_cycle_model: G0/G1 -> S -> G2/M
+     flow_cytometry_separated_cycle_model: G0/G1 -> S -> G2 -> M 
+
 
 Beta features (not fully supported):
 + Added PhysiCell_pugixml.* for easier extraction of parameter 

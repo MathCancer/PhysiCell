@@ -72,7 +72,7 @@ namespace PhysiCell
 
 // standard cycle models: 
 
-extern Cycle_Model Ki67_advanced, Ki67_basic, live; // later, flow cytometry models 
+extern Cycle_Model Ki67_advanced, Ki67_basic, live, flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model; 
 extern Cycle_Model apoptosis, necrosis, inert; 
 extern Death_Parameters apoptosis_parameters, necrosis_parameters; 
 
@@ -89,7 +89,7 @@ void standard_live_phase_entry_function( Cell* pCell, Phenotype& phenotype, doub
 
 void G1_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); 
 void G0_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); 
-void S_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); 
+void S_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
 
 void standard_apoptosis_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
 void standard_necrosis_entry_function( Cell* pCell, Phenotype& phenotype, double dt );  // done 

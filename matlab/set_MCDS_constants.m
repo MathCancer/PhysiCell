@@ -81,6 +81,8 @@ MCDS_constants.flow_cytometry_cycle_model=2;
 MCDS_constants.live_apoptotic_cycle_model=3;
 MCDS_constants.total_cells_cycle_model=4;
 MCDS_constants.live_cells_cycle_model = 5; 
+
+MCDS_constants.flow_cytometry_separated_cycle_model  = 6; 
 	
 % currently recognized death models 
 MCDS_constants.apoptosis_death_model = 100; 
@@ -106,6 +108,10 @@ MCDS_constants.G2M_phase=11;
 MCDS_constants.G2_phase=12;
 MCDS_constants.M_phase=13;
 MCDS_constants.live=14;
+
+MCDS_constants.G1pm_phase = 15;
+MCDS_constants.G1ps_phase = 16;
+
 	
 MCDS_constants.custom_phase = 9999;
 % death phases

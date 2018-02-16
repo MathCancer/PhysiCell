@@ -72,6 +72,11 @@ bool PhysiCell_standard_cycle_models_initialized = false;
 	
 Cycle_Model Ki67_advanced, Ki67_basic, live, apoptosis, necrosis, inert; 
 Death_Parameters apoptosis_parameters, necrosis_parameters; 
+
+// new cycle models:
+
+Cycle_Model flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model; 
+
 	
 void standard_Ki67_positive_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
@@ -87,6 +92,15 @@ void standard_Ki67_negative_phase_entry_function( Cell* pCell, Phenotype& phenot
 }
 
 void standard_live_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// the cell wants to double its volume 
+	phenotype.volume.target_solid_nuclear *= 2.0; 
+	phenotype.volume.target_solid_cytoplasmic *= 2.0; 
+	
+	return; 
+}
+
+void S_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// the cell wants to double its volume 
 	phenotype.volume.target_solid_nuclear *= 2.0; 
@@ -266,6 +280,72 @@ void create_live_model( void )
 	return; 
 }
 
+bool create_cytometry_cycle_models( void )
+{
+	// basic one first 
+	flow_cytometry_cycle_model.code = PhysiCell_constants::flow_cytometry_cycle_model; 
+	flow_cytometry_cycle_model.name = "Flow cytometry model (basic)"; 
+	
+	flow_cytometry_cycle_model.data.time_units = "min"; 
+	
+	flow_cytometry_cycle_model.add_phase( PhysiCell_constants::G0G1_phase , "G0/G1" ); 
+	flow_cytometry_cycle_model.add_phase( PhysiCell_constants::S_phase , "S" ); 
+	flow_cytometry_cycle_model.add_phase( PhysiCell_constants::G2M_phase , "G2/M" ); 
+
+	flow_cytometry_cycle_model.phases[2].division_at_phase_exit = true; 
+	
+	flow_cytometry_cycle_model.add_phase_link( 0 , 1 , NULL ); // G0/G1 to S
+	flow_cytometry_cycle_model.add_phase_link( 1 , 2 , NULL ); // S to G2/M
+	flow_cytometry_cycle_model.add_phase_link( 2 , 0 , NULL ); // G2/M to G0/G1 
+
+	// need reference values! 
+	flow_cytometry_cycle_model.transition_rate(0,1) = 0.0432 / 60.0;
+	flow_cytometry_cycle_model.transition_rate(1,2) = 0.0432 / 60.0;
+	flow_cytometry_cycle_model.transition_rate(2,0) = 0.0432 / 60.0;
+	
+	flow_cytometry_cycle_model.phases[0].entry_function = NULL; //  ;
+	flow_cytometry_cycle_model.phases[1].entry_function = S_phase_entry_function; // Double nuclear volume ;
+	flow_cytometry_cycle_model.phases[2].entry_function = NULL;		
+
+	// // expanded flow cytometry model 
+	
+	flow_cytometry_separated_cycle_model.code = PhysiCell_constants::flow_cytometry_separated_cycle_model; 
+	flow_cytometry_separated_cycle_model.name = "Flow cytometry model (separated)"; 
+	
+	flow_cytometry_separated_cycle_model.data.time_units = "min"; 
+	
+	flow_cytometry_separated_cycle_model.add_phase( PhysiCell_constants::G0G1_phase , "G0/G1" ); 
+	flow_cytometry_separated_cycle_model.add_phase( PhysiCell_constants::S_phase , "S" ); 
+	flow_cytometry_separated_cycle_model.add_phase( PhysiCell_constants::G2_phase , "G2" ); 
+	flow_cytometry_separated_cycle_model.add_phase( PhysiCell_constants::M_phase , "M" ); 
+	
+	
+	flow_cytometry_separated_cycle_model.phases[3].division_at_phase_exit = true; 
+	
+	flow_cytometry_separated_cycle_model.add_phase_link( 0 , 1 , NULL ); // G0/G1 to S
+	flow_cytometry_separated_cycle_model.add_phase_link( 1 , 2 , NULL ); // S to G2
+	flow_cytometry_separated_cycle_model.add_phase_link( 2 , 3 , NULL ); // G2 to M 
+	flow_cytometry_separated_cycle_model.add_phase_link( 3 , 0 , NULL ); // M to G0/G1 
+
+	// need reference values! 
+	flow_cytometry_separated_cycle_model.transition_rate(0,1) = 0.0432 / 60.0;
+	flow_cytometry_separated_cycle_model.transition_rate(1,2) = 0.0432 / 60.0;
+	flow_cytometry_separated_cycle_model.transition_rate(2,3) = 0.0432 / 60.0;
+	flow_cytometry_separated_cycle_model.transition_rate(3,0) = 0.0432 / 60.0;
+	
+	flow_cytometry_separated_cycle_model.phases[0].entry_function = NULL; //  ;
+	flow_cytometry_separated_cycle_model.phases[1].entry_function = S_phase_entry_function; // Double nuclear volume ;
+	flow_cytometry_separated_cycle_model.phases[2].entry_function = NULL;		
+	flow_cytometry_separated_cycle_model.phases[3].entry_function = NULL;		
+	
+	
+	
+	
+	
+	
+	return true; 
+}
+
 bool create_standard_cell_cycle_models( void )
 {
 	if( PhysiCell_standard_cycle_models_initialized )
@@ -273,6 +353,8 @@ bool create_standard_cell_cycle_models( void )
 
 	create_ki67_models();
 	create_live_model();
+	
+	create_cytometry_cycle_models(); 
 
 	PhysiCell_standard_cycle_models_initialized = true;
 	if( PhysiCell_standard_death_models_initialized )

@@ -147,6 +147,8 @@ void display_simulation_status( std::ostream& os )
 	BioFVM::TOC();
 	BioFVM::display_stopwatch_value( os , BioFVM::stopwatch_value() ); 
 	os << std::endl; 
+	BioFVM::TIC(); 
+	
 	os << "total wall time: "; 
 	BioFVM::RUNTIME_TOC();
 	BioFVM::display_stopwatch_value( os , BioFVM::runtime_stopwatch_value() ); 
@@ -162,11 +164,11 @@ void log_output(double t, int output_index, Microenvironment microenvironment, s
 	int num_deaths=0;
 //	std::cout << "current simulated time: " << t   << " minutes " << std::endl; 
 //	std::cout << "interval wall time: ";
-	BioFVM::TOC();
+//	BioFVM::TOC();
 //	BioFVM::display_stopwatch_value( std::cout , BioFVM::stopwatch_value() ); 
 //	std::cout << std::endl; 
 //	std::cout << "total wall time: "; 
-	BioFVM::RUNTIME_TOC();
+//	BioFVM::RUNTIME_TOC();
 //	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
 //	std::cout << std::endl;
 	
@@ -175,7 +177,7 @@ void log_output(double t, int output_index, Microenvironment microenvironment, s
 	num_deaths=((Cell_Container *)microenvironment.agent_container)->num_deaths_in_current_step;
 	std::cout<<"total number of agents (newly born, deaths): " << (*all_cells).size()<<"("<<num_new_cells<<", "<<num_deaths<<")" << std::endl; 
 	report_file<<t<<"\t"<<(*all_cells).size()<<"\t"<<num_new_cells<<"\t"<<num_deaths<<"\t"<<BioFVM::stopwatch_value()<< std::endl; 
-	BioFVM::TIC();
+//	BioFVM::TIC();
 	
 	((Cell_Container *)microenvironment.agent_container)->num_divisions_in_current_step=0;
 	((Cell_Container *)microenvironment.agent_container)->num_deaths_in_current_step=0;
