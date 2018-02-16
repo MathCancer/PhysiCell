@@ -156,6 +156,82 @@ std::vector<std::string> false_cell_coloring_live_dead( Cell* pCell )
 	return output; 
 }
 
+std::vector<std::string> false_cell_coloring_cytometry( Cell* pCell )
+{
+	static std::vector< std::string > output( 4 , "rgb(0,0,0)" );
+	
+	// First, check for death. Use standard dead colors and exit
+	
+	
+	if (pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic )  // Apoptotic - Red
+	{
+		output[0] = "rgb(255,0,0)";
+		output[2] = "rgb(125,0,0)";
+		return output; 
+	}
+	
+	// Necrotic - Brown
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+	{
+		output[0] = "rgb(250,138,38)";
+		output[2] = "rgb(139,69,19)";
+		return output; 
+	}		
+	
+	
+	// Check if this coloring function even makes sense, and if so,
+	
+	if( pCell->phenotype.cycle.model().code != PhysiCell_constants::flow_cytometry_separated_cycle_model &&  
+	    pCell->phenotype.cycle.model().code != PhysiCell_constants::flow_cytometry_cycle_model )
+	{ return output; }
+	
+	// G0/G1 and G1 are blue 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::G0G1_phase || 
+	    pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::G1_phase )
+	{
+		output[0] = "rgb(0,80,255)"; 
+		output[2] = "rgb(0,40,255)"; 
+		return output; 
+	}
+
+	// G0 is pale blue 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::G0_phase )
+	{
+		output[0] = "rgb(40,200,255)";
+		output[2] = "rgb(20,100,255)";
+		return output; 
+	}
+	
+	// S is magenta  
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::S_phase )
+	{
+		output[0] = "rgb(255, 0, 255)";
+		output[2] = "rgb(190,0,190)";
+		return output; 
+	}
+	
+	// G2 is yellow
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::G2_phase )
+	{
+		output[0] = "rgb(255, 255, 0)";
+		output[2] = "rgb(190, 190, 0)";
+		return output; 
+	}
+	
+	// G2/M and M are green 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::G2M_phase || 
+	    pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::M_phase )
+	{
+		output[0] = "rgb(0,255,0)";
+		output[2] = "rgb(0,190,0)";
+		
+		return output; 
+	}
+	
+	return output; 
+}
 
 std::vector<double> transmission( std::vector<double>& incoming_light, std::vector<double>& absorb_color, double thickness , double stain )
 {

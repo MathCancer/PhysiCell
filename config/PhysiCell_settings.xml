@@ -79,7 +79,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2880</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -93,11 +93,11 @@
 
 		<full_data>
 			<interval units="min">60</interval>
-			<enable>true</enable>
+			<enable>false</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">360.0</interval>
+			<interval units="min">30.0</interval>
 			<enable>true</enable>
 		</SVG>
 		

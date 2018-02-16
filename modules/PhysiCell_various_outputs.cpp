@@ -142,6 +142,8 @@ void display_simulation_status( std::ostream& os )
 		PhysiCell_settings.time_units << " (max: " << 
 		PhysiCell_settings.max_time << " " << 
 		PhysiCell_settings.time_units << ")" << std::endl; 
+		
+	os << "total agents: " << all_cells->size() << std::endl; 
 	
 	os << "interval wall time: ";
 	BioFVM::TOC();

@@ -299,9 +299,11 @@ bool create_cytometry_cycle_models( void )
 	flow_cytometry_cycle_model.add_phase_link( 2 , 0 , NULL ); // G2/M to G0/G1 
 
 	// need reference values! 
-	flow_cytometry_cycle_model.transition_rate(0,1) = 0.0432 / 60.0;
-	flow_cytometry_cycle_model.transition_rate(1,2) = 0.0432 / 60.0;
-	flow_cytometry_cycle_model.transition_rate(2,0) = 0.0432 / 60.0;
+	// https://www.ncbi.nlm.nih.gov/books/NBK9876/
+	flow_cytometry_cycle_model.transition_rate(0,1) = 0.00152; // 11 hours in G0/G1
+	flow_cytometry_cycle_model.transition_rate(1,2) = 0.00208; // 8 hours in S
+	flow_cytometry_cycle_model.transition_rate(2,0) = 0.00333; // 5 hours in G2/M 
+	
 	
 	flow_cytometry_cycle_model.phases[0].entry_function = NULL; //  ;
 	flow_cytometry_cycle_model.phases[1].entry_function = S_phase_entry_function; // Double nuclear volume ;
@@ -328,10 +330,10 @@ bool create_cytometry_cycle_models( void )
 	flow_cytometry_separated_cycle_model.add_phase_link( 3 , 0 , NULL ); // M to G0/G1 
 
 	// need reference values! 
-	flow_cytometry_separated_cycle_model.transition_rate(0,1) = 0.0432 / 60.0;
-	flow_cytometry_separated_cycle_model.transition_rate(1,2) = 0.0432 / 60.0;
-	flow_cytometry_separated_cycle_model.transition_rate(2,3) = 0.0432 / 60.0;
-	flow_cytometry_separated_cycle_model.transition_rate(3,0) = 0.0432 / 60.0;
+	flow_cytometry_separated_cycle_model.transition_rate(0,1) = 0.00152; // 11 hours in G0/G1
+	flow_cytometry_separated_cycle_model.transition_rate(1,2) = 0.00208; // 8 hours in S  
+	flow_cytometry_separated_cycle_model.transition_rate(2,3) = 0.00417; // 4 hours in G2 
+	flow_cytometry_separated_cycle_model.transition_rate(3,0) = 0.0167; // 1 hour in M 
 	
 	flow_cytometry_separated_cycle_model.phases[0].entry_function = NULL; //  ;
 	flow_cytometry_separated_cycle_model.phases[1].entry_function = S_phase_entry_function; // Double nuclear volume ;
@@ -668,6 +670,8 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	
 	if( indices_initiated == false )
 	{
+		// Ki67 models
+		
 		if( phenotype.cycle.model().code == PhysiCell_constants::advanced_Ki67_cycle_model || 
 			phenotype.cycle.model().code == PhysiCell_constants::basic_Ki67_cycle_model )
 		{
@@ -687,6 +691,8 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 				indices_initiated = true; 
 			}
 		}
+		
+		// live model 
 			
 		if( phenotype.cycle.model().code ==  PhysiCell_constants::live_cells_cycle_model )
 		{
@@ -695,6 +701,18 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 			end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::live );
 			indices_initiated = true; 
 		}
+		
+		// cytometry models 
+		
+		if( phenotype.cycle.model().code == PhysiCell_constants::flow_cytometry_cycle_model || 
+			phenotype.cycle.model().code == PhysiCell_constants::flow_cytometry_separated_cycle_model )
+		{
+			start_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::G0G1_phase );
+			necrosis_index = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+			end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::S_phase );
+			indices_initiated = true; 
+		}		
+		
 	}
 	
 	// don't continue if we never "figured out" the current cycle model. 

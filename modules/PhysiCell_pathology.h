@@ -102,6 +102,8 @@ std::vector<std::string> simple_cell_coloring( Cell* pCell ); // done
 std::vector<std::string> false_cell_coloring_Ki67( Cell* pCell ); // done 
 std::vector<std::string> false_cell_coloring_live_dead( Cell* pCell ); // done 
 
+std::vector<std::string> false_cell_coloring_cytometry( Cell* pCell ); 
+
 std::vector<std::string> hematoxylin_and_eosin_cell_coloring( Cell* pCell ); // done 
 std::vector<std::string> hematoxylin_and_eosin_stroma_coloring( double& ECM_fraction , double& blood_vessel_fraction); // planned 
 

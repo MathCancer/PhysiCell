@@ -109,7 +109,6 @@ class PhysiCell_constants
 	static const int live_apoptotic_cycle_model=3;
 	static const int total_cells_cycle_model=4;
 	static const int live_cells_cycle_model = 5; 
-	
 	static const int flow_cytometry_separated_cycle_model = 6; 
 	
 	// currently recognized death models 

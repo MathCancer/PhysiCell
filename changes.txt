@@ -49,10 +49,15 @@ void display_simulation_status( std::ofstream& of );
 
 + added G1pm_phase and G1ps_phase to the PhysiCell constants. 
 
-+ implemnted new cell cycle models: 
++ implemented new cell cycle models: 
 
      flow_cytometry_cycle_model: G0/G1 -> S -> G2/M
      flow_cytometry_separated_cycle_model: G0/G1 -> S -> G2 -> M 
+
++ Added new coloring function: false_cell_coloring_cytometry
+
++ added support for the new cytometry cycle models to the oxygen-based 
+     phenotype model (update_cell_and_death_parameters_O2_based)
 
 
 Beta features (not fully supported):
