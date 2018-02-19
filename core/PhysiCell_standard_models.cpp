@@ -330,7 +330,7 @@ bool create_cytometry_cycle_models( void )
 	flow_cytometry_separated_cycle_model.add_phase_link( 3 , 0 , NULL ); // M to G0/G1 
 
 	// need reference values! 
-	flow_cytometry_separated_cycle_model.transition_rate(0,1) = 0.00152; // 11 hours in G0/G1
+	flow_cytometry_separated_cycle_model.transition_rate(0,1) = 0.00335; // 4.98 hours in G0/G1
 	flow_cytometry_separated_cycle_model.transition_rate(1,2) = 0.00208; // 8 hours in S  
 	flow_cytometry_separated_cycle_model.transition_rate(2,3) = 0.00417; // 4 hours in G2 
 	flow_cytometry_separated_cycle_model.transition_rate(3,0) = 0.0167; // 1 hour in M 
