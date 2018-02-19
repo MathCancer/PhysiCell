@@ -48,16 +48,20 @@ parameters.S.duration = TS;
 parameters.S.death_rate = d; 
 parameters.S.initial = 0; 
 
-parameters.G2M.duration = TG2M; 
-parameters.G2M.death_rate = d; 
-parameters.G2M.initial = 0; 
+parameters.G2.duration = TG2; 
+parameters.G2.death_rate = d; 
+parameters.G2.initial = 0; 
+
+parameters.M.duration = TM; 
+parameters.M.death_rate = d; 
+parameters.M.initial = 0; 
 
 parameters.A.duration = TA; 
 parameters.A.initial = 0; 
 
 % run the exact solution 
 
-solution = Cytometry_exact( parameters ); 
+solution = Cytometry_separated_exact( parameters ); 
 
 relative_tolerance = 0.1;
 
@@ -89,11 +93,12 @@ for k=1:300
     step = step*0.99; 
     
     parameters.G0G1.duration = TG0G1; 
-    solution = Cytometry_exact( parameters ); 
+    solution = Cytometry_separated_exact( parameters ); 
     
     parameters.G0G1.initial = 1000*solution.long_time.G0G1I;
     parameters.S.initial = 1000*solution.long_time.SI;
-    parameters.G2M.initial = 1000*solution.long_time.G2MI;
+    parameters.G2.initial = 1000*solution.long_time.G2I;
+    parameters.M.initial = 1000*solution.long_time.MI;
     parameters.A.initial = 1000*solution.long_time.AI;
     
     
