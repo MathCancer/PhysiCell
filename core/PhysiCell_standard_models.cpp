@@ -300,7 +300,7 @@ bool create_cytometry_cycle_models( void )
 
 	// need reference values! 
 	// https://www.ncbi.nlm.nih.gov/books/NBK9876/
-	flow_cytometry_cycle_model.transition_rate(0,1) = 0.00152; // 11 hours in G0/G1
+	flow_cytometry_cycle_model.transition_rate(0,1) = 0.00324; // 5.15 hours in G0/G1 by fitting 
 	flow_cytometry_cycle_model.transition_rate(1,2) = 0.00208; // 8 hours in S
 	flow_cytometry_cycle_model.transition_rate(2,0) = 0.00333; // 5 hours in G2/M 
 	
