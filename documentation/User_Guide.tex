@@ -6106,6 +6106,7 @@ so that the apoptotic fraction is approximately 2\%
 order of 0.04 hr${}^\textrm{-1}$ \cite{ref:MultiCellDS,ref:MCF10A-NeoST,ref:MCF10A_PSON}. 
 
 \subsection{Live cycle model}
+\label{sec:parameters:live}
 For the Live cell model (Section \ref{sec:Standard_Models:Live}), we fit the 
 system of ODEs
 \beqa
@@ -6129,6 +6130,7 @@ To get the death rate $d$, we use a simple iterative fitting method
 \v|./documentation/matlab/tune_death_in_live_model|) to get $d \sim 0.00319 \textrm{ hr}^{-1}$. 
 
 \subsection{Ki67 Basic model}
+\label{sec:parameters:Ki67_basic}
 For the Ki67 Basic model (Section \ref{sec:Standard_Models:Ki67_Basic}), 
 we fit the system of ODEs 
 \beqa
@@ -6150,6 +6152,7 @@ $T_Q$. We use a simple iterative fitting method
 (see \v|./documentation/matlab/tune_Ki67_basic|) to get $T_Q \sim 4.59 \textrm{ hr}$. 
 
 \subsection{Ki67 Advanced model}
+\label{sec:parameters:Ki67_advanced}
 For the Ki67 Advanced model (Section \ref{sec:Standard_Models:Ki67_Advanced}), 
 we fit the system of ODEs 
 \beqa
@@ -6175,32 +6178,66 @@ $T_Q$. We use a simple iterative fitting method
 % in 21\% oxygenation prior to confluence effects 
 \cite{ref:Ki67_MCF10A}. 
 
-
-\subsection{Cytometry model}
-For the Cytometry model (Section \ref{sec:Standard_Models:Ki67_Advanced}), 
+\subsection{Flow Cytometry model}
+\label{sec:parameters:flow_cytometry}
+For the Flow Cytometry model (Section \ref{sec:Standard_Models:Flow_Cytometry}), 
 we fit the system of ODEs 
 \beqa
-\frac{d}{dt}\tt{Ki67-} & = & -\left( \frac{1}{T_Q} + d \right) \tt{Ki67-} + \frac{1}{T_{K2}}\tt{Ki67+}_2  \\
-\frac{d}{dt}\tt{Ki67+}_1 & = & \frac{1}{T_Q} \tt{Ki67-} - \left( \frac{1}{T_{K1}} + d \right) \tt{Ki67+}_1 \\
-\frac{d}{dt}\tt{Ki67+}_2 & = &  \frac{2}{T_{K1}} \tt{Ki67+}_1 - \left( \frac{1}{T_{K2}} + d \right) \tt{Ki67+}_2 \\
-\frac{d}{dt}\tt{Apoptotic} & = & d\left( \tt{Ki67-} + \tt{Ki67+}_1 + \tt{Ki67+}_2 \right) -\frac{1}{T_A} \tt{Apoptotic}, 
+\frac{d}{dt}\tt{G0G1} & = & -\left( \frac{1}{T_{G0G1}} + d \right) \tt{G0G1} + \frac{2}{T_{G2M}}\tt{G2M}  \\
+\frac{d}{dt}\tt{S} & = & \frac{1}{T_{G0G1}} \tt{G0G1} - \left( \frac{1}{T_{S}} + d \right) \tt{S} \\
+\frac{d}{dt}\tt{G2M} & = &  \frac{1}{T_{S}} \tt{S} - \left( \frac{1}{T_{G2M}} + d \right) \tt{G2M} \\
+\frac{d}{dt}\tt{Apoptotic} & = & d\left( \tt{G0G1} + \tt{S} + \tt{G2M} \right) -\frac{1}{T_A} \tt{Apoptotic}, 
 \eeqa
 and we note that 
 \beqa
 \frac{d}{dt}\tt{Total} 
-& = & \frac{1}{T_{K1}} \tt{Ki67+}_1 - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
-& = & \left( \frac{\textrm{KI}_1}{T_{K1}} - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & \frac{1}{T_{G2M}} \tt{G2M} - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
+& = & \left( \frac{1}{T_{G2M}} \frac{\tt{G2M}}{\tt{Total}} - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
 & = & r \tt{Total} 
 \eeqa
-We set $T_{K1} = 13$ hr, $T_{K2} = 2.5$ hr, $T_A = 8.6$ hr, and 
+For consistency with our estimates for the Ki67-Advanced model (see Section \ref{sec:parameters:Ki67_advanced}), 
+we set $T_{S} = 8$ hr, $T_{G2M} = T_{G2} + T_{M} = 5$ hr, $T_A = 8.6$ hr, and 
 $r = 0.04 \textrm{ hr}^{-1}$, and we set AI = 0.02 as before and keep 
-$d = 0.00319 \textrm{ hr}^{-1}$ from the prior estimate. We thus need to fit  
-$T_Q$. We use a simple iterative fitting method 
-(see \v|./documentation/matlab/tune_Ki67_advanced|) to get $T_Q \sim 3.62 \textrm{ hr}$ for this model. 
+$d = 0.00319 \textrm{ hr}^{-1}$ from the prior estimates. We thus need to fit  
+$T_{G0G1}$. We use a simple iterative fitting method 
+(see \v|./documentation/matlab/tune_cytometry|) to get $T_{G0G1} \sim 5.15 \textrm{ hr}$ for this model. 
 % It is interesting to note that this parameter set gives an (predicted; unfitted) Ki67+ fraction of 
 % approximately 74\%, in line with independent MCF10A measurements 
 % in 21\% oxygenation prior to confluence effects 
 \cite{ref:Ki67_MCF10A}. 
+
+
+\subsection{Separated Flow Cytometry model}
+\label{sec:parameters:flow_cytometry_separated}
+For the Flow Cytometry model (Section \ref{sec:Standard_Models:Flow_Cytometry_Separated}), 
+we fit the system of ODEs 
+\beqa
+\frac{d}{dt}\tt{G0G1} & = & -\left( \frac{1}{T_{G0G1}} + d \right) \tt{G0G1} + \frac{2}{T_{M}}\tt{M}  \\
+\frac{d}{dt}\tt{S} & = & \frac{1}{T_{G0G1}} \tt{G0G1} - \left( \frac{1}{T_{S}} + d \right) \tt{S} \\
+\frac{d}{dt}\tt{G2} & = &  \frac{1}{T_{S}} \tt{S} - \left( \frac{1}{T_{G2}} + d \right) \tt{G2} \\
+\frac{d}{dt}\tt{M} & = &  \frac{1}{T_{G2}} \tt{G2} - \left( \frac{1}{T_{M}} + d \right) \tt{M} \\
+\frac{d}{dt}\tt{Apoptotic} & = & d\left( \tt{G0G1} + \tt{S} + \tt{G2} + \tt{M} \right) -\frac{1}{T_A} \tt{Apoptotic}, 
+\eeqa
+and we note that 
+\beqa
+\frac{d}{dt}\tt{Total} 
+& = & \frac{1}{T_{M}} \tt{M} - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
+& = & \left( \frac{\tt{MI}}{T_{M}}  - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & r \tt{Total},
+\eeqa
+where $\tt{MI}$ is the mitotic index. 
+
+For consistency with our estimates for the Ki67-Advanced model (see Section \ref{sec:parameters:Ki67_advanced}), 
+we set $T_{S} = 8$ hr, $T_{G2} = 4$ h, $T_{M} = 1$ hr, $T_A = 8.6$ hr, and 
+$r = 0.04 \textrm{ hr}^{-1}$, and we set AI = 0.02 as before and keep 
+$d = 0.00319 \textrm{ hr}^{-1}$ from the prior estimates. We thus need to fit  
+$T_{G0G1}$. We use a simple iterative fitting method 
+(see \v|./documentation/matlab/tune_cytometry_separated|) to get $T_{G0G1} \sim 4.98 \textrm{ hr}$ for this model. 
+% It is interesting to note that this parameter set gives an (predicted; unfitted) Ki67+ fraction of 
+% approximately 74\%, in line with independent MCF10A measurements 
+% in 21\% oxygenation prior to confluence effects 
+\cite{ref:Ki67_MCF10A}. 
+
 
 
 
