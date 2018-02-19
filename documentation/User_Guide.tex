@@ -5246,6 +5246,145 @@ volume) and reference parameter values can be found in \cite{ref:PhysiCell}.
 
 \TOClink 
 
+\subsubsection{Flow Cytometry (\texttt{flow\_cytometry\_cycle\_model})\\
+(code: \texttt{PhysiCell\_constants::flow\_cytometry\_cycle\_model})}
+\label{sec:Standard_Models:Flow_Cytometry}
+This \v|Cycle_Mode| has the following \v|Phase|s: 
+\begin{enumerate}
+\item 
+\textbf{Phase 0:} Named \v|G0G1| with code \v|PhysiCell_constants::G0G1_phase|. This is the default 
+phase of the model. 
+
+\item 
+\textbf{Phase 1:} Named \v|S| with code \\ \v|PhysiCell_constants::S_phase|. 
+
+\item 
+\textbf{Phase 2:} Named \v|G2M| with code \\ \v|PhysiCell_constants::G2M_phase|. 
+
+\end{enumerate}
+
+In this model, $G_0/G_1$ cells can enter the cell cycle to 
+become $S$-phase cells, at transition rate $r_{01}$. $S$-phase cells 
+can become $G_2/M$-phase cells at rate $r_{12}$. 
+$G_2/M$-phase cells can divide into two $G_0/G_1$ daughter cells 
+at rate $r_{20}$. 
+See Fig. \ref{fig:cycle_model:flow_cytometry}. The 
+population-scale model is given by: 
+\beqa
+\frac{d\t{G0G1}}{dt} & = & -r_{01} \t{G0G1} + 2 r_{20} \t{G2M} \\
+\frac{d\t{S}}{dt} & = &  r_{01} \t{G0G1} -r_{12} \t{S} \\
+\frac{d\t{G2M}}{dt} & = &  r_{12} \t{S} -r_{20} \t{G2M} 
+\eeqa
+Further details on the \emph{biology} of this model (including 
+details the placement of daughter cells and changes in cell 
+volume) and reference parameter values can be found in \cite{ref:PhysiCell}. 
+
+\begin{figure}
+\begin{mdframed}[style=mystyle]
+% \begin{centering}
+% \begin{tikzpicture}
+% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1cm}}
+% \tikzset{edge/.style = {->,> = latex'}}
+% vertices
+% \node[vertex] (L) at (0,0) {Live};
+%edges
+% \draw[edge] (L) to[loop right] (L) {};
+% \end{tikzpicture}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,thick]
+\tikzstyle{every state}=[fill=lightgray,draw=black,text=black,minimum size=2.5cm]
+% \node[initial,state] (L) {Live}; 
+\node[initial,state] (A) {$G_0/G_1$}; 
+\node[state] (B) [above right of=A]{$S$}; 
+\node[state] (C) [below right of=B]{$G_2/M$}; 
+\path 
+(A) edge [bend left] node {$r_{01}$} (B)
+(B) edge [bend left] node {$r_{12}$ } (C)
+(C) edge [bend left] node {$r_{20}$ (divides)} (A);
+\end{tikzpicture}
+\caption{The graph structure of the Flow Cytometry cell cycle model. The default phase is marked 
+``start.''}
+\label{fig:cycle_model:flow_cytometry}
+\end{mdframed}
+\end{figure}
+
+\TOClink 
+
+
+\subsubsection{Flow Cytometry Separated (\texttt{flow\_cytometry\_separated\_cycle\_model})\\
+(code: \texttt{PhysiCell\_constants::flow\_cytometry\_separated\_cycle\_model})}
+\label{sec:Standard_Models:Flow_Cytometry_Separated}
+This \v|Cycle_Mode| has the following \v|Phase|s: 
+\begin{enumerate}
+\item 
+\textbf{Phase 0:} Named \v|G0G1| with code \v|PhysiCell_constants::G0G1_phase|. This is the default 
+phase of the model. 
+
+\item 
+\textbf{Phase 1:} Named \v|S| with code \\ \v|PhysiCell_constants::S_phase|. 
+
+\item 
+\textbf{Phase 2:} Named \v|G2| with code \\ \v|PhysiCell_constants::G2_phase|. 
+
+\item 
+\textbf{Phase 3:} Named \v|M| with code \\ \v|PhysiCell_constants::M_phase|. 
+
+\end{enumerate}
+
+In this model, $G_0/G_1$ cells can enter the cell cycle to 
+become $S$-phase cells, at transition rate $r_{01}$. $S$-phase cells 
+can become $G_2$-phase cells at rate $r_{12}$. 
+$G_2$-phase cells can become $M$-phase cells at rate $r_{23}$. 
+$M$-phase cells can divide into two $G_0/G_1$ daughter cells 
+at rate $r_{30}$. 
+See Fig. \ref{fig:cycle_model:flow_cytometry_separated}. The 
+population-scale model is given by: 
+\beqa
+\frac{d\t{G0G1}}{dt} & = & -r_{01} \t{G0G1} + 2 r_{30} \t{M} \\
+\frac{d\t{S}}{dt} & = &  r_{01} \t{G0G1} -r_{12} \t{S} \\
+\frac{d\t{G2}}{dt} & = &  r_{12} \t{S} -r_{23} \t{G2} \\
+\frac{d\t{M}}{dt} & = &  r_{23} \t{G2} -r_{30} \t{M} 
+\eeqa
+Further details on the \emph{biology} of this model (including 
+details the placement of daughter cells and changes in cell 
+volume) and reference parameter values can be found in \cite{ref:PhysiCell}. 
+
+\begin{figure}
+\begin{mdframed}[style=mystyle]
+% \begin{centering}
+% \begin{tikzpicture}
+% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1cm}}
+% \tikzset{edge/.style = {->,> = latex'}}
+% vertices
+% \node[vertex] (L) at (0,0) {Live};
+%edges
+% \draw[edge] (L) to[loop right] (L) {};
+% \end{tikzpicture}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,thick]
+\tikzstyle{every state}=[fill=lightgray,draw=black,text=black,minimum size=2.5cm]
+% \node[initial,state] (L) {Live}; 
+\node[initial,state] (A) {$G_0/G_1$}; 
+\node[state] (B) [above right of=A]{$S$}; 
+\node[state] (C) [below right of=B]{$G_2$}; 
+\node[state] (D) [below left of=C]{$M$}; 
+\path 
+(A) edge [bend left] node {$r_{01}$} (B)
+(B) edge [bend left] node {$r_{12}$ } (C)
+(C) edge [bend left] node {$r_{23}$ } (D)
+(D) edge [bend left] node {$r_{40}$ (divides)} (A);
+\end{tikzpicture}
+\caption{The graph structure of the Flow Cytometry Separated cell cycle model. The default phase is marked 
+``start.''}
+\label{fig:cycle_model:flow_cytometry_separated}
+\end{mdframed}
+\end{figure}
+
+\TOClink 
+
+
+
+
+
+
 
 \subsection{Death Cycle Models}
 \label{sec:Standard_Models:Death}
@@ -5977,7 +6116,7 @@ and we note that
 \beqa
 \frac{d}{dt}\tt{Total} 
 & = & b \tt{Live} - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
-& = & \left( b (1-\textrm{AI}) + \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & \left( b (1-\textrm{AI}) - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
 & = & r \tt{Total} 
 \eeqa
 Here, $r = 0.04\textrm{ hr}^{-1}$, $\textrm{AI} = 0.02$ is the apoptotic index, and
@@ -6001,7 +6140,7 @@ and we note that
 \beqa
 \frac{d}{dt}\tt{Total} 
 & = & \frac{1}{t_K} \tt{Ki67+} - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
-& = & \left( \frac{\textrm{KI}}{T_K} + \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & \left( \frac{\textrm{KI}}{T_K} - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
 & = & r \tt{Total} 
 \eeqa
 We set $T_K = 13 + 2.5$ hr (the duration of the two phases in the Ki67 Advanced model), 
@@ -6023,7 +6162,7 @@ and we note that
 \beqa
 \frac{d}{dt}\tt{Total} 
 & = & \frac{1}{T_{K1}} \tt{Ki67+}_1 - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
-& = & \left( \frac{\textrm{KI}_1}{T_{K1}} + \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & \left( \frac{\textrm{KI}_1}{T_{K1}} - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
 & = & r \tt{Total} 
 \eeqa
 We set $T_{K1} = 13$ hr, $T_{K2} = 2.5$ hr, $T_A = 8.6$ hr, and 
@@ -6035,6 +6174,37 @@ $T_Q$. We use a simple iterative fitting method
 % approximately 74\%, in line with independent MCF10A measurements 
 % in 21\% oxygenation prior to confluence effects 
 \cite{ref:Ki67_MCF10A}. 
+
+
+\subsection{Cytometry model}
+For the Cytometry model (Section \ref{sec:Standard_Models:Ki67_Advanced}), 
+we fit the system of ODEs 
+\beqa
+\frac{d}{dt}\tt{Ki67-} & = & -\left( \frac{1}{T_Q} + d \right) \tt{Ki67-} + \frac{1}{T_{K2}}\tt{Ki67+}_2  \\
+\frac{d}{dt}\tt{Ki67+}_1 & = & \frac{1}{T_Q} \tt{Ki67-} - \left( \frac{1}{T_{K1}} + d \right) \tt{Ki67+}_1 \\
+\frac{d}{dt}\tt{Ki67+}_2 & = &  \frac{2}{T_{K1}} \tt{Ki67+}_1 - \left( \frac{1}{T_{K2}} + d \right) \tt{Ki67+}_2 \\
+\frac{d}{dt}\tt{Apoptotic} & = & d\left( \tt{Ki67-} + \tt{Ki67+}_1 + \tt{Ki67+}_2 \right) -\frac{1}{T_A} \tt{Apoptotic}, 
+\eeqa
+and we note that 
+\beqa
+\frac{d}{dt}\tt{Total} 
+& = & \frac{1}{T_{K1}} \tt{Ki67+}_1 - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
+& = & \left( \frac{\textrm{KI}_1}{T_{K1}} - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & r \tt{Total} 
+\eeqa
+We set $T_{K1} = 13$ hr, $T_{K2} = 2.5$ hr, $T_A = 8.6$ hr, and 
+$r = 0.04 \textrm{ hr}^{-1}$, and we set AI = 0.02 as before and keep 
+$d = 0.00319 \textrm{ hr}^{-1}$ from the prior estimate. We thus need to fit  
+$T_Q$. We use a simple iterative fitting method 
+(see \v|./documentation/matlab/tune_Ki67_advanced|) to get $T_Q \sim 3.62 \textrm{ hr}$ for this model. 
+% It is interesting to note that this parameter set gives an (predicted; unfitted) Ki67+ fraction of 
+% approximately 74\%, in line with independent MCF10A measurements 
+% in 21\% oxygenation prior to confluence effects 
+\cite{ref:Ki67_MCF10A}. 
+
+
+
+
 
 % \pagebreak 
 % \section{Examples}

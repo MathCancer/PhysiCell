@@ -22,8 +22,14 @@ NOTE: OSX users must now define PHYSICELL_CPP system variable.
 PhysiCell is currently in press at PLoS Comput. Biol. 
 
 Major new features and changes:
-+ none 
++ implemented new cell cycle models: 
 
+     flow_cytometry_cycle_model: G0/G1 -> S -> G2/M
+     flow_cytometry_separated_cycle_model: G0/G1 -> S -> G2 -> M 
+	 
+   along with documentation and updated coloring functions 
+   
+	 
 Minor new features and changes: 
 + Added "beta" directory where we will put new features that are still
   undergoing testing 
@@ -49,16 +55,14 @@ void display_simulation_status( std::ofstream& of );
 
 + added G1pm_phase and G1ps_phase to the PhysiCell constants. 
 
-+ implemented new cell cycle models: 
 
-     flow_cytometry_cycle_model: G0/G1 -> S -> G2/M
-     flow_cytometry_separated_cycle_model: G0/G1 -> S -> G2 -> M 
 
 + Added new coloring function: false_cell_coloring_cytometry
 
 + added support for the new cytometry cycle models to the oxygen-based 
      phenotype model (update_cell_and_death_parameters_O2_based)
 
++ updated user manual to reflect new cytometry models 
 
 Beta features (not fully supported):
 + Added PhysiCell_pugixml.* for easier extraction of parameter 
