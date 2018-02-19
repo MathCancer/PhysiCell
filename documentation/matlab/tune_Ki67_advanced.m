@@ -23,7 +23,7 @@ parameters.dt = 0.1; % 6 min = 0.1 hours
 parameters.time_units = 'hour'; 
 parameters.t_max = 3*24; % 3 days 
 
-parameters.A.duration = 8.6; 
+parameters.A.duration = TA; 
 parameters.A.initial = 0; 
 
 %TQ =   3.680494645500002
@@ -86,6 +86,12 @@ for k=1:300
     
     parameters.Q.duration = TQ; 
     solution = Ki67_exact( parameters ); 
+    
+    parameters.Q.initial = 1000*solution.long_time.QI;
+    parameters.K1.initial = 1000*solution.long_time.KI1;
+    parameters.K2.initial = 1000*solution.long_time.KI2;
+    parameters.A.initial = 1000*solution.long_time.AI;    
+    
     
     figure(1)
     clf
