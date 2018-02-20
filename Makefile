@@ -1,5 +1,5 @@
-VERSION := 1.2.2
-PROGRAM_NAME := beta-testing
+VERSION := 1.3.0
+PROGRAM_NAME := project2D
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -37,21 +37,22 @@ COMPILE_COMMAND := $(CC) $(CFLAGS)
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o 
 
-PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o 
+PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
+PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o 
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := heterogeneity.o 
+PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
-# compile the project  
+# compile the project 
 
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
@@ -124,18 +125,17 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
-	
-# beta PhysiCell modules 
-PhysiCell_pugixml.o: ./beta/PhysiCell_pugixml.cpp
-	$(COMPILE_COMMAND) -c ./beta/PhysiCell_pugixml.cpp
 
-PhysiCell_settings.o: ./beta/PhysiCell_settings.cpp
-	$(COMPILE_COMMAND) -c ./beta/PhysiCell_settings.cpp
+PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
+	
+PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-heterogeneity.o: ./custom_modules/heterogeneity.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/heterogeneity.cpp
+custom.o: ./custom_modules/custom.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 # cleanup
 
@@ -154,6 +154,7 @@ data-cleanup:
 	rm -f *.xml
 	rm -f *.svg
 	rm -f ./output/*
+	touch ./output/empty.txt
 	
 # archival 
 	
