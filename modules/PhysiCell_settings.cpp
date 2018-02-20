@@ -154,8 +154,7 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	omp_num_threads = xml_get_int_value( node, "omp_num_threads" ); 
 
 	// random seed options 
-	
-	
+		
 	
 	return; 
 }
