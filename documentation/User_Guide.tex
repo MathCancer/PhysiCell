@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.2.2} 
+\newcommand{\Version}{1.3.0} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -33,7 +33,7 @@
 \usepackage{bold-extra}
   
 \hypersetup{
-pdftitle={PhysiCell User Guide 1.2.2}, 
+pdftitle={PhysiCell User Guide \Version}, 
 pdfauthor={Paul Macklin and the PhysiCell Project}, 
 pdfsubject={PhysiCell},
 pdfproducer={http://MathCancer.org}, 
@@ -98,7 +98,7 @@ urlcolor=blue
 
 \author{PhysiCell Project (Lead: Paul Macklin)}
 \title{PhysiCell User Guide (Version \Version)}
-\date{Revision: November 4, 2017}%\today}
+\date{Revision: February 19, 2018}%\today}
 
 \maketitle
 
@@ -121,21 +121,24 @@ We built our model using PhysiCell (Version \Version) [1]. \\
 
 
 [1] A. Ghaffarizadeh, R. Heiland, S.H. Friedman, S.M. Mumenthaler, and P. Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems, 
-bioRxiv 088773, 2017. DOI: 
+PLoS Comput. Biol., 2018 (accepted). DOI: \href{https://dx.doi.org/10.1371/journal.pcbi.1005991}{10.1371/journal.pcbi.1005991}. 
+% bioRxiv 088773, 2017. 
+% 
+preprint DOI: 
 \href{http://dx.doi.org/10.1101/088773}{10.1101/088773}. \\
 }
 
-We will update this citation information as PhysiCell progresses through peer review.
+% We will update this citation information as PhysiCell progresses through peer review.
 
-If you prefer to cite a peer-reviewed journal publication while waiting for our 
-main method paper, you you can also cite an earlier (2-D) 
-version of the code by our 2012 paper in the Journal of Theoretical Biology:
+% If you prefer to cite a peer-reviewed journal publication while waiting for our 
+% main method paper, you you can also cite an earlier (2-D) 
+% version of the code by our 2012 paper in the Journal of Theoretical Biology:
 
-\hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
-P. Macklin, M.E. Edgerton, A.M. Thompson, and V. Cristini. 
-Patient-calibrated agent-based modelling of ductal carcinoma in situ (DCIS): From microscopic measurements to macroscopic predictions of clinical progression. J. Theor. Biol. 301:122-40, 2012. 
-DOI: \href{http://dx.doi.org/10.1016/j.jtbi.2012.02.002}{10.1016/j.jtbi.2012.02.002}.%
-}
+% \hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
+% P. Macklin, M.E. Edgerton, A.M. Thompson, and V. Cristini. 
+% Patient-calibrated agent-based modelling of ductal carcinoma in situ (DCIS): From microscopic measurements to macroscopic predictions of clinical progression. J. Theor. Biol. 301:122-40, 2012. 
+% DOI: \href{http://dx.doi.org/10.1016/j.jtbi.2012.02.002}{10.1016/j.jtbi.2012.02.002}.%
+% }
 
 \TOClink
 
@@ -462,8 +465,10 @@ subdirectories:
 to fully replace these files with any later version of BioFVM. Note that BioFVM distributions also include 
 pugixml (an efficient cross-platform XML parser) \cite{ref:pugixml}. 
 \item 
-\smallcode{config} While this directory is not currently used, PhysiCell will eventually parse XML files with 
-configuration information in this directory. Any custom configuration files should be placed in this directory. 
+\smallcode{beta} This directory is used for beta functionality used by our team during 
+testing and development. Use at your own risk! 
+\item 
+\smallcode{config} This directory is ued for XML configuration files with. Any custom configuration files should be placed in this directory. 
 \item 
 \smallcode{core} The core library files for PhysiCell are kept in this directory. Users should not modify functions in 
 the core library. 
@@ -3923,10 +3928,89 @@ Cell_Container* cell_container = create_cell_container_for_microenvironment(
 \TOClink
 
 \section{PhysiCell Inputs}
+As of Version 1.3.0, we began introducing functions to read XML files to initialize 
+PhysiCell options. We will continue expanding these functions over the next few 
+releases. 
 
 \subsection{XML parsing in PhysiCell}
 \label{sec:XML}
-\red{List the basic functions to extract values from an XML file}
+The following functions make use of pugixml \cite{ref:pugixml} to parse XML files and 
+extract parameters. Note that in the DOM (document object model), pugixml's key data 
+structure is the \v|pugi::xml_node|, which corresponds roughly to an XML tag. It 
+can have attribute, a data value, parent elements, and child elements. 
+
+PhysiCell's XML parsing is found in \v|./modules/PhysiCell_pugixml.*|, and it all 
+is based upon finding XML nodes relative to a supplied parent (pugixml) XML node. 
+Here are the main functions: 
+
+\begin{verbatim}
+
+
+
+// get the string attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+std::string get_string_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
+
+// get the int attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+int get_int_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
+
+// get the double attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+double get_double_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
+\end{verbatim}
+
+
+\begin{enumerate}
+\item 
+\smallcode{pugi::xml\_node xml\_find\_node(pugi::xml\_node\& parent\_node , std::string find\_me)} 
+returns the first XML child node named \v|find_me| under the XML \v|parent_node|. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me />
+</parent_node>
+\end{verbatim}
+
+\item 
+\smallcode{std::string xml\_get\_string\_value(pugi::xml\_node\& parent\_node , std::string find\_me)} returns a string value for the \v|find_me| tag within the \v|parent_node| parent. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me>output32</find_me> 
+</parent_node>
+\end{verbatim}
+
+\item 
+\smallcode{double xml\_get\_double\_value(pugi::xml\_node\& parent\_node , std::string find\_me)}
+returns a double value for the \v|find_me| tag within the \v|parent_node| parent. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me>3.14</find_me> 
+</parent_node>
+\end{verbatim}
+
+\item 
+\smallcode{double xml\_get\_int\_value(pugi::xml\_node\& parent\_node , std::string find\_me)}
+returns an integer value for the \v|find_me| tag within the \v|parent_node| parent. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me>3</find_me> 
+</parent_node>
+\end{verbatim}
+
+\item 
+\smallcode{double xml\_get\_bool\_value(pugi::xml\_node\& parent\_node , std::string find\_me)}
+returns an Boolean value for the \v|find_me| tag within the \v|parent_node| parent. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me>true</find_me> 
+</parent_node>
+\end{verbatim}
+Note that Booleans can be represented as 0 and 1, or \v|false| and \v|true|. 
+
+\end{enumerate}
+\TOClink
 
 \subsection{Passing XML options to PhysiCell}
 \label{sec:XML_options}
@@ -6029,12 +6113,14 @@ Several features are planned for upcoming PhysiCell releases:
 \item 
 We will further refine the MultiCellDS output functions to capture 
 more of the cell's state, including custom variable values. 
+\red{(Completed in Version 1.2.2)}
 
 \item 
 We will add functions to read in a saved simulation state. 
 
 \item 
 We will add an XML-based configuration file. 
+\red{(Completed in Version 1.3.0)}
 
 \item 
 We will add a function like 
@@ -6055,7 +6141,7 @@ its neighbors).
 
 \item 
 We will generalize the cell-cell adhesion model to allow differing levels of adhesion 
-between different types of cells. 
+between different types of cells. \red{(Completed in Version 1.2.0)} 
 
 \item 
 We will merge the \v|Vector_Variable| and \v|Variable| types for a more unified 
@@ -6063,12 +6149,26 @@ We will merge the \v|Vector_Variable| and \v|Variable| types for a more unified
 
 \item 
 We may update \v|motilty| and associated update functions to 
-build in some hysteresis (bias towards the last directoin of the day).
+build in some hysteresis (bias towards the last direction of the day).
 
 \item 
 We will consider partial SBML support for importing molecular-scale models. 
 
+\item 
+We will continue to refine XML parsing for options and configuration. 
+
+\item 
+We will allow ellipsoidal cell potential functions for better approximation of cell shapes. 
+
+\item 
+We will introduce  a standard library of simplified (bulk) vasculatures. 
+
+\item 
+We will introduce a standard library of simplified ECM functions. 
+
 \end{enumerate}
+
+\TOClink 
 
 % \section{Last code changes}
 
@@ -6156,6 +6256,8 @@ To get the death rate $d$, we use a simple iterative fitting method
 (see \\
 \v|./documentation/matlab/tune_death_in_live_model|) to get $d \sim 0.00319 \textrm{ hr}^{-1}$. 
 
+\TOClink 
+
 \subsection{Ki67 Basic model}
 \label{sec:parameters:Ki67_basic}
 For the Ki67 Basic model (Section \ref{sec:Standard_Models:Ki67_Basic}), 
@@ -6177,6 +6279,8 @@ $r = 0.04 \textrm{ hr}^{-1}$, and we set AI = 0.02 as before and keep
 $d = 0.00319 \textrm{ hr}^{-1}$ from the prior estimate. We thus need to fit  
 $T_Q$. We use a simple iterative fitting method 
 (see \v|./documentation/matlab/tune_Ki67_basic|) to get $T_Q \sim 4.59 \textrm{ hr}$. 
+
+\TOClink 
 
 \subsection{Ki67 Advanced model}
 \label{sec:parameters:Ki67_advanced}
@@ -6204,6 +6308,8 @@ $T_Q$. We use a simple iterative fitting method
 % approximately 74\%, in line with independent MCF10A measurements 
 % in 21\% oxygenation prior to confluence effects 
 \cite{ref:Ki67_MCF10A}. 
+
+\TOClink 
 
 \subsection{Flow Cytometry model}
 \label{sec:parameters:flow_cytometry}
@@ -6233,6 +6339,7 @@ $T_{G0G1}$. We use a simple iterative fitting method
 % in 21\% oxygenation prior to confluence effects 
 \cite{ref:Ki67_MCF10A}. 
 
+\TOClink 
 
 \subsection{Separated Flow Cytometry model}
 \label{sec:parameters:flow_cytometry_separated}
@@ -6265,7 +6372,7 @@ $T_{G0G1}$. We use a simple iterative fitting method
 % in 21\% oxygenation prior to confluence effects 
 \cite{ref:Ki67_MCF10A}. 
 
-
+\TOClink 
 
 
 
