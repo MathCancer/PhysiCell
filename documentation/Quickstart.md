@@ -127,8 +127,8 @@ default, using a slice through the Z=0 plane, as depicted in the following image
 
 ### MATLAB/Octave
 
-If you have access to MATLAB (or Octave), we already have a detailed tutorial on how to visualize the
-MultiCellDS digital snapshots (.xml and .mat files) at http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/.
+If you have access to MATLAB (or Octave), we have a [detailed tutorial](http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/) on how to visualize the
+MultiCellDS digital snapshots (.xml and .mat files).
 
 ### ImageMagick
 
