@@ -156,7 +156,7 @@ $ magick animate small.gif
 
 If you install ParaView, you can visualize and interact with output from 3D models (the `.mat` files). Refer to our [blog post](http://www.mathcancer.org/blog/paraview-for-physicell-part-1/) to get started.
 
-![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/PhysiCell_ParaView_quickstart.png "ParaView w clipping planes and barchart")
+![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/ParaView_clip_planes.png "ParaView w clipping planes and barchart")
 
 <hr> <!---------------------------------------------->
 
