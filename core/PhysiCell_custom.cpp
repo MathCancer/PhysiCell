@@ -113,7 +113,7 @@ Custom_Cell_Data::Custom_Cell_Data()
 
 Custom_Cell_Data::Custom_Cell_Data( const Custom_Cell_Data& ccd )
 {
-	std::cout << __FUNCTION__ << "(copy)" << std::endl; 
+//	std::cout << __FUNCTION__ << "(copy)" << std::endl; 
 	variables = ccd.variables; 
 	vector_variables = ccd.vector_variables; 
 	

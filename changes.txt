@@ -55,14 +55,19 @@ void display_simulation_status( std::ofstream& of );
 
 + added G1pm_phase and G1ps_phase to the PhysiCell constants. 
 
-
-
 + Added new coloring function: false_cell_coloring_cytometry
 
 + added support for the new cytometry cycle models to the oxygen-based 
      phenotype model (update_cell_and_death_parameters_O2_based)
 
 + updated user manual to reflect new cytometry models 
+
++ updated template2D and template3D projects to use to use the 
+  new cytometry models and coloring schemes. Also reduced to 
+  1 mm x 1 mm (2D) and 1 mm^3 (3D) for faster demos. 
+  
+ 
+  
 
 Beta features (not fully supported):
 + Added PhysiCell_pugixml.* for easier extraction of parameter 

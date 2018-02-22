@@ -135,7 +135,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = false_cell_coloring_cytometry;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );

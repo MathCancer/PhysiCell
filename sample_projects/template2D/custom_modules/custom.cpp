@@ -88,7 +88,7 @@ void create_cell_types( void )
 	
 	// set default cell cycle model 
 
-	cell_defaults.functions.cycle_model = flow_cytometry_separated; 
+	cell_defaults.functions.cycle_model = flow_cytometry_separated_cycle_model; 
 	
 	// set default_cell_functions; 
 	
@@ -165,8 +165,8 @@ void setup_microenvironment( void )
 {
 	// set domain parameters 
 	
-	default_microenvironment_options.X_range = {-750, 750}; 
-	default_microenvironment_options.Y_range = {-750, 750}; 
+	default_microenvironment_options.X_range = {-500, 500}; 
+	default_microenvironment_options.Y_range = {-500, 500}; 
 	default_microenvironment_options.simulate_2D = true; // 2D! 
 	
 	// no gradients need for this example 
@@ -198,15 +198,15 @@ void setup_tissue( void )
 	pC->assign_position( 0.0, 0.0, 0.0 );
 
 	pC = create_cell(); 
-	pC->assign_position( -2.0, -6.0, 0.0 );
+	pC->assign_position( -100, 0, 0.0 );
 	
 	pC = create_cell(); 
-	pC->assign_position( -5.0, 8.0, 0.0 );
+	pC->assign_position( 0, 100, 0.0 );
 	
 	// now create a motile cell 
 	
 	pC = create_cell( motile_cell ); 
-	pC->assign_position( 5.0, -8.0, 0.0 );
+	pC->assign_position( 15.0, -18.0, 0.0 );
 
 	return; 
 }

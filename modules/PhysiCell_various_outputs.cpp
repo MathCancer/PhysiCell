@@ -64,7 +64,7 @@
 #include "../core/PhysiCell.h"
 #include "./PhysiCell_various_outputs.h"
 
-#include "../beta/PhysiCell_settings.h"
+#include "./PhysiCell_settings.h"
 
 namespace PhysiCell{
 
