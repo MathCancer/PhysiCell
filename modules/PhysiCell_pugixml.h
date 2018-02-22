@@ -92,6 +92,7 @@ int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me ); // d
 bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me );// done 
 
 
+
 // get the string attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
 std::string get_string_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
 

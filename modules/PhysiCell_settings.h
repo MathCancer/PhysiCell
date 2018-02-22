@@ -72,7 +72,7 @@
 #include <random>
 #include <chrono>
 
-#include "../modules/PhysiCell_pugixml.h"
+#include "./PhysiCell_pugixml.h"
 
 namespace PhysiCell{
  	
