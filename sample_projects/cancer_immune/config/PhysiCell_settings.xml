@@ -80,7 +80,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">30240</max_time> <!-- 21 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -90,7 +90,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>.</folder> <!-- use . for root --> 
+		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
 			<interval units="min">60</interval>
@@ -98,7 +98,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">10</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		

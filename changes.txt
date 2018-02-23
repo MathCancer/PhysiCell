@@ -66,8 +66,7 @@ void display_simulation_status( std::ofstream& of );
   new cytometry models and coloring schemes. Also reduced to 
   1 mm x 1 mm (2D) and 1 mm^3 (3D) for faster demos. 
   
- 
-  
++ removed archives directory 
 
 Beta features (not fully supported):
 + Added PhysiCell_pugixml.* for easier extraction of parameter 
@@ -109,7 +108,7 @@ Bugfixes:
   
 Notices for intended changes that may affect backwards compatibility:
 
-+ None at this time
++ template_projects folder will be removed
 
 Planned future improvements: 
 
