@@ -7,7 +7,7 @@
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2018 (accepted).                        #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
@@ -18,7 +18,7 @@
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2018 (accepted).                        #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
@@ -112,9 +112,8 @@ void create_cell_types( void )
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 
-	int K1_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_positive_premitotic );
-	int K2_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_positive_postmitotic );
-	int Q_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_negative );
+	int G0G1_index = Ki67_advanced.find_phase_index( PhysiCell_constants::G0G1_phase );
+	int S_index = Ki67_advanced.find_phase_index( PhysiCell_constants::S_phase );
 
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
@@ -155,8 +154,8 @@ void create_cell_types( void )
 	motile_cell.phenotype.death.rates[apoptosis_model_index] = 0.0; 
 	
 	// Set proliferation to 10% of other cells. 
-	// Alter the transition rate from Q state (quiecent) to K1 state (Ki67+, pre-mitotic)
-	motile_cell.phenotype.cycle.data.transition_rate(Q_index,K1_index) *= 0.1; 
+	// Alter the transition rate from G0G1 state to S state
+	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 0.1; 
 	
 	return; 
 }

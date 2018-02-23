@@ -7,7 +7,7 @@
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2018 (accepted).                        #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
@@ -18,7 +18,7 @@
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2018 (accepted).                        #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
@@ -83,10 +83,13 @@ int main( int argc, char* argv[] )
 {
 	// load and parse settings file(s)
 	
+	bool XML_status = false; 
 	if( argc > 1 )
-	{ load_PhysiCell_config_file( argv[1] ); }
+	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
 	else
-	{ load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	if( !XML_status )
+	{ exit(-1); }
 	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);

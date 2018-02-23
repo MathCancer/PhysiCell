@@ -96,7 +96,16 @@ Bugfixes:
 
 + Removed .git directory that was accidentally included in releases
 
++ Updated PhysiCell_MultiCellDS.cpp 
+  (add_PhysiCell_cells_to_open_xml_pugi) so that we exit(-1) with a 
+  meaningful error message if we cannot open a matlab subfile 
+  for writing. 
+  
++ Updated PhysiCell_pathology.cpp (SVG_plot) so that we exit(-1) 
+  with a meaningful error message if we cannot open an SVG file 
+  for writing. 
 
+  
   
 Notices for intended changes that may affect backwards compatibility:
 
