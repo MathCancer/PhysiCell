@@ -80,13 +80,13 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">14400</max_time> <!-- 10 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>8</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
