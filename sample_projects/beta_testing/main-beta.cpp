@@ -3,23 +3,23 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1].    #
+# We implemented and solved the model using PhysiCell (Version 1.3.0) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
-#     preprint DOI: 10.1101/088773                                            #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1],    #
+# We implemented and solved the model using PhysiCell (Version 1.3.0) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
-#     preprint DOI: 10.1101/088773                                            #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
 #    llelized diffusive transport solver for 3-D biological simulations,      #
@@ -29,7 +29,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -71,8 +71,6 @@
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
-#include "./beta/PhysiCell_pugixml.h" 
-#include "./beta/PhysiCell_settings.h" 
 
 // custom user modules 
 
@@ -88,10 +86,13 @@ int main( int argc, char* argv[] )
 {
 	// load and parse settings file(s)
 	
+	bool XML_status = false; 
 	if( argc > 1 )
-	{ load_PhysiCell_config_file( argv[1] ); }
+	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
 	else
-	{ load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	if( !XML_status )
+	{ exit(-1); }
 	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
@@ -230,10 +231,9 @@ int main( int argc, char* argv[] )
 	// save a final simulation snapshot 
 	
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
-	
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
-	
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
 	// timer 
