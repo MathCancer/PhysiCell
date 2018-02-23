@@ -86,7 +86,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>8</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -98,7 +98,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">10</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
