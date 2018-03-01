@@ -208,9 +208,7 @@ int main( int argc, char* argv[] )
 			
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
-			if( default_microenvironment_options.calculate_gradients )
-			{ microenvironment.compute_all_gradient_vectors(); }
-			
+
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
