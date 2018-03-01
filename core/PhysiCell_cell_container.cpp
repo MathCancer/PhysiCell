@@ -301,6 +301,13 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{
 			time_since_last_mechanics = mechanics_dt_;
 		}
+		
+		// new February 2018 
+		// if we need gradients, compute them
+		if( default_microenvironment_options.calculate_gradients ) 
+		{ microenvironment.compute_all_gradient_vectors();  }
+		// end of new in Feb 2018 		
+		
 		// Compute velocities
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
