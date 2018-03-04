@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.12)  19 FEB 2018 23:34
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.2.12)  4 MAR 2018 13:03
 entering extended mode
 **C:/GitHub/PhysiCell/documentation/User_Guide.tex
 (C:/GitHub/PhysiCell/documentation/User_Guide.tex
@@ -1238,31 +1238,31 @@ e 904.
 
 [13]
 
-LaTeX Warning: Reference `sec:templates' on page 14 undefined on input line 101
-4.
+LaTeX Warning: Reference `sec:templates' on page 14 undefined on input line 102
+5.
 
-
-Overfull \hbox (9.80061pt too wide) in paragraph at lines 1034--1036
+[14]
+Overfull \hbox (9.80061pt too wide) in paragraph at lines 1045--1047
 []\OT1/cmtt/b/n/12 std::vector<double>& nearest[]density[]vector( std::vector<d
 ouble>& position ) \OT1/cmr/m/n/12 This func-
  []
 
-[14]
-Overfull \hbox (5.99251pt too wide) in paragraph at lines 1047--1049
+
+Overfull \hbox (5.99251pt too wide) in paragraph at lines 1058--1060
 []\OT1/cmtt/b/n/12 std::vector<gradient>& gradient[]vector(std::vector<double>&
  position ) \OT1/cmr/m/n/12 This func-tion ac-
  []
 
 
-LaTeX Warning: Reference `sec:Cells' on page 15 undefined on input line 1075.
+LaTeX Warning: Reference `sec:Cells' on page 15 undefined on input line 1086.
 
 [15]
 
 LaTeX Warning: Reference `sec:BioFVM_options' on page 16 undefined on input lin
-e 1130.
+e 1141.
 
 
-Overfull \hbox (11.58601pt too wide) in paragraph at lines 1133--1136
+Overfull \hbox (11.58601pt too wide) in paragraph at lines 1144--1147
 []\OT1/cmtt/b/n/12 void Microenvironment::set[]substrate[]dirichlet[]activation
 ( int substrate[]index , bool
  []
@@ -1270,206 +1270,205 @@ Overfull \hbox (11.58601pt too wide) in paragraph at lines 1133--1136
 [16]
 
 LaTeX Warning: Reference `sec:Custom_Cell_Data' on page 17 undefined on input l
-ine 1177.
+ine 1188.
 
 
 LaTeX Warning: Reference `sec:Cell_Parameters' on page 17 undefined on input li
-ne 1182.
+ne 1193.
 
 
 LaTeX Warning: Reference `sec:Cell_Functions' on page 17 undefined on input lin
-e 1187.
+e 1198.
 
 
-LaTeX Warning: Reference `sec:Cell_State' on page 17 undefined on input line 11
-92.
+LaTeX Warning: Reference `sec:Cell_State' on page 17 undefined on input line 12
+03.
 
 
-LaTeX Warning: Reference `sec:Phenotype' on page 17 undefined on input line 119
-7.
+LaTeX Warning: Reference `sec:Phenotype' on page 17 undefined on input line 120
+8.
 
-[17] [18]
+[17] [18] [19]
 
 LaTeX Font Warning: Font shape `U/stmry/b/n' undefined
-(Font)              using `U/stmry/m/n' instead on input line 1352.
+(Font)              using `U/stmry/m/n' instead on input line 1363.
 
-[19]
 
-LaTeX Warning: Reference `sec:Motility' on page 20 undefined on input line 1386
+LaTeX Warning: Reference `sec:Motility' on page 20 undefined on input line 1397
 .
 
 
 LaTeX Warning: Reference `sec:Cell_Functions' on page 20 undefined on input lin
-e 1388.
+e 1399.
 
 
-LaTeX Warning: Reference `sec:Motility' on page 20 undefined on input line 1390
+LaTeX Warning: Reference `sec:Motility' on page 20 undefined on input line 1401
 .
 
 
-LaTeX Warning: Reference `sec:Phenotype' on page 20 undefined on input line 140
-6.
+LaTeX Warning: Reference `sec:Phenotype' on page 20 undefined on input line 141
+7.
 
 
-LaTeX Warning: Reference `sec:Volume' on page 20 undefined on input line 1413.
+LaTeX Warning: Reference `sec:Volume' on page 20 undefined on input line 1424.
 
 
-LaTeX Warning: Reference `sec:Geometry' on page 20 undefined on input line 1418
+LaTeX Warning: Reference `sec:Geometry' on page 20 undefined on input line 1429
 .
 
 
-LaTeX Warning: Reference `sec:Phase' on page 20 undefined on input line 1431.
+LaTeX Warning: Reference `sec:Phase' on page 20 undefined on input line 1442.
 
 
-LaTeX Warning: Reference `sec:Death' on page 20 undefined on input line 1432.
+LaTeX Warning: Reference `sec:Death' on page 20 undefined on input line 1443.
 
 
-LaTeX Warning: Reference `sec:Cycle' on page 20 undefined on input line 1433.
+LaTeX Warning: Reference `sec:Cycle' on page 20 undefined on input line 1444.
 
 
-LaTeX Warning: Reference `sec:Cycle' on page 20 undefined on input line 1438.
-
-
-LaTeX Warning: Reference `sec:Cell_Functions' on page 20 undefined on input lin
-e 1448.
-
-
-LaTeX Warning: Reference `sec:Examples' on page 20 undefined on input line 1449
-.
+LaTeX Warning: Reference `sec:Cycle' on page 20 undefined on input line 1449.
 
 [20]
 
+LaTeX Warning: Reference `sec:Cell_Functions' on page 21 undefined on input lin
+e 1459.
+
+
+LaTeX Warning: Reference `sec:Examples' on page 21 undefined on input line 1460
+.
+
+
 LaTeX Warning: Reference `sec:other_key_cell_functions' on page 21 undefined on
- input line 1501.
+ input line 1512.
 
 
 LaTeX Warning: Reference `sec:Cell_Functions' on page 21 undefined on input lin
-e 1533.
+e 1544.
 
 [21]
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/it' in size <12> not available
-(Font)              Font shape `OT1/cmtt/m/it' tried instead on input line 1567
+(Font)              Font shape `OT1/cmtt/m/it' tried instead on input line 1578
 .
 
-Overfull \hbox (4.36784pt too wide) in paragraph at lines 1563--1570
+Overfull \hbox (4.36784pt too wide) in paragraph at lines 1574--1581
 []\OT1/cmtt/b/n/12 std::vector<Cell*>& cells[]in[]my[]container( void ) \OT1/cm
 r/m/n/12 re-turns (by ref-er-ence) a vec-tor of point-
  []
 
 
 LaTeX Warning: Reference `sec:Cell_Definition' on page 22 undefined on input li
-ne 1574.
+ne 1585.
 
 
 LaTeX Warning: Reference `sec:Cell_Definition' on page 22 undefined on input li
-ne 1595.
+ne 1606.
 
 
 LaTeX Warning: Reference `sec:Cell_Definition' on page 22 undefined on input li
-ne 1611.
+ne 1622.
 
 [22]
 
 LaTeX Warning: Reference `sec:Custom_Cell_Data' on page 23 undefined on input l
-ine 1638.
+ine 1649.
 
 
-LaTeX Warning: Reference `sec:All_Cells' on page 23 undefined on input line 163
-9.
-
-
-LaTeX Warning: Reference `sec:Custom_Cell_Data' on page 23 undefined on input l
-ine 1659.
-
-
-LaTeX Warning: Reference `sec:All_Cells' on page 23 undefined on input line 166
+LaTeX Warning: Reference `sec:All_Cells' on page 23 undefined on input line 165
 0.
 
 
+LaTeX Warning: Reference `sec:Custom_Cell_Data' on page 23 undefined on input l
+ine 1670.
+
+
+LaTeX Warning: Reference `sec:All_Cells' on page 23 undefined on input line 167
+1.
+
+
 LaTeX Warning: Reference `sec:Cell_Definition' on page 23 undefined on input li
-ne 1682.
+ne 1693.
 
 [23] [24]
-Overfull \hbox (11.61339pt too wide) in paragraph at lines 1771--1774
+Overfull \hbox (11.61339pt too wide) in paragraph at lines 1782--1785
 []\OT1/cmtt/b/n/12 int add[]variable( std::string name , std::string units , do
 uble value ) \OT1/cmr/m/n/12 adds a new
  []
 
-[25] [26]
+[25] [26] [27]
 
-LaTeX Warning: Reference `sec:Cell_Definition' on page 27 undefined on input li
-ne 1938.
+LaTeX Warning: Reference `sec:Cell_Definition' on page 28 undefined on input li
+ne 1949.
 
 
-LaTeX Warning: Reference `sec:Phenotype' on page 27 undefined on input line 194
-0.
+LaTeX Warning: Reference `sec:Phenotype' on page 28 undefined on input line 195
+1.
 
-[27] [28]
+[28]
 
-LaTeX Warning: Reference `sec:Phenotype' on page 29 undefined on input line 204
-2.
+LaTeX Warning: Reference `sec:Phenotype' on page 29 undefined on input line 205
+3.
 
 [29]
 
 LaTeX Warning: Reference `sec:Cell_Definition' on page 30 undefined on input li
-ne 2109.
+ne 2120.
 
 
 LaTeX Warning: Reference `sec:Cycle_Model' on page 30 undefined on input line 2
-111.
+122.
 
 
-LaTeX Warning: Reference `sec:Volume' on page 30 undefined on input line 2116.
+LaTeX Warning: Reference `sec:Volume' on page 30 undefined on input line 2127.
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 30 undefined on input 
-line 2118.
+line 2129.
 
 
-Overfull \hbox (8.96611pt too wide) in paragraph at lines 2114--2119
+Overfull \hbox (8.96611pt too wide) in paragraph at lines 2125--2130
 []\OT1/cmtt/b/n/12 void (*volume[]update[]function)( Cell* pCell, Phenotype& ph
 enotype, double dt ) \OT1/cmr/m/n/12 is
  []
 
 
-LaTeX Warning: Reference `sec:Motility' on page 30 undefined on input line 2124
+LaTeX Warning: Reference `sec:Motility' on page 30 undefined on input line 2135
 .
 
 
 LaTeX Warning: Reference `sec:Examples:migration' on page 30 undefined on input
- line 2125.
+ line 2136.
+
+[30]
+
+LaTeX Warning: Reference `sec:Examples:custom_rule' on page 31 undefined on inp
+ut line 2141.
 
 
-LaTeX Warning: Reference `sec:Examples:custom_rule' on page 30 undefined on inp
-ut line 2130.
-
-
-Overfull \hbox (0.76418pt too wide) in paragraph at lines 2128--2131
+Overfull \hbox (0.76418pt too wide) in paragraph at lines 2139--2142
 []\OT1/cmtt/b/n/12 void (*custom[]cell[]rule)( Cell* pCell, Phenotype& phenotyp
 e, double dt ) \OT1/cmr/m/n/12 is a cus-
  []
 
 
-LaTeX Warning: Reference `sec:Examples:phenotype_rule' on page 30 undefined on 
-input line 2135.
+LaTeX Warning: Reference `sec:Examples:phenotype_rule' on page 31 undefined on 
+input line 2146.
 
 
-Package natbib Warning: Citation `ref:PhysiCell' on page 30 undefined on input 
-line 2137.
+Package natbib Warning: Citation `ref:PhysiCell' on page 31 undefined on input 
+line 2148.
 
 
-Overfull \hbox (3.85246pt too wide) in paragraph at lines 2133--2138
+Overfull \hbox (3.85246pt too wide) in paragraph at lines 2144--2149
 []\OT1/cmtt/b/n/12 void (*update[]phenotype)( Cell* pCell, Phenotype& phenotype
 , double dt ) \OT1/cmr/m/n/12 is where
  []
 
-[30]
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 31 undefined on input 
-line 2142.
+line 2153.
 
 
-Overfull \hbox (12.26616pt too wide) in paragraph at lines 2140--2143
+Overfull \hbox (12.26616pt too wide) in paragraph at lines 2151--2154
 []\OT1/cmtt/b/n/12 void (*update[]velocity)( Cell* pCell, Phenotype& phenotype,
  double dt ) \OT1/cmr/m/n/12 is a pointer
  []
@@ -1477,135 +1476,134 @@ Overfull \hbox (12.26616pt too wide) in paragraph at lines 2140--2143
 [31]
 
 Package natbib Warning: Citation `macklin12_jtb' on page 32 undefined on input 
-line 2212.
+line 2223.
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 32 undefined on input 
-line 2212.
+line 2223.
 
 
 Package natbib Warning: Citation `hyun13_jtb' on page 32 undefined on input lin
-e 2224.
+e 2235.
 
 [32]
 
 LaTeX Warning: Reference `sec:Cell_Parameters' on page 33 undefined on input li
-ne 2314.
+ne 2325.
 
 
 LaTeX Warning: Reference `sec:Custom_Cell_Data' on page 33 undefined on input l
-ine 2317.
+ine 2328.
 
 
 LaTeX Warning: Reference `sec:Cell_Functions' on page 33 undefined on input lin
-e 2321.
+e 2332.
 
 
-LaTeX Warning: Reference `sec:Phenotype' on page 33 undefined on input line 232
-5.
-
-
-LaTeX Warning: Reference `sec:Cycle' on page 33 undefined on input line 2348.
-
-
-LaTeX Warning: Reference `sec:Death' on page 33 undefined on input line 2354.
-
-
-LaTeX Warning: Reference `sec:Volume' on page 33 undefined on input line 2358.
+LaTeX Warning: Reference `sec:Phenotype' on page 33 undefined on input line 233
+6.
 
 [33]
 
-LaTeX Warning: Reference `sec:Geometry' on page 34 undefined on input line 2362
+LaTeX Warning: Reference `sec:Cycle' on page 34 undefined on input line 2359.
+
+
+LaTeX Warning: Reference `sec:Death' on page 34 undefined on input line 2365.
+
+
+LaTeX Warning: Reference `sec:Volume' on page 34 undefined on input line 2369.
+
+
+LaTeX Warning: Reference `sec:Geometry' on page 34 undefined on input line 2373
 .
 
 
-LaTeX Warning: Reference `sec:Mechanics' on page 34 undefined on input line 236
-9.
+LaTeX Warning: Reference `sec:Mechanics' on page 34 undefined on input line 238
+0.
 
 
-LaTeX Warning: Reference `sec:Motility' on page 34 undefined on input line 2375
+LaTeX Warning: Reference `sec:Motility' on page 34 undefined on input line 2386
 .
 
 
-LaTeX Warning: Reference `sec:Secretion' on page 34 undefined on input line 237
-9.
-
-
-LaTeX Warning: Reference `sec:phenotype_details' on page 34 undefined on input 
-line 2406.
-
-
-LaTeX Warning: Reference `sec:Cycle' on page 34 undefined on input line 2419.
+LaTeX Warning: Reference `sec:Secretion' on page 34 undefined on input line 239
+0.
 
 [34]
 
+LaTeX Warning: Reference `sec:phenotype_details' on page 35 undefined on input 
+line 2417.
+
+
+LaTeX Warning: Reference `sec:Cycle' on page 35 undefined on input line 2430.
+
+
 LaTeX Warning: Reference `sec:Cycle_Class' on page 35 undefined on input line 2
-440.
+451.
 
 
 LaTeX Warning: Reference `sec:Cycle_Model' on page 35 undefined on input line 2
-442.
+453.
 
 
 LaTeX Warning: Reference `sec:Cycle_Data' on page 35 undefined on input line 24
-42.
+53.
 
 
 LaTeX Warning: Reference `sec:Cycle_Class' on page 35 undefined on input line 2
-443.
+454.
 
 
-LaTeX Warning: Reference `sec:Phase' on page 35 undefined on input line 2447.
+LaTeX Warning: Reference `sec:Phase' on page 35 undefined on input line 2458.
 
 
 LaTeX Warning: Reference `sec:Phase_Link' on page 35 undefined on input line 24
-48.
+59.
 
 
 LaTeX Warning: Reference `sec:PhysiCell_constants' on page 35 undefined on inpu
-t line 2463.
+t line 2474.
 
 [35]
-Overfull \hbox (7.29126pt too wide) in paragraph at lines 2529--2534
+Overfull \hbox (7.29126pt too wide) in paragraph at lines 2540--2545
 \OT1/cmr/m/n/12 vari-able only makes sense if there is a sin-gle, unique phase 
 tran-si-tion start-ing from [][]\OT1/cmtt/m/n/12 start_phase_index[]\OT1/cmr/m/
 n/12 . 
  []
 
-
-Overfull \hbox (4.61464pt too wide) in paragraph at lines 2536--2542
+[36]
+Overfull \hbox (4.61464pt too wide) in paragraph at lines 2547--2553
 []\OT1/cmtt/b/n/12 void (*arrest[]function)(Cell* pCell, Phenotype& phenotype, 
 double dt) \OT1/cmr/m/n/12 is a func-tion
  []
 
-[36]
 
 LaTeX Warning: Reference `sec:Cycle_Data' on page 37 undefined on input line 25
-81.
+92.
+
+[37]
+
+LaTeX Warning: Reference `sec:PhysiCell_constants' on page 38 undefined on inpu
+t line 2612.
 
 
-LaTeX Warning: Reference `sec:PhysiCell_constants' on page 37 undefined on inpu
-t line 2601.
-
-
-Overfull \hbox (1.58614pt too wide) in paragraph at lines 2607--2610
+Overfull \hbox (1.58614pt too wide) in paragraph at lines 2618--2621
 []\OT1/cmtt/b/n/12 std::vector< std::vector<Phase[]Link> > phase[]links \OT1/cm
 r/m/n/12 is a vec-tor of vec-tors of [][]\OT1/cmtt/m/n/12 Phase_Link[]\OT1/cmr/
 m/n/12 s.
  []
 
-[37]
 
 LaTeX Warning: Reference `sec:Cycle_Data' on page 38 undefined on input line 26
-19.
+30.
 
 [38]
 
 LaTeX Warning: Reference `sec:Cycle_Data' on page 39 undefined on input line 26
-67.
+78.
 
 
-Overfull \hbox (15.84782pt too wide) in paragraph at lines 2677--2684
+Overfull \hbox (15.84782pt too wide) in paragraph at lines 2688--2695
 \OT1/cmr/m/n/12 adds a new [][]\OT1/cmtt/m/n/12 Phase_Link []\OT1/cmr/m/n/12 to
  [][]\OT1/cmtt/m/n/12 phase_links[start_index] []\OT1/cmr/m/n/12 join-ing phase
  [][]\OT1/cmtt/m/n/12 start_index []\OT1/cmr/m/n/12 to phase [][]\OT1/cmtt/m/n/
@@ -1613,14 +1611,14 @@ Overfull \hbox (15.84782pt too wide) in paragraph at lines 2677--2684
  []
 
 
-Overfull \hbox (18.1999pt too wide) in paragraph at lines 2677--2684
+Overfull \hbox (18.1999pt too wide) in paragraph at lines 2688--2695
 \OT1/cmr/m/n/12 ([][]\OT1/cmtt/m/n/12 new_index[]\OT1/cmr/m/n/12 ) so that the 
 phase link can be di-rectly ac-cessed as [][]\OT1/cmtt/m/n/12 phase_links[start
 _index][new_index][]\OT1/cmr/m/n/12 . 
  []
 
 
-Overfull \hbox (15.84782pt too wide) in paragraph at lines 2687--2694
+Overfull \hbox (15.84782pt too wide) in paragraph at lines 2698--2705
 \OT1/cmr/m/n/12 adds a new [][]\OT1/cmtt/m/n/12 Phase_Link []\OT1/cmr/m/n/12 to
  [][]\OT1/cmtt/m/n/12 phase_links[start_index] []\OT1/cmr/m/n/12 join-ing phase
  [][]\OT1/cmtt/m/n/12 start_index []\OT1/cmr/m/n/12 to phase [][]\OT1/cmtt/m/n/
@@ -1628,468 +1626,412 @@ Overfull \hbox (15.84782pt too wide) in paragraph at lines 2687--2694
  []
 
 
-Overfull \hbox (18.1999pt too wide) in paragraph at lines 2687--2694
+Overfull \hbox (18.1999pt too wide) in paragraph at lines 2698--2705
 \OT1/cmr/m/n/12 ([][]\OT1/cmtt/m/n/12 new_index[]\OT1/cmr/m/n/12 ) so that the 
 phase link can be di-rectly ac-cessed as [][]\OT1/cmtt/m/n/12 phase_links[start
 _index][new_index][]\OT1/cmr/m/n/12 . 
  []
 
 
-Overfull \hbox (1.65265pt too wide) in paragraph at lines 2696--2699
+Overfull \hbox (1.65265pt too wide) in paragraph at lines 2707--2710
 []\OT1/cmtt/b/n/12 int find[]phase[]index( int code ) \OT1/cmr/m/n/12 finds the
  in-dex [][]\OT1/cmtt/m/n/12 i []\OT1/cmr/m/n/12 such that [][]\OT1/cmtt/m/n/12
  phases[i].code = code[]\OT1/cmr/m/n/12 . Please
  []
 
 
-Overfull \hbox (17.45378pt too wide) in paragraph at lines 2701--2704
+Overfull \hbox (17.45378pt too wide) in paragraph at lines 2712--2715
 []\OT1/cmtt/b/n/12 int find[]phase[]index( std::string name ) \OT1/cmr/m/n/12 f
 inds the in-dex [][]\OT1/cmtt/m/n/12 i []\OT1/cmr/m/n/12 such that [][]\OT1/cmt
 t/m/n/12 phases[i].name = name[]\OT1/cmr/m/n/12 .
  []
 
 
-Overfull \hbox (3.34544pt too wide) in paragraph at lines 2711--2714
+Overfull \hbox (3.34544pt too wide) in paragraph at lines 2722--2725
 []\OT1/cmtt/b/n/12 Phase[]Link& phase[]link(int start[]index , int end[]index) 
 \OT1/cmr/m/n/12 is a user-friendly in-ter-face func-
  []
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 39 undefined on input 
-line 2719.
+line 2730.
 
 
-Overfull \hbox (7.00874pt too wide) in paragraph at lines 2716--2722
+Overfull \hbox (7.00874pt too wide) in paragraph at lines 2727--2733
 []\OT1/cmtt/b/n/12 void advance[]model( Cell* pCell, Phenotype& phenotype, doub
 le dt ) \OT1/cmr/m/n/12 ad-vances the the
  []
 
+[39]
 
-LaTeX Warning: Reference `sec:Cycle_Model' on page 39 undefined on input line 2
-734.
+LaTeX Warning: Reference `sec:Cycle_Model' on page 40 undefined on input line 2
+745.
 
-[39] [40] [41]
+[40] [41]
 
 LaTeX Warning: Reference `sec:Cycle_Model' on page 42 undefined on input line 3
-001.
+012.
 
 
 LaTeX Warning: Reference `sec:Death_Parameters' on page 42 undefined on input l
-ine 3002.
+ine 3013.
 
 
 LaTeX Warning: Reference `sec:Death_Class' on page 42 undefined on input line 3
-003.
+014.
 
 
 LaTeX Warning: Reference `sec:Cycle_Class' on page 42 undefined on input line 3
-004.
+015.
 
 [42]
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 43 undefined on input 
-line 3068.
+line 3079.
 
 [43] [44] [45] [46] [47] [48]
 
-LaTeX Warning: Reference `sec:Geometry' on page 49 undefined on input line 3537
+LaTeX Warning: Reference `sec:Geometry' on page 49 undefined on input line 3548
 .
 
 
-LaTeX Warning: Reference `sec:Geometry' on page 49 undefined on input line 3542
+LaTeX Warning: Reference `sec:Geometry' on page 49 undefined on input line 3553
 .
 
 
-LaTeX Warning: Reference `sec:Geometry' on page 49 undefined on input line 3546
+LaTeX Warning: Reference `sec:Geometry' on page 49 undefined on input line 3557
 .
 
 [49]
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 50 undefined on input 
-line 3564.
+line 3575.
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 50 undefined on input 
-line 3570.
+line 3581.
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 50 undefined on input 
-line 3576.
+line 3587.
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 50 undefined on input 
-line 3582.
+line 3593.
 
 [50]
 
 LaTeX Warning: Reference `sec:motility_definitions' on page 51 undefined on inp
-ut line 3671.
+ut line 3682.
 
 [51]
 
 LaTeX Warning: Reference `sec:motility_definitions' on page 52 undefined on inp
-ut line 3691.
+ut line 3702.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3700--3703
+Underfull \hbox (badness 10000) in paragraph at lines 3711--3714
 [][][]\OT1/cmtt/m/n/12 is_motile = false[]\OT1/cmr/m/n/12 , 
  []
 
 
 LaTeX Warning: Reference `sec:cell_member_functions' on page 52 undefined on in
-put line 3726.
+put line 3737.
 
 
 Package natbib Warning: Citation `ref:BioFVM' on page 52 undefined on input lin
-e 3760.
-
-
-Package natbib Warning: Citation `ref:BioFVM' on page 52 undefined on input lin
-e 3773.
+e 3771.
 
 [52]
-Overfull \hbox (1.526pt too wide) in paragraph at lines 3813--3816
+
+Package natbib Warning: Citation `ref:BioFVM' on page 53 undefined on input lin
+e 3784.
+
+
+Overfull \hbox (1.526pt too wide) in paragraph at lines 3824--3827
 []\OT1/cmtt/b/n/12 void sync[]to[]current[]microenvironment(void) \OT1/cmr/m/n/
 12 re-sizes [][]\OT1/cmtt/m/n/12 secretion_rates[]\OT1/cmr/m/n/12 , [][]\OT1/cm
 tt/m/n/12 uptake_rates[]\OT1/cmr/m/n/12 , and
  []
 
 [53] [54]
-Overfull \hbox (1.37526pt too wide) in paragraph at lines 3914--3914
+Overfull \hbox (1.37526pt too wide) in paragraph at lines 3925--3925
 []\OT1/cmtt/m/n/12 Cell_Container* create_cell_container_for_microenvironment( 
 BioFVM::Microenvironment& m,[] 
  []
 
-
-Package natbib Warning: Citation `ref:pugixml' on page 55 undefined on input li
-ne 3937.
-
 [55]
-Overfull \hbox (279.2504pt too wide) in paragraph at lines 3958--3958
-[]\OT1/cmtt/m/n/12 // get the string attribute named "attribute" in the first s
-td:string in <parent_node> <find_me>string_value</find_me> </parent_node>[] 
- []
+
+Package natbib Warning: Citation `ref:pugixml' on page 56 undefined on input li
+ne 3948.
 
 
-Overfull \hbox (174.27534pt too wide) in paragraph at lines 3958--3958
-[]\OT1/cmtt/m/n/12 std::string get_string_attribute_value( pugi::xml_node& pare
-nt_node , std::string find_me , std::string attribute );[] 
- []
-
-
-Overfull \hbox (260.72539pt too wide) in paragraph at lines 3958--3958
-[]\OT1/cmtt/m/n/12 // get the int attribute named "attribute" in the first std:
-string in <parent_node> <find_me>string_value</find_me> </parent_node>[] 
- []
-
-
-Overfull \hbox (106.35031pt too wide) in paragraph at lines 3958--3958
-[]\OT1/cmtt/m/n/12 int get_int_attribute_value( pugi::xml_node& parent_node , s
-td::string find_me , std::string attribute );[] 
- []
-
-
-Overfull \hbox (279.2504pt too wide) in paragraph at lines 3958--3958
-[]\OT1/cmtt/m/n/12 // get the double attribute named "attribute" in the first s
-td:string in <parent_node> <find_me>string_value</find_me> </parent_node>[] 
- []
-
-
-Overfull \hbox (143.40033pt too wide) in paragraph at lines 3958--3958
-[]\OT1/cmtt/m/n/12 double get_double_attribute_value( pugi::xml_node& parent_no
-de , std::string find_me , std::string attribute );[] 
- []
-
-
-Overfull \hbox (13.98372pt too wide) in paragraph at lines 3963--3965
+Overfull \hbox (13.98372pt too wide) in paragraph at lines 3959--3961
 []\OT1/cmtt/b/n/12 pugi::xml[]node xml[]find[]node(pugi::xml[]node& parent[]nod
 e , std::string find[]me) \OT1/cmr/m/n/12 re-
  []
 
 
-Overfull \hbox (24.06459pt too wide) in paragraph at lines 3973--3974
+Overfull \hbox (24.06459pt too wide) in paragraph at lines 3969--3970
 []\OT1/cmtt/b/n/12 std::string xml[]get[]string[]value(pugi::xml[]node& parent[
 ]node , std::string find[]me)
  []
 
 
-Overfull \hbox (7.38368pt too wide) in paragraph at lines 3982--3984
+Overfull \hbox (7.38368pt too wide) in paragraph at lines 3978--3980
 []\OT1/cmtt/b/n/12 double xml[]get[]double[]value(pugi::xml[]node& parent[]node
  , std::string find[]me) \OT1/cmr/m/n/12 re-
  []
 
 
-Overfull \hbox (10.49583pt too wide) in paragraph at lines 3992--3994
+Overfull \hbox (10.49583pt too wide) in paragraph at lines 3988--3990
 []\OT1/cmtt/b/n/12 double xml[]get[]int[]value(pugi::xml[]node& parent[]node , 
 std::string find[]me) \OT1/cmr/m/n/12 re-turns
  []
 
 
-Overfull \hbox (17.09587pt too wide) in paragraph at lines 4002--4004
+Overfull \hbox (17.09587pt too wide) in paragraph at lines 3998--4000
 []\OT1/cmtt/b/n/12 double xml[]get[]bool[]value(pugi::xml[]node& parent[]node ,
  std::string find[]me) \OT1/cmr/m/n/12 re-turns
  []
 
 [56]
-Overfull \hbox (48.05988pt too wide) in paragraph at lines 4017--4020
-\OT1/cmr/m/n/12 PhysiCell 1.3.0 in-tro-duced pre-li-ma-nary sup-port for XML co
-n-fig-u-ra-tion files, via [][]\OT1/cmtt/m/n/12 ./modules/PhysiCell_settings.*[
-]\OT1/cmr/m/n/12 .
- []
+! You can't use `macro parameter character #' in horizontal mode.
+l.4014 #
+        #This does not show up well on the pdf \v|./modules/PhysiCell_settin...
+
+? R
+OK, entering \nonstopmode...
+! You can't use `macro parameter character #' in horizontal mode.
+l.4014 ##
+         This does not show up well on the pdf \v|./modules/PhysiCell_settin...
+Sorry, but I'm not programmed to handle this case;
+I'll just pretend that you didn't ask for it.
+If you're in the wrong mode, you might be able to
+return to the right one by typing `I}' or `I$' or `I\par'.
+
+! You can't use `macro parameter character #' in horizontal mode.
+l.4014 ...df \v|./modules/PhysiCell_settings.*|. #
+                                                  #
+Sorry, but I'm not programmed to handle this case;
+I'll just pretend that you didn't ask for it.
+If you're in the wrong mode, you might be able to
+return to the right one by typing `I}' or `I$' or `I\par'.
+
+! You can't use `macro parameter character #' in horizontal mode.
+l.4014 ...f \v|./modules/PhysiCell_settings.*|. ##
+                                                  
+Sorry, but I'm not programmed to handle this case;
+I'll just pretend that you didn't ask for it.
+If you're in the wrong mode, you might be able to
+return to the right one by typing `I}' or `I$' or `I\par'.
 
 [57]
 
 Package natbib Warning: Citation `ref:MultiCellDS' on page 58 undefined on inpu
-t line 4105.
+t line 4104.
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.4118 ...cross-sections; see Section ref{sec:SVG_
-                                                  functions}.
-? R
-OK, entering \nonstopmode...
-! Extra }, or forgotten $.
-l.4118 ...ions; see Section ref{sec:SVG_functions}
-                                                  .
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.4119 
-       
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
+LaTeX Warning: Reference `sec:SVG_functions' on page 58 undefined on input line
+ 4117.
 
-! Missing } inserted.
-<inserted text> 
-                }
-l.4119 
-       
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-[58] [59] [60]
-Overfull \hbox (5.743pt too wide) in paragraph at lines 4276--4282
+[58] [59] [60] [61]
+Overfull \hbox (5.743pt too wide) in paragraph at lines 4339--4345
 []\OT1/cmtt/b/n/12 std::string stroke[]color , std::string fill[]color ) \OT1/c
 mr/m/n/12 places a rect-an-gle with upper-
  []
 
 
-Overfull \hbox (0.24117pt too wide) in paragraph at lines 4303--4307
+Overfull \hbox (0.24117pt too wide) in paragraph at lines 4366--4370
 []\OT1/cmtt/b/n/12 double thickness, std::string stroke[]color ) \OT1/cmr/m/n/1
 2 draws a line with color [][]\OT1/cmtt/m/n/12 stroke_color
  []
 
-[61]
-
-LaTeX Warning: Reference `sec:Pathology_Coloring' on page 62 undefined on input
- line 4343.
-
-
-LaTeX Warning: Reference `sec:SVG_options' on page 62 undefined on input line 4
-360.
-
-
-Package natbib Warning: Citation `ref:lambert_beer' on page 62 undefined on inp
-ut line 4376.
-
 [62]
 
-LaTeX Warning: Reference `sec:Cycle' on page 63 undefined on input line 4441.
+LaTeX Warning: Reference `sec:Pathology_Coloring' on page 63 undefined on input
+ line 4406.
 
 
-LaTeX Warning: Reference `sec:Standard_Models:Cycle' on page 63 undefined on in
-put line 4442.
+LaTeX Warning: Reference `sec:SVG_options' on page 63 undefined on input line 4
+423.
 
 
-Package natbib Warning: Citation `ref:H_and_E' on page 63 undefined on input li
-ne 4463.
+Package natbib Warning: Citation `ref:lambert_beer' on page 63 undefined on inp
+ut line 4439.
+
+[63]
+
+LaTeX Warning: Reference `sec:Cycle' on page 64 undefined on input line 4504.
 
 
-Package natbib Warning: Citation `ref:H_and_E' on page 63 undefined on input li
-ne 4477.
+LaTeX Warning: Reference `sec:Standard_Models:Cycle' on page 64 undefined on in
+put line 4505.
 
 
-Overfull \hbox (11.62236pt too wide) in paragraph at lines 4470--4480
+Package natbib Warning: Citation `ref:H_and_E' on page 64 undefined on input li
+ne 4526.
+
+[64]
+
+Package natbib Warning: Citation `ref:H_and_E' on page 65 undefined on input li
+ne 4540.
+
+
+Overfull \hbox (11.62236pt too wide) in paragraph at lines 4533--4543
 \OT1/cmr/m/n/12 main-ing un-stained. The re-sult of this sim-u-lated trans-mis-
 sion is then fed back through the [][]\OT1/cmtt/m/n/12 transmission
  []
 
 
-Package natbib Warning: Citation `ref:H_and_E' on page 63 undefined on input li
-ne 4491.
-
-[63]
-
-Package natbib Warning: Citation `ref:H_and_E' on page 64 undefined on input li
-ne 4560.
-
-[64]
-
-Package natbib Warning: Citation `ref:MultiCellDS' on page 65 undefined on inpu
-t line 4608.
-
-
-LaTeX Warning: Reference `sec:MultiCellDS_Options' on page 65 undefined on inpu
-t line 4609.
-
-
-Package natbib Warning: Citation `ref:MultiCellDS' on page 65 undefined on inpu
-t line 4611.
+Package natbib Warning: Citation `ref:H_and_E' on page 65 undefined on input li
+ne 4554.
 
 [65]
-Underfull \hbox (badness 10000) in paragraph at lines 4618--4619
+
+Package natbib Warning: Citation `ref:H_and_E' on page 66 undefined on input li
+ne 4623.
+
+[66]
+
+Package natbib Warning: Citation `ref:MultiCellDS' on page 67 undefined on inpu
+t line 4671.
+
+
+LaTeX Warning: Reference `sec:MultiCellDS_Options' on page 67 undefined on inpu
+t line 4672.
+
+
+Package natbib Warning: Citation `ref:MultiCellDS' on page 67 undefined on inpu
+t line 4674.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4681--4682
 
  []
 
 
-Overfull \hbox (37.80624pt too wide) in paragraph at lines 4620--4622
+Overfull \hbox (37.80624pt too wide) in paragraph at lines 4683--4685
 []\OT1/cmr/m/n/12 Here, the [][]\OT1/cmtt/m/n/12 filebase []\OT1/cmr/m/n/12 de-
 ter-mines how all the snap-shot sub-files will be named: [][]\OT1/cmtt/m/n/12 f
 ilebase.xml[]\OT1/cmr/m/n/12 , [][]\OT1/cmtt/m/n/12 filebase_cells.mat[]\OT1/cm
 r/m/n/12 ,
  []
 
-[66] [67]
-Underfull \hbox (badness 10000) in paragraph at lines 4777--4783
+[67] [68] [69]
+Underfull \hbox (badness 10000) in paragraph at lines 4840--4846
 
  []
-
-[68] [69]
-
-LaTeX Warning: Reference `sec:set_up_BioFVM' on page 70 undefined on input line
- 4880.
-
-
-LaTeX Warning: Reference `sec:Cell_Container' on page 70 undefined on input lin
-e 4887.
-
-
-Overfull \hbox (16.09695pt too wide) in paragraph at lines 4885--4888
-[]\OT1/cmtt/b/n/12 microenvironment, mechanics[]voxel[]size );\OT1/cmr/m/n/12 .
- Note that [][]\OT1/cmtt/m/n/12 microenvironment
- []
-
-
-LaTeX Warning: Reference `sec:templates' on page 70 undefined on input line 489
-9.
 
 [70]
 
 LaTeX Warning: Reference `sec:set_up_BioFVM' on page 71 undefined on input line
- 4959.
+ 4943.
 
 
-LaTeX Warning: Reference `sec:Cell_Definition' on page 71 undefined on input li
-ne 4965.
+LaTeX Warning: Reference `sec:Cell_Container' on page 71 undefined on input lin
+e 4950.
 
 
-Package natbib Warning: Citation `ref:MultiCellDS' on page 71 undefined on inpu
-t line 4967.
+Overfull \hbox (16.09695pt too wide) in paragraph at lines 4948--4951
+[]\OT1/cmtt/b/n/12 microenvironment, mechanics[]voxel[]size );\OT1/cmr/m/n/12 .
+ Note that [][]\OT1/cmtt/m/n/12 microenvironment
+ []
 
 [71]
 
-LaTeX Warning: Reference `sec:Initialization_Functions' on page 72 undefined on
- input line 4973.
+LaTeX Warning: Reference `sec:templates' on page 72 undefined on input line 496
+2.
+
+[72]
+
+LaTeX Warning: Reference `sec:set_up_BioFVM' on page 73 undefined on input line
+ 5022.
 
 
-LaTeX Warning: Reference `sec:Standard_Models:Ki67_Advanced' on page 72 undefin
-ed on input line 4979.
+LaTeX Warning: Reference `sec:Cell_Definition' on page 73 undefined on input li
+ne 5028.
 
 
-Package natbib Warning: Citation `ref:PhysiCell' on page 72 undefined on input 
-line 4984.
+Package natbib Warning: Citation `ref:MultiCellDS' on page 73 undefined on inpu
+t line 5030.
 
 
-LaTeX Warning: Reference `sec:Standard_Models:Volume' on page 72 undefined on i
-nput line 4990.
+LaTeX Warning: Reference `sec:Initialization_Functions' on page 73 undefined on
+ input line 5036.
+
+
+LaTeX Warning: Reference `sec:Standard_Models:Ki67_Advanced' on page 73 undefin
+ed on input line 5042.
+
+
+Package natbib Warning: Citation `ref:PhysiCell' on page 73 undefined on input 
+line 5047.
+
+
+LaTeX Warning: Reference `sec:Standard_Models:Volume' on page 73 undefined on i
+nput line 5053.
 
 
 LaTeX Warning: Reference `sec:Standard_Models:Microenvironment_Phenotype' on pa
-ge 72 undefined on input line 5000.
+ge 73 undefined on input line 5063.
 
 
-Package natbib Warning: Citation `ref:PhysiCell' on page 72 undefined on input 
-line 5002.
+Package natbib Warning: Citation `ref:PhysiCell' on page 73 undefined on input 
+line 5065.
 
 
-LaTeX Warning: Reference `sec:Standard_Models:Velocity' on page 72 undefined on
- input line 5006.
+LaTeX Warning: Reference `sec:Standard_Models:Velocity' on page 73 undefined on
+ input line 5069.
 
 
-LaTeX Warning: Reference `sec:other_key_cell_functions' on page 72 undefined on
- input line 5011.
+LaTeX Warning: Reference `sec:other_key_cell_functions' on page 73 undefined on
+ input line 5074.
 
-
-Overfull \hbox (7.55026pt too wide) in paragraph at lines 5037--5037
+[73]
+Overfull \hbox (7.55026pt too wide) in paragraph at lines 5100--5100
 []    \OT1/cmtt/m/n/12 std::cout << pC->ID << ": " << pC->phenotype.cycle.curre
 nt_phase().name << std::endl;[] 
  []
 
-[72] [73] [74]
+[74] [75]
 
-LaTeX Warning: Reference `sec:Pathology' on page 75 undefined on input line 516
-2.
+LaTeX Warning: Reference `sec:Pathology' on page 76 undefined on input line 522
+5.
 
-[75] [76] [77]
-
-Package natbib Warning: Citation `ref:PhysiCell' on page 78 undefined on input 
-line 5304.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\\' on input line 5312.
-
-
-LaTeX Warning: Reference `fig:cycle_model:live' on page 78 undefined on input l
-ine 5320.
-
-
-Package natbib Warning: Citation `ref:PhysiCell' on page 78 undefined on input 
-line 5332.
-
-Package mdframed Info: mdframed inside float 
- mdframed uses option nobreak mdframed on input line 5356.
-Package mdframed Info: mdframed inside a box 
- mdframed uses option nobreak mdframed on input line 5356.
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\\' on input line 5362.
-
-[78]
-
-LaTeX Warning: Reference `fig:cycle_model:ki67_basic' on page 79 undefined on i
-nput line 5377.
-
+[76] [77] [78]
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 79 undefined on input 
-line 5385.
+line 5367.
 
-Package mdframed Info: mdframed inside float 
- mdframed uses option nobreak mdframed on input line 5411.
-Package mdframed Info: mdframed inside a box 
- mdframed uses option nobreak mdframed on input line 5411.
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\\' on input line 5417.
+(hyperref)                removing `\\' on input line 5375.
 
 
-LaTeX Warning: Reference `fig:cycle_model:ki67_advanced' on page 79 undefined o
-n input line 5438.
+LaTeX Warning: Reference `fig:cycle_model:live' on page 79 undefined on input l
+ine 5383.
 
 [79]
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 80 undefined on input 
-line 5447.
+line 5395.
+
+Package mdframed Info: mdframed inside float 
+ mdframed uses option nobreak mdframed on input line 5419.
+Package mdframed Info: mdframed inside a box 
+ mdframed uses option nobreak mdframed on input line 5419.
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `\\' on input line 5425.
+
+
+LaTeX Warning: Reference `fig:cycle_model:ki67_basic' on page 80 undefined on i
+nput line 5440.
+
+
+Package natbib Warning: Citation `ref:PhysiCell' on page 80 undefined on input 
+line 5448.
 
 Package mdframed Info: mdframed inside float 
  mdframed uses option nobreak mdframed on input line 5474.
@@ -2099,11 +2041,11 @@ Package mdframed Info: mdframed inside a box
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
 (hyperref)                removing `\\' on input line 5480.
 
-
-LaTeX Warning: Reference `fig:cycle_model:flow_cytometry' on page 80 undefined 
-on input line 5501.
-
 [80]
+
+LaTeX Warning: Reference `fig:cycle_model:ki67_advanced' on page 81 undefined o
+n input line 5501.
+
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 81 undefined on input 
 line 5510.
@@ -2114,466 +2056,302 @@ Package mdframed Info: mdframed inside a box
  mdframed uses option nobreak mdframed on input line 5537.
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\\' on input line 5544.
+(hyperref)                removing `\\' on input line 5543.
 
 
-LaTeX Warning: Reference `fig:cycle_model:flow_cytometry_separated' on page 81 
-undefined on input line 5569.
+LaTeX Warning: Reference `fig:cycle_model:flow_cytometry' on page 81 undefined 
+on input line 5564.
 
 [81]
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 82 undefined on input 
-line 5579.
+line 5573.
 
 Package mdframed Info: mdframed inside float 
- mdframed uses option nobreak mdframed on input line 5608.
+ mdframed uses option nobreak mdframed on input line 5600.
 Package mdframed Info: mdframed inside a box 
- mdframed uses option nobreak mdframed on input line 5608.
+ mdframed uses option nobreak mdframed on input line 5600.
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\\' on input line 5625.
+(hyperref)                removing `\\' on input line 5607.
 
 [82]
 
-LaTeX Warning: Reference `fig:death_model:apoptosis' on page 83 undefined on in
-put line 5638.
+LaTeX Warning: Reference `fig:cycle_model:flow_cytometry_separated' on page 83 
+undefined on input line 5632.
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 83 undefined on input 
-line 5644.
+line 5642.
 
 Package mdframed Info: mdframed inside float 
- mdframed uses option nobreak mdframed on input line 5661.
+ mdframed uses option nobreak mdframed on input line 5671.
 Package mdframed Info: mdframed inside a box 
- mdframed uses option nobreak mdframed on input line 5661.
+ mdframed uses option nobreak mdframed on input line 5671.
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\\' on input line 5668.
+(hyperref)                removing `\\' on input line 5688.
 
-
-LaTeX Warning: Reference `fig:death_model:necrosis' on page 83 undefined on inp
-ut line 5687.
-
-
-Package natbib Warning: Citation `ref:PhysiCell' on page 83 undefined on input 
-line 5690.
-
-Package mdframed Info: mdframed inside float 
- mdframed uses option nobreak mdframed on input line 5712.
-Package mdframed Info: mdframed inside a box 
- mdframed uses option nobreak mdframed on input line 5712.
 [83]
-LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/cmtt/b/n' tried instead on input line 5717.
 
-
-
-Package natbib Warning: Citation `ref:PhysiCell' on page 84 undefined on input 
-line 5721.
-
-
-LaTeX Warning: Reference `sec:Volume' on page 84 undefined on input line 5764.
+LaTeX Warning: Reference `fig:death_model:apoptosis' on page 84 undefined on in
+put line 5701.
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 84 undefined on input 
-line 5765.
+line 5707.
 
-
-LaTeX Warning: Reference `sec:Motility' on page 84 undefined on input line 5780
-.
-
-
-LaTeX Warning: Reference `sec:Mechanics' on page 84 undefined on input line 578
-1.
-
-
-LaTeX Warning: Reference `sec:Cells' on page 84 undefined on input line 5782.
-
+Package mdframed Info: mdframed inside float 
+ mdframed uses option nobreak mdframed on input line 5724.
+Package mdframed Info: mdframed inside a box 
+ mdframed uses option nobreak mdframed on input line 5724.
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\\' on input line 5795.
+(hyperref)                removing `\\' on input line 5731.
+
+
+LaTeX Warning: Reference `fig:death_model:necrosis' on page 84 undefined on inp
+ut line 5750.
 
 [84]
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 5809.
+Package natbib Warning: Citation `ref:PhysiCell' on page 85 undefined on input 
+line 5753.
 
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5814.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5824.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5824.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5824.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5856.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5860.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5868.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5868.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 5868.
-
-
-LaTeX Warning: Reference `sec:Standard_Models:Ki67_Advanced' on page 85 undefin
-ed on input line 5879.
-
-
-LaTeX Warning: Reference `sec:Standard_Models:Ki67_Basic' on page 85 undefined 
-on input line 5884.
-
-
-LaTeX Warning: Reference `sec:Standard_Models:Live' on page 85 undefined on inp
-ut line 5889.
-
-
-LaTeX Warning: Reference `sec:Cycle' on page 85 undefined on input line 5892.
-
-
-LaTeX Warning: Reference `sec:Standard_Models:Death' on page 85 undefined on in
-put line 5895.
-
-
-LaTeX Warning: Reference `sec:Standard_Models:Cycle' on page 85 undefined on in
-put line 5896.
+Package mdframed Info: mdframed inside float 
+ mdframed uses option nobreak mdframed on input line 5775.
+Package mdframed Info: mdframed inside a box 
+ mdframed uses option nobreak mdframed on input line 5775.
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/cmtt/b/n' tried instead on input line 5780.
 
 
 Package natbib Warning: Citation `ref:PhysiCell' on page 85 undefined on input 
-line 5897.
+line 5784.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 5914.
+LaTeX Warning: Reference `sec:Volume' on page 85 undefined on input line 5827.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 5914.
+Package natbib Warning: Citation `ref:PhysiCell' on page 85 undefined on input 
+line 5828.
+
+
+LaTeX Warning: Reference `sec:Motility' on page 85 undefined on input line 5843
+.
+
+
+LaTeX Warning: Reference `sec:Mechanics' on page 85 undefined on input line 584
+4.
+
+
+LaTeX Warning: Reference `sec:Cells' on page 85 undefined on input line 5845.
 
 [85]
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 5919.
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `\\' on input line 5858.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5872.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5877.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5887.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5887.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5887.
 
 
 LaTeX Font Warning: Command \small invalid in math mode on input line 5919.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 5920.
+LaTeX Font Warning: Command \small invalid in math mode on input line 5923.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 5924.
+LaTeX Font Warning: Command \small invalid in math mode on input line 5931.
 
-[86] [87] [88]
-Overfull \hbox (1.37526pt too wide) in paragraph at lines 6108--6108
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5931.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5931.
+
+
+LaTeX Warning: Reference `sec:Standard_Models:Ki67_Advanced' on page 86 undefin
+ed on input line 5942.
+
+[86]
+
+LaTeX Warning: Reference `sec:Standard_Models:Ki67_Basic' on page 87 undefined 
+on input line 5947.
+
+
+LaTeX Warning: Reference `sec:Standard_Models:Live' on page 87 undefined on inp
+ut line 5952.
+
+
+LaTeX Warning: Reference `sec:Cycle' on page 87 undefined on input line 5955.
+
+
+LaTeX Warning: Reference `sec:Standard_Models:Death' on page 87 undefined on in
+put line 5958.
+
+
+LaTeX Warning: Reference `sec:Standard_Models:Cycle' on page 87 undefined on in
+put line 5959.
+
+
+Package natbib Warning: Citation `ref:PhysiCell' on page 87 undefined on input 
+line 5960.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5977.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5977.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5982.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5982.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5983.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 5987.
+
+[87] [88] [89]
+Overfull \hbox (1.37526pt too wide) in paragraph at lines 6171--6171
 []      \OT1/cmtt/m/n/12 (pCell->parameters.o2_hypoxic_response - pCell->parame
 ters.o2_hypoxic_saturation);[] 
  []
 
-
-Overfull \hbox (7.55026pt too wide) in paragraph at lines 6108--6108
+[90]
+Overfull \hbox (7.55026pt too wide) in paragraph at lines 6171--6171
 []      \OT1/cmtt/m/n/12 pCell->parameters.pReference_live_phenotype->mechanics
 .cell_cell_adhesion_strength;[] 
  []
 
-[89] [90]
+[91]
 
-LaTeX Warning: Reference `sec:Volume' on page 91 undefined on input line 6176.
+LaTeX Warning: Reference `sec:Volume' on page 92 undefined on input line 6239.
 
-[91] [92]
+[92] [93]
 
-Package natbib Warning: Citation `ref:MCF10A_apoptosis' on page 93 undefined on
- input line 6350.
+Package natbib Warning: Citation `ref:MCF10A_apoptosis' on page 94 undefined on
+ input line 6413.
 
 
-Package natbib Warning: Citation `ref:MultiCellDS' on page 93 undefined on inpu
-t line 6352.
+Package natbib Warning: Citation `ref:MultiCellDS' on page 94 undefined on inpu
+t line 6415.
 
 
-Package natbib Warning: Citation `ref:MCF10A-NeoST' on page 93 undefined on inp
-ut line 6352.
+Package natbib Warning: Citation `ref:MCF10A-NeoST' on page 94 undefined on inp
+ut line 6415.
 
 
-Package natbib Warning: Citation `ref:MCF10A_PSON' on page 93 undefined on inpu
-t line 6352.
+Package natbib Warning: Citation `ref:MCF10A_PSON' on page 94 undefined on inpu
+t line 6415.
 
 
-LaTeX Warning: Reference `sec:Standard_Models:Live' on page 93 undefined on inp
-ut line 6356.
+LaTeX Warning: Reference `sec:Standard_Models:Live' on page 94 undefined on inp
+ut line 6419.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6359.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6422.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6359.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6422.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6360.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6423.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6360.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6423.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6360.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6423.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6364.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6427.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6365.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6428.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6365.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6428.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6366.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6429.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6367.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6430.
 
 
-LaTeX Warning: Reference `sec:Standard_Models:Apoptosis' on page 93 undefined o
-n input line 6370.
-
-
-LaTeX Warning: Reference `sec:Standard_Models:Ki67_Basic' on page 93 undefined 
-on input line 6382.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6385.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6385.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6385.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6386.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6386.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6386.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6387.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6387.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6387.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6387.
-
-[93]
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6391.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6392.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6392.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6393.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6394.
-
-
-LaTeX Warning: Reference `sec:Standard_Models:Ki67_Advanced' on page 94 undefin
-ed on input line 6406.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6409.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6409.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6409.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6410.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6410.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6410.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6411.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6411.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6411.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6412.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6412.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6412.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6412.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6412.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6416.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6417.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6417.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6418.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6419.
-
-
-Package natbib Warning: Citation `ref:Ki67_MCF10A' on page 94 undefined on inpu
-t line 6429.
-
-
-LaTeX Warning: Reference `sec:Standard_Models:Flow_Cytometry' on page 94 undefi
-ned on input line 6435.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6438.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6438.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6438.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6439.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6439.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6439.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6440.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6440.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6440.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6441.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6441.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6441.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6441.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6441.
+LaTeX Warning: Reference `sec:Standard_Models:Apoptosis' on page 94 undefined o
+n input line 6433.
 
 [94]
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6445.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6446.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6446.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6447.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6447.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6447.
+LaTeX Warning: Reference `sec:Standard_Models:Ki67_Basic' on page 95 undefined 
+on input line 6445.
 
 
 LaTeX Font Warning: Command \small invalid in math mode on input line 6448.
 
 
-LaTeX Warning: Reference `sec:parameters:Ki67_advanced' on page 95 undefined on
- input line 6450.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6448.
 
 
-Package natbib Warning: Citation `ref:Ki67_MCF10A' on page 95 undefined on inpu
-t line 6459.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6448.
 
 
-LaTeX Warning: Reference `sec:Standard_Models:Flow_Cytometry_Separated' on page
- 95 undefined on input line 6465.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6449.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6468.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6449.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6468.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6449.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6468.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6450.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6469.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6450.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6469.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6450.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6469.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6450.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6470.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6454.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6470.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6455.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6470.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6455.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6471.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6456.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6471.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6457.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6471.
-
-
-LaTeX Font Warning: Command \small invalid in math mode on input line 6472.
+LaTeX Warning: Reference `sec:Standard_Models:Ki67_Advanced' on page 95 undefin
+ed on input line 6469.
 
 
 LaTeX Font Warning: Command \small invalid in math mode on input line 6472.
@@ -2585,51 +2363,231 @@ LaTeX Font Warning: Command \small invalid in math mode on input line 6472.
 LaTeX Font Warning: Command \small invalid in math mode on input line 6472.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6472.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6473.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6472.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6473.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6476.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6473.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6477.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6474.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6477.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6474.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6478.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6474.
 
 
-LaTeX Font Warning: Command \small invalid in math mode on input line 6478.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6475.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6475.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6475.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6475.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6475.
 
 
 LaTeX Font Warning: Command \small invalid in math mode on input line 6479.
 
 
+LaTeX Font Warning: Command \small invalid in math mode on input line 6480.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6480.
+
+
 LaTeX Font Warning: Command \small invalid in math mode on input line 6481.
 
 
-LaTeX Warning: Reference `sec:parameters:Ki67_advanced' on page 95 undefined on
- input line 6483.
-
-
-Package natbib Warning: Citation `ref:Ki67_MCF10A' on page 95 undefined on inpu
-t line 6492.
+LaTeX Font Warning: Command \small invalid in math mode on input line 6482.
 
 [95]
+
+Package natbib Warning: Citation `ref:Ki67_MCF10A' on page 96 undefined on inpu
+t line 6492.
+
+
+LaTeX Warning: Reference `sec:Standard_Models:Flow_Cytometry' on page 96 undefi
+ned on input line 6498.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6501.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6501.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6501.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6502.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6502.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6502.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6503.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6503.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6503.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6504.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6504.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6504.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6504.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6504.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6508.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6509.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6509.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6510.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6510.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6510.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6511.
+
+
+LaTeX Warning: Reference `sec:parameters:Ki67_advanced' on page 96 undefined on
+ input line 6513.
+
+
+Package natbib Warning: Citation `ref:Ki67_MCF10A' on page 96 undefined on inpu
+t line 6522.
+
+
+LaTeX Warning: Reference `sec:Standard_Models:Flow_Cytometry_Separated' on page
+ 96 undefined on input line 6528.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6531.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6531.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6531.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6532.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6532.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6532.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6533.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6533.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6533.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6534.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6534.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6534.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6535.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6535.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6535.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6535.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6535.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6535.
+
+[96]
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6539.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6540.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6540.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6541.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6541.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6542.
+
+
+LaTeX Font Warning: Command \small invalid in math mode on input line 6544.
+
+
+LaTeX Warning: Reference `sec:parameters:Ki67_advanced' on page 97 undefined on
+ input line 6546.
+
+
+Package natbib Warning: Citation `ref:Ki67_MCF10A' on page 97 undefined on inpu
+t line 6555.
+
 No file User_Guide.bbl.
 
 Package natbib Warning: There were undefined citations.
 
-[96]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 6549.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 6549.
+[97]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 6612.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 6612.
  (User_Guide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 6549.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 6549.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 6612.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 6612.
 
 
 
@@ -2639,7 +2597,7 @@ Package rerunfilecheck Warning: File `User_Guide.out' has changed.
 
 Package rerunfilecheck Info: Checksums for `User_Guide.out':
 (rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  4768256F381AFE84A49B01342C971D17;10488.
+(rerunfilecheck)             After:  B606515AF27C7B14B54CEBC030105310;10157.
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
@@ -2649,12 +2607,12 @@ LaTeX Warning: There were undefined references.
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 6549.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 6612.
  ) 
 Here is how much of TeX's memory you used:
- 29829 strings out of 493303
- 578890 string characters out of 3138859
- 636683 words of memory out of 3000000
+ 29831 strings out of 493303
+ 578857 string characters out of 3138859
+ 635683 words of memory out of 3000000
  32289 multiletter control sequences out of 15000+200000
  546664 words of font info for 87 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -2677,9 +2635,9 @@ les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Program Files/MiKT
 eX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Program Files/MiKTeX 2.9/f
 onts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Program Files/MiKTeX 2.9/fonts/typ
 e1/public/amsfonts/cm/cmtt8.pfb>
-Output written on User_Guide.pdf (96 pages, 573472 bytes).
+Output written on User_Guide.pdf (97 pages, 576741 bytes).
 PDF statistics:
- 1464 PDF objects out of 1728 (max. 8388607)
- 696 named destinations out of 1000 (max. 500000)
+ 1473 PDF objects out of 1728 (max. 8388607)
+ 698 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 
