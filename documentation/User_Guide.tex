@@ -280,7 +280,7 @@ In particular, I suggest the following:
 \item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix1.html}{Tutorial 1} (navigation, creating directories, etc.) 
 \item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix2.html}{Tutorial 2} (moving, copying files, etc.)
 \item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix4.html}{Tutorial 4} (wildcards, filename conventions, etc.)
-\item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix7.html}{Tutorial 7} (compiling and runnign software, etc.)
+\item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix7.html}{Tutorial 7} (compiling and running software, etc.)
 \item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix8.html}{Tutorial 8} (UNIX and environment variables, etc.) (\textbf{Note:} 
 May not work in Windows/MinGW.) 
 \end{enumerate}
@@ -425,7 +425,7 @@ and visualization:
 
 \begin{enumerate}
 \item 
-\textbf{ImageMagick} is a cross-flatform image manipulation suite, which can (among other things)
+\textbf{ImageMagick} is a cross-platform image manipulation suite, which can (among other things)
 resize and crop images, change formats, and insert text labels. In PhysiCell, ImageMagick is especially 
 useful for converting SVG files to PNG, JPG, or other raster-based formats for further animation. 
 
@@ -468,7 +468,7 @@ pugixml (an efficient cross-platform XML parser) \cite{ref:pugixml}.
 \smallcode{beta} This directory is used for beta functionality used by our team during 
 testing and development. Use at your own risk! 
 \item 
-\smallcode{config} This directory is ued for XML configuration files with. Any custom configuration files should be placed in this directory. 
+\smallcode{config} This directory is used for XML configuration files with. Any custom configuration files should be placed in this directory. 
 \item 
 \smallcode{core} The core library files for PhysiCell are kept in this directory. Users should not modify functions in 
 the core library. 
@@ -501,7 +501,7 @@ and any other (BSD-compatible) dependencies are kept here.
 \item 
 \smallcode{output} Some examples will put their outputs here. 
 \item 
-\smallcode{povray} This includes some basic utilities for visulization by povray (an open source raytracing package) \cite{ref:povray}. 
+\smallcode{povray} This includes some basic utilities for visualization by povray (an open source raytracing package) \cite{ref:povray}. 
 \item 
 \smallcode{template\_projects} This directory once stored template projects for 2D and 3D. These have been 
 moved to the sample projects as of Version 1.2.2. This directory will be deprecated. 
@@ -847,7 +847,7 @@ to add a new substrate called \v|name| with units \v|units|. (e.g., crayons with
 
 \item 
 \smallcode{void Microenvironment::add\_density( std::string name , std::string units, double diffusion\_constant, double decay\_rate )} acts similarly as above, but also sets the diffusion coefficient and decay rate. Generally, 
-these shoudl be in the same units as the simulation: by default, $\micron^2/\textrm{min}$ for diffusion 
+these should be in the same units as the simulation: by default, $\micron^2/\textrm{min}$ for diffusion 
 and $1/\textrm{min}$ for decay. 
 \end{enumerate}
 
@@ -1586,7 +1586,7 @@ stored in the Cell Definition in \verb+cd+. (See Section \ref{sec:Cell_Definitio
 information on cell definitions.) As of Version 1.2.2, this function does not overwrite 
 the \v|is_movable|, \v|is_out_of_domain|, and \v|displacement| data of the cell. 
 
-This function is particularly useful if you want to do thinks like stem cell heirarchies, where you 
+This function is particularly useful if you want to do thinks like stem cell hierarchies, where you 
 might ``convert'' a stem cell to a differentiated cell, each of which has been defined 
 separately. 
 
