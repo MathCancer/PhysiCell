@@ -28,6 +28,20 @@ Major new features and changes:
      flow_cytometry_separated_cycle_model: G0/G1 -> S -> G2 -> M 
 	 
    along with documentation and updated coloring functions 
+
++ update_all_cells(t,dt,dt,dt) now checks to see if gradient 
+  calculations are enabled, and if so, computes it once per dt_mechanics.
+
+	// new February 2018 
+	// if we need gradients, compute them
+	if( default_microenvironment_options.calculate_gradients ) 
+	{ microenvironment.compute_all_gradient_vectors();  }
+	// end of new in Feb 2018 
+
+  This improves code performance by 2x to 3x in gradient-enabled codes, 
+  because we no longer need to calculate gradients once per dt_diffusion 
+  time step. (Gradients are only needed for cell velocity calculations, 
+  and occasionally for phenotype decisions.)
    
 	 
 Minor new features and changes: 
