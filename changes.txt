@@ -42,7 +42,8 @@ Major new features and changes:
   because we no longer need to calculate gradients once per dt_diffusion 
   time step. (Gradients are only needed for cell velocity calculations, 
   and occasionally for phenotype decisions.)
-   
+
+  All sample projects have been updated to make use of this.    
 	 
 Minor new features and changes: 
 + Added "beta" directory where we will put new features that are still
