@@ -3,23 +3,23 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1].    #
+# We implemented and solved the model using PhysiCell (Version 1.3.0) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
-#     preprint DOI: 10.1101/088773                                            #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1],    #
+# We implemented and solved the model using PhysiCell (Version 1.3.0) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
-#     preprint DOI: 10.1101/088773                                            #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
 #    llelized diffusive transport solver for 3-D biological simulations,      #
@@ -29,7 +29,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -79,27 +79,26 @@
 using namespace BioFVM;
 using namespace PhysiCell;
 
-// set number of threads for OpenMP (parallel computing)
-int omp_num_threads = 8; // set this to # of CPU cores x 2 (for hyperthreading)
-
 int main( int argc, char* argv[] )
 {
+	// load and parse settings file(s)
+	
+	bool XML_status = false; 
+	if( argc > 1 )
+	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
+	else
+	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	if( !XML_status )
+	{ exit(-1); }
+	
 	// OpenMP setup
-	omp_set_num_threads(omp_num_threads);
+	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
 	SeedRandom(); 
 	
 	// time setup 
 	std::string time_units = "min"; 
-	double t = 0.0; // current simulation time 
-	
-	double immune_activation_time = 60 * 24 * 14; // activate immune response at 14 days 
-	
-	double t_output_interval = 60; // 5; // output once per hour 
-	double t_max = immune_activation_time + 60*24*7;  // 45 days 
-	double t_next_output_time = t; 
-	int output_index = 0; // used for creating unique output filenames 
 
 	/* Microenvironment setup */ 
 	
@@ -116,7 +115,8 @@ int main( int argc, char* argv[] )
 	
 	/* Users typically start modifying here. START USERMODS */ 
 
-
+	double immune_activation_time = 60 * 24 * 14; // activate immune response at 14 days 
+	
 	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
@@ -128,7 +128,9 @@ int main( int argc, char* argv[] )
 	
 	// save a simulation snapshot 
 
-	save_PhysiCell_to_MultiCellDS_xml_pugi( "initial" , microenvironment , t ); 
+	char filename[1024];
+	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
+	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
@@ -139,69 +141,93 @@ int main( int argc, char* argv[] )
 	
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = cancer_immune_coloring_function;
 	
-	SVG_plot( "initial.svg" , microenvironment, 0.0 , t, cell_coloring_function );
+	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
+	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
 	// set the performance timers 
 
 	BioFVM::RUNTIME_TIC();
 	BioFVM::TIC();
 	
-	std::ofstream report_file ("simulation_report.txt"); 	// create the data log file 
-	report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
+	std::ofstream report_file;
+	if( PhysiCell_settings.enable_legacy_saves == true )
+	{	
+		sprintf( filename , "%s/simulation_report.txt" , PhysiCell_settings.folder.c_str() ); 
+		
+		report_file.open(filename); 	// create the data log file 
+		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
+	}
 	
 	// main loop 
 	
 	try 
 	{	
-		while( t < t_max + 0.1*diffusion_dt )
+		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
 		{
-			// save data if it's time. 
-			if(  fabs( t - t_next_output_time ) < 0.01 * diffusion_dt )
+			static bool immune_cells_introduced = false; 
+			if( PhysiCell_globals.current_time > immune_activation_time - 0.01*diffusion_dt && immune_cells_introduced == false )
 			{
-				log_output(t, output_index, microenvironment, report_file);
+				std::cout << "Therapy activated!" << std::endl << std::endl; 
+				immune_cells_introduced = true; 
 				
-				char filename[1024]; 
-				sprintf( filename , "output%08u" , output_index ); 
+				PhysiCell_settings.full_save_interval = 3.0; 
+				PhysiCell_settings.SVG_save_interval = 3.0; 
 				
-				save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , t ); 
+				PhysiCell_globals.next_full_save_time = PhysiCell_globals.current_time; 
+				PhysiCell_globals.next_SVG_save_time = PhysiCell_globals.current_time; 
 				
-				sprintf( filename , "snapshot%08u.svg" , output_index ); 
-				SVG_plot( filename , microenvironment, 0.0 , t, cell_coloring_function );
-				
-				static bool immune_cells_introduced = false; 
-				if( t > immune_activation_time - 0.01*diffusion_dt && immune_cells_introduced == false )
-				{
-					immune_cells_introduced = true; 
-					t_output_interval = 3.0; 
-					introduce_immune_cells();
-				} 
-			
-/*			
-				for( int i=0; i < (*all_cells).size() ; i++ )
-				{
-					Cell* pC = (*all_cells)[i]; 
-					if( fabs( pC->position[2] ) > 1e-5 )
-					{
-						std::cout << "cell " << pC << " of type " << pC->type << " is at " << pC->position << std::endl; 
-						std::cout << "\t" << pC->state.simple_pressure << std::endl; 
-					}
+				introduce_immune_cells();
+			} 
+
+			// save data if it's time. 
+			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
+			{
+				display_simulation_status( std::cout ); 
+				if( PhysiCell_settings.enable_legacy_saves == true )
+				{	
+					log_output( PhysiCell_globals.current_time , PhysiCell_globals.full_output_index, microenvironment, report_file);
 				}
-*/				
-				output_index++; 
-				t_next_output_time += t_output_interval;
+				
+				if( PhysiCell_settings.enable_full_saves == true )
+				{	
+					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
+					
+					save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+				}
+				
+				PhysiCell_globals.full_output_index++; 
+				PhysiCell_globals.next_full_save_time += PhysiCell_settings.full_save_interval;
 			}
+			
+			// save SVG plot if it's time
+			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_SVG_save_time  ) < 0.01 * diffusion_dt )
+			{
+				if( PhysiCell_settings.enable_SVG_saves == true )
+				{	
+					sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
+					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+					
+					PhysiCell_globals.SVG_output_index++; 
+					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
+				}
+			}
+			
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
-			if( default_microenvironment_options.calculate_gradients )
-			{ microenvironment.compute_all_gradient_vectors(); }
+			// if( default_microenvironment_options.calculate_gradients )
+			// { microenvironment.compute_all_gradient_vectors(); }
 			
 			// run PhysiCell 
-			((Cell_Container *)microenvironment.agent_container)->update_all_cells(t);
+			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
-			t += diffusion_dt; 
+			PhysiCell_globals.current_time += diffusion_dt;
 		}
-		log_output(t, output_index, microenvironment, report_file);
-		report_file.close();
+		
+		if( PhysiCell_settings.enable_legacy_saves == true )
+		{			
+			log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file);
+			report_file.close();
+		}
 	}
 	catch( const std::exception& e )
 	{ // reference to the base of a polymorphic object
@@ -210,13 +236,11 @@ int main( int argc, char* argv[] )
 	
 	// save a final simulation snapshot 
 	
-	save_PhysiCell_to_MultiCellDS_xml_pugi( "final" , microenvironment , t ); 
-	SVG_plot( "final.svg" , microenvironment, 0.0 , t, cell_coloring_function );
+	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
+	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
-	// timer 
-	
-	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
-	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
+	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
+	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 
 	return 0; 
 }

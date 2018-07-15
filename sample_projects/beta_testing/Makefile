@@ -1,4 +1,4 @@
-VERSION := 1.2.2
+VERSION := 1.3.0
 PROGRAM_NAME := beta-testing
 
 CC := g++
@@ -125,12 +125,13 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
 	
-# beta PhysiCell modules 
-PhysiCell_pugixml.o: ./beta/PhysiCell_pugixml.cpp
-	$(COMPILE_COMMAND) -c ./beta/PhysiCell_pugixml.cpp
+PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
 
-PhysiCell_settings.o: ./beta/PhysiCell_settings.cpp
-	$(COMPILE_COMMAND) -c ./beta/PhysiCell_settings.cpp
+PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
+	
+# beta PhysiCell modules 
 	
 # user-defined PhysiCell modules
 

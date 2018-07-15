@@ -3,23 +3,23 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1].    #
+# We implemented and solved the model using PhysiCell (Version 1.3.0) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
-#     preprint DOI: 10.1101/088773                                            #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1],    #
+# We implemented and solved the model using PhysiCell (Version 1.3.0) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
-#     preprint DOI: 10.1101/088773                                            #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
 #    llelized diffusive transport solver for 3-D biological simulations,      #
@@ -29,7 +29,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -88,7 +88,7 @@ void create_cell_types( void )
 	
 	// set default cell cycle model 
 
-	cell_defaults.functions.cycle_model = Ki67_advanced; 
+	cell_defaults.functions.cycle_model = flow_cytometry_separated_cycle_model; 
 	
 	// set default_cell_functions; 
 	
@@ -114,9 +114,8 @@ void create_cell_types( void )
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 
-	int K1_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_positive_premitotic );
-	int K2_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_positive_postmitotic );
-	int Q_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_negative );
+	int G0G1_index = Ki67_advanced.find_phase_index( PhysiCell_constants::G0G1_phase );
+	int S_index = Ki67_advanced.find_phase_index( PhysiCell_constants::S_phase );
 
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
@@ -157,8 +156,8 @@ void create_cell_types( void )
 	motile_cell.phenotype.death.rates[apoptosis_model_index] = 0.0; 
 	
 	// Set proliferation to 10% of other cells. 
-	// Alter the transition rate from Q state (quiecent) to K1 state (Ki67+, pre-mitotic)
-	motile_cell.phenotype.cycle.data.transition_rate(Q_index,K1_index) *= 0.1; 
+	// Alter the transition rate from G0G1 state to S state
+	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 0.1; 
 	
 	return; 
 }
@@ -167,9 +166,9 @@ void setup_microenvironment( void )
 {
 	// set domain parameters 
 	
-	default_microenvironment_options.X_range = {-750, 750}; 
-	default_microenvironment_options.Y_range = {-750, 750}; 
-	default_microenvironment_options.Z_range = {-750, 750}; 
+	default_microenvironment_options.X_range = {-500, 500}; 
+	default_microenvironment_options.Y_range = {-500, 500}; 
+	default_microenvironment_options.Z_range = {-500, 500}; 
 	default_microenvironment_options.simulate_2D = false; // 3D! 
 	
 	// no gradients need for this example 
@@ -201,15 +200,15 @@ void setup_tissue( void )
 	pC->assign_position( 0.0, 0.0, 0.0 );
 
 	pC = create_cell(); 
-	pC->assign_position( -2.0, -6.0, 1.0 );
+	pC->assign_position( -100.0, 0.0, 1.0 );
 	
 	pC = create_cell(); 
-	pC->assign_position( -5.0, 8.0, -7.0 );
+	pC->assign_position( 0, 100.0, -7.0 );
 	
 	// now create a motile cell 
 	
 	pC = create_cell( motile_cell ); 
-	pC->assign_position( 5.0, -8.0, 3.0 );
+	pC->assign_position( 15.0, -18.0, 3.0 );
 
 	return; 
 }
