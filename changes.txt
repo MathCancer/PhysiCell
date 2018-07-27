@@ -55,6 +55,25 @@ Major new features and changes:
      flow_cytometry_separated_cycle_model: G0/G1 -> S -> G2 -> M 
 	 
    along with documentation and updated coloring functions 
+<<<<<<< HEAD
+
++ update_all_cells(t,dt,dt,dt) now checks to see if gradient 
+  calculations are enabled, and if so, computes it once per dt_mechanics.
+
+	// new February 2018 
+	// if we need gradients, compute them
+	if( default_microenvironment_options.calculate_gradients ) 
+	{ microenvironment.compute_all_gradient_vectors();  }
+	// end of new in Feb 2018 
+
+  This improves code performance by 2x to 3x in gradient-enabled codes, 
+  because we no longer need to calculate gradients once per dt_diffusion 
+  time step. (Gradients are only needed for cell velocity calculations, 
+  and occasionally for phenotype decisions.)
+
+  All sample projects have been updated to make use of this.    
+	 
+=======
    
 + The oxygen-based phenotype models now support the new cycle
   model. 
@@ -78,6 +97,7 @@ Major new features and changes:
   including reference parameters chosen for consistency with 
   the other cycle models. 
    
+>>>>>>> 4ec4153a7a7c47b9c0d00f064deaf0db824ad45b
 Minor new features and changes: 
 + Added PhysiCell_pugixml.* for easier extraction of parameter 
   arguments from XML files
