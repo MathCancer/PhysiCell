@@ -110,6 +110,7 @@ class PhysiCell_constants
 	static const int total_cells_cycle_model=4;
 	static const int live_cells_cycle_model = 5; 
 	static const int flow_cytometry_separated_cycle_model = 6; 
+	static const int cycling_quiescent_model = 7; 
 	
 	// currently recognized death models 
 	static const int apoptosis_death_model = 100; 
@@ -138,6 +139,10 @@ class PhysiCell_constants
 	
 	static const int G1pm_phase = 15;
 	static const int G1ps_phase = 16; 
+	
+	static const int cycling = 17; 
+	static const int quiescent = 18; 
+	
 	
 	static const int custom_phase = 9999;
 	// death phases

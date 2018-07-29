@@ -71,6 +71,7 @@ bool PhysiCell_standard_death_models_initialized = false;
 bool PhysiCell_standard_cycle_models_initialized = false; 
 	
 Cycle_Model Ki67_advanced, Ki67_basic, live, apoptosis, necrosis, inert; 
+Cycle_Model cycling_quiescent; 
 Death_Parameters apoptosis_parameters, necrosis_parameters; 
 
 // new cycle models:
@@ -105,6 +106,15 @@ void S_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
 	// the cell wants to double its volume 
 	phenotype.volume.target_solid_nuclear *= 2.0; 
 	phenotype.volume.target_solid_cytoplasmic *= 2.0; 
+	
+	return; 
+}
+
+void standard_cycling_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// the cell wants to double its volume 
+	phenotype.volume.target_solid_nuclear *= 2.0; 
+	phenotype.volume.target_solid_cytoplasmic *= 2.0; 	
 	
 	return; 
 }
@@ -348,6 +358,33 @@ bool create_cytometry_cycle_models( void )
 	return true; 
 }
 
+void create_cycling_quiescent_model( void )
+{
+	// Ki67_basic: 
+	
+	cycling_quiescent.code = PhysiCell_constants::cycling_quiescent_model; 
+	cycling_quiescent.name = "Cycling-Quiescent model"; 
+	
+	cycling_quiescent.data.time_units = "min"; 
+	
+	cycling_quiescent.add_phase( PhysiCell_constants::quiescent , "Quiescent" ); 
+	cycling_quiescent.add_phase( PhysiCell_constants::cycling , "Cycling" ); 
+
+	cycling_quiescent.phases[1].division_at_phase_exit = true; 
+	
+	cycling_quiescent.add_phase_link( 0 , 1 , NULL ); // Q to C
+	cycling_quiescent.add_phase_link( 1 , 0 , NULL ); // C to Q 
+	
+	cycling_quiescent.transition_rate(0,1) = 1.0/(4.59*60.0); // MCF10A cells are ~4.59 hours in Ki67- state
+	cycling_quiescent.transition_rate(1,0) = 1.0/(15.5*60.0); // length of Ki67+ states in advanced model 
+	cycling_quiescent.phase_link(1,0).fixed_duration = true; 
+	
+	cycling_quiescent.phases[0].entry_function = NULL; 
+	cycling_quiescent.phases[1].entry_function = standard_cycling_entry_function;
+	
+	return; 
+}
+
 bool create_standard_cell_cycle_models( void )
 {
 	if( PhysiCell_standard_cycle_models_initialized )
@@ -357,6 +394,8 @@ bool create_standard_cell_cycle_models( void )
 	create_live_model();
 	
 	create_cytometry_cycle_models(); 
+	
+	create_cycling_quiescent_model();
 
 	PhysiCell_standard_cycle_models_initialized = true;
 	if( PhysiCell_standard_death_models_initialized )
@@ -694,7 +733,7 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 		
 		// live model 
 			
-		if( phenotype.cycle.model().code ==  PhysiCell_constants::live_cells_cycle_model )
+		if( phenotype.cycle.model().code == PhysiCell_constants::live_cells_cycle_model )
 		{
 			start_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::live );
 			necrosis_index = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
@@ -711,7 +750,15 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 			necrosis_index = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
 			end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::S_phase );
 			indices_initiated = true; 
-		}		
+		}	
+
+		if( phenotype.cycle.model().code == PhysiCell_constants::cycling_quiescent_model )
+		{
+			start_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::quiescent );
+			necrosis_index = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+			end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::cycling );
+			indices_initiated = true; 
+		}
 		
 	}
 	

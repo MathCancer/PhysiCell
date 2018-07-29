@@ -149,9 +149,15 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	node = node.parent(); 
 
 	// parallel options 
+
+	std::cout << omp_num_threads << std::endl; 
 	
 	node = xml_find_node( physicell_config_root , "parallel" ); 		
 	omp_num_threads = xml_get_int_value( node, "omp_num_threads" ); 
+	
+	std::cout << omp_num_threads << std::endl; 
+	
+	system("pause"); 
 
 	// random seed options 
 		

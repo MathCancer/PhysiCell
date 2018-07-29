@@ -72,7 +72,7 @@ namespace PhysiCell
 
 // standard cycle models: 
 
-extern Cycle_Model Ki67_advanced, Ki67_basic, live, flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model; 
+extern Cycle_Model Ki67_advanced, Ki67_basic, live, flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model, cycling_quiescent; 
 extern Cycle_Model apoptosis, necrosis, inert; 
 extern Death_Parameters apoptosis_parameters, necrosis_parameters; 
 
