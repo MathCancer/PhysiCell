@@ -60,111 +60,53 @@
 #                                                                             #
 ###############################################################################
 */
- 
-#include "./PhysiCell_settings.h"
 
-namespace PhysiCell{
-	
-PhysiCell_Settings PhysiCell_settings; 
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-bool physicell_config_dom_initialized = false; 
-pugi::xml_document physicell_config_doc; 	
-pugi::xml_node physicell_config_root; 
-	
-bool load_PhysiCell_config_file( std::string filename )
-{
-	std::cout << "Using config file " << filename << " ... " << std::endl ; 
-	pugi::xml_parse_result result = physicell_config_doc.load_file( filename.c_str()  );
-	
-	if( result.status != pugi::xml_parse_status::status_ok )
-	{
-		std::cout << "Error loading " << filename << "!" << std::endl; 
-		return false;
-	}
-	
-	physicell_config_root = physicell_config_doc.child("PhysiCell_settings");
-	physicell_config_dom_initialized = true; 
-	
-	PhysiCell_settings.read_from_pugixml(); 
-	
-	return true; 	
-}
+using namespace BioFVM;
+using namespace PhysiCell;
 
-PhysiCell_Settings::PhysiCell_Settings()
-{
-	// units 
-	time_units = "min"; 
-	space_units = "micron"; 
-	
-	// save options
-	folder = "."; 
-	max_time = 60*24*45;   
+// declare the cell types 
 
-	full_save_interval = 60;  
-	enable_full_saves = true; 
-	enable_legacy_saves = false; 
-	
-	SVG_save_interval = 60; 
-	enable_SVG_saves = true; 
-	
-	// parallel options 
-	
-	omp_num_threads = 4; 
-	 
-	return; 
-}
- 	
-void PhysiCell_Settings::read_from_pugixml( void )
-{
-	pugi::xml_node node; 
-	
-	// overall options 
-	
-	node = xml_find_node( physicell_config_root , "overall" );
+static Cell_Definition worker_cell; 
+static Cell_Definition cargo_cell; 
+static Cell_Definition director_cell; 
+static Cell_Definition linker_cell; 
 
-	max_time = xml_get_double_value( node , "max_time" );
-	time_units = xml_get_string_value( node, "time_units" ) ;
-	space_units = xml_get_string_value( node, "space_units" ) ;
+static int worker_ID = 0;
+static int cargo_ID = 1;
+static int linker_ID = 2; 
+static int director_ID = 3;
 
-	node = node.parent(); 
-	
-	// save options 
-	
-	node = xml_find_node( physicell_config_root , "save" ); 
-	
-	folder = xml_get_string_value( node, "folder" ) ;
-	
-	node = xml_find_node( node , "full_data" ); 
-	full_save_interval = xml_get_double_value( node , "interval" );
-	enable_full_saves = xml_get_bool_value( node , "enable" ); 
-	node = node.parent(); 
-	
-	node = xml_find_node( node , "SVG" ); 
-	SVG_save_interval = xml_get_double_value( node , "interval" );
-	enable_SVG_saves = xml_get_bool_value( node , "enable" ); 
-	node = node.parent(); 
-	
-	node = xml_find_node( node , "legacy_data" ); 
-	enable_legacy_saves = xml_get_bool_value( node , "enable" );
-	node = node.parent(); 
+// set up the microenvironment 
 
-	// parallel options 
+void setup_microenvironment( void ); // done 
 
-	node = xml_find_node( physicell_config_root , "parallel" ); 		
-	omp_num_threads = xml_get_int_value( node, "omp_num_threads" ); 
+// set up the cell types 
 
-	// random seed options 
-		
-	
-	return; 
-}
+void create_cell_types( void );
+
+// set up the problem geometry 
+
+void setup_tissue( void ); 
+
+// coloring functions 
+
+std::vector<std::string> robot_coloring_function( Cell* pCell ); 
+
+// these are the custom functions for these cells 
+
+void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
+
+void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
+void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt ); 
 
 
-PhysiCell_Globals PhysiCell_globals; 
 
- 
+void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );  // done 
 
-}; 
- 
 
- 
+
