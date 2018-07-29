@@ -11,10 +11,40 @@ update_all_cells(t,dt,dt,dt) now checks to see if gradient calculations are enab
 
 This improves code performance by 2x to 3x in gradient-enabled codes, because we no longer need to calculate gradients once per dt_diffusion time step. (Gradients are only needed for cell velocity calculations, and occasionally for phenotype decisions.)
 
-Also, removing the explicit gradient calculations from the template and sample projects. 
+Also, removed the explicit gradient calculations from the template and sample projects. 
+
+In response to requests from Luis S.V., added cycling_quiescent cell cycle model, with time scales matching the Kk67 basic model. 
+
+Also added the following constants: 
+
+	static const int cycling = 17; 
+	static const int quiescent = 18; 
+	static const int cycling_quiescent_model = 7; 
+
+Updated update_cell_and_death_parameters_O2_based() to support the new cycling_quiescent cycle model 
+
+bugfix: 
+
+added missing "omp_set_num_threads(PhysiCell_settings.omp_num_threads)" in the main-heterogeneity.cpp file for the heterogeneity sample project. 
 
 
 
+
+/* todo in this release */
+
+1) a function to set interaction distance while maintaining equilibrium spacing
+
+2) a function to set equilibrium spacing while maintaining interaction distance 
+
+3) a new cycle model for Luis (done)
+
+4) at least a *start* on a contact function 
+
+5) update documentation 
+
+6) find that issue from working with Eric? 
+
+7) add a standardized o2 and pressure-based proliferation function 
 
 
 
