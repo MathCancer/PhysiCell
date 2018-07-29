@@ -27,6 +27,10 @@ bugfix:
 
 added missing "omp_set_num_threads(PhysiCell_settings.omp_num_threads)" in the main-heterogeneity.cpp file for the heterogeneity sample project. 
 
+bugfix:
+
+In BioFVM, Microenvironment::compute_gradient_vector(int), removed "static" from "static std::vector<int> indices(3,0)" to prevent rare segfaults. 
+
 
 
 
