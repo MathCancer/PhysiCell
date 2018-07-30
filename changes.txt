@@ -53,9 +53,9 @@ In BioFVM, Microenvironment::compute_gradient_vector(int), removed "static" from
 
 /* todo in this release */
 
-1) a function to set interaction distance while maintaining equilibrium spacing
-
-2) a function to set equilibrium spacing while maintaining interaction distance 
+1) a function to set interaction distance while maintaining equilibrium spacing (done)
+ 
+2) a function to set equilibrium spacing while maintaining interaction distance (done)
 
 3) a new cycle model for Luis (done)
 
