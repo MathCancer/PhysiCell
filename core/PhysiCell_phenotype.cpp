@@ -641,10 +641,117 @@ Mechanics::Mechanics()
 	
 	// this is a multiple of the cell (equivalent) radius
 	relative_maximum_adhesion_distance = 1.25; 
-	maximum_adhesion_distance = 0.0; 
+	// maximum_adhesion_distance = 0.0; 
+	
+	
 	
 	return; 
 }
+
+
+// new on July 29, 2018
+// change the ratio without changing the repulsion strength or equilibrium spacing 
+void Mechanics::set_relative_maximum_adhesion_distance( double new_value )
+{
+	// get old equilibrium spacing, based on equilibriation of pairwise adhesive/repulsive forces at that distance. 
+	
+		// relative equilibrium spacing (relative to mean cell radius)
+	double s_relative = 2.0; 
+//	std::cout << "----------------" << std::endl; 
+//	std::cout << __FILE__ << " : " << __FUNCTION__ << " : " << __LINE__ << ": " << s_relative << std::endl; 
+	
+	double temp1 = cell_cell_adhesion_strength; 
+	temp1 /= cell_cell_repulsion_strength;
+	temp1 = sqrt( temp1 ); 
+	
+	double temp2 = 1.0; 
+	temp2 -= temp1; //  1 - sqrt( alpha_CCA / alpha_CCR );
+	
+	
+	s_relative *= temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ); 
+	
+	temp1 /= relative_maximum_adhesion_distance; // sqrt( alpha_CCA / alpha_CCR)/f;
+	temp2 = 1.0; 
+	temp2 -= temp1; // 1 - sqrt( alpha_CCA / alpha_CCR )/f;
+
+	s_relative /= temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ) / ( 1-1/f) ; 
+	
+	std::cout << "\t\t\t" << s_relative << std::endl; 
+	
+	// now, adjust the relative max adhesion distance 
+	
+	relative_maximum_adhesion_distance = new_value; 
+	
+	// adjust the adhesive coefficient to preserve the old equilibrium distance
+
+	temp1 = s_relative; 
+	temp1 /= 2.0; 
+	
+	temp2 = 1.0;
+	temp2 -= temp1; // 1 - s_relative/2.0 
+	
+	temp1 /= relative_maximum_adhesion_distance; // s_relative/(2*relative_maximum_adhesion_distance); 
+	temp1 *= -1.0; // -s_relative/(2*relative_maximum_adhesion_distance); 
+	temp1 += 1.0; // 1.0 -s_relative/(2*relative_maximum_adhesion_distance); 
+	
+	temp2 /= temp1; 
+	temp2 *= temp2; 
+	
+	cell_cell_adhesion_strength = cell_cell_repulsion_strength;
+	cell_cell_adhesion_strength *= temp2; 
+
+	return; 
+}		
+		
+// new on July 29, 2018
+// set the cell-cell equilibrium spacing, accomplished by changing the 
+// cell-cell adhesion strength, while leaving the cell-cell repulsion 
+// strength and the maximum adhesion distance unchanged 
+void Mechanics::set_relative_equilibrium_distance( double new_value )
+{
+	if( new_value > 2.0 )
+	{
+		std::cout << "**** Warning in function " << __FUNCTION__ << " in " << __FILE__ << " : " << std::endl 
+			<< "\tAttempted to set equilibrium distance exceeding two cell radii." << std::endl
+			<< "\tWe will cap the equilibrium distance at 2.0 cell radii." << std::endl 
+			<< "****" << std::endl << std::endl; 
+			
+			new_value = 2.0; 
+	}
+	
+
+
+
+	// adjust the adhesive coefficient to achieve the new (relative) equilibrium distance
+
+	double temp1 = new_value; 
+	temp1 /= 2.0; 
+	
+	double temp2 = 1.0;
+	temp2 -= temp1; // 1 - s_relative/2.0 
+	
+	temp1 /= relative_maximum_adhesion_distance; // s_relative/(2*relative_maximum_adhesion_distance); 
+	temp1 *= -1.0; // -s_relative/(2*relative_maximum_adhesion_distance); 
+	temp1 += 1.0; // 1.0 -s_relative/(2*relative_maximum_adhesion_distance); 
+	
+	temp2 /= temp1; 
+	temp2 *= temp2; 
+	
+	cell_cell_adhesion_strength = cell_cell_repulsion_strength;
+	cell_cell_adhesion_strength *= temp2; 
+
+	return; 
+}
+
+void Mechanics::set_absolute_equilibrium_distance( Phenotype& phenotype, double new_value )
+{
+	return set_relative_equilibrium_distance( new_value / phenotype.geometry.radius ); 
+}
+
+
+
+// void Mechanics::set_maximum_adhesion_distance( double new_value );
+// void 
 	
 	
 Motility::Motility()

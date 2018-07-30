@@ -357,9 +357,17 @@ class Mechanics
 	
 	// this is a multiple of the cell (equivalent) radius
 	double relative_maximum_adhesion_distance; 
-	double maximum_adhesion_distance; // needed? 
+	// double maximum_adhesion_distance; // needed? 
+	
 	
 	Mechanics(); // done 
+	
+	void set_relative_maximum_adhesion_distance( double new_value ); // done 
+	void set_relative_equilibrium_distance( double new_value ); // done 
+	
+	void set_absolute_equilibrium_distance( Phenotype& phenotype, double new_value ); // done 
+	
+	
 };
 
 class Motility

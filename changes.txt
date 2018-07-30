@@ -13,6 +13,9 @@ This improves code performance by 2x to 3x in gradient-enabled codes, because we
 
 Also, removed the explicit gradient calculations from the template and sample projects. 
 
+
+
+
 In response to requests from Luis S.V., added cycling_quiescent cell cycle model, with time scales matching the Kk67 basic model. 
 
 Also added the following constants: 
@@ -22,6 +25,20 @@ Also added the following constants:
 	static const int cycling_quiescent_model = 7; 
 
 Updated update_cell_and_death_parameters_O2_based() to support the new cycling_quiescent cycle model 
+
+
+
+Added new function to Phenotype.Mechanics: 
+
+	void set_relative_maximum_adhesion_distance( double new_value ); 
+
+Added new function to Phenotype.Mechanics:
+
+	void set_relative_equilibrium_distance( double new_value ); 
+
+Removed the (never-used) Phenotype.Mechanics.maximum_adhesion_distance. 
+
+
 
 bugfix: 
 

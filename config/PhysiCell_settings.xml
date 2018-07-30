@@ -80,25 +80,25 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2880</max_time> <!-- 2 days * 24 h * 60 min -->
+		<max_time units="min">64800</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>8</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
-		<folder>output</folder> <!-- use . for root --> 
+		<folder>.</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">2</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">2</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
