@@ -39,6 +39,14 @@ Added new function to Phenotype.Mechanics:
 Removed the (never-used) Phenotype.Mechanics.maximum_adhesion_distance. 
 
 
+interactions: cell i interacts with cell j with function f(i,j). 
+* go through contact testing
+* add (i,j,f) to a list if: (j,i,f) is not already in list. 
+* add (i,j,f) even if (j,i,g) is in the list. 
+
+So, we need a list: 
+ unsorted map that sort of hashes (i,j,f) (have we tested yet?) 
+
 
 bugfix: 
 

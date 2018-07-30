@@ -897,6 +897,8 @@ Cell_Functions::Cell_Functions()
 	calculate_distance_to_membrane = NULL; 
 	
 	set_orientation = NULL; 
+	
+	contact_function = NULL; 
 
 	return; 
 }

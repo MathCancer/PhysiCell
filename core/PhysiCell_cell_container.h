@@ -117,6 +117,8 @@ int find_escaping_face_index(Cell* agent);
 extern std::vector<Cell*> *all_cells; 
 
 Cell_Container* create_cell_container_for_microenvironment( BioFVM::Microenvironment& m , double mechanics_voxel_size );
-	
+
+
+
 };
 #endif

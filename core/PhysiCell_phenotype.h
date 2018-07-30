@@ -441,6 +441,9 @@ class Cell_Functions
 	
 	void (*set_orientation)(Cell* pCell, Phenotype& phenotype, double dt );
 	
+	void (*contact_function)(Cell* pMyself, Phenotype& my_phenotype, 
+		Cell* pOther, Phenotype& other_phenotype, double dt ); 
+	
 	Cell_Functions(); // done 
 };
 
