@@ -156,6 +156,46 @@ std::vector<std::string> false_cell_coloring_live_dead( Cell* pCell )
 	return output; 
 }
 
+// works for any Ki67-based cell cycle model 
+std::vector<std::string> false_cell_coloring_cycling_quiescent( Cell* pCell )
+{
+	static std::vector< std::string > output( 4 , "rgb(0,0,0)" );
+    
+    // output[0] = cyto_color, output[1] = cyto_outline , output[2] = nuclear_color, output[3] = nuclear_outline
+
+	// Cycling - Green
+	if ( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::cycling )  
+	{
+		output[0] = "rgb(0,255,0)";
+		output[2] = "rgb(0,125,0)";
+	}
+
+	// Quiescent - Blue 
+    if (pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::quiescent ) 
+    {
+        output[0] = "rgb(40,200,255)";
+        output[2] = "rgb(20,100,255)";
+    }
+
+	// Apoptotic - Red
+    if (pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic )  
+    {
+        output[0] = "rgb(255,0,0)";
+        output[2] = "rgb(125,0,0)";
+    }
+	
+	// Necrotic - Brown
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+	{
+		output[0] = "rgb(250,138,38)";
+		output[2] = "rgb(139,69,19)";
+    }
+    
+    return output;
+}
+
 std::vector<std::string> false_cell_coloring_cytometry( Cell* pCell )
 {
 	static std::vector< std::string > output( 4 , "rgb(0,0,0)" );

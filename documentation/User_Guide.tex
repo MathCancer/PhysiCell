@@ -3598,10 +3598,10 @@ to penetration and deformation by cells).
 \smallcode{double relative\_maximum\_adhesion\_distance} is the maximum distance of cell adhesion 
 to other cells or a basement membrane, given as a (dimensionless) multiple of \texttt{geometry.radius}. 
 
-\item 
-\smallcode{double maximum\_adhesion\_distance} is the absolute maximum distance at which a cell 
-interacts adhesively with other cells or basement membrane. We tend not to use this variable 
-in PhysiCell functions, so it may be deprecated in future releases. 
+% \item 
+% \smallcode{double maximum\_adhesion\_distance} is the absolute maximum distance at which a cell 
+% interacts adhesively with other cells or basement membrane. We tend not to use this variable 
+% in PhysiCell functions, so it may be deprecated in future releases. 
 \end{enumerate}
 
 As future releases of PhysiCell may include 
@@ -3621,6 +3621,11 @@ class Mechanics
     
     double relative_maximum_adhesion_distance; 
     double maximum_adhesion_distance;
+	
+    void set_relative_maximum_adhesion_distance( double new_value );  
+    void set_relative_equilibrium_distance( double new_value );  
+	
+    void set_absolute_equilibrium_distance( Phenotype\& phenotype, double new_value );  
     
     Mechanics();      
 };
@@ -3634,6 +3639,34 @@ class Mechanics
 \smallcode{Mechanics()} is the default constructor function. It sets the parameters to the reference value for 
 a generic breast epithelium line.  
 % MCF-10A breast cancer cells. 
+
+
+\item
+\smallcode{void set\_relative\_maximum\_adhesion\_distance( double new\_value )} sets the new maximum 
+adhesion interaction distance to \texttt{new\_value}, as a multiple of the cell's mean equivalent radius. It 
+preserves the repulsion strength and equilibrium cell-cell spacing, by adjusting the adhesion strength. 
+
+\item 
+\smallcode{void set\_relative\_equilibrium\_distance( double new\_value )} sets the new cell-cell equilibrium 
+spacing or distance to \texttt{new\_value}, as a multiple of the cell's mean equivalent radius. It 
+preserves the repulsion strength and maximum mechanical interaction distance, 
+by adjusting the adhesion strength. Note that this function performs a ``sanity check'' cap 
+\texttt{new\_value} at 2.0. 
+
+
+\item 
+\smallcode{void set\_absolute\_equilibrium\_distance( Phenotype\& phenotype, double new\_value )}
+ sets the new cell-cell equilibrium 
+spacing or distance to \texttt{new\_value}, in absolute units (microns). It requires the cell's 
+equivalent radius, as given within the supplied \texttt{phenotype}
+ as a multiple of the cell's mean equivalent radius. It 
+preserves the repulsion strength and maximum mechanical interaction distance, 
+by adjusting the adhesion strength.  Note that this function performs a ``sanity check'' cap 
+\texttt{new\_value} at 2 cell radii. Note also that internally, PhysiCell performs physical calculations 
+based upon the multiples of the cell's current radius. This means that the equilibrium distance will 
+stay the same relative to the cell's radius, but the absolute (dimensional) equilibrium spacing will 
+vary in time even after setting the value with this function. 
+
 \end{enumerate}
 
 \TOClink
@@ -4574,6 +4607,21 @@ All outlines match the corresponding fill colors.
 % \red{Lambert-Beer Law} 
 
 % \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4976978/}{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4976978/}
+
+\item
+\smallcode{false\_cell\_coloring\_cycling\_quiescent} colors quiescent and cycling cells as Blue and Green, 
+respectively, for use in the \texttt{cycling\_quiescent} cell cycle model. 
+
+\item
+\smallcode{false\_cell\_coloring\_cytometry} supports all the various flow cytometry-based cell 
+cycle models.  As other coloring funcitons, apoptotic cells are red, and necrotic cells are brown. 
+
+G0/G1 cells, or G1 cells, are colored light blue. (0,80,255). \\
+G0 cells are colored pale blue . (40,200,255). \\
+S cells are colored magenta. (255,0,255). \\
+G2 cells are colored yellow. (255,255,0). \\
+G2/M and M cells are colored green. (0,255,0). 
+
 
 \end{enumerate}
 

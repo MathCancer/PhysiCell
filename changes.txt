@@ -100,6 +100,8 @@ Minor new features and changes:
      static const int quiescent = 18; 
      static const int cycling_quiescent_model = 7; 
  
++ Added new coloring function: false_cell_coloring_cycling_quiescent 
+ 
 + Removed the (never-used) Mechanics.maximum_adhesion_distance. 
  
 + Removed the legacy template_projects folder.
