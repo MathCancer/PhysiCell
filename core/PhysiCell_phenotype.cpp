@@ -643,8 +643,6 @@ Mechanics::Mechanics()
 	relative_maximum_adhesion_distance = 1.25; 
 	// maximum_adhesion_distance = 0.0; 
 	
-	
-	
 	return; 
 }
 
@@ -718,10 +716,7 @@ void Mechanics::set_relative_equilibrium_distance( double new_value )
 			
 			new_value = 2.0; 
 	}
-	
-
-
-
+ 
 	// adjust the adhesive coefficient to achieve the new (relative) equilibrium distance
 
 	double temp1 = new_value; 
@@ -748,9 +743,7 @@ void Mechanics::set_absolute_equilibrium_distance( Phenotype& phenotype, double 
 	return set_relative_equilibrium_distance( new_value / phenotype.geometry.radius ); 
 }
 
-
-
-// void Mechanics::set_maximum_adhesion_distance( double new_value );
+// void Mechanics::set_absolute_maximum_adhesion_distance( double new_value );
 // void 
 	
 	
