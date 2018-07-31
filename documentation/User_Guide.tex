@@ -5676,6 +5676,63 @@ volume) and reference parameter values can be found in \cite{ref:PhysiCell}.
 \TOClink 
 
 
+\subsubsection{Cycling-Quiescent (\texttt{cycling\_quiescent})\\
+(Code: \texttt{PhysiCell\_constants::cycling\_quiescent\_model})}
+\label{sec:Standard_Models:cycling_quiescent}
+This \v|Cycle_Mode| has the following \v|Phase|s: 
+\begin{enumerate}
+\item 
+\textbf{Phase 0:} Named \v|Quiescent| with code \v|PhysiCell_constants::quiescent|. 
+
+\item 
+\textbf{Phase 1:} Named \v|Cycling| with code \v|PhysiCell_constants::cycling|. 
+\end{enumerate}
+
+In this model, Quiescent cells can enter the cell cycle to 
+become Cycling cells, at transition rate $r_{01}$. Cycling cells 
+divide into two Quiescent cells at rate $r_{10}$. 
+See Fig. \ref{fig:cycle_model:cycling_quiescent}. The 
+population-scale model is given by: 
+\beqa
+\frac{d\t{Quiescent}}{dt} & = & -r_{01} \t{Ki67-} + 2 r_{10} \t{Cycling} \\
+\frac{d\t{Cycling}}{dt} & = &  r_{01} \t{Quiescent} -r_{10} \t{Cycling} 
+\eeqa
+Further details on the \emph{biology} of this model (including 
+details the placement of daughter cells and changes in cell 
+volume) and reference parameter values can be found in \cite{ref:PhysiCell}. 
+
+\begin{figure}
+\begin{mdframed}[style=mystyle]
+% \begin{centering}
+% \begin{tikzpicture}
+% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1cm}}
+% \tikzset{edge/.style = {->,> = latex'}}
+% vertices
+% \node[vertex] (L) at (0,0) {Live};
+%edges
+% \draw[edge] (L) to[loop right] (L) {};
+% \end{tikzpicture}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,thick]
+\tikzstyle{every state}=[fill=lightgray,draw=black,text=black,minimum size=2.5cm]
+% \node[initial,state] (L) {Live}; 
+\node[initial,state] (A) {Quiescent}; 
+\node[state] (B) [right of=A]{Cycling}; 
+\path 
+(A) edge [bend left] node {$r_{01}$} (B)
+(B) edge [bend left] node {$r_{10}$ (divides)} (A);
+\end{tikzpicture}
+% \end{centering}
+\caption{The graph structure of the Cycling-Quiescent cell cycle model. The default phase is marked 
+``start.''}
+\label{fig:cycle_model:cycling_quiescent}
+\end{mdframed}
+\end{figure}
+
+\TOClink 
+
+
+
+
 
 
 

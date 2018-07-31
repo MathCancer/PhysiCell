@@ -92,31 +92,32 @@
 \BOOKMARK [3][-]{subsubsection.17.1.3}{Ki-67 Advanced \(Ki67\137advanced\) \(code: PhysiCell\137constants::advanced\137Ki67\137cycle\137model\)}{subsection.17.1}% 92
 \BOOKMARK [3][-]{subsubsection.17.1.4}{Flow Cytometry \(flow\137cytometry\137cycle\137model\) \(code: PhysiCell\137constants::flow\137cytometry\137cycle\137model\)}{subsection.17.1}% 93
 \BOOKMARK [3][-]{subsubsection.17.1.5}{Flow Cytometry Separated \(flow\137cytometry\137separated\137cycle\137model\) \(code: PhysiCell\137constants::flow\137cytometry\137separated\137cycle\137model\)}{subsection.17.1}% 94
-\BOOKMARK [2][-]{subsection.17.2}{Death Cycle Models}{section.17}% 95
-\BOOKMARK [3][-]{subsubsection.17.2.1}{Apoptosis \(apoptosis\) \(code: PhysiCell\137constants::apoptosis\137death\137model\)}{subsection.17.2}% 96
-\BOOKMARK [3][-]{subsubsection.17.2.2}{Necrosis \(necrosis\) \(code: PhysiCell\137constants::necrosis\137death\137model\)}{subsection.17.2}% 97
-\BOOKMARK [2][-]{subsection.17.3}{Volume model \(standard\137volume\137update\137function\)}{section.17}% 98
-\BOOKMARK [2][-]{subsection.17.4}{Cell velocity model \(standard\137update\137cell\137velocity\)}{section.17}% 99
-\BOOKMARK [2][-]{subsection.17.5}{Up orientation model \(up\137orientation\)}{section.17}% 100
-\BOOKMARK [2][-]{subsection.17.6}{Oxygen-dependent phenotype \040\(update\137cell\137and\137death\137parameters\137O2\137based\)}{section.17}% 101
-\BOOKMARK [1][-]{section.18}{Examples}{}% 102
-\BOOKMARK [2][-]{subsection.18.1}{Working with Cell functions}{section.18}% 103
-\BOOKMARK [3][-]{subsubsection.18.1.1}{Example: a custom volume model}{subsection.18.1}% 104
-\BOOKMARK [3][-]{subsubsection.18.1.2}{Example: a custom migration bias}{subsection.18.1}% 105
-\BOOKMARK [3][-]{subsubsection.18.1.3}{Example: a custom cell rule}{subsection.18.1}% 106
-\BOOKMARK [3][-]{subsubsection.18.1.4}{Example: a custom phenotype update function}{subsection.18.1}% 107
-\BOOKMARK [3][-]{subsubsection.18.1.5}{Example: a custom velocity update function}{subsection.18.1}% 108
-\BOOKMARK [3][-]{subsubsection.18.1.6}{Example: analytical basement membrane functions}{subsection.18.1}% 109
-\BOOKMARK [3][-]{subsubsection.18.1.7}{Example: a custom cell orientation function}{subsection.18.1}% 110
-\BOOKMARK [2][-]{subsection.18.2}{Cell cycle models}{section.18}% 111
-\BOOKMARK [3][-]{subsubsection.18.2.1}{Creating a custom cell cycle model}{subsection.18.2}% 112
-\BOOKMARK [3][-]{subsubsection.18.2.2}{Adding an arrest function}{subsection.18.2}% 113
-\BOOKMARK [3][-]{subsubsection.18.2.3}{Adding a custom phase entry function}{subsection.18.2}% 114
-\BOOKMARK [1][-]{section.19}{Future}{}% 115
-\BOOKMARK [1][-]{section.20}{Some notes on parameter values}{}% 116
-\BOOKMARK [2][-]{subsection.20.1}{Live cycle model}{section.20}% 117
-\BOOKMARK [2][-]{subsection.20.2}{Ki67 Basic model}{section.20}% 118
-\BOOKMARK [2][-]{subsection.20.3}{Ki67 Advanced model}{section.20}% 119
-\BOOKMARK [2][-]{subsection.20.4}{Flow Cytometry model}{section.20}% 120
-\BOOKMARK [2][-]{subsection.20.5}{Separated Flow Cytometry model}{section.20}% 121
-\BOOKMARK [1][-]{section.21}{Acknowledgements}{}% 122
+\BOOKMARK [3][-]{subsubsection.17.1.6}{Cycling-Quiescent \(cycling\137quiescent\) \(Code: PhysiCell\137constants::cycling\137quiescent\137model\)}{subsection.17.1}% 95
+\BOOKMARK [2][-]{subsection.17.2}{Death Cycle Models}{section.17}% 96
+\BOOKMARK [3][-]{subsubsection.17.2.1}{Apoptosis \(apoptosis\) \(code: PhysiCell\137constants::apoptosis\137death\137model\)}{subsection.17.2}% 97
+\BOOKMARK [3][-]{subsubsection.17.2.2}{Necrosis \(necrosis\) \(code: PhysiCell\137constants::necrosis\137death\137model\)}{subsection.17.2}% 98
+\BOOKMARK [2][-]{subsection.17.3}{Volume model \(standard\137volume\137update\137function\)}{section.17}% 99
+\BOOKMARK [2][-]{subsection.17.4}{Cell velocity model \(standard\137update\137cell\137velocity\)}{section.17}% 100
+\BOOKMARK [2][-]{subsection.17.5}{Up orientation model \(up\137orientation\)}{section.17}% 101
+\BOOKMARK [2][-]{subsection.17.6}{Oxygen-dependent phenotype \040\(update\137cell\137and\137death\137parameters\137O2\137based\)}{section.17}% 102
+\BOOKMARK [1][-]{section.18}{Examples}{}% 103
+\BOOKMARK [2][-]{subsection.18.1}{Working with Cell functions}{section.18}% 104
+\BOOKMARK [3][-]{subsubsection.18.1.1}{Example: a custom volume model}{subsection.18.1}% 105
+\BOOKMARK [3][-]{subsubsection.18.1.2}{Example: a custom migration bias}{subsection.18.1}% 106
+\BOOKMARK [3][-]{subsubsection.18.1.3}{Example: a custom cell rule}{subsection.18.1}% 107
+\BOOKMARK [3][-]{subsubsection.18.1.4}{Example: a custom phenotype update function}{subsection.18.1}% 108
+\BOOKMARK [3][-]{subsubsection.18.1.5}{Example: a custom velocity update function}{subsection.18.1}% 109
+\BOOKMARK [3][-]{subsubsection.18.1.6}{Example: analytical basement membrane functions}{subsection.18.1}% 110
+\BOOKMARK [3][-]{subsubsection.18.1.7}{Example: a custom cell orientation function}{subsection.18.1}% 111
+\BOOKMARK [2][-]{subsection.18.2}{Cell cycle models}{section.18}% 112
+\BOOKMARK [3][-]{subsubsection.18.2.1}{Creating a custom cell cycle model}{subsection.18.2}% 113
+\BOOKMARK [3][-]{subsubsection.18.2.2}{Adding an arrest function}{subsection.18.2}% 114
+\BOOKMARK [3][-]{subsubsection.18.2.3}{Adding a custom phase entry function}{subsection.18.2}% 115
+\BOOKMARK [1][-]{section.19}{Future}{}% 116
+\BOOKMARK [1][-]{section.20}{Some notes on parameter values}{}% 117
+\BOOKMARK [2][-]{subsection.20.1}{Live cycle model}{section.20}% 118
+\BOOKMARK [2][-]{subsection.20.2}{Ki67 Basic model}{section.20}% 119
+\BOOKMARK [2][-]{subsection.20.3}{Ki67 Advanced model}{section.20}% 120
+\BOOKMARK [2][-]{subsection.20.4}{Flow Cytometry model}{section.20}% 121
+\BOOKMARK [2][-]{subsection.20.5}{Separated Flow Cytometry model}{section.20}% 122
+\BOOKMARK [1][-]{section.21}{Acknowledgements}{}% 123
