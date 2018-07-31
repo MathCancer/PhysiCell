@@ -1,4 +1,4 @@
-VERSION := 1.3.0
+VERSION := 1.3.1
 PROGRAM_NAME := cancer_biorobots
 
 CC := g++

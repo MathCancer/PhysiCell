@@ -155,6 +155,9 @@ Minor new features and changes:
  
 + Removed the (never-used) Mechanics.maximum_adhesion_distance. 
  
++ Removed the legacy template_projects folder.
+ 
+ 
 Beta features (not fully supported):
  
 + Added a function pointer to the Cell_Functions class for intended 
@@ -223,7 +226,7 @@ Bugfixes:
   
 Notices for intended changes that may affect backwards compatibility:
  
-+ template_projects folder will be removed
++ None.
  
 Planned future improvements: 
  
