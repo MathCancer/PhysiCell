@@ -502,9 +502,9 @@ and any other (BSD-compatible) dependencies are kept here.
 \smallcode{output} Some examples will put their outputs here. 
 \item 
 \smallcode{povray} This includes some basic utilities for visualization by povray (an open source raytracing package) \cite{ref:povray}. 
-\item 
-\smallcode{template\_projects} This directory once stored template projects for 2D and 3D. These have been 
-moved to the sample projects as of Version 1.2.2. This directory will be deprecated. 
+% \item 
+% \smallcode{template\_projects} This directory once stored template projects for 2D and 3D. These have been 
+% moved to the sample projects as of Version 1.2.2. This directory will be deprecated. 
 \item 
 \smallcode{sample\_projects} This directory includes sample projects, including 2D and 3D template projects 
 and at least the four sample projects in \cite{ref:PhysiCell}.  A good start to a new 
@@ -3625,7 +3625,7 @@ class Mechanics
     void set_relative_maximum_adhesion_distance( double new_value );  
     void set_relative_equilibrium_distance( double new_value );  
 	
-    void set_absolute_equilibrium_distance( Phenotype\& phenotype, double new_value );  
+    void set_absolute_equilibrium_distance( Phenotype& phenotype, double new_value );  
     
     Mechanics();      
 };
