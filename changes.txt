@@ -1,3 +1,13 @@
+changes in next version
+
+
+bugfixes: 
+
+MultiCellDS outputs used size 3 for all custom vector variables, instead 
+of actual size. Fixed to read the size from the vector. 
+
+
+
 =======================================================================
  
 PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
