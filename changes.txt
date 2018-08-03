@@ -6,7 +6,9 @@ bugfixes:
 MultiCellDS outputs used size 3 for all custom vector variables, instead 
 of actual size. Fixed to read the size from the vector. 
 
-
+Fixed the ostream operator for Vector_Variable to correctly output all 
+the vector.value elements, rather than the original hard-coded output 
+of 3 elements regardless of size. 
 
 =======================================================================
  
