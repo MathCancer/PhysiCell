@@ -94,7 +94,10 @@ Vector_Variable::Vector_Variable()
 
 std::ostream& operator<<(std::ostream& os, const Vector_Variable& v)
 {
-	os << v.name << ": [" << v.value[0] << "," << v.value[1] << "," << v.value[2] << "] " << v.units; 
+	os << v.name << ": ";
+	for( int i=0; i < v.value.size()-1 ; i++ )
+	{ os << v.value[i] << ","; }
+	os << v.value[v.value.size()-1] << " (" << v.units << ")"; 
 	return os; 
 }
 
