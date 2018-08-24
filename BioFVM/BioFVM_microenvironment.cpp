@@ -951,8 +951,8 @@ void Microenvironment::compute_gradient_vector( int n )
 	static double two_dx = mesh.dx; 
 	static double two_dy = mesh.dy; 
 	static double two_dz = mesh.dz; 
-	bool gradient_constants_defined = false; 
-	static std::vector<int> indices(3,0);
+	static bool gradient_constants_defined = false; 
+	std::vector<int> indices(3,0);
 	
 	if( gradient_constants_defined == false )
 	{
