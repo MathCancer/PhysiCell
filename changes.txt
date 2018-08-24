@@ -1,14 +1,74 @@
-changes in next version
+=======================================================================
 
+PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
+Multicellular Systems.
+ 
+Version:      1.3.2
+Release date: 24 August 2018
 
-bugfixes: 
+Release summary: 
+ 
+This release fixes a small gradient bug that I swear I had fixed before. 
+ 
+NOTE: OSX users must now define PHYSICELL_CPP system variable. 
+      See the documentation.
+ 
+Major new features and changes:
+ 
++ none
+  
+Minor new features and changes: 
+ 
++ none
+  
+Beta features (not fully supported):
+ 
++ none
+  
+Bugfixes: 
 
-MultiCellDS outputs used size 3 for all custom vector variables, instead 
-of actual size. Fixed to read the size from the vector. 
++ In BioFVM, Microenvironment::compute_gradient_vector(int), removed "static"
+  from "static std::vector<int> indices(3,0)" to prevent rare segfaults. 
+  
++ In BioFVM, Microenvironment::compute_gradient_vector(int), replaced "static"
+  for "bool gradient_constants_defined = false". Yep, I removed static from 
+  the wrong line in 1.3.1 
 
-Fixed the ostream operator for Vector_Variable to correctly output all 
-the vector.value elements, rather than the original hard-coded output 
-of 3 elements regardless of size. 
++ Correct some errors in both the README.txt and changes.txt files. 
+  
+Notices for intended changes that may affect backwards compatibility:
+ 
++ None.
+ 
+Planned future improvements: 
+ 
++ Further XML-based simulation setup. 
+ 
++ read saved simulation states (as MultiCellDS digital snapshots)
+ 
++ "mainline" prototype cell attach/detach mechanics as standard models 
+  (currently in the biorobots and immune examples)
+ 
++ integrate SBML-encoded systems of ODEs as custom data and functions 
+  for molecular-scale modeling 
+  
++ integrate Boolean network support from PhysiBoSS into the mainline code 
+  (See https://doi.org/10.1101/267070.)
+  
++ Develop contact-based cell-cell interactions. (Likely in next release.)
+ 
++ Add a new standard phenotype function that uses mechanobiology, 
+  where high pressure can arrest cycle progression. 
+  (See https://twitter.com/MathCancer/status/1022555441518338048.) 
+  (Likely in next release.) 
+ 
++ Add module for standardized pharmacodynamics, as prototyped in the 
+  nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
+ 
++ create an angiogenesis sample project 
+ 
++ create a small library of angiogenesis and vascularization codes as 
+  an optional standard module in ./modules (but not as a core component)
 
 =======================================================================
  
@@ -183,6 +243,13 @@ Bugfixes:
   
 + Changed <xml> root above the comment lines in output files for 
   better Python parsing compatibility. Thanks, rheiland! 
+
++ MultiCellDS outputs used size 3 for all custom vector variables, instead 
+  of actual size. Fixed to read the size from the vector. 
+
++ Fixed the ostream operator for Vector_Variable to correctly output all 
+  the vector.value elements, rather than the original hard-coded output 
+  of 3 elements regardless of size. 
   
 Notices for intended changes that may affect backwards compatibility:
  
