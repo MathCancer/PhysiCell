@@ -1,10 +1,9 @@
-**PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
-Multicellular Systems.**
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems. 
 
 **Version:**      1.3.3
 **Release date:** 16 September 2018 
 
-**Overview:** 
+## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments. 
 
 **Reference:** A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
