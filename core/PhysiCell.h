@@ -10,8 +10,9 @@
 #     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
-# See VERSION.txt or call std::string PhysiCell_version() to get the current  #
-#     version x.y.z.                                                          #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
@@ -25,8 +26,8 @@
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
-#    llelized diffusive transport solver for 3-D biological simulations,      #
-#    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730   #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
 #                                                                             #
 ###############################################################################
 #                                                                             #
@@ -71,8 +72,9 @@
 #include <fstream>
 #include <string>
 
-static std::string PhysiCell_version = "1.3.3"; 
+static std::string PhysiCell_Version = "1.3.3"; 
 static std::string PhysiCell_URL = "http://PhysiCell.MathCancer.org"; 
+static std::string PhysiCell_DOI = "10.1371/journal.pcbi.1005991"; 
 
 #include "PhysiCell_phenotype.h"
 #include "PhysiCell_standard_models.h"

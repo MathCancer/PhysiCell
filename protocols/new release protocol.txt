@@ -2,8 +2,8 @@
 
 (See static std::string PhysiCell_version.) 
 
-2) Update VERSION.txt with a string only 
-containing the version number. 
+2) Update VERSION.txt with a string only containing the version 
+number. There should be no spaces in this file. 
 
 3) update CITATION.txt to reflect the new version 
 number. 
@@ -13,7 +13,11 @@ number.
 
 5) Append most recent changes in README.txt 
 
-6) Sourceforge.net release 
+6) Make appropriate changs to ./documentation/User_Guide.tex, and 
+   recompile the LaTeX document. Don't forget to set \Version to x.y.z 
+   at the top of the document. Set the \ReleaseDate to today (manually). 
+
+7) Sourceforge.net release 
    a) Move one directory up. Zip everything in PhysiCell 
       into a new zip file. 
 
@@ -32,7 +36,7 @@ number.
 
    g) Edit the README.txt file (on SF) to exclude it from stats tracking. 
 
-7) GitHub release: 
+8) GitHub release: 
 
    a) Go to https://github.com/MathCancer/PhysiCell/releases. 
       Click "draft new release" 
@@ -46,9 +50,9 @@ number.
    e) On the "attach binaries", use the zip file you created for the 
       SourceForge release.  
 
-   f) 
+   f) Click "" 
 
-8) Update MathCancer.org
+9) Update MathCancer.org
 
    a) Update the version number on http://MathCancer.org/OpenSource.php
 

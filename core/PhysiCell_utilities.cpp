@@ -3,17 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.2) [1].    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
 #     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.2) [1],    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
@@ -22,8 +26,8 @@
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
-#    llelized diffusive transport solver for 3-D biological simulations,      #
-#    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730   #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
 #                                                                             #
 ###############################################################################
 #                                                                             #
@@ -63,6 +67,11 @@
 
 #include "PhysiCell_utilities.h"
 #include "PhysiCell_constants.h"
+
+#include "PhysiCell.h" 
+
+#include <iostream>
+#include <fstream>
 
 namespace PhysiCell{
 
@@ -111,5 +120,70 @@ double dist(std::vector<double> p1, std::vector<double> p2)
 {
 	return sqrt(dist_squared(p1, p2));
 }
+
+std::string get_PhysiCell_version( void )
+{
+//	extern std::string PhysiCell_version; 
+	return PhysiCell_Version; 
+}	
+void get_PhysiCell_version( std::string& pString )
+{
+//	extern std::string PhysiCell_version; 
+	pString.assign( PhysiCell_Version ); 
+}
+
+std::vector<std::string> software_versions; 
+std::vector<std::string> software_names; 
+std::vector<std::string> software_DOIs; 
+std::vector<std::string> software_URLs; 
+
+void display_citations( std::ostream& os )
+{
+	static bool PhysiCell_citation_added = false; 
+	if( PhysiCell_citation_added == false )
+	{
+		add_software_citation( "PhysiCell" , get_PhysiCell_version() , 
+			PhysiCell_DOI , PhysiCell_URL ); 
+		PhysiCell_citation_added = true; 
+	}
+	
+	std::ofstream of( "ALL_CITATIONS.txt" , std::ios::out );
+	for( int i=0; i < software_versions.size() ; i++ )
+	{
+		os << "Using " << software_names[i] 
+		<< " version " << software_versions[i] 
+		<< std::endl << "\tPlease cite DOI: " << software_DOIs[i] 
+		<< std::endl << "\tProject website: " << software_URLs[i] 
+		<< std::endl; 
+		
+		of << "Using " << software_names[i] 
+		<< " version " << software_versions[i] 
+		<< std::endl << "\tPlease cite DOI: " << software_DOIs[i] 
+		<< std::endl << "\tProject website: " << software_URLs[i] 
+		<< std::endl; 
+	}
+	os << std::endl << "See ALL_CITATIONS.txt for this list." << std::endl; 
+	
+	of << std::endl; 
+	of.close(); 
+	
+	return; 
+}
+
+void display_citations( void )
+{
+	return display_citations( std::cout ); 
+}
+
+void add_software_citation( std::string name , std::string version, std::string DOI , std::string URL )
+{
+	software_names.push_back( name ); 
+	software_versions.push_back( version ); 
+	software_DOIs.push_back( DOI ); 
+	software_URLs.push_back( URL ); 
+	return; 
+}
+
+
 
 };

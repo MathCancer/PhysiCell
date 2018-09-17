@@ -1,4 +1,4 @@
-VERSION := 1.3.2
+VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
 PROGRAM_NAME := biorobots
 
 CC := g++

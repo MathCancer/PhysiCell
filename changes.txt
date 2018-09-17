@@ -23,36 +23,63 @@ Minor new features and changes:
 + Moved all version information to VERSION.txt to facilitate 
   faster release cycles. 
   
++ Updated all the Makefiles to set VERSION via 
+  
+  VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
+  
 + Moved detailed citation information to CITATION.txt to 
   facilitate faster release cycles.
   
-+ 
++ Changed std::string PhysiCell_version to 
+  std::string PhysiCell_Version for more consistency with 
+  prior BioFVM work. 
   
++ Added new static string to PhysiCell.h: 
+  static std::string PhysiCell_DOI
+  
++ Added new functions to PhysiCell_utilities to query 
+  PhysiCell versioning: 
+
+  std::string get_PhysiCell_version( void ); 
+  void get_PhysiCell_version( std::string& pString ); 
+  
++ Added the following function to PhysiCell_utilities to 
+  display a list of all software versions and citations 
+  used in the code:   
+  
+  void display_citations( std::ostream& os ); 
+  void display_citations( void ); 
+  
+  For example, use display_citations( std::cout ), or use 
+  an output file stream. Note that display_citations(void) 
+  calls display_citation(std::cout);   
+
 Beta features (not fully supported):
  
 + Added ./protocols/ directory to include release and other 
   instructions, to help train new developer contributors. 
   
-+ 
++ Added the following functions to PhysiCell_utilities to 
+  register third-party software citations in a global list, 
+  ready for query and display: 
+  
+  void add_software_citation( std::string name , 
+       std::string version, std::string DOI, std::string URL ); 
   
 Bugfixes: 
 
-+ In BioFVM, Microenvironment::compute_gradient_vector(int), removed "static"
-  from "static std::vector<int> indices(3,0)" to prevent rare segfaults. 
-  
-+ In BioFVM, Microenvironment::compute_gradient_vector(int), replaced "static"
-  for "bool gradient_constants_defined = false". Yep, I removed static from 
-  the wrong line in 1.3.1 
-
-+ Correct some errors in both the README.txt and changes.txt files. 
++ None
   
 Notices for intended changes that may affect backwards compatibility:
  
-+ We will probably move from README.txt to README.md to support markdown 
-  and improve releases on both SourceForge and GitHub. 
++ We will probably move from README.txt to README.md to support 
+  markdown and improve releases on both SourceForge and GitHub. 
   
-+ We will probably move from changes.txt to changes.md to support markdown 
-  in the long-term change logs.  
++ We will probably move from changes.txt to changes.md to support 
+  markdown in the long-term change logs.  
+ 
++ We intend to merge Custom_Variable and Custom_Vector_Variable in the
+  very near future.  
  
 Planned future improvements: 
  
