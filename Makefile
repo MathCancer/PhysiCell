@@ -232,6 +232,8 @@ reset:
 	cp ./sample_projects/Makefile-default Makefile 
 	rm -f ./custom_modules/*
 	touch ./custom_modules/empty.txt 
+	touch ALL_CITATIONS.txt 
+	rm ALL_CITATIONS.txt 
 	
 clean:
 	rm -f *.o
