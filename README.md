@@ -11,7 +11,7 @@ PhysiCell is a flexible open source framework for building agent-based multicell
 
 Visit http://MathCancer.org/blog for the latest tutorials and help. 
 
-###Key makefile rules:
+### Key makefile rules:
 
 make               : compiles the current project. If no 
                      project has been defined, it first 
@@ -54,18 +54,18 @@ See changes.txt for the full change log.
 
 -=-=-=-=-
 
-##Release summary:
+## Release summary:
  
 This release introduces simplifications in versioning to facilitate faster release cycles. It also introduces functions to register and list citations for third-part add-ons. The goal is to encourage end-users to properly cite PhysiCell and add-on products used in their projects. 
  
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. 
       See the documentation.
  
-Major new features and changes:
+### Major new features and changes:
  
 + none
   
-Minor new features and changes: 
+### Minor new features and changes: 
  
 + Moved all version information to VERSION.txt to facilitate 
   faster release cycles. 
@@ -104,7 +104,7 @@ Minor new features and changes:
   
 + Updated all the sample projects to use display_citations(); 
 
-Beta features (not fully supported):
+### Beta features (not fully supported):
  
 + Added ./protocols/ directory to include release and other 
   instructions, to help train new developer contributors. 
@@ -117,11 +117,11 @@ Beta features (not fully supported):
   void add_software_citation( std::string name , 
        std::string version, std::string DOI, std::string URL ); 
   
-Bugfixes: 
+### Bugfixes: 
 
 + None
   
-Notices for intended changes that may affect backwards compatibility:
+### Notices for intended changes that may affect backwards compatibility:
  
 + We will probably move from README.txt to README.md to support 
   markdown and improve releases on both SourceForge and GitHub. 
@@ -132,7 +132,7 @@ Notices for intended changes that may affect backwards compatibility:
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the
   very near future.  
  
-Planned future improvements: 
+### Planned future improvements: 
  
 + Further XML-based simulation setup. 
  
