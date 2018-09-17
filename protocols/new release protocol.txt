@@ -44,8 +44,8 @@ zip -r -X PhysiCell/* PhysiCell_V.x.y.z.zip -x PhysiCell/.git -x PhysiCell/.giti
 
 8) GitHub release: 
 
-   a) Go to https://github.com/MathCancer/PhysiCell/releases. 
-      Click "draft new release" 
+   a) Go to https://github.com/MathCancer/PhysiCell/releases
+      Click "Draft a new release" 
 
    b) For "Tag version", Use x.y.z (for the version x.y.z)
 
