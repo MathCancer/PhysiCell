@@ -39,7 +39,9 @@ make reset         : de-populates the sample project and returns to
 
 
 **Homepage:**     http://PhysiCell.MathCancer.org
+
 **Downloads:**    http://PhysiCell.sf.net
+
 **Support:**      https://sourceforge.net/p/physicell/tickets/
 
 **Quick Start:**  Look at QuickStart.pdf in the documentation folder. 
