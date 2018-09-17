@@ -11,7 +11,9 @@ number.
 4) Put most recent changes in README.txt. (Note that only the current releases 
    changes should be in readme.txt. 
 
-5) Append most recent changes in README.txt 
+5) Append most recent changes in README.txt. Copy everything after 
+   "Release summary" in changes.txt (the most recent version x.y.z only) 
+   to overwrite everything after "-=-=-=-=-" in README.txt 
 
 6) Make appropriate changs to ./documentation/User_Guide.tex, and 
    recompile the LaTeX document. Don't forget to set \Version to x.y.z 
@@ -19,7 +21,12 @@ number.
 
 7) Sourceforge.net release 
    a) Move one directory up. Zip everything in PhysiCell 
-      into a new zip file. 
+      into a new zip file. Use 
+      
+      zip -r -X PhysiCell/* PhysiCell_V.x.y.z.zip 
+      
+      (with appropriate version x.y.z). 
+          
 
    b) Rename the zip file to PhysiCell_V.x.y.z.zip (based on version x.y.z)
 
