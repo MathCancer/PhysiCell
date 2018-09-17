@@ -1,8 +1,8 @@
 PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
 Multicellular Systems.
 
-Version:      1.3.2
-Release date: 24 August 2018 
+Version:      1.3.3
+Release date: 16 September 2018 
 
 Overview: 
 PhysiCell is a flexible open source framework for building 
@@ -61,7 +61,11 @@ See changes.txt for the full change log.
 
 Release summary: 
  
-This release fixes a small gradient bug that I swear I had fixed before. 
+This release introduces simplifications in versioning to facilitate 
+faster release cycles. It also introduces functions to register and 
+list citations for third-part add-ons. The goal is to encourage end-
+users to properly cite PhysiCell and add-on products used in their 
+projects. 
  
 NOTE: OSX users must now define PHYSICELL_CPP system variable. 
       See the documentation.
@@ -72,26 +76,70 @@ Major new features and changes:
   
 Minor new features and changes: 
  
-+ none
++ Moved all version information to VERSION.txt to facilitate 
+  faster release cycles. 
   
++ Updated all the Makefiles to set VERSION via 
+  
+  VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
+  
++ Moved detailed citation information to CITATION.txt to 
+  facilitate faster release cycles.
+  
++ Changed std::string PhysiCell_version to 
+  std::string PhysiCell_Version for more consistency with 
+  prior BioFVM work. 
+  
++ Added new static string to PhysiCell.h: 
+  static std::string PhysiCell_DOI
+  
++ Added new functions to PhysiCell_utilities to query 
+  PhysiCell versioning: 
+
+  std::string get_PhysiCell_version( void ); 
+ 
+  void get_PhysiCell_version( std::string& pString ); 
+  
++ Added the following function to PhysiCell_utilities to 
+  display a list of all software versions and citations 
+  used in the code:   
+  
+  void display_citations( std::ostream& os ); 
+  void display_citations( void ); 
+  
+  For example, use display_citations( std::cout ), or use 
+  an output file stream. Note that display_citations(void) 
+  calls display_citation(std::cout);   
+  
++ Updated all the sample projects to use display_citations(); 
+
 Beta features (not fully supported):
  
-+ none
++ Added ./protocols/ directory to include release and other 
+  instructions, to help train new developer contributors. 
+  Perhaps this should be called "checklists" ? 
+  
++ Added the following functions to PhysiCell_utilities to 
+  register third-party software citations in a global list, 
+  ready for query and display: 
+  
+  void add_software_citation( std::string name , 
+       std::string version, std::string DOI, std::string URL ); 
   
 Bugfixes: 
 
-+ In BioFVM, Microenvironment::compute_gradient_vector(int), removed "static"
-  from "static std::vector<int> indices(3,0)" to prevent rare segfaults. 
-  
-+ In BioFVM, Microenvironment::compute_gradient_vector(int), replaced "static"
-  for "bool gradient_constants_defined = false". Yep, I removed static from 
-  the wrong line in 1.3.1 
-
-+ Correct some errors in both the README.txt and changes.txt files. 
++ None
   
 Notices for intended changes that may affect backwards compatibility:
  
-+ None.
++ We will probably move from README.txt to README.md to support 
+  markdown and improve releases on both SourceForge and GitHub. 
+  
++ We will probably move from changes.txt to changes.md to support 
+  markdown in the long-term change logs.  
+ 
++ We intend to merge Custom_Variable and Custom_Vector_Variable in the
+  very near future.  
  
 Planned future improvements: 
  
@@ -106,7 +154,7 @@ Planned future improvements:
   for molecular-scale modeling 
   
 + integrate Boolean network support from PhysiBoSS into the mainline code 
-  (See https://doi.org/10.1101/267070.)
+  (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
   
 + Develop contact-based cell-cell interactions. (Likely in next release.)
  
@@ -122,3 +170,4 @@ Planned future improvements:
  
 + create a small library of angiogenesis and vascularization codes as 
   an optional standard module in ./modules (but not as a core component)
+  
