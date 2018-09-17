@@ -45,11 +45,12 @@ make reset         : de-populates the sample project and returns to
 **Support:**      https://sourceforge.net/p/physicell/tickets/
 
 **Quick Start:**  Look at QuickStart.pdf in the documentation folder. 
+
 **User Guide:**   Look at UserGuide.pdf in the documentation folder. 
  
 **Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
 
-Latest info:  follow [@MathCancer](https://twitter.com/MathCancer) on Twitter (http://twitter.com/MathCancer)
+**Latest info:**  follow [@MathCancer](https://twitter.com/MathCancer) on Twitter (http://twitter.com/MathCancer)
 
 See changes.txt for the full change log. 
 
