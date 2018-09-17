@@ -53,6 +53,8 @@ Minor new features and changes:
   For example, use display_citations( std::cout ), or use 
   an output file stream. Note that display_citations(void) 
   calls display_citation(std::cout);   
+  
++ Updated all the sample projects to use display_citations(); 
 
 Beta features (not fully supported):
  
