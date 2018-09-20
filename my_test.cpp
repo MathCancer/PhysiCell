@@ -8,25 +8,9 @@
 #include <vector> 
 #include <unordered_map> 
 
-template <class T> 
-class Parameter
+#include "my_test.h" 
+namespace blah
 {
- private:
-	template <class Y>
-	friend std::ostream& operator<<(std::ostream& os, const Parameter<Y>& param); 
-
- public: 
-	std::string name; 
-	std::string units; 
-	T value; 
-	
-	Parameter();
-	Parameter( std::string my_name ); 
-	
-	void operator=( T& rhs ); 
-	void operator=( T rhs ); 
-	void operator=( Parameter& p ); 
-};
 
 template <class T>
 Parameter<T>::Parameter()
@@ -86,41 +70,6 @@ std::ostream& operator<<(std::ostream& os, const Parameter<T>& param)
 	os << param.name << ": " << param.value << " [" << param.units << "]"; 
 	return os; 
 }
-
-template <class T>
-class Parameters
-{
- private:
-	std::unordered_map<std::string,int> name_to_index_map; 
-	
-	template <class Y>
-	friend std::ostream& operator<<( std::ostream& os , const Parameters<Y>& params ); 
-
- public: 
-	Parameters(); 
- 
-	std::vector< Parameter<T> > parameters; 
-	
-	void add_parameter( std::string my_name ); 
-	void add_parameter( std::string my_name , T& my_value ); 
-	void add_parameter( std::string my_name , T my_value ); 
-	void add_parameter( std::string my_name , T& my_value , std::string my_units ); 
-	void add_parameter( std::string my_name , T my_value , std::string my_units ); 
-	
-	void add_parameter( Parameter<T>& param );
-	
-	int find_index( std::string search_name ); 
-	
-	// these access the values 
-	T& operator()( int i );
-	T& operator()( std::string str ); 
-
-	// these access the full, raw parameters 
-	Parameter<T>& operator[]( int i );
-	Parameter<T>& operator[]( std::string str ); 
-	
-	int size( void ) const; 
-};
 
 template <class T>
 int Parameters<T>::size( void ) const
@@ -268,20 +217,6 @@ void Parameters<T>::add_parameter( Parameter<T>& param )
 	return; 
 }
 
-class User_Parameters
-{
- private:
-	friend std::ostream& operator<<( std::ostream& os , const User_Parameters up ); 
- 
- public:
- 
-	Parameters<bool> bools; 
-	Parameters<int> ints; 
-	Parameters<double> doubles; 
-	Parameters<std::string> strings; 
-	
-}; 
-
 std::ostream& operator<<( std::ostream& os , const User_Parameters up )
 {
 	os << "Bool parameters:: " << std::endl << up.bools << std::endl; 
@@ -291,6 +226,9 @@ std::ostream& operator<<( std::ostream& os , const User_Parameters up )
 	return os; 
 }
 
+}
+
+using namespace blah; 
 
 int main( int argc, char* argv[] )
 {

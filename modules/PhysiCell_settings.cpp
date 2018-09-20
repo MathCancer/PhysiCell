@@ -68,6 +68,7 @@
 #include "./PhysiCell_settings.h"
 
 using namespace BioFVM; 
+
 namespace PhysiCell{
 	
 PhysiCell_Settings PhysiCell_settings; 
@@ -465,21 +466,46 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
 		if( done == false )
 		{
 			std::string value = xml_get_my_string_value( node1 ); 
-			strings.add_parameter( name, "hi" , units ); 
+			strings.add_parameter( name, value , units ); 
 		}
 		
 		node1 = node1.next_sibling(); 
 		i++; 
 	}
 	
+	std::cout << "User parameters in XML config file: " << std::endl; 
 	std::cout << *this << std::endl; 
 	
 	return; 
 }
 
- 
 
-}; 
+
+// Paul's debugging for weird linking on templates. I learned. 
+
+template <class C>
+blerg<C>::blerg()
+{
+	C* pC; 
+	pC = new C;
+	value = *pC; 
+	return; 
+}
+
+// need this so that the template gets filled and compiled prior to linking 
+template class blerg<double>;
+
+template class Parameter<bool>;
+template class Parameter<int>;
+template class Parameter<double>;
+template class Parameter<std::string>;
+ 
+template class Parameters<bool>;
+template class Parameters<int>;
+template class Parameters<double>;
+template class Parameters<std::string>;
+
+} 
  
 
  

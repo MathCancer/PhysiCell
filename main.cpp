@@ -72,6 +72,7 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
+#include <string> 
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
@@ -85,6 +86,15 @@ using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
+	blerg<double> blarg; 
+	std::cout << blarg.value << std::endl; 
+/*
+	Parameter<double> blah; 
+	blah.name = "name"; 
+	blah.units = "none"; 
+	blah = 3.14; 
+	std::cout << blah << std::endl; 
+*/
 	// load and parse settings file(s)
 	
 	bool XML_status = false; 

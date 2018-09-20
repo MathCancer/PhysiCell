@@ -203,7 +203,16 @@ extern PhysiCell_Settings PhysiCell_settings;
 
 extern User_Parameters parameters; 
 
-} 
+template <class C>
+class blerg
+{
+ public:
+	C value; 
+	
+	blerg(); 
+};
+
+}
 
 #endif 
 

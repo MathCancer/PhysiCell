@@ -28,6 +28,19 @@ Minor new features and changes:
  
 + Updated all the sample projects to use the improved XML 
   parsing; 
+  
++ New functions in PhysiCell_pugixml: 
+
+
+std::string xml_get_my_name( pugi::xml_node node ); 
+bool xml_get_my_bool_value( pugi::xml_node node ); 
+int xml_get_my_int_value( pugi::xml_node node ); 
+double xml_get_my_double_value( pugi::xml_node node ); 
+std::string xml_get_my_string_value( pugi::xml_node node ); 
+
+
+
+
 
 Beta features (not fully supported):
  

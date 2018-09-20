@@ -118,6 +118,12 @@
 		<neato type="bool" units="none">false</neato> 
 		<blah type="double">13.4</blah>
 		<color type="string">rgb(12,12,13)</color>
+		
+		<tumor_radius type="double" units="micron">250.0</tumor_radius>
+		<oncoprotein_mean type="double" units="dimensionless">1.0</oncoprotein_mean>
+		<oncoprotein_sd type="double" units="dimensionless">0.25</oncoprotein_sd>
+		<oncoprotein_min type="double" units="dimensionless">0.0</oncoprotein_min>
+		<oncoprotein_max type="double" units="dimensionless">2</oncoprotein_max>
 	</user_parameters>
 	
 </PhysiCell_settings>
