@@ -83,6 +83,7 @@
 		<dx>20</dx>
 		<dy>20</dy>
 		<dz>20</dz>
+		<use_2D>true</use_2D>
 	</domain>
 	
 	<overall>
@@ -96,7 +97,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>.</folder> <!-- use . for root --> 
+		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
 			<interval units="min">60</interval>
@@ -114,16 +115,12 @@
 	</save>
 	
 	<user_parameters>
-		<golly type="int" units="blah">48</golly>
-		<neato type="bool" units="none">false</neato> 
-		<blah type="double">13.4</blah>
-		<color type="string">rgb(12,12,13)</color>
-		
 		<tumor_radius type="double" units="micron">250.0</tumor_radius>
 		<oncoprotein_mean type="double" units="dimensionless">1.0</oncoprotein_mean>
 		<oncoprotein_sd type="double" units="dimensionless">0.25</oncoprotein_sd>
 		<oncoprotein_min type="double" units="dimensionless">0.0</oncoprotein_min>
 		<oncoprotein_max type="double" units="dimensionless">2</oncoprotein_max>
+		<random_seed type="int" units="dimensionless">0</random_seed>
 	</user_parameters>
 	
 </PhysiCell_settings>

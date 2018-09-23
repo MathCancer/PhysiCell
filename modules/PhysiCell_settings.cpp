@@ -180,7 +180,7 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	double dy = xml_get_double_value( node, "dy" ); 
 	double dz = xml_get_double_value( node, "dz" ); 
 	
-	default_microenvironment_options.simulate_2D = xml_get_bool_value( node, "2D_simulation" ); 
+	default_microenvironment_options.simulate_2D = xml_get_bool_value( node, "use_2D" ); 
 
 	if( default_microenvironment_options.simulate_2D == true )
 	{
@@ -479,22 +479,7 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
 	return; 
 }
 
-
-
-// Paul's debugging for weird linking on templates. I learned. 
-
-template <class C>
-blerg<C>::blerg()
-{
-	C* pC; 
-	pC = new C;
-	value = *pC; 
-	return; 
-}
-
 // need this so that the template gets filled and compiled prior to linking 
-template class blerg<double>;
-
 template class Parameter<bool>;
 template class Parameter<int>;
 template class Parameter<double>;

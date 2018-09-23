@@ -74,7 +74,8 @@ void create_cell_types( void )
 	// same initial histogram of oncoprotein, even if threading means 
 	// that future division and other events are still not identical 
 	// for all runs 
-	SeedRandom(0); 
+	
+	SeedRandom( parameters.ints( "random_seed" ) ); 
 	
 	// housekeeping 
 	
@@ -88,7 +89,8 @@ void create_cell_types( void )
 	
 	// Make sure we're ready for 2D
 	
-	cell_defaults.functions.set_orientation = up_orientation; 
+	cell_defaults.functions.set_orientation = up_orientation;  
+	
 	cell_defaults.phenotype.geometry.polarity = 1.0; 
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	
@@ -131,6 +133,12 @@ void setup_microenvironment( void )
 	default_microenvironment_options.Y_range = {-1000, 1000}; 
 	default_microenvironment_options.simulate_2D = true; 
 */
+	// make sure ot override and go back to 2D 
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
+		default_microenvironment_options.simulate_2D = true; 
+	}
 	
 	// no gradients needed for this example 
 	

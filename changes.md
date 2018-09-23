@@ -8,12 +8,7 @@ Release date: 21 September 2018
 
 Release summary: 
  
-This release improves the use of XML parsing in configuring simula-
-tions, notably (1) reading the domain parameters instead of hard-coded 
-values, and (2) parsing a <user_parameters> block in the XML config 
-files to populate a global parameters data structure of Boolean, 
-integer, double, and std::string variables. Users can efficiently 
-query these from wihtin any function. 
+This release improves the use of XML parsing in configuring simula-tions, notably (1) reading the domain parameters instead of hard-coded values, and (2) parsing a <user_parameters> block in the XML config files to populate a global parameters data structure of Boolean, integer, double, and std::string variables. Users can efficiently query these from wihtin any function. 
  
 NOTE: OSX users must now define PHYSICELL_CPP system variable. 
       See the documentation.
@@ -22,7 +17,7 @@ Major new features and changes:
  
 + User Parameters! 
 
-+ Parsing XML to set domain size. 
++ Parsing XML to set domain size for all sample projects. 
   
 Minor new features and changes: 
  
@@ -31,13 +26,32 @@ Minor new features and changes:
   
 + New functions in PhysiCell_pugixml: 
 
+  1) std::string xml_get_my_name( pugi::xml_node node ); 
+  
+     This helps to easily extract the name of an XML node. (e.g., <bob units="none"/> returns bob.) 
 
-std::string xml_get_my_name( pugi::xml_node node ); 
-bool xml_get_my_bool_value( pugi::xml_node node ); 
-int xml_get_my_int_value( pugi::xml_node node ); 
-double xml_get_my_double_value( pugi::xml_node node ); 
-std::string xml_get_my_string_value( pugi::xml_node node ); 
+  2) bool xml_get_my_bool_value( pugi::xml_node node ); 
+  
+     This gets the Boolean value of an XML node. (e.g., <bob units="none">true</bob> returns true.) 
+  
+  3) int xml_get_my_int_value( pugi::xml_node node ); 
+  
+     This gets the integer value of an XML node. (e.g., <bob units="none">42</bob> returns 42.)
+  
+  4) double xml_get_my_double_value( pugi::xml_node node ); 
 
+     This gets the double value of an XML node. (e.g., <bob units="none">42.03</bob> returns 42.03.)
+
+  5) std::string xml_get_my_string_value( pugi::xml_node node ); 
+  
+     
+
++ Updated the heterogeneity sample project: 
+  1) Use the domain settings from the XML config file2
+  
+  2) Use the XML config file options to set the initial tumor size and initiaoncoprotein distribution. 
+  
+  3) Get the random seed from the XML config file. 
 
 
 
@@ -57,7 +71,8 @@ Beta features (not fully supported):
   
 Bugfixes: 
 
-+ None
++ Updated the "reset" rules so that the default config file 
+  is restored. (In all the sample makefiles.) 
   
 Notices for intended changes that may affect backwards compatibility:
  

@@ -77,13 +77,13 @@
 		<xmin>-1000.0</xmin> <!-- outer edge, not voxel center --> 
 		<xmax>1000.0</xmax>
 		<ymin>-1000.0</ymin>
-		<ymax>980.0</ymax>
+		<ymax>1000.0</ymax>
 		<zmin>-10</zmin>
 		<zmax>10</zmax>
 		<dx>20</dx>
 		<dy>20</dy>
 		<dz>20</dz>
-		<2D_simulation>true</2D_simulation>
+		<use_2D>true</use_2D>
 	</domain>
 	
 	<overall>

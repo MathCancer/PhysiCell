@@ -74,15 +74,16 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<xmin>0.02</xmin>
-		<xmax>52.01</xmax>
-		<ymin>-5.03</ymin>
-		<ymax>5.04</ymax>
-		<zmin>-10.01</zmin>
-		<zmax>10.7</zmax>
+		<x_min>-1000</x_min>
+		<x_max>1000</x_max>
+		<y_min>-1000</y_min>
+		<y_max>1000</y_max>
+		<z_min>-10</z_min>
+		<z_max>10</z_max>
 		<dx>20</dx>
 		<dy>20</dy>
-		<dz>-20.02</dz>
+		<dz>20</dz>
+		<use_2D>true</use_2D>
 	</domain>
 	
 	<overall>
@@ -96,7 +97,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>.</folder> <!-- use . for root --> 
+		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
 			<interval units="min">60</interval>
@@ -113,7 +114,13 @@
 		</legacy_data>
 	</save>
 	
-	<custom>
-	</custom>
+	<user_parameters>
+		<tumor_radius type="double" units="micron">250.0</tumor_radius>
+		<oncoprotein_mean type="double" units="dimensionless">1.0</oncoprotein_mean>
+		<oncoprotein_sd type="double" units="dimensionless">0.25</oncoprotein_sd>
+		<oncoprotein_min type="double" units="dimensionless">0.0</oncoprotein_min>
+		<oncoprotein_max type="double" units="dimensionless">2</oncoprotein_max>
+		<random_seed type="int" units="dimensionless">0</random_seed>
+	</user_parameters>
 	
 </PhysiCell_settings>
