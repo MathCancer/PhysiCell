@@ -3,12 +3,12 @@
 PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
 Multicellular Systems.
  
-Version:      1.3.4
+Version:      1.4.0
 Release date: ? September 2018
 
 Release summary: 
  
-This release improves the use of XML parsing in configuring simula-tions, notably (1) reading the domain parameters instead of hard-coded values, and (2) parsing a <user_parameters> block in the XML config files to populate a global parameters data structure of Boolean, integer, double, and std::string variables. Users can efficiently query these from wihtin any function. 
+This release improves the use of XML parsing in configuring simulations, notably (1) reading the domain parameters instead of hard-coded values, and (2) parsing a <user_parameters> block in the XML config files to populate a global parameters data structure of Boolean, integer, double, and std::string variables. Users can efficiently query these from within any function anywhere in a PhysiCell project. 
  
 NOTE: OSX users must now define PHYSICELL_CPP system variable. 
       See the documentation.
@@ -55,19 +55,9 @@ Minor new features and changes:
   
   4) Rewrote the custom coloring function to scale from min oncoprotein value (blue) to max oncoprotein value (yellow). 
 
-
 Beta features (not fully supported):
  
-+ Added ./protocols/ directory to include release and other 
-  instructions, to help train new developer contributors. 
-  Perhaps this should be called "checklists" ? 
-  
-+ Added the following functions to PhysiCell_utilities to 
-  register third-party software citations in a global list, 
-  ready for query and display: 
-  
-  void add_software_citation( std::string name , 
-       std::string version, std::string DOI, std::string URL ); 
++ None 
   
 Bugfixes: 
 
