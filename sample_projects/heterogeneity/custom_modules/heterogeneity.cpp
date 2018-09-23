@@ -310,7 +310,7 @@ std::vector<std::string> heterogeneity_coloring_function( Cell* pCell )
 	// live cells are green, but shaded by oncoprotein value 
 	if( pCell->phenotype.death.dead == false )
 	{
-		int oncoprotein = (int) round( (1.0/p_max) * pCell->custom_data[oncoprotein_i] * 255.0 ); 
+		int oncoprotein = (int) round( (1.0/(p_max-p_min)) * (pCell->custom_data[oncoprotein_i]-p_min) * 255.0 ); 
 		char szTempString [128];
 		sprintf( szTempString , "rgb(%u,%u,%u)", oncoprotein, oncoprotein, 255-oncoprotein );
 		output[0].assign( szTempString );

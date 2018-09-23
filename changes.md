@@ -4,7 +4,7 @@ PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D
 Multicellular Systems.
  
 Version:      1.3.4
-Release date: 21 September 2018
+Release date: ? September 2018
 
 Release summary: 
  
@@ -44,7 +44,7 @@ Minor new features and changes:
 
   5) std::string xml_get_my_string_value( pugi::xml_node node ); 
   
-     
++ Updated all Makefiles to copy main.cpp, the Makefile, and ./config/PhysiCell_settings.xml to backup copies prior to populating any sample project.      
 
 + Updated the heterogeneity sample project: 
   1) Use the domain settings from the XML config file2
@@ -52,8 +52,8 @@ Minor new features and changes:
   2) Use the XML config file options to set the initial tumor size and initiaoncoprotein distribution. 
   
   3) Get the random seed from the XML config file. 
-
-
+  
+  4) Rewrote the custom coloring function to scale from min oncoprotein value (blue) to max oncoprotein value (yellow). 
 
 
 Beta features (not fully supported):

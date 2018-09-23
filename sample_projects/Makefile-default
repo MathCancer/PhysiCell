@@ -60,7 +60,7 @@ all:
 	make heterogeneity-sample
 	make 
 
-# template projects 	
+# sample projects 	
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -68,6 +68,7 @@ template2D:
 	cp ./sample_projects/template2D/main-2D.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/template2D/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/template2D/config/* ./config/
 	
 template3D: 	
@@ -76,6 +77,7 @@ template3D:
 	cp ./sample_projects/template3D/main-3D.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/template3D/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/template3D/config/* ./config/
 	
 # sample projects 
@@ -86,6 +88,7 @@ biorobots-sample:
 	cp ./sample_projects/biorobots/main-biorobots.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/biorobots/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/biorobots/config/* ./config/
 	
 cancer-biorobots-sample:
@@ -94,6 +97,7 @@ cancer-biorobots-sample:
 	cp ./sample_projects/cancer_biorobots/main-cancer_biorobots.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/cancer_biorobots/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/cancer_biorobots/config/* ./config/
 	
 heterogeneity-sample:
@@ -102,6 +106,7 @@ heterogeneity-sample:
 	cp ./sample_projects/heterogeneity/main-heterogeneity.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/heterogeneity/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/heterogeneity/config/* ./config/
 	
 cancer-immune-sample:
@@ -110,6 +115,7 @@ cancer-immune-sample:
 	cp ./sample_projects/cancer_immune/main-cancer_immune_3D.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/cancer_immune/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/cancer_immune/config/* ./config/
 	
 beta-testing:
@@ -118,6 +124,7 @@ beta-testing:
 	cp ./sample_projects/beta_testing/main-beta.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/beta_testing/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/beta_testing/config/* ./config/
 	
 # early examples for convergence testing 
