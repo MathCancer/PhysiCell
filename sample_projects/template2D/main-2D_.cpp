@@ -98,29 +98,6 @@ int main( int argc, char* argv[] )
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
-	
-int my_index = parameters.doubles.find_index( "base_cell_adhesion_distance" ); 
-double temp = parameters.doubles( my_index ); 
-std::cout << temp << std::endl; 
-
-/* this streams a formatted output including the parameter name and units */ 
-std::cout << parameters.doubles[ my_index ] << std::endl; 
-
-std::cout << parameters.doubles[ my_index ].name << " " 
-     << parameters.doubles[ my_index ].value << " " 
-     << parameters.doubles[ my_index ].units << std::endl; 
-	 
-	if( parameters.bools("include_motile_cell") == true )
-{ std::cout << "I shall include a motile cell." << std::endl; }
-
-int rand_ind = parameters.ints.find_index( "random_seed" ); 
-std::cout << parameters.ints[rand_ind].name << " is at index " << rand_ind << std::endl; 
-
-std::cout << "We'll use this nice color: " << parameters.strings( "motile_color" ); 
-
-	 
-	 exit(0); 
-	
 	// PNRG setup 
 	SeedRandom(); 
 	
@@ -165,7 +142,7 @@ std::cout << "We'll use this nice color: " << parameters.strings( "motile_color"
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = false_cell_coloring_cytometry;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
@@ -230,10 +207,6 @@ std::cout << "We'll use this nice color: " << parameters.strings( "motile_color"
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
-			
-			/*
-			  Custom add-ons could potentially go here. 
-			*/
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}

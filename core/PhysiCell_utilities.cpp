@@ -184,6 +184,21 @@ void add_software_citation( std::string name , std::string version, std::string 
 	return; 
 }
 
-
+int choose_event( std::vector<double>& probabilities )
+{
+	double rand_number = UniformRandom(); 
+	
+	for( int i=0 ; i < probabilities.size() ; i++ )
+	{
+		if( rand_number <= probabilities[i] )
+		{ return i; }
+		else
+		{
+			rand_number -= probabilities[i]; 
+		}
+	}
+	
+	return probabilities.size(); 
+}
 
 };

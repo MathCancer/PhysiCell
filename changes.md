@@ -21,8 +21,7 @@ Major new features and changes:
   
 Minor new features and changes: 
  
-+ Updated all the sample projects to use the improved XML 
-  parsing; 
++ Updated all the sample projects to use the improved XML parsing; 
   
 + New functions in PhysiCell_pugixml: 
 
@@ -47,6 +46,7 @@ Minor new features and changes:
 + Updated all Makefiles to copy main.cpp, the Makefile, and ./config/PhysiCell_settings.xml to backup copies prior to populating any sample project.      
 
 + Updated the heterogeneity sample project: 
+
   1) Use the domain settings from the XML config file
   
   2) Use the XML config file options to set the initial tumor size and oncoprotein distribution. 
@@ -56,15 +56,36 @@ Minor new features and changes:
   4) Rewrote the custom coloring function to scale from min oncoprotein value (blue) to max oncoprotein value (yellow). 
   
 + Updated template2D sample project:
+
   1) Use the domain settings from the XML config file
   
   2) Use the XML config file to set the motile cell parameters
   
   3) Get the random seed from the XML config file. 
   
-  4) Updated to use the my_coloring_function coloring function. 
+  4) Updated to use the my_coloring_function coloring function. Made sure the my_coloring_function used false_cell_coloring_cytometry as its starting point. 
   
++ Updated template3D sample project:
 
+  1) Use the domain settings from the XML config file
+  
+  2) Use the XML config file to set the motile cell parameters
+  
+  3) Get the random seed from the XML config file. 
+  
+  4) Updated to use the my_coloring_function coloring function. Made sure the my_coloring_function used false_cell_coloring_cytometry as its starting point. 
+  
+  
++ New function in ./core/PhysiCell_utilities/*: 
+
+  int choose_event( std::vector<double probabilities> );
+  
+  If probabilities is a vector of n probabilities (for n events), and the sum of the probabilities is 1, then this chooses one of those n events according to these probabilities and returns the index of the selected event. 
+
++ Moved from README.txt to README.md to support markdown and improve releases on both SourceForge and GitHub. 
+  
++ Moved from changes.txt to changes.md to support markdown and improve releases on both SourceForge and GitHub. 
+  
 Beta features (not fully supported):
  
 + None 
@@ -77,14 +98,7 @@ Bugfixes:
   
 Notices for intended changes that may affect backwards compatibility:
  
-+ We will probably move from README.txt to README.md to support 
-  markdown and improve releases on both SourceForge and GitHub. 
-  
-+ We will probably move from changes.txt to changes.md to support 
-  markdown in the long-term change logs.  
- 
-+ We intend to merge Custom_Variable and Custom_Vector_Variable in the
-  very near future.  
++ We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
  
 Planned future improvements: 
  
@@ -92,29 +106,23 @@ Planned future improvements:
  
 + read saved simulation states (as MultiCellDS digital snapshots)
  
-+ "mainline" prototype cell attach/detach mechanics as standard models 
-  (currently in the biorobots and immune examples)
++ "mainline" prototype cell attach/detach mechanics as standard models (currently in the biorobots and immune examples)
  
-+ integrate SBML-encoded systems of ODEs as custom data and functions 
-  for molecular-scale modeling 
++ integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
   
-+ integrate Boolean network support from PhysiBoSS into the mainline code 
-  (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
++ integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
   
 + Develop contact-based cell-cell interactions. (Likely in next release.)
+
++ Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
  
-+ Add a new standard phenotype function that uses mechanobiology, 
-  where high pressure can arrest cycle progression. 
-  (See https://twitter.com/MathCancer/status/1022555441518338048.) 
-  (Likely in next release.) 
++ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
  
-+ Add module for standardized pharmacodynamics, as prototyped in the 
-  nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
++ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
  
 + create an angiogenesis sample project 
  
-+ create a small library of angiogenesis and vascularization codes as 
-  an optional standard module in ./modules (but not as a core component)
++ create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
 
 =======================================================================
 

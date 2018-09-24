@@ -73,13 +73,13 @@
 -->
 
 <PhysiCell_settings version="1.3.3">
-	<domain units="micron">
-		<xmin>-1000.0</xmin> <!-- outer edge, not voxel center --> 
-		<xmax>1000.0</xmax>
-		<ymin>-1000.0</ymin>
-		<ymax>1000.0</ymax>
-		<zmin>-10</zmin>
-		<zmax>10</zmax>
+	<domain>
+		<x_min>-1000</x_min>
+		<x_max>1000</x_max>
+		<y_min>-1000</y_min>
+		<y_max>1000</y_max>
+		<z_min>-10</z_min>
+		<z_max>10</z_max>
 		<dx>20</dx>
 		<dy>20</dy>
 		<dz>20</dz>

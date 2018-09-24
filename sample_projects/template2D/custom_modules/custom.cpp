@@ -78,7 +78,7 @@ void create_cell_types( void )
 	// that future division and other events are still not identical 
 	// for all runs 
 	
-	SeedRandom( time(NULL) ); // or specify a seed here 
+	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
 	
 	// housekeeping 
 	
@@ -99,6 +99,8 @@ void create_cell_types( void )
 	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
 	
 	// needed for a 2-D simulation: 
+	
+	/* grab code from heterogeneity */ 
 	
 	cell_defaults.functions.set_orientation = up_orientation; 
 	cell_defaults.phenotype.geometry.polarity = 1.0;
@@ -129,8 +131,7 @@ void create_cell_types( void )
 	
 	// add custom data here, if any 
 	
-	
-	
+
 	// Now, let's define another cell type. 
 	// It's best to just copy the default and modify it. 
 	
@@ -141,25 +142,26 @@ void create_cell_types( void )
 	motile_cell.type = 1; 
 	motile_cell.name = "motile tumor cell"; 
 	
-	// make sure the new cell type has its own reference phenotyhpe
+	// make sure the new cell type has its own reference phenotype
 	
 	motile_cell.parameters.pReference_live_phenotype = &( motile_cell.phenotype ); 
 	
 	// enable random motility 
 	motile_cell.phenotype.motility.is_motile = true; 
-	motile_cell.phenotype.motility.persistence_time = 15.0; // 15 minutes
-	motile_cell.phenotype.motility.migration_speed = 0.25; // 0.25 micron/minute 
+	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; 
+	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
 	motile_cell.phenotype.motility.migration_bias = 0.0;// completely random 
 	
 	// Set cell-cell adhesion to 5% of other cells 
-	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 0.05; 
+	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
 	
 	// Set apoptosis to zero 
-	motile_cell.phenotype.death.rates[apoptosis_model_index] = 0.0; 
+	motile_cell.phenotype.death.rates[apoptosis_model_index] = parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
 	
 	// Set proliferation to 10% of other cells. 
 	// Alter the transition rate from G0G1 state to S state
-	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 0.1; 
+	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
+		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); // 0.1; 
 	
 	return; 
 }
@@ -168,9 +170,17 @@ void setup_microenvironment( void )
 {
 	// set domain parameters 
 	
-	default_microenvironment_options.X_range = {-500, 500}; 
-	default_microenvironment_options.Y_range = {-500, 500}; 
-	default_microenvironment_options.simulate_2D = true; // 2D! 
+/* now this is in XML 
+	default_microenvironment_options.X_range = {-1000, 1000}; 
+	default_microenvironment_options.Y_range = {-1000, 1000}; 
+	default_microenvironment_options.simulate_2D = true; 
+*/
+	// make sure to override and go back to 2D 
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
+		default_microenvironment_options.simulate_2D = true; 
+	}
 	
 	// no gradients need for this example 
 
@@ -210,7 +220,7 @@ void setup_tissue( void )
 	
 	pC = create_cell( motile_cell ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
-
+	
 	return; 
 }
 
@@ -218,15 +228,12 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	// start with the Ki67 coloring 
 	
-	std::vector<std::string> output = false_cell_coloring_Ki67(pCell); 
-	
-	// if the cell is motile and not dead, paint it black 
-	
-	if( pCell->phenotype.death.dead == false && 
-		pCell->type == 1 )
+	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
+		
+	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
 	{
 		 output[0] = "black"; 
-		 output[2] = "black"; 	
+		 output[2] = "black"; 
 	}
 	
 	return output; 
