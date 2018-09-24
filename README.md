@@ -54,7 +54,7 @@ make reset         : de-populates the sample project and returns to
 
 See changes.txt for the full change log. 
 
--=-=-=-=-
+* * * 
 
 ## Release summary:
  
