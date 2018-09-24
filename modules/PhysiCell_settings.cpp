@@ -490,6 +490,11 @@ template class Parameters<int>;
 template class Parameters<double>;
 template class Parameters<std::string>;
 
+
+template std::ostream& operator<<(std::ostream& os, const Parameter<bool>& param);
+template std::ostream& operator<<(std::ostream& os, const Parameter<int>& param);
+template std::ostream& operator<<(std::ostream& os, const Parameter<double>& param);
+template std::ostream& operator<<(std::ostream& os, const Parameter<std::string>& param);
 } 
  
 

@@ -659,8 +659,6 @@ void Mechanics::set_relative_maximum_adhesion_distance( double new_value )
 	
 		// relative equilibrium spacing (relative to mean cell radius)
 	double s_relative = 2.0; 
-//	std::cout << "----------------" << std::endl; 
-//	std::cout << __FILE__ << " : " << __FUNCTION__ << " : " << __LINE__ << ": " << s_relative << std::endl; 
 	
 	double temp1 = cell_cell_adhesion_strength; 
 	temp1 /= cell_cell_repulsion_strength;
@@ -677,8 +675,6 @@ void Mechanics::set_relative_maximum_adhesion_distance( double new_value )
 	temp2 -= temp1; // 1 - sqrt( alpha_CCA / alpha_CCR )/f;
 
 	s_relative /= temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ) / ( 1-1/f) ; 
-	
-	std::cout << "\t\t\t" << s_relative << std::endl; 
 	
 	// now, adjust the relative max adhesion distance 
 	

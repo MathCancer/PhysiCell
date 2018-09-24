@@ -404,10 +404,13 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 
 	std::string time_label = formatted_minutes_to_DDHHMM( temp_time ); 
  
-	sprintf( szString , "Current time: %s, z = %3.2f %s", time_label.c_str() ,  z_slice , PhysiCell_SVG_options.simulation_space_units.c_str() ); 
-	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1), font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+	sprintf( szString , "Current time: %s, z = %3.2f %s", time_label.c_str(), 
+		z_slice , PhysiCell_SVG_options.simulation_space_units.c_str() ); 
+	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1), 
+		font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
 	sprintf( szString , "%u agents" , total_cell_count ); 
-	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1+.2+.9) , 0.95*font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1+.2+.9), 
+		0.95*font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
 	
 	delete [] szString; 
 
@@ -506,8 +509,6 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
    
 			double plot_radius = sqrt( r*r - z*z ); 
 
-//			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]+top_margin-Y_lower, 
-//				plot_radius , 0.5, Colors[1], Colors[0] ); 
 			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
 				plot_radius , 0.5, Colors[1], Colors[0] ); 
 
@@ -515,8 +516,6 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 			if( fabs(z) < rn && PhysiCell_SVG_options.plot_nuclei == true )
 			{   
 				plot_radius = sqrt( rn*rn - z*z ); 
-//			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]+top_margin-Y_lower, 
-//					plot_radius, 0.5, Colors[3],Colors[2]); 
 			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
 					plot_radius, 0.5, Colors[3],Colors[2]); 
 			}					  

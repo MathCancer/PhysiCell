@@ -47,13 +47,23 @@ Minor new features and changes:
 + Updated all Makefiles to copy main.cpp, the Makefile, and ./config/PhysiCell_settings.xml to backup copies prior to populating any sample project.      
 
 + Updated the heterogeneity sample project: 
-  1) Use the domain settings from the XML config file2
+  1) Use the domain settings from the XML config file
   
-  2) Use the XML config file options to set the initial tumor size and initiaoncoprotein distribution. 
+  2) Use the XML config file options to set the initial tumor size and oncoprotein distribution. 
   
   3) Get the random seed from the XML config file. 
   
   4) Rewrote the custom coloring function to scale from min oncoprotein value (blue) to max oncoprotein value (yellow). 
+  
++ Updated template2D sample project:
+  1) Use the domain settings from the XML config file
+  
+  2) Use the XML config file to set the motile cell parameters
+  
+  3) Get the random seed from the XML config file. 
+  
+  4) Updated to use the my_coloring_function coloring function. 
+  
 
 Beta features (not fully supported):
  
@@ -61,8 +71,9 @@ Beta features (not fully supported):
   
 Bugfixes: 
 
-+ Updated the "reset" rules so that the default config file 
-  is restored. (In all the sample makefiles.) 
++ Updated the "reset" rules so that the default config file is restored (in all the sample makefiles). 
+  
++ Removed a cout from Mechanics::set_relative_equilibrium_distance() from ./core/PhysiCell_phenotype.*
   
 Notices for intended changes that may affect backwards compatibility:
  
