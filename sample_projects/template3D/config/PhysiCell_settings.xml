@@ -66,7 +66,6 @@
 #                                                                             #
 ###############################################################################
 */
-
 --> 
 
 <!--
@@ -75,15 +74,16 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<xmin>0.02</xmin>
-		<xmax>52.01</xmax>
-		<ymin>-5.03</ymin>
-		<ymax>5.04</ymax>
-		<zmin>-10.01</zmin>
-		<zmax>10.7</zmax>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
+		<z_min>-500</z_min>
+		<z_max>500</z_max>
 		<dx>20</dx>
 		<dy>20</dy>
-		<dz>-20.02</dz>
+		<dz>20</dz>
+		<use_2D>false</use_2D>
 	</domain>
 	
 	<overall>
@@ -97,7 +97,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>.</folder> <!-- use . for root --> 
+		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
 			<interval units="min">360</interval>
@@ -114,7 +114,18 @@
 		</legacy_data>
 	</save>
 	
-	<custom>
-	</custom>
+	<user_parameters>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<!-- example parameters from the template --> 
+		
+		<!-- motile cell type parameters --> 
+		<motile_cell_persistence_time type="double" units="min">15</motile_cell_persistence_time>
+		<motile_cell_migration_speed type="double" units="micron/min">0.25</motile_cell_migration_speed> 
+		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
+		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
+		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.1</motile_cell_relative_cycle_entry_rate>
+		
+	</user_parameters>
+	
 	
 </PhysiCell_settings>

@@ -131,16 +131,8 @@ void create_cell_types( void )
 	
 	// add custom data here, if any 
 	
-	/* for the tutorial */ 
-	cell_defaults.phenotype.cycle.data.transition_rate(G0G1_index,S_index) = 
-		parameters.doubles("base_cycle_entry_rate"); 
-	cell_defaults.phenotype.death.rates[apoptosis_model_index] = 
-		parameters.doubles("base_apoptosis_rate"); 
-		
-	cell_defaults.phenotype.mechanics.set_relative_maximum_adhesion_distance( 
-		parameters.doubles("base_cell_adhesion_distance") ); // done 
 
-		// Now, let's define another cell type. 
+	// Now, let's define another cell type. 
 	// It's best to just copy the default and modify it. 
 	
 	// make this cell type randomly motile, less adhesive, greater survival, 
@@ -150,25 +142,15 @@ void create_cell_types( void )
 	motile_cell.type = 1; 
 	motile_cell.name = "motile tumor cell"; 
 	
-	// make sure the new cell type has its own reference phenotyhpe
+	// make sure the new cell type has its own reference phenotype
 	
 	motile_cell.parameters.pReference_live_phenotype = &( motile_cell.phenotype ); 
-	
-/*
-		<motile_cell_persistence_time type="double" units="min">15.0</motile_cell_persistence_time>
-		<motile_cell_migration_speed type="double" units="micron/min">0.25</motile_cell_migration_speed>
-		<motile_cell_migration_bias type="double" units="dimensionless">0.0</motile_cell_migration_bias>
-		
-		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
-		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
-		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.10</motile_cell_relative_cycle_entry_rate>
-*/
 	
 	// enable random motility 
 	motile_cell.phenotype.motility.is_motile = true; 
 	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; 
 	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
-	motile_cell.phenotype.motility.migration_bias = parameters.doubles( "motile_cell_migration_bias" ); // 0.0;// completely random 
+	motile_cell.phenotype.motility.migration_bias = 0.0;// completely random 
 	
 	// Set cell-cell adhesion to 5% of other cells 
 	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
@@ -193,7 +175,7 @@ void setup_microenvironment( void )
 	default_microenvironment_options.Y_range = {-1000, 1000}; 
 	default_microenvironment_options.simulate_2D = true; 
 */
-	// make sure ot override and go back to 2D 
+	// make sure to override and go back to 2D 
 	if( default_microenvironment_options.simulate_2D == false )
 	{
 		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
@@ -236,21 +218,8 @@ void setup_tissue( void )
 	
 	// now create a motile cell 
 	
-		/*
-		<base_cycle_entry_rate type="double" units="1/min">9.3e-4</base_cycle_entry_rate> 
-		<base_apoptosis_rate type="double" units="1/min">1e-6</base_apoptosis_rate>
-		<base_cell_adhesion_distance type="double" units="dimensionless">1.7</base_cell_adhesion_distance> 
-		
-		<include_motile_cell type="bool" units="dimensionless">true</include_motile_cell>
-	*/
-	/*  remove this conditional for the normal project */ 
-	if( parameters.bools("include_motile_cell") == true )
-	{
-	
 	pC = create_cell( motile_cell ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
-
-	}
 	
 	return; 
 }
@@ -260,15 +229,11 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	// start with the Ki67 coloring 
 	
 	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
-	
-	// if the cell is motile and not dead, paint it black 
-	
-	static std::string motile_color = parameters.strings( "motile_color" );  // tutorial 
 		
 	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
 	{
-		 output[0] = motile_color; // "black";  // tutorial 
-		 output[2] = motile_color; // "black"; 	// tutorial 
+		 output[0] = "black"; 
+		 output[2] = "black"; 
 	}
 	
 	return output; 

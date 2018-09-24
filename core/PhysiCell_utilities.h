@@ -92,6 +92,8 @@ void display_citations( std::ostream& os );
 void display_citations( void ); 
 void add_software_citation( std::string name , std::string version, std::string DOI, std::string URL ); 
 
+int choose_event( std::vector<double>& probabilities ); 
+
 };
 
 #endif
