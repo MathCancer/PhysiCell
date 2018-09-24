@@ -155,7 +155,6 @@ void create_cell_types( void )
 	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
 	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; 
 	
-	<!-- resume here!!!!! --> 
 	//
 	// Define "seed" cells 
 	
@@ -195,9 +194,9 @@ void create_cell_types( void )
 	// make them motile, and unadhesive  
 	
 	worker_cell.phenotype.motility.is_motile = true; 
-	worker_cell.phenotype.motility.persistence_time = 5.0; 
-	worker_cell.phenotype.motility.migration_speed = 5;
-	worker_cell.phenotype.motility.migration_bias = 0.0;
+	worker_cell.phenotype.motility.persistence_time = 5.0; /* param */
+	worker_cell.phenotype.motility.migration_speed = 5; /* param */
+	worker_cell.phenotype.motility.migration_bias = 0.0; /* param */
 	
 	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0; 
 	
@@ -322,9 +321,9 @@ void create_cargo_cluster_3( std::vector<double>& center )
 
 void setup_tissue( void )
 {
-	int number_of_directors = 15;
-	int number_of_cargo_clusters = 100; 
-	int number_of_workers = 50; 
+	int number_of_directors = 15;  /* param */
+	int number_of_cargo_clusters = 100;  /* param */
+	int number_of_workers = 50;  /* param */
 
 	std::cout << "Placing cells ... " << std::endl; 
 	
@@ -335,7 +334,7 @@ void setup_tissue( void )
 	double x_range = default_microenvironment_options.X_range[1] - default_microenvironment_options.X_range[0]; 
 	double y_range = default_microenvironment_options.Y_range[1] - default_microenvironment_options.Y_range[0]; 
 
-	double relative_margin = 0.2; 
+	double relative_margin = 0.2;  
 	double relative_outer_margin = 0.02; 
 	
 	std::cout << "\tPlacing director cells ... " << std::endl; 
@@ -510,7 +509,7 @@ void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, doub
 
 void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static double threshold = 0.4; 
+	static double threshold = 0.4; /* param */
 	
 	// have I arrived? If so, release my cargo 
 	if( pCell->nearest_density_vector()[0] > threshold )
@@ -552,14 +551,14 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	if( pCell->state.neighbors.size() > 0 )
 	{
-		phenotype.motility.migration_bias = 1.0; 
+		phenotype.motility.migration_bias = 1.0; /* param */
 
 		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(0);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			
 	}
 	else
 	{
-		phenotype.motility.migration_bias = 0.5; 
+		phenotype.motility.migration_bias = 0.5; /* param */
 		
 		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(1);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			

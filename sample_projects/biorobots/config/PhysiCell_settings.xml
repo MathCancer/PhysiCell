@@ -93,7 +93,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>8</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -125,7 +125,7 @@
 		
 		<!-- for cell definitions -->
 		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>
-		
+		<director_cell_secretion_rate type="double" units="1/min"></director_cell_secretion_rate>
 		
 	
 	</user_parameters>
