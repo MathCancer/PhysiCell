@@ -194,10 +194,14 @@ void create_cell_types( void )
 	// make them motile, and unadhesive  
 	
 	worker_cell.phenotype.motility.is_motile = true; 
-	worker_cell.phenotype.motility.persistence_time = 5.0; /* param */
-	worker_cell.phenotype.motility.migration_speed = 5; /* param */
-	worker_cell.phenotype.motility.migration_bias = 0.0; /* param */
+	worker_cell.phenotype.motility.persistence_time = 
+		parameters.doubles("worker_motility_persistence_time"); // 5.0; 
+	worker_cell.phenotype.motility.migration_speed = 
+		parameters.doubles("worker_migration_speed"); // 5; 
+	worker_cell.phenotype.motility.migration_bias = 
+		parameters.doubles("unattached_worker_migration_bias"); // 0.0; 
 	
+
 	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0; 
 	
 	worker_cell.functions.update_phenotype = worker_cell_rule; 
@@ -321,9 +325,9 @@ void create_cargo_cluster_3( std::vector<double>& center )
 
 void setup_tissue( void )
 {
-	int number_of_directors = 15;  /* param */
-	int number_of_cargo_clusters = 100;  /* param */
-	int number_of_workers = 50;  /* param */
+	int number_of_directors = parameters.ints("number_of_directors"); // 15;  
+	int number_of_cargo_clusters = parameters.ints("number_of_cargo_clusters"); // 100;  
+	int number_of_workers = parameters.ints("number_of_workers"); // 50;  
 
 	std::cout << "Placing cells ... " << std::endl; 
 	
@@ -509,7 +513,7 @@ void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, doub
 
 void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static double threshold = 0.4; /* param */
+	static double threshold = parameteres.doubles("drop_threshold"); // 0.4; 
 	
 	// have I arrived? If so, release my cargo 
 	if( pCell->nearest_density_vector()[0] > threshold )
@@ -549,16 +553,21 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	// if attached, biased motility towards director chemoattractant 
 	// otherwise, biased motility towards cargo chemoattractant 
 	
+	static double attached_worker_migration_bias = 
+		parameters.doubles("attached_worker_migration_bias"); 
+	static double unattached_worker_migration_bias = 
+		parameters.doubles("unattached_worker_migration_bias"); 
+	
 	if( pCell->state.neighbors.size() > 0 )
 	{
-		phenotype.motility.migration_bias = 1.0; /* param */
+		phenotype.motility.migration_bias = attached_worker_migration_bias; 
 
 		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(0);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			
 	}
 	else
 	{
-		phenotype.motility.migration_bias = 0.5; /* param */
+		phenotype.motility.migration_bias = unattached_worker_migration_bias; 
 		
 		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(1);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			

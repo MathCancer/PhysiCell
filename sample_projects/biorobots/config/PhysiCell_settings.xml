@@ -125,8 +125,19 @@
 		
 		<!-- for cell definitions -->
 		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>
-		<director_cell_secretion_rate type="double" units="1/min"></director_cell_secretion_rate>
+
+		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
+		<worker_migration_speed type="double" units="micron/min">5.0</worker_migration_speed>
+		<attached_worker_migration_bias type="double" units="min">1.0</attached_worker_migration_bias>
+		<unattached_worker_migration_bias type="double" units="min">0.5</unattached_worker_migration_bias>
+
+		<!-- tissue setup --> 
+		<number_of_directors type="int" units="none">15</number_of_directors> 
+		<number_of_cargo_clusters type="int" units="none">100</number_of_cargo_clusters>
+		<number_of_workers type="int" units="none">50</number_of_workers>
 		
+		<!-- cargo parameters --> 
+		<drop_threshold type="double" units="dimensionless">0.4</drop_threshold> 
 	
 	</user_parameters>
 	
