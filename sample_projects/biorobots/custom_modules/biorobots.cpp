@@ -73,23 +73,30 @@ void setup_microenvironment( void )
 	
 	default_microenvironment_options.outer_Dirichlet_conditions = false;
 
+/*
+	// this is in the XML now 
 	default_microenvironment_options.X_range = {-1000, 1000}; 
 	default_microenvironment_options.Y_range = {-1000, 1000}; 
 	default_microenvironment_options.simulate_2D = true; 
+*/	
 	
 	default_microenvironment_options.calculate_gradients = true;
 
 	microenvironment.add_density( "cargo signal", "dimensionless" ); 
-	microenvironment.diffusion_coefficients[1] = 1e3; 
-	microenvironment.decay_rates[1] = .4; // 50 micron length scale 
+	microenvironment.diffusion_coefficients[1] = 
+		parameters.doubles("cargo_signal_D"); // 1e3; 
+	microenvironment.decay_rates[1] = 
+		parameters.doubles("cargo_signal_decay"); // .4; // 50 micron length scale 
 	
 	initialize_microenvironment(); 	
 
 	// update the first diffusing substrate (gets overwritten by BioFVM::initialize_microenvironment()
 	
 	microenvironment.set_density( 0 , "director signal", "dimensionless" ); 
-	microenvironment.diffusion_coefficients[0] = 1e3; 
-	microenvironment.decay_rates[0] = 0.1;  // 100 micron length scale 
+	microenvironment.diffusion_coefficients[0] = 
+		parameters.doubles("director_signal_D"); // 1e3; 
+	microenvironment.decay_rates[0] = 
+		parameters.doubles("director_signal_decay"); // 0.1;  // 100 micron length scale 
 	
 	microenvironment.name = "synthetic tissue"; 
 
@@ -142,8 +149,13 @@ void create_cell_types( void )
 	// add custom data 
 	
 	cell_defaults.custom_data.add_variable( "receptor" , "dimensionless", 0.0 ); 
+	/*
 	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 );  // 0.1; 
+	*/
+	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
+	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; 
 	
+	<!-- resume here!!!!! --> 
 	//
 	// Define "seed" cells 
 	
