@@ -87,20 +87,27 @@ void create_immune_cell_type( void )
 	
 	// reduce o2 uptake 
 	
-	immune_cell.phenotype.secretion.uptake_rates[0] *= 0.1; 
+	immune_cell.phenotype.secretion.uptake_rates[0] *= 
+		parameters.doubles("immune_o2_relative_uptake"); // 0.1; 
 	
 	// set apoptosis to survive 10 days (on average) 
 	
-	immune_cell.phenotype.death.rates[apoptosis_index] = 1.0 / (10.0 * 24.0 * 60.0 ); 
+	immune_cell.phenotype.death.rates[apoptosis_index] = 
+		parameters.doubles("immune_apoptosis_rate"); // 1.0 / (10.0 * 24.0 * 60.0 ); 
 	
 	// turn on motility; 
 	immune_cell.phenotype.motility.is_motile = true; 
-	immune_cell.phenotype.motility.persistence_time = 10.0; 
-	immune_cell.phenotype.motility.migration_speed = 1;  
-	immune_cell.phenotype.motility.migration_bias = 0.5;
+	immune_cell.phenotype.motility.persistence_time = 
+		parameters.doubles("immune_motility_persistence_time"); // 10.0; 
+	immune_cell.phenotype.motility.migration_speed = 
+		parameters.doubles("immune_migration_speed"); // 1;  
+	immune_cell.phenotype.motility.migration_bias = 
+		parameters.doubles("immune_migration_bias"); // 0.5;
 	
-	immune_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 0.0;
-	immune_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 5.0;
+	immune_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
+		parameters.doubles("immune_relative_adhesion"); // 0.0;
+	immune_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 
+		parameters.doubles("immune_relative_repulsion"); // 5.0;
 	
 	// set functions 
 	
@@ -110,10 +117,15 @@ void create_immune_cell_type( void )
 	
 	// set custom data values 
 	
+	Parameter<double> paramD; 
+	
 	immune_cell.custom_data[ "oncoprotein" ] = 0.0; 
-	immune_cell.custom_data[ "kill rate" ] = 1.0/15.0; // how often it tries to kill
-	immune_cell.custom_data[ "attachment lifetime" ] = 60.00; // how long it can stay attached 
-	immune_cell.custom_data[ "attachment rate" ] = 1.0/5.0; // how long it wants to wander before attaching	
+	immune_cell.custom_data[ "kill rate" ] = 
+		parameters.doubles("immune_kill_rate"); // 1.0/15.0; // how often it tries to kill
+	immune_cell.custom_data[ "attachment lifetime" ] = 
+		parameters.doubles("immune_attachment_lifetime"); // 60.00; // how long it can stay attached 
+	immune_cell.custom_data[ "attachment rate" ] = 
+		parameters.doubles("immune_attachment_rate"); // 1.0/5.0; // how long it wants to wander before attaching	
 	
 	return; 
 }
