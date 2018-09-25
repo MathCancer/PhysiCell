@@ -119,7 +119,7 @@ int main( int argc, char* argv[] )
 	
 	/* Users typically start modifying here. START USERMODS */ 
 
-	double therapy_activation_time = 60 * 24 * 7; // inject therapy at 7 days 
+	double therapy_activation_time = parameters.doubles("therapy_activation_time"); // 60 * 24 * 7; // inject therapy at 7 days 
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	
@@ -175,8 +175,8 @@ int main( int argc, char* argv[] )
 			{
 				std::cout << "Therapy started!" << std::endl; 
 				therapy_introduced = true; 
-				PhysiCell_settings.full_save_interval = 3.0; 
-				PhysiCell_settings.SVG_save_interval = 3.0; 
+				PhysiCell_settings.full_save_interval = parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
+				PhysiCell_settings.SVG_save_interval = parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
 				
 				PhysiCell_globals.next_full_save_time = PhysiCell_globals.current_time; 
 				PhysiCell_globals.next_SVG_save_time = PhysiCell_globals.current_time; 

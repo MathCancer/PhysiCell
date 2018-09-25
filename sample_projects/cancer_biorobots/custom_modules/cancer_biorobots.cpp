@@ -88,20 +88,24 @@ void create_cargo_cell_type( void )
 	
 	// reduce o2 uptake 
 	
-	cargo_cell.phenotype.secretion.uptake_rates[0] *= 0.1; 
+	cargo_cell.phenotype.secretion.uptake_rates[0] *= 
+		parameters.doubles("cargo_o2_relative_uptake"); // 0.1; 
 	
 	// set secretion of the chemoattractant
 	cargo_cell.phenotype.secretion.secretion_rates[1] = 10; 
 	
 	// set apoptosis to survive 10 days (on average) 
 	
-	cargo_cell.phenotype.death.rates[apoptosis_index] = 1.0 / (10.0 * 24.0 * 60.0 ); 
+	cargo_cell.phenotype.death.rates[apoptosis_index] = 
+		parameters.doubles("cargo_apoptosis_rate"); // 1.0 / (10.0 * 24.0 * 60.0 ); 
 	
 	// turn of motility; 
 	cargo_cell.phenotype.motility.is_motile = false; 
 	
-	cargo_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 0.0;
-	cargo_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 5.0;
+	cargo_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
+		parameters.doubles("cargo_relative_adhesion"); // 0.0;
+	cargo_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 
+		parameters.doubles("cargo_relative_repulsion"); // 5.0;
 	
 	// set functions 
 	
@@ -119,7 +123,6 @@ void create_cargo_cell_type( void )
 
 	return;
 }	
-	
 
 void create_worker_cell_type( void )
 {
@@ -139,20 +142,27 @@ void create_worker_cell_type( void )
 	
 	// reduce o2 uptake 
 	
-	worker_cell.phenotype.secretion.uptake_rates[0] *= 0.1; 
+	worker_cell.phenotype.secretion.uptake_rates[0] *= 
+		parameters.doubles("worker_o2_relative_uptake"); // 0.1; 
 	
 	// set apoptosis zero
 	
-	worker_cell.phenotype.death.rates[apoptosis_index] = 0.0; // 1.0 / (10.0 * 24.0 * 60.0 ); 
+	worker_cell.phenotype.death.rates[apoptosis_index] = 
+		paramters.doubles("worker_apoptosis_rate"); // 0.0; // 1.0 / (10.0 * 24.0 * 60.0 ); 
 	
 	// turn on motility; 
 	worker_cell.phenotype.motility.is_motile = true; 
-	worker_cell.phenotype.motility.persistence_time = 5.0; 
-	worker_cell.phenotype.motility.migration_speed = 2;  
-	worker_cell.phenotype.motility.migration_bias = 1;
+	worker_cell.phenotype.motility.persistence_time = 
+		parameters.doubles("worker_motility_persistence_time"); // 5.0; 
+	worker_cell.phenotype.motility.migration_speed = 
+		parameters.doubles("worker_migration_speed"); // 2;  
+	worker_cell.phenotype.motility.migration_bias = 
+		parameters.doubles("unattached_worker_migration_bias"); // 1;
 	
-	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 0.0;
-	worker_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 5.0;
+	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
+		parameters.doubles("worker_relative_adhesion"); // 0.0;
+	worker_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 
+		parameters.doubles("worker_relative_repulsion"); // 5.0;
 	
 	// set functions 
 	
@@ -231,12 +241,19 @@ void create_cell_types( void )
 	
 	// add custom data 
 		
-	// for cargo-worker 
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 ); 
-	cell_defaults.custom_data.add_variable( "receptor" , "dimensionless", 0.0 ); 
-//	cell_defaults.custom_data.add_variable( "cargo release oxygen threshold" , "mmHg", 10.0 ); 
-	cell_defaults.custom_data.add_variable( "cargo release oxygen threshold" , "mmHg", 15.0 ); 
+	Parameter<double> paramD; 
 	
+	// for cargo-worker 
+	paramD = parameters.doubles["elastic_coefficient"]; 
+	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units, parmaD.value ); 
+	
+	paramD = parameters.doubles["receptor"]; 
+	cell_defaults.custom_data.add_variable( "receptor" , paramD.units, paramD.value ); 
+	
+	paramD = parameters.doubles["cargo_release_o2_threshold"]; 
+	cell_defaults.custom_data.add_variable( "cargo release oxygen threshold" , paramD.units, paramD.value ); 
+	
+	/* START HERE */ 
 
 	// for therapy 
 	
