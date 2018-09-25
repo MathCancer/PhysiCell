@@ -1,25 +1,23 @@
-=======================================================================
+* * * 
 
-PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
-Multicellular Systems.
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
  
-Version:      1.4.0
-Release date: ? September 2018
+**Version:**      1.4.0
+**Release date:** ? September 2018
 
-Release summary: 
+## Release summary: 
  
 This release improves the use of XML parsing in configuring simulations, notably (1) reading the domain parameters instead of hard-coded values, and (2) parsing a <user_parameters> block in the XML config files to populate a global parameters data structure of Boolean, integer, double, and std::string variables. Users can efficiently query these from within any function anywhere in a PhysiCell project. 
  
-NOTE: OSX users must now define PHYSICELL_CPP system variable. 
-      See the documentation.
+**NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
-Major new features and changes:
+### Major new features and changes:
  
 + User Parameters! 
 
 + Parsing XML to set domain size for all sample projects. 
   
-Minor new features and changes: 
+### Minor new features and changes: 
  
 + Updated all the sample projects to use the improved XML parsing; 
   
@@ -93,21 +91,21 @@ Minor new features and changes:
   
 + Moved from changes.txt to changes.md to support markdown and improve releases on both SourceForge and GitHub. 
   
-Beta features (not fully supported):
+### Beta features (not fully supported):
  
 + None 
   
-Bugfixes: 
+### Bugfixes: 
 
 + Updated the "reset" rules so that the default config file is restored (in all the sample makefiles). 
   
 + Removed a cout from Mechanics::set_relative_equilibrium_distance() from ./core/PhysiCell_phenotype.*
   
-Notices for intended changes that may affect backwards compatibility:
+### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
  
-Planned future improvements: 
+### Planned future improvements: 
  
 + Further XML-based simulation setup. 
  
@@ -131,7 +129,7 @@ Planned future improvements:
  
 + create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
 
-=======================================================================
+* * * 
 
 PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D 
 Multicellular Systems.
