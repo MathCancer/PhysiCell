@@ -463,10 +463,19 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
 //			bools.add_parameter( name, value, units ); 
 		}
 				
-		if( done == false || type == "string" )
+		if( done == false && type == "string" )
 		{
 			std::string value = xml_get_my_string_value( node1 ); 
 			strings.add_parameter( name, value , units ); 
+			done = true; 
+		}
+		
+		/* default if no type specified: */
+		if( done == false )
+		{
+			double value = xml_get_my_double_value( node1 ); 
+			doubles.add_parameter( name , value, units ); 
+			done = true; 
 		}
 		
 		node1 = node1.next_sibling(); 
