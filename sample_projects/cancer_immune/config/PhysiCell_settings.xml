@@ -74,15 +74,16 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<xmin>0.02</xmin>
-		<xmax>52.01</xmax>
-		<ymin>-5.03</ymin>
-		<ymax>5.04</ymax>
-		<zmin>-10.01</zmin>
-		<zmax>10.7</zmax>
+		<x_min>-750</x_min>
+		<x_max>750</x_max>
+		<y_min>-750</y_min>
+		<y_max>750</y_max>
+		<z_min>-10</z_min>
+		<z_max>10</z_max>
 		<dx>20</dx>
 		<dy>20</dy>
-		<dz>-20.02</dz>
+		<dz>20</dz>
+		<use_2D>false</use_2D>
 	</domain>
 	
 	<overall>
@@ -113,7 +114,15 @@
 		</legacy_data>
 	</save>
 	
-	<custom>
-	</custom>
+	<user_parameters>
+		<!-- main --> 
+		<immune_activation_time type="double" units="min">20160</immune_activation_time>
+			<!-- activate in 7 days --> 
+		<save_interval_after_therapy_start type="double" units="min">3.0</save_interval_after_therapy_start>
+
+	
+
+		
+	</user_parameters>
 	
 </PhysiCell_settings>
