@@ -239,16 +239,20 @@ std::vector<std::string> robot_coloring_function( Cell* pCell )
 	{ return output; }
 
 	output[3] = "none"; // no nuclear outline color 
+	
+	static std::string worker_color = parameters.strings( "worker_color" ); 
+	static std::string cargo_color = parameters.strings( "cargo_color" ); 
+	static std::string director_color = parameters.strings( "director_color" ); 
 
 	if( pCell->type == worker_ID )
-	{ color = "red"; }
+	{ color = worker_color; }
 	if( pCell->type == cargo_ID )
-	{ color = "blue"; }
+	{ color = cargo_color; }
 	if( pCell->type == linker_ID )
 	{ color = "aquamarine"; }
 
 	if( pCell->type == director_ID )
-	{ color = "limegreen"; }
+	{ color = director_color; }
 
 	output[0] = color; 
 	output[2] = color; 
@@ -513,7 +517,7 @@ void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, doub
 
 void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static double threshold = parameteres.doubles("drop_threshold"); // 0.4; 
+	static double threshold = parameters.doubles("drop_threshold"); // 0.4; 
 	
 	// have I arrived? If so, release my cargo 
 	if( pCell->nearest_density_vector()[0] > threshold )

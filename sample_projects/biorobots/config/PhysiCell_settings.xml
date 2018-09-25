@@ -138,6 +138,11 @@
 		
 		<!-- cargo parameters --> 
 		<drop_threshold type="double" units="dimensionless">0.4</drop_threshold> 
+		
+		<!-- colors --> 
+		<worker_color type="string" units="none">red</worker_color>
+		<cargo_color type="string" units="none">blue</cargo_color>
+		<director_color type="string" units="none">limegreen</director_color> 
 	
 	</user_parameters>
 	

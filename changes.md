@@ -76,7 +76,12 @@ Minor new features and changes:
   4) Updated to use the my_coloring_function coloring function. Made sure the my_coloring_function used false_cell_coloring_cytometry as its starting point. 
   
 + Updated biorobots sample project:   
+
+  1) Use the domain settings from the XML config file
   
+  2) Use the XML config file to set parameters and colors throughout the biorobots.cpp file 
+  
+  3) Get the random seed from the XML config file
   
 + New function in ./core/PhysiCell_utilities/*: 
 
