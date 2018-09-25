@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-1000</x_min>
-		<x_max>1000</x_max>
-		<y_min>-1000</y_min>
-		<y_max>1000</y_max>
+		<x_min>-750</x_min>
+		<x_max>750</x_max>
+		<y_min>-750</y_min>
+		<y_max>750</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -100,12 +100,12 @@
 		<folder>.</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">2</interval>
-			<enable>true</enable>
+			<interval units="min">60</interval>
+			<enable>false</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">2</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -118,7 +118,7 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		
 		<!-- for main --> 
-		<therapy_activation_time type="double" units="min">10080</therapy_activation_time> 
+		<therapy_activation_time type="double" units="min">96</therapy_activation_time> 
 			<!-- activate in 7 days --> 
 		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
 		
@@ -145,47 +145,30 @@
 		<receptor type="double" units="dimensionless">0.0</receptor>
 		<cargo_release_o2_threshold type="double" units="mmHg">10</cargo_release_o2_threshold>
 		
+		<!-- for therapy --> 
+		<damage_rate type="double" units="1/min">0.03333</damage_rate> <!-- 1/30 --> 
+		<repair_rate type="double" units="1/min">0.004167</repair_rate> <!-- 1/240 --> 
+		<drug_death_rate type="double" units="1/min">0.004167</drug_death_rate> <!-- 1/240 --> 
 		
-<!--
+		<worker_fraction type="double" units="dimensionless">0.10</worker_fraction>
+		<number_of_injected_cells type="int" units="dimensionless">500</number_of_injected_cells>
 		
-
-
-	// for therapy 
-	
-	cell_defaults.custom_data.add_variable( "damage rate" , "1/min", 1.0/30.0 ); 
-	cell_defaults.custom_data.add_variable( "repair rate" , "1/min", 1.0/240.0 ); 
-	cell_defaults.custom_data.add_variable( "drug death rate" , "1/min" , 1.0/240.0 ); 
-	cell_defaults.custom_data.add_variable( "damage" , "dimensionless", 0.0 ); 
-	
-	-->
-
-		<!-- for microenvironment setup --> 
-		<cargo_signal_D type="double" units="micron/min^2">1e3</cargo_signal_D>
-		<cargo_signal_decay type="double" units="1/min">.4</cargo_signal_decay> <!-- 50 micron length scale -->
-		<director_signal_D type="double" units="micron/min^2">1e3</director_signal_D>
-		<director_signal_decay type="double" units="1/min">.1</director_signal_decay> <!-- 100 micron length scale -->
+		<!-- tissue setup -->
+		<tumor_radius type="double" units="micron">200</tumor_radius> 
 		
-		<!-- for cell definitions -->
-		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>
-
-		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
-		<worker_migration_speed type="double" units="micron/min">5.0</worker_migration_speed>
-		<attached_worker_migration_bias type="double" units="min">1.0</attached_worker_migration_bias>
-		<unattached_worker_migration_bias type="double" units="min">0.5</unattached_worker_migration_bias>
-
-		<!-- tissue setup --> 
-		<number_of_directors type="int" units="none">15</number_of_directors> 
-		<number_of_cargo_clusters type="int" units="none">100</number_of_cargo_clusters>
-		<number_of_workers type="int" units="none">50</number_of_workers>
+		<!-- custom mechanics --> 
+		<max_elastic_displacement type="double" units="micron">50.0</max_elastic_displacement>
 		
-		<!-- cargo parameters --> 
-		<drop_threshold type="double" units="dimensionless">0.4</drop_threshold> 
+		<!-- attachment parameters --> 
+		<attachment_receptor_threshold type="double" units="dimensionless">0.1</attachment_receptor_threshold>
+		<max_attachment_distance type="double" units="micron">18.0</max_attachment_distance>
+		<min_attachment_distance type="double" units="micron">14.0</min_attachment_distance>
 		
-		<!-- colors --> 
-		<worker_color type="string" units="none">red</worker_color>
-		<cargo_color type="string" units="none">blue</cargo_color>
-		<director_color type="string" units="none">limegreen</director_color> 
-	
+		<!-- worker cell motility parameters -->
+		<motility_shutdown_detection_threshold type="double" units="dimensionless">0.001</motility_shutdown_detection_threshold>
+			<!-- shut down worker motility if signal < motility_shutdown_detection_threshold -->
+		<attached_worker_migration_bias type="double" units="dimensionless">0.5</attached_worker_migration_bias>
+		<unattached_worker_migration_bias type="double" units="dimensionless">0.5</unattached_worker_migration_bias>
 	</user_parameters>
 	
 </PhysiCell_settings>

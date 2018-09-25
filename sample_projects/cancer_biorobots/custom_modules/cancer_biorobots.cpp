@@ -253,13 +253,14 @@ void create_cell_types( void )
 	paramD = parameters.doubles["cargo_release_o2_threshold"]; 
 	cell_defaults.custom_data.add_variable( "cargo release oxygen threshold" , paramD.units, paramD.value ); 
 	
-	/* START HERE */ 
-
 	// for therapy 
 	
-	cell_defaults.custom_data.add_variable( "damage rate" , "1/min", 1.0/30.0 ); 
-	cell_defaults.custom_data.add_variable( "repair rate" , "1/min", 1.0/240.0 ); 
-	cell_defaults.custom_data.add_variable( "drug death rate" , "1/min" , 1.0/240.0 ); 
+	paramD = parameters.doubles["damage_rate"]; 
+	cell_defaults.custom_data.add_variable( "damage rate" , paramD.units, paramD.value ); 
+	paramD = parameters.doubles["repair_rate"]; 
+	cell_defaults.custom_data.add_variable( "repair rate" , paramD.units, paramD.value ); 
+	paramD = parameters.doubles["drug_death_rate"]; 	
+	cell_defaults.custom_data.add_variable( "drug death rate" , paramD.units, paramD.value ); 
 	cell_defaults.custom_data.add_variable( "damage" , "dimensionless", 0.0 ); 
 	
 	// create the biorobot types 
@@ -272,18 +273,27 @@ void create_cell_types( void )
 void setup_microenvironment( void )
 {
 	// set domain parameters
-
+	
+/*
+	// in the XML now 
 	default_microenvironment_options.X_range = {-750, 750}; 
 	default_microenvironment_options.Y_range = {-750, 750}; 
 	// default_microenvironment_options.Z_range = {-750, 750}; 
-	
-	default_microenvironment_options.simulate_2D = true; 
+*/
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		std::cout << "WARNING: overriding from 3-D to 2-D" << std::endl; 
+		default_microenvironment_options.simulate_2D = true; 
+	}
 	
 	// gradients are needed for this example 
 	
 	default_microenvironment_options.calculate_gradients = true; 
 	
 	// add cargo cell chemokine
+
+	/* A future release of PhysiCell will handle setup of chemical factors 
+	   more elegantly. So, let's skip XML specification for now. */
 	
 	// add therapeutic 
 	
@@ -320,15 +330,18 @@ void setup_microenvironment( void )
 void introduce_biorobots( void )
 {
 	// idea: we'll "inject" them in a little column
+		
+	static double worker_fraction = 
+		parameters.doubles("worker_fraction"); // 0.10; /* param */ 
+	static int number_of_injected_cells = 
+		parameters.ints("number_of_injected_cells"); // 500; /* param */ 
 	
-	double worker_fraction = 0.10; 
-	int number_of_injected_cells = 500; 
-	
-	double left_coordinate = 600.0; 
-	double right_cooridnate = 700.0;
+	// make these vary with domain size 
+	double left_coordinate = default_microenvironment_options.X_range[1] - 150.0; // 600.0; 
+	double right_cooridnate = default_microenvironment_options.X_range[1] - 50.0; // 700.0;
 
-	double bottom_coordinate = -700; 
-	double top_coordinate = 700; 
+	double bottom_coordinate = default_microenvironment_options.Y_range[0] + 50.0; // -700; 
+	double top_coordinate = default_microenvironment_options.Y_range[1] - 50.0; // 700; 
 		
 	for( int i=0 ;i < number_of_injected_cells ; i++ )
 	{
@@ -354,7 +367,7 @@ void setup_tissue( void )
 	double cell_radius = cell_defaults.phenotype.geometry.radius; 
 	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	
-	double tumor_radius = 200.0; 
+	double tumor_radius = parameters.doubles("tumor_radius"); // 200.0; 
 	
 	Cell* pCell = NULL; 
 	
@@ -474,7 +487,9 @@ void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_c
 	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
 	
 	// dettach cells if too far apart 
-	static double max_displacement_squared = 50*50;  
+	static double max_elastic_displacement = parameters.doubles("max_elastic_displacement");
+	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
+	
 	if( norm_squared( displacement ) > max_displacement_squared )
 	{
 		dettach_cells( pActingOn , pAttachedTo );
@@ -596,10 +611,13 @@ bool worker_cell_attempt_attachment( Cell* pWorker, Cell* pCargo , double dt )
 {
 	static int receptor_i = pCargo->custom_data.find_variable_index( "receptor" ); 
 
-	static double receptor_threshold = 0.1; 
+	static double receptor_threshold = 
+		parameters.doubles("attachment_receptor_threshold"); // 0.1; 
 	
-	static double max_attachment_distance = 18.0; 
-	static double min_attachment_distance = 14.0; 
+	static double max_attachment_distance = 
+		parameters.doubles("max_attachment_distance"); // 18.0; 
+	static double min_attachment_distance = 
+		parameters.doubles("min_attachment_distance"); // 14.0; 
 	static double attachment_difference = max_attachment_distance - min_attachment_distance; 
 	
 	if( pCargo->custom_data[receptor_i] > receptor_threshold )
@@ -664,14 +682,20 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
 	static int signal_index = microenvironment.find_density_index( "chemoattractant" ); 
 
-	static double detection_threshold = 0.001; 
+	static double detection_threshold = 
+		parameters.doubles("motility_shutdown_detection_threshold"); // 0.001; 
 	
 	// if attached, biased motility towards director chemoattractant 
 	// otherwise, biased motility towards cargo chemoattractant 
 	
+	static double attached_worker_migration_bias = 
+		parameters.doubles("attached_worker_migration_bias"); 
+	static double unattached_worker_migration_bias = 
+		parameters.doubles("unattached_worker_migration_bias"); 
+	
 	if( pCell->state.neighbors.size() > 0 )
 	{
-		phenotype.motility.migration_bias = 0.5; 
+		phenotype.motility.migration_bias = attached_worker_migration_bias; 
 
 		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);	
 		phenotype.motility.migration_bias_direction *= -1.0; 
@@ -686,7 +710,7 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 			pCell->functions.update_migration_bias = NULL; 
 		}
 		
-		phenotype.motility.migration_bias = 0.5; 
+		phenotype.motility.migration_bias = unattached_worker_migration_bias; 
 		
 		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(signal_index);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			
