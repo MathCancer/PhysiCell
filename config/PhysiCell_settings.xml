@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2880</max_time> <!-- 2 days * 24 h * 60 min -->
+		<max_time units="min">14400</max_time> <!-- 10 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -118,7 +118,7 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		
 		<!-- for main --> 
-		<therapy_activation_time type="double" units="min">96</therapy_activation_time> 
+		<therapy_activation_time type="double" units="min">360</therapy_activation_time> <!-- 10080 --> 
 			<!-- activate in 7 days --> 
 		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
 		
@@ -145,12 +145,15 @@
 		<receptor type="double" units="dimensionless">0.0</receptor>
 		<cargo_release_o2_threshold type="double" units="mmHg">10</cargo_release_o2_threshold>
 		
+		<max_relative_cell_adhesion_distance type="double" units="dimensionless">2.5</max_relative_cell_adhesion_distance>
+			<!-- how far out can cancer cells "feel" to close gaps? default is 1.25 -->
+		
 		<!-- for therapy --> 
 		<damage_rate type="double" units="1/min">0.03333</damage_rate> <!-- 1/30 --> 
 		<repair_rate type="double" units="1/min">0.004167</repair_rate> <!-- 1/240 --> 
 		<drug_death_rate type="double" units="1/min">0.004167</drug_death_rate> <!-- 1/240 --> 
 		
-		<worker_fraction type="double" units="dimensionless">0.10</worker_fraction>
+		<worker_fraction type="double" units="dimensionless">3.84234jduawfe</worker_fraction> <!-- 0.10 -->
 		<number_of_injected_cells type="int" units="dimensionless">500</number_of_injected_cells>
 		
 		<!-- tissue setup -->

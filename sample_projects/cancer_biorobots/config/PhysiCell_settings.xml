@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2880</max_time> <!-- 2 days * 24 h * 60 min -->
+		<max_time units="min">14400</max_time> <!-- 10 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -100,12 +100,12 @@
 		<folder>.</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">2</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">2</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -144,6 +144,9 @@
 		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>		
 		<receptor type="double" units="dimensionless">0.0</receptor>
 		<cargo_release_o2_threshold type="double" units="mmHg">10</cargo_release_o2_threshold>
+		
+		<max_relative_cell_adhesion_distance type="double" units="dimensionless">1.25</max_relative_cell_adhesion_distance>
+			<!-- how far out can cancer cells "feel" to close gaps? default is 1.25 -->
 		
 		<!-- for therapy --> 
 		<damage_rate type="double" units="1/min">0.03333</damage_rate> <!-- 1/30 --> 

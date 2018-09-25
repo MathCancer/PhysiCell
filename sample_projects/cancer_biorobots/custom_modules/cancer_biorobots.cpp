@@ -236,6 +236,9 @@ void create_cell_types( void )
 	// add the extra bit of "attachment" mechanics 
 	cell_defaults.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
 	
+	// change the max cell-cell adhesion distance 
+	cell_defaults.phenotype.mechanics.set_relative_maximum_adhesion_distance(parameters.doubles("max_relative_cell_adhesion_distance") );
+	
 	cell_defaults.name = "cancer cell"; 
 	cell_defaults.type = 0; 
 	
