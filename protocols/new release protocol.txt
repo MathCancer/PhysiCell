@@ -20,7 +20,7 @@ number.
    a) Move one directory up. Zip everything in PhysiCell 
       into a new zip file. Use 
       
-zip -r -X PhysiCell/* PhysiCell_V.x.y.z.zip -x PhysiCell/.git -x PhysiCell/.gitignore
+zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.gitignore
       
       (with appropriate version x.y.z). 
 
@@ -32,12 +32,12 @@ zip -r -X PhysiCell/* PhysiCell_V.x.y.z.zip -x PhysiCell/.git -x PhysiCell/.giti
 
    e) Create a new folder named PhysiCell x.y.z (based on version x.y.z)
 
-   f) Upload the zip file and README.txt file to the new folder
+   f) Upload the zip file and README.md file to the new folder
 
    g) Edit the zip file (on SF) ot make it the default download for 
       all operating systems. 
 
-   g) Edit the README.txt file (on SF) to exclude it from stats tracking. 
+   g) Edit the README.md file (on SF) to exclude it from stats tracking. 
 
 8) GitHub release: 
 
@@ -48,7 +48,7 @@ zip -r -X PhysiCell/* PhysiCell_V.x.y.z.zip -x PhysiCell/.git -x PhysiCell/.giti
 
    c) For "Release title," use "Version x.y.z" (for the version x.y.z)
 
-   d) Copy / paste everything from README.txt in the "write" field. 
+   d) Copy / paste everything from README.md in the "write" field. 
 
    e) On the "attach binaries", use the zip file you created for the 
       SourceForge release.  
