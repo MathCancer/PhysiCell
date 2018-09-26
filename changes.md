@@ -13,7 +13,7 @@ This release improves the use of XML parsing in configuring simulations, notably
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
 ### Major new features and changes:
- 
+
 + User Parameters! 
 
 + Parsing XML to set domain size for all sample projects. 

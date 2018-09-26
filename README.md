@@ -28,14 +28,11 @@ make <project-name>: populates the indicated sample project.
     heterogeneity-sample
     cancer-immune-sample 
 
-make clean         : removes all .o files and the executable, so that 
-                     the next "make" recompiles the entire project 
+make clean         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
 
 make data-cleanup  : clears out all simulation data 
 
-make reset         : de-populates the sample project and returns to
-                     the original PhysiCell state. Use this when 
-                     switching to a new PhysiCell sample project. 
+make reset         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
 
 
 **Homepage:**     http://PhysiCell.MathCancer.org
