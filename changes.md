@@ -4,7 +4,7 @@
  
 **Version:**      1.4.0
 
-**Release date:** ? September 2018
+**Release date:** 26 September 2018
 
 ## Release summary: 
  
@@ -82,7 +82,15 @@ This release improves the use of XML parsing in configuring simulations, notably
   
   3) Get the random seed from the XML config file
   
-+ New function in ./core/PhysiCell_utilities/*: 
++ Updated cancer immune sample project:   
+
+  1) Use the domain settings from the XML config file
+  
+  2) Use the XML config file to set parameters throughout the cancer_immune_3D.cpp file 
+  
+  3) Get the random seed from the XML config file
+
++ New function in ./core/PhysiCell_utilities: 
 
   int choose_event( std::vector<double probabilities> );
   

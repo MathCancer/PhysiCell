@@ -8,12 +8,9 @@ number. There should be no spaces in this file.
 3) update CITATION.txt to reflect the new version 
 number. 
 
-4) Put most recent changes in README.txt. (Note that only the current releases 
-   changes should be in readme.txt. 
-
-5) Append most recent changes in README.txt. Copy everything after 
-   "Release summary" in changes.txt (the most recent version x.y.z only) 
-   to overwrite everything after "-=-=-=-=-" in README.txt 
+4) Append most recent changes in README.md. Copy everything after 
+   "Release summary" in changes.md (the most recent version x.y.z only) 
+   to overwrite everything after "* * * " in README.md 
 
 6) Make appropriate changs to ./documentation/User_Guide.tex, and 
    recompile the LaTeX document. Don't forget to set \Version to x.y.z 
