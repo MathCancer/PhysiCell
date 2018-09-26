@@ -139,12 +139,26 @@
 
 		<elastic_coefficient type="double" units="1/min">0.01</elastic_coefficient>		
 
+		<!-- immune seeding parameters --> 
 		
+		<number_of_immune_cells type="int" units="dimensionless">7500</number_of_immune_cells> 
+		<initial_min_immune_distance_from_tumor type="double" units="micron">30</initial_min_immune_distance_from_tumor>
+		<thickness_of_immune_seeding_region type="double" units="micron">75</thickness_of_immune_seeding_region>
 		
-			<!-- survive 10 days -->
-
-
-	
+		<!-- tissue setup -->
+		<tumor_radius type="double" units="micron">250</tumor_radius> 
+		<tumor_mean_immunogenicity type="double" units="dimensionless">1.0</tumor_mean_immunogenicity>
+		<tumor_immunogenicity_standard_deviation type="double" units="dimensionless">0.25</tumor_immunogenicity_standard_deviation>
+		
+		<!-- some attachment parameters --> 
+		<oncoprotein_saturation type="double" units="dimensionless">2.0</oncoprotein_saturation>
+			<!-- above this value, more oncoprotein doesn't make cells any further immunogenic -->
+		<oncoprotein_threshold type="double" units="dimensionless">0.5</oncoprotein_threshold>
+			<!-- below this vlaue, cells are not immunogenic --> 
+		<max_attachment_distance type="double" units="micron">18.0</max_attachment_distance>
+			<!-- cells do not remain attached beyond this distance --> 
+		<min_attachment_distance type="double" units="micron">14.0</min_attachment_distance>
+			<!-- analogous ot resting spring length --> 
 
 		
 	</user_parameters>

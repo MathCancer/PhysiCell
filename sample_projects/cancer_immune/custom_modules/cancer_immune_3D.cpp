@@ -192,7 +192,7 @@ void create_cell_types( void )
 	Parameter<double> paramD;
 	
 	cell_defaults.custom_data.add_variable( "oncoprotein" , "dimensionless", 1.0 ); 
-	parmaD = parameters.doubles( "elastic_coefficient" ); 
+	paramD = parameters.doubles[ "elastic_coefficient" ]; 
 	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units, paramD.value ); 
 		// "1/min" , 0.01 );  /* param */ 
 	cell_defaults.custom_data.add_variable( "kill rate" , "1/min" , 0 ); // how often it tries to kill
@@ -278,9 +278,12 @@ void introduce_immune_cells( void )
 	
 	// now seed immune cells 
 	
-	int number_of_immune_cells = 7500; // 100; // 40; 
-	double radius_inner = tumor_radius + 30.0; // 75 // 50; 
-	double radius_outer = radius_inner + 75.0; // 100; // 1000 - 50.0; 
+	int number_of_immune_cells = 
+		parameters.ints("number_of_immune_cells"); // 7500; // 100; // 40; 
+	double radius_inner = tumor_radius + 
+		parameters.doubles("initial_min_immune_distance_from_tumor"); 30.0; // 75 // 50; 
+	double radius_outer = radius_inner + 
+		parameters.doubles("thickness_of_immune_seeding_region"); // 75.0; // 100; // 1000 - 50.0; 
 	
 	double mean_radius = 0.5*(radius_inner + radius_outer); 
 	double std_radius = 0.33*( radius_outer-radius_inner)/2.0; 
@@ -338,18 +341,26 @@ void setup_tissue( void )
 	double cell_radius = cell_defaults.phenotype.geometry.radius; 
 	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	
-	double tumor_radius = 250.0; 
+	double tumor_radius = 
+		parameters.doubles("tumor_radius"); // 250.0; 
 	
 	Cell* pCell = NULL; 
+	
+	
 	
 	std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,tumor_radius); 
 	std::cout << "creating " << positions.size() << " closely-packed tumor cells ... " << std::endl; 
 	
+	static double imm_mean = parameters.doubles("tumor_mean_immunogenicity"); 
+	static double imm_sd = parameters.doubles("tumor_immunogenicity_standard_deviation"); 
+		
 	for( int i=0; i < positions.size(); i++ )
 	{
 		pCell = create_cell(); // tumor cell 
 		pCell->assign_position( positions[i] );
-		pCell->custom_data[0] = NormalRandom( 1.0, 0.25 );
+		pCell->custom_data[0] = NormalRandom( imm_mean, imm_sd );
+		if( pCell->custom_data[0] < 0.0 )
+		{ pCell->custom_data[0] = 0.0; } 
 	}
 	
 	double sum = 0.0; 
@@ -622,12 +633,16 @@ bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt 
 	static int oncoprotein_i = pTarget->custom_data.find_variable_index( "oncoprotein" ); 
 	static int attach_rate_i = pAttacker->custom_data.find_variable_index( "attachment rate" ); 
 
-	static double oncoprotein_saturation = 2.0; 
-	static double oncoprotein_threshold =  0.5; // 0.1; 
+	static double oncoprotein_saturation = 
+		parameters.doubles("oncoprotein_saturation"); // 2.0; 
+	static double oncoprotein_threshold =  
+		parameters.doubles("oncoprotein_threshold"); // 0.5; // 0.1; 
 	static double oncoprotein_difference = oncoprotein_saturation - oncoprotein_threshold;
 	
-	static double max_attachment_distance = 18.0; 
-	static double min_attachment_distance = 14.0; 
+	static double max_attachment_distance = 
+		parameters.doubles("max_attachment_distance"); // 18.0; 
+	static double min_attachment_distance = 
+		parameters.doubles("min_attachment_distance"); // 14.0; 
 	static double attachment_difference = max_attachment_distance - min_attachment_distance; 
 	
 	if( pTarget->custom_data[oncoprotein_i] > oncoprotein_threshold && pTarget->phenotype.death.dead == false )
@@ -669,8 +684,10 @@ bool immune_cell_attempt_apoptosis( Cell* pAttacker, Cell* pTarget, double dt )
 	
 	
 	
-	static double oncoprotein_saturation = 2.0; 
-	static double oncoprotein_threshold =  0.5; // 0.1; 
+	static double oncoprotein_saturation = 
+		parameters.doubles("oncoprotein_saturation"); // 2.0; 
+	static double oncoprotein_threshold =  
+		parameters.doubles("oncoprotein_threshold"); // 0.5; // 0.1; 
 	static double oncoprotein_difference = oncoprotein_saturation - oncoprotein_threshold;
 
 	
