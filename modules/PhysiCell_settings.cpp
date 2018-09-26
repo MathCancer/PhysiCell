@@ -210,7 +210,7 @@ template <class T>
 Parameter<T>::Parameter()
 {
 	name = "unnamed"; 
-	units= "dimensionless"; 
+	units= "none"; 
 /*	
 	T* pT; 
 	pT = new T; 
@@ -441,8 +441,6 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
 			bool value = xml_get_my_bool_value( node1 ); 
 			bools.add_parameter( name , value, units ); 
 			done = true; 
-
-//			bools.add_parameter( name, value, units ); 
 		}
 		
 		if( type == "int" && done == false )
@@ -450,8 +448,6 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
 			int value = xml_get_my_int_value( node1 ); 
 			ints.add_parameter( name , value, units ); 
 			done = true; 
-
-//			bools.add_parameter( name, value, units ); 
 		}
 		
 		if( type == "double" && done == false )
@@ -459,8 +455,6 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
 			double value = xml_get_my_double_value( node1 ); 
 			doubles.add_parameter( name , value, units ); 
 			done = true; 
-
-//			bools.add_parameter( name, value, units ); 
 		}
 				
 		if( done == false && type == "string" )

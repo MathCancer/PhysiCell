@@ -710,6 +710,10 @@ To clear out the compiler-generated objects (which would allow you to recompile 
 
 \v|make clean| 
 
+To reset to a clean slate (e.g., to clear out a sample project and populate another): 
+
+\v|make reset|
+
 \TOClink 
 
 \section{The BioFVM microenvironment \DONE}
@@ -4039,14 +4043,38 @@ returns an Boolean value for the \v|find_me| tag within the \v|parent_node| pare
 \end{verbatim}
 Note that Booleans can be represented as 0 and 1, or \v|false| and \v|true|. 
 
+
+\item 
+\smallcode{std::string xml\_get\_my\_name( pugi::xml\_node node )} helps to easily extract the name of an XML node. (e.g., \v|<bob units="none">| returns bob.) 
+
+\item 
+\smallcode{bool xml\_get\_my\_bool\_value( pugi::xml\_node node )} gets the Boolean value of an XML node. (e.g., \v|<bob units="none">true</bob>| returns true.) 
+
+
+\item 
+\smallcode{int xml\_get\_my\_int\_value( pugi::xml\_node node )} gets the int value of an XML node. (e.g., \v|<bob units="none">42</bob>| returns 42.) 
+ 
+
+\item 
+\smallcode{int xml\_get\_my\_double\_value( pugi::xml\_node node )} gets the double value of an XML node. (e.g., \v|<bob units="none">42.03</bob>| returns 42.03.) 
+ 
+
+\item 
+\smallcode{std::string xml\_get\_my\_string\_value( pugi::xml\_node node )} gets the string value of an XML node. (e.g., \v|<bob units="none">is nice</bob>| returns \"is nice\".) 
+
+
+
+
 \end{enumerate}
 \TOClink
 
 \subsection{Passing XML options to PhysiCell}
 \label{sec:XML_options}
 PhysiCell 1.3.0 introduced preliminary support for XML configuration files, via \hfill\break
-\v|./modules/PhysiCell_settings.*|.
-It primarily works by creating two data 
+\v|./modules/PhysiCell_settings.*|. Version 1.4.0 introduced further refinements that are 
+detailed in Sections \ref{sec:XML_PhysiCell_structure} and \ref{sec:XML_user_parameters}.
+
+XML options in PhysiCell work  primarily  by creating two data 
 structures defined as: 
 
 \begin{verbatim}
@@ -4174,7 +4202,7 @@ based upon the DOM that has previously been loaded with
 
 \subsection{Structure of PhysiCell XML parameter files}
 \label{sec:XML_PhysiCell_structure}
-PhysiCell's XML files look like this (as of Version 1.3.0); they 
+PhysiCell's XML files look like this (as of Version 1.4.0); they 
 are subject to extension. 
 
 \begin{verbatim}
@@ -4183,15 +4211,16 @@ are subject to extension.
 
 <PhysiCell_settings version="devel-version">
    <domain>
-      <xmin>0.02</xmin>
-      <xmax>52.01</xmax>
-      <ymin>-5.03</ymin>
-      <ymax>5.04</ymax>
-      <zmin>-10.01</zmin>
-      <zmax>10.7</zmax>
+      <x_min>-1000</x_min>
+      <x_max>1000</x_max>
+      <y_min>-1000</y_min>
+      <y_max>1000</y_max>
+      <z_min>-10</z_min>
+      <z_max>10</z_max>
       <dx>20</dx>
       <dy>20</dy>
-      <dz>-20.02</dz>
+      <dz>20</dz>
+      <use_2D>true</use_2D>
    </domain>
    
    <overall>
@@ -4222,8 +4251,8 @@ are subject to extension.
       </legacy_data>
    </save>
    
-   <custom>
-   </custom>
+   <user_parameters>
+   </user_parameters>
 
 </PhysiCell_settings>
 \end{verbatim}
@@ -4231,8 +4260,10 @@ are subject to extension.
 The main groupings of settings are: 
 \begin{enumerate}
 \item
-\smallcode{domain} will eventually have settings on the simulation domain size. 
-This is in alpha-stage planning. 
+\smallcode{domain} stores settings on the simulation domain size. As of 
+Version 1.4.0, all PhysiCell sample projects parse this section and set hte 
+simulation size accordingly, although most override the \v|use_2D| setting 
+due to 2D/3D specific tissue initializations. 
 
 \item
 \smallcode{overall} stores overall simulation settings, like units 
@@ -4245,9 +4276,185 @@ and maximum simulation time.
 \smallcode{save} stores settings for where and how often data are saved. 
 
 \item 
-\smallcode{custom} will eventually be a place for storing custom, 
-user-defined settings. 
+\smallcode{user\_parameters} stores user-defined parameters, specific to their 
+simulation. See \ref{sec:XML_user_parameters} for more details. 
 \end{enumerate}
+
+\TOClink 
+
+\subsection{User Parameters}
+\label{sec:XML_user_parameters}
+As of Version 1.4.0, PhysiCell supports custom Boolean, integer, double, and string user parameters, which are automatically parsed into PhysiCell into a \v|parameters| data structure and available for query throughout a project. In Section \ref{sec:XML_user_parameters_XML_structure}, we show how to structure new 
+user parameters in an XML parameter file. In Section \ref{sec:XML_user_parameters_reading_them}, 
+we show how to access them within a project. In section \ref{sec:XML_user_parameters_data_types}, 
+we formally define the data types. 
+
+A detailed tutorial on these parameters is provided at: 
+\begin{center}
+\href{http://www.mathcancer.org/blog/user-parameters-in-physicell/}{http://www.mathcancer.org/blog/user-parameters-in-physicell/}
+\end{center}
+
+\TOClink
+
+\subsubsection{Adding User Parameters to an XML Configuration File}
+\label{sec:XML_user_parameters_XML_structure}
+In the \v|<user_parameters>| section of an XML configuration file, you can 
+add any named parameter with the following syntax: 
+\begin{verbatim}
+   <user_parameters>
+      <parameter_name type="TYPE" units="UNITS">value</parameter_name>
+   </user_parameters>
+\end{verbatim}
+
+\begin{itemize}
+\item \textbf{parameter\_name} is the name of the parameter. Note that this cannot begin with a digit. 
+\item \textbf{type} is the type of parameter. Allowed types are bool (Boolean), int (integer), double (floating point double precision), and string (std::string). Note that if this attribute is not supplied, PhysiCell will attempt to process the parameter as a double. 
+\item \textbf{units} are the units (default: none). Note that PhysiCell does not convert units, so supplying units here is important communication between users to ensure all are using correct units. By default, PhysiCell works in microns for spatial units and minutes for time units. 
+\item \textbf{value} is the actual value of the parameter. 
+\end{itemize}
+
+Here is an example \v|<user_parameters>| with each of these types of data
+\begin{verbatim}
+   <user_parameters>
+      <enable_detailed_model type="bool" units="none">true</enable_detailed_model>
+      <number_of_initial_cells type="int" units="none">42</number_of_initial_cells>
+      <division_rate type="double" units="1/min">0.001</division_rate>
+      <mean_waiting_time type="double" units="min">1.2e2</mean_waiting_time>
+      <mutant_cell_color type="string" units="none">rgb(255,0,0)</mutant_cell_color>
+   </user_parameters>
+\end{verbatim}
+
+PhysiCell reads into a global data structure called \v|parameters|. All Boolean 
+parameters are in \v|parameters.bools|. All integer parameters are stored in 
+\v|parameters.ints|. All double parameters are stored in \v|parameters.doubles|. 
+All string parameters are stored in \v|parameters.strings|. See 
+\ref{sec:XML_user_parameters_data_types} for technical details of 
+these structures. 
+
+\TOClink
+
+\subsubsection{Accessing User Parameters in a Project}
+\label{sec:XML_user_parameters_reading_them}
+Use the () operator to access the \emph{value} of a parameter, either 
+by its name (easier) or by its index (faster). For example, to get 
+the value of the \v|mean_waiting_time|, use: 
+
+\begin{verbatim}
+parameters.doubles("mean_waiting_time")
+\end{verbatim}
+
+To find the index of this parameter, and then access by index, use: 
+
+\begin{verbatim}
+int i = parameters.doubles.find_index("mean_waiting_time");
+parameters.doubles(i); 
+\end{verbatim}
+
+Use the [] operator to access the \emph{full data structure} of a parameter, either 
+by its name (easier) or by its index (faster). For example, to get 
+the value of the \v|number_of_initial_cells|, use: 
+
+\begin{verbatim}
+Parameter<int> param = parameters.ints["number_of_initial_cells"];
+std::cout << param.name << " " << param.units << " " << param.value << std::endl; 
+std::cout << param << std::endl; 
+\end{verbatim}
+
+To find the index of this parameter, and then access by index, use: 
+
+\begin{verbatim}
+int i = parameters.ints.find_index("mean_waiting_time");
+Parameter<int> param = parameters.ints[i]; 
+std::cout << param.name << " " << param.units << " " << param.value << std::endl; 
+std::cout << param << std::endl; 
+\end{verbatim}
+
+The usage is similar for Boolean, string, and double parameters. 
+
+\TOClink
+
+
+\subsubsection{User Parameters Technical Details}
+\label{sec:XML_user_parameters_data_types}
+We first define a template class for a \v|Parameter|: 
+\begin{verbatim}
+template <class T> 
+class Parameter
+{
+ private:
+   template <class Y>
+   friend std::ostream& operator<<(std::ostream& os, const Parameter<Y>& param); 
+
+ public: 
+   std::string name; 
+   std::string units; 
+   T value; 
+   
+   Parameter();
+   Parameter( std::string my_name ); 
+   
+   void operator=( T& rhs ); 
+   void operator=( T rhs ); 
+   void operator=( Parameter& p ); 
+};
+\end{verbatim} 
+The supported types \v|T| are \v|int|, \v|double|, \v|bool|, and \v|std::string|. You can use 
+the assignment operator = to either access the entire parameter or just its value. 
+We also provide user-friendly streaming via the \v|<<| overator. 
+
+Next, we provide a template class \v|Parameters| that bundles a searchable vector of parameters. 
+\begin{verbatim}
+template <class T>
+class Parameters
+{
+ private:
+   std::unordered_map<std::string,int> name_to_index_map; 
+   
+   template <class Y>
+   friend std::ostream& operator<<( std::ostream& os , const Parameters<Y>& params ); 
+
+ public: 
+   Parameters(); 
+ 
+   std::vector< Parameter<T> > parameters; 
+   
+   void add_parameter( std::string my_name ); 
+   void add_parameter( std::string my_name , T my_value ); 
+   void add_parameter( std::string my_name , T my_value , std::string my_units ); 
+   
+   void add_parameter( Parameter<T> param );
+   
+   int find_index( std::string search_name ); 
+   
+   // these access the values 
+   T& operator()( int i );
+   T& operator()( std::string str ); 
+
+   // these access the full, raw parameters 
+   Parameter<T>& operator[]( int i );
+   Parameter<T>& operator[]( std::string str ); 
+   
+   int size( void ) const; 
+};
+\end{verbatim} 
+As shown in the examples above, use the () operator to access a specific parameter value, and use the [] operator to access a specific full parameter data structure. Use \v|find_index| to search for the index of a parameter. We also provide a friendly streaming operation to summarize the parameters. 
+
+Lastly, \v|User_Parameters| bundles Boolean, integer, double, and string parameters: 
+\begin{verbatim}
+class User_Parameters
+{
+ private:
+   friend std::ostream& operator<<( std::ostream& os , const User_Parameters up ); 
+ 
+ public:
+   Parameters<bool> bools; 
+   Parameters<int> ints; 
+   Parameters<double> doubles; 
+   Parameters<std::string> strings; 
+   
+   void read_from_pugixml( pugi::xml_node parent_node );
+}; 
+\end{verbatim}
 
 \TOClink 
 
@@ -5411,6 +5618,12 @@ static double phenotype_dt = 6.0;
 
 \TOClink 
 
+\subsection{User Parameters}
+\label{sec:global_user_parameters}
+As detailed in Section \ref{sec:XML_user_parameters}, PhysiCell has a global 
+\v|User_Parameters| data struture called \v|parameters|. 
+\TOClink 
+
 \section{Standard models \DONE}
 \label{sec:Standard_Models}
 PhysiCell includes several models for easier out-of-the-box simulation. 
@@ -6067,6 +6280,60 @@ Section \ref{sec:Standard_Models:Death} on standard death models, and
 Section \ref{sec:Standard_Models:Cycle} on standard cell cycle models. 
 See \cite{ref:PhysiCell} for more on the biology of these 
 models. 
+
+\TOClink 
+
+\section{Functions for Random Events}
+\label{sec:random_functions}
+PhysiCell provides several functions for working with random variables and events. All this functionality is based upon C++11 standard, cross-platform functions, using the 64-bit Mersenne Twister for generating random longs. The following functions simplify using random numbers: 
+\begin{enumerate}
+
+\item 
+\smallcode{long SeedRandom( long input )} seeds the pseudo-random number generator with the supplied seed.   
+
+\item 
+\smallcode{long SeedRandom( void )} seeds the pseudo-random number generator based upon the system time. 
+
+
+\item 
+\smallcode{double UniformRandom( void )} returns a uniformly distributed random number between 0 and 1. 
+
+\item 
+\smallcode{double NormalRandom( double mean, double standard\_deviation ) } provides a random number from a Gaussian distribution with mean \v|mean| and standard deviation \v|standard_deviation|. 
+
+\item 
+\smallcode{int choose\_event( std::vector<double>\& probabilities ) } helps choose a random event based upon the supplied probabilities in the vector \v|probabilities| (which must sum to 1). For example, suppose we have 
+events \v|{0, 1, 2, 3}| with probabilities \v|{0.01, 0.82, 0.14, 0.03}|. Then this code will (on average) 
+return 0 with probability 0.01, return 1 with probability 0.82, and so forth. 
+
+\begin{verbatim}
+std::vector<double> probabilities = {0.01, 0.82, 0.14, 0.03}; 
+
+int number_of_samples = 100000; 
+std::vector<int> events( number_of_samples , 0 ); 
+
+//this is thread-safe 
+#pragma omp parallel for 
+for( int i=0 ; i < number_of_samples ; i++ )
+{ events[i] = choose_event( probabilities ); }
+
+std::vector<int> counts( probabilities.size() , 0 ); 
+//this is not thread-safe 
+for( int i=0 ; i < number_of_samples ; i++ )
+{ counts[ events[i] ]++; }
+
+// display counts vs. 
+ 
+std::cout << "Summary: fraction vs correct fraction " << std::endl; 
+for( int i=0; i < counts.size(); i++)
+{
+   std::cout << i << " : " << (double) counts[i] / (double) number_of_samples 
+             << " vs " << probs[i] << std::endl;
+} 
+\end{verbatim}
+
+
+\end{enumerate}
 
 \TOClink 
 
