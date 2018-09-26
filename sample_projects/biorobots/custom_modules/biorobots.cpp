@@ -107,6 +107,7 @@ void setup_microenvironment( void )
 
 void create_cell_types( void )
 {
+	SeedRandom( parameters.ints("random_seed") ); 
 	// housekeeping 
 	
 	initialize_default_cell_definition();

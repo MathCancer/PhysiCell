@@ -136,7 +136,7 @@ void create_cell_types( void )
 	// same initial histogram of oncoprotein, even if threading means 
 	// that future division and other events are still not identical 
 	// for all runs 
-	SeedRandom(0); 
+	SeedRandom( parameters.ints("random_seed") ); 
 	
 	// housekeeping 
 	
@@ -189,8 +189,12 @@ void create_cell_types( void )
 	
 	// add custom data 
 	
+	Parameter<double> paramD;
+	
 	cell_defaults.custom_data.add_variable( "oncoprotein" , "dimensionless", 1.0 ); 
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.01 ); 
+	parmaD = parameters.doubles( "elastic_coefficient" ); 
+	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units, paramD.value ); 
+		// "1/min" , 0.01 );  /* param */ 
 	cell_defaults.custom_data.add_variable( "kill rate" , "1/min" , 0 ); // how often it tries to kill
 	cell_defaults.custom_data.add_variable( "attachment lifetime" , "min" , 0 ); // how long it can stay attached 
 	cell_defaults.custom_data.add_variable( "attachment rate" , "1/min" ,0 ); // how long it wants to wander before attaching
@@ -209,17 +213,26 @@ void setup_microenvironment( void )
 	default_microenvironment_options.Y_range = {-1000, 1000}; 
 	default_microenvironment_options.Z_range = {-1000, 1000}; 
 */	
+/*
+	// now in XML 
 	default_microenvironment_options.X_range = {-750, 750}; 
 	default_microenvironment_options.Y_range = {-750, 750}; 
-	default_microenvironment_options.Z_range = {-750, 750}; 
+	default_microenvironment_options.Z_range = {-750, 750};
+*/
 	
-	default_microenvironment_options.simulate_2D = false; 
+	if( default_microenvironment_options.simulate_2D == true )
+	{
+		std::cout << "Warning: overriding 2D setting to return to 3D" << std::endl; 
+		default_microenvironment_options.simulate_2D = false; 
+	}
 	
 	// gradients are needed for this example 
 	
 	default_microenvironment_options.calculate_gradients = true; 
 	
 	// add the immunostimulatory factor 
+	
+	// let's do these in XML later 
 	
 	microenvironment.add_density( "immunostimulatory factor", "dimensionless" ); 
 	microenvironment.diffusion_coefficients[1] = 1e3; 

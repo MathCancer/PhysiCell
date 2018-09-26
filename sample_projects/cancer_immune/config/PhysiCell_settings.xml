@@ -78,8 +78,8 @@
 		<x_max>750</x_max>
 		<y_min>-750</y_min>
 		<y_max>750</y_max>
-		<z_min>-10</z_min>
-		<z_max>10</z_max>
+		<z_min>-750</z_min>
+		<z_max>750</z_max>
 		<dx>20</dx>
 		<dy>20</dy>
 		<dz>20</dz>
@@ -115,6 +115,8 @@
 	</save>
 	
 	<user_parameters>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+
 		<!-- main --> 
 		<immune_activation_time type="double" units="min">20160</immune_activation_time>
 			<!-- activate in 7 days --> 
@@ -135,7 +137,8 @@
 		<immune_attachment_lifetime type="double" units="min">60.0</immune_attachment_lifetime> 
 		<immune_attachment_rate type="double" units="1/min">0.2</immune_attachment_rate> <!-- 5 min--> 
 
-		
+		<elastic_coefficient type="double" units="1/min">0.01</elastic_coefficient>		
+
 		
 		
 			<!-- survive 10 days -->

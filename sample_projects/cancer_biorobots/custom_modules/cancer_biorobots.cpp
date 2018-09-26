@@ -186,7 +186,7 @@ void create_cell_types( void )
 	// same initial histogram of oncoprotein, even if threading means 
 	// that future division and other events are still not identical 
 	// for all runs 
-	SeedRandom(0); 
+	SeedRandom( parameters.ints("random_seed") ); 
 	
 	// housekeeping 
 	
