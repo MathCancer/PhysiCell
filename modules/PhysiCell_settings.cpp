@@ -216,7 +216,16 @@ Parameter<T>::Parameter()
 	pT = new T; 
 	value = *pT; 
 */
-	value = 1-1; 
+	value = (T) 0;
+//	value = 1-1; 
+	return; 
+}
+
+template <> Parameter<std::string>::Parameter()
+{
+	name = "unnamed"; 
+	units= "none"; 
+	value = "\0";
 	return; 
 }
 
@@ -230,7 +239,15 @@ Parameter<T>::Parameter( std::string my_name )
 	pT = new T; 
 	value = *pT; 
 */
-	value = 1-1; 
+	value = (T) 0; 
+	return; 
+}
+
+template <> Parameter<std::string>::Parameter( std::string my_name )
+{
+	name = my_name;  
+	units= "none"; 
+	value = "\0";
 	return; 
 }
 
