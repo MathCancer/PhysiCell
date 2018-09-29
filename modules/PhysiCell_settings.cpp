@@ -225,7 +225,7 @@ template <> Parameter<std::string>::Parameter()
 {
 	name = "unnamed"; 
 	units= "none"; 
-	value = "\0";
+	value = "none";
 	return; 
 }
 
@@ -247,7 +247,7 @@ template <> Parameter<std::string>::Parameter( std::string my_name )
 {
 	name = my_name;  
 	units= "none"; 
-	value = "\0";
+	value = "none";
 	return; 
 }
 

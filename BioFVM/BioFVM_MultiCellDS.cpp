@@ -639,7 +639,19 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			
 			node = node.append_child( "filename" ); 
 			
-			node.append_child( pugi::node_pcdata ).set_value( filename ); 
+			/* start debugging */ 
+			char filename_text [1024];
+			char* filename_start = strrchr( filename , '/' ); 
+			if( filename_start == NULL )
+			{ filename_start = filename; }
+			else	
+			{ filename_start++; } 
+			strcpy( filename_text , filename_start ); 
+			
+			std::cout << filename << " " << filename_text << std::endl; 
+			/* end debugging */ 			
+			
+			node.append_child( pugi::node_pcdata ).set_value( filename_text ); // filename ); 
 			
 			node = node.parent(); 
 			
@@ -726,7 +738,19 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			sprintf( filename , "%s_microenvironment%d.mat" , filename_base.c_str() , 0 ); 
 			M.write_to_matlab( filename ); 
 			
-			node.append_child( pugi::node_pcdata ).set_value( filename );				
+			/* start debugging */ 
+			char filename_text [1024];
+			char* filename_start = strrchr( filename , '/' ); 
+			if( filename_start == NULL )
+			{ filename_start = filename; }
+			else	
+			{ filename_start++; } 
+			strcpy( filename_text , filename_start ); 
+			
+			std::cout << filename << " " << filename_text << std::endl; 
+			/* end debugging */ 
+			
+			node.append_child( pugi::node_pcdata ).set_value( filename_text ); // filename );				
 			
 			node = node.parent(); 
 		}
@@ -777,8 +801,20 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		sprintf( filename , "%s_microenvironment%d.mat" , filename_base.c_str() , 0 ); 
 		M.write_to_matlab( filename ); 
 		
+		/* start debugging */ 
+		char filename_text [1024];
+		char* filename_start = strrchr( filename , '/' ); 
+		if( filename_start == NULL )
+		{ filename_start = filename; }
+		else	
+		{ filename_start++; } 
+		strcpy( filename_text , filename_start ); 
+		
+	 	std::cout << filename << " " << filename_text << std::endl; 
+		/* end debugging */ 	
+		
 		node = node.first_child(); 
-		node.set_value( filename ); 
+		node.set_value( filename_text ); // filename ); 
 		node = node.parent(); 
 	}
 	
@@ -862,13 +898,26 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		char filename [1024]; 
 		sprintf( filename , "%s_cells.mat" , filename_base.c_str() ); 
 		
+		/* start debugging */ 
+		char filename_text [1024];
+		char* filename_start = strrchr( filename , '/' ); 
+		if( filename_start == NULL )
+		{ filename_start = filename; }
+		else	
+		{ filename_start++; } 
+		strcpy( filename_text , filename_start ); 
+		
+		std::cout << filename << " " << filename_text << std::endl; 
+		/* end debugging */ 			
+		
+		
 		if( !node.first_child() )
 		{
-			node.append_child( pugi::node_pcdata ).set_value( filename ); 
+			node.append_child( pugi::node_pcdata ).set_value( filename_text ); // filename ); 
 		}
 		else
 		{
-			node.first_child().set_value( filename ); 
+			node.first_child().set_value( filename_text ); // filename ); 
 		}
 		
 		// next, create a matlab structure and save it!
