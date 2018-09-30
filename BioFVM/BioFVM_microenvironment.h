@@ -189,7 +189,7 @@ class Microenvironment
 	std::vector<int> cartesian_indices( int n ); 
 	
 	int nearest_voxel_index( std::vector<double>& position ); 
-	std::vector<int> nearest_cartesian_indices( std::vector<double>& position ); 
+	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
 	Voxel& nearest_voxel( std::vector<double>& position ); 
 	Voxel& voxels( int voxel_index );
 	std::vector<double>& nearest_density_vector( std::vector<double>& position );  

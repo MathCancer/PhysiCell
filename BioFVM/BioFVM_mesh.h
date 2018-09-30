@@ -200,7 +200,7 @@ class Cartesian_Mesh : public General_Mesh
 	
 	int nearest_voxel_index( std::vector<double>& position );   
 	int nearest_voxel_face_index( std::vector<double>& position );  
-	std::vector<int> nearest_cartesian_indices( std::vector<double>& position ); 
+	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
 	Voxel& nearest_voxel( std::vector<double>& position ); 
 	
 	void display_information( std::ostream& os ); 
