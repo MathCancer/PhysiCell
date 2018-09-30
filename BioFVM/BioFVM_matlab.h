@@ -84,10 +84,10 @@ named_vector_data read_matlab_with_names( std::string filename );
 bool write_matlab( std::vector< std::vector<double> >& input , std::string filename );
 bool write_matlab( std::vector< std::vector<double> >& input , std::string filename , std::vector<std::string>& names );
 
-FILE* write_matlab_header( int rows, int cols, std::string filename, std::string variable_name );  
+FILE* write_matlab_header( unsigned int rows, unsigned int cols, std::string filename, std::string variable_name );  
 
 // output: FILE pointer, and overwrites rows, cols so you know the size 
-FILE* read_matlab_header( int* rows, int* cols , std::string filename ); 
+FILE* read_matlab_header( unsigned int* rows, unsigned int* cols , std::string filename ); 
 
 };
 

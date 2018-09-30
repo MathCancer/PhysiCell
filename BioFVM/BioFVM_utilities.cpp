@@ -144,7 +144,7 @@ double compute_mean( std::vector<double>& values )
 {
 	static double sum; 
 	sum = 0.0; 
-	for( int i=0; i < values.size(); i++ )
+	for( unsigned int i=0; i < values.size(); i++ )
 	{ sum += values[i]; }
 	sum /= (double) values.size(); 
 	return sum; 	
@@ -154,7 +154,7 @@ double compute_variance( std::vector<double>& values, double mean )
 {
 	static double output; 
 	output = 0.0; 
-	for( int i=0; i < values.size() ; i++ )
+	for( unsigned int i=0; i < values.size() ; i++ )
 	{
 		static double temp; 
 		temp = values[i]; 

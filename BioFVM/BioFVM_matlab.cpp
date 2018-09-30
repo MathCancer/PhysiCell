@@ -160,15 +160,15 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
  fread( name , name_length , 1 , fp );
 
  // read the real part of the matrix
- int i = 0;
- int j = 0;
+ unsigned int i = 0;
+ unsigned int j = 0;
  
  switch( type_data_format )
  {
   case 0:
    // all fields are doubles
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	double temp;
 	fread( (char*) &temp, sizeof(double), 1 , fp );
@@ -183,7 +183,7 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 1:
    // all fields are floats 
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	float temp;
 	fread( (char*) &temp, sizeof(float), 1 , fp );
@@ -198,7 +198,7 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 2:
    // all fields are signed ints of size 4 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	int temp;
 	fread( (char*) &temp, sizeof(int), 1 , fp );
@@ -213,7 +213,7 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 3:
    // all fields are signed ints of size 2 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	short temp;
 	fread( (char*) &temp, sizeof(short), 1 , fp );
@@ -228,7 +228,7 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 4:
    // all fields are unsigned ints of size 2 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	unsigned short temp;
 	fread( (char*) &temp, sizeof(unsigned short), 1 , fp );
@@ -243,7 +243,7 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 5:
    // all fields are unsigned ints of size 1 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	unsigned char temp;
 	fread( (char*) &temp, sizeof(unsigned char), 1 , fp );
@@ -351,15 +351,15 @@ named_vector_data read_matlab_with_names( std::string filename )
  output.names[0] = name; 
 
  // read the real part of the matrix
- int i = 0;
- int j = 0;
+ unsigned int i = 0;
+ unsigned int j = 0;
  
  switch( type_data_format )
  {
   case 0:
    // all fields are doubles
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	double temp;
 	fread( (char*) &temp, sizeof(double), 1 , fp );
@@ -374,7 +374,7 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 1:
    // all fields are floats 
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	float temp;
 	fread( (char*) &temp, sizeof(float), 1 , fp );
@@ -389,7 +389,7 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 2:
    // all fields are signed ints of size 4 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	int temp;
 	fread( (char*) &temp, sizeof(int), 1 , fp );
@@ -404,7 +404,7 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 3:
    // all fields are signed ints of size 2 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	short temp;
 	fread( (char*) &temp, sizeof(short), 1 , fp );
@@ -419,7 +419,7 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 4:
    // all fields are unsigned ints of size 2 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	unsigned short temp;
 	fread( (char*) &temp, sizeof(unsigned short), 1 , fp );
@@ -434,7 +434,7 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 5:
    // all fields are unsigned ints of size 1 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	unsigned char temp;
 	fread( (char*) &temp, sizeof(unsigned char), 1 , fp );
@@ -460,7 +460,7 @@ named_vector_data read_matlab_with_names( std::string filename )
  return output;
 }
 
-FILE* read_matlab_header( int* rows, int* cols , std::string filename )
+FILE* read_matlab_header( unsigned int* rows, unsigned int* cols , std::string filename )
 {
  FILE* fp; 
  fp = fopen( filename.c_str() , "rb" );
@@ -578,7 +578,7 @@ FILE* write_matlab4_header( int nrows, int ncols, std::string filename, std::str
  return fp; 
 }
 
-FILE* write_matlab_header( int rows, int cols, std::string filename, std::string variable_name )
+FILE* write_matlab_header( unsigned int rows, unsigned int cols, std::string filename, std::string variable_name )
 {
  return write_matlab4_header( rows, cols, filename, variable_name );  
 }

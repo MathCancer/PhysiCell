@@ -19,6 +19,8 @@ This release improves includes minor bug fixes ...
 ### Minor new features and changes: 
  
 + Changed the MultiCellDS outputs to only store the filename, and not the full relative path, in the <filename> tags. This makes it simpler to load MultiCellDS outputs from matlab and other platforms. (No longer need to read from a directory higher up to make the relative pathing correct.) 
+
++ Did major cleanup on BioFVM so that it compiles cleanly even with -Wall (show all warnings). 
  
 ### Beta features (not fully supported):
  

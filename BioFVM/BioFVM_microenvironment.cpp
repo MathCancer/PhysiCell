@@ -67,28 +67,28 @@ Microenvironment* get_default_microenvironment( void )
 
 void zero_function( std::vector<double>& position, std::vector<double>& input , std::vector<double>* write_destination )
 {
-	for( int i=0 ; i < write_destination->size() ; i++ )
+	for( unsigned int i=0 ; i < write_destination->size() ; i++ )
 	{ (*write_destination)[i] = 0.0; }
 	return; 
 }
 
 void one_function( std::vector<double>& position, std::vector<double>& input , std::vector<double>* write_destination )
 {
-	for( int i=0 ; i < write_destination->size() ; i++ )
+	for( unsigned int i=0 ; i < write_destination->size() ; i++ )
 	{ (*write_destination)[i] = 1.0; }
 	return; 
 }
 
 void zero_function( Microenvironment* pMicroenvironment, int voxel_index, std::vector<double>* write_destination ) 
 {
-	for( int i=0 ; i < write_destination->size() ; i++ )
+	for( unsigned int i=0 ; i < write_destination->size() ; i++ )
 	{ (*write_destination)[i] = 0.0; }
 	return; 
 }
 
 void one_function( Microenvironment* pMicroenvironment, int voxel_index, std::vector<double>* write_destination )
 {
-	for( int i=0 ; i < write_destination->size() ; i++ )
+	for( unsigned int i=0 ; i < write_destination->size() ; i++ )
 	{ (*write_destination)[i] = 1.0; }
 	return; 
 }
@@ -128,7 +128,7 @@ Microenvironment::Microenvironment()
 	p_density_vectors = &temporary_density_vectors1;
 
 	gradient_vectors.resize( mesh.voxels.size() ); 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( 1 ); 
 		(gradient_vectors[k])[0].resize( 3, 0.0 );
@@ -264,12 +264,12 @@ void Microenvironment::apply_dirichlet_conditions( void )
 {
 	/*
 	#pragma omp parallel for 
-	for( int i=0 ; i < dirichlet_indices.size() ; i++ )
+	for( unsigned int i=0 ; i < dirichlet_indices.size() ; i++ )
 	{ density_vector( dirichlet_indices[i] ) = dirichlet_value_vectors[i]; }
 	*/
 
 	#pragma omp parallel for 
-	for( int i=0 ; i < mesh.voxels.size() ;i++ )
+	for( unsigned int i=0 ; i < mesh.voxels.size() ;i++ )
 	{
 		/*
 		if( mesh.voxels[i].is_Dirichlet == true )
@@ -277,7 +277,7 @@ void Microenvironment::apply_dirichlet_conditions( void )
 		*/
 		if( mesh.voxels[i].is_Dirichlet == true )
 		{
-			for( int j=0; j < dirichlet_value_vectors[i].size(); j++ )
+			for( unsigned int j=0; j < dirichlet_value_vectors[i].size(); j++ )
 			{
 				if( dirichlet_activation_vector[j] == true )
 				{
@@ -305,10 +305,10 @@ void Microenvironment::resize_voxels( int new_number_of_voxes )
 	temporary_density_vectors2.resize( mesh.voxels.size() , zero ); 
 		
 	gradient_vectors.resize( mesh.voxels.size() ); 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( number_of_densities() ); 
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -329,10 +329,10 @@ void Microenvironment::resize_space( int x_nodes, int y_nodes, int z_nodes )
 	temporary_density_vectors2.assign( mesh.voxels.size() , zero ); 
 		
 	gradient_vectors.resize( mesh.voxels.size() ); 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( number_of_densities() ); 
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -352,10 +352,10 @@ void Microenvironment::resize_space( double x_start, double x_end, double y_star
 	temporary_density_vectors2.assign( mesh.voxels.size() , zero ); 
 	
 	gradient_vectors.resize( mesh.voxels.size() ); 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( number_of_densities() ); 
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -375,10 +375,10 @@ void Microenvironment::resize_space( double x_start, double x_end, double y_star
 	temporary_density_vectors2.assign( mesh.voxels.size() , zero ); 
 	
 	gradient_vectors.resize( mesh.voxels.size() ); 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( number_of_densities() ); 
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -403,10 +403,10 @@ void Microenvironment::resize_densities( int new_size )
 	temporary_density_vectors1.assign( mesh.voxels.size() , zero );
 	temporary_density_vectors2.assign( mesh.voxels.size() , zero );
 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( number_of_densities() ); 
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -452,17 +452,17 @@ void Microenvironment::add_density( void )
 	decay_rates.push_back( 0.0 ); 
 	
 	// update sources and such 
-	for( int i=0; i < temporary_density_vectors1.size() ; i++ )
+	for( unsigned int i=0; i < temporary_density_vectors1.size() ; i++ )
 	{
 		temporary_density_vectors1[i].push_back( 0.0 ); 
 		temporary_density_vectors2[i].push_back( 0.0 ); 
 	}
 
 	// resize the gradient data structures 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( number_of_densities() ); 
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -504,17 +504,17 @@ void Microenvironment::add_density( std::string name , std::string units )
 	decay_rates.push_back( 0.0 ); 
 	
 	// update sources and such 
-	for( int i=0; i < temporary_density_vectors1.size() ; i++ )
+	for( unsigned int i=0; i < temporary_density_vectors1.size() ; i++ )
 	{
 		temporary_density_vectors1[i].push_back( 0.0 ); 
 		temporary_density_vectors2[i].push_back( 0.0 ); 
 	}
 
 	// resize the gradient data structures, 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( number_of_densities() ); 
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -555,17 +555,17 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	decay_rates.push_back( decay_rate ); 
 	
 	// update sources and such 
-	for( int i=0; i < temporary_density_vectors1.size() ; i++ )
+	for( unsigned int i=0; i < temporary_density_vectors1.size() ; i++ )
 	{
 		temporary_density_vectors1[i].push_back( 0.0 ); 
 		temporary_density_vectors2[i].push_back( 0.0 ); 
 	}
 
 	// resize the gradient data structures 
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
 		gradient_vectors[k].resize( number_of_densities() ); 
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -590,7 +590,7 @@ void Microenvironment::add_density( std::string name , std::string units, double
 
 int Microenvironment::find_density_index( std::string name )
 {
-	for( int i=0; i < density_names.size() ; i++ )
+	for( unsigned int i=0; i < density_names.size() ; i++ )
 	{
 		if( density_names[i] == name )
 		{ return i; }
@@ -626,7 +626,7 @@ void Microenvironment::set_density( int index , std::string name , std::string u
 int Microenvironment::voxel_index( int i, int j, int k )
 { return mesh.voxel_index(i,j,k) ; }
 
-std::vector<int> Microenvironment::cartesian_indices( int n )
+std::vector<unsigned int> Microenvironment::cartesian_indices( int n )
 { return mesh.cartesian_indices( n ); }
 
 int Microenvironment::nearest_voxel_index( std::vector<double>& position )
@@ -696,7 +696,7 @@ void Microenvironment::display_information( std::ostream& os )
 	os << std::endl << "Microenvironment summary: " << name << ": " << std::endl; 
 	mesh.display_information( os ); 
 	os << "Densities: (" << number_of_densities() << " total)" << std::endl; 
-	for( int i = 0 ; i < density_names.size() ; i++ )
+	for( unsigned int i = 0 ; i < density_names.size() ; i++ )
 	{
 		os << "   " << density_names[i] << ":" << std::endl
 		<< "     units: " << density_units[i] << std::endl 
@@ -711,13 +711,13 @@ void Microenvironment::display_information( std::ostream& os )
 	return; 
 }
 	
-int Microenvironment::number_of_densities( void )
+unsigned int Microenvironment::number_of_densities( void )
 { return (*p_density_vectors)[0].size(); }
 
-int Microenvironment::number_of_voxels( void )
+unsigned int Microenvironment::number_of_voxels( void )
 { return mesh.voxels.size(); }
 
-int Microenvironment::number_of_voxel_faces( void )
+unsigned int Microenvironment::number_of_voxel_faces( void )
 { return mesh.voxel_faces.size(); } 
 
 void Microenvironment::write_to_matlab( std::string filename )
@@ -737,7 +737,7 @@ void Microenvironment::write_to_matlab( std::string filename )
 
 		// densities  
 
-		for( int j=0 ; j < (*p_density_vectors)[i].size() ; j++)
+		for( unsigned int j=0 ; j < (*p_density_vectors)[i].size() ; j++)
 		{ fwrite( (char*) &( ((*p_density_vectors)[i])[j] ) , sizeof(double) , 1 , fp ); }
 	}
 
@@ -759,7 +759,7 @@ void Microenvironment::simulate_bulk_sources_and_sinks( double dt )
 	}
 	
 	#pragma omp parallel for
-	for( int i=0; i < mesh.voxels.size() ; i++ )
+	for( unsigned int i=0; i < mesh.voxels.size() ; i++ )
 	{
 		bulk_supply_rate_function( this,i, &bulk_source_sink_solver_temp1[i] ); // temp1 = S
 		bulk_supply_target_densities_function( this,i, &bulk_source_sink_solver_temp2[i]); // temp2 = T
@@ -781,7 +781,7 @@ void Microenvironment::simulate_bulk_sources_and_sinks( double dt )
 void Microenvironment::simulate_cell_sources_and_sinks( std::vector<Basic_Agent*>& basic_agent_list , double dt )
 {
 	#pragma omp parallel for
-	for( int i=0 ; i < basic_agent_list.size() ; i++ )
+	for( unsigned int i=0 ; i < basic_agent_list.size() ; i++ )
 	{		
 		basic_agent_list[i]->simulate_secretion_and_uptake( this , dt ); 
 	}
@@ -806,7 +806,7 @@ void Microenvironment::update_rates( void )
 	{ uptake_rates.assign( number_of_voxels() , zero ); }
 
 	#pragma omp parallel for 
-	for( int i=0 ; i < number_of_voxels() ; i++ )
+	for( unsigned int i=0 ; i < number_of_voxels() ; i++ )
 	{
 		bulk_uptake_rate_function( this,i, &(uptake_rates[i]) ); 		
 		bulk_supply_rate_function( this,i, &(supply_rates[i]) ); 		
@@ -877,14 +877,14 @@ void Microenvironment::compute_all_gradient_vectors( void )
 	}
 	
 	#pragma omp parallel for 
-	for( int k=0; k < mesh.z_coordinates.size() ; k++ )
+	for( unsigned int k=0; k < mesh.z_coordinates.size() ; k++ )
 	{
-		for( int j=0; j < mesh.y_coordinates.size() ; j++ )
+		for( unsigned int j=0; j < mesh.y_coordinates.size() ; j++ )
 		{
 			
-			for( int i=1; i < mesh.x_coordinates.size()-1 ; i++ )
+			for( unsigned int i=1; i < mesh.x_coordinates.size()-1 ; i++ )
 			{
-				for( int q=0; q < number_of_densities() ; q++ )
+				for( unsigned int q=0; q < number_of_densities() ; q++ )
 				{
 					int n = voxel_index(i,j,k);
 					// x-derivative of qth substrate at voxel n
@@ -900,14 +900,14 @@ void Microenvironment::compute_all_gradient_vectors( void )
 	}
 	
 	#pragma omp parallel for 
-	for( int k=0; k < mesh.z_coordinates.size() ; k++ )
+	for( unsigned int k=0; k < mesh.z_coordinates.size() ; k++ )
 	{
-		for( int i=0; i < mesh.x_coordinates.size() ; i++ )
+		for( unsigned int i=0; i < mesh.x_coordinates.size() ; i++ )
 		{
 			
-			for( int j=1; j < mesh.y_coordinates.size()-1 ; j++ )
+			for( unsigned int j=1; j < mesh.y_coordinates.size()-1 ; j++ )
 			{
-				for( int q=0; q < number_of_densities() ; q++ )
+				for( unsigned int q=0; q < number_of_densities() ; q++ )
 				{
 					int n = voxel_index(i,j,k);
 					// y-derivative of qth substrate at voxel n
@@ -922,14 +922,14 @@ void Microenvironment::compute_all_gradient_vectors( void )
 	}
 
 	#pragma omp parallel for 
-	for( int j=0; j < mesh.y_coordinates.size() ; j++ )
+	for( unsigned int j=0; j < mesh.y_coordinates.size() ; j++ )
 	{
-		for( int i=0; i < mesh.x_coordinates.size() ; i++ )
+		for( unsigned int i=0; i < mesh.x_coordinates.size() ; i++ )
 		{
 			
-			for( int k=1; k < mesh.z_coordinates.size()-1 ; k++ )
+			for( unsigned int k=1; k < mesh.z_coordinates.size()-1 ; k++ )
 			{
-				for( int q=0; q < number_of_densities() ; q++ )
+				for( unsigned int q=0; q < number_of_densities() ; q++ )
 				{
 					int n = voxel_index(i,j,k);
 					// y-derivative of qth substrate at voxel n
@@ -952,7 +952,7 @@ void Microenvironment::compute_gradient_vector( int n )
 	static double two_dy = mesh.dy; 
 	static double two_dz = mesh.dz; 
 	static bool gradient_constants_defined = false; 
-	std::vector<int> indices(3,0);
+	std::vector<unsigned int> indices(3,0);
 	
 	if( gradient_constants_defined == false )
 	{
@@ -967,7 +967,7 @@ void Microenvironment::compute_gradient_vector( int n )
 	// d/dx 
 	if( indices[0] > 0 && indices[0] < mesh.x_coordinates.size()-1 )
 	{
-		for( int q=0; q < number_of_densities() ; q++ )
+		for( unsigned int q=0; q < number_of_densities() ; q++ )
 		{
 			gradient_vectors[n][q][0] = (*p_density_vectors)[n+thomas_i_jump][q]; 
 			gradient_vectors[n][q][0] -= (*p_density_vectors)[n-thomas_i_jump][q]; 
@@ -979,7 +979,7 @@ void Microenvironment::compute_gradient_vector( int n )
 	// d/dy 
 	if( indices[1] > 0 && indices[1] < mesh.y_coordinates.size()-1 )
 	{
-		for( int q=0; q < number_of_densities() ; q++ )
+		for( unsigned int q=0; q < number_of_densities() ; q++ )
 		{
 			gradient_vectors[n][q][1] = (*p_density_vectors)[n+thomas_j_jump][q]; 
 			gradient_vectors[n][q][1] -= (*p_density_vectors)[n-thomas_j_jump][q]; 
@@ -991,7 +991,7 @@ void Microenvironment::compute_gradient_vector( int n )
 	// d/dz 
 	if( indices[2] > 0 && indices[2] < mesh.z_coordinates.size()-1 )
 	{
-		for( int q=0; q < number_of_densities() ; q++ )
+		for( unsigned int q=0; q < number_of_densities() ; q++ )
 		{
 			gradient_vectors[n][q][2] = (*p_density_vectors)[n+thomas_k_jump][q]; 
 			gradient_vectors[n][q][2] -= (*p_density_vectors)[n-thomas_k_jump][q]; 
@@ -1005,9 +1005,9 @@ void Microenvironment::compute_gradient_vector( int n )
 
 void Microenvironment::reset_all_gradient_vectors( void )
 {
-	for( int k=0 ; k < mesh.voxels.size() ; k++ )
+	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
-		for( int i=0 ; i < number_of_densities() ; i++ )
+		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
@@ -1110,23 +1110,23 @@ void initialize_microenvironment( void )
 	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
 
 	// set the initial densities to the values set in the Dirichlet_condition_vector
-	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{ microenvironment.density_vector(n) = default_microenvironment_options.Dirichlet_condition_vector; }
 	
 	if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
 	{
 		
-		for( int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+		for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
 		{
 			// set Dirichlet conditions along the 4 outer edges 
-			for( int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+			for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
 			{
 				int J = microenvironment.mesh.y_coordinates.size()-1;
 				microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,0,k) , default_microenvironment_options.Dirichlet_condition_vector );
 				microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_condition_vector );
 			}
 			int I = microenvironment.mesh.x_coordinates.size()-1;
-			for( int j=1; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
+			for( unsigned int j=1; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
 			{
 				microenvironment.add_dirichlet_node( microenvironment.voxel_index(0,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
 				microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
@@ -1136,9 +1136,9 @@ void initialize_microenvironment( void )
 		if( default_microenvironment_options.simulate_2D == false )
 		{
 			int K = microenvironment.mesh.z_coordinates.size()-1; 
-			for( int j=1 ; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
+			for( unsigned int j=1 ; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
 			{
-				for( int i=1; i < microenvironment.mesh.x_coordinates.size()-1 ; i++ )
+				for( unsigned int i=1; i < microenvironment.mesh.x_coordinates.size()-1 ; i++ )
 				{
 					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,0) , default_microenvironment_options.Dirichlet_condition_vector );
 					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_condition_vector );
