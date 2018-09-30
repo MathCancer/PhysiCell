@@ -340,12 +340,13 @@ void General_Mesh::read_from_matlab( std::string filename )
 	bounding_box[4] = -9e99; 
 	bounding_box[5] = -9e99; 
  
+        size_t result;
 	for( int i=0; i < number_of_data_entries ; i++ )
 	{
-		fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
 		
 		// estimate the bounding box; 
 		if( voxels[i].center[0] < bounding_box[0] )
@@ -988,12 +989,13 @@ void Cartesian_Mesh::read_from_matlab( std::string filename )
 	bounding_box[4] = -9e99; 
 	bounding_box[5] = -9e99; 
  
+        size_t result;
 	for( int i=0; i < number_of_data_entries ; i++ )
 	{
-		fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
 		
 		// estimate the bounding box; 
 		if( voxels[i].center[0] < bounding_box[0] )
