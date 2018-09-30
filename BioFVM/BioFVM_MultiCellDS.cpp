@@ -1087,6 +1087,8 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 // not yet supported 
 void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination , pugi::xml_document& xml_dom )
 {
+        size_t result;
+
 	// find the first microenvironment 
 	
 	using namespace pugi;
@@ -1233,10 +1235,10 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 				for( unsigned int j=0; j < columns ; j++ )
 				{
 					// read x, y, z, dV
-					fread( (char*) & (M_destination.mesh.voxels[j].center[0])   , sizeof(double) , 1 , fp );
-					fread( (char*) & (M_destination.mesh.voxels[j].center[1])   , sizeof(double) , 1 , fp );
-					fread( (char*) & (M_destination.mesh.voxels[j].center[2])   , sizeof(double) , 1 , fp );
-					fread( (char*) & (M_destination.mesh.voxels[j].volume)   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.mesh.voxels[j].center[0])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.mesh.voxels[j].center[1])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.mesh.voxels[j].center[2])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.mesh.voxels[j].volume)   , sizeof(double) , 1 , fp );
 				} 
 				fclose( fp );				
 			}
@@ -1354,11 +1356,11 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 				double temp; 
 				// read x,y,z,dV to a temp (throwaway) variable (if start_row == 4)
 				for( unsigned int i=0; i < start_row ; i++ )
-				{ fread( (char*) &temp , sizeof(double) , 1 , fp ); }
+				{ result = fread( (char*) &temp , sizeof(double) , 1 , fp ); }
 
 				// now, read the actual data 
 				for( unsigned int i=start_row; i < rows ; i++ )
-				{ fread( (char*) &( M_destination.density_vector(j)[i-start_row] ) , sizeof(double) , 1 , fp ); }
+				{ result = fread( (char*) &( M_destination.density_vector(j)[i-start_row] ) , sizeof(double) , 1 , fp ); }
 			} 
 			
 			fclose( fp );
