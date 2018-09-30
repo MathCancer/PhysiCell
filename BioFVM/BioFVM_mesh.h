@@ -173,8 +173,8 @@ class Cartesian_Mesh : public General_Mesh
 	std::vector<double> z_coordinates; 	
 	std::vector< std::vector<int> > moore_connected_voxel_indices; // Keeps the list of voxels in the Moore nighborhood 
 	void create_moore_neighborhood(void);
-	int voxel_index( int i, int j, int k ); 
-	std::vector<int> cartesian_indices( int n ); 
+	unsigned int voxel_index( unsigned int i, unsigned int j, unsigned int k ); 
+	std::vector<unsigned int> cartesian_indices( unsigned int n ); 
 	
 	double dx;
 	double dy;

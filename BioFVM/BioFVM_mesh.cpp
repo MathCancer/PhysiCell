@@ -310,8 +310,8 @@ void General_Mesh::write_to_matlab( std::string filename )
 
 void General_Mesh::read_from_matlab( std::string filename )
 {
-	int size_of_each_datum; 
-	int number_of_data_entries; 
+	unsigned int size_of_each_datum; 
+	unsigned int number_of_data_entries; 
 	FILE* fp = read_matlab_header( &size_of_each_datum, &number_of_data_entries,  filename ); 
 
 	voxel_faces.resize( 0 ); 
@@ -340,8 +340,12 @@ void General_Mesh::read_from_matlab( std::string filename )
 	bounding_box[4] = -9e99; 
 	bounding_box[5] = -9e99; 
  
+<<<<<<< HEAD
         size_t result;
 	for( int i=0; i < number_of_data_entries ; i++ )
+=======
+	for( unsigned int i=0; i < number_of_data_entries ; i++ )
+>>>>>>> 6fa1e820807c64eea133e97fd6a5c057b3bd3720
 	{
 		result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
 		result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
@@ -596,21 +600,21 @@ void Cartesian_Mesh::create_moore_neighborhood()
 		}
 	}
 }
-int Cartesian_Mesh::voxel_index( int i, int j, int k )
+unsigned int Cartesian_Mesh::voxel_index( unsigned int i, unsigned int j, unsigned int k )
 {
  return ( k*y_coordinates.size() + j )*x_coordinates.size() + i; 
 }
 
-std::vector<int> Cartesian_Mesh::cartesian_indices( int n )
+std::vector<unsigned int> Cartesian_Mesh::cartesian_indices( unsigned int n )
 {
-	std::vector<int> out(3, -1 ); 
+	std::vector<unsigned int> out(3, -1 ); 
 
 	// figure out i; 
-	int XY = x_coordinates.size() * y_coordinates.size();
-	out[2] = (int) floor( n/XY ); 
+	unsigned int XY = x_coordinates.size() * y_coordinates.size();
+	out[2] = (unsigned int) floor( n/XY ); 
  
 	// figure out j; 
-	out[1] = (int) floor(   (n - out[2]*XY) / x_coordinates.size() );
+	out[1] = (unsigned int) floor(   (n - out[2]*XY) / x_coordinates.size() );
  
 	// figure out k; 
 	out[0] = n - x_coordinates.size()*(   out[1] + y_coordinates.size()*out[2] ); 
@@ -955,8 +959,8 @@ void Cartesian_Mesh::display_information( std::ostream& os )
 
 void Cartesian_Mesh::read_from_matlab( std::string filename )
 {
-	int size_of_each_datum; 
-	int number_of_data_entries; 
+	unsigned int size_of_each_datum; 
+	unsigned int number_of_data_entries; 
 	FILE* fp = read_matlab_header( &size_of_each_datum, &number_of_data_entries,  filename ); 
 
 	voxel_faces.resize( 0 ); 
@@ -989,8 +993,12 @@ void Cartesian_Mesh::read_from_matlab( std::string filename )
 	bounding_box[4] = -9e99; 
 	bounding_box[5] = -9e99; 
  
+<<<<<<< HEAD
         size_t result;
 	for( int i=0; i < number_of_data_entries ; i++ )
+=======
+	for( unsigned int i=0; i < number_of_data_entries ; i++ )
+>>>>>>> 6fa1e820807c64eea133e97fd6a5c057b3bd3720
 	{
 		result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
 		result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
