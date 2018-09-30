@@ -340,12 +340,8 @@ void General_Mesh::read_from_matlab( std::string filename )
 	bounding_box[4] = -9e99; 
 	bounding_box[5] = -9e99; 
  
-<<<<<<< HEAD
         size_t result;
-	for( int i=0; i < number_of_data_entries ; i++ )
-=======
 	for( unsigned int i=0; i < number_of_data_entries ; i++ )
->>>>>>> 6fa1e820807c64eea133e97fd6a5c057b3bd3720
 	{
 		result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
 		result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
@@ -993,12 +989,8 @@ void Cartesian_Mesh::read_from_matlab( std::string filename )
 	bounding_box[4] = -9e99; 
 	bounding_box[5] = -9e99; 
  
-<<<<<<< HEAD
         size_t result;
-	for( int i=0; i < number_of_data_entries ; i++ )
-=======
 	for( unsigned int i=0; i < number_of_data_entries ; i++ )
->>>>>>> 6fa1e820807c64eea133e97fd6a5c057b3bd3720
 	{
 		result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
 		result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
