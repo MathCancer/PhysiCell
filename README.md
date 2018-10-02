@@ -49,13 +49,13 @@ make reset         : de-populates the sample project and returns to the original
 
 **Latest info:**  follow [@MathCancer](https://twitter.com/MathCancer) on Twitter (http://twitter.com/MathCancer)
 
-See changes.txt for the full change log. 
+See changes.md for the full change log. 
 
 * * * 
 
 ## Release summary: 
  
-This release improves includes minor bug fixes ... 
+This release improves includes minor bug fixes for compiling in older versions of MinGW, and simplified XML MultiCellDS outputs that no longer record the relative pathing to .mat files. (This allows users to read data from their actual locations, rather than from a parent directory.) This release includes minor code cleanups in BioFVM for cleaner compiling in Ubuntu. Lastly, we have make small refinements to the sample projects and makefiles to default data saving to the ./output directory, and to prevent future releases from excluding the output directory from the zip releases. 
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
