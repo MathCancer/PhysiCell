@@ -1,7 +1,7 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems. 
 
-**Version:**      1.4.0
-**Release date:** 26 September 2018 
+**Version:**      1.4.1
+**Release date:** 2 October 2018 
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments. 
@@ -49,118 +49,44 @@ make reset         : de-populates the sample project and returns to the original
 
 **Latest info:**  follow [@MathCancer](https://twitter.com/MathCancer) on Twitter (http://twitter.com/MathCancer)
 
-See changes.txt for the full change log. 
+See changes.md for the full change log. 
 
 * * * 
 
 ## Release summary: 
  
-This release improves the use of XML parsing in configuring simulations, notably (1) reading the domain parameters instead of hard-coded values, and (2) parsing a <user_parameters> block in the XML config files to populate a global parameters data structure of Boolean, integer, double, and std::string variables. Users can efficiently query these from within any function anywhere in a PhysiCell project. 
- 
+This release improves includes minor bug fixes for compiling in older versions of MinGW, and simplified XML MultiCellDS outputs that no longer record the relative pathing to .mat files. (This allows users to read data from their actual locations, rather than from a parent directory.) This release includes minor code cleanups in BioFVM for cleaner compiling in Ubuntu. Lastly, we have make small refinements to the sample projects and makefiles to default data saving to the ./output directory, and to prevent future releases from excluding the output directory from the zip releases. 
+
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
 ### Major new features and changes:
- 
-+ User Parameters! 
 
-+ Parsing XML to set domain size for all sample projects. 
-  
++ None 
+
 ### Minor new features and changes: 
  
-+ Updated all the sample projects to use the improved XML parsing; 
-  
-+ New functions in PhysiCell_pugixml: 
++ Changed the MultiCellDS outputs to only store the filename, and not the full relative path, in the <filename> tags. This makes it simpler to load MultiCellDS outputs from matlab and other platforms. (No longer need to read from a directory higher up to make the relative pathing correct.) 
 
-  1) std::string xml_get_my_name( pugi::xml_node node ); 
-  
-     This helps to easily extract the name of an XML node. (e.g., <bob units="none"/> returns bob.) 
++ Did major cleanup on BioFVM so that it compiles cleanly on Ubuntu. 
 
-  2) bool xml_get_my_bool_value( pugi::xml_node node ); 
-  
-     This gets the Boolean value of an XML node. (e.g., <bob units="none">true</bob> returns true.) 
-  
-  3) int xml_get_my_int_value( pugi::xml_node node ); 
-  
-     This gets the integer value of an XML node. (e.g., <bob units="none">42</bob> returns 42.)
-  
-  4) double xml_get_my_double_value( pugi::xml_node node ); 
-
-     This gets the double value of an XML node. (e.g., <bob units="none">42.03</bob> returns 42.03.)
-
-  5) std::string xml_get_my_string_value( pugi::xml_node node ); 
-  
-+ Updated all Makefiles to copy main.cpp, the Makefile, and ./config/PhysiCell_settings.xml to backup copies prior to populating any sample project.      
-
-+ Updated the heterogeneity sample project: 
-
-  1) Use the domain settings from the XML config file
-  
-  2) Use the XML config file options to set the initial tumor size and oncoprotein distribution. 
-  
-  3) Get the random seed from the XML config file. 
-  
-  4) Rewrote the custom coloring function to scale from min oncoprotein value (blue) to max oncoprotein value (yellow). 
-  
-+ Updated template2D sample project:
-
-  1) Use the domain settings from the XML config file
-  
-  2) Use the XML config file to set the motile cell parameters
-  
-  3) Get the random seed from the XML config file. 
-  
-  4) Updated to use the my_coloring_function coloring function. Made sure the my_coloring_function used false_cell_coloring_cytometry as its starting point. 
-  
-+ Updated template3D sample project:
-
-  1) Use the domain settings from the XML config file
-  
-  2) Use the XML config file to set the motile cell parameters
-  
-  3) Get the random seed from the XML config file. 
-  
-  4) Updated to use the my_coloring_function coloring function. Made sure the my_coloring_function used false_cell_coloring_cytometry as its starting point. 
-  
-+ Updated biorobots sample project:   
-
-  1) Use the domain settings from the XML config file
-  
-  2) Use the XML config file to set parameters and colors throughout the biorobots.cpp file 
-  
-  3) Get the random seed from the XML config file
-  
-+ Updated cancer immune sample project:   
-
-  1) Use the domain settings from the XML config file
-  
-  2) Use the XML config file to set parameters throughout the cancer_immune_3D.cpp file 
-  
-  3) Get the random seed from the XML config file
-
-+ New function in ./core/PhysiCell_utilities: 
-
-  int choose_event( std::vector<double probabilities> );
-  
-  If probabilities is a vector of n probabilities (for n events), and the sum of the probabilities is 1, then this chooses one of those n events according to these probabilities and returns the index of the selected event. 
-
-+ Moved from README.txt to README.md to support markdown and improve releases on both SourceForge and GitHub. 
-  
-+ Moved from changes.txt to changes.md to support markdown and improve releases on both SourceForge and GitHub. 
-  
++ All sample projects output to the ./output directory 
+ 
 ### Beta features (not fully supported):
  
 + None 
   
 ### Bugfixes: 
 
-+ Updated the "reset" rules so that the default config file is restored (in all the sample makefiles). 
-  
-+ Removed a cout from Mechanics::set_relative_equilibrium_distance() from ./core/PhysiCell_phenotype.*
++ Updated the Parameter<T> constructor functions to create a specialized version for std::string, to fix odd compiling bugs on older versions of MinGW. (Worked in 7.1.0, but not in 5.3.0.) Now, Parameter<T> for T = bool, int, or double get initialized to value = (T) 0. And Parameter<T> for T = std::string gets initialized to "none". I had hoped to do a unified version, but value = (T) 0 for std::string acts like a NULL pointer. 
+
++ All Makefiles ensure that the reset and data-cleanup rules leave at least empty.txt in ./output, so that future releases are never missing the output directory. 
   
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
- 
+
++ We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
+
 ### Planned future improvements: 
  
 + Further XML-based simulation setup. 
@@ -184,3 +110,5 @@ This release improves the use of XML parsing in configuring simulations, notably
 + create an angiogenesis sample project 
  
 + create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
+
++ (optionally) track internalized substrate, coupled with BioFVM

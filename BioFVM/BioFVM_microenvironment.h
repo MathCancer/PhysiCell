@@ -160,9 +160,9 @@ class Microenvironment
 		
 	/*! functions to simplify size queries */ 
 	
-	int number_of_densities( void ); 
-	int number_of_voxels( void ); 
-	int number_of_voxel_faces( void ); 
+	unsigned int number_of_densities( void ); 
+	unsigned int number_of_voxels( void ); 
+	unsigned int number_of_voxel_faces( void ); 
 
  	
 	void auto_choose_diffusion_decay_solver( void ); 
@@ -186,10 +186,10 @@ class Microenvironment
 	int find_density_index( std::string name ); 
 	
 	int voxel_index( int i, int j, int k ); 
-	std::vector<int> cartesian_indices( int n ); 
+	std::vector<unsigned int> cartesian_indices( int n ); 
 	
 	int nearest_voxel_index( std::vector<double>& position ); 
-	std::vector<int> nearest_cartesian_indices( std::vector<double>& position ); 
+	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
 	Voxel& nearest_voxel( std::vector<double>& position ); 
 	Voxel& voxels( int voxel_index );
 	std::vector<double>& nearest_density_vector( std::vector<double>& position );  

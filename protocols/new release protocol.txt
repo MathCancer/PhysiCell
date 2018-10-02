@@ -12,7 +12,7 @@ number.
    "Release summary" in changes.md (the most recent version x.y.z only) 
    to overwrite everything after "* * * " in README.md 
 
-6) Make appropriate changs to ./documentation/User_Guide.tex, and 
+6) Make appropriate changes to ./documentation/User_Guide.tex, and 
    recompile the LaTeX document. Don't forget to set \Version to x.y.z 
    at the top of the document. Set the \ReleaseDate to today (manually). 
 

@@ -57,7 +57,7 @@ namespace BioFVM{
 std::vector<double> operator-( const std::vector<double>& v1 , const std::vector<double>& v2 )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] -= v2[i]; }
  return v; 
 }
@@ -65,7 +65,7 @@ std::vector<double> operator-( const std::vector<double>& v1 , const std::vector
 std::vector<double> operator+( const std::vector<double>& v1 , const std::vector<double>& v2 )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] += v2[i]; }
  return v; 
 }
@@ -73,7 +73,7 @@ std::vector<double> operator+( const std::vector<double>& v1 , const std::vector
 std::vector<double> operator*( const std::vector<double>& v1 , const std::vector<double>& v2 )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] *= v2[i]; }
  return v; 
 }
@@ -81,7 +81,7 @@ std::vector<double> operator*( const std::vector<double>& v1 , const std::vector
 std::vector<double> operator/( const std::vector<double>& v1 , const std::vector<double>& v2 )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] /= v2[i]; }
  return v; 
 }
@@ -89,7 +89,7 @@ std::vector<double> operator/( const std::vector<double>& v1 , const std::vector
 std::vector<double> operator*( double d , const std::vector<double>& v1 )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] *= d; }
  return v; 
 }
@@ -97,7 +97,7 @@ std::vector<double> operator*( double d , const std::vector<double>& v1 )
 std::vector<double> operator+( double d , const std::vector<double>& v1 )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] += d; }
  return v; 
 }
@@ -105,7 +105,7 @@ std::vector<double> operator+( double d , const std::vector<double>& v1 )
 std::vector<double> operator+( const std::vector<double>& v1 , double d )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] += d; }
  return v; 
 }
@@ -113,7 +113,7 @@ std::vector<double> operator+( const std::vector<double>& v1 , double d )
 std::vector<double> operator-( double d , const std::vector<double>& v1 )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] = d - v1[i]; }
  return v; 
 }
@@ -121,49 +121,49 @@ std::vector<double> operator-( double d , const std::vector<double>& v1 )
 std::vector<double> operator-( const std::vector<double>& v1 , double d  )
 {
  std::vector<double> v = v1;
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v[i] -= d; }
  return v; 
 }
 
 void operator+=( std::vector<double>& v1, const std::vector<double>& v2 )
 {
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v1[i] += v2[i]; }
  return; 
 }
 
 void operator-=( std::vector<double>& v1, const std::vector<double>& v2 )
 {
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v1[i] -= v2[i]; }
  return; 
 }
 
 void operator/=( std::vector<double>& v1, const std::vector<double>& v2 )
 {
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v1[i] /= v2[i]; }
  return;  
 } 
 
 void operator*=( std::vector<double>& v1, const double& a )
 {
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v1[i] *= a; }
  return; 
 }
 
 void operator*=( std::vector<double>& v1, const std::vector<double>& v2 )
 {
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v1[i] *= v2[i]; }
  return;  
 }
 
 void operator/=( std::vector<double>& v1, const double& a )
 {
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  { v1[i] /= a; }
  return;  
 }
@@ -178,7 +178,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<double>& v )
   return os; 
  }
 
- for( int i=0; i < v.size(); i++ )
+ for( unsigned int i=0; i < v.size(); i++ )
  { os << v[i] << " " ; }
  return os; 
 }
@@ -191,11 +191,11 @@ std::vector<double> normalize( std::vector<double>& v )
  double norm = 0.0; 
  norm = 0.0; 
 
- for( int i=0; i < v.size(); i++ )
+ for( unsigned int i=0; i < v.size(); i++ )
  { norm += ( v[i]*v[i] ); }
  norm = sqrt( norm ); 
 
- for( int i=0; i < v.size(); i++ )
+ for( unsigned int i=0; i < v.size(); i++ )
  { output[i] /= norm ; }
  return output; 
 }
@@ -205,11 +205,11 @@ void normalize( std::vector<double>* v )
 {
  double norm = 1e-32; 
 
- for( int i=0; i < v->size(); i++ )
+ for( unsigned int i=0; i < v->size(); i++ )
  { norm += ( (*v)[i] * (*v)[i] ); }
  norm = sqrt( norm ); 
 
- for( int i=0; i < v->size(); i++ )
+ for( unsigned int i=0; i < v->size(); i++ )
  { (*v)[i] /=  norm ; }
  return; 
 }
@@ -217,7 +217,7 @@ void normalize( std::vector<double>* v )
 double norm_squared( const std::vector<double>& v )
 {
  double out = 0.0; 
- for( int i=0 ; i < v.size() ; i++ )
+ for( unsigned int i=0 ; i < v.size() ; i++ )
  { out += ( v[i] * v[i] ); }
  return out; 
 }
@@ -230,7 +230,7 @@ double norm( const std::vector<double>& v )
 double maxabs( const std::vector<double>& v )
 {
  double out = 0.0; 
- for( int i=0; i < v.size() ; i++ )
+ for( unsigned int i=0; i < v.size() ; i++ )
  {
   if( fabs( v[i] ) > out )
   { out = v[i]; }
@@ -241,7 +241,7 @@ double maxabs( const std::vector<double>& v )
 double max_abs_difference( const std::vector<double>& v1 , const std::vector<double>& v2 )
 {
  double out = 0.0; 
- for( int i=0; i < v1.size() ; i++ )
+ for( unsigned int i=0; i < v1.size() ; i++ )
  {
   if( fabs( v1[i] -v2[i] ) > out )
   { out = fabs( v1[i] - v2[i] ); }
@@ -253,7 +253,7 @@ std::vector<double> exponentiate( const std::vector<double>& exponent )
 {
  std::vector<double> out( exponent.size() , 0.0 );
  
- for( int i=0 ; i < out.size() ; i++ )
+ for( unsigned int i=0 ; i < out.size() ; i++ )
  { out[i] = exp( exponent[i] ); }
 
  return out; 
@@ -261,11 +261,9 @@ std::vector<double> exponentiate( const std::vector<double>& exponent )
  
 void randomize( std::vector<double>* v )
 {
- double norm = 1e-32; 
- 
  static double d1 = 2.0 / (double) RAND_MAX; 
 
- for( int i=0; i < v->size(); i++ )
+ for( unsigned int i=0; i < v->size(); i++ )
  { (*v)[i] =  -1 + d1 * rand(); }
  
  return; 
@@ -275,7 +273,7 @@ void randomize( std::vector<double>* v )
 
 void axpy( std::vector<double>* y, double& a , std::vector<double>& x )
 {
- for( int i=0; i < (*y).size() ; i++ )
+ for( unsigned int i=0; i < (*y).size() ; i++ )
  {
   (*y)[i] += a * x[i] ; 
  }
@@ -284,7 +282,7 @@ void axpy( std::vector<double>* y, double& a , std::vector<double>& x )
 
 void axpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>& x )
 {
- for( int i=0; i < (*y).size() ; i++ )
+ for( unsigned int i=0; i < (*y).size() ; i++ )
  {
   (*y)[i] += a[i] * x[i] ; 
  }
@@ -293,7 +291,7 @@ void axpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>&
 
 void naxpy( std::vector<double>* y, double& a , std::vector<double>& x )
 {
- for( int i=0; i < (*y).size() ; i++ )
+ for( unsigned int i=0; i < (*y).size() ; i++ )
  {
   (*y)[i] -= a * x[i] ; 
  }
@@ -302,7 +300,7 @@ void naxpy( std::vector<double>* y, double& a , std::vector<double>& x )
 
 void naxpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>& x )
 {
- for( int i=0; i < (*y).size() ; i++ )
+ for( unsigned int i=0; i < (*y).size() ; i++ )
  {
   (*y)[i] -= a[i] * x[i] ; 
  }
@@ -314,7 +312,7 @@ void naxpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>
 void csv_to_vector( const char* buffer , std::vector<double>& vect )
 {
 	vect.resize(0); 
-	int i=0;
+	unsigned int i=0;
 	while( i < strlen( buffer )  )
 	{
 		// churn through delimiters, whitespace, etc. to reach the next numeric term
@@ -340,7 +338,7 @@ char* vector_to_csv( const std::vector<double>& vect )
 	buffer = new char[ datum_size * vect.size() ];
 	
 	int position = 0; 
-	for( int j=0; j < vect.size()-1 ; j++ )
+	for( unsigned int j=0; j < vect.size()-1 ; j++ )
 	{
 		position += sprintf( buffer+position , "%.7e," , vect[j] ); 
 	}
@@ -361,7 +359,7 @@ void vector_to_csv_safe( const std::vector<double>& vect , char*& buffer )
 	std::cout << __LINE__ << std::endl; 
 	
 	int position = 0; 
-	for( int j=0; j < vect.size()-1 ; j++ )
+	for( unsigned int j=0; j < vect.size()-1 ; j++ )
 	{
 		position += sprintf( buffer+position , "%.7e," , vect[j] ); 
 	}
@@ -375,7 +373,7 @@ void vector_to_csv( const std::vector<double>& vect , char*& buffer )
 	// If you want better precision, use a binary data format like matlab, or (in the future) HDF 
 
 	int position = 0; 
-	for( int j=0; j < vect.size()-1 ; j++ )
+	for( unsigned int j=0; j < vect.size()-1 ; j++ )
 	{
 		position += sprintf( buffer+position , "%.7e," , vect[j] ); 
 	}
@@ -401,7 +399,7 @@ char* vector_to_list( const std::vector<double>& vect , char delim )
 	buffer = new char[ datum_size * vect.size() ];
 	
 	int position = 0; 
-	for( int j=0; j < vect.size()-1 ; j++ )
+	for( unsigned int j=0; j < vect.size()-1 ; j++ )
 	{
 		position += sprintf( buffer+position , "%.7e%c" , vect[j] , delim ); 
 	}
@@ -421,7 +419,7 @@ void vector_to_list_safe( const std::vector<double>& vect , char*& buffer , char
 	buffer = new char[ datum_size * vect.size() ];
 	
 	int position = 0; 
-	for( int j=0; j < vect.size()-1 ; j++ )
+	for( unsigned int j=0; j < vect.size()-1 ; j++ )
 	{
 		position += sprintf( buffer+position , "%.7e%c" , vect[j] , delim ); 
 	}
@@ -435,7 +433,7 @@ void vector_to_list( const std::vector<double>& vect , char*& buffer , char deli
 	// If you want better precision, use a binary data format like matlab, or (in the future) HDF 
 
 	int position = 0; 
-	for( int j=0; j < vect.size()-1 ; j++ )
+	for( unsigned int j=0; j < vect.size()-1 ; j++ )
 	{
 		position += sprintf( buffer+position , "%.7e%c" , vect[j] , delim ); 
 	}

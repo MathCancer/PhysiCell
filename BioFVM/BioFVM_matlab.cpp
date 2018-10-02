@@ -87,8 +87,8 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
  // read the basic header information 
  
  UINT temp;
- 
- fread( (char*) &temp , UINTs , 1 , fp );
+ size_t result;
+ result = fread( (char*) &temp , UINTs , 1 , fp );
  
  UINT type_numeric_format = thousands(temp);
  UINT type_reserved = hundreds(temp);
@@ -115,10 +115,10 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
  // get the size of the data 
  
  UINT rows;
- fread( (char*) &rows , UINTs , 1, fp );
+ result = fread( (char*) &rows , UINTs , 1, fp );
  
  UINT cols;
- fread( (char*) &cols, UINTs , 1 , fp );
+ result = fread( (char*) &cols, UINTs , 1 , fp );
  
  // resize the output accordingly 
 
@@ -132,7 +132,7 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
  // make sure we're not dealing with complex numbers 
  
  UINT imag;
- fread( (char*) &imag, UINTs, 1 , fp );
+ result = fread( (char*) &imag, UINTs, 1 , fp );
  if( imag != 0 )
  {
   std::cout << "Error: I can't read imaginary matrices yet!" << std::endl;
@@ -149,7 +149,7 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
  // MultiCellDS_Fields:name1,name2,...,nameN, where N = rows - 3; 
 
  UINT name_length;
- fread( (char*) &name_length, UINTs, 1 , fp );
+ result = fread( (char*) &name_length, UINTs, 1 , fp );
  char* name;
  name = new char [name_length];
 
@@ -157,21 +157,21 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
 
  // read the name
  
- fread( name , name_length , 1 , fp );
+ result = fread( name , name_length , 1 , fp );
 
  // read the real part of the matrix
- int i = 0;
- int j = 0;
+ unsigned int i = 0;
+ unsigned int j = 0;
  
  switch( type_data_format )
  {
   case 0:
    // all fields are doubles
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	double temp;
-	fread( (char*) &temp, sizeof(double), 1 , fp );
+	result = fread( (char*) &temp, sizeof(double), 1 , fp );
 	(output[i])[j] = temp; 
     i++;
 	
@@ -183,10 +183,10 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 1:
    // all fields are floats 
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	float temp;
-	fread( (char*) &temp, sizeof(float), 1 , fp );
+	result = fread( (char*) &temp, sizeof(float), 1 , fp );
 	(output[i])[j] = (double) temp; 
     i++;
 	
@@ -198,10 +198,10 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 2:
    // all fields are signed ints of size 4 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	int temp;
-	fread( (char*) &temp, sizeof(int), 1 , fp );
+	result = fread( (char*) &temp, sizeof(int), 1 , fp );
 	(output[i])[j] = (double) temp; 
     i++;
 	
@@ -213,10 +213,10 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 3:
    // all fields are signed ints of size 2 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	short temp;
-	fread( (char*) &temp, sizeof(short), 1 , fp );
+	result = fread( (char*) &temp, sizeof(short), 1 , fp );
 	(output[i])[j] = (double) temp; 
     i++;
 	
@@ -228,10 +228,10 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 4:
    // all fields are unsigned ints of size 2 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	unsigned short temp;
-	fread( (char*) &temp, sizeof(unsigned short), 1 , fp );
+	result = fread( (char*) &temp, sizeof(unsigned short), 1 , fp );
 	(output[i])[j] = (double) temp; 
     i++;
 	
@@ -243,10 +243,10 @@ std::vector< std::vector<double> > read_matlab( std::string filename )
   case 5:
    // all fields are unsigned ints of size 1 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	unsigned char temp;
-	fread( (char*) &temp, sizeof(unsigned char), 1 , fp );
+	result = fread( (char*) &temp, sizeof(unsigned char), 1 , fp );
 	(output[i])[j] = (double) temp; 
     i++;
 	
@@ -286,8 +286,8 @@ named_vector_data read_matlab_with_names( std::string filename )
  // read the basic header information 
  
  UINT temp;
- 
- fread( (char*) &temp , UINTs , 1 , fp );
+ size_t result;
+ result = fread( (char*) &temp , UINTs , 1 , fp );
  
  UINT type_numeric_format = thousands(temp);
  UINT type_reserved = hundreds(temp);
@@ -308,10 +308,10 @@ named_vector_data read_matlab_with_names( std::string filename )
  // get the size of the data 
  
  UINT rows;
- fread( (char*) &rows , UINTs , 1, fp );
+ result = fread( (char*) &rows , UINTs , 1, fp );
  
  UINT cols;
- fread( (char*) &cols, UINTs , 1 , fp );
+ result = fread( (char*) &cols, UINTs , 1 , fp );
  
  // resize the output accordingly 
 
@@ -322,7 +322,7 @@ named_vector_data read_matlab_with_names( std::string filename )
  // make sure we're not dealing with complex numbers 
  
  UINT imag;
- fread( (char*) &imag, UINTs, 1 , fp );
+ result = fread( (char*) &imag, UINTs, 1 , fp );
  if( imag != 0 )
  {
   std::cout << "Error: I can't read imaginary matrices yet!" << std::endl;
@@ -339,7 +339,7 @@ named_vector_data read_matlab_with_names( std::string filename )
  // MultiCellDS_Fields:name1,name2,...,nameN, where N = rows - 3; 
 
  UINT name_length;
- fread( (char*) &name_length, UINTs, 1 , fp );
+ result = fread( (char*) &name_length, UINTs, 1 , fp );
  char* name;
  name = new char [name_length];
 
@@ -347,22 +347,22 @@ named_vector_data read_matlab_with_names( std::string filename )
 
  // read the name
  
- fread( name , name_length , 1 , fp );
+ result = fread( name , name_length , 1 , fp );
  output.names[0] = name; 
 
  // read the real part of the matrix
- int i = 0;
- int j = 0;
+ unsigned int i = 0;
+ unsigned int j = 0;
  
  switch( type_data_format )
  {
   case 0:
    // all fields are doubles
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	double temp;
-	fread( (char*) &temp, sizeof(double), 1 , fp );
+	result = fread( (char*) &temp, sizeof(double), 1 , fp );
 	(output.data[i])[j] = temp; 
     i++;
 	
@@ -374,10 +374,10 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 1:
    // all fields are floats 
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	float temp;
-	fread( (char*) &temp, sizeof(float), 1 , fp );
+	result = fread( (char*) &temp, sizeof(float), 1 , fp );
 	(output.data[i])[j] = (double) temp; 
     i++;
 	
@@ -389,10 +389,10 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 2:
    // all fields are signed ints of size 4 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	int temp;
-	fread( (char*) &temp, sizeof(int), 1 , fp );
+	result = fread( (char*) &temp, sizeof(int), 1 , fp );
 	(output.data[i])[j] = (double) temp; 
     i++;
 	
@@ -404,10 +404,10 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 3:
    // all fields are signed ints of size 2 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	short temp;
-	fread( (char*) &temp, sizeof(short), 1 , fp );
+	result = fread( (char*) &temp, sizeof(short), 1 , fp );
 	(output.data[i])[j] = (double) temp; 
     i++;
 	
@@ -419,10 +419,10 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 4:
    // all fields are unsigned ints of size 2 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	unsigned short temp;
-	fread( (char*) &temp, sizeof(unsigned short), 1 , fp );
+	result = fread( (char*) &temp, sizeof(unsigned short), 1 , fp );
 	(output.data[i])[j] = (double) temp; 
     i++;
 	
@@ -434,10 +434,10 @@ named_vector_data read_matlab_with_names( std::string filename )
   case 5:
    // all fields are unsigned ints of size 1 bytes  
    
-   for( int n=0; n < rows*cols ; n++ )
+   for( unsigned int n=0; n < rows*cols ; n++ )
    {
 	unsigned char temp;
-	fread( (char*) &temp, sizeof(unsigned char), 1 , fp );
+	result = fread( (char*) &temp, sizeof(unsigned char), 1 , fp );
 	(output.data[i])[j] = (double) temp; 
     i++;
 	
@@ -460,7 +460,7 @@ named_vector_data read_matlab_with_names( std::string filename )
  return output;
 }
 
-FILE* read_matlab_header( int* rows, int* cols , std::string filename )
+FILE* read_matlab_header( unsigned int* rows, unsigned int* cols , std::string filename )
 {
  FILE* fp; 
  fp = fopen( filename.c_str() , "rb" );
@@ -477,7 +477,8 @@ FILE* read_matlab_header( int* rows, int* cols , std::string filename )
  
  UINT temp;
  
- fread( (char*) &temp , UINTs , 1 , fp );
+ size_t result;
+ result = fread( (char*) &temp , UINTs , 1 , fp );
  
  UINT type_numeric_format = thousands(temp);
  UINT type_reserved = hundreds(temp);
@@ -499,17 +500,17 @@ FILE* read_matlab_header( int* rows, int* cols , std::string filename )
  // get the size of the data 
  
 // UINT rows;
- fread( (char*) rows , UINTs , 1, fp );
+ result = fread( (char*) rows , UINTs , 1, fp );
  
 // UINT cols;
- fread( (char*) cols, UINTs , 1 , fp );
+result =  fread( (char*) cols, UINTs , 1 , fp );
  
  // resize the output accordingly 
 
  // make sure we're not dealing with complex numbers 
  
  UINT imag;
- fread( (char*) &imag, UINTs, 1 , fp );
+ result = fread( (char*) &imag, UINTs, 1 , fp );
  if( imag != 0 )
  {
   std::cout << "Error: I can't read imaginary matrices yet!" << std::endl;
@@ -518,7 +519,7 @@ FILE* read_matlab_header( int* rows, int* cols , std::string filename )
  }
 
  UINT name_length;
- fread( (char*) &name_length, UINTs, 1 , fp );
+ result = fread( (char*) &name_length, UINTs, 1 , fp );
  char* name;
  name = new char [name_length];
 
@@ -526,7 +527,7 @@ FILE* read_matlab_header( int* rows, int* cols , std::string filename )
 
  // read the name
  
- fread( name , name_length , 1 , fp );
+ result = fread( name , name_length , 1 , fp );
  delete name; 
   
  return fp; 
@@ -578,7 +579,7 @@ FILE* write_matlab4_header( int nrows, int ncols, std::string filename, std::str
  return fp; 
 }
 
-FILE* write_matlab_header( int rows, int cols, std::string filename, std::string variable_name )
+FILE* write_matlab_header( unsigned int rows, unsigned int cols, std::string filename, std::string variable_name )
 {
  return write_matlab4_header( rows, cols, filename, variable_name );  
 }

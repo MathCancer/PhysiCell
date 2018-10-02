@@ -147,6 +147,7 @@ reset:
 	touch ALL_CITATIONS.txt 
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings_default.xml ./config/PhysiCell_settings.xml 
+	touch ./config/empty.txt
 	
 clean:
 	rm -f *.o
@@ -158,6 +159,7 @@ data-cleanup:
 	rm -f *.svg
 	rm -f ./output/*
 	touch ./output/empty.txt
+	touch ./config/empty.txt
 	
 # archival 
 	

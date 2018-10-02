@@ -566,7 +566,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		{
 			char temp [10240];
 			int position = 0; 
-			for( int k=0 ; k < M.mesh.x_coordinates.size()-1 ; k++ )
+			for( unsigned int k=0 ; k < M.mesh.x_coordinates.size()-1 ; k++ )
 			{ position += sprintf( temp+position, "%f " , M.mesh.x_coordinates[k] ); }
 			sprintf( temp+position , "%f" , M.mesh.x_coordinates[ M.mesh.x_coordinates.size()-1] ); 
 			node = node.append_child( "x_coordinates" ); 
@@ -576,7 +576,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			
 			node = node.parent();
 			position = 0; 
-			for( int k=0 ; k < M.mesh.y_coordinates.size()-1 ; k++ )
+			for( unsigned int k=0 ; k < M.mesh.y_coordinates.size()-1 ; k++ )
 			{ position += sprintf( temp+position, "%f " , M.mesh.y_coordinates[k] ); }
 			sprintf( temp+position , "%f" , M.mesh.y_coordinates[ M.mesh.y_coordinates.size()-1] ); 
 			node = node.append_child( "y_coordinates" ); 
@@ -586,7 +586,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			
 			node = node.parent();
 			position = 0; 
-			for( int k=0 ; k < M.mesh.z_coordinates.size()-1 ; k++ )
+			for( unsigned int k=0 ; k < M.mesh.z_coordinates.size()-1 ; k++ )
 			{ position += sprintf( temp+position, "%f " , M.mesh.z_coordinates[k] ); }
 			sprintf( temp+position , "%f" , M.mesh.z_coordinates[ M.mesh.z_coordinates.size()-1] ); 
 			node = node.append_child( "z_coordinates" ); 
@@ -602,7 +602,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			attrib = node.append_attribute("type");
 			attrib.set_value( "xml" ); 
 			char temp [1024]; 
-			for( int k=0; k < M.mesh.voxels.size() ; k++ )
+			for( unsigned int k=0; k < M.mesh.voxels.size() ; k++ )
 			{
 				node = node.append_child( "voxel" );
 				
@@ -639,7 +639,16 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			
 			node = node.append_child( "filename" ); 
 			
-			node.append_child( pugi::node_pcdata ).set_value( filename ); 
+			/* store filename without the relative pathing (if any) */ 
+			char filename_without_pathing [1024];
+			char* filename_start = strrchr( filename , '/' ); 
+			if( filename_start == NULL )
+			{ filename_start = filename; }
+			else	
+			{ filename_start++; } 
+			strcpy( filename_without_pathing , filename_start ); 
+			
+			node.append_child( pugi::node_pcdata ).set_value( filename_without_pathing ); // filename ); 
 			
 			node = node.parent(); 
 			
@@ -652,7 +661,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		node = node.append_child( "variables" ); 
 		
 		char temp [1024]; 
-		for( int j=0 ; j < M.number_of_densities() ; j++ )
+		for( unsigned int j=0 ; j < M.number_of_densities() ; j++ )
 		{
 			node = node.append_child( "variable" ); 
 			attrib = node.append_attribute( "name" ); 
@@ -701,7 +710,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			
 			char* buffer; 
 			buffer = new char [data_size]; 
-			for( int j=0 ; j < M.mesh.voxels.size() ; j++ )
+			for( unsigned int j=0 ; j < M.mesh.voxels.size() ; j++ )
 			{
 				vector_to_list( M.density_vector(j) , buffer , ' ' ); 
 				node = node.append_child( "data_vector"); 
@@ -726,7 +735,16 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			sprintf( filename , "%s_microenvironment%d.mat" , filename_base.c_str() , 0 ); 
 			M.write_to_matlab( filename ); 
 			
-			node.append_child( pugi::node_pcdata ).set_value( filename );				
+			/* store filename without the relative pathing (if any) */ 
+			char filename_without_pathing [1024];
+			char* filename_start = strrchr( filename , '/' ); 
+			if( filename_start == NULL )
+			{ filename_start = filename; }
+			else	
+			{ filename_start++; } 
+			strcpy( filename_without_pathing , filename_start ); 
+			
+			node.append_child( pugi::node_pcdata ).set_value( filename_without_pathing ); // filename );				
 			
 			node = node.parent(); 
 		}
@@ -753,7 +771,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		char* buffer; 
 		buffer = new char [data_size]; 
 		node = node.child( "data_vector" );
-		for( int j=0 ; j < M.mesh.voxels.size() ; j++ )
+		for( unsigned int j=0 ; j < M.mesh.voxels.size() ; j++ )
 		{
 			vector_to_list( M.density_vector(j) , buffer , ' ' ); 
 			node = node.first_child(); 
@@ -777,8 +795,17 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		sprintf( filename , "%s_microenvironment%d.mat" , filename_base.c_str() , 0 ); 
 		M.write_to_matlab( filename ); 
 		
+		/* store filename without the relative pathing (if any) */ 
+		char filename_without_pathing [1024];
+		char* filename_start = strrchr( filename , '/' ); 
+		if( filename_start == NULL )
+		{ filename_start = filename; }
+		else	
+		{ filename_start++; } 
+		strcpy( filename_without_pathing , filename_start ); 
+		
 		node = node.first_child(); 
-		node.set_value( filename ); 
+		node.set_value( filename_without_pathing ); // filename ); 
 		node = node.parent(); 
 	}
 	
@@ -862,13 +889,22 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		char filename [1024]; 
 		sprintf( filename , "%s_cells.mat" , filename_base.c_str() ); 
 		
+		/* store filename without the relative pathing (if any) */ 
+		char filename_without_pathing [1024];
+		char* filename_start = strrchr( filename , '/' ); 
+		if( filename_start == NULL )
+		{ filename_start = filename; }
+		else	
+		{ filename_start++; } 
+		strcpy( filename_without_pathing , filename_start ); 
+		
 		if( !node.first_child() )
 		{
-			node.append_child( pugi::node_pcdata ).set_value( filename ); 
+			node.append_child( pugi::node_pcdata ).set_value( filename_without_pathing ); // filename ); 
 		}
 		else
 		{
-			node.first_child().set_value( filename ); 
+			node.first_child().set_value( filename_without_pathing ); // filename ); 
 		}
 		
 		// next, create a matlab structure and save it!
@@ -892,7 +928,7 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 			fwrite( (char*) &( volTemp ) , sizeof(double) , 1 , fp ); 
 			
 			// add variables and their source/sink/saturation values (per-cell basis)
-			for( int j=0; j < M.number_of_densities() ; j++ ) 
+			for( unsigned int j=0; j < M.number_of_densities() ; j++ ) 
 			{
 				double dTemp = all_basic_agents[i]->get_total_volume() * (*all_basic_agents[i]->secretion_rates)[j]; 
 				fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
@@ -923,7 +959,7 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 	// now go through all cells 
 
 	root = node; 
-	for( int i=0; i < all_basic_agents.size(); i++ )
+	for( unsigned int i=0; i < all_basic_agents.size(); i++ )
 	{
 		node = node.append_child( "cell" ); 
 		attrib = node.append_attribute( "ID" ); 
@@ -936,7 +972,7 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		node = node.append_child( "transport_processes" ); 
 		
 		// add variables and their source/sink/saturation values (per-cell basis)
-		for( int j=0; j < M.number_of_densities() ; j++ ) 
+		for( unsigned int j=0; j < M.number_of_densities() ; j++ ) 
 		{
 			node = node.append_child( "variable" ); 
 			attrib = node.append_attribute( "name" ); 
@@ -1042,7 +1078,8 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 {
 	std::cout << "Reading data from file " << filename << " ... " ; 
 	pugi::xml_document doc; 
-	pugi::xml_parse_result result = doc.load_file( filename.c_str()  );
+	// pugi::xml_parse_result result = // g++ warning: set but not used 
+	doc.load_file( filename.c_str()  );
 	
 	read_microenvironment_from_MultiCellDS_xml( M_destination , doc ); 
 }
@@ -1050,6 +1087,8 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 // not yet supported 
 void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination , pugi::xml_document& xml_dom )
 {
+        size_t result;
+
 	// find the first microenvironment 
 	
 	using namespace pugi;
@@ -1059,7 +1098,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 
 	// read all the microenvironments 
 	
-	int microenvironment_index = -1; 
+	// int microenvironment_index = -1; // g++ warning: set but not used 
 	while( root )
 	{
 		M_destination.name = root.attribute("name").value(); 
@@ -1088,20 +1127,20 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 		// get the bounding box 
 		node = node.child( "bounding_box");
 		
-		int i=0; 
+		// int i=0; // g++ warning: set but not used 
 		
 		csv_to_vector( node.text().get() , M_destination.mesh.bounding_box ); 
 		
 		// if Cartesian, try to get the mesh just by reading the x, y, z coordinates 
 		if( cartesian == true )
 		{
-			bool read_coordinates = true; 
+			// bool read_coordinates = true; // g++ warning: set but not used 
 			
 			// read the x coordinates 
 			node = node.parent();
 			node = node.child("x_coordinates"); 
 			M_destination.mesh.x_coordinates.clear();
-			i=0;
+			// i=0;// g++ warning: set but not used 
 			
 			csv_to_vector( node.text().get() , M_destination.mesh.x_coordinates ); 
 			
@@ -1114,7 +1153,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 			node = node.parent();
 			node = node.child("y_coordinates"); 
 			M_destination.mesh.y_coordinates.clear();
-			i=0;
+			// i=0; // g++ warning: set but not used 
 			
 			csv_to_vector( node.text().get() , M_destination.mesh.y_coordinates );
 			
@@ -1127,7 +1166,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 			node = node.parent();
 			node = node.child("z_coordinates"); 
 			M_destination.mesh.z_coordinates.clear();
-			i=0;
+			// i=0; // g++ warning: set but not used 
 			csv_to_vector( node.text().get() , M_destination.mesh.z_coordinates );
 			if( M_destination.mesh.z_coordinates.size() > 1 )
 			{ M_destination.mesh.dz = M_destination.mesh.z_coordinates[1] - M_destination.mesh.z_coordinates[0]; }
@@ -1173,7 +1212,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 			node = node.child( "voxels" );  // now we're at the voxels level 
 			
 			// are the voxels written in matlab format or as xml? 
-			pugi::xml_attribute attrib = node.attribute( "type" );
+			// pugi::xml_attribute attrib = node.attribute( "type" ); // g++ warning: set but not used 
 			
 			if( strcmp(  node.attribute( "type" ).value()  , "matlab" ) == 0 )
 			{
@@ -1184,23 +1223,22 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 				M_destination.mesh.use_voxel_faces = false; 				
 				
 				// determine the number of voxels 
-				int rows; 
-				int columns; 
+				unsigned int rows; 
+				unsigned int columns; 
 				FILE* fp = read_matlab_header( &rows, &columns, node.text().get() ); 
-				int voxel_count = columns; 
+				unsigned int voxel_count = columns; 
 				
 				// resize the appropriate data structure 
 				M_destination.resize_voxels( voxel_count );	
 
 				// read the data directly into the voxels  
-				for( int j=0; j < columns ; j++ )
+				for( unsigned int j=0; j < columns ; j++ )
 				{
-					double temp; 
 					// read x, y, z, dV
-					fread( (char*) & (M_destination.mesh.voxels[j].center[0])   , sizeof(double) , 1 , fp );
-					fread( (char*) & (M_destination.mesh.voxels[j].center[1])   , sizeof(double) , 1 , fp );
-					fread( (char*) & (M_destination.mesh.voxels[j].center[2])   , sizeof(double) , 1 , fp );
-					fread( (char*) & (M_destination.mesh.voxels[j].volume)   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.mesh.voxels[j].center[0])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.mesh.voxels[j].center[1])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.mesh.voxels[j].center[2])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.mesh.voxels[j].volume)   , sizeof(double) , 1 , fp );
 				} 
 				fclose( fp );				
 			}
@@ -1304,25 +1342,25 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 		// read in if stored as matlab 		
 		if( strcmp(  node.attribute( "type" ).value()  , "matlab" ) == 0 ) 
 		{  
-			int rows; 
-			int columns; 
+			unsigned int rows; 
+			unsigned int columns; 
 			FILE* fp = read_matlab_header( &rows, &columns, node.text().get() ); 			
-			int start_row = 0; 
+			unsigned int start_row = 0; 
 			if( rows > M_destination.number_of_densities() )
 			{ start_row = 4; }
 			
 
 			// read the data directly into the microenvironment 
-			for( int j=0; j < columns ; j++ )
+			for( unsigned int j=0; j < columns ; j++ )
 			{
 				double temp; 
 				// read x,y,z,dV to a temp (throwaway) variable (if start_row == 4)
-				for( int i=0; i < start_row ; i++ )
-				{ fread( (char*) &temp , sizeof(double) , 1 , fp ); }
+				for( unsigned int i=0; i < start_row ; i++ )
+				{ result = fread( (char*) &temp , sizeof(double) , 1 , fp ); }
 
 				// now, read the actual data 
-				for( int i=start_row; i < rows ; i++ )
-				{ fread( (char*) &( M_destination.density_vector(j)[i-start_row] ) , sizeof(double) , 1 , fp ); }
+				for( unsigned int i=start_row; i < rows ; i++ )
+				{ result = fread( (char*) &( M_destination.density_vector(j)[i-start_row] ) , sizeof(double) , 1 , fp ); }
 			} 
 			
 			fclose( fp );
@@ -1331,7 +1369,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 		{
 			// attempt to read it in as XML data, voxel by voxel 
 			node = node.child( "density_vector" ); 
-			for( int j=0 ; j < M_destination.mesh.voxels.size() ; j++ )
+			for( unsigned int j=0 ; j < M_destination.mesh.voxels.size() ; j++ )
 			{
 				csv_to_vector( node.first_child().value() , M_destination.density_vector(j)  ); 
 				if( node.next_sibling( "density_vector" ) ) 
