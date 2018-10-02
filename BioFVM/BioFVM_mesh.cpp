@@ -163,19 +163,19 @@ std::ostream& operator<<(std::ostream& os, const General_Mesh& mesh)
 	static std::string tabbing3 = "\t\t\t"; 
 	os	<< tabbing << "<mesh type=\"general\" uniform=\"" << mesh.uniform_mesh << "\" regular=\"" << mesh.regular_mesh << "\" units=\"" << mesh.units << "\">"  << std::endl
 		<< tabbing2 << "<voxels>" << std::endl;
-	for( int i=0; i < mesh.voxels.size() ; i++ )
+	for( unsigned int i=0; i < mesh.voxels.size() ; i++ )
 	{ os << mesh.voxels[i] << std::endl; } 
 	os 	<< tabbing2 << "</voxels>" << std::endl 
 		<< tabbing2 << "<voxel_faces>" << std::endl;
-	for( int i=0; i < mesh.voxel_faces.size() ; i++ )
+	for( unsigned int i=0; i < mesh.voxel_faces.size() ; i++ )
 	{ os << mesh.voxel_faces[i] << std::endl; } 
 	os 	<< tabbing2 << "</voxel_faces>" << std::endl; 
 	
 	os	<< tabbing2 << "<voxel_connections>" << std::endl;
-	for( int i=0 ; i < mesh.connected_voxel_indices.size() ; i++ )
+	for( unsigned int i=0 ; i < mesh.connected_voxel_indices.size() ; i++ )
 	{
 		os << tabbing3 << "<connected_voxel_indices ID=\"" << i << "\">" << std::endl; 
-		for( int j=0; j < mesh.connected_voxel_indices[i].size() ; j++ )
+		for( unsigned int j=0; j < mesh.connected_voxel_indices[i].size() ; j++ )
 		{
 			os 	<< tabbing3 << "\t<index>" << (mesh.connected_voxel_indices[i])[j] << "</index>" << std::endl; 
 		}
@@ -282,7 +282,7 @@ void General_Mesh::display_information( std::ostream& os )
 	<< "   volume: "; 
 
 	double total_volume = 0.0; 
-	for( int i=0; i < voxels.size(); i++ )
+	for( unsigned int i=0; i < voxels.size(); i++ )
 	{ total_volume += voxels[i].volume; }
 	os << total_volume << " cubic " << units << std::endl; 
  
@@ -291,13 +291,13 @@ void General_Mesh::display_information( std::ostream& os )
 
 void General_Mesh::write_to_matlab( std::string filename )
 { 
-	int number_of_data_entries = voxels.size();
-	int size_of_each_datum = 3 + 1; // x,y,z, volume 
+	unsigned int number_of_data_entries = voxels.size();
+	unsigned int size_of_each_datum = 3 + 1; // x,y,z, volume 
 
 	FILE* fp = write_matlab_header( size_of_each_datum, number_of_data_entries,  filename, "mesh" );  
 
 	// storing data as cols 
-	for( int i=0; i < number_of_data_entries ; i++ )
+	for( unsigned int i=0; i < number_of_data_entries ; i++ )
 	{
 		fwrite( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
 		fwrite( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
@@ -310,8 +310,8 @@ void General_Mesh::write_to_matlab( std::string filename )
 
 void General_Mesh::read_from_matlab( std::string filename )
 {
-	int size_of_each_datum; 
-	int number_of_data_entries; 
+	unsigned int size_of_each_datum; 
+	unsigned int number_of_data_entries; 
 	FILE* fp = read_matlab_header( &size_of_each_datum, &number_of_data_entries,  filename ); 
 
 	voxel_faces.resize( 0 ); 
@@ -340,12 +340,13 @@ void General_Mesh::read_from_matlab( std::string filename )
 	bounding_box[4] = -9e99; 
 	bounding_box[5] = -9e99; 
  
-	for( int i=0; i < number_of_data_entries ; i++ )
+        size_t result;
+	for( unsigned int i=0; i < number_of_data_entries ; i++ )
 	{
-		fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
 		
 		// estimate the bounding box; 
 		if( voxels[i].center[0] < bounding_box[0] )
@@ -420,11 +421,11 @@ void Cartesian_Mesh::create_voxel_faces( void )
 	int k_jump = x_coordinates.size() * y_coordinates.size(); 
 		
 	// x-aligned connections 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int j=0 ; j < y_coordinates.size() ; j++ )
+		for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 		{
-			for( int i=0 ; i < x_coordinates.size()-1 ; i++ )
+			for( unsigned int i=0 ; i < x_coordinates.size()-1 ; i++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_faces_only(n,n+i_jump, dS_yz ); 
@@ -432,11 +433,11 @@ void Cartesian_Mesh::create_voxel_faces( void )
 		}
 	}
 	// y-aligned connections 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int j=0 ; j < y_coordinates.size()-1 ; j++ )
+			for( unsigned int j=0 ; j < y_coordinates.size()-1 ; j++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_faces_only(n,n+j_jump, dS_xz ); 
@@ -444,11 +445,11 @@ void Cartesian_Mesh::create_voxel_faces( void )
 		}
 	}	
 	// z-aligned connections 
-	for( int j=0 ; j < y_coordinates.size() ; j++ )
+	for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int k=0 ; k < z_coordinates.size()-1 ; k++ )
+			for( unsigned int k=0 ; k < z_coordinates.size()-1 ; k++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_faces_only(n,n+k_jump, dS_xy ); 
@@ -480,11 +481,11 @@ Cartesian_Mesh::Cartesian_Mesh( int xnodes, int ynodes, int znodes )
 	regular_mesh = true; 
 	use_voxel_faces = false; 
  
-	for( int i=0; i < x_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < x_coordinates.size() ; i++ )
 	{ x_coordinates[i] = i*dx; }
-	for( int i=0; i < y_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < y_coordinates.size() ; i++ )
 	{ y_coordinates[i] = i*dy; }
-	for( int i=0; i < z_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < z_coordinates.size() ; i++ )
 	{ z_coordinates[i] = i*dz; }	
 	
 	bounding_box[0] = x_coordinates[0]-dx/2.0; 
@@ -504,11 +505,11 @@ Cartesian_Mesh::Cartesian_Mesh( int xnodes, int ynodes, int znodes )
 	// initializing and connecting voxels 
  
 	int n=0; 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int j=0 ; j < y_coordinates.size() ; j++ )
+		for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 		{
-			for( int i=0 ; i < x_coordinates.size() ; i++ )
+			for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 			{
 				voxels[n].center[0] = x_coordinates[i]; 
 				voxels[n].center[1] = y_coordinates[j]; 
@@ -530,11 +531,11 @@ Cartesian_Mesh::Cartesian_Mesh( int xnodes, int ynodes, int znodes )
 	int k_jump = x_coordinates.size() * y_coordinates.size(); 
 		
 	// x-aligned connections 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int j=0 ; j < y_coordinates.size() ; j++ )
+		for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 		{
-			for( int i=0 ; i < x_coordinates.size()-1 ; i++ )
+			for( unsigned int i=0 ; i < x_coordinates.size()-1 ; i++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+i_jump, dS_yz ); 
@@ -542,11 +543,11 @@ Cartesian_Mesh::Cartesian_Mesh( int xnodes, int ynodes, int znodes )
 		}
 	}
 	// y-aligned connections 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int j=0 ; j < y_coordinates.size()-1 ; j++ )
+			for( unsigned int j=0 ; j < y_coordinates.size()-1 ; j++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+j_jump, dS_xz ); 
@@ -554,11 +555,11 @@ Cartesian_Mesh::Cartesian_Mesh( int xnodes, int ynodes, int znodes )
 		}
 	}	
 	// z-aligned connections 
-	for( int j=0 ; j < y_coordinates.size() ; j++ )
+	for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int k=0 ; k < z_coordinates.size()-1 ; k++ )
+			for( unsigned int k=0 ; k < z_coordinates.size()-1 ; k++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+k_jump, dS_xy ); 
@@ -573,11 +574,11 @@ Cartesian_Mesh::Cartesian_Mesh( int xnodes, int ynodes, int znodes )
 void Cartesian_Mesh::create_moore_neighborhood()
 {
 	moore_connected_voxel_indices.resize( voxels.size() );
-	for( int j=0 ; j < y_coordinates.size() ; j++ )
+	for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int k=0 ; k < z_coordinates.size() ; k++ )
+			for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 			{
 				int center_inex = voxel_index(i,j,k); 
 				for(int ii=-1;ii<=1;ii++)
@@ -595,21 +596,21 @@ void Cartesian_Mesh::create_moore_neighborhood()
 		}
 	}
 }
-int Cartesian_Mesh::voxel_index( int i, int j, int k )
+unsigned int Cartesian_Mesh::voxel_index( unsigned int i, unsigned int j, unsigned int k )
 {
  return ( k*y_coordinates.size() + j )*x_coordinates.size() + i; 
 }
 
-std::vector<int> Cartesian_Mesh::cartesian_indices( int n )
+std::vector<unsigned int> Cartesian_Mesh::cartesian_indices( unsigned int n )
 {
-	std::vector<int> out(3, -1 ); 
+	std::vector<unsigned int> out(3, -1 ); 
 
 	// figure out i; 
-	int XY = x_coordinates.size() * y_coordinates.size();
-	out[2] = (int) floor( n/XY ); 
+	unsigned int XY = x_coordinates.size() * y_coordinates.size();
+	out[2] = (unsigned int) floor( n/XY ); 
  
 	// figure out j; 
-	out[1] = (int) floor(   (n - out[2]*XY) / x_coordinates.size() );
+	out[1] = (unsigned int) floor(   (n - out[2]*XY) / x_coordinates.size() );
  
 	// figure out k; 
 	out[0] = n - x_coordinates.size()*(   out[1] + y_coordinates.size()*out[2] ); 
@@ -644,11 +645,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	if( fabs( dx - dz ) > tol && x_nodes > 1 && z_nodes > 1 )
 	{ uniform_mesh = false; }
 
-	for( int i=0; i < x_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < x_coordinates.size() ; i++ )
 	{ x_coordinates[i] = x_start + (i+0.5)*dx; }
-	for( int i=0; i < y_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < y_coordinates.size() ; i++ )
 	{ y_coordinates[i] = y_start + (i+0.5)*dy; }
-	for( int i=0; i < z_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < z_coordinates.size() ; i++ )
 	{ z_coordinates[i] = z_start + (i+0.5)*dz; }
 
 	bounding_box[0] = x_start; 
@@ -671,11 +672,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	voxels.assign( x_coordinates.size() * y_coordinates.size() * z_coordinates.size() , template_voxel ); 
 
 	int n=0; 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int j=0 ; j < y_coordinates.size() ; j++ )
+		for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 		{
-			for( int i=0 ; i < x_coordinates.size() ; i++ )
+			for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 			{
 				voxels[n].center[0] = x_coordinates[i]; 
 				voxels[n].center[1] = y_coordinates[j]; 
@@ -693,7 +694,7 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	connected_voxel_indices.resize( voxels.size() ); 
 	voxel_faces.clear(); 
 	
-	for( int i=0; i < connected_voxel_indices.size() ; i++ )
+	for( unsigned int i=0; i < connected_voxel_indices.size() ; i++ )
 	{ connected_voxel_indices[i].clear(); }
 	int i_jump = 1; 
 	int j_jump = x_coordinates.size(); 
@@ -701,11 +702,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	
 	// x-aligned connections 
 	int count = 0; 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int j=0 ; j < y_coordinates.size() ; j++ )
+		for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 		{
-			for( int i=0 ; i < x_coordinates.size()-1 ; i++ )
+			for( unsigned int i=0 ; i < x_coordinates.size()-1 ; i++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+i_jump, dS_yz ); 
@@ -714,11 +715,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 		}
 	}
 	// y-aligned connections 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int j=0 ; j < y_coordinates.size()-1 ; j++ )
+			for( unsigned int j=0 ; j < y_coordinates.size()-1 ; j++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+j_jump, dS_xz ); 
@@ -726,11 +727,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 		}
 	}	
 	// z-aligned connections 
-	for( int j=0 ; j < y_coordinates.size() ; j++ )
+	for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int k=0 ; k < z_coordinates.size()-1 ; k++ )
+			for( unsigned int k=0 ; k < z_coordinates.size()-1 ; k++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+k_jump, dS_xy ); 
@@ -766,11 +767,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	if( fabs( dx - dy ) > tol || fabs( dy - dz ) > tol || fabs( dx - dz ) > tol )
 	{ uniform_mesh = false; }
 
-	for( int i=0; i < x_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < x_coordinates.size() ; i++ )
 	{ x_coordinates[i] = x_start + (i+0.5)*dx; }
-	for( int i=0; i < y_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < y_coordinates.size() ; i++ )
 	{ y_coordinates[i] = y_start + (i+0.5)*dy; }
-	for( int i=0; i < z_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < z_coordinates.size() ; i++ )
 	{ z_coordinates[i] = z_start + (i+0.5)*dz; }
 
 	bounding_box[0] = x_start; 
@@ -793,11 +794,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	voxels.assign( x_coordinates.size() * y_coordinates.size() * z_coordinates.size() , template_voxel ); 
 	
 	int n=0; 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int j=0 ; j < y_coordinates.size() ; j++ )
+		for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 		{
-			for( int i=0 ; i < x_coordinates.size() ; i++ )
+			for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 			{
 				voxels[n].center[0] = x_coordinates[i]; 
 				voxels[n].center[1] = y_coordinates[j]; 
@@ -815,7 +816,7 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	connected_voxel_indices.resize( voxels.size() ); 
 	voxel_faces.clear(); 
 	
-	for( int i=0; i < connected_voxel_indices.size() ; i++ )
+	for( unsigned int i=0; i < connected_voxel_indices.size() ; i++ )
 	{ connected_voxel_indices[i].clear(); }
 	
 	int i_jump = 1; 
@@ -824,11 +825,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	
 	// x-aligned connections 
 	int count = 0; 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int j=0 ; j < y_coordinates.size() ; j++ )
+		for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 		{
-			for( int i=0 ; i < x_coordinates.size()-1 ; i++ )
+			for( unsigned int i=0 ; i < x_coordinates.size()-1 ; i++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+i_jump, dS_yz ); 
@@ -838,11 +839,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	}
 
 	// y-aligned connections 
-	for( int k=0 ; k < z_coordinates.size() ; k++ )
+	for( unsigned int k=0 ; k < z_coordinates.size() ; k++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int j=0 ; j < y_coordinates.size()-1 ; j++ )
+			for( unsigned int j=0 ; j < y_coordinates.size()-1 ; j++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+j_jump, dS_xz ); 
@@ -851,11 +852,11 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	}	
 
 	// z-aligned connections 
-	for( int j=0 ; j < y_coordinates.size() ; j++ )
+	for( unsigned int j=0 ; j < y_coordinates.size() ; j++ )
 	{
-		for( int i=0 ; i < x_coordinates.size() ; i++ )
+		for( unsigned int i=0 ; i < x_coordinates.size() ; i++ )
 		{
-			for( int k=0 ; k < z_coordinates.size()-1 ; k++ )
+			for( unsigned int k=0 ; k < z_coordinates.size()-1 ; k++ )
 			{
 				int n = voxel_index(i,j,k); 
 				connect_voxels_indices_only(n,n+k_jump, dS_xy ); 
@@ -878,9 +879,9 @@ void Cartesian_Mesh::resize_uniform( double x_start, double x_end, double y_star
 
 int Cartesian_Mesh::nearest_voxel_index( std::vector<double>& position )
 {
-	int i = (int) floor( (position[0]-bounding_box[0])/dx ); 
-	int j = (int) floor( (position[1]-bounding_box[1])/dy ); 
-	int k = (int) floor( (position[2]-bounding_box[2])/dz ); 
+	unsigned int i = (unsigned int) floor( (position[0]-bounding_box[0])/dx ); 
+	unsigned int j = (unsigned int) floor( (position[1]-bounding_box[1])/dy ); 
+	unsigned int k = (unsigned int) floor( (position[2]-bounding_box[2])/dz ); 
 
 	//  add some bounds checking -- truncate to inside the computational domain   
 
@@ -896,13 +897,13 @@ int Cartesian_Mesh::nearest_voxel_index( std::vector<double>& position )
 	return ( k*y_coordinates.size() + j )*x_coordinates.size() + i; 
 }
 
-std::vector<int> Cartesian_Mesh::nearest_cartesian_indices( std::vector<double>& position )
+std::vector<unsigned int> Cartesian_Mesh::nearest_cartesian_indices( std::vector<double>& position )
 {
-	std::vector<int> out; 
+	std::vector<unsigned int> out; 
 	out.assign(3, 0 ); 
-	out[0] = (int) floor( (position[0]-bounding_box[0])/dx ); 
-	out[1] = (int) floor( (position[1]-bounding_box[1])/dy ); 
-	out[2] = (int) floor( (position[2]-bounding_box[2])/dz ); 
+	out[0] = (unsigned int) floor( (position[0]-bounding_box[0])/dx ); 
+	out[1] = (unsigned int) floor( (position[1]-bounding_box[1])/dy ); 
+	out[2] = (unsigned int) floor( (position[2]-bounding_box[2])/dz ); 
 
 	//  add some bounds checking -- truncate to inside the computational domain  
 
@@ -954,8 +955,8 @@ void Cartesian_Mesh::display_information( std::ostream& os )
 
 void Cartesian_Mesh::read_from_matlab( std::string filename )
 {
-	int size_of_each_datum; 
-	int number_of_data_entries; 
+	unsigned int size_of_each_datum; 
+	unsigned int number_of_data_entries; 
 	FILE* fp = read_matlab_header( &size_of_each_datum, &number_of_data_entries,  filename ); 
 
 	voxel_faces.resize( 0 ); 
@@ -988,12 +989,13 @@ void Cartesian_Mesh::read_from_matlab( std::string filename )
 	bounding_box[4] = -9e99; 
 	bounding_box[5] = -9e99; 
  
-	for( int i=0; i < number_of_data_entries ; i++ )
+        size_t result;
+	for( unsigned int i=0; i < number_of_data_entries ; i++ )
 	{
-		fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
-		fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[0] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[1] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].center[2] ) , sizeof(double) , 1 , fp ); 
+		result = fread( (char*) &( voxels[i].volume ) , sizeof(double) , 1 , fp ); 
 		
 		// estimate the bounding box; 
 		if( voxels[i].center[0] < bounding_box[0] )
@@ -1018,7 +1020,7 @@ void Cartesian_Mesh::read_from_matlab( std::string filename )
 	double ymin = bounding_box[1]; // voxels[0].center[1]; 
 	double zmin = bounding_box[2]; // voxels[0].center[2]; 
 
-	int n = voxels.size(); 
+	// int n = voxels.size(); 
 	double xmax = bounding_box[3]; // voxels[n-1].center[0]; 
 	double ymax = bounding_box[4]; // voxels[n-1].center[1]; 
 	double zmax = bounding_box[5]; // voxels[n-1].center[2]; 
@@ -1082,13 +1084,13 @@ void Cartesian_Mesh::read_from_matlab( std::string filename )
 	y_coordinates.resize( ynodes ); 
 	z_coordinates.resize( znodes ); 
 
-	for( int i=0; i < x_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < x_coordinates.size() ; i++ )
 	{ x_coordinates[i] = xmin + i*dx ;   }
 
-	for( int i=0; i < y_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < y_coordinates.size() ; i++ )
 	{ y_coordinates[i] = ymin + i*dy ; }
 
-	for( int i=0; i < z_coordinates.size() ; i++ )
+	for( unsigned int i=0; i < z_coordinates.size() ; i++ )
 	{ z_coordinates[i] = zmin + i*dz ; }
 
 	dV = dx*dy*dz; 
@@ -1115,7 +1117,7 @@ void Voronoi_Mesh::display_information( std::ostream& os )
 	<< "   volume: "; 
 
 	double total_volume = 0.0; 
-	for( int i=0; i < voxels.size(); i++ )
+	for( unsigned int i=0; i < voxels.size(); i++ )
 	{ total_volume += voxels[i].volume; }
 	os << total_volume << " cubic " << units << std::endl; 
 
