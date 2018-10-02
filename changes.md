@@ -64,6 +64,8 @@ This release improves includes minor bug fixes ...
  
 + create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
 
++ (optionally) track internalized substrate, coupled with BioFVM
+
 * * * 
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
