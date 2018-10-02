@@ -2,9 +2,9 @@
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
  
-**Version:**      1.4.1
+**Version:** 1.4.1
 
-**Release date:** ?? October 2018
+**Release date:** 2 October 2018
 
 ## Release summary: 
  
@@ -20,7 +20,9 @@ This release improves includes minor bug fixes ...
  
 + Changed the MultiCellDS outputs to only store the filename, and not the full relative path, in the <filename> tags. This makes it simpler to load MultiCellDS outputs from matlab and other platforms. (No longer need to read from a directory higher up to make the relative pathing correct.) 
 
-+ Did major cleanup on BioFVM so that it compiles cleanly even with -Wall (show all warnings). 
++ Did major cleanup on BioFVM so that it compiles cleanly on Ubuntu. 
+
++ All sample projects output to the ./output directory 
  
 ### Beta features (not fully supported):
  
@@ -29,6 +31,8 @@ This release improves includes minor bug fixes ...
 ### Bugfixes: 
 
 + Updated the Parameter<T> constructor functions to create a specialized version for std::string, to fix odd compiling bugs on older versions of MinGW. (Worked in 7.1.0, but not in 5.3.0.) Now, Parameter<T> for T = bool, int, or double get initialized to value = (T) 0. And Parameter<T> for T = std::string gets initialized to "none". I had hoped to do a unified version, but value = (T) 0 for std::string acts like a NULL pointer. 
+
++ All Makefiles ensure that the reset and data-cleanup rules leave at least empty.txt in ./output, so that future releases are never missing the output directory. 
   
 ### Notices for intended changes that may affect backwards compatibility:
  
