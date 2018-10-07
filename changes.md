@@ -11,7 +11,7 @@
 This release focuses on ... 
 
 tracking substrates 
-other? 
+differentiation 
 
 
 improves includes minor bug fixes for compiling in older versions of MinGW, and simplified XML MultiCellDS outputs that no longer record the relative pathing to .mat files. (This allows users to read data from their actual locations, rather than from a parent directory.) This release includes minor code cleanups in BioFVM for cleaner compiling in Ubuntu. Lastly, we have make small refinements to the sample projects and makefiles to default data saving to the ./output directory, and to prevent future releases from excluding the output directory from the zip releases. 
@@ -20,7 +20,22 @@ improves includes minor bug fixes for compiling in older versions of MinGW, and 
  
 ### Major new features and changes:
 
-+ None 
++ Added functionality in BioFVM to (optionally) track the total amount of substrates in each cell, based upon tracking uptake and secretion. Note that without additional, user-defined functions to internaly create or consume substrate (e.g., synthesizing proteins, or using oxygen in metabolism), this can result in negative internal values (if cells only secrete but no internal creation functions have been set) or unbounded positive values (if cells uptake a substrate but do not use it). In particular, Basic_Agents (and hense Cells) now have: 
+
+++ std::vector<double> internalized_substrates 
+++ bool use_internal_densities_as_targets
+
+In BioFVM::Microenvironment_Options class   
+++ bool enable_internalization_tracking
+	bool track_internalized_substrates_in_each_agent; 
+
+(it defaults to false); 
+
+updated: 
+
+void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )
+ 
+ added to 
 
 ### Minor new features and changes: 
  

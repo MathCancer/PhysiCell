@@ -82,6 +82,9 @@ class Basic_Agent
 	void set_total_volume(double);
 	void update_voxel_index();
 	
+	std::vector<double> internalized_substrates; 
+	bool use_internal_densities_as_targets; 
+	
 	void set_internal_uptake_constants( double dt ); // any time you update the cell volume or rates, should call this function. 
 
 	void register_microenvironment( Microenvironment* );

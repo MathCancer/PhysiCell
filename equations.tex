@@ -1,0 +1,115 @@
+\documentclass[11point]{article}
+
+\usepackage[letterpaper,margin=1in]{geometry}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{bbm}
+
+\newcommand{\beq}{\begin{eqnarray}}
+\newcommand{\eeq}{\end{eqnarray}}
+\renewcommand{\d}[1]{\:\mathrm{d}#1}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\newcommand{\one}{\mathbbm{1}}
+\newcommand{\reals}{\mathbb{R}}
+
+\newcommand{\df}[1]{\delta \left( #1 \right)}
+\newcommand{\set}[1]{\left\{#1\right\}}
+
+\begin{document}
+\section{Notation}
+\begin{itemize}
+\item
+For any cell $i$ with center $\vec{x}_i$, let $R_i$ denote the 
+region of space occupied by it. Assume that for any other cell 
+$j$, that $R_i \cap R_j = \emptyset$. 
+\item 
+For any  computational 
+mesh with voxels $\set{ \Omega }$ and corresponding 
+volumes $\set{W}$, let $\rho( \Omega) $ denote the mean 
+substrate density in voxel $\Omega$, and let 
+$n(\Omega) = \int_\Omega \rho \d{V}$ denote the total
+ amount of substrate in the voxel. 
+
+Note that BioFVM tracks the mean substrate density in each voxel, 
+so $\rho \equiv \rho( \Omega )$ throughout $\Omega$. 
+\item 
+For any voxel $\Omega_k$ with an index $k$, let $W_k$ denote 
+its volume, define $\rho_k = \rho( \Omega_k )$, and 
+define $n_k = n( \Omega_k)$. 
+
+\item 
+For any cell $i$ with center $\vec{x}_i$, let $\Omega_i$ denote the 
+voxel containing cell $i$, with corresponding volume $W_i$. 
+\item
+Let $\one_i(\vec{x})$ be the characteristic  function for the cell, so that 
+$\one_i(\vec{x}) =1$ inside the cell (inside $R_i$), and 
+$\one_i(\vec{x}) = 0$ otherwise. 
+\item 
+Let $V_i = \int_{\reals^3} \one_i(\vec{x}) \d{V} = V_i$ be the total volume of cell $i$. 
+
+\end{itemize}
+
+\section{Net extracellular substrate change 
+due to the $i^\textrm{th}$ cell}
+Note that in BioFVM the cells' contribution 
+to changes in total substrate in any volume $\Omega$ is given by 
+\beq
+\frac{ \partial }{ \partial t} 
+\int_\Omega \rho \d{V} & = &  
+\sum_{\textrm{cells } i} 
+\int_\Omega  \one_i(\vec{x})
+\Bigl(  S_i \left( \rho^T_i - \rho \right)  - U_i \rho   \Bigr) \d{V}\\
+& \approx & 
+\sum_{\textrm{cells } i}
+V_i \int_\Omega \df{ \vec{x} - \vec{x}_i }
+\Bigl(  S_i \left( \rho^T_i - \rho \right)  - U_i \rho   \Bigr) \d{V}.
+\eeq 
+
+Now, let $\Omega = \Omega_i$ be the voxel containing $\vec{x}_i$ as 
+defined above. Then assuming that only cell $i$ is in $\Omega_i$:  \beq
+\frac{ d{n_i} }{ d{t} }  
+= 
+\frac{ \partial }{ \partial t} 
+\int_{\Omega_i} \rho \d{V}
+ & \approx &  
+V_i 
+\Bigl(  S_i \left( \rho^T_i - \rho(\vec{x}_i) \right)  - U_i \rho(\vec{x}_i)   \Bigr)  \\
+& = & 
+V_i 
+\Bigl(  S_i \left( \rho^T_i - \rho_i \right)  - U_i \rho_i   \Bigr) .
+\eeq 
+(The case with multiple cells in a single computational voxel generalizes by performing this calculation separately for each cell contained in the voxel.)
+
+Now, because $n_i = \rho_i W_i $, and asssuming $W_i$ is constant or changes very slowly compared to substrate densities, 
+\beq
+W_i \frac{ d{\rho_i} }{ d{t} }  & \approx &  
+V_i 
+\Bigl(  S_i \left( \rho^T_i - \rho_i \right)  - U_i \rho_i   \Bigr)   \\
+\Longrightarrow 
+\frac{d\rho_i }{dt} & \approx & 
+\frac{ V_i }{W_i }
+\Bigl( S_i \left( \rho_i^T - \rho_i \right) - U_i \rho_i \Bigr) 
+\eeq 
+
+Now, let's apply a backward Euler scheme as in BioFVM, to determine the net change in total substrate in any time step with duration $\Delta t$: 
+\beq
+\frac{ \rho_i(t+\Delta t) - \rho_i(t)}{\Delta t} 
+& \approx & 
+\frac{ V_i }{W_i } 
+\Bigl( S_i \left( \rho_i^T - \rho_i(t+\Delta t) \right) 
+- U_i \rho_i( t + \Delta t ) \Bigr)\\
+\Longrightarrow 
+\rho_i( t+\Delta t) 
+& \approx & 
+\frac{\rho_i(t)  + c_1 }{c_2},
+\eeq
+where 
+\beq
+c_1 & = & \Delta t \frac{ V_i }{W_i } 
+\left( S_i \rho_i^T \right) \\ 
+c_2 & = & 1 + \Delta t \frac{ V_i }{W_i } 
+\left( S_i + U_i \right) .
+\eeq
+\end{document}

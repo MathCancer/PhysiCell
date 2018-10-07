@@ -75,6 +75,11 @@ Basic_Agent::Basic_Agent()
 	// extern Microenvironment* default_microenvironment;
 	// register_microenvironment( default_microenvironment ); 
 	register_microenvironment( get_default_microenvironment() );
+	
+	// these are done in register_microenvironment
+	// internalized_substrates.assign( get_default_microenvironment()->number_of_densities() , 0.0 ); 
+	// use_internal_densities_as_targets = false;  	
+	
 	return;	
 }
 
@@ -122,6 +127,15 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 	//   p(n+1)*temp2 =  p(n) + temp1
 	//   p(n+1) = (  p(n) + temp1 )/temp2
 	//int nearest_voxel= current_voxel_index;
+	
+	
+	// new for tracking internal densities
+	if( use_internal_densities_as_targets == true )
+	{
+		*saturation_densities = internalized_substrates;
+		*saturation_densities /= ( 1e-15 + volume ); 
+	}
+	
 	double internal_constant_to_discretize_the_delta_approximation = dt * volume / ( (microenvironment->voxels(current_voxel_index)).volume ) ; // needs a fix 
 
 	// temp1 = dt*(V_cell/V_voxel)*S*T 
@@ -136,6 +150,8 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 	axpy( &(cell_source_sink_solver_temp2) , internal_constant_to_discretize_the_delta_approximation , *uptake_rates );	
 	
 	volume_is_changed = false; 
+	
+	return; 
 }
 
 void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )
@@ -148,6 +164,11 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	// some solver temporary variables 
 	cell_source_sink_solver_temp1.resize( microenvironment->density_vector(0).size() , 0.0 );
 	cell_source_sink_solver_temp2.resize( microenvironment->density_vector(0).size() , 1.0 );
+		
+	// new for internalized substrate tracking 
+	internalized_substrates.assign( microenvironment->number_of_densities() , 0.0 ); 
+	use_internal_densities_as_targets = false;  	
+	
 	return; 
 }
 

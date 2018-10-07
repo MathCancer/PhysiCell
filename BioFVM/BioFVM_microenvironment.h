@@ -310,6 +310,8 @@ class Microenvironment_Options
 	bool calculate_gradients; 
 	
 	bool use_oxygen_as_first_field;
+	
+	bool track_internalized_substrates_in_each_agent; 	
 };
 
 extern Microenvironment_Options default_microenvironment_options; 
