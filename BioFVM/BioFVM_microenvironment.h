@@ -234,6 +234,7 @@ class Microenvironment
 	
 	void add_dirichlet_node( int voxel_index, std::vector<double>& value ); 
 	void update_dirichlet_node( int voxel_index , std::vector<double>& new_value ); 
+	void update_dirichlet_node( int voxel_index , int substrate_index , double new_value );
 	void remove_dirichlet_node( int voxel_index ); 
 	void apply_dirichlet_conditions( void ); 
 

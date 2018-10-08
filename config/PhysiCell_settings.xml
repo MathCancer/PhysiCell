@@ -72,7 +72,7 @@
 <user_details />
 -->
 
-<PhysiCell_settings version="devel-version">
+<PhysiCell_settings version="1.3.3">
 	<domain>
 		<x_min>-1000</x_min>
 		<x_max>1000</x_max>
@@ -103,7 +103,7 @@
 			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
-		
+		 
 		<SVG>
 			<interval units="min">60</interval>
 			<enable>true</enable>
@@ -115,12 +115,13 @@
 	</save>
 	
 	<user_parameters>
-		<tumor_radius type="double" units="micron">250.0</tumor_radius>
-		<oncoprotein_mean type="double" units="dimensionless">1.0</oncoprotein_mean>
-		<oncoprotein_sd type="double" units="dimensionless">0.25</oncoprotein_sd>
-		<oncoprotein_min type="double" units="dimensionless">0.0</oncoprotein_min>
-		<oncoprotein_max type="double" units="dimensionless">2</oncoprotein_max>
-		<random_seed type="int" units="dimensionless">0</random_seed>
+	<!-- exmaples --> 
+	<!--
+		<model type="int">3</model>
+		<necrotic_color type="string">rgb(64,64,64)</necrotic_color>
+		<birth_rate type="double" units="1/min">0.01</birth_rate>
+		<chemoresistant type="bool">false</chemoresistant> 
+	-->
 	</user_parameters>
 	
 </PhysiCell_settings>

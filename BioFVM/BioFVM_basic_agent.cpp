@@ -128,7 +128,6 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 	//   p(n+1) = (  p(n) + temp1 )/temp2
 	//int nearest_voxel= current_voxel_index;
 	
-	
 	// new for tracking internal densities
 	if( use_internal_densities_as_targets == true )
 	{
@@ -137,12 +136,14 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 	}
 	
 	double internal_constant_to_discretize_the_delta_approximation = dt * volume / ( (microenvironment->voxels(current_voxel_index)).volume ) ; // needs a fix 
-
+	
 	// temp1 = dt*(V_cell/V_voxel)*S*T 
 	cell_source_sink_solver_temp1.assign( (*secretion_rates).size() , 0.0 ); 
 	cell_source_sink_solver_temp1 += *secretion_rates; 
 	cell_source_sink_solver_temp1 *= *saturation_densities; 
 	cell_source_sink_solver_temp1 *= internal_constant_to_discretize_the_delta_approximation; 
+	
+//	total_extracellular_substrate_change.assign( (*secretion_rates).size() , 1.0 ); 
 
 	// temp2 = 1 + dt*(V_cell/V_voxel)*( S + U )
 	cell_source_sink_solver_temp2.assign( (*secretion_rates).size() , 1.0 ); 
@@ -164,11 +165,12 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	// some solver temporary variables 
 	cell_source_sink_solver_temp1.resize( microenvironment->density_vector(0).size() , 0.0 );
 	cell_source_sink_solver_temp2.resize( microenvironment->density_vector(0).size() , 1.0 );
-		
-	// new for internalized substrate tracking 
-	internalized_substrates.assign( microenvironment->number_of_densities() , 0.0 ); 
-	use_internal_densities_as_targets = false;  	
 	
+	// new for internalized substrate tracking 
+	internalized_substrates.resize( microenvironment->density_vector(0).size() , 0.0 );
+	total_extracellular_substrate_change.resize( microenvironment->density_vector(0).size() , 1.0 );
+	use_internal_densities_as_targets = false;  
+
 	return; 
 }
 
@@ -258,6 +260,7 @@ double Basic_Agent::get_total_volume()
 {
 	return volume;
 }
+
 void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt )
 {
 	if(!is_active)
@@ -268,6 +271,20 @@ void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt
 		set_internal_uptake_constants(dt);
 		volume_is_changed = false;
 	}
+	
+	if( default_microenvironment_options.track_internalized_substrates_in_each_agent == true )
+	{
+		total_extracellular_substrate_change.assign( total_extracellular_substrate_change.size() , 1.0 ); // 1
+
+		total_extracellular_substrate_change -= cell_source_sink_solver_temp2; // 1-c2
+		total_extracellular_substrate_change *= (*pS)(current_voxel_index); // (1-c2)*rho 
+		total_extracellular_substrate_change += cell_source_sink_solver_temp1; // (1-c2)*rho+c1 
+		total_extracellular_substrate_change /= cell_source_sink_solver_temp2; // ((1-c2)*rho+c1)/c2
+		total_extracellular_substrate_change *= pS->voxels(current_voxel_index).volume; // W*((1-c2)*rho+c1)/c2 
+		
+		internalized_substrates -= total_extracellular_substrate_change; // opposite of net extracellular change 	
+	}
+	
 	(*pS)(current_voxel_index) += cell_source_sink_solver_temp1; 
 	(*pS)(current_voxel_index) /= cell_source_sink_solver_temp2; 
 

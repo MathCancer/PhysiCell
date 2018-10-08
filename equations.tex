@@ -17,6 +17,8 @@
 \newcommand{\df}[1]{\delta \left( #1 \right)}
 \newcommand{\set}[1]{\left\{#1\right\}}
 
+\newcommand{\var}[1]{\texttt{#1}}
+
 \begin{document}
 \section{Notation}
 \begin{itemize}
@@ -48,6 +50,8 @@ $\one_i(\vec{x}) =1$ inside the cell (inside $R_i$), and
 $\one_i(\vec{x}) = 0$ otherwise. 
 \item 
 Let $V_i = \int_{\reals^3} \one_i(\vec{x}) \d{V} = V_i$ be the total volume of cell $i$. 
+\item 
+For any cell $i$, let $N_i$ denote the \emph{internalized} total substrate. 
 
 \end{itemize}
 
@@ -93,6 +97,7 @@ V_i
 \Bigl( S_i \left( \rho_i^T - \rho_i \right) - U_i \rho_i \Bigr) 
 \eeq 
 
+\subsection{BioFVM implementation}
 Now, let's apply a backward Euler scheme as in BioFVM, to determine the net change in total substrate in any time step with duration $\Delta t$: 
 \beq
 \frac{ \rho_i(t+\Delta t) - \rho_i(t)}{\Delta t} 
@@ -112,4 +117,72 @@ c_1 & = & \Delta t \frac{ V_i }{W_i }
 c_2 & = & 1 + \Delta t \frac{ V_i }{W_i } 
 \left( S_i + U_i \right) .
 \eeq
+
+This is the algorithm in 
+
+\begin{center}\verb|void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt )|
+\end{center}
+
+The constants $c_1$ and $c_2$ are set in 
+\verb|void Basic_Agent::set_internal_uptake_constants( double dt )|. 
+
+\subsection{Net extracellular substrate change}
+
+Now, let's determine the change in total substrates in this implementation. First, 
+\beq
+n_i(t+\Delta t ) - n_i(t) & = & 
+W_i \rho_i(t+\Delta t) - W_i \rho_i(t) \\
+& = & 
+W_i \left( \frac{\rho_i(t)+c_1}{c_2} - \rho_i(t) \right) \\ 
+& = & 
+W_i \left( \frac{\rho_i(t) + c_1  - c_2 \rho_i(t) }{c_2} \right) \\ 
+& = & 
+W_i \left( \frac{ (1-c_2) \rho_i(t) + c_1  }{c_2} \right) \\ 
+\eeq
+Notice that this can be calculated completely using constants that are already computed and used in BioFVM. 
+\subsection{Algorithm}
+We will use the following operations in the cell secretion/uptake function. (In the actual implementation, 
+perform this on the entire vector of substrates, and use element-wise operations. i.e., Hadamard products and 
+quotients.) 
+\begin{enumerate}
+\item 
+\verb|change = 1 // 1|
+\item 
+\verb|change -= c2 // 1-c2|
+\item 
+\verb|change *= substrates // (1-c2)*rho|
+\item 
+\verb|change += c1 // (1-c2)*rho + c1|
+\item 
+\verb|change /= c2 // ((1-c2)*rho + c1)/c2|
+\item 
+\verb|change *= voxel_volume // W_i*((1-c2)*rho + c1)/c2|
+\end{enumerate}
+This is the net change in total substrates in $\Omega_i$. For conservation, 
+the net chnage in cell $i$ is equal and opposite. Thus 
+\begin{enumerate}
+\setcounter{enumi}{6}
+\item 
+\verb|internalized_substrates -= change|
+\end{enumerate}
+
+\section{Additional option(s)}
+If you set \verb|Basic_Agent::use_internal_densities_as_targets = true|, then whenever
+the internal constants are changed, it sets 
+\beq
+\rho_i^* & = & \frac{N_i}{V_i}
+\eeq
+This criterion would be appropriate for non-active, diffusive secretion from the cell. 
+
+Please note that 
+if $\rho_i^* < \rho_i$, there is nothing in the mathematical form to prevent diffusion of the substrate 
+back into the cell. If this is a concern, I suggest users manually test for that and set 
+the secretion rates to zero accordingly. 
+
+Future releases of PhysiCell may automate this testing, but we note that this test should be performed 
+substrate-by-substrate. 
+
+
+
+
 \end{document}

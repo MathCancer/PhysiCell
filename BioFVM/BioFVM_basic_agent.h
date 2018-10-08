@@ -74,6 +74,8 @@ class Basic_Agent
 	std::vector<double> previous_velocity; 
 	bool is_active;
 	
+	std::vector<double> total_extracellular_substrate_change; 
+	
  public:
 	std::vector<double> * secretion_rates; 
 	std::vector<double> * saturation_densities; 

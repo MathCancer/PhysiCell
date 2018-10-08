@@ -217,6 +217,13 @@ void Microenvironment::update_dirichlet_node( int voxel_index , std::vector<doub
 	return; 
 }
 
+void Microenvironment::update_dirichlet_node( int voxel_index , int substrate_index , double new_value )
+{
+	mesh.voxels[voxel_index].is_Dirichlet = true; 
+	dirichlet_value_vectors[voxel_index][substrate_index] = new_value; 
+	return; 
+}
+
 void Microenvironment::remove_dirichlet_node( int voxel_index )
 {
 	mesh.voxels[voxel_index].is_Dirichlet = false; 

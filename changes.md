@@ -36,14 +36,13 @@ updated:
 void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )
  
  added to 
-
+ 
+ 
 ### Minor new features and changes: 
  
-+ Changed the MultiCellDS outputs to only store the filename, and not the full relative path, in the <filename> tags. This makes it simpler to load MultiCellDS outputs from matlab and other platforms. (No longer need to read from a directory higher up to make the relative pathing correct.) 
++ Add void Microenvironment::update_dirichlet_node( int voxel_index , int substrate_index , double new_value ) based on pc4nanobio changes, whihc allows you to update a single substrate's dirichlet condition at specific voxel, rather than all of them. 
 
-+ Did major cleanup on BioFVM so that it compiles cleanly on Ubuntu. 
 
-+ All sample projects output to the ./output directory 
  
 ### Beta features (not fully supported):
  
