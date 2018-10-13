@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -66,62 +64,29 @@
 #                                                                             #
 ###############################################################################
 */
---> 
 
-<!--
-<user_details />
--->
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-<PhysiCell_settings version="1.3.3">
-	<domain>
-		<x_min>-1000</x_min>
-		<x_max>1000</x_max>
-		<y_min>-1000</y_min>
-		<y_max>1000</y_max>
-		<z_min>-10</z_min>
-		<z_max>10</z_max>
-		<dx>20</dx>
-		<dy>20</dy>
-		<dz>20</dz>
-		<use_2D>true</use_2D>
-	</domain>
-	
-	<overall>
-		<max_time units="min">64800</max_time> <!-- 5 days * 24 h * 60 min -->
-		<time_units>min</time_units>
-		<space_units>micron</space_units>
-	</overall>
-	
-	<parallel>
-		<omp_num_threads>4</omp_num_threads>
-	</parallel> 
-	
-	<save>
-		<folder>output</folder> <!-- use . for root --> 
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-		<full_data>
-			<interval units="min">60</interval>
-			<enable>true</enable>
-		</full_data>
-		 
-		<SVG>
-			<interval units="min">60</interval>
-			<enable>true</enable>
-		</SVG>
-		
-		<legacy_data>
-			<enable>false</enable>
-		</legacy_data>
-	</save>
-	
-	<user_parameters>
-	<!-- exmaples --> 
-	<!--
-		<model type="int">3</model>
-		<necrotic_color type="string">rgb(64,64,64)</necrotic_color>
-		<birth_rate type="double" units="1/min">0.01</birth_rate>
-		<chemoresistant type="bool">false</chemoresistant> 
-	-->
-	</user_parameters>
-	
-</PhysiCell_settings>
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+// any additional cell types (beyond cell_defaults)
+
+extern Cell_Definition motile_cell; 
+
+// custom cell phenotype functions could go here 
+
+// setup functions to help us along 
+
+void create_cell_types( void );
+void setup_tissue( void ); 
+
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
+
+// custom pathology coloring function 
+
+std::vector<std::string> my_coloring_function( Cell* );

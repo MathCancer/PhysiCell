@@ -392,6 +392,11 @@ Cell* Cell::divide( )
 	child->copy_function_pointers(this);
 	child->parameters = parameters;
 	
+	// evenly divide internalized substrates 
+	// if these are not actively tracked, they are zero anyway 
+	internalized_substrates *= 0.5; 
+	child->internalized_substrates = internalized_substrates ; 
+	
 	// The following is already performed by create_cell(). JULY 2017 ***
 	// child->register_microenvironment( get_microenvironment() );
 	

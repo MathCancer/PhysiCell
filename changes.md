@@ -26,8 +26,7 @@ improves includes minor bug fixes for compiling in older versions of MinGW, and 
 ++ bool use_internal_densities_as_targets
 
 In BioFVM::Microenvironment_Options class   
-++ bool enable_internalization_tracking
-	bool track_internalized_substrates_in_each_agent; 
+++ bool track_internalized_substrates_in_each_agent; 
 
 (it defaults to false); 
 
@@ -50,9 +49,9 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
   
 ### Bugfixes: 
 
-+ Updated the Parameter<T> constructor functions to create a specialized version for std::string, to fix odd compiling bugs on older versions of MinGW. (Worked in 7.1.0, but not in 5.3.0.) Now, Parameter<T> for T = bool, int, or double get initialized to value = (T) 0. And Parameter<T> for T = std::string gets initialized to "none". I had hoped to do a unified version, but value = (T) 0 for std::string acts like a NULL pointer. 
++ Updated BioFVM's operator<< on std::vector<double> so that it doesn't output x="value", y="value", z = "value" for 3-D vectors. 
 
-+ All Makefiles ensure that the reset and data-cleanup rules leave at least empty.txt in ./output, so that future releases are never missing the output directory. 
++ Fixed the search for cycle phase indices in the 2D adn 3D template projects, to make sure it searches teh flow_cytometry_separated_cycle_model model and not the Ki67_advanced model, as part of the create_cell_types() function in the custom.cpp files. 
   
 ### Notices for intended changes that may affect backwards compatibility:
  

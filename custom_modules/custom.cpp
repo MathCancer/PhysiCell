@@ -85,6 +85,10 @@ void create_cell_types( void )
 	initialize_default_cell_definition();
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
+	// enable internalized substrate tracking 
+	
+	
+	
 	// Name the default cell type 
 	
 	cell_defaults.type = 0; 
@@ -98,13 +102,13 @@ void create_cell_types( void )
 	
 	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
 	
-	// only needed for a 2-D simulation: 
+	// needed for a 2-D simulation: 
 	
-	/*
+	/* grab code from heterogeneity */ 
+	
 	cell_defaults.functions.set_orientation = up_orientation; 
 	cell_defaults.phenotype.geometry.polarity = 1.0;
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	*/
 	
 	// make sure the defaults are self-consistent. 
 	
@@ -120,19 +124,41 @@ void create_cell_types( void )
 
 	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
 	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
+	
+	int G2_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G2_phase ); 
+	int M_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::M_phase ); 
 
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
+	
+	// set apoptosis rate 
+	cell_defaults.phenotype.death.rates[apoptosis_model_index] =  0; 
 
+	// set a faster time scale for division 
+	cell_defaults.phenotype.cycle.data.transition_rate(G0G1_index,S_index) = 1.0 / 1.0; // 1 min wait time 
+	// let's speed up M phase 
+	cell_defaults.phenotype.cycle.data.transition_rate(M_index,G0G1_index) = 1.0 / 30.0; // 30 minutes  
+	// let's speed up G2 phase 
+	cell_defaults.phenotype.cycle.data.transition_rate(G2_index,M_index) = 1.0 / 60.0; // 60 minutes  
+	// let's speed up S phase 
+	cell_defaults.phenotype.cycle.data.transition_rate(S_index,G2_index) = 1.0 / 60.0; // 60 minutes  
+	
 	// set oxygen uptake / secretion parameters for the default cell type 
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
+
+	// next substrate is secreted 
+	cell_defaults.phenotype.secretion.uptake_rates[1] = 0; 
+	cell_defaults.phenotype.secretion.secretion_rates[1] = 10; 
+	cell_defaults.phenotype.secretion.saturation_densities[1] = 1; 
+
+	// next substrate is secreted and uptake 
+	cell_defaults.phenotype.secretion.uptake_rates[2] = 3; 
+	cell_defaults.phenotype.secretion.secretion_rates[2] = 10; 
+	cell_defaults.phenotype.secretion.saturation_densities[2] = 1; 
 	
-	// add custom data here, if any 
-	
-	
-	
+
 	// Now, let's define another cell type. 
 	// It's best to just copy the default and modify it. 
 	
@@ -143,23 +169,21 @@ void create_cell_types( void )
 	motile_cell.type = 1; 
 	motile_cell.name = "motile tumor cell"; 
 	
-	// make sure the new cell type has its own reference phenotyhpe
+	// make sure the new cell type has its own reference phenotype
 	
 	motile_cell.parameters.pReference_live_phenotype = &( motile_cell.phenotype ); 
 	
 	// enable random motility 
 	motile_cell.phenotype.motility.is_motile = true; 
-	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; // 15 minutes
-	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25; // 0.25 micron/minute 
+	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; 
+	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
 	motile_cell.phenotype.motility.migration_bias = 0.0;// completely random 
 	
 	// Set cell-cell adhesion to 5% of other cells 
-	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
-		parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
+	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
 	
 	// Set apoptosis to zero 
-	motile_cell.phenotype.death.rates[apoptosis_model_index] = 
-		parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
+	motile_cell.phenotype.death.rates[apoptosis_model_index] = parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
 	
 	// Set proliferation to 10% of other cells. 
 	// Alter the transition rate from G0G1 state to S state
@@ -173,34 +197,62 @@ void setup_microenvironment( void )
 {
 	// set domain parameters 
 	
-/*	
-	default_microenvironment_options.X_range = {-500, 500}; 
-	default_microenvironment_options.Y_range = {-500, 500}; 
-	default_microenvironment_options.Z_range = {-500, 500}; 
-*/	
+/* now this is in XML 
+	default_microenvironment_options.X_range = {-1000, 1000}; 
+	default_microenvironment_options.Y_range = {-1000, 1000}; 
+	default_microenvironment_options.simulate_2D = true; 
+*/
 	// make sure to override and go back to 2D 
-	if( default_microenvironment_options.simulate_2D == true )
+	if( default_microenvironment_options.simulate_2D == false )
 	{
-		std::cout << "Warning: overriding XML config option and setting to 3D!" << std::endl; 
-		default_microenvironment_options.simulate_2D = false; 
-	}	
-	
+		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
+		default_microenvironment_options.simulate_2D = true; 
+	}
 	
 	// no gradients need for this example 
 
 	default_microenvironment_options.calculate_gradients = false; 
 	
-	// set Dirichlet conditions 
+	// set Dirichlet conditions off
 
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
+	default_microenvironment_options.outer_Dirichlet_conditions = false;
+
+	// enable tracking (requires 1.5.0 or later)
 	
-	// if there are more substrates, resize accordingly 
-	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
+	default_microenvironment_options.track_internalized_substrates_in_each_agent = true; 
+	
+	
+	// add a new substrate 
+	
+	microenvironment.add_density( "sample 1", "dimensionless" ); 
+	microenvironment.diffusion_coefficients[1] = 1e3; 
+	microenvironment.decay_rates[1] = 0; 	
+	
+	// add the immunostimulatory factor 
+	
+	microenvironment.add_density( "sample 2", "dimensionless" ); 
+	microenvironment.diffusion_coefficients[2] = 2e3; 
+	microenvironment.decay_rates[2] = 0; 	
+	
+	// use this for default Dirichlet conditions. 
+	// Actually, we'll just use it for initial conditions 
+	std::vector<double> bc_vector( 3 , 38.0 ); // 5% o2
+	bc_vector[1] = 0.5; 
+	bc_vector[2] = 0.5; 
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
 	
 	// initialize BioFVM 
 	
 	initialize_microenvironment(); 	
+	
+	// set the oxygen decay rate back to zero 
+	microenvironment.decay_rates[0] = 0; 	
+		
+	// now, let's set all the substrates to the bc_vector value 
+	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		microenvironment(n) = bc_vector; 
+	}	
 	
 	return; 
 }
@@ -215,16 +267,87 @@ void setup_tissue( void )
 	pC->assign_position( 0.0, 0.0, 0.0 );
 
 	pC = create_cell(); 
-	pC->assign_position( -100.0, 0.0, 1.0 );
+	pC->assign_position( -100, 0, 0.0 );
 	
 	pC = create_cell(); 
-	pC->assign_position( 0, 100.0, -7.0 );
+	pC->assign_position( 100, 0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( 0, 100, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 0, -100, 0.0 );
+
+	
+	pC = create_cell(); 
+	pC->assign_position( 150.0, 150.0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -150, -150, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( -150, 150, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 150, -150, 0.0 );
+	
+
+	pC = create_cell(); 
+	pC->assign_position( 50.0, 50.0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -50, -50, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( -50, 50, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 50, -50, 0.0 );
+	
+
+	pC = create_cell(); 
+	pC->assign_position( 200.0, 0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -200, 0.0 , 0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 0,200, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position(0,-200 ,  0.0 );
+	
+	
+	pC = create_cell(); 
+	pC->assign_position( 250.0, 250.0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -250, -250, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( -250, 250, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 250, -250, 0.0 );	
+	
+
+	pC = create_cell(); 
+	pC->assign_position( 300.0, 0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -300, 0.0 , 0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 0,300, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position(0,-300 ,  0.0 );
 	
 	// now create a motile cell 
 	
 	pC = create_cell( motile_cell ); 
-	pC->assign_position( 15.0, -18.0, 3.0 );
-
+	pC->assign_position( 15.0, -18.0, 0.0 );
+	
 	return; 
 }
 
@@ -233,15 +356,34 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	// start with flow cytometry coloring 
 	
 	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
-	
-	// if the cell is motile and not dead, paint it black 
-	
-	if( pCell->phenotype.death.dead == false && 
-		pCell->type == 1 )
+		
+	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
 	{
 		 output[0] = "black"; 
-		 output[2] = "black"; 	
+		 output[2] = "black"; 
 	}
 	
 	return output; 
+}
+
+std::vector<double> integrate_total_substrates( void )
+{
+	// start with 0 vector 
+	std::vector<double> out( microenvironment.number_of_densities() , 0.0 ); 
+
+	// integrate extracellular substrates 
+	for( unsigned int n = 0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		// out = out + microenvironment(n) * dV(n) 
+		axpy( &out , microenvironment.mesh.voxels[n].volume , microenvironment(n) ); 
+	}
+
+	// inte
+	for( unsigned int n=0; n < (*all_cells).size(); n++ )
+	{
+		Cell* pC = (*all_cells)[n];
+		out += pC->internalized_substrates;
+	}
+	
+	return out; 
 }

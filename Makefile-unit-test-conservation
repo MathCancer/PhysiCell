@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := project2D
+PROGRAM_NAME := unit-test-conservation
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -54,8 +54,8 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
 # compile the project 
 
-all: main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
+all: unit_test_conservation.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) unit_test_conservation.cpp 
 
 # PhysiCell core components	
 

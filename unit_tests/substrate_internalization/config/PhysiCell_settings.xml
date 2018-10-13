@@ -72,12 +72,12 @@
 <user_details />
 -->
 
-<PhysiCell_settings version="1.3.3">
+<PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-1000</x_min>
-		<x_max>1000</x_max>
-		<y_min>-1000</y_min>
-		<y_max>1000</y_max>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">64800</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -100,10 +100,10 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">60</interval>
+			<interval units="min">360</interval>
 			<enable>true</enable>
 		</full_data>
-		 
+		
 		<SVG>
 			<interval units="min">60</interval>
 			<enable>true</enable>
@@ -115,13 +115,17 @@
 	</save>
 	
 	<user_parameters>
-	<!-- exmaples --> 
-	<!--
-		<model type="int">3</model>
-		<necrotic_color type="string">rgb(64,64,64)</necrotic_color>
-		<birth_rate type="double" units="1/min">0.01</birth_rate>
-		<chemoresistant type="bool">false</chemoresistant> 
-	-->
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<!-- example parameters from the template --> 
+		
+		<!-- motile cell type parameters --> 
+		<motile_cell_persistence_time type="double" units="min">15</motile_cell_persistence_time>
+		<motile_cell_migration_speed type="double" units="micron/min">0.5</motile_cell_migration_speed> 
+		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
+		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
+		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.1</motile_cell_relative_cycle_entry_rate>
+		
 	</user_parameters>
+	
 	
 </PhysiCell_settings>
