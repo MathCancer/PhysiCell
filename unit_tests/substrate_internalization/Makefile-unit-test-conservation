@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := project2D
+PROGRAM_NAME := unit-test-conservation
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -45,7 +45,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := custom.o
+PhysiCell_custom_module_OBJECTS := custom-unit-substrate-conservation.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -54,8 +54,8 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
 # compile the project 
 
-all: main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
+all: unit_test_conservation.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) unit_test_conservation.cpp 
 
 # PhysiCell core components	
 
@@ -134,8 +134,8 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-custom.o: ./custom_modules/custom.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
+custom-unit-substrate-conservation.o: ./custom_modules/custom-unit-substrate-conservation.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/custom-unit-substrate-conservation.cpp
 
 # cleanup
 

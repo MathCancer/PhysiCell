@@ -85,6 +85,10 @@ void create_cell_types( void )
 	initialize_default_cell_definition();
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
+	// enable internalized substrate tracking 
+	
+	
+	
 	// Name the default cell type 
 	
 	cell_defaults.type = 0; 
@@ -118,18 +122,41 @@ void create_cell_types( void )
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 
-	int G0G1_index = Ki67_advanced.find_phase_index( PhysiCell_constants::G0G1_phase );
-	int S_index = Ki67_advanced.find_phase_index( PhysiCell_constants::S_phase );
+	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
+	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
+	
+	int G2_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G2_phase ); 
+	int M_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::M_phase ); 
 
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
+	
+	// set apoptosis rate 
+	cell_defaults.phenotype.death.rates[apoptosis_model_index] =  0.0025; 
 
+	// set a faster time scale for division 
+	cell_defaults.phenotype.cycle.data.transition_rate(G0G1_index,S_index) = 1.0 / 1.0; // 1 min wait time 
+	// let's speed up M phase 
+	cell_defaults.phenotype.cycle.data.transition_rate(M_index,G0G1_index) = 1.0 / 30.0; // 30 minutes M
+	// let's speed up G2 phase 
+	cell_defaults.phenotype.cycle.data.transition_rate(G2_index,M_index) = 1.0 / 60.0; // 60 minutes G2
+	// let's speed up S phase 
+	cell_defaults.phenotype.cycle.data.transition_rate(S_index,G2_index) = 1.0 / 90.0; // 90 minutes S
+	
 	// set oxygen uptake / secretion parameters for the default cell type 
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
-	
-	// add custom data here, if any 
+
+	// next substrate is secreted 
+	cell_defaults.phenotype.secretion.uptake_rates[1] = 0; 
+	cell_defaults.phenotype.secretion.secretion_rates[1] = 10; 
+	cell_defaults.phenotype.secretion.saturation_densities[1] = 1; 
+
+	// next substrate is secreted and uptake 
+	cell_defaults.phenotype.secretion.uptake_rates[2] = 3; 
+	cell_defaults.phenotype.secretion.secretion_rates[2] = 10; 
+	cell_defaults.phenotype.secretion.saturation_densities[2] = 1; 
 	
 
 	// Now, let's define another cell type. 
@@ -186,17 +213,46 @@ void setup_microenvironment( void )
 
 	default_microenvironment_options.calculate_gradients = false; 
 	
-	// set Dirichlet conditions 
+	// set Dirichlet conditions off
 
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
+	default_microenvironment_options.outer_Dirichlet_conditions = false;
+
+	// enable tracking (requires 1.5.0 or later)
 	
-	// if there are more substrates, resize accordingly 
-	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
+	default_microenvironment_options.track_internalized_substrates_in_each_agent = true; 
+	
+	
+	// add a new substrate 
+	
+	microenvironment.add_density( "sample 1", "dimensionless" ); 
+	microenvironment.diffusion_coefficients[1] = 1e3; 
+	microenvironment.decay_rates[1] = 0; 	
+	
+	// add the immunostimulatory factor 
+	
+	microenvironment.add_density( "sample 2", "dimensionless" ); 
+	microenvironment.diffusion_coefficients[2] = 2e3; 
+	microenvironment.decay_rates[2] = 0; 	
+	
+	// use this for default Dirichlet conditions. 
+	// Actually, we'll just use it for initial conditions 
+	std::vector<double> bc_vector( 3 , 160  ); // 21% o2
+	bc_vector[1] = 0.5; 
+	bc_vector[2] = 0.5; 
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
 	
 	// initialize BioFVM 
 	
 	initialize_microenvironment(); 	
+	
+	// set the oxygen decay rate back to zero 
+	microenvironment.decay_rates[0] = 0; 	
+		
+	// now, let's set all the substrates to the bc_vector value 
+	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		microenvironment(n) = bc_vector; 
+	}	
 	
 	return; 
 }
@@ -206,7 +262,25 @@ void setup_tissue( void )
 	// create some cells near the origin
 	
 	Cell* pC;
+	
+	double theta = 0.0; 
+	double r = 20; 
+	
+	double dr = 1.25; 
+	double dS = 20; 
+	
+	double temp = sqrt( dS*dS - dr*dr ); 
+	
+	while( r < 425 )
+	{
+		pC = create_cell(); 
+		pC->assign_position( r*cos(theta), r*sin(theta), 0.0 ); 
 
+		theta += temp / r; 
+		r += dr; 		
+	}
+	
+/*
 	pC = create_cell(); 
 	pC->assign_position( 0.0, 0.0, 0.0 );
 
@@ -214,12 +288,84 @@ void setup_tissue( void )
 	pC->assign_position( -100, 0, 0.0 );
 	
 	pC = create_cell(); 
+	pC->assign_position( 100, 0, 0.0 );
+
+	pC = create_cell(); 
 	pC->assign_position( 0, 100, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 0, -100, 0.0 );
+
+	
+	pC = create_cell(); 
+	pC->assign_position( 150.0, 150.0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -150, -150, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( -150, 150, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 150, -150, 0.0 );
+	
+
+	pC = create_cell(); 
+	pC->assign_position( 50.0, 50.0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -50, -50, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( -50, 50, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 50, -50, 0.0 );
+	
+
+	pC = create_cell(); 
+	pC->assign_position( 200.0, 0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -200, 0.0 , 0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 0,200, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position(0,-200 ,  0.0 );
+	
+	
+	pC = create_cell(); 
+	pC->assign_position( 250.0, 250.0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -250, -250, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( -250, 250, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 250, -250, 0.0 );	
+	
+
+	pC = create_cell(); 
+	pC->assign_position( 300.0, 0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -300, 0.0 , 0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 0,300, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position(0,-300 ,  0.0 );
 	
 	// now create a motile cell 
 	
 	pC = create_cell( motile_cell ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
+*/
 	
 	return; 
 }
@@ -237,4 +383,26 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	}
 	
 	return output; 
+}
+
+std::vector<double> integrate_total_substrates( void )
+{
+	// start with 0 vector 
+	std::vector<double> out( microenvironment.number_of_densities() , 0.0 ); 
+
+	// integrate extracellular substrates 
+	for( unsigned int n = 0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		// out = out + microenvironment(n) * dV(n) 
+		axpy( &out , microenvironment.mesh.voxels[n].volume , microenvironment(n) ); 
+	}
+
+	// inte
+	for( unsigned int n=0; n < (*all_cells).size(); n++ )
+	{
+		Cell* pC = (*all_cells)[n];
+		out += pC->internalized_substrates;
+	}
+	
+	return out; 
 }

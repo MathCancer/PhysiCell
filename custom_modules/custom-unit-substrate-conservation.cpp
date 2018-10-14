@@ -65,7 +65,7 @@
 ###############################################################################
 */
 
-#include "./custom.h"
+#include "./custom-unit-substrate-conservation.h"
 
 // declare cell definitions here 
 

@@ -78,7 +78,7 @@
 
 // put custom code modules here! 
 
-#include "./custom_modules/custom.h" 
+#include "./custom_modules/custom-unit-substrate-conservation.h" 
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -91,7 +91,7 @@ int main( int argc, char* argv[] )
 	if( argc > 1 )
 	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
 	else
-	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	{ XML_status = load_PhysiCell_config_file( "./config/unit-conservation-settings.xml" ); }
 	if( !XML_status )
 	{ exit(-1); }
 	
