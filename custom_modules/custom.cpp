@@ -132,16 +132,16 @@ void create_cell_types( void )
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 	
 	// set apoptosis rate 
-	cell_defaults.phenotype.death.rates[apoptosis_model_index] =  0; 
+	cell_defaults.phenotype.death.rates[apoptosis_model_index] =  0.0025; 
 
 	// set a faster time scale for division 
 	cell_defaults.phenotype.cycle.data.transition_rate(G0G1_index,S_index) = 1.0 / 1.0; // 1 min wait time 
 	// let's speed up M phase 
-	cell_defaults.phenotype.cycle.data.transition_rate(M_index,G0G1_index) = 1.0 / 30.0; // 30 minutes  
+	cell_defaults.phenotype.cycle.data.transition_rate(M_index,G0G1_index) = 1.0 / 30.0; // 30 minutes M
 	// let's speed up G2 phase 
-	cell_defaults.phenotype.cycle.data.transition_rate(G2_index,M_index) = 1.0 / 60.0; // 60 minutes  
+	cell_defaults.phenotype.cycle.data.transition_rate(G2_index,M_index) = 1.0 / 60.0; // 60 minutes G2
 	// let's speed up S phase 
-	cell_defaults.phenotype.cycle.data.transition_rate(S_index,G2_index) = 1.0 / 60.0; // 60 minutes  
+	cell_defaults.phenotype.cycle.data.transition_rate(S_index,G2_index) = 1.0 / 90.0; // 90 minutes S
 	
 	// set oxygen uptake / secretion parameters for the default cell type 
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
@@ -236,7 +236,7 @@ void setup_microenvironment( void )
 	
 	// use this for default Dirichlet conditions. 
 	// Actually, we'll just use it for initial conditions 
-	std::vector<double> bc_vector( 3 , 38.0 ); // 5% o2
+	std::vector<double> bc_vector( 3 , 160  ); // 21% o2
 	bc_vector[1] = 0.5; 
 	bc_vector[2] = 0.5; 
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
@@ -262,7 +262,25 @@ void setup_tissue( void )
 	// create some cells near the origin
 	
 	Cell* pC;
+	
+	double theta = 0.0; 
+	double r = 20; 
+	
+	double dr = 1.25; 
+	double dS = 20; 
+	
+	double temp = sqrt( dS*dS - dr*dr ); 
+	
+	while( r < 425 )
+	{
+		pC = create_cell(); 
+		pC->assign_position( r*cos(theta), r*sin(theta), 0.0 ); 
 
+		theta += temp / r; 
+		r += dr; 		
+	}
+	
+/*
 	pC = create_cell(); 
 	pC->assign_position( 0.0, 0.0, 0.0 );
 
@@ -347,6 +365,7 @@ void setup_tissue( void )
 	
 	pC = create_cell( motile_cell ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
+*/
 	
 	return; 
 }

@@ -170,6 +170,7 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	internalized_substrates.resize( microenvironment->density_vector(0).size() , 0.0 );
 	total_extracellular_substrate_change.resize( microenvironment->density_vector(0).size() , 1.0 );
 	use_internal_densities_as_targets = false;  
+	release_internalized_substrates_at_death = true; 
 
 	return; 
 }
@@ -179,7 +180,15 @@ Microenvironment* Basic_Agent::get_microenvironment( void )
 
 Basic_Agent::~Basic_Agent()
 {
- return; 
+	if( release_internalized_substrates_at_death )
+	{
+		Microenvironment* pS = get_default_microenvironment(); 
+		
+		internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
+		(*pS)(current_voxel_index) += internalized_substrates; 
+	} 
+	
+	return; 
 }
 
 Basic_Agent* create_basic_agent( void )

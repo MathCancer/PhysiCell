@@ -86,6 +86,7 @@ class Basic_Agent
 	
 	std::vector<double> internalized_substrates; 
 	bool use_internal_densities_as_targets; 
+	bool release_internalized_substrates_at_death; 
 	
 	void set_internal_uptake_constants( double dt ); // any time you update the cell volume or rates, should call this function. 
 

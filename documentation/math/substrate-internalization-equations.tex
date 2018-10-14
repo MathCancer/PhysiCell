@@ -182,6 +182,27 @@ the secretion rates to zero accordingly.
 Future releases of PhysiCell may automate this testing, but we note that this test should be performed 
 substrate-by-substrate. 
 
+\section{Key cellular processes}
+When a cell divides, it must distribute its internalized substrates to its daughter cells while maintaining conservation of mass. 
+
+In PhysiCell 1.5.0, we do this by dividing the substrate by half in each of the daughter cells. 
+
+When a cell dies and is removed by the simulation, multiple things could happen: for some substrates, it may make sense to 
+remove them from the environment entirely, release it entirely at teh time of lysis, or slowly release it back into the environment 
+while the cell degrades. 
+
+In PhysiCell, we opt for the simplest solution: release any internalized substrates when the basic agent (and hence cell) calls 
+its destructor. We overwrite the density in the cell's voxel by first noting that there should be conservation of mass: 
+\beq
+n_i( t + \Delta t ) & = & 
+n_i( t ) + N_i (t)  \\ 
+\Longrightarrow 
+W_i \rho_i(t + \Delta t) & = &
+W_i \rho_i(t) + N_i(t) \\ 
+\Longrightarrow 
+\rho_i( t + \Delta t ) & = & 
+\rho_i(t) + \frac{1}{W_i} N_i 
+\eeq
 
 
 
