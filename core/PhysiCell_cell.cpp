@@ -917,3 +917,54 @@ std::vector<Cell*>& Cell::cells_in_my_container( void )
 }
 
 };
+
+void ingest_cell( Cell* pCell_to_eat )
+{
+	// absorb all the volume(s)
+/*
+	//
+	// state variables 
+	//
+	double total;
+	double solid;
+	double fluid;
+	double fluid_fraction; 
+	
+	double nuclear;
+	double nuclear_fluid;
+	double nuclear_solid; 
+
+	double cytoplasmic;
+	double cytoplasmic_fluid; 
+	double cytoplasmic_solid; 
+	
+	double calcified_fraction;
+	
+	double cytoplasmic_to_nuclear_ratio;
+	
+	double rupture_volume; // in volume units 
+	*/
+
+	// absorb fluid volume 
+	phenotype.volume.fluid += pCell_to_eat->phenotype.volume.fluid; 
+	
+	// absorb nuclear and cyto solid volume 
+	phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.cytoplasmic_solid; 
+	phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.nuclear_solid; 
+	
+	// set other volumes for consistency 
+	
+	
+	// 
+	phenotype.geometry.update( this , phenotype , 0.0 ); 
+	
+	// update corresponding BioFVM parameters (self-consistency) 
+	set_total_volume( phenotype.volume.total ); 
+	
+	// absorb the internalized substrates 
+	
+	// trigger removal from the simulation 
+	pCell_to_eat->die(); 	
+	
+	return; 
+}
