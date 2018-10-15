@@ -90,3 +90,6 @@ void setup_microenvironment( void );
 // custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
+
+std::vector<double> integrate_total_substrates( void ); 
+

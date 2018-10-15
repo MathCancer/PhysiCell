@@ -162,6 +162,9 @@ int main( int argc, char* argv[] )
 	
 	// main loop 
 	
+	std::cout << "Unit test: conservation with individual agent substrate internalization " << std::endl 
+		<< "If this works, the total amount of each substrate should stay fixed at each output " << std::endl << std::endl ; 
+	
 	try 
 	{		
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
@@ -197,6 +200,8 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
+				
+				std::cout << "Total substrates " << integrate_total_substrates() << std::endl; 
 			}
 
 			// update the microenvironment
