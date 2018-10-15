@@ -214,6 +214,17 @@ int main( int argc, char* argv[] )
 			  Custom add-ons could potentially go here. 
 			*/
 			
+			static double next_time = 120.0; 
+			if( fabs( PhysiCell_globals.current_time - next_time ) < 1e-6 )
+			{
+				std::cout << std::endl << std::endl << "\t\tnom nom nom" << std::endl << std::endl ;
+				
+				(*all_cells)[0]->ingest_cell( (*all_cells)[1] ); 
+				
+				next_time += 120.0; 
+//				system( "pause" ); 
+			}
+			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 		

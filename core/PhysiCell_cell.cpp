@@ -916,9 +916,7 @@ std::vector<Cell*>& Cell::cells_in_my_container( void )
 	return get_container()->agent_grid[get_current_mechanics_voxel_index()];
 }
 
-};
-
-void ingest_cell( Cell* pCell_to_eat )
+void Cell::ingest_cell( Cell* pCell_to_eat )
 {
 	// absorb all the volume(s)
 /*
@@ -947,24 +945,63 @@ void ingest_cell( Cell* pCell_to_eat )
 
 	// absorb fluid volume 
 	phenotype.volume.fluid += pCell_to_eat->phenotype.volume.fluid; 
+	pCell_to_eat->phenotype.volume.fluid = 0.0; 
 	
 	// absorb nuclear and cyto solid volume 
-	phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.cytoplasmic_solid; 
-	phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.nuclear_solid; 
+	phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.cytoplasmic_solid; 
+	pCell_to_eat->phenotype.volume.cytoplasmic_solid = 0.0; 
+	
+	phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.nuclear_solid; 
+	pCell_to_eat->phenotype.volume.nuclear_solid = 0.0; 
 	
 	// set other volumes for consistency 
 	
+	phenotype.volume.solid = phenotype.volume.nuclear_solid + phenotype.volume.cytoplasmic_solid; 
+	pCell_to_eat->phenotype.volume.solid = 0.0; 
 	
-	// 
+	phenotype.volume.total = phenotype.volume.fluid + phenotype.volume.solid; 
+	pCell_to_eat->phenotype.volume.total = 0.0; 
+	
+	phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
+		( 1e-16 + phenotype.volume.total ); 
+	pCell_to_eat->phenotype.volume.fluid_fraction = 0.0; 
+	
+	phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
+		( phenotype.volume.nuclear_solid + 1e-16 );
+	
+	phenotype.volume.cytoplasmic = phenotype.volume.total / 
+		( 1.0 + phenotype.volume.cytoplasmic_to_nuclear_ratio );
+	pCell_to_eat->phenotype.volume.cytoplasmic = 0.0; 
+	
+	phenotype.volume.nuclear = phenotype.volume.total - 
+		phenotype.volume.cytoplasmic; 
+	pCell_to_eat->phenotype.volume.nuclear = 0.0; 
+	
+	phenotype.volume.nuclear_fluid = phenotype.volume.nuclear - 
+		phenotype.volume.nuclear_solid; 
+	pCell_to_eat->phenotype.volume.nuclear_fluid = 0.0; 
+	
+	phenotype.volume.cytoplasmic_fluid = phenotype.volume.cytoplasmic - 
+		phenotype.volume.cytoplasmic_solid; 
+	pCell_to_eat->phenotype.volume.cytoplasmic_fluid = 0.0; 
+
 	phenotype.geometry.update( this , phenotype , 0.0 ); 
 	
 	// update corresponding BioFVM parameters (self-consistency) 
 	set_total_volume( phenotype.volume.total ); 
+	pCell_to_eat->set_total_volume( 0.0 ); 
 	
 	// absorb the internalized substrates 
+	
+	internalized_substrates += pCell_to_eat->internalized_substrates; 
+	int n = internalized_substrates.size(); 
+	( pCell_to_eat->internalized_substrates ).assign( n , 0.0 ); 	
 	
 	// trigger removal from the simulation 
 	pCell_to_eat->die(); 	
 	
 	return; 
 }
+
+};
+
