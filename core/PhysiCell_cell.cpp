@@ -918,6 +918,11 @@ std::vector<Cell*>& Cell::cells_in_my_container( void )
 
 void Cell::ingest_cell( Cell* pCell_to_eat )
 {
+	std::cout << "old volumes 1: " <<  phenotype.volume.nuclear << " " 
+		<< phenotype.volume.cytoplasmic << " " << phenotype.volume.fluid_fraction << std::endl; 
+	std::cout << "old volumes 2: " <<  pCell_to_eat->phenotype.volume.nuclear << " " 
+		<< pCell_to_eat->phenotype.volume.cytoplasmic << " " << pCell_to_eat->phenotype.volume.fluid_fraction << std::endl; 
+	
 	// absorb all the volume(s)
 /*
 	//
@@ -943,8 +948,8 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	double rupture_volume; // in volume units 
 	*/
 
-	// absorb fluid volume 
-	phenotype.volume.fluid += pCell_to_eat->phenotype.volume.fluid; 
+	// absorb fluid volume (all into the cytoplasm) 
+	phenotype.volume.cytoplasmic_fluid += pCell_to_eat->phenotype.volume.fluid; 
 	pCell_to_eat->phenotype.volume.fluid = 0.0; 
 	
 	// absorb nuclear and cyto solid volume 
@@ -962,13 +967,10 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	phenotype.volume.total = phenotype.volume.fluid + phenotype.volume.solid; 
 	pCell_to_eat->phenotype.volume.total = 0.0; 
 	
-	phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
-		( 1e-16 + phenotype.volume.total ); 
-	pCell_to_eat->phenotype.volume.fluid_fraction = 0.0; 
-	
-	phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
-		( phenotype.volume.nuclear_solid + 1e-16 );
-	
+	phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + phenotype.volume.cytoplasmic_fluid; 
+	phenotype.volume.fluid = phenotype.volume.cytoplasmic_fluid + phenotype.volume.nuclear_fluid; 
+
+/*	
 	phenotype.volume.cytoplasmic = phenotype.volume.total / 
 		( 1.0 + phenotype.volume.cytoplasmic_to_nuclear_ratio );
 	pCell_to_eat->phenotype.volume.cytoplasmic = 0.0; 
@@ -984,12 +986,35 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	phenotype.volume.cytoplasmic_fluid = phenotype.volume.cytoplasmic - 
 		phenotype.volume.cytoplasmic_solid; 
 	pCell_to_eat->phenotype.volume.cytoplasmic_fluid = 0.0; 
+*/
 
+	phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
+		( 1e-16 + phenotype.volume.total ); 
+	pCell_to_eat->phenotype.volume.fluid_fraction = 0.0; 
+
+	phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
+		( phenotype.volume.nuclear_solid + 1e-16 );
+
+	
+	pCell_to_eat->phenotype.volume.cytoplasmic = 0; 
+	pCell_to_eat->phenotype.volume.nuclear = 0.0; 
+	pCell_to_eat->phenotype.volume.nuclear_fluid = 0.0; 
+	pCell_to_eat->phenotype.volume.cytoplasmic_fluid = 0.0; 
+	
+	
+	std::cout << "old size: " << phenotype.geometry.nuclear_radius << " " << phenotype.geometry.radius << std::endl; 
 	phenotype.geometry.update( this , phenotype , 0.0 ); 
+	std::cout << "new size: " << phenotype.geometry.nuclear_radius << " " << phenotype.geometry.radius << std::endl; 
 	
 	// update corresponding BioFVM parameters (self-consistency) 
 	set_total_volume( phenotype.volume.total ); 
 	pCell_to_eat->set_total_volume( 0.0 ); 
+
+	std::cout << "new volumes 1: " <<  phenotype.volume.nuclear << " " 
+		<< phenotype.volume.cytoplasmic << " " << phenotype.volume.fluid_fraction << std::endl; 
+	std::cout << "new volumes 2: " <<  pCell_to_eat->phenotype.volume.nuclear << " " 
+		<< pCell_to_eat->phenotype.volume.cytoplasmic << " " << pCell_to_eat->phenotype.volume.fluid_fraction << std::endl; 
+
 	
 	// absorb the internalized substrates 
 	

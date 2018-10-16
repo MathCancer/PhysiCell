@@ -214,8 +214,8 @@ int main( int argc, char* argv[] )
 			  Custom add-ons could potentially go here. 
 			*/
 			
-			static double next_time = 120.0; 
-			if( fabs( PhysiCell_globals.current_time - next_time ) < 1e-6 )
+			static double next_time = 60.0; 
+			if( fabs( PhysiCell_globals.current_time - next_time ) < 1e-6 && PhysiCell_globals.current_time - next_time < 1000 )
 			{
 				std::cout << std::endl << std::endl << "\t\tnom nom nom" << std::endl << std::endl ;
 				
