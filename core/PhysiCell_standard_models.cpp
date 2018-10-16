@@ -555,6 +555,10 @@ void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double 
 		* (1- phenotype.volume.calcified_fraction);
    
 	phenotype.volume.total = phenotype.volume.cytoplasmic + phenotype.volume.nuclear; 
+	
+	
+	phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
+		( 1e-16 + phenotype.volume.total ); 
    
 	phenotype.geometry.update( pCell,phenotype,dt );
 

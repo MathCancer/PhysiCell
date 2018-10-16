@@ -71,6 +71,16 @@
 
 Cell_Definition motile_cell; 
 
+void inert_phenotype( Cell* pCell, Phenotype& phenotype , double dt )
+{
+	phenotype.cycle.data.transition_rate(0,1) = 0.0; 
+	phenotype.death.rates[0] = 0;
+	phenotype.death.rates[1] = 0;
+	
+	
+	return; 
+}
+
 void create_cell_types( void )
 {
 	// use the same random seed so that future experiments have the 
@@ -273,25 +283,25 @@ void setup_tissue( void )
 
 	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
 	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
-	
-	std::cout << __FUNCTION__ << " " << G0G1_index << " " << S_index << std::endl; 
-	
+
+/*	
 	pC = create_cell(); 
 	pC->assign_position( -490, 490, 0.0 ); 
-	pC->phenotype.cycle.data.transition_rate(0,1) = 0.0; 
+	pC->functions.update_phenotype = inert_phenotype; 
 
 	pC = create_cell(); 
 	pC->assign_position( -470 , 490 , 0.0 ); 
-	pC->phenotype.cycle.data.transition_rate(0,1) = 0.0; 
+	pC->functions.update_phenotype = inert_phenotype; 
 	
 	pC = create_cell(); 
 	pC->assign_position( -450 , 490 , 0.0 ); 
-	pC->phenotype.cycle.data.transition_rate(0,1) = 0.0; 
+	pC->functions.update_phenotype = inert_phenotype; 
 		
 	pC = create_cell(); 
 	pC->assign_position( -430 , 490 , 0.0 ); 
-	pC->phenotype.cycle.data.transition_rate(0,1) = 0.0; 
-
+	pC->functions.update_phenotype = inert_phenotype; 
+*/
+	
 	while( r < 425 )
 	{
 		pC = create_cell(); 

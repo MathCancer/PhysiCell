@@ -215,14 +215,30 @@ int main( int argc, char* argv[] )
 			*/
 			
 			static double next_time = 60.0; 
-			if( fabs( PhysiCell_globals.current_time - next_time ) < 1e-6 && PhysiCell_globals.current_time - next_time < 1000 )
+			if( fabs( PhysiCell_globals.current_time - next_time ) < 1e-6 && 
+				PhysiCell_globals.current_time < 1440.1 && 
+				(*all_cells).size() > 2 )
 			{
-				std::cout << std::endl << std::endl << "\t\tnom nom nom" << std::endl << std::endl ;
+				// choose a cell to eat the "next" cell 
+				int n = (int) round( UniformRandom() * ((*all_cells).size()-2) ); 
 				
-				(*all_cells)[0]->ingest_cell( (*all_cells)[1] ); 
+				Cell* pC1 = (*all_cells)[n];
+				Cell* pC2 = (*all_cells)[n+1]; 
 				
-				next_time += 120.0; 
-//				system( "pause" ); 
+				std::cout << std::endl << std::endl << "\tCell " << pC1 << " is ingesting cell " << pC2
+					<< std::endl << std::endl; 
+				
+				// ingest the cell 
+				pC1->ingest_cell( pC2 ); 
+				
+				// set the "eater" to zero division and death rates 
+				pC1->functions.update_phenotype = inert_phenotype; 
+				
+				// if we accidentally had a zombie cell do the eating, kill it off. 
+				if( pC1->phenotype.death.dead == true )
+				{ pC1->die(); } 
+	
+				next_time += 90.0; 			
 			}
 			
 			PhysiCell_globals.current_time += diffusion_dt;
