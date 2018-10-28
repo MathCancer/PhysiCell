@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.10.7)  13 OCT 2018 22:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.10.7)  27 OCT 2018 20:22
 entering extended mode
 **C:/GitHub/PhysiCell/documentation/math/substrate-internalization-equations.te
 x
@@ -224,145 +224,114 @@ Agent::set_internal_uptake_constants( double dt )[]\OT1/cmr/m/n/10 .
  []
 
 [2]
-! Missing $ inserted.
+! Missing } inserted.
 <inserted text> 
-                $
-l.197 
-      
+                }
+l.239 = S ( -\rho_E^* + \rho_I^* \right
+                                       )V .
 ? R
 OK, entering \nonstopmode...
-! Missing } inserted.
-<inserted text> 
-                }
-l.197 
-      
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
+! Extra \right.
+l.239 = S ( -\rho_E^* + \rho_I^* \right)
+                                        V .
+I'm ignoring a \right that had no matching \left.
 
-! Missing } inserted.
+! Incomplete \ifcase; all text was ignored after line 240.
 <inserted text> 
-                }
-l.197 
-      
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.197 
-      
-I'm guessing that you meant to end an alignment here.
-
-! Missing { inserted.
-<inserted text> 
-                {
-l.197 
-      
-I've put in what seems to be necessary to fix
-the current column of the current alignment.
-Try to go on, since this might almost work.
+                \fi 
+l.240 \eeq
+          
+A forbidden control sequence occurred in skipped text.
+This kind of error happens when you say `\if...' and forget
+the matching `\fi'. I've inserted a `\fi'; this might work.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.197 
-      
+l.240 \eeq
+          
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
+! Extra alignment tab has been changed to \cr.
+<template> \egroup \endtemplate 
+                                
+l.240 \eeq
+          
+You have given more \span or & marks than there were
+in the preamble to the \halign or \valign now in progress.
+So I'll assume that you meant to type \cr instead.
+
+! Extra \or.
+\@@eqncr ...e \@eqcnt \def \reserved@a {& & &}\or 
+                                                  \def \reserved@a {& &}\or ...
+l.240 \eeq
+          
+I'm ignoring this; it doesn't match any \if.
+
+! Extra \or.
+\@@eqncr ... {& & &}\or \def \reserved@a {& &}\or 
+                                                  \def \reserved@a {&}\else ...
+l.240 \eeq
+          
+I'm ignoring this; it doesn't match any \if.
+
+Runaway definition?
+->\egroup 
+! Forbidden control sequence found while scanning definition of \reserved@a.
+<inserted text> 
+                }
+l.240 \eeq
+          
+I suspect you have forgotten a `}', causing me
+to read past where you wanted me to stop.
+I'll try to recover; but if the error is serious,
+you'd better type `E' or `X' now and fix your file.
+
+! Extra alignment tab has been changed to \cr.
+<recently read> \endtemplate 
+                             
+l.240 \eeq
+          
+You have given more \span or & marks than there were
+in the preamble to the \halign or \valign now in progress.
+So I'll assume that you meant to type \cr instead.
+
+! Extra \else.
+\@@eqncr ...@a {& &}\or \def \reserved@a {&}\else 
+                                                  \let \reserved@a \@empty \...
+l.240 \eeq
+          
+I'm ignoring this; it doesn't match any \if.
+
 ! Missing $$ inserted.
 <to be read again> 
-                   \par 
-l.197 
-      
+                   \begingroup 
+l.240 \eeq
+          
 Displays can use special alignments (like \eqalignno)
 only if nothing but the alignment itself is between $$'s.
 
-! Misplaced alignment tab character &.
-\reserved@a ->&
-                & &
-l.198 \eeq
-          
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
 
-! Misplaced alignment tab character &.
-\reserved@a ->& &
-                  &
-l.198 \eeq
-          
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
+! LaTeX Error: Too many columns in eqnarray environment.
 
-! Misplaced alignment tab character &.
-\reserved@a ->& & &
-                   
-l.198 \eeq
-          
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced \cr.
-\@@eqncr ...l \@eqnswtrue \global \@eqcnt \z@ \cr 
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
                                                   
-l.198 \eeq
+l.240 \eeq
           
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
 
-! Extra }, or forgotten \endgroup.
-\endeqnarray ->\@@eqncr \egroup 
-                                \global \advance \c@equation \m@ne $$\@ignor...
-l.198 \eeq
+! Extra \fi.
+\@@eqncr ...mns in eqnarray environment}\@ehc \fi 
+                                                  \reserved@a \if@eqnsw \@eq...
+l.240 \eeq
           
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
+I'm ignoring this; it doesn't match any \if.
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.198 \eeq
-          
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-! Display math should end with $$.
-<to be read again> 
-                   \endgroup 
-l.198 \eeq
-          
-The `$' that I just saw supposedly matches a previous `$$'.
-So I shall assume that you typed `$$' both times.
-
-[3] (substrate-internalization-equations.aux) ) 
+[3] [4] (substrate-internalization-equations.aux) ) 
 Here is how much of TeX's memory you used:
  1720 strings out of 492970
  22946 string characters out of 3126594
@@ -370,31 +339,31 @@ Here is how much of TeX's memory you used:
  5599 multiletter control sequences out of 15000+200000
  9763 words of font info for 40 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 27i,10n,32p,291b,159s stack positions out of 5000i,500n,10000p,200000b,50000s
- <C:\Users\PaulT\AppData\Local\M
-iKTeX\2.9\fonts\pk\ljfour\public\bbm\dpi600\bbm10.pk><C:/Users/PaulT/AppData/Lo
-cal/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Pau
-lT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
+ 27i,13n,32p,291b,159s stack positions out of 5000i,500n,10000p,200000b,50000s
+ <C:\Users\PaulT\AppData\Loc
+al\MiKTeX\2.9\fonts\pk\ljfour\public\bbm\dpi600\bbm10.pk><C:/Users/PaulT/AppDat
+a/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users
+/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.
+pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfon
+ts/cm/cmex10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmmi10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9
+/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/PaulT/AppData/Local/Progra
+ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/PaulT/AppData/
+Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Pa
+ulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb>
 <C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/c
-m/cmex10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/publ
-ic/amsfonts/cm/cmmi10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fon
-ts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/PaulT/AppData/Local/Programs/M
-iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/PaulT/AppData/Loca
-l/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/PaulT/
-AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/
-Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cm
-r5.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/ams
-fonts/cm/cmr7.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
-/public/amsfonts/cm/cmsy10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.
-9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/PaulT/AppData/Local/Progra
-ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/PaulT/AppData
-/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/
-PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/msb
-m7.pfb>
-Output written on substrate-internalization-equations.pdf (3 pages, 162543 byte
+m/cmr5.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public
+/amsfonts/cm/cmr7.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/t
+ype1/public/amsfonts/cm/cmsy10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTe
+X 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/PaulT/AppData/Local/Pr
+ograms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/PaulT/App
+Data/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Us
+ers/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols
+/msbm7.pfb>
+Output written on substrate-internalization-equations.pdf (4 pages, 171835 byte
 s).
 PDF statistics:
- 77 PDF objects out of 1000 (max. 8388607)
+ 80 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
