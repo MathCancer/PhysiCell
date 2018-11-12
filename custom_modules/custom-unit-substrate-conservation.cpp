@@ -94,6 +94,7 @@ void create_cell_types( void )
 	
 	initialize_default_cell_definition();
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+
 	
 	// enable internalized substrate tracking 
 	
@@ -432,7 +433,7 @@ std::vector<double> integrate_total_substrates( void )
 	for( unsigned int n=0; n < (*all_cells).size(); n++ )
 	{
 		Cell* pC = (*all_cells)[n];
-		out += pC->internalized_substrates;
+		out += *(pC->internalized_substrates);
 	}
 	
 	return out; 

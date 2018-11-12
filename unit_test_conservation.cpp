@@ -114,7 +114,6 @@ int main( int argc, char* argv[] )
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	create_cell_types();
-	
 	setup_tissue();
 
 	/* Users typically stop modifying here. END USERMODS */ 
@@ -125,7 +124,7 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_data_as_matlab( true ); 
 	set_save_biofvm_cell_data( true ); 
 	set_save_biofvm_cell_data_as_custom_matlab( true );
-	
+
 	// save a simulation snapshot 
 	
 	char filename[1024];
@@ -140,7 +139,7 @@ int main( int argc, char* argv[] )
 	// for simplicity, set a pathology coloring function 
 	
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
-	
+
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	

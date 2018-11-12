@@ -877,6 +877,91 @@ void Secretion::scale_all_uptake_by_factor( double factor )
 	return; 
 }
 
+Molecular::Molecular()
+{
+	pMicroenvironment = get_default_microenvironment(); 
+	
+	sync_to_current_microenvironment(); 
+	return; 
+}
+
+void Molecular::sync_to_current_microenvironment( void )
+{
+	if( pMicroenvironment )
+	{
+		sync_to_microenvironment( pMicroenvironment ); 
+	}
+	else
+	{
+		internalized_substrates.resize( 0 , 0.0 ); 
+		internalized_substrate_release_fractions.resize( 0 , 0.0 ); 
+		substrate_creation_rates.resize( 0 , 0.0 ); 
+		substrate_use_rates.resize( 0 , 0.0 ); 
+	}
+	return; 
+}
+	
+void Molecular::sync_to_microenvironment( Microenvironment* pNew_Microenvironment )
+{
+	pMicroenvironment = pNew_Microenvironment;
+	
+	internalized_substrates.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
+	internalized_substrate_release_fractions.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
+	substrate_creation_rates.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
+	substrate_use_rates.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
+
+	return; 
+}
+
+void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
+{
+	// if this phenotype is not associated with a cell, exit 
+	if( pCell == NULL )
+	{ return; }
+
+	// if there is no microenvironment, attempt to sync. 
+	if( pMicroenvironment == NULL )
+	{
+		// first, try the cell's microenvironment
+		if( pCell->get_microenvironment() )
+		{
+			sync_to_microenvironment( pCell->get_microenvironment() ); 
+		}
+		// otherwise, try the default microenvironment
+		else
+		{
+			sync_to_microenvironment( get_default_microenvironment() ); 
+		}
+
+		// if we've still failed, return. 
+		if( pMicroenvironment == NULL ) 
+		{
+			return; 
+		}
+	}
+
+	// make sure the associated cell has the correct rate vectors 
+	if( pCell->internalized_substrates != &internalized_substrates )
+	{
+		delete pCell->internalized_substrates; 
+		
+		pCell->internalized_substrates = &internalized_substrates; 
+	}
+
+	// now, call the BioFVM secretion/uptake function 
+	
+	// not sure!!! 
+	
+	// pCell->simulate_secretion_and_uptake( pMicroenvironment , dt ); 
+	
+	return; 
+}
+
+
+
+
+
+
 Cell_Functions::Cell_Functions()
 {
 	volume_update_function = NULL; 

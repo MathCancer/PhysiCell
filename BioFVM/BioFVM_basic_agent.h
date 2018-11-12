@@ -84,7 +84,7 @@ class Basic_Agent
 	void set_total_volume(double);
 	void update_voxel_index();
 	
-	std::vector<double> internalized_substrates; 
+	std::vector<double> * internalized_substrates; 
 	bool use_internal_densities_as_targets; 
 	bool release_internalized_substrates_at_death; 
 	

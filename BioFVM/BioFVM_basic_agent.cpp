@@ -74,7 +74,10 @@ Basic_Agent::Basic_Agent()
 	saturation_densities= new std::vector<double>(0);
 	// extern Microenvironment* default_microenvironment;
 	// register_microenvironment( default_microenvironment ); 
+
+	internalized_substrates = new std::vector<double>(0); // 
 	register_microenvironment( get_default_microenvironment() );
+	
 	
 	// these are done in register_microenvironment
 	// internalized_substrates.assign( get_default_microenvironment()->number_of_densities() , 0.0 ); 
@@ -131,7 +134,7 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 	// new for tracking internal densities
 	if( use_internal_densities_as_targets == true )
 	{
-		*saturation_densities = internalized_substrates;
+		*saturation_densities = *internalized_substrates;
 		*saturation_densities /= ( 1e-15 + volume ); 
 	}
 	
@@ -167,7 +170,7 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	cell_source_sink_solver_temp2.resize( microenvironment->density_vector(0).size() , 1.0 );
 	
 	// new for internalized substrate tracking 
-	internalized_substrates.resize( microenvironment->density_vector(0).size() , 0.0 );
+	internalized_substrates->resize( microenvironment->density_vector(0).size() , 0.0 );
 	total_extracellular_substrate_change.resize( microenvironment->density_vector(0).size() , 1.0 );
 	use_internal_densities_as_targets = false;  
 	release_internalized_substrates_at_death = true; 
@@ -184,8 +187,8 @@ Basic_Agent::~Basic_Agent()
 	{
 		Microenvironment* pS = get_default_microenvironment(); 
 		
-		internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
-		(*pS)(current_voxel_index) += internalized_substrates; 
+		*internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
+		(*pS)(current_voxel_index) += *internalized_substrates; 
 	} 
 	
 	return; 
@@ -291,7 +294,7 @@ void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt
 		total_extracellular_substrate_change /= cell_source_sink_solver_temp2; // ((1-c2)*rho+c1)/c2
 		total_extracellular_substrate_change *= pS->voxels(current_voxel_index).volume; // W*((1-c2)*rho+c1)/c2 
 		
-		internalized_substrates -= total_extracellular_substrate_change; // opposite of net extracellular change 	
+		*internalized_substrates -= total_extracellular_substrate_change; // opposite of net extracellular change 	
 	}
 	
 	(*pS)(current_voxel_index) += cell_source_sink_solver_temp1; 

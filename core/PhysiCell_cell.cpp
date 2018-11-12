@@ -394,8 +394,8 @@ Cell* Cell::divide( )
 	
 	// evenly divide internalized substrates 
 	// if these are not actively tracked, they are zero anyway 
-	internalized_substrates *= 0.5; 
-	child->internalized_substrates = internalized_substrates ; 
+	*internalized_substrates *= 0.5; 
+	*(child->internalized_substrates) = *internalized_substrates ; 
 	
 	// The following is already performed by create_cell(). JULY 2017 ***
 	// child->register_microenvironment( get_microenvironment() );
@@ -966,9 +966,9 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	
 	// absorb the internalized substrates 
 	
-	internalized_substrates += pCell_to_eat->internalized_substrates; 
-	static int n_substrates = internalized_substrates.size(); 
-	( pCell_to_eat->internalized_substrates ).assign( n_substrates , 0.0 ); 	
+	*internalized_substrates += *(pCell_to_eat->internalized_substrates); 
+	static int n_substrates = internalized_substrates->size(); 
+	pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
 	
 	// trigger removal from the simulation 
 	pCell_to_eat->die(); 	

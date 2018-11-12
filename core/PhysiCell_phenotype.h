@@ -447,8 +447,40 @@ class Cell_Functions
 	
 	void (*contact_function)(Cell* pMyself, Phenotype& my_phenotype, 
 		Cell* pOther, Phenotype& other_phenotype, double dt ); 
+		
+	void (*insternal_substrate_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
+	void (*molecular_model_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
+		
 	
 	Cell_Functions(); // done 
+};
+
+class Molecular
+{
+	private:
+	public: 
+		Microenvironment* pMicroenvironment; 
+	
+		// model much of this from Secretion 
+		Molecular(); 
+	
+		std::vector<double> internalized_substrates; // we'll set this to replace BioFVM's version  
+
+		std::vector<double> internalized_substrate_release_fractions; 
+		std::vector<double> substrate_creation_rates; 
+		std::vector<double> substrate_use_rates; 
+		// std::vector<bool> 
+		
+		// use this to properly size the secretion parameters to the microenvironment in 
+		// pMicroenvironment
+		void sync_to_current_microenvironment( void ); // done 
+		
+		void advance( Basic_Agent* pCell, Phenotype& phenotype , double dt ); 
+		
+		// use this to properly size the secretion parameters to the microenvironment 
+		void sync_to_microenvironment( Microenvironment* pNew_Microenvironment ); // done 
+		
+		
 };
 
 class Phenotype

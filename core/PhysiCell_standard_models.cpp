@@ -656,18 +656,18 @@ void initialize_default_cell_definition( void )
 	cell_defaults.pMicroenvironment = NULL;
 	if( BioFVM::get_default_microenvironment() != NULL )
 	{ cell_defaults.pMicroenvironment = BioFVM::get_default_microenvironment(); }
-
+	
 	// make sure phenotype.secretions are correctly sized 
 	
 	cell_defaults.phenotype.secretion.sync_to_current_microenvironment();
-
+	
 	// set up the default parameters 
 		
 	cell_defaults.type = 0; 
 	cell_defaults.name = "breast epithelium"; 
 
 	cell_defaults.parameters.pReference_live_phenotype = &(cell_defaults.phenotype); 
-		
+	
 	// set up the default custom data 
 		// the default Custom_Cell_Data constructor should take care of this
 		

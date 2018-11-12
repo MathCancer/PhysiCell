@@ -4,7 +4,7 @@
  
 **Version:** 1.5.0
 
-**Release date:** ? October 2018
+**Release date:** ? November 2018
 
 ## Release summary: 
  
@@ -20,7 +20,7 @@ improves includes minor bug fixes for compiling in older versions of MinGW, and 
  
 ### Major new features and changes:
 
-+ Added functionality in BioFVM to (optionally) track the total amount of substrates in each cell, based upon tracking uptake and secretion. Note that without additional, user-defined functions to internaly create or consume substrate (e.g., synthesizing proteins, or using oxygen in metabolism), this can result in negative internal values (if cells only secrete but no internal creation functions have been set) or unbounded positive values (if cells uptake a substrate but do not use it). In particular, Basic_Agents (and hense Cells) now have: 
++ Added functionality in BioFVM to (optionally) track the total amount of substrates in each cell, based upon tracking uptake and secretion. Note that without additional, user-defined functions to internally create or consume substrate (e.g., synthesizing proteins, or using oxygen in metabolism), this can result in negative internal values (if cells only secrete but no internal creation functions have been set) or unbounded positive values (if cells uptake a substrate but do not use it). In particular, Basic_Agents (and hence Cells) now have: 
 
 ++ std::vector<double> internalized_substrates 
 ++ bool use_internal_densities_as_targets
@@ -35,6 +35,11 @@ updated:
 void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )
  
  added to 
+ 
+(need ot track this one down ... )
+
++ Added new "Molecular" block to Phenotype 
+
  
  
 ### Minor new features and changes: 
