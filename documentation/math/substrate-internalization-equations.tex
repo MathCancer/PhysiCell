@@ -5,11 +5,15 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{bbm}
+\usepackage{bm}
+
 
 \newcommand{\beq}{\begin{eqnarray}}
 \newcommand{\eeq}{\end{eqnarray}}
 \renewcommand{\d}[1]{\:\mathrm{d}#1}
-\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\grvec}[1]{\bm{#1}}
+
 
 \newcommand{\one}{\mathbbm{1}}
 \newcommand{\reals}{\mathbb{R}}
@@ -189,54 +193,54 @@ in the case of secretion, the internalized value will be negative to upload mass
 
 Users can provide their own internal model (e.g., for metabolomics), but we provide a ``sensible default.'' Inside the cell, we model: 
 \beq
-\frac{dN}{dt} & = & -u N + s ( N^* -  N) \\
+\frac{dN}{dt} & = & \overbrace{-u N}^\textrm{use} + \overbrace{c ( N^* -  n)}^\textrm{creation} \\
 & = & 
--u \rho_I V + s( \rho_I^* - \rho_E ) V, 
+-u \rho_I W + s( \rho_I^* - \rho_E ) W, 
 \eeq
-where $\rho_I$ is the internal density, and $s$, $u$, and $\rho_I^*$ are to be determined. We shall give the rationale for this form in the analysis below. 
+where $\rho_I$ is the internal density, and $c$, $u$, and $\rho_I^*$ are to be determined. We shall give the rationale for this form in the analysis below. 
 
 To determine these parameters, let us consider the total amount of substrate in the cell: 
 \beq
 \frac{dN}{dt} & =& 
-\overbrace{ U \rho_E V  }^\textrm{import} 
+\overbrace{ U \rho_E W  }^\textrm{import} 
 - 
-\overbrace{ S \left( \rho_E^* - \rho_E \right) V }^\textrm{export} 
+\overbrace{ S \left( \rho_E^* - \rho_E \right) W }^\textrm{export} 
 - 
-\overbrace{ u \rho_I V }^\textrm{internal use} 
+\overbrace{ u \rho_I W }^\textrm{internal use} 
 + 
-\overbrace{ s \left( \rho_I^* - \rho_E \right)V  }^\textrm{internal production}
+\overbrace{ c \left( \rho_I^* - \rho_E \right)W  }^\textrm{internal creation}
 \eeq
 Now, consider the case where there is uptake and use but no creation or secretion. Then 
 \beq
 \frac{dN}{dt} & = & 
-U\rho_E V - u \rho_I V = \left( U \rho_E - u \rho_I \right) V. 
+U\rho_E W - u \rho_I W = \left( U \rho_E - u \rho_I \right) W. 
 \eeq
 In quasi-steady (or steady) conditions, we seek $u$ so that 
 $\rho_I \approx \rho_E$. Notice that if $u = U$, then 
 \beq
-\frac{dN}{dt}  & = & U \left( \rho_E - \rho_I \right) V, 
+\frac{dN}{dt}  & = & U \left( \rho_E - \rho_I \right) W, 
 \eeq
 and so $\rho_I = \rho_E$ in quasi-steady condition. This model 
 balances import with internal use. Moreover, if we balance all substrate in the 
 environment (assuming without loss of generality only one uptaking cell): 
 \beq
 \frac{d}{dt} \left( n + N \right) & = &
-- U \rho_E V + U \rho_E V - U \rho_I V = - U \rho_I V, 
+- U \rho_E W + U \rho_E W - U \rho_I V = - U \rho_I W, 
 \eeq
 and over long times, $\rho_I \approx \rho_E$ , so we arrive at the 
 normal situation from BioFVM where the overall loss rate is 
-$- U \rho_E V$. 
+$- U \rho_E W$. 
 
-Next, consider the case of only secretion and export. In that case, 
+Next, consider the case of only creation and export. In that case, 
 \beq
 \frac{dN}{dt} & = & 
--S ( \rho_E^* - \rho_E ) V + s ( \rho_I^* - \rho_E) V. 
+-S ( \rho_E^* - \rho_E ) W + s ( \rho_I^* - \rho_E) W. 
 \eeq
 Suppose we follow our prior motivation and set $s = S$. Then 
 \beq
 \frac{dN}{dt} & = & 
-S \left( - \rho_E^*  + \rho_E + \rho_I^* - \rho_E \right) V 
-= S \left( -\rho_E^* + \rho_I^* \right)V . 
+S \left( - \rho_E^*  + \rho_E + \rho_I^* - \rho_E \right) W 
+= S \left( -\rho_E^* + \rho_I^* \right)W. 
 \eeq
 If we choose $\rho_I^* = \rho_E^*$, then 
 \beq
@@ -248,15 +252,18 @@ of the more obvious $s ( \rho_I^* - \rho_I)$. The biophysical interpretation
 is that the cell internally creates the substrate until the extenral density 
 reaches the target value. 
 
-I NEED TO DOUBLE-CHECK THIS. 
-
-In summary, we use (as an internal model): 
+\subsection{Summary:}
+Returning now to the original notation where $\vec{\rho}$ is the vector of (extracellular) substrate densities, $\vec{N}$ is the vector of total internalized 
+substrates, then we use (as an internal model), and 
 \beq
-\frac{dN}{dt} & = & 
-- UN + S \left( N^* - N \right) \\
-N^* & = & \rho_E^* V. 
+\frac{d\vec{N}}{dt} & = & 
+- \vec{u}\circ \vec{N} + \vec{c} \circ \left( \vec{\rho}^* - \vec{\rho}  \right)W
 \eeq
-
+and we set defaults: 
+\beq
+\vec{u} & = & \vec{U} \\
+\vec{c} & = & \vec{S} 
+\eeq
 
 \section{Key cellular processes}
 When a cell divides, it must distribute its internalized substrates to its daughter cells while maintaining conservation of mass. 
@@ -264,20 +271,23 @@ When a cell divides, it must distribute its internalized substrates to its daugh
 In PhysiCell 1.5.0, we do this by dividing the substrate by half in each of the daughter cells. 
 
 When a cell dies and is removed by the simulation, multiple things could happen: for some substrates, it may make sense to 
-remove them from the environment entirely, release it entirely at teh time of lysis, or slowly release it back into the environment 
+remove them from the environment entirely, release it entirely at the time of lysis, or slowly release it back into the environment 
 while the cell degrades. 
 
-In PhysiCell, we opt for the simplest solution: release any internalized substrates when the basic agent (and hence cell) calls 
-its destructor. We overwrite the density in the cell's voxel by first noting that there should be conservation of mass: 
+In PhysiCell, we opt for the simplest solution: release (some fraction) of internalized substrates when the basic agent (and hence cell) calls 
+its destructor. Let $0 \le F \le 1$ denote the fraction of internalized 
+substrates released at the time of death. 
+
+We overwrite the density in the cell's voxel by first noting that there should be conservation of mass: 
 \beq
 n_i( t + \Delta t ) & = & 
-n_i( t ) + N_i (t)  \\ 
+n_i( t ) + F N_i (t)  \\ 
 \Longrightarrow 
 W_i \rho_i(t + \Delta t) & = &
-W_i \rho_i(t) + N_i(t) \\ 
+W_i \rho_i(t) + F N_i(t) \\ 
 \Longrightarrow 
 \rho_i( t + \Delta t ) & = & 
-\rho_i(t) + \frac{1}{W_i} N_i 
+\rho_i(t) + \frac{F}{W_i} N_i 
 \eeq
 
 

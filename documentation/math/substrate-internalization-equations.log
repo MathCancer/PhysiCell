@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.10.7)  27 OCT 2018 20:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2018.11.10)  10 NOV 2018 18:37
 entering extended mode
 **C:/GitHub/PhysiCell/documentation/math/substrate-internalization-equations.te
 x
@@ -149,18 +149,18 @@ LaTeX Warning: Unused global option(s):
 No file substrate-internalization-equations.aux.
 \openout1 = `substrate-internalization-equations.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 22.
-LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -195,172 +195,118 @@ LaTeX Font Info:    ... okay on input line 22.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 26.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 28.
 ("C:\Users\PaulT\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\omscmr.fd"
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 26.
-LaTeX Font Info:    Try loading font information for U+msa on input line 26.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 28.
+LaTeX Font Info:    Try loading font information for U+msa on input line 28.
 
 ("C:\Users\PaulT\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 26.
+LaTeX Font Info:    Try loading font information for U+msb on input line 28.
 ("C:\Users\PaulT\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+bbm on input line 48.
+LaTeX Font Info:    Try loading font information for U+bbm on input line 50.
 ("C:\Users\PaulT\AppData\Local\Programs\MiKTeX 2.9\tex\latex\bbm\ubbm.fd"
 File: ubbm.fd 1999/03/15 V 1.2 Font definition for bbm font - TH
 )
 [1
 
 {C:/Users/PaulT/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
-Overfull \hbox (6.67531pt too wide) in paragraph at lines 126--128
+Overfull \hbox (6.67531pt too wide) in paragraph at lines 128--130
 []\OT1/cmr/m/n/10 The con-stants $\OML/cmm/m/it/10 c[]$ \OT1/cmr/m/n/10 and $\O
 ML/cmm/m/it/10 c[]$ \OT1/cmr/m/n/10 are set in [][]\OT1/cmtt/m/n/10 void Basic_
 Agent::set_internal_uptake_constants( double dt )[]\OT1/cmr/m/n/10 . 
  []
 
 [2]
-! Missing } inserted.
-<inserted text> 
-                }
-l.239 = S ( -\rho_E^* + \rho_I^* \right
-                                       )V .
+! Undefined control sequence.
+\grvec #1->\bm 
+               {#1}
+l.254 ...the original notation where $\grvec{\rho}
+                                                  $ is the vector of (extrac...
+
 ? R
 OK, entering \nonstopmode...
-! Extra \right.
-l.239 = S ( -\rho_E^* + \rho_I^* \right)
-                                        V .
-I'm ignoring a \right that had no matching \left.
+! Undefined control sequence.
+\grvec #1->\bm 
+               {#1}
+l.258 ...ec{N} + \vec{c} \circ \left( \grvec{\rho}
+                                                  ^* - \grvec{\rho}  \right)V
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
-! Incomplete \ifcase; all text was ignored after line 240.
-<inserted text> 
-                \fi 
-l.240 \eeq
-          
-A forbidden control sequence occurred in skipped text.
-This kind of error happens when you say `\if...' and forget
-the matching `\fi'. I've inserted a `\fi'; this might work.
+! Undefined control sequence.
+\grvec #1->\bm 
+               {#1}
+l.258 ...circ \left( \grvec{\rho}^* - \grvec{\rho}
+                                                    \right)V
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.240 \eeq
-          
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
+[3]
+! Undefined control sequence.
+\grvec #1->\bm 
+               {#1}
+l.264 \grvec{\rho}
+                  _I^* & = & \grvec{\rho} \\
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
-! Extra alignment tab has been changed to \cr.
-<template> \egroup \endtemplate 
-                                
-l.240 \eeq
-          
-You have given more \span or & marks than there were
-in the preamble to the \halign or \valign now in progress.
-So I'll assume that you meant to type \cr instead.
+! Undefined control sequence.
+\grvec #1->\bm 
+               {#1}
+l.264 \grvec{\rho}_I^* & = & \grvec{\rho}
+                                          \\
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
-! Extra \or.
-\@@eqncr ...e \@eqcnt \def \reserved@a {& & &}\or 
-                                                  \def \reserved@a {& &}\or ...
-l.240 \eeq
-          
-I'm ignoring this; it doesn't match any \if.
-
-! Extra \or.
-\@@eqncr ... {& & &}\or \def \reserved@a {& &}\or 
-                                                  \def \reserved@a {&}\else ...
-l.240 \eeq
-          
-I'm ignoring this; it doesn't match any \if.
-
-Runaway definition?
-->\egroup 
-! Forbidden control sequence found while scanning definition of \reserved@a.
-<inserted text> 
-                }
-l.240 \eeq
-          
-I suspect you have forgotten a `}', causing me
-to read past where you wanted me to stop.
-I'll try to recover; but if the error is serious,
-you'd better type `E' or `X' now and fix your file.
-
-! Extra alignment tab has been changed to \cr.
-<recently read> \endtemplate 
-                             
-l.240 \eeq
-          
-You have given more \span or & marks than there were
-in the preamble to the \halign or \valign now in progress.
-So I'll assume that you meant to type \cr instead.
-
-! Extra \else.
-\@@eqncr ...@a {& &}\or \def \reserved@a {&}\else 
-                                                  \let \reserved@a \@empty \...
-l.240 \eeq
-          
-I'm ignoring this; it doesn't match any \if.
-
-! Missing $$ inserted.
-<to be read again> 
-                   \begingroup 
-l.240 \eeq
-          
-Displays can use special alignments (like \eqalignno)
-only if nothing but the alignment itself is between $$'s.
-
-
-! LaTeX Error: Too many columns in eqnarray environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.240 \eeq
-          
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-! Extra \fi.
-\@@eqncr ...mns in eqnarray environment}\@ehc \fi 
-                                                  \reserved@a \if@eqnsw \@eq...
-l.240 \eeq
-          
-I'm ignoring this; it doesn't match any \if.
-
-[3] [4] (substrate-internalization-equations.aux) ) 
+[4] (substrate-internalization-equations.aux) ) 
 Here is how much of TeX's memory you used:
- 1720 strings out of 492970
- 22946 string characters out of 3126594
- 95836 words of memory out of 3000000
- 5599 multiletter control sequences out of 15000+200000
+ 1722 strings out of 492970
+ 22953 string characters out of 3126593
+ 95843 words of memory out of 3000000
+ 5601 multiletter control sequences out of 15000+200000
  9763 words of font info for 40 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  27i,13n,32p,291b,159s stack positions out of 5000i,500n,10000p,200000b,50000s
- <C:\Users\PaulT\AppData\Loc
-al\MiKTeX\2.9\fonts\pk\ljfour\public\bbm\dpi600\bbm10.pk><C:/Users/PaulT/AppDat
-a/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users
-/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.
-pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfon
-ts/cm/cmex10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/
-public/amsfonts/cm/cmmi10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9
-/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/PaulT/AppData/Local/Progra
-ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/PaulT/AppData/
-Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Pa
-ulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb>
+ <C:\Users\PaulT\AppData\Local\M
+iKTeX\2.9\fonts\pk\ljfour\public\bbm\dpi600\bbm10.pk><C:/Users/PaulT/AppData/Lo
+cal/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Pau
+lT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 <C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/c
-m/cmr5.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public
-/amsfonts/cm/cmr7.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/t
-ype1/public/amsfonts/cm/cmsy10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTe
-X 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/PaulT/AppData/Local/Pr
-ograms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/PaulT/App
-Data/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Us
-ers/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols
-/msbm7.pfb>
-Output written on substrate-internalization-equations.pdf (4 pages, 171835 byte
+m/cmex10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/publ
+ic/amsfonts/cm/cmmi10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fon
+ts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/PaulT/AppData/Local/Programs/M
+iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/PaulT/AppData/Loca
+l/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/PaulT/
+AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/
+Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cm
+r5.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/ams
+fonts/cm/cmr7.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
+/public/amsfonts/cm/cmsy10.pfb><C:/Users/PaulT/AppData/Local/Programs/MiKTeX 2.
+9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/PaulT/AppData/Local/Progra
+ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/PaulT/AppData
+/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/
+PaulT/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/msb
+m7.pfb>
+Output written on substrate-internalization-equations.pdf (4 pages, 175320 byte
 s).
 PDF statistics:
  80 PDF objects out of 1000 (max. 8388607)
