@@ -101,6 +101,8 @@ int main( int argc, char* argv[] )
 	// time setup 
 	std::string time_units = "min"; 
 
+		std::cout << __LINE__ << std::endl; 
+
 	/* Microenvironment setup */ 
 	
 	setup_microenvironment(); // modify this in the custom code 
@@ -110,11 +112,14 @@ int main( int argc, char* argv[] )
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+	std::cout << __LINE__ << std::endl; 
 	
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	create_cell_types();
+	std::cout << __LINE__ << std::endl; 
 	setup_tissue();
+	std::cout << __LINE__ << std::endl; 
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	
@@ -124,6 +129,9 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_data_as_matlab( true ); 
 	set_save_biofvm_cell_data( true ); 
 	set_save_biofvm_cell_data_as_custom_matlab( true );
+	
+	std::cout << __LINE__ << std::endl; 
+	
 
 	// save a simulation snapshot 
 	
@@ -158,6 +166,36 @@ int main( int argc, char* argv[] )
 		report_file.open(filename); 	// create the data log file 
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
+	
+	//
+	std::cout << __LINE__ << std::endl; 
+	Cell* pCell_1 = create_cell(); //  cell_defaults ); 
+	pCell_1->assign_position( 0,0,0 ); 
+	std::cout << __LINE__ << std::endl; 
+	Cell* pCell_2 = pCell_1->divide(); 
+	std::cout << __LINE__ << std::endl; 
+	
+	std::cout << "1:" << pCell_1->phenotype.secretion.secretion_rates << std::endl; 
+	std::cout << "2:" << pCell_2->phenotype.secretion.secretion_rates << std::endl; 
+	
+	// change cell 1 secretion rate 
+	pCell_1->phenotype.secretion.secretion_rates[0] = 12; 
+	
+	std::cout << "1:" << pCell_1->phenotype.secretion.secretion_rates << std::endl; 
+	std::cout << "2:" << pCell_2->phenotype.secretion.secretion_rates << std::endl; 
+
+	system( "pause" ); 
+	
+	Bools bools; 
+	for( int i=0 ; i < bools.size() ; i++ )
+	{
+		std::cout << i << " : " << bools.values[i] << std::endl; 
+	}
+	
+	// advance_molecular_models( molecular_dt ); 
+	
+
+	system("pause"); 
 	
 	// main loop 
 	
@@ -206,6 +244,9 @@ int main( int argc, char* argv[] )
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
+			// run molecular models 
+			advance_molecular_models( molecular_dt ); 
+
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			

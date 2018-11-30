@@ -880,8 +880,8 @@ void Secretion::scale_all_uptake_by_factor( double factor )
 Molecular::Molecular()
 {
 	pMicroenvironment = get_default_microenvironment(); 
-	
 	sync_to_current_microenvironment(); 
+
 	return; 
 }
 
@@ -943,24 +943,24 @@ void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
 	// make sure the associated cell has the correct rate vectors 
 	if( pCell->internalized_substrates != &internalized_substrates )
 	{
+		// copy the data over 
+		internalized_substrates = *(pCell->internalized_substrates);
+		// remove the BioFVM copy 
 		delete pCell->internalized_substrates; 
-		
+		// point BioFVM to this one  
 		pCell->internalized_substrates = &internalized_substrates; 
 	}
 
-	// now, call the BioFVM secretion/uptake function 
-	
-	// not sure!!! 
-	
-	// pCell->simulate_secretion_and_uptake( pMicroenvironment , dt ); 
-	
+	// now, call the functions 
+/*
+	if( pCell->functions.internal_substrate_function )
+	{ pCell->functions.internal_substrate_function( pCell,phenotype,dt);  }
+	if( pCell->functions.molecular_model_function )
+	{ pCell->functions.molecular_model_function( pCell,phenotype,dt);  }
+*/
+
 	return; 
 }
-
-
-
-
-
 
 Cell_Functions::Cell_Functions()
 {
@@ -977,6 +977,9 @@ Cell_Functions::Cell_Functions()
 	set_orientation = NULL; 
 	
 	contact_function = NULL; 
+	
+	internal_substrate_function = NULL; 
+	molecular_model_function = NULL; 
 
 	return; 
 }
@@ -997,113 +1000,36 @@ Phenotype::Phenotype()
 }
 
 /*
-Microenvironment microenvironment; 
-
-Microenvironment_Options::Microenvironment_Options()
+class Bools
 {
-	pMicroenvironment = &microenvironment; 
-	name = "microenvironment"; 
-	
-	time_units = "min"; 
-	spatial_units = "micron"; 
-	dx = 20; 
-	dy = 20; 
-	dz = 20; 
-	
-	outer_Dirichlet_conditions = false; 
-	Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 0.0 ); 
-	
-	// set a far-field value for oxygen (assumed to be in the first field)
-	Dirichlet_condition_vector[0] = 38.0; 
-	
-	simulate_2D = false; 
-	
-	X_range.resize(2,500.0); 
-	X_range[0] *= -1.0;
-	
-	Y_range.resize(2,500.0); 
-	Y_range[0] *= -1.0;
-	
-	Z_range.resize(2,500.0); 
-	Z_range[0] *= -1.0;
-	
-	calculate_gradients = false; 
-	
+	public:
+		std::vector<bool> values; 
+		std::unordered_map<std::string,int> name_map; 
+		std::string& name( int i ); 
+		std::vector<std::string> units; 
+		void resize( int n ); 
+		int add( std::string name , std::string units , bool value ); 
+		
+		bool& operator[]( int i ); 
+		bool& operator[]( std::string name ); 
+		
+		Bools(); 
+}
+*/
+
+Bools::Bools()
+{
+	values.resize( 0 , true ); 
+	name_map.clear(); 
+	bool
 	return; 
 }
 
-Microenvironment_Options default_microenvironment_options; 
+int Bools::size( void )
+{ return values.size(); } 
 
-void initialize_microenvironment( void )
-{
-	// create and name a microenvironment; 
-	microenvironment.name = default_microenvironment_options.name;
-	// register the diffusion solver 
-	if( default_microenvironment_options.simulate_2D == true )
-	{
-		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
-	}
-	else
-	{
-		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D; 
-	}
-	
-	// set the default substrate to oxygen (with typical units of mmHg)
-	microenvironment.set_density(0, "oxygen" , "mmHg" );
-	microenvironment.diffusion_coefficients[0] = 1e5; 
-	microenvironment.decay_rates[0] = 0.1; 
-	
-	// resize the microenvironment to 1 mm^2 (and dz thick), centered at (0,0,0)
-	if( default_microenvironment_options.simulate_2D == true )
-	{
-		default_microenvironment_options.Z_range[0] = -default_microenvironment_options.dz/2.0; 
-		default_microenvironment_options.Z_range[1] = default_microenvironment_options.dz/2.0;
-	}
-	microenvironment.resize_space( default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
-		default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1], 
-		default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], 
-		default_microenvironment_options.dx,default_microenvironment_options.dy,default_microenvironment_options.dz );
-		
-	// set units
-	microenvironment.spatial_units = default_microenvironment_options.spatial_units;
-	microenvironment.time_units = default_microenvironment_options.time_units;
-	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
 
-	// set the initial oxygenation to 38 mmHg (a typical normoxic tissue value of 5% O2)
-	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
-	{ microenvironment.density_vector(n) = default_microenvironment_options.Dirichlet_condition_vector; }
-	
-	// set Dirichlet conditions along the 4 outer edges 
-	for( int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
-	{
-		int J = microenvironment.mesh.y_coordinates.size()-1;
-		microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,0,0) , default_microenvironment_options.Dirichlet_condition_vector );
-		microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,0) , default_microenvironment_options.Dirichlet_condition_vector );
-	}
-	int I = microenvironment.mesh.x_coordinates.size()-1;
-	for( int j=1; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
-	{
-		microenvironment.add_dirichlet_node( microenvironment.voxel_index(0,j,0) , default_microenvironment_options.Dirichlet_condition_vector );
-		microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,0) , default_microenvironment_options.Dirichlet_condition_vector );
-	}		
-	
-	// if 3-D, also along the corresponding additional faces 
-	if( default_microenvironment_options.simulate_2D == false )
-	{
-		
-		for( int k=1 ; k < microenvironment.mesh.z_coordinates.size()-1 ; k++ )
-		{
-			int i = microenvironment.mesh.x_coordinates.size()-1;
-			for( int j=1; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
-			{
-				microenvironment.add_dirichlet_node( microenvironment.voxel_index(0,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
-				microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
-			}	
-		}	
-	}
-	
-	microenvironment.display_information( std::cout );
-	return;
-}
-*/	
+
 };
+
+

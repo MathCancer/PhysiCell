@@ -271,7 +271,7 @@ void setup_microenvironment( void )
 void setup_tissue( void )
 {
 	// create some cells near the origin
-	
+	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 	Cell* pC;
 	
 	double theta = 0.0; 
@@ -282,122 +282,26 @@ void setup_tissue( void )
 	
 	double temp = sqrt( dS*dS - dr*dr ); 
 
+	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+
 	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
 	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
 
-/*	
-	pC = create_cell(); 
-	pC->assign_position( -490, 490, 0.0 ); 
-	pC->functions.update_phenotype = inert_phenotype; 
+	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 
-	pC = create_cell(); 
-	pC->assign_position( -470 , 490 , 0.0 ); 
-	pC->functions.update_phenotype = inert_phenotype; 
-	
-	pC = create_cell(); 
-	pC->assign_position( -450 , 490 , 0.0 ); 
-	pC->functions.update_phenotype = inert_phenotype; 
-		
-	pC = create_cell(); 
-	pC->assign_position( -430 , 490 , 0.0 ); 
-	pC->functions.update_phenotype = inert_phenotype; 
-*/
-	
+	int i = 0; 
 	while( r < 425 )
 	{
+		std::cout << i << " " ; 
 		pC = create_cell(); 
 		pC->assign_position( r*cos(theta), r*sin(theta), 0.0 ); 
 
 		theta += temp / r; 
-		r += dr; 		
+		r += dr; 
+
+		i++;		
 	}
-	
-/*
-	pC = create_cell(); 
-	pC->assign_position( 0.0, 0.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -100, 0, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 100, 0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( 0, 100, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 0, -100, 0.0 );
-
-	
-	pC = create_cell(); 
-	pC->assign_position( 150.0, 150.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -150, -150, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( -150, 150, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 150, -150, 0.0 );
-	
-
-	pC = create_cell(); 
-	pC->assign_position( 50.0, 50.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -50, -50, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( -50, 50, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 50, -50, 0.0 );
-	
-
-	pC = create_cell(); 
-	pC->assign_position( 200.0, 0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -200, 0.0 , 0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 0,200, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position(0,-200 ,  0.0 );
-	
-	
-	pC = create_cell(); 
-	pC->assign_position( 250.0, 250.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -250, -250, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( -250, 250, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 250, -250, 0.0 );	
-	
-
-	pC = create_cell(); 
-	pC->assign_position( 300.0, 0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -300, 0.0 , 0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 0,300, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position(0,-300 ,  0.0 );
-	
-	// now create a motile cell 
-	
-	pC = create_cell( motile_cell ); 
-	pC->assign_position( 15.0, -18.0, 0.0 );
-*/
+	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 	
 	return; 
 }

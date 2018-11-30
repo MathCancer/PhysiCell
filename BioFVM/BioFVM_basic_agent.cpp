@@ -76,8 +76,8 @@ Basic_Agent::Basic_Agent()
 	// register_microenvironment( default_microenvironment ); 
 
 	internalized_substrates = new std::vector<double>(0); // 
+	released_fractions_at_death = new std::vector<double>(0); 
 	register_microenvironment( get_default_microenvironment() );
-	
 	
 	// these are done in register_microenvironment
 	// internalized_substrates.assign( get_default_microenvironment()->number_of_densities() , 0.0 ); 
@@ -172,8 +172,9 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	// new for internalized substrate tracking 
 	internalized_substrates->resize( microenvironment->density_vector(0).size() , 0.0 );
 	total_extracellular_substrate_change.resize( microenvironment->density_vector(0).size() , 1.0 );
+	
+	released_fractions_at_death->resize( microenvironment->density_vector(0).size() , 0.0 ); 
 	use_internal_densities_as_targets = false;  
-	release_internalized_substrates_at_death = true; 
 
 	return; 
 }
@@ -183,13 +184,15 @@ Microenvironment* Basic_Agent::get_microenvironment( void )
 
 Basic_Agent::~Basic_Agent()
 {
-	if( release_internalized_substrates_at_death )
-	{
-		Microenvironment* pS = get_default_microenvironment(); 
-		
-		*internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
-		(*pS)(current_voxel_index) += *internalized_substrates; 
-	} 
+	Microenvironment* pS = get_default_microenvironment(); 
+	
+	std::cout << "\t\t\t" << (*pS)(current_voxel_index) << "\t\t\t" << std::endl; 
+	*internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
+	std::cout << "\t\t" << *internalized_substrates << std::endl; 
+	*internalized_substrates *= *released_fractions_at_death;  // what fraction is released? 
+	std::cout << "\t\t" << *internalized_substrates  << std::endl ;
+	(*pS)(current_voxel_index) += *internalized_substrates; 
+	std::cout << "\t\t\t" << (*pS)(current_voxel_index) << "\t\t\t" << std::endl << std::endl; 
 	
 	return; 
 }

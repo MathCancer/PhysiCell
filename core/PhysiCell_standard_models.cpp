@@ -693,7 +693,12 @@ void initialize_default_cell_definition( void )
 	
 	// set up the default phenotype (to be consistent with the default functions)
 	cell_defaults.phenotype.cycle.sync_to_cycle_model( cell_defaults.functions.cycle_model ); 
-
+	
+	// set molecular defaults 
+	
+	cell_defaults.functions.internal_substrate_function = standard_substrate_model;
+	cell_defaults.functions.molecular_model_function = NULL; 
+	
 	return; 	
 }
 
@@ -813,6 +818,42 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	// now, update the necrosis rate 
 	
 	pCell->phenotype.death.rates[necrosis_index] = multiplier * pCell->parameters.max_necrosis_rate; 
+	
+	return; 
+}
+
+void standard_substrate_model( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// phenotype.molecular.internalized_substrates[0] = 9e9; // not properly linked yet 
+	pCell->internalized_substrates->operator[](0) = 8e8; 
+	
+	return; 
+}
+
+void advance_molecular_models( double molecular_dt_ )
+{
+	static double time_since_last_update = molecular_dt_; 
+	static double tolerance = 0.001 * molecular_dt_; 
+	
+	extern std::vector<Cell*> *all_cells;
+	
+	// is it time to update? 
+	if( fabs( time_since_last_update - molecular_dt_ ) < tolerance )
+	{
+		
+		#pragma omp parallel for
+		for( int i=0 ; i < (*all_cells).size() ; i++ )
+		{
+			void (*func)(Cell*,Phenotype&,double) = (*all_cells)[i]->functions.internal_substrate_function;
+			if( func )
+			{ func( (*all_cells)[i] , (*all_cells)[i]->phenotype, time_since_last_update );  }
+			func = (*all_cells)[i]->functions.molecular_model_function;
+			if( func ) 
+			{ func( (*all_cells)[i] , (*all_cells)[i]->phenotype, time_since_last_update );  }		
+		}
+		
+		time_since_last_update -= molecular_dt_; 
+	}
 	
 	return; 
 }

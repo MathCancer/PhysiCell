@@ -126,6 +126,10 @@ bool create_standard_cell_death_models( void ); // done
 bool create_standard_cycle_and_death_models( void ); // done 
 
 void initialize_default_cell_definition( void ); // done 
+
+void standard_substrate_model( Cell* pCell, Phenotype& phenotype, double dt ); 
+void advance_molecular_models( double molecular_dt_ ); 
+
 	
 };
 

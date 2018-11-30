@@ -38,9 +38,14 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
  
 (need ot track this one down ... )
 
+
 + Added new "Molecular" block to Phenotype 
 
- 
++ Added molecular_dt to PhysiCell_constants
+
++ added functions to Cell_Functions class 
+
++ 
  
 ### Minor new features and changes: 
  
