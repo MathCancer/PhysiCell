@@ -64,6 +64,8 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 + Fixed the search for cycle phase indices in the 2D adn 3D template projects, to make sure it searches teh flow_cytometry_separated_cycle_model model and not the Ki67_advanced model, as part of the create_cell_types() function in the custom.cpp files. 
 
 + In PhysiCell_standard_models, standard_volume_update_function is now fixed to update phenotype.volume.fluid. (This was not used in any mechanics or other calculations, so it does not affect prior modeling results.) 
+
++ Removed repeated parameters (attached_worker_migration_bias, unattached_worker_migration_bias) in the cancer biorobots sample project.
  
 ### Notices for intended changes that may affect backwards compatibility:
  
