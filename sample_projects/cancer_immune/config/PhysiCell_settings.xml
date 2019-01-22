@@ -128,7 +128,7 @@
 			<!-- 10 day survival time --> 
 		<immune_motility_persistence_time type="double" units="min">10</immune_motility_persistence_time>
 		<immune_migration_speed type="double" units="micron/min">1.0</immune_migration_speed>
-		<immune_migration_bias type="double" units="min">0.5</immune_migration_bias>
+		<immune_migration_bias type="double" units="dimensionless">0.5</immune_migration_bias>
 		<immune_relative_adhesion type="double" units="dimensionless">0</immune_relative_adhesion>
 		<immune_relative_repulsion type="double" units="dimensionless">5</immune_relative_repulsion> 	
 		

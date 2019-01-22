@@ -128,8 +128,8 @@
 
 		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
 		<worker_migration_speed type="double" units="micron/min">5.0</worker_migration_speed>
-		<attached_worker_migration_bias type="double" units="min">1.0</attached_worker_migration_bias>
-		<unattached_worker_migration_bias type="double" units="min">0.5</unattached_worker_migration_bias>
+		<attached_worker_migration_bias type="double" units="dimensionless">1.0</attached_worker_migration_bias>
+		<unattached_worker_migration_bias type="double" units="dimensionless">0.5</unattached_worker_migration_bias>
 
 		<!-- tissue setup --> 
 		<number_of_directors type="int" units="none">15</number_of_directors> 
