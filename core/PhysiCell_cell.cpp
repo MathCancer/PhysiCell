@@ -425,6 +425,14 @@ Cell* Cell::divide( )
 	// position[0] -= 0.5*radius*rand_vec[0];
 	// position[1] -= 0.5*radius*rand_vec[1]; 
 	// position[2] -= 0.5*radius*rand_vec[2]; 
+
+	//If this cell has been moved outside of the boundaries, mark it as such.
+	//(If the child cell is outside of the boundaries, that has been taken care of in the assign_position function.)
+	if( !get_container()->underlying_mesh.is_position_valid(position[0], position[1], position[2])){
+		is_out_of_domain = true;
+		is_active = false;
+		is_movable = false;
+	}
 	 
 	update_voxel_in_container();
 	phenotype.volume.divide(); 
