@@ -96,7 +96,7 @@ void create_cell_types( void )
 	
 	// set default_cell_functions; 
 	
-	cell_defaults.functions.update_phenotype = NULL;
+	cell_defaults.functions.update_phenotype = epithelial_function;
 	
 	// needed for a 2-D simulation: 
 	
@@ -147,6 +147,7 @@ void create_cell_types( void )
 	// It's best to just copy the default and modify it. 
 	
 	macrophage = cell_defaults; 
+	macrophage.functions.update_phenotype = macrophage_function; 
 	
 	// make this cell type randomly motile, less adhesive, greater survival, 
 	// and less proliferative 
@@ -242,7 +243,7 @@ void setup_tissue( void )
 	
 	// now create a motile cell 
 	
-	pC = create_cell( motile_cell ); 
+	pC = create_cell( macrophage ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
 	
 	return; 
@@ -263,6 +264,28 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	return output; 
 }
 
+std::vector<std::string> viral_coloring_function( Cell* pCell )
+{
+	// start with flow cytometry coloring 
+	
+	std::vector<std::string> output = { "white" , "black" , "grey", "black" }; 
+		
+	// dead cells 
+	if( pCell->phenotype.death.dead == false )
+	{
+		 output[0] = "black"; 
+		 output[2] = "black"; 
+	}
+	
+	if( pCell->type != macrophage.type )
+	{
+		output[0] = "red"; 
+		output[2] = "darkred"; 
+	}
+	
+	return output; 
+}
+
 void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// bookeeping 
@@ -273,7 +296,7 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	static double implicit_Euler_constant = 
 		(1.0 + dt * parameters.doubles("virus_digestion_rate") );
-	phenotype.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
+	phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
 	
 	// check for contact with a cell
 	
@@ -282,19 +305,23 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 	for( int n=0; n < pCell->cells_in_my_container().size() ; n++ )
 	{
 		pTestCell = pCell->cells_in_my_container()[n]; 
-		// if it is not me 
-		if( pC
-		// if it is not a macrophage, test for viral load 
+		// if it is not me and not a macrophage 
+		if( pTestCell != pCell && pTestCell->type != macrophage.type )
+		{
+			// if it is not a macrophage, test for viral load 
+			// if high viral load, eat it. 
 		
-		// if high viral load, eat it. 
-
-
+			if( pTestCell->phenotype.molecular.internalized_total_substrates[nVirus] 
+				> parameters.doubles("min_virion_detection_threshold") )
+			{
+				std::cout << "nom nom nom" << std::endl; 
+				pCell->ingest_cell( pTestCell ); 
+			}
+		}
 	}
-	
-	// if it is not a macrophage, test for viral load 
-	
-	// if high viral load, eat it. 
-	
 	
 	return; 
 }
+
+void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
+{ return; } 

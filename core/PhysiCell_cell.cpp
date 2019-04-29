@@ -983,8 +983,11 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	// flag it for removal 
 	pCell_to_eat->flag_for_removal(); 
 	// mark it as dead 
-	pCell_to_eat->phenotype.death.is_dead = true; 
+	pCell_to_eat->phenotype.death.dead = true; 
 	// set secretion and uptake to zero 
+	pCell_to_eat->phenotype.secretion.set_all_secretion_to_zero( );  
+	pCell_to_eat->phenotype.secretion.set_all_uptake_to_zero( ); 
+
 	
 	// deactivate all custom function 
 	pCell_to_eat->functions.custom_cell_rule = NULL; 

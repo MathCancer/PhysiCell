@@ -80,6 +80,9 @@ extern Cell_Definition macrophage;
 
 // custom cell phenotype functions could go here 
 
+void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt );
+void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt );
+
 // setup functions to help us along 
 
 void create_cell_types( void );
@@ -91,3 +94,4 @@ void setup_microenvironment( void );
 // custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
+std::vector<std::string> viral_coloring_function( Cell* pCell );
