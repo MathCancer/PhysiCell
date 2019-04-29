@@ -79,25 +79,25 @@ void create_cell_types( void )
 	// for all runs 
 	
 	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
-	
+
 	// housekeeping 
 	
 	initialize_default_cell_definition();
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
-	
+
 	// Name the default cell type 
 	
 	cell_defaults.type = 0; 
 	cell_defaults.name = "epithelial cell"; 
-	
+
 	// set default cell cycle model 
 
 	cell_defaults.functions.cycle_model = flow_cytometry_separated_cycle_model; 
-	
+
 	// set default_cell_functions; 
 	
 	cell_defaults.functions.update_phenotype = epithelial_function;
-	
+
 	// needed for a 2-D simulation: 
 	
 	/* grab code from heterogeneity */ 
@@ -105,10 +105,11 @@ void create_cell_types( void )
 	cell_defaults.functions.set_orientation = up_orientation; 
 	cell_defaults.phenotype.geometry.polarity = 1.0;
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	
+
 	// make sure the defaults are self-consistent. 
 	
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.molecular.sync_to_microenvironment( &microenvironment );
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 
 	// set the rate terms in the default phenotype 
@@ -124,10 +125,10 @@ void create_cell_types( void )
 	// initially no death 
 	cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
-	
+
 	// initially no birth 
 	cell_defaults.phenotype.cycle.data.transition_rate(G0G1_index, S_index ) = 0.0 ; 
-	
+
 	// not motile 
 	cell_defaults.phenotype.motility.is_motile = false; 
 
@@ -136,7 +137,7 @@ void create_cell_types( void )
 		parameters.doubles("viral_internalization_rate"); 
 	cell_defaults.phenotype.secretion.secretion_rates[virus_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[virus_index] = 0; 
-	
+
 	// add custom data here, if any 
 	
 	// release virus at death or when eaten 
@@ -148,36 +149,36 @@ void create_cell_types( void )
 	
 	macrophage = cell_defaults; 
 	macrophage.functions.update_phenotype = macrophage_function; 
-	
+
 	// make this cell type randomly motile, less adhesive, greater survival, 
 	// and less proliferative 
 	
 	macrophage.type = 1; 
 	macrophage.name = "macrophage"; 
-	
+
 	// make sure the new cell type has its own reference phenotype
 	
 	macrophage.parameters.pReference_live_phenotype = &( macrophage.phenotype ); 
-	
+
 	// macrophages do not release virus at death 
 	macrophage.phenotype.molecular.fraction_released_at_death[ virus_index ]= 0.0; 
 		
 	// macrophages don't get eaten 
 	macrophage.phenotype.molecular.fraction_transferred_when_ingested[ virus_index ]= 0.0; 
-	
+
 	// enable random motility 
 	macrophage.phenotype.motility.is_motile = true; 
 	macrophage.phenotype.motility.persistence_time = parameters.doubles( "macrophage_persistence_time" );
 	macrophage.phenotype.motility.migration_speed = parameters.doubles( "macrophage_migration_speed" ); 
 	macrophage.phenotype.motility.migration_bias = 0.0;// completely random 
-	
+
 	// Set cell-cell adhesion relative to other cells 
 	macrophage.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "macrophage_relative_adhesion" ); 
-	
+
 	// macrophages do not uptake viral particles 
 	macrophage.phenotype.secretion.uptake_rates[virus_index] = 
 		parameters.doubles("viral_internalization_rate"); 
-	
+
 	return; 
 }
 
@@ -228,12 +229,14 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
+	int nVirus = microenvironment.find_density_index( "virus" ); 
 	// create some cells near the origin
 	
 	Cell* pC;
 
 	pC = create_cell(); 
 	pC->assign_position( 0.0, 0.0, 0.0 );
+	pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 10; 
 
 	pC = create_cell(); 
 	pC->assign_position( -100, 0, 0.0 );
@@ -268,7 +271,11 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 {
 	// start with flow cytometry coloring 
 	
-	std::vector<std::string> output = { "white" , "black" , "grey", "black" }; 
+	std::vector<std::string> output = { "white" , "black" , "white", "black" }; 
+	static int nVirus = microenvironment.find_density_index( "virus" ); 
+	
+	static double denominator = parameters.doubles("burst_virion_count") 
+		- parameters.doubles( "min_virion_count" ); 
 		
 	// dead cells 
 	if( pCell->phenotype.death.dead == false )
@@ -279,8 +286,25 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 	
 	if( pCell->type != macrophage.type )
 	{
-		output[0] = "red"; 
-		output[2] = "darkred"; 
+		output[0] = "blue"; 
+		output[2] = "darkblue"; 
+		
+		double virus = pCell->phenotype.molecular.internalized_total_substrates[nVirus]; 
+		
+		if( pCell->phenotype.molecular.internalized_total_substrates[nVirus] > 0.01 )
+		{
+			double interp = (virus - parameters.doubles( "min_virion_count" ) )/ denominator;  
+			if( interp > 1.0 )
+			{ interp = 1.0; } 
+			int Red = (int) floor( 255.0*(1-interp) ); 
+			int Green = (int) floor( 255.0*(1-interp) ); 
+			int Blue = (int) floor( 255.0 * interp ); 
+			
+			char szTempString [128];
+			sprintf( szTempString , "rgb(%u,%u,%u)", Red, Green, Blue );
+			output[0].assign( szTempString );
+		}
+		
 	}
 	
 	return output; 
