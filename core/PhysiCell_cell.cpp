@@ -979,7 +979,20 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
 	
 	// trigger removal from the simulation 
-	pCell_to_eat->die(); 	
+	// pCell_to_eat->die(); // I don't think this is safe if it's in an OpenMP loop 
+	// flag it for removal 
+	pCell_to_eat->flag_for_removal(); 
+	// mark it as dead 
+	pCell_to_eat->phenotype.death.is_dead = true; 
+	// set secretion and uptake to zero 
+	
+	// deactivate all custom function 
+	pCell_to_eat->functions.custom_cell_rule = NULL; 
+	pCell_to_eat->functions.update_phenotype = NULL; 
+	pCell_to_eat->functions.contact_function = NULL; 
+	
+	// set it to zero mechanics 
+	pCell_to_eat->functions.custom_cell_rule = NULL; 
 	
 	return; 
 }

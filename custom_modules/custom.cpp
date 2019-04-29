@@ -69,7 +69,7 @@
 
 // declare cell definitions here 
 
-Cell_Definition epithelial_cell , macrophage; 
+Cell_Definition macrophage; 
 
 void create_cell_types( void )
 {
@@ -88,7 +88,7 @@ void create_cell_types( void )
 	// Name the default cell type 
 	
 	cell_defaults.type = 0; 
-	cell_defaults.name = "default"; 
+	cell_defaults.name = "epithelial cell"; 
 	
 	// set default cell cycle model 
 
@@ -96,7 +96,7 @@ void create_cell_types( void )
 	
 	// set default_cell_functions; 
 	
-	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.update_phenotype = NULL;
 	
 	// needed for a 2-D simulation: 
 	
@@ -116,58 +116,66 @@ void create_cell_types( void )
 	// first find index for a few key variables. 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
-	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
+	int virus_index = microenvironment.find_density_index( "virus" ); 
 
 	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
 	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
 
-	// initially no necrosis 
+	// initially no death 
+	cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
+	
+	// initially no birth 
+	cell_defaults.phenotype.cycle.data.transition_rate(G0G1_index, S_index ) = 0.0 ; 
+	
+	// not motile 
+	cell_defaults.phenotype.motility.is_motile = false; 
 
-	// set oxygen uptake / secretion parameters for the default cell type 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
-	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
+	// set virus uptake / secretion parameters for the default (epithelial) cell type 
+	cell_defaults.phenotype.secretion.uptake_rates[virus_index] = 
+		parameters.doubles("viral_internalization_rate"); 
+	cell_defaults.phenotype.secretion.secretion_rates[virus_index] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[virus_index] = 0; 
 	
 	// add custom data here, if any 
 	
-	
-	
+	// release virus at death or when eaten 
+	cell_defaults.phenotype.molecular.fraction_released_at_death[ virus_index ]= 1.0; 
+	cell_defaults.phenotype.molecular.fraction_transferred_when_ingested[ virus_index ]= 1.0; 
 
 	// Now, let's define another cell type. 
 	// It's best to just copy the default and modify it. 
 	
+	macrophage = cell_defaults; 
+	
 	// make this cell type randomly motile, less adhesive, greater survival, 
 	// and less proliferative 
 	
-	epithelial_cell.type = 1; 
-	epithelial_cell.name = "epithelial cell"; 
+	macrophage.type = 1; 
+	macrophage.name = "macrophage"; 
 	
 	// make sure the new cell type has its own reference phenotype
 	
-	epithelial_cell.parameters.pReference_live_phenotype = &( epithelial_cell.phenotype ); 
+	macrophage.parameters.pReference_live_phenotype = &( macrophage.phenotype ); 
 	
-	// epithelial cells are not random 
-	
-	
-	
+	// macrophages do not release virus at death 
+	macrophage.phenotype.molecular.fraction_released_at_death[ virus_index ]= 0.0; 
+		
+	// macrophages don't get eaten 
+	macrophage.phenotype.molecular.fraction_transferred_when_ingested[ virus_index ]= 0.0; 
 	
 	// enable random motility 
-	epithelial_cell.phenotype.motility.is_motile = true; 
-	epithelial_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; 
-	epithelial_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
-	epithelial_cell.phenotype.motility.migration_bias = 0.0;// completely random 
+	macrophage.phenotype.motility.is_motile = true; 
+	macrophage.phenotype.motility.persistence_time = parameters.doubles( "macrophage_persistence_time" );
+	macrophage.phenotype.motility.migration_speed = parameters.doubles( "macrophage_migration_speed" ); 
+	macrophage.phenotype.motility.migration_bias = 0.0;// completely random 
 	
-	// Set cell-cell adhesion to 5% of other cells 
-	epithelial_cell.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
+	// Set cell-cell adhesion relative to other cells 
+	macrophage.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "macrophage_relative_adhesion" ); 
 	
-	// Set apoptosis to zero 
-	epithelial_cell.phenotype.death.rates[apoptosis_model_index] = parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
-	
-	// Set proliferation to 10% of other cells. 
-	// Alter the transition rate from G0G1 state to S state
-	epithelial_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
-		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); // 0.1; 
+	// macrophages do not uptake viral particles 
+	macrophage.phenotype.secretion.uptake_rates[virus_index] = 
+		parameters.doubles("viral_internalization_rate"); 
 	
 	return; 
 }
@@ -196,7 +204,7 @@ void setup_microenvironment( void )
 	default_microenvironment_options.use_oxygen_as_first_field = false; 
 	
 	// set properties 
-	microenvironment.set_density( 0 , "viral particle density", "particles/micron^3" ); 
+	microenvironment.set_density( 0 , "virus", "particles/micron^3" ); 
 	microenvironment.diffusion_coefficients[0] = 1e4; 
 	microenvironment.decay_rates[0] = 0; 
 	
@@ -253,4 +261,40 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	}
 	
 	return output; 
+}
+
+void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// bookeeping 
+	
+	static int nVirus = microenvironment.find_density_index( "virus" ); 
+	
+	// digest virus particles inside me 
+	
+	static double implicit_Euler_constant = 
+		(1.0 + dt * parameters.doubles("virus_digestion_rate") );
+	phenotype.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
+	
+	// check for contact with a cell
+	
+	Cell* pTestCell = NULL; 
+	
+	for( int n=0; n < pCell->cells_in_my_container().size() ; n++ )
+	{
+		pTestCell = pCell->cells_in_my_container()[n]; 
+		// if it is not me 
+		if( pC
+		// if it is not a macrophage, test for viral load 
+		
+		// if high viral load, eat it. 
+
+
+	}
+	
+	// if it is not a macrophage, test for viral load 
+	
+	// if high viral load, eat it. 
+	
+	
+	return; 
 }

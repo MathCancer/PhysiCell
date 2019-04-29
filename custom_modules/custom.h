@@ -76,7 +76,7 @@ void macrophage_cell_phenotype( Cell* pCell , Phenotype& phenotype , double dt )
 
 // any additional cell types (beyond cell_defaults)
 
-extern Cell_Definition epithelial_cell , macrophage; 
+extern Cell_Definition macrophage; 
 
 // custom cell phenotype functions could go here 
 
