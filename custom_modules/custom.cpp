@@ -232,18 +232,22 @@ void setup_tissue( void )
 	int nVirus = microenvironment.find_density_index( "virus" ); 
 	// create some cells near the origin
 	
+	double length_x = microenvironment.mesh.bounding_box[3] - 
+		microenvironment.mesh.bounding_box[0]; 
+		
+	double length_y = microenvironment.mesh.bounding_box[4] - 
+		microenvironment.mesh.bounding_box[1]; 
+		
 	Cell* pC;
 
-	pC = create_cell(); 
-	pC->assign_position( 0.0, 0.0, 0.0 );
-	pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 10; 
-
-	pC = create_cell(); 
-	pC->assign_position( -100, 0, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 0, 100, 0.0 );
-	
+	for( int n = 0 ; n < 500 ; n++ )
+	{
+		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
+		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
+		pC = create_cell(); 
+		pC->assign_position( x,y, 0.0 );
+		pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 10; 
+	}
 	// now create a motile cell 
 	
 	pC = create_cell( macrophage ); 
@@ -278,7 +282,7 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 		- parameters.doubles( "min_virion_count" ); 
 		
 	// dead cells 
-	if( pCell->phenotype.death.dead == false )
+	if( pCell->phenotype.death.dead == true )
 	{
 		 output[0] = "black"; 
 		 output[2] = "black"; 
