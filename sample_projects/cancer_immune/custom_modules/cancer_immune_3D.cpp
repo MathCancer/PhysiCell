@@ -248,7 +248,10 @@ void setup_microenvironment( void )
 	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // physioxic conditions 
 	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; 
 	default_microenvironment_options.Dirichlet_activation_vector[1] = false;  // no Dirichlet for the immunostimulatory factor 
-			
+
+	// set initial conditions 
+	default_microenvironment_options.initial_condition_vector = { 38.0 , 0 }; 
+	
 	initialize_microenvironment(); 	
 
 	return; 

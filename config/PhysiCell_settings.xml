@@ -35,7 +35,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2019, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1440</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -100,12 +100,12 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">60</interval>
+			<interval units="min">360</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">6</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -115,15 +115,14 @@
 	</save>
 	
 	<user_parameters>
-		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<random_seed type="int" units="dimensionless" hidden="true">0</random_seed> 
 		<!-- example parameters from the template --> 
 		
-		<!-- motile cell type parameters --> 
-		<motile_cell_persistence_time type="double" units="min">15</motile_cell_persistence_time>
-		<motile_cell_migration_speed type="double" units="micron/min">0.5</motile_cell_migration_speed> 
-		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
-		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
-		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.1</motile_cell_relative_cycle_entry_rate>
+		<viral_replication_rate type="double" units="viral particles/min" description="rate at which infected cells create new viral particles">0.1</viral_replication_rate> 
+		<min_virion_count type="int" units="none" description="minimum number of virions to start replication">1</min_virion_count>
+		<burst_virion_count type="int" units="none" description="max virion load, where infected cells lyse to release viral particles">1000</burst_virion_count>
+		<viral_internalization_rate type="double" units="1/min" description="internalization rate for viral particles">1</viral_internalization_rate> 
+		<viral_diffusion_coefficient type="double" units="micron^2/min" description="diffusion coefficient for viral particles">1e4</viral_diffusion_coefficient>
 		
 	</user_parameters>
 	

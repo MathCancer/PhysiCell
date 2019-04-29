@@ -301,6 +301,8 @@ class Microenvironment_Options
 	std::vector<double> Dirichlet_condition_vector; 
 	std::vector<bool> Dirichlet_activation_vector; 
 	
+	std::vector<double> initial_condition_vector; 
+	
 	bool simulate_2D; 
 	std::vector<double> X_range; 
 	std::vector<double> Y_range; 

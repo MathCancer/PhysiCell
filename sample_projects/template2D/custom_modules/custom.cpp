@@ -194,6 +194,9 @@ void setup_microenvironment( void )
 	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
 	
+	// set initial conditions 
+	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
+	
 	// initialize BioFVM 
 	
 	initialize_microenvironment(); 	

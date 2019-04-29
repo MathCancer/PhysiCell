@@ -235,11 +235,13 @@ void setup_microenvironment( void )
 	microenvironment.decay_rates[2] = 0; 	
 	
 	// use this for default Dirichlet conditions. 
-	// Actually, we'll just use it for initial conditions 
 	std::vector<double> bc_vector( 3 , 160  ); // 21% o2
 	bc_vector[1] = 0.5; 
 	bc_vector[2] = 0.5; 
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
+	
+	// this is for initial conditions 
+	default_microenvironment_options.initial_condition_vector = {160.0, 0.5, 0.5}; 
 	
 	// initialize BioFVM 
 	

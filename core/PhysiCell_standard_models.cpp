@@ -696,9 +696,6 @@ void initialize_default_cell_definition( void )
 	
 	// set molecular defaults 
 	
-	cell_defaults.functions.internal_substrate_function = standard_substrate_model;
-	cell_defaults.functions.molecular_model_function = NULL; 
-	
 	return; 	
 }
 
@@ -822,14 +819,7 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	return; 
 }
 
-void standard_substrate_model( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	// phenotype.molecular.internalized_substrates[0] = 9e9; // not properly linked yet 
-	pCell->internalized_substrates->operator[](0) = 8e8; 
-	
-	return; 
-}
-
+/*
 void advance_molecular_models( double molecular_dt_ )
 {
 	static double time_since_last_update = molecular_dt_; 
@@ -857,5 +847,6 @@ void advance_molecular_models( double molecular_dt_ )
 	
 	return; 
 }
+*/
 
 };

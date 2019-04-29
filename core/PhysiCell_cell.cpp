@@ -310,6 +310,9 @@ Cell::Cell()
 	
 	phenotype = cell_defaults.phenotype; 
 	
+	// sync up molecular state
+	phenotype.molecular.sync_to_cell( this ); 
+	
 	// cell state should be fine by the default constructor 
 	
 	current_mechanics_voxel_index=-1;
@@ -320,6 +323,7 @@ Cell::Cell()
 	
 	assign_orientation();
 	container = NULL;
+	
 	
 	return; 
 }
@@ -965,6 +969,10 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	pCell_to_eat->set_total_volume( 0.0 ); 
 	
 	// absorb the internalized substrates 
+	
+	// multiply by the fraction that is supposed to be ingested (for each substrate) 
+	*(pCell_to_eat->internalized_substrates) *= 
+		*(pCell_to_eat->fraction_transferred_when_ingested); // 
 	
 	*internalized_substrates += *(pCell_to_eat->internalized_substrates); 
 	static int n_substrates = internalized_substrates->size(); 

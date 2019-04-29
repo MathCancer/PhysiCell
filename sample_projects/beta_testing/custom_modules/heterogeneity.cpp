@@ -152,6 +152,9 @@ void setup_microenvironment( void )
 	
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
 	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // normoxic conditions 
+	
+	// set initial conditions 
+	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
 			
 	initialize_microenvironment(); 	
 

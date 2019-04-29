@@ -23,10 +23,12 @@ improves includes minor bug fixes for compiling in older versions of MinGW, and 
 + Added functionality in BioFVM to (optionally) track the total amount of substrates in each cell, based upon tracking uptake and secretion. Note that without additional, user-defined functions to internally create or consume substrate (e.g., synthesizing proteins, or using oxygen in metabolism), this can result in negative internal values (if cells only secrete but no internal creation functions have been set) or unbounded positive values (if cells uptake a substrate but do not use it). In particular, Basic_Agents (and hence Cells) now have: 
 
 ++ std::vector<double> internalized_substrates 
-++ bool use_internal_densities_as_targets
+++ bool use_internal_densities_as_targets (get rid of this!)
 
 In BioFVM::Microenvironment_Options class   
 ++ bool track_internalized_substrates_in_each_agent; 
+
+initial_condition_vector 
 
 (it defaults to false); 
 
@@ -41,9 +43,9 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 
 + Added new "Molecular" block to Phenotype 
 
-+ Added molecular_dt to PhysiCell_constants
++ Added molecular_dt to PhysiCell_constants // ditch for now? 
 
-+ added functions to Cell_Functions class 
++ added functions to Cell_Functions class / 
 
 + 
  

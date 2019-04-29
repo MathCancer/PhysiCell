@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -66,66 +64,30 @@
 #                                                                             #
 ###############################################################################
 */
---> 
 
-<!--
-<user_details />
--->
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-<PhysiCell_settings version="devel-version">
-	<domain>
-		<x_min>-500</x_min>
-		<x_max>500</x_max>
-		<y_min>-500</y_min>
-		<y_max>500</y_max>
-		<z_min>-10</z_min>
-		<z_max>10</z_max>
-		<dx>20</dx>
-		<dy>20</dy>
-		<dz>20</dz>
-		<use_2D>true</use_2D>
-	</domain>
-	
-	<overall>
-		<max_time units="min">2880</max_time> <!-- 5 days * 24 h * 60 min -->
-		<time_units>min</time_units>
-		<space_units>micron</space_units>
-	</overall>
-	
-	<parallel>
-		<omp_num_threads>4</omp_num_threads>
-	</parallel> 
-	
-	<save>
-		<folder>output</folder> <!-- use . for root --> 
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-		<full_data>
-			<interval units="min">60</interval>
-			<enable>true</enable>
-		</full_data>
-		
-		<SVG>
-			<interval units="min">6</interval>
-			<enable>true</enable>
-		</SVG>
-		
-		<legacy_data>
-			<enable>false</enable>
-		</legacy_data>
-	</save>
-	
-	<user_parameters>
-		<random_seed type="int" units="dimensionless">0</random_seed> 
-		<!-- example parameters from the template --> 
-		
-		<!-- motile cell type parameters --> 
-		<motile_cell_persistence_time type="double" units="min">15</motile_cell_persistence_time>
-		<motile_cell_migration_speed type="double" units="micron/min">0.5</motile_cell_migration_speed> 
-		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
-		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
-		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.1</motile_cell_relative_cycle_entry_rate>
-		
-	</user_parameters>
-	
-	
-</PhysiCell_settings>
+void epithelial_cell_phenotype( Cell* pCell , Phenotype& phenotype , double dt ); 
+void macrophage_cell_phenotype( Cell* pCell , Phenotype& phenotype , double dt ); 
+
+// any additional cell types (beyond cell_defaults)
+
+extern Cell_Definition epithelial_cell , macrophage; 
+
+// custom cell phenotype functions could go here 
+
+// setup functions to help us along 
+
+void create_cell_types( void );
+void setup_tissue( void ); 
+
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
+
+// custom pathology coloring function 
+
+std::vector<std::string> my_coloring_function( Cell* );

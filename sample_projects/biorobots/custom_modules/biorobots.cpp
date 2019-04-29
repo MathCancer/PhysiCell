@@ -87,6 +87,9 @@ void setup_microenvironment( void )
 		parameters.doubles("cargo_signal_D"); // 1e3; 
 	microenvironment.decay_rates[1] = 
 		parameters.doubles("cargo_signal_decay"); // .4; // 50 micron length scale 
+		
+	// set initial conditions 
+	default_microenvironment_options.initial_condition_vector = { 0.0 , 0.0  }; 
 	
 	initialize_microenvironment(); 	
 

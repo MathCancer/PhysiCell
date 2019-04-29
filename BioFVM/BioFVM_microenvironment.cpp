@@ -438,6 +438,8 @@ void Microenvironment::resize_densities( int new_size )
 	default_microenvironment_options.Dirichlet_condition_vector.assign( new_size , 1.0 );  
 	default_microenvironment_options.Dirichlet_activation_vector.assign( new_size, true ); 
 	
+	default_microenvironment_options.initial_condition_vector.assign( new_size , 1.0 ); 
+	
 	return; 
 }
 
@@ -490,6 +492,8 @@ void Microenvironment::add_density( void )
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
 	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
 	
+	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
+	
 	return; 
 }
 
@@ -541,6 +545,8 @@ void Microenvironment::add_density( std::string name , std::string units )
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
 	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
 
+	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
+	
 	return; 
 }
 
@@ -591,6 +597,8 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	// fix in PhysiCell preview November 2017 
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); // = one; 
 	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
+	
+	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
 	
 	return; 
 }
@@ -1050,6 +1058,8 @@ Microenvironment_Options::Microenvironment_Options()
 	Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 1.0 ); 
 	Dirichlet_activation_vector.assign( pMicroenvironment->number_of_densities() , true ); 
 	
+	initial_condition_vector = Dirichlet_condition_vector; 
+	
 	// set a far-field value for oxygen (assumed to be in the first field)
 	Dirichlet_condition_vector[0] = 38.0; 
 	
@@ -1066,7 +1076,7 @@ Microenvironment_Options::Microenvironment_Options()
 	
 	calculate_gradients = false; 
 	
-	track_internalized_substrates_in_each_agent = false; 
+	track_internalized_substrates_in_each_agent = true; 
 	
 	return; 
 }
@@ -1118,9 +1128,9 @@ void initialize_microenvironment( void )
 	microenvironment.time_units = default_microenvironment_options.time_units;
 	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
 
-	// set the initial densities to the values set in the Dirichlet_condition_vector
+	// set the initial densities to the values set in the initial_condition_vector
 	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
-	{ microenvironment.density_vector(n) = default_microenvironment_options.Dirichlet_condition_vector; }
+	{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
 	
 	if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
 	{

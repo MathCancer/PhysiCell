@@ -83,11 +83,12 @@ class Basic_Agent
 	double get_total_volume();
 	void set_total_volume(double);
 	void update_voxel_index();
-	
+
+	/* new for internalized substrates in 1.5.0 */ 
 	std::vector<double> * internalized_substrates; 
-	std::vector<double> * released_fractions_at_death; 
-	bool use_internal_densities_as_targets; 
-	
+	std::vector<double> * fraction_released_at_death; 
+	std::vector<double> * fraction_transferred_when_ingested; 
+
 	void set_internal_uptake_constants( double dt ); // any time you update the cell volume or rates, should call this function. 
 
 	void register_microenvironment( Microenvironment* );

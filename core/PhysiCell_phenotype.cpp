@@ -893,10 +893,9 @@ void Molecular::sync_to_current_microenvironment( void )
 	}
 	else
 	{
-		internalized_substrates.resize( 0 , 0.0 ); 
-		internalized_substrate_release_fractions.resize( 0 , 0.0 ); 
-		substrate_creation_rates.resize( 0 , 0.0 ); 
-		substrate_use_rates.resize( 0 , 0.0 ); 
+		internalized_total_substrates.resize( 0 , 0.0 ); 
+		fraction_released_at_death.resize( 0 , 0.0 ); 
+		fraction_transferred_when_ingested.resize( 0, 0.0 ); 
 	}
 	return; 
 }
@@ -905,14 +904,31 @@ void Molecular::sync_to_microenvironment( Microenvironment* pNew_Microenvironmen
 {
 	pMicroenvironment = pNew_Microenvironment;
 	
-	internalized_substrates.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
-	internalized_substrate_release_fractions.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
-	substrate_creation_rates.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
-	substrate_use_rates.resize( pMicroenvironment->number_of_densities() , 0.0 ); 
+	int number_of_densities = pMicroenvironment->number_of_densities() ; 
+
+	internalized_total_substrates.resize( number_of_densities , 0.0 ); 
+	fraction_released_at_death.resize( number_of_densities , 0.0 ); 
+	fraction_transferred_when_ingested.resize( number_of_densities , 0.0 ); 
+	
+	return; 
+}
+
+void Molecular::sync_to_cell( Basic_Agent* pCell )
+{
+	delete pCell->internalized_substrates;
+	pCell->internalized_substrates = &internalized_total_substrates;
+	
+	delete pCell->fraction_released_at_death;
+	pCell->fraction_released_at_death = &fraction_released_at_death; 
+	
+	delete pCell->fraction_transferred_when_ingested; 
+	pCell->fraction_transferred_when_ingested = &fraction_transferred_when_ingested; 
 
 	return; 
 }
 
+
+/*
 void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
 {
 	// if this phenotype is not associated with a cell, exit 
@@ -952,15 +968,16 @@ void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
 	}
 
 	// now, call the functions 
-/*
-	if( pCell->functions.internal_substrate_function )
-	{ pCell->functions.internal_substrate_function( pCell,phenotype,dt);  }
-	if( pCell->functions.molecular_model_function )
-	{ pCell->functions.molecular_model_function( pCell,phenotype,dt);  }
-*/
+//	if( pCell->functions.internal_substrate_function )
+//	{ pCell->functions.internal_substrate_function( pCell,phenotype,dt);  }
+//	if( pCell->functions.molecular_model_function )
+//	{ pCell->functions.molecular_model_function( pCell,phenotype,dt);  }
+
 
 	return; 
 }
+*/
+
 
 Cell_Functions::Cell_Functions()
 {
@@ -977,10 +994,11 @@ Cell_Functions::Cell_Functions()
 	set_orientation = NULL; 
 	
 	contact_function = NULL; 
-	
+
+/*	
 	internal_substrate_function = NULL; 
 	molecular_model_function = NULL; 
-
+*/
 	return; 
 }
 
@@ -1021,7 +1039,6 @@ Bools::Bools()
 {
 	values.resize( 0 , true ); 
 	name_map.clear(); 
-	bool
 	return; 
 }
 

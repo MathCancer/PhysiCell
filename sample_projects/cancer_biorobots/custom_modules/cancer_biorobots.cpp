@@ -323,6 +323,9 @@ void setup_microenvironment( void )
 	
 	default_microenvironment_options.Dirichlet_activation_vector[1] = false;  // no Dirichlet for the chemoattractant 
 	default_microenvironment_options.Dirichlet_activation_vector[2] = false;  // no Dirichlet for the therapeutic  
+	
+	// set initial conditions 
+	default_microenvironment_options.initial_condition_vector = { 38.0 , 0.0, 0.0 }; 
 			
 	initialize_microenvironment(); 	
 

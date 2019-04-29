@@ -449,8 +449,11 @@ class Cell_Functions
 	void (*contact_function)(Cell* pMyself, Phenotype& my_phenotype, 
 		Cell* pOther, Phenotype& other_phenotype, double dt ); 
 		
+	/* prototyping / beta in 1.5.0 */ 
+/*	
 	void (*internal_substrate_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
 	void (*molecular_model_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
+*/
 	
 	Cell_Functions(); // done 
 };
@@ -482,13 +485,22 @@ class Molecular
 		// model much of this from Secretion 
 		Molecular(); 
  	
-		std::vector<double> internalized_substrates; // we'll set this to replace BioFVM's version  
-		std::vector<double> internalized_substrate_release_fractions; 
+		// we'll set this to replace BioFVM's version		
+		std::vector<double> internalized_total_substrates; 
+
+		// for each substrate, a fraction 0 <= f <= 1 of the 
+		// total internalized substrate is released back inot
+		// the environment at death 
+		std::vector<double> fraction_released_at_death; 
+
+		// for each substrate, a fraction 0 <= f <= 1 of the 
+		// total internalized substrate is transferred to the  
+		// predatory cell when ingested 
+		std::vector<double> fraction_transferred_when_ingested; 
 		
-		std::vector<double> substrate_creation_rates; 
-		std::vector<double> substrate_use_rates; 
-		
+		/* prototyping / beta in 1.5.0 */ 
 		// Boolean, Integer, and Double parameters
+/*		
 		std::vector<bool> bools; 
 		std::unordered_map<std::string,int> bool_name_map; 
 		std::string& bool_name( int i ); 
@@ -508,16 +520,18 @@ class Molecular
 		std::string& double_name( int i ); 
 		std::vector<std::string> double_units; 
 		double& access_double( std::string name ); 
-		
+*/
+	
 		// use this to properly size the secretion parameters to the microenvironment in 
 		// pMicroenvironment
 		void sync_to_current_microenvironment( void ); // done 
 		
-		void advance( Basic_Agent* pCell, Phenotype& phenotype , double dt ); 
-			// has to go somewhere else 
+//		void advance( Basic_Agent* pCell, Phenotype& phenotype , double dt ); 
 		
 		// use this to properly size the secretion parameters to the microenvironment 
 		void sync_to_microenvironment( Microenvironment* pNew_Microenvironment ); // done 
+		
+		void sync_to_cell( Basic_Agent* pCell ); 
 		
 };
 
