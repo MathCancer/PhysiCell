@@ -193,10 +193,16 @@ Basic_Agent::~Basic_Agent()
 	// total_ext / vol_voxel = total_ext / vol_voxel + fraction*total_internal / vol_voxel 
 	// density_ext += fraction * total_internal / vol_volume 
 	
+	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " 
+		<< *internalized_substrates << " " << std::endl; ; 
+	
 	// std::cout << "\t\t\t" << (*pS)(current_voxel_index) << "\t\t\t" << std::endl; 
 	*internalized_substrates /=  pS->voxels(current_voxel_index).volume; // turn to density 
 	*internalized_substrates *= *fraction_released_at_death;  // what fraction is released? 
 	
+	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " 
+		<< *internalized_substrates << " " << std::endl; ; 
+
 	// release this amount into the environment 
 	
 	(*pS)(current_voxel_index) += *internalized_substrates; 

@@ -465,6 +465,29 @@ void Death::trigger_death( int death_model_index )
 {
 	dead = true; 
 	current_death_model_index = death_model_index; 
+	
+/*	
+	// if so, change the cycle model to the current death model 
+	phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() ); 
+	
+	// also, turn off motility.
+	
+	phenotype.motility.is_motile = false; 
+	phenotype.motility.motility_vector.assign( 3, 0.0 ); 
+	functions.update_migration_bias = NULL;
+	
+	// turn off secretion, and reduce uptake by a factor of 10 
+	phenotype.secretion.set_all_secretion_to_zero();
+	phenotype.secretion.scale_all_uptake_by_factor( 0.10 );
+	
+	// make sure to run the death entry function 
+	if( phenotype.cycle.current_phase().entry_function )
+	{
+		phenotype.cycle.current_phase().entry_function( this, phenotype, dt_ ); 
+	}
+*/
+		
+	
 	return; 
 }
 

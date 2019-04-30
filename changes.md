@@ -68,6 +68,8 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 + In PhysiCell_standard_models, standard_volume_update_function is now fixed to update phenotype.volume.fluid. (This was not used in any mechanics or other calculations, so it does not affect prior modeling results.) 
 
 + Removed repeated parameters (attached_worker_migration_bias, unattached_worker_migration_bias) in the cancer biorobots sample project.
+
++ trigger_death() now works. 
  
 ### Notices for intended changes that may affect backwards compatibility:
  

@@ -310,7 +310,6 @@ Cell::Cell()
 	
 	phenotype = cell_defaults.phenotype; 
 	
-	// sync up molecular state
 	phenotype.molecular.sync_to_cell( this ); 
 	
 	// cell state should be fine by the default constructor 

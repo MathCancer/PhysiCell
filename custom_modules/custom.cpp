@@ -149,6 +149,7 @@ void create_cell_types( void )
 	
 	macrophage = cell_defaults; 
 	macrophage.functions.update_phenotype = macrophage_function; 
+	macrophage.phenotype.sync_to_functions( macrophage.functions ); 
 
 	// make this cell type randomly motile, less adhesive, greater survival, 
 	// and less proliferative 
@@ -207,7 +208,7 @@ void setup_microenvironment( void )
 	
 	// set properties 
 	microenvironment.set_density( 0 , "virus", "particles/micron^3" ); 
-	microenvironment.diffusion_coefficients[0] = 1e4; 
+	microenvironment.diffusion_coefficients[0] = parameters.doubles("viral_diffusion_coefficient"); 
 	microenvironment.decay_rates[0] = 0; 
 	
 	// set Dirichlet conditions 
@@ -218,6 +219,7 @@ void setup_microenvironment( void )
 	std::vector<double> bc_vector( 1 , 0.0 ); // 5% o2
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
 	
+	default_microenvironment_options.initial_condition_vector = { 0.0 }; 
 	// 
 	
 	// initialize BioFVM 
@@ -240,18 +242,28 @@ void setup_tissue( void )
 		
 	Cell* pC;
 
-	for( int n = 0 ; n < 500 ; n++ )
+	pC = create_cell(); 
+	pC->assign_position( 0.0,0.0, 0.0 );
+	pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 1; 
+
+	for( int n = 1 ; n < 500 ; n++ )
 	{
 		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
 		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
 		pC = create_cell(); 
 		pC->assign_position( x,y, 0.0 );
-		pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 10; 
+//		pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 0; 
 	}
 	// now create a motile cell 
 	
-	pC = create_cell( macrophage ); 
-	pC->assign_position( 15.0, -18.0, 0.0 );
+	for( int n= 0 ; n < parameters.ints( "number_of_macrophages" ); n++ )
+	{
+		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
+		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
+		pC = create_cell( macrophage ); 
+		pC->assign_position( x,y, 0.0 );
+	}
+	
 	
 	return; 
 }
@@ -275,17 +287,19 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 {
 	// start with flow cytometry coloring 
 	
-	std::vector<std::string> output = { "white" , "black" , "white", "black" }; 
+	std::vector<std::string> output = { "white" , "black" , "lightgrey", "black" }; 
 	static int nVirus = microenvironment.find_density_index( "virus" ); 
 	
-	static double denominator = parameters.doubles("burst_virion_count") 
-		- parameters.doubles( "min_virion_count" ); 
-		
+	static double min_virus = parameters.doubles( "min_virion_count" );
+	static double max_virus = parameters.doubles( "burst_virion_count" ); 
+	static double denominator = max_virus - min_virus + 1e-15; 
+				
 	// dead cells 
 	if( pCell->phenotype.death.dead == true )
 	{
-		 output[0] = "black"; 
-		 output[2] = "black"; 
+		 output[0] = "red"; 
+		 output[2] = "darkred"; 
+		 return output; 
 	}
 	
 	if( pCell->type != macrophage.type )
@@ -295,18 +309,20 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 		
 		double virus = pCell->phenotype.molecular.internalized_total_substrates[nVirus]; 
 		
-		if( pCell->phenotype.molecular.internalized_total_substrates[nVirus] > 0.01 )
+		if( pCell->phenotype.molecular.internalized_total_substrates[nVirus] >= min_virus )
 		{
-			double interp = (virus - parameters.doubles( "min_virion_count" ) )/ denominator;  
+			double interp = (virus - min_virus )/ denominator;  
 			if( interp > 1.0 )
 			{ interp = 1.0; } 
-			int Red = (int) floor( 255.0*(1-interp) ); 
-			int Green = (int) floor( 255.0*(1-interp) ); 
-			int Blue = (int) floor( 255.0 * interp ); 
+		
+			int Red   = (int) floor( 255.0*interp ); 
+			int Green = (int) floor( 255.0*interp ); 
+			int Blue  = (int) floor( 255.0 *(1-interp) ); 
 			
 			char szTempString [128];
 			sprintf( szTempString , "rgb(%u,%u,%u)", Red, Green, Blue );
 			output[0].assign( szTempString );
+			output[2].assign( szTempString );
 		}
 		
 	}
@@ -316,7 +332,7 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 
 void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	// bookeeping 
+	// bookkeeping 
 	
 	static int nVirus = microenvironment.find_density_index( "virus" ); 
 	
@@ -352,4 +368,40 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 }
 
 void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
-{ return; } 
+{
+	// bookkeeping
+	
+	static int nVirus = microenvironment.find_density_index( "virus" ); 
+	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
+	
+	// compare against viral load. Should I commit apoptosis? 
+	
+	double virus = phenotype.molecular.internalized_total_substrates[nVirus]; 
+	if( virus >= parameters.doubles("burst_virion_count") )
+	{
+		std::cout << "death! " << parameters.doubles("min_viron_count") << " "   
+			<< virus << " " << parameters.doubles("burst_virion_count") << std::endl; 
+		pCell->start_death( apoptosis_model_index );
+		pCell->functions.update_phenotype = NULL; 
+		return; 
+	}
+
+	// replicate virus particles inside me 
+	
+	if( virus >= parameters.doubles("min_virion_count") ) 
+	{
+		std::cout << pCell << " has enough ... " << virus << " " <<  std::endl; 
+		double new_virus = parameters.doubles( "viral_replication_rate" ); 
+		new_virus *= dt;
+		phenotype.molecular.internalized_total_substrates[nVirus] += new_virus; 
+	}
+//	static double implicit_Euler_constant = 
+//		(1.0 + dt * parameters.doubles("virus_digestion_rate") );
+//	phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
+	
+	
+	// if I have too many 
+	// if I have too many 
+
+	return; 
+} 
