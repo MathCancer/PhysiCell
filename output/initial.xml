@@ -11,9 +11,9 @@
 		</software>
 		<citation />
 		<current_time units="min">0.000000</current_time>
-		<current_runtime units="sec">0.043122</current_runtime>
-		<created>2019-04-30T04:06:32Z</created>
-		<last_modified>2019-04-30T04:06:32Z</last_modified>
+		<current_runtime units="sec">0.055699</current_runtime>
+		<created>2019-04-30T04:14:09Z</created>
+		<last_modified>2019-04-30T04:14:09Z</last_modified>
 	</metadata>
 	<microenvironment>
 		<domain name="microenvironment">
@@ -30,7 +30,7 @@
 				<variable name="virus" units="particles/micron^3" ID="0">
 					<physical_parameter_set>
 						<conditions />
-						<diffusion_coefficient units="micron^2/min">10000.000000</diffusion_coefficient>
+						<diffusion_coefficient units="micron^2/min">1000.000000</diffusion_coefficient>
 						<decay_rate units="1/min">0.000000</decay_rate>
 					</physical_parameter_set>
 				</variable>

@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2880</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">5760</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -97,7 +97,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>output</folder> <!-- use . for root --> 
+		<folder>output1</folder> <!-- use . for root --> 
 
 		<full_data>
 			<interval units="min">60</interval>
@@ -126,7 +126,7 @@
 		<viral_diffusion_coefficient type="double" units="micron^2/min" description="diffusion coefficient for viral particles">1e3</viral_diffusion_coefficient>
 		
 		<!-- macrophage properties --> 
-		<number_of_macrophages type="int" units="none" description="initial number of macrophages">0</number_of_macrophages> 
+		<number_of_macrophages type="int" units="none" description="initial number of macrophages">50</number_of_macrophages> 
 		<min_virion_detection_threshold type="double" units="none" description="minimal viral load for microphages to detect as infected">1</min_virion_detection_threshold>
 		<virus_digestion_rate type="double" units="1/min" description="rate that macrophages digest internalized viral particles">0.01</virus_digestion_rate> 
 		<macrophage_persistence_time type="double" units="min">15</macrophage_persistence_time>

@@ -175,6 +175,10 @@ void create_cell_types( void )
 
 	// Set cell-cell adhesion relative to other cells 
 	macrophage.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "macrophage_relative_adhesion" ); 
+	
+	// no birth 
+	macrophage.phenotype.cycle.data.transition_rate(G0G1_index, S_index ) = 0.0 ; 
+
 
 	// macrophages do not uptake viral particles 
 	macrophage.phenotype.secretion.uptake_rates[virus_index] = 
@@ -287,7 +291,7 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 {
 	// start with flow cytometry coloring 
 	
-	std::vector<std::string> output = { "white" , "black" , "lightgrey", "black" }; 
+	std::vector<std::string> output = { "magenta" , "black" , "magenta", "black" }; 
 	static int nVirus = microenvironment.find_density_index( "virus" ); 
 	
 	static double min_virus = parameters.doubles( "min_virion_count" );
@@ -330,6 +334,38 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 	return output; 
 }
 
+std::vector<Cell*> get_possible_neighbors( Cell* pCell )
+{
+	std::vector<Cell*> neighbors = {}; 
+
+	// First check the neighbors in my current voxel
+	std::vector<Cell*>::iterator neighbor;
+	std::vector<Cell*>::iterator end =
+		pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
+	for( neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
+	{ neighbors.push_back( *neighbor ); }
+
+	std::vector<int>::iterator neighbor_voxel_index;
+	std::vector<int>::iterator neighbor_voxel_index_end = 
+		pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].end();
+
+	for( neighbor_voxel_index = 
+		pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].begin();
+		neighbor_voxel_index != neighbor_voxel_index_end; 
+		++neighbor_voxel_index )
+	{
+		if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+			continue;
+		end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
+		for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
+		{ neighbors.push_back( *neighbor ); }
+	}
+	
+	return neighbors; 
+}
+
+
+
 void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// bookkeeping 
@@ -345,10 +381,12 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 	// check for contact with a cell
 	
 	Cell* pTestCell = NULL; 
+	std::vector<Cell*> neighbors = get_possible_neighbors(pCell);
 	
-	for( int n=0; n < pCell->cells_in_my_container().size() ; n++ )
+//	for( int n=0; n < pCell->cells_in_my_container().size() ; n++ )
+	for( int n=0; n < neighbors.size() ; n++ )
 	{
-		pTestCell = pCell->cells_in_my_container()[n]; 
+		pTestCell = neighbors[n]; 
 		// if it is not me and not a macrophage 
 		if( pTestCell != pCell && pTestCell->type != macrophage.type )
 		{
@@ -379,8 +417,6 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 	double virus = phenotype.molecular.internalized_total_substrates[nVirus]; 
 	if( virus >= parameters.doubles("burst_virion_count") )
 	{
-		std::cout << "death! " << parameters.doubles("min_viron_count") << " "   
-			<< virus << " " << parameters.doubles("burst_virion_count") << std::endl; 
 		pCell->start_death( apoptosis_model_index );
 		pCell->functions.update_phenotype = NULL; 
 		return; 
@@ -390,7 +426,6 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	if( virus >= parameters.doubles("min_virion_count") ) 
 	{
-		std::cout << pCell << " has enough ... " << virus << " " <<  std::endl; 
 		double new_virus = parameters.doubles( "viral_replication_rate" ); 
 		new_virus *= dt;
 		phenotype.molecular.internalized_total_substrates[nVirus] += new_virus; 
