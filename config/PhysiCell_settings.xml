@@ -97,7 +97,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>output1</folder> <!-- use . for root --> 
+		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
 			<interval units="min">60</interval>
@@ -124,9 +124,10 @@
 		<burst_virion_count type="double" units="none" description="max virion load, where infected cells lyse to release viral particles">1000</burst_virion_count>
 		<viral_internalization_rate type="double" units="1/min" description="internalization rate for viral particles">0.01</viral_internalization_rate> 
 		<viral_diffusion_coefficient type="double" units="micron^2/min" description="diffusion coefficient for viral particles">1e3</viral_diffusion_coefficient>
+		<number_of_infected_cells type="int" units="none" description="initial number of infected cells">3</number_of_infected_cells>
 		
 		<!-- macrophage properties --> 
-		<number_of_macrophages type="int" units="none" description="initial number of macrophages">50</number_of_macrophages> 
+		<number_of_macrophages type="int" units="none" description="initial number of macrophages">10 </number_of_macrophages> 
 		<min_virion_detection_threshold type="double" units="none" description="minimal viral load for microphages to detect as infected">1</min_virion_detection_threshold>
 		<virus_digestion_rate type="double" units="1/min" description="rate that macrophages digest internalized viral particles">0.01</virus_digestion_rate> 
 		<macrophage_persistence_time type="double" units="min">15</macrophage_persistence_time>

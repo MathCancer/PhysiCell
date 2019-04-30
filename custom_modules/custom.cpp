@@ -245,12 +245,19 @@ void setup_tissue( void )
 		microenvironment.mesh.bounding_box[1]; 
 		
 	Cell* pC;
+	
+	int number_of_infected_cells = parameters.ints( "number_of_infected_cells" ); 
 
-	pC = create_cell(); 
-	pC->assign_position( 0.0,0.0, 0.0 );
-	pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 1; 
+	for( int n = 0 ; n < number_of_infected_cells; n++ )
+	{
+		pC = create_cell(); 
+		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
+		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
+		pC->assign_position( x,y, 0.0 );
+		pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 1; 
+	}
 
-	for( int n = 1 ; n < 500 ; n++ )
+	for( int n = number_of_infected_cells ; n < 500 ; n++ )
 	{
 		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
 		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
