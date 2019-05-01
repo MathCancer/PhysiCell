@@ -282,93 +282,6 @@ void setup_tissue( void )
 		r += dr; 		
 	}
 	
-/*
-	pC = create_cell(); 
-	pC->assign_position( 0.0, 0.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -100, 0, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 100, 0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( 0, 100, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 0, -100, 0.0 );
-
-	
-	pC = create_cell(); 
-	pC->assign_position( 150.0, 150.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -150, -150, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( -150, 150, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 150, -150, 0.0 );
-	
-
-	pC = create_cell(); 
-	pC->assign_position( 50.0, 50.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -50, -50, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( -50, 50, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 50, -50, 0.0 );
-	
-
-	pC = create_cell(); 
-	pC->assign_position( 200.0, 0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -200, 0.0 , 0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 0,200, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position(0,-200 ,  0.0 );
-	
-	
-	pC = create_cell(); 
-	pC->assign_position( 250.0, 250.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -250, -250, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( -250, 250, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 250, -250, 0.0 );	
-	
-
-	pC = create_cell(); 
-	pC->assign_position( 300.0, 0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -300, 0.0 , 0 );
-	
-	pC = create_cell(); 
-	pC->assign_position( 0,300, 0.0 );
-	
-	pC = create_cell(); 
-	pC->assign_position(0,-300 ,  0.0 );
-	
-	// now create a motile cell 
-	
-	pC = create_cell( motile_cell ); 
-	pC->assign_position( 15.0, -18.0, 0.0 );
-*/
-	
 	return; 
 }
 
@@ -403,7 +316,7 @@ std::vector<double> integrate_total_substrates( void )
 	for( unsigned int n=0; n < (*all_cells).size(); n++ )
 	{
 		Cell* pC = (*all_cells)[n];
-		out += pC->internalized_substrates;
+		out += pC->phenotype.molecular.internalized_substrates;
 	}
 	
 	return out; 

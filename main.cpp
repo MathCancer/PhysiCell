@@ -197,6 +197,8 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
+				
+				std::cout << "Total substrates " << integrate_total_substrates() << std::endl; 
 			}
 
 			// update the microenvironment

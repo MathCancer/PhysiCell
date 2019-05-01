@@ -121,18 +121,21 @@
 		<!-- virus properties --> 
 		<viral_replication_rate type="double" units="viral particles/min" description="rate at which infected cells create new viral particles">1</viral_replication_rate> 
 		<min_virion_count type="double" units="none" description="minimum number of virions to start replication">1</min_virion_count>
-		<burst_virion_count type="double" units="none" description="max virion load, where infected cells lyse to release viral particles">1000</burst_virion_count>
-		<viral_internalization_rate type="double" units="1/min" description="internalization rate for viral particles">0.01</viral_internalization_rate> 
+		<burst_virion_count type="double" units="none" description="max virion load, where infected cells lyse to release viral particles">100</burst_virion_count>
+		<viral_internalization_rate type="double" units="1/min" description="internalization rate for viral particles">10</viral_internalization_rate> 
 		<viral_diffusion_coefficient type="double" units="micron^2/min" description="diffusion coefficient for viral particles">1e3</viral_diffusion_coefficient>
-		<number_of_infected_cells type="int" units="none" description="initial number of infected cells">3</number_of_infected_cells>
+		<number_of_infected_cells type="int" units="none" description="initial number of infected cells">10</number_of_infected_cells>
+		
+		<!-- virus diffusion coefficient ~ 1e3 micron^2/min : https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105894 --> 
 		
 		<!-- macrophage properties --> 
-		<number_of_macrophages type="int" units="none" description="initial number of macrophages">10 </number_of_macrophages> 
+		<number_of_macrophages type="int" units="none" description="initial number of macrophages">50</number_of_macrophages> 
 		<min_virion_detection_threshold type="double" units="none" description="minimal viral load for microphages to detect as infected">1</min_virion_detection_threshold>
 		<virus_digestion_rate type="double" units="1/min" description="rate that macrophages digest internalized viral particles">0.01</virus_digestion_rate> 
 		<macrophage_persistence_time type="double" units="min">15</macrophage_persistence_time>
-		<macrophage_migration_speed type="double" units="micron/min">0.5</macrophage_migration_speed> 
-		<macrophage_relative_adhesion type="double" units="dimensionless">0.05</macrophage_relative_adhesion>
+		<macrophage_migration_speed type="double" units="micron/min">1</macrophage_migration_speed> 
+		<macrophage_migration_bias type="double" units="dimensionless">0.1</macrophage_migration_bias> 
+		<macrophage_relative_adhesion type="double" units="dimensionless">0.8</macrophage_relative_adhesion>
 				
 	</user_parameters>
 	

@@ -149,6 +149,7 @@ void create_cell_types( void )
 	
 	macrophage = cell_defaults; 
 	macrophage.functions.update_phenotype = macrophage_function; 
+	macrophage.functions.update_migration_bias = macrophage_chemotaxis; 
 	macrophage.phenotype.sync_to_functions( macrophage.functions ); 
 
 	// make this cell type randomly motile, less adhesive, greater survival, 
@@ -397,11 +398,21 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 		// if it is not me and not a macrophage 
 		if( pTestCell != pCell && pTestCell->type != macrophage.type )
 		{
+			// calculate distance to the cell 
+			std::vector<double> displacement = pTestCell->position;
+			displacement -= pCell->position;
+			double distance = norm( displacement ); 
+			
+			double max_distance = pCell->phenotype.geometry.radius + 
+				pTestCell->phenotype.geometry.radius; 
+			max_distance *= 1.1; 
+			
 			// if it is not a macrophage, test for viral load 
 			// if high viral load, eat it. 
 		
 			if( pTestCell->phenotype.molecular.internalized_total_substrates[nVirus] 
-				> parameters.doubles("min_virion_detection_threshold") )
+				> parameters.doubles("min_virion_detection_threshold") &&
+				distance < max_distance )
 			{
 				std::cout << "nom nom nom" << std::endl; 
 				pCell->ingest_cell( pTestCell ); 
@@ -424,6 +435,7 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 	double virus = phenotype.molecular.internalized_total_substrates[nVirus]; 
 	if( virus >= parameters.doubles("burst_virion_count") )
 	{
+		std::cout << "burst!" << std::endl; 
 		pCell->start_death( apoptosis_model_index );
 		pCell->functions.update_phenotype = NULL; 
 		return; 
@@ -447,3 +459,40 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 	return; 
 } 
+
+void macrophage_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	static double bias = parameters.doubles("macrophage_migration_bias");
+	static int nVirus = microenvironment.find_density_index( "virus" ); 
+	
+	phenotype.motility.migration_bias = bias; 
+	
+	phenotype.motility.migration_bias_direction = pCell->nearest_gradient( nVirus ); 
+	double denominator =  norm( phenotype.motility.migration_bias_direction ) + 1e-17; 
+	
+	phenotype.motility.migration_bias_direction /= denominator; 
+	
+	return; 
+}
+
+std::vector<double> integrate_total_substrates( void )
+{
+	// start with 0 vector 
+	std::vector<double> out( microenvironment.number_of_densities() , 0.0 ); 
+
+	// integrate extracellular substrates 
+	for( unsigned int n = 0; n < microenvironment.number_of_voxels() ; n++ )
+	{
+		// out = out + microenvironment(n) * dV(n) 
+		axpy( &out , microenvironment.mesh.voxels[n].volume , microenvironment(n) ); 
+	}
+
+	// inte
+	for( unsigned int n=0; n < (*all_cells).size(); n++ )
+	{
+		Cell* pC = (*all_cells)[n];
+		out += pC->phenotype.molecular.internalized_total_substrates;
+	}
+	
+	return out; 
+}

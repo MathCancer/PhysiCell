@@ -83,6 +83,8 @@ extern Cell_Definition macrophage;
 void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt );
 void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt );
 
+void macrophage_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt );
+
 // setup functions to help us along 
 
 void create_cell_types( void );
@@ -95,3 +97,6 @@ void setup_microenvironment( void );
 
 std::vector<std::string> my_coloring_function( Cell* );
 std::vector<std::string> viral_coloring_function( Cell* pCell );
+
+std::vector<double> integrate_total_substrates( void ); 
+
