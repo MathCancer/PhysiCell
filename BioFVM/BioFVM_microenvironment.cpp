@@ -1076,7 +1076,7 @@ Microenvironment_Options::Microenvironment_Options()
 	
 	calculate_gradients = false; 
 	
-	track_internalized_substrates_in_each_agent = true; 
+	track_internalized_substrates_in_each_agent = false; 
 	
 	return; 
 }

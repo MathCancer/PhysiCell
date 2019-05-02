@@ -124,7 +124,7 @@
 		<burst_virion_count type="double" units="none" description="max virion load, where infected cells lyse to release viral particles">100</burst_virion_count>
 		<viral_internalization_rate type="double" units="1/min" description="internalization rate for viral particles">10</viral_internalization_rate> 
 		<viral_diffusion_coefficient type="double" units="micron^2/min" description="diffusion coefficient for viral particles">1e3</viral_diffusion_coefficient>
-		<number_of_infected_cells type="int" units="none" description="initial number of infected cells">10</number_of_infected_cells>
+		<number_of_infected_cells type="int" units="none" description="initial number of infected cells">1</number_of_infected_cells>
 		
 		<!-- virus diffusion coefficient ~ 1e3 micron^2/min : https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105894 --> 
 		
@@ -135,7 +135,7 @@
 		<macrophage_persistence_time type="double" units="min">15</macrophage_persistence_time>
 		<macrophage_migration_speed type="double" units="micron/min">1</macrophage_migration_speed> 
 		<macrophage_migration_bias type="double" units="dimensionless">0.1</macrophage_migration_bias> 
-		<macrophage_relative_adhesion type="double" units="dimensionless">0.8</macrophage_relative_adhesion>
+		<macrophage_relative_adhesion type="double" units="dimensionless">0.05</macrophage_relative_adhesion>
 				
 	</user_parameters>
 	
