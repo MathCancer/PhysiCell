@@ -556,6 +556,8 @@ class Phenotype
 	
 	void sync_to_functions( Cell_Functions& functions ); // done 
 	
+	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 
+	
 	// make sure cycle, death, etc. are synced to the defaults. 
 	void sync_to_default_functions( void ); // done 
 };

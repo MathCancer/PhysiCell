@@ -1071,6 +1071,15 @@ int Bools::size( void )
 { return values.size(); } 
 
 
+void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
+{
+	secretion.sync_to_microenvironment( pMicroenvironment ); 
+	molecular.sync_to_microenvironment( pMicroenvironment ); 
+
+	return; 
+}
+
+
 
 };
 

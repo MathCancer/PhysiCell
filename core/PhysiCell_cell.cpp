@@ -999,5 +999,25 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	return; 
 }
 
+void Cell::lyse_cell( void )
+{
+	flag_for_removal(); 
+	// mark it as dead 
+	phenotype.death.dead = true; 
+	// set secretion and uptake to zero 
+	phenotype.secretion.set_all_secretion_to_zero( );  
+	phenotype.secretion.set_all_uptake_to_zero( ); 
+	
+	// deactivate all custom function 
+	functions.custom_cell_rule = NULL; 
+	functions.update_phenotype = NULL; 
+	functions.contact_function = NULL; 
+	
+	// set it to zero mechanics 
+	functions.custom_cell_rule = NULL; 
+
+	return; 
+}
+
 };
 

@@ -1058,7 +1058,7 @@ Microenvironment_Options::Microenvironment_Options()
 	Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 1.0 ); 
 	Dirichlet_activation_vector.assign( pMicroenvironment->number_of_densities() , true ); 
 	
-	initial_condition_vector = Dirichlet_condition_vector; 
+	initial_condition_vector.resize(0); //  = Dirichlet_condition_vector; 
 	
 	// set a far-field value for oxygen (assumed to be in the first field)
 	Dirichlet_condition_vector[0] = 38.0; 
@@ -1129,6 +1129,17 @@ void initialize_microenvironment( void )
 	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
 
 	// set the initial densities to the values set in the initial_condition_vector
+	
+	// if the initial condition vector has not been set, use the Dirichlet condition vector 
+	if( default_microenvironment_options.initial_condition_vector.size() == 0 )
+	{
+		std::cout << "BioFVM Warning: Initial conditions not set. " << std::endl 
+				  << "                Using Dirichlet condition vector to set initial substrate values!" << std::endl 
+				  << "                In the future, set default_microenvironment_options.initial_condition_vector." 
+				  << std::endl << std::endl;  
+		default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector; 
+	}
+	
 	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
 	

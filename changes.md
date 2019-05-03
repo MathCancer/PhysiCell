@@ -47,13 +47,15 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 
 + added functions to Cell_Functions class / 
 
-+ 
++ add itinitial condition vector ot microenvironment
  
 ### Minor new features and changes: 
  
 + Add void Microenvironment::update_dirichlet_node( int voxel_index , int substrate_index , double new_value ) based on pc4nanobio changes, whihc allows you to update a single substrate's dirichlet condition at specific voxel, rather than all of them. 
 
-
++ 	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 
+ 
+ 
  
 ### Beta features (not fully supported):
  

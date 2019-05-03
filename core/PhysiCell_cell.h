@@ -174,6 +174,7 @@ class Cell : public Basic_Agent
 	void flag_for_removal( void ); // done 
 	
 	void start_death( int death_model_index ); 
+	void lyse_cell( void ); 
 
 	Cell* divide( void );
 	void die( void );
