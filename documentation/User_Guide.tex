@@ -495,9 +495,6 @@ and any other (BSD-compatible) dependencies are kept here.
 \smallcode{output} Some examples will put their outputs here. 
 \item 
 \smallcode{povray} This includes some basic utilities for visualization by povray (an open source raytracing package) \cite{ref:povray}. 
-% \item 
-% \smallcode{template\_projects} This directory once stored template projects for 2D and 3D. These have been 
-% moved to the sample projects as of Version 1.2.2. This directory will be deprecated. 
 \item 
 \smallcode{sample\_projects} This directory includes sample projects, including 2D and 3D template projects 
 and at least the four sample projects in \cite{ref:PhysiCell}.  A good start to a new 
@@ -506,34 +503,6 @@ which will populate the \v|main.cpp|, \v|Makefile|, and \v|./custom_modules| wit
 codes to get started. See Section \ref{sec:templates} for more information on the 
 template projects, and Section \ref{sec:sample_projects} for the full list of sample 
 projects and instructions to build them. 
-
-% Here are the sample projects included as of Version 1.2.2: 
-% \begin{enumerate}
-% \item 
-% \smallcode{biorobots} is a 2-D example of 3 cell types: cargo cells, worker cells (which seek out cargo cells and 
-% haul them to a destination), and director cells (which attract worker cells). 
-
-% \item 
-% \smallcode{cancer\_biorobots} extends the biorobots example to (1) simulate a 2-D tumor that develops a necrotic 
-% core, (2) so that cargo cells are hauled towards hypoxic tumor regions, and (3) so that released cargo cells secrete 
-% a chemotherapeutic compounds. 
-
-% \item
-% \smallcode{heterogeneity} simulates a 2-D tumor with heterogeneous ``genetics'' that drive differential proliferation. 
-
-% \item 
-% \smallcode{cancer\_immune} extends the heterogeneity example to 3D, and introduces a new immune 
-% cell type (modeling T cells) that migrate towards tumor cells, temporarily adhere, test for immunogenicity, 
-% and initiate apoptosis. 
-
-% \item 
-% \smallcode{template2D} is the template for a 2-D project. See the description above and 
-% Section \ref{sec:templates}. 
-
-% \item 
-% \smallcode{template3D} is the template for a 3-D project. See the description above and 
-% Section \ref{sec:templates}. 
-% \end{enumerate}
 
 \end{enumerate}
 
@@ -682,6 +651,15 @@ a chemotherapeutic compounds.
 \smallcode{cancer-immune-sample} extends the heterogeneity example to 3D, and introduces a new immune 
 cell type (modeling T cells) that migrate towards tumor cells, temporarily adhere, test for immunogenicity, 
 and initiate apoptosis. 
+
+\item 
+\smallcode{virus-macrophage-sample} simulates a basic virus that diffuses, is uptaken by cells, replicates, 
+and then is released in cell lysis. Macrophages eat and degrade infected cells. This is a test of internalized 
+substrate tracking first released in PhysiCell 1.5.0. 
+
+\item 
+\smallcode{beta-testing} is a small project that can be used for beta testing new features. Don't count on 
+it remaining unchanged from release to release. 
 
 \item 
 \smallcode{template2D} is the template for a 2-D project. See Section \ref{sec:templates}. 
