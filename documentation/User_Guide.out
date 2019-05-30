@@ -64,60 +64,66 @@
 \BOOKMARK [3][-]{subsubsection.13.2.1}{Member data}{subsection.13.2}% 64
 \BOOKMARK [3][-]{subsubsection.13.2.2}{Member functions}{subsection.13.2}% 65
 \BOOKMARK [2][-]{subsection.13.3}{Structure of PhysiCell XML parameter files}{section.13}% 66
-\BOOKMARK [1][-]{section.14}{PhysiCell Outputs }{}% 67
-\BOOKMARK [2][-]{subsection.14.1}{Virtual Pathology}{section.14}% 68
-\BOOKMARK [3][-]{subsubsection.14.1.1}{SVG functions }{subsection.14.1}% 69
-\BOOKMARK [3][-]{subsubsection.14.1.2}{Pathology functions }{subsection.14.1}% 70
-\BOOKMARK [3][-]{subsubsection.14.1.3}{Cell coloring functions }{subsection.14.1}% 71
-\BOOKMARK [3][-]{subsubsection.14.1.4}{Examples of custom cell coloring functions}{subsection.14.1}% 72
-\BOOKMARK [2][-]{subsection.14.2}{MultiCellDS digital simulation snapshots }{section.14}% 73
-\BOOKMARK [3][-]{subsubsection.14.2.1}{Reading PhysiCell snapshots in MATLAB}{subsection.14.2}% 74
-\BOOKMARK [2][-]{subsection.14.3}{Other outputs }{section.14}% 75
-\BOOKMARK [1][-]{section.15}{Key initialization functions }{}% 76
-\BOOKMARK [1][-]{section.16}{Key global data structures }{}% 77
-\BOOKMARK [2][-]{subsection.16.1}{Global strings}{section.16}% 78
-\BOOKMARK [2][-]{subsection.16.2}{Default microenvironment }{section.16}% 79
-\BOOKMARK [2][-]{subsection.16.3}{Default cell definition }{section.16}% 80
-\BOOKMARK [2][-]{subsection.16.4}{A list of all cells}{section.16}% 81
-\BOOKMARK [2][-]{subsection.16.5}{MultiCellDS options }{section.16}% 82
-\BOOKMARK [3][-]{subsubsection.16.5.1}{Software metadata}{subsection.16.5}% 83
-\BOOKMARK [3][-]{subsubsection.16.5.2}{Citation metadata}{subsection.16.5}% 84
-\BOOKMARK [3][-]{subsubsection.16.5.3}{Person metadata}{subsection.16.5}% 85
-\BOOKMARK [2][-]{subsection.16.6}{SVG options }{section.16}% 86
-\BOOKMARK [2][-]{subsection.16.7}{PhysiCell Constants }{section.16}% 87
-\BOOKMARK [1][-]{section.17}{Standard models }{}% 88
-\BOOKMARK [2][-]{subsection.17.1}{Cell Cycle Models }{section.17}% 89
-\BOOKMARK [3][-]{subsubsection.17.1.1}{Live \(live\) code: PhysiCell\137constants::live\137cells\137cycle\137model\)}{subsection.17.1}% 90
-\BOOKMARK [3][-]{subsubsection.17.1.2}{Ki-67 Basic \(Ki67\137basic\) \(Code: PhysiCell\137constants::basic\137Ki67\137cycle\137model\)}{subsection.17.1}% 91
-\BOOKMARK [3][-]{subsubsection.17.1.3}{Ki-67 Advanced \(Ki67\137advanced\) \(code: PhysiCell\137constants::advanced\137Ki67\137cycle\137model\)}{subsection.17.1}% 92
-\BOOKMARK [3][-]{subsubsection.17.1.4}{Flow Cytometry \(flow\137cytometry\137cycle\137model\) \(code: PhysiCell\137constants::flow\137cytometry\137cycle\137model\)}{subsection.17.1}% 93
-\BOOKMARK [3][-]{subsubsection.17.1.5}{Flow Cytometry Separated \(flow\137cytometry\137separated\137cycle\137model\) \(code: PhysiCell\137constants::flow\137cytometry\137separated\137cycle\137model\)}{subsection.17.1}% 94
-\BOOKMARK [3][-]{subsubsection.17.1.6}{Cycling-Quiescent \(cycling\137quiescent\) \(Code: PhysiCell\137constants::cycling\137quiescent\137model\)}{subsection.17.1}% 95
-\BOOKMARK [2][-]{subsection.17.2}{Death Cycle Models}{section.17}% 96
-\BOOKMARK [3][-]{subsubsection.17.2.1}{Apoptosis \(apoptosis\) \(code: PhysiCell\137constants::apoptosis\137death\137model\)}{subsection.17.2}% 97
-\BOOKMARK [3][-]{subsubsection.17.2.2}{Necrosis \(necrosis\) \(code: PhysiCell\137constants::necrosis\137death\137model\)}{subsection.17.2}% 98
-\BOOKMARK [2][-]{subsection.17.3}{Volume model \(standard\137volume\137update\137function\)}{section.17}% 99
-\BOOKMARK [2][-]{subsection.17.4}{Cell velocity model \(standard\137update\137cell\137velocity\)}{section.17}% 100
-\BOOKMARK [2][-]{subsection.17.5}{Up orientation model \(up\137orientation\)}{section.17}% 101
-\BOOKMARK [2][-]{subsection.17.6}{Oxygen-dependent phenotype \040\(update\137cell\137and\137death\137parameters\137O2\137based\)}{section.17}% 102
-\BOOKMARK [1][-]{section.18}{Examples}{}% 103
-\BOOKMARK [2][-]{subsection.18.1}{Working with Cell functions}{section.18}% 104
-\BOOKMARK [3][-]{subsubsection.18.1.1}{Example: a custom volume model}{subsection.18.1}% 105
-\BOOKMARK [3][-]{subsubsection.18.1.2}{Example: a custom migration bias}{subsection.18.1}% 106
-\BOOKMARK [3][-]{subsubsection.18.1.3}{Example: a custom cell rule}{subsection.18.1}% 107
-\BOOKMARK [3][-]{subsubsection.18.1.4}{Example: a custom phenotype update function}{subsection.18.1}% 108
-\BOOKMARK [3][-]{subsubsection.18.1.5}{Example: a custom velocity update function}{subsection.18.1}% 109
-\BOOKMARK [3][-]{subsubsection.18.1.6}{Example: analytical basement membrane functions}{subsection.18.1}% 110
-\BOOKMARK [3][-]{subsubsection.18.1.7}{Example: a custom cell orientation function}{subsection.18.1}% 111
-\BOOKMARK [2][-]{subsection.18.2}{Cell cycle models}{section.18}% 112
-\BOOKMARK [3][-]{subsubsection.18.2.1}{Creating a custom cell cycle model}{subsection.18.2}% 113
-\BOOKMARK [3][-]{subsubsection.18.2.2}{Adding an arrest function}{subsection.18.2}% 114
-\BOOKMARK [3][-]{subsubsection.18.2.3}{Adding a custom phase entry function}{subsection.18.2}% 115
-\BOOKMARK [1][-]{section.19}{Future}{}% 116
-\BOOKMARK [1][-]{section.20}{Some notes on parameter values}{}% 117
-\BOOKMARK [2][-]{subsection.20.1}{Live cycle model}{section.20}% 118
-\BOOKMARK [2][-]{subsection.20.2}{Ki67 Basic model}{section.20}% 119
-\BOOKMARK [2][-]{subsection.20.3}{Ki67 Advanced model}{section.20}% 120
-\BOOKMARK [2][-]{subsection.20.4}{Flow Cytometry model}{section.20}% 121
-\BOOKMARK [2][-]{subsection.20.5}{Separated Flow Cytometry model}{section.20}% 122
-\BOOKMARK [1][-]{section.21}{Acknowledgements}{}% 123
+\BOOKMARK [2][-]{subsection.13.4}{User Parameters}{section.13}% 67
+\BOOKMARK [3][-]{subsubsection.13.4.1}{Adding User Parameters to an XML Configuration File}{subsection.13.4}% 68
+\BOOKMARK [3][-]{subsubsection.13.4.2}{Accessing User Parameters in a Project}{subsection.13.4}% 69
+\BOOKMARK [3][-]{subsubsection.13.4.3}{User Parameters Technical Details}{subsection.13.4}% 70
+\BOOKMARK [1][-]{section.14}{PhysiCell Outputs }{}% 71
+\BOOKMARK [2][-]{subsection.14.1}{Virtual Pathology}{section.14}% 72
+\BOOKMARK [3][-]{subsubsection.14.1.1}{SVG functions }{subsection.14.1}% 73
+\BOOKMARK [3][-]{subsubsection.14.1.2}{Pathology functions }{subsection.14.1}% 74
+\BOOKMARK [3][-]{subsubsection.14.1.3}{Cell coloring functions }{subsection.14.1}% 75
+\BOOKMARK [3][-]{subsubsection.14.1.4}{Examples of custom cell coloring functions}{subsection.14.1}% 76
+\BOOKMARK [2][-]{subsection.14.2}{MultiCellDS digital simulation snapshots }{section.14}% 77
+\BOOKMARK [3][-]{subsubsection.14.2.1}{Reading PhysiCell snapshots in MATLAB}{subsection.14.2}% 78
+\BOOKMARK [2][-]{subsection.14.3}{Other outputs }{section.14}% 79
+\BOOKMARK [1][-]{section.15}{Key initialization functions }{}% 80
+\BOOKMARK [1][-]{section.16}{Key global data structures }{}% 81
+\BOOKMARK [2][-]{subsection.16.1}{Global strings}{section.16}% 82
+\BOOKMARK [2][-]{subsection.16.2}{Default microenvironment }{section.16}% 83
+\BOOKMARK [2][-]{subsection.16.3}{Default cell definition }{section.16}% 84
+\BOOKMARK [2][-]{subsection.16.4}{A list of all cells}{section.16}% 85
+\BOOKMARK [2][-]{subsection.16.5}{MultiCellDS options }{section.16}% 86
+\BOOKMARK [3][-]{subsubsection.16.5.1}{Software metadata}{subsection.16.5}% 87
+\BOOKMARK [3][-]{subsubsection.16.5.2}{Citation metadata}{subsection.16.5}% 88
+\BOOKMARK [3][-]{subsubsection.16.5.3}{Person metadata}{subsection.16.5}% 89
+\BOOKMARK [2][-]{subsection.16.6}{SVG options }{section.16}% 90
+\BOOKMARK [2][-]{subsection.16.7}{PhysiCell Constants }{section.16}% 91
+\BOOKMARK [2][-]{subsection.16.8}{User Parameters}{section.16}% 92
+\BOOKMARK [1][-]{section.17}{Standard models }{}% 93
+\BOOKMARK [2][-]{subsection.17.1}{Cell Cycle Models }{section.17}% 94
+\BOOKMARK [3][-]{subsubsection.17.1.1}{Live \(live\) code: PhysiCell\137constants::live\137cells\137cycle\137model\)}{subsection.17.1}% 95
+\BOOKMARK [3][-]{subsubsection.17.1.2}{Ki-67 Basic \(Ki67\137basic\) \(Code: PhysiCell\137constants::basic\137Ki67\137cycle\137model\)}{subsection.17.1}% 96
+\BOOKMARK [3][-]{subsubsection.17.1.3}{Ki-67 Advanced \(Ki67\137advanced\) \(code: PhysiCell\137constants::advanced\137Ki67\137cycle\137model\)}{subsection.17.1}% 97
+\BOOKMARK [3][-]{subsubsection.17.1.4}{Flow Cytometry \(flow\137cytometry\137cycle\137model\) \(code: PhysiCell\137constants::flow\137cytometry\137cycle\137model\)}{subsection.17.1}% 98
+\BOOKMARK [3][-]{subsubsection.17.1.5}{Flow Cytometry Separated \(flow\137cytometry\137separated\137cycle\137model\) \(code: PhysiCell\137constants::flow\137cytometry\137separated\137cycle\137model\)}{subsection.17.1}% 99
+\BOOKMARK [3][-]{subsubsection.17.1.6}{Cycling-Quiescent \(cycling\137quiescent\) \(Code: PhysiCell\137constants::cycling\137quiescent\137model\)}{subsection.17.1}% 100
+\BOOKMARK [2][-]{subsection.17.2}{Death Cycle Models}{section.17}% 101
+\BOOKMARK [3][-]{subsubsection.17.2.1}{Apoptosis \(apoptosis\) \(code: PhysiCell\137constants::apoptosis\137death\137model\)}{subsection.17.2}% 102
+\BOOKMARK [3][-]{subsubsection.17.2.2}{Necrosis \(necrosis\) \(code: PhysiCell\137constants::necrosis\137death\137model\)}{subsection.17.2}% 103
+\BOOKMARK [2][-]{subsection.17.3}{Volume model \(standard\137volume\137update\137function\)}{section.17}% 104
+\BOOKMARK [2][-]{subsection.17.4}{Cell velocity model \(standard\137update\137cell\137velocity\)}{section.17}% 105
+\BOOKMARK [2][-]{subsection.17.5}{Up orientation model \(up\137orientation\)}{section.17}% 106
+\BOOKMARK [2][-]{subsection.17.6}{Oxygen-dependent phenotype \040\(update\137cell\137and\137death\137parameters\137O2\137based\)}{section.17}% 107
+\BOOKMARK [1][-]{section.18}{Functions for Random Events}{}% 108
+\BOOKMARK [1][-]{section.19}{Examples}{}% 109
+\BOOKMARK [2][-]{subsection.19.1}{Working with Cell functions}{section.19}% 110
+\BOOKMARK [3][-]{subsubsection.19.1.1}{Example: a custom volume model}{subsection.19.1}% 111
+\BOOKMARK [3][-]{subsubsection.19.1.2}{Example: a custom migration bias}{subsection.19.1}% 112
+\BOOKMARK [3][-]{subsubsection.19.1.3}{Example: a custom cell rule}{subsection.19.1}% 113
+\BOOKMARK [3][-]{subsubsection.19.1.4}{Example: a custom phenotype update function}{subsection.19.1}% 114
+\BOOKMARK [3][-]{subsubsection.19.1.5}{Example: a custom velocity update function}{subsection.19.1}% 115
+\BOOKMARK [3][-]{subsubsection.19.1.6}{Example: analytical basement membrane functions}{subsection.19.1}% 116
+\BOOKMARK [3][-]{subsubsection.19.1.7}{Example: a custom cell orientation function}{subsection.19.1}% 117
+\BOOKMARK [2][-]{subsection.19.2}{Cell cycle models}{section.19}% 118
+\BOOKMARK [3][-]{subsubsection.19.2.1}{Creating a custom cell cycle model}{subsection.19.2}% 119
+\BOOKMARK [3][-]{subsubsection.19.2.2}{Adding an arrest function}{subsection.19.2}% 120
+\BOOKMARK [3][-]{subsubsection.19.2.3}{Adding a custom phase entry function}{subsection.19.2}% 121
+\BOOKMARK [1][-]{section.20}{Future}{}% 122
+\BOOKMARK [1][-]{section.21}{Some notes on parameter values}{}% 123
+\BOOKMARK [2][-]{subsection.21.1}{Live cycle model}{section.21}% 124
+\BOOKMARK [2][-]{subsection.21.2}{Ki67 Basic model}{section.21}% 125
+\BOOKMARK [2][-]{subsection.21.3}{Ki67 Advanced model}{section.21}% 126
+\BOOKMARK [2][-]{subsection.21.4}{Flow Cytometry model}{section.21}% 127
+\BOOKMARK [2][-]{subsection.21.5}{Separated Flow Cytometry model}{section.21}% 128
+\BOOKMARK [1][-]{section.22}{Acknowledgements}{}% 129

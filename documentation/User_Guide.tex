@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 \newcommand{\Version}{1.5.0} 
-\newcommand{\ReleaseDate}{October 13, 2018} 
+\newcommand{\ReleaseDate}{May 30, 2019} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -109,37 +109,27 @@ urlcolor=blue
 \setlength{\parskip}{8pt}
 
 \section{Introduction and citing PhysiCell \DONE}
-This user guide will teach you how to download and use PhysiCell \cite{ref:PhysiCell}, as well as document the key 
-classes and functions. Wherever possible, it will demonstrate with specific examples. 
-Please note that this guide will be periodically updated.
-Users should check \href{http://PhysiCell.MathCancer.org}{PhysiCell.MathCancer.org} for the latest version. 
-The PhysiCell method paper is in revision for additional peer review at PLoS Computational Biology \cite{ref:PhysiCell}. 
+This user guide will teach you how to download and use PhysiCell \cite{ref:PhysiCell}, 
+as well as document the key classes and functions. Wherever possible, it will demonstrate 
+with specific examples. Please note that this guide will be periodically updated. Users 
+should check \href{http://PhysiCell.MathCancer.org}{PhysiCell.MathCancer.org} for the latest version. 
+The PhysiCell method paper was published in PLoS Computational Biology \cite{ref:PhysiCell}. \\
+\\
+If you use PhysiCell, please cite it as: \\
+\\
+\phantom{ }\hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
+We implemented and solved our model using PhysiCell (Version \Version) [1]. \\
 
-If you use PhysiCell, please cite it as: 
+[1] A. Ghaffarizadeh, R. Heiland, S.H. Friedman, S.M. Mumenthaler, and P. Macklin. PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: \href{https://dx.doi.org/10.1371/journal.pcbi.1005991}{10.1371/journal.pcbi.1005991}. \\
 
-\hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
-We built our model using PhysiCell (Version \Version) [1]. \\
+Because PhysiCell makes extensive use of BioFVM, we suggest you also cite it. Here's a good way to do that:  \\
 
+We implemented and solved the model using PhysiCell (Version \Version) [1], with BioFVM [2] to solve the transport equations. \\
 
-[1] A. Ghaffarizadeh, R. Heiland, S.H. Friedman, S.M. Mumenthaler, and P. Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems, 
-PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: \href{https://dx.doi.org/10.1371/journal.pcbi.1005991}{10.1371/journal.pcbi.1005991}. 
-% bioRxiv 088773, 2017. 
-% 
-preprint DOI: 
-\href{http://dx.doi.org/10.1101/088773}{10.1101/088773}. \\
+[1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin. PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: \href{https://dx.doi.org/10.1371/journal.pcbi.1005991}{10.1371/journal.pcbi.1005991} \\
+
+[2] A Ghaffarizadeh, SH Friedman, and P Macklin. BioFVM: an efficient parallelized diffusive transport solver for 3-D biological simulations, Bioinformatics 32(8): 1256-8, 2016. DOI: \href{https://dx.doi.org/10.1093/bioinformatics/btv730}{10.1093/bioinformatics/btv730}  
 }
-
-% We will update this citation information as PhysiCell progresses through peer review.
-
-% If you prefer to cite a peer-reviewed journal publication while waiting for our 
-% main method paper, you you can also cite an earlier (2-D) 
-% version of the code by our 2012 paper in the Journal of Theoretical Biology:
-
-% \hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
-% P. Macklin, M.E. Edgerton, A.M. Thompson, and V. Cristini. 
-% Patient-calibrated agent-based modelling of ductal carcinoma in situ (DCIS): From microscopic measurements to macroscopic predictions of clinical progression. J. Theor. Biol. 301:122-40, 2012. 
-% DOI: \href{http://dx.doi.org/10.1016/j.jtbi.2012.02.002}{10.1016/j.jtbi.2012.02.002}.%
-% }
 
 \TOClink
 
@@ -243,6 +233,8 @@ Please visit the
 \href{http:/PhysiCell.MathCancer.org/blog/physicell-tutorials}{PhysiCell blog} 
 for information on running VirtualDub and using the virtual appliance. 
 (Section \ref{sec:blog_and_help}). 
+
+Note that we do not update the Virtual Box distribution; you should download the latest PhysiCell version from inside your virtual machine. 
 \TOClink
 
 %\subsection{Docker option \DONE}
@@ -388,7 +380,7 @@ virtual appliance. %
 A helpful site for using Alpine Linux. %
 %
 \item 
-\textbf{VirtualBox shared folders in Alpine:} 
+\textbf{VirtualBox shared folders in Alpine:} \hfill \break
 \href{https://wiki.alpinelinux.org/wiki/VirtualBox_shared_folders}{https://wiki.alpinelinux.org/wiki/VirtualBox\_shared\_folders
 }%
 %
