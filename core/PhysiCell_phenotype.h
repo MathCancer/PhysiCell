@@ -522,15 +522,17 @@ class Molecular
 		double& access_double( std::string name ); 
 */
 	
-		// use this to properly size the secretion parameters to the microenvironment in 
-		// pMicroenvironment
+		// use this to properly size the secretion parameters to the 
+		// microenvironment in molecular.pMicroenvironment. 
 		void sync_to_current_microenvironment( void ); // done 
 		
 //		void advance( Basic_Agent* pCell, Phenotype& phenotype , double dt ); 
 		
-		// use this to properly size the secretion parameters to the microenvironment 
+		// use this to properly size the secretion parameters to the microenvironment in 
+		// pMicroenvironment
 		void sync_to_microenvironment( Microenvironment* pNew_Microenvironment ); // done 
 		
+		// use this 
 		void sync_to_cell( Basic_Agent* pCell ); 
 		
 };

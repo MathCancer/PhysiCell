@@ -700,7 +700,7 @@ using namespace BioFVM;
 using namespace PhysiCell;
 \end{verbatim}
 
-\subsection{A brief note on the microenvironment}
+\subsection{Notes on the microenvironment}
 \label{sec:about_BioFVM_microenvironment}
 BioFVM divides the simulation domain into a collection of non-intersecting \textbf{voxels}: volumetric 
 pixels. Each voxel has a unique integer \textbf{index}: this is its unique address, 
@@ -711,7 +711,11 @@ BioFVM adds one or more diffusible substrates to this microenvironment. Each sub
 diffusion coefficient and decay rate. At present, these are homogeneous throughout the microenvironment, 
 although improvements are planned for BioFVM to have spatially variable diffusion coefficients. In 
 BioFVM, each substrate diffuses and decays, and can be secreted or uptaken by individual 
-cells (see Section \ref{sec:Secretion}) at their individual positions. You can also set bulk uptake and secretion 
+cells (see Section \ref{sec:Secretion}) at their individual positions.  
+As of PhysiCell 1.5.0, each cell can track the total amount of each substrate secreted and uptaken, and 
+pass half of it contents to its two daughter cells at division. Users can optionally set PhysiCell 
+to release the cell's internalized substrates at the end of death or lysis. 
+You can also set bulk uptake and secretion 
 functions, which are applied in each voxel. These are not used in the current template and sample 
 PhysiCell projects. See \cite{ref:BioFVM} for more information. 
 
@@ -757,7 +761,9 @@ class Microenvironment_Options
     bool outer_Dirichlet_conditions; 
     std::vector<double> Dirichlet_condition_vector; 
     std::vector<bool> Dirichlet_activation_vector; 
-    
+
+    std::vector<double> initial_condition_vector; 
+
     bool simulate_2D; 
     std::vector<double> X_range; 
     std::vector<double> Y_range; 
@@ -768,6 +774,8 @@ class Microenvironment_Options
     bool calculate_gradients; 
     
     bool use_oxygen_as_first_field;
+    
+    bool track_internalized_substrates_in_each_agent; 	
 };
 \end{verbatim}
 
@@ -791,6 +799,9 @@ default_microenvironment_options.outer_Dirichlet_conditions = true;
 
 std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2  
 default_microenvironment_options.Dirichlet_condition_vector = bc_vector; 
+
+// set the initial oxygen concentration (uniform in the domain) at 42 mmHg: 
+default_microenvironment_options.initial_condition_vector = {42.0 }; 
 	
 // stick with a 3-D simulation 
 default_microenvironment_options.simulate_2D = false; 
@@ -802,6 +813,9 @@ default_microenvironment_options.Z_range = {-100, 100};
 	
 // turn off gradient calculations 
 default_microenvironment_options.bool calculate_gradients = false; 
+
+// track internalized oxygen 
+default_microenvironment_options.track_internalized_substrates_in_each_agent = true; 
 \end{verbatim}
 
 
@@ -1140,6 +1154,133 @@ Note that turning on or off a Dirichlet condition for a substrate applies it at 
 which \v|is_dirichlet_node(int voxel_index)| is \v|true|. 
 
 \TOClink
+
+\subsection{Setting the initial conditions}
+\label{sec:BioFVM_initial_conditions}
+As of PhysiCell Version 1.5.0, users can use \v|default_microenvironment_options.initial_condition_vector|  
+to set the initial conditions for all substrates (uniformly) across the mesh. For example, 
+suppose we have substrates oxygen (units: mmHg) and glucose (dimensionless), and we 
+want to use the initial conditions (38, 0.83). We would insert this code within 
+the \v|setup_microenvironment()| function, and prior to calling 
+\v|initialize_microenvironment()|: 
+
+\begin{verbatim}
+void setup_microenvironment( void )
+{
+   // no gradients need for this example 
+   default_microenvironment_options.calculate_gradients = false; 
+	
+   // set Dirichlet conditions 
+   default_microenvironment_options.outer_Dirichlet_conditions = true;
+	
+   // if there are more substrates, resize accordingly 
+   std::vector<double> bc_vector.Dirichlet_condition_vector = { 40.0, 1.0 };
+	 	
+   // set initial conditions 
+   default_microenvironment_options.initial_condition_vector = { 38.0 , 0.83 }; 
+	
+   // initialize BioFVM 
+   initialize_microenvironment(); 	
+	
+   return; 
+}
+\end{verbatim}
+
+Note that users have not set \v|default_microenvironment_options.initial_condition_vector| prior 
+to calling \v|initialize_microenvironment()|, then BioFVM / PhysiCell reverts to its prior behavior: 
+it uses \v|default_microenvironment_options.Dirichlet_condition_vector| as a sensible 
+default for initial conditions. 
+
+\TOClink
+
+\subsubsection{Setting a non-uniform initial condition} 
+\label{sec:BioFVM_nonuniform_initial_condition}
+
+Users may want a non-uniform initial condition. This can be accopmlished 
+by cycling through all voxels and setting the substrate values. This must be 
+performed after \v|initialize_microenvironment()| to avoid being overwritten by the 
+built-in behavior. For example, to set the initial oxygen to $e^{-\frac{x}{100}}$, 
+use code like this:
+
+\begin{verbatim}
+void setup_microenvironment( void )
+{
+   // no gradients need for this example 
+   default_microenvironment_options.calculate_gradients = false; 
+	
+   // set Dirichlet conditions 
+   default_microenvironment_options.outer_Dirichlet_conditions = true;
+	
+   // if there are more substrates, resize accordingly 
+   std::vector<double> bc_vector.Dirichlet_condition_vector = { 40.0, 1.0 };
+	 	
+   // set initial conditions 
+   default_microenvironment_options.initial_condition_vector = { 38.0 , 0.83 }; 
+	
+   // initialize BioFVM 
+   initialize_microenvironment(); 	
+   
+   // set a new initial condition for oxygen
+   int k = microenvironment.find_density_index( "oxygen" ); // find its index 
+   for( int n=0; n < microenvironment.number_of_voxels(); n++ )
+   {
+    // x coordinate of the nth voxel's center  
+    x = microenvironment.mesh.voxels[n].center[0]; 
+    // access kth substrate of the nth voxel 
+    microenvironment(n)[k] = exp( -x / 100.0 ); 
+   }
+	
+   return; 
+}
+\end{verbatim}
+\TOClink 
+
+\subsection{Automated tracking of internalized substrates}
+\label{sec:BioFVM_internalization_tracking}
+As of PhysiCell 1.5.0, each individual \v|Basic_Agent| can track the net total amount of substrates 
+uptaken and secreted over its lifetime, conserving mass with the uptake/secretion terms in the 
+governing PDEs in \cite{ref:BioFVM}.  By matching to system of PDEs in BioFVM (with the Dirac delta
+function approximation used in the code), in any time step $\Delta t$, the total amount of net mass 
+transferred from the $i^{th}$ cell (sitting in voxel $\Omega_n$) into the microenvironment is given by: 
+\beqa
+\Delta t \int_{\Omega_n} \grvec{\rho} \: dV 
+& = & \Delta t \int_{\Omega_n } V_i \delta( \vec{x} - \vec{x}_i ) 
+\Bigl( \vec{S}_i \circ 
+\left( \grvec{\rho}^*_i - \grvec{\rho} \right) - \vec{U}_i \circ \grvec{\rho} \Bigr) dV 
+\nonumber \\
+& = & 
+\Delta t V_i 
+\Bigl( \vec{S}_i \circ 
+\left( \grvec{\rho}^*_i - \grvec{\rho}(\vec{x}_n) \right) - \vec{U}_i \circ \grvec{\rho}(\vec{x}_n) \Bigr)   
+\eeqa
+After comparing against the numerical implementation in BioFVM to calculate 
+$\Delta \grvec{\rho}$, and multiplying this by the volume of the voxel, we get that the net 
+total change in external substrates between $t$ and $t+\Delta t$ is
+\beq
+\Delta \vec{n}_k = W_k 
+\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right), 
+% \left( \frac{ (1-\vec{c}_2) \grvec{\rho}_k + \vec{c}_1} }{ \vec{c}_2 } \right),
+\eeq
+where $W_k$ is the volume of the voxel, $\vec{c}_i$ are internal constants already calculated for the 
+BioFVM secretion/uptake functions, and division of vectors is element-wise. For conservation of mass, 
+the net change in the cell's internalized substrates is 
+\beq
+-W_k 
+\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right), 
+% \left( \frac{ (1-\vec{c}_2) \grvec{\rho}_k + \vec{c}_1} }{ \vec{c}_2 } \right),
+\eeq
+If you set \v|default_microenvironment_options.track_internalized_substrates_in_each_agent = true|, then 
+PhysiCell will automatically perform these calculations in every cell at every diffusion time step. 
+\TOClink
+
+\subsubsection{Automated release of internalized substrates at cell death}
+\label{sec:BioFVM_auto_release_at_death}
+
+Users can optionally set PhysiCell to release some or all of its internalized substrates at the end of 
+cell death or at lysis. This functionality is accessed through the \v|Molecular| portion of the 
+\v|Phenotype|. See Section \ref{sec:phenotype_molecular}. 
+
+\TOClink 
 
 \subsection{Other BioFVM resources}
 \label{sec:BioFVM_further_reading}
@@ -2363,6 +2504,12 @@ completely deterministic along the current bias direction. See Section \ref{sec:
 \item 
 \textbf{Secretion} records cell secretion and uptake rates, as well as a 
 saturation density (at which secretion ends). See Section \ref{sec:Secretion}. 
+
+\item 
+\textbf{Molecular} is used to model molecular-scale details, particularly 
+tracking internalized substrates. In future versions of PhysiCell, molecular-scale 
+models (e.g., SBML models) will likely be attached here. See Section \ref{sec:phenotype_molecular}. 
+
 \end{enumerate}
 
 Here is how the \v|Phenotype| class is defined in \v|PhysiCell_phenotype.h|:
@@ -2381,10 +2528,13 @@ class Phenotype
     Mechanics mechanics; 
     Motility motility; 
     Secretion secretion; 
+    Molecular molecular; 
     
     Phenotype();   
     
     void sync_to_functions( Cell_Functions& functions ); 
+    
+    void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 
     
     void sync_to_default_functions( void );   
 };
@@ -2404,6 +2554,12 @@ In the Section \ref{sec:phenotype_details}, we give further details on the data 
 \v|phenotype.cycle| is matched to the cycle model and parameters in 
 \v|functions.cycle_model|. See Section \ref{sec:Cycle} for more details on the 
 cycle model. 
+
+\item 
+\smallcode{void sync\_to\_microenvironment( Microenvironment* pMicroenvironment )} bundles 
+all functions (currently in \v|Secretion| and \v|Molecular|) that need to sync the phenotype 
+with the microenvironment. This function is not yet needed, as syncing is performed automatically 
+in the appropriate constructors. 
 
 \item 
 \smallcode{void sync\_to\_default\_functions( void )} is neither implemented nor 
@@ -3867,6 +4023,26 @@ all the uptake rates by \v|factor|.
 
 \end{enumerate}
 \TOClink
+
+\subsection{Molecular}
+\label{sec:phenotype_molecular}
+\v|Molecular| collects molecular-scale data and models for the cell. As of Version 1.5.0, 
+this structure tracks internalized total substrates (See Section \ref{sec:BioFVM_internalization_tracking}) in the cell after secretion and 
+uptake. It is up to end users to supply an internal function (e.g., as part of the phenotype function) to 
+create internalized substrate (for subsequent secretion) and/or consume internalized substrate (after 
+uptake). The main data elements include:
+
+\begin{enumerate}
+\item
+
+\end{enumerate}
+
+Here is the full class definition:
+
+\TOClink 
+\subsubsection{Member functions}
+\label{sec:molecular_functions}
+\TOClink 
 
 \section{Cell Containers}
 \label{sec:Cell_Container}

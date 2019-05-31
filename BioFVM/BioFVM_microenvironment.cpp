@@ -1131,7 +1131,8 @@ void initialize_microenvironment( void )
 	// set the initial densities to the values set in the initial_condition_vector
 	
 	// if the initial condition vector has not been set, use the Dirichlet condition vector 
-	if( default_microenvironment_options.initial_condition_vector.size() == 0 )
+	if( default_microenvironment_options.initial_condition_vector.size() != 
+		microenvironment.number_of_densities() )
 	{
 		std::cout << "BioFVM Warning: Initial conditions not set. " << std::endl 
 				  << "                Using Dirichlet condition vector to set initial substrate values!" << std::endl 
