@@ -4027,21 +4027,94 @@ all the uptake rates by \v|factor|.
 \subsection{Molecular}
 \label{sec:phenotype_molecular}
 \v|Molecular| collects molecular-scale data and models for the cell. As of Version 1.5.0, 
-this structure tracks internalized total substrates (See Section \ref{sec:BioFVM_internalization_tracking}) in the cell after secretion and 
+this structure tracks internalized total substrates 
+(See Section \ref{sec:BioFVM_internalization_tracking}) in the cell after secretion and 
 uptake. It is up to end users to supply an internal function (e.g., as part of the phenotype function) to 
 create internalized substrate (for subsequent secretion) and/or consume internalized substrate (after 
-uptake). The main data elements include:
+uptake). 
 
+By default, internalized substrate tracking is turned off. See Section 
+\ref{sec:BioFVM_internalization_tracking} to learn how to enable this feature. 
+
+The main data elements include:
 \begin{enumerate}
 \item
+\smallcode{Microenvironment* pMicroenvironment} is a pointer to the 
+correct microenvironment, where substrates have already been declared. 
+ 
+\item 
+\smallcode{std::vector<double> internalized\_total\_substrates} is a 
+vector of the total net internalized substrates for the cell. 
+(Note that these are totals, not concentrations or densities. To get a 
+density, divide by the cell's total volume.) This vector's size and ordering 
+matches the diffusing substrates in the microenvironment. 
 
+Note that at cell division, each daughter cell receives half of each 
+internalized substrate. 
+
+\item 
+\smallcode{std::vector<double> fraction\_released\_at\_death} is a 
+vector of the total fraction (between 0 and 1) of each substrate 
+that is released back into the microenvironment (at the cell's location)
+at the end of death. By default, this is a zero vector. 
+This vector's size and ordering 
+matches the diffusing substrates in the microenvironment. 
+
+\item 
+\smallcode{std::vector<double> fraction\_transferred\_when\_ingested} is a 
+vector of the total fraction (between 0 and 1) of each substrate 
+that is absorbed by any cell that consumes this cell. By default, this is a 
+zero vector. (Note that these are totals, not concentrations or densities. To get a 
+density, divide by the cell's total volume.) This vector's size and ordering 
+matches the diffusing substrates in the microenvironment. 
 \end{enumerate}
 
 Here is the full class definition:
 
+\begin{verbatim}
+class Molecular
+{
+    private:
+    public: 
+        Microenvironment* pMicroenvironment; 
+    
+        Molecular(); 
+     
+        std::vector<double> internalized_total_substrates; 
+        std::vector<double> fraction_released_at_death; 
+        std::vector<double> fraction_transferred_when_ingested; 
+        
+        void sync_to_current_microenvironment( void );
+        void sync_to_microenvironment( Microenvironment* pNew_Microenvironment );
+        void sync_to_cell( Basic_Agent* pCell );        
+};
+\end{verbatim}
+
 \TOClink 
 \subsubsection{Member functions}
 \label{sec:molecular_functions}
+
+\begin{enumerate}
+\item
+\smallcode{Molecular()} is the default constructor. You should never need to call this function. 
+
+\item 
+\smallcode{void sync\_to\_current\_microenvironment( void )} syncs this class's data structures 
+to the microenvironment in \v|pMicroenvironment| if it is non-NULL, or sets all to size zero. 
+All values are initially zero. 
+
+\item 
+\smallcode{void sync\_to\_microenvironment( Microenvironment* pNew\_Microenvironment )}  
+syncs this class's data structures to the microenvironment at \v|pNew_Microenvironment|. 
+All values are initially zero. 
+
+\item 
+\smallcode{void sync\_to\_cell( Basic\_Agent* pCell )} sets the cell's internal pointers 
+to this class's data structures. 
+
+\end{enumerate}
+
+
 \TOClink 
 
 \section{Cell Containers}
