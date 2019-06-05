@@ -462,14 +462,6 @@ void Cell::set_previous_velocity(double xV, double yV, double zV)
 
 bool Cell::assign_position(double x, double y, double z)
 {
-	if( !get_container()->underlying_mesh.is_position_valid(x,y,z) )
-	{	
-		is_out_of_domain = true; 
-		is_active = false; 
-		is_movable = false; 
-		
-		return false;
-	}
 	position[0]=x;
 	position[1]=y;
 	position[2]=z;
@@ -480,6 +472,15 @@ bool Cell::assign_position(double x, double y, double z)
 	current_mechanics_voxel_index= get_container()->underlying_mesh.nearest_voxel_index( position );
 	get_container()->register_agent(this);
 	
+	if( !get_container()->underlying_mesh.is_position_valid(x,y,z) )
+	{
+		is_out_of_domain = true;
+		is_active = false;
+		is_movable = false;
+
+		return false;
+	}
+
 	return true;
 }
 
