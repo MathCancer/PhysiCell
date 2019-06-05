@@ -586,7 +586,8 @@ void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt
 		neighbor_voxel_index != neighbor_voxel_index_end; 
 		++neighbor_voxel_index )
 	{
-		if(is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index)){
+		if(is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+		{
 			end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
 			for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
 			{
