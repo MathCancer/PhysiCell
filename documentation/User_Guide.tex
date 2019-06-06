@@ -1271,6 +1271,10 @@ the net change in the cell's internalized substrates is
 \eeq
 If you set \v|default_microenvironment_options.track_internalized_substrates_in_each_agent = true|, then 
 PhysiCell will automatically perform these calculations in every cell at every diffusion time step. 
+
+Note that users should \emph{access} these internalized substrates via the \v|molecular| part of the 
+cell's \v|phenotype|. See Section \ref{sec:phenotype_molecular}. 
+
 \TOClink
 
 \subsubsection{Automated release of internalized substrates at cell death}
