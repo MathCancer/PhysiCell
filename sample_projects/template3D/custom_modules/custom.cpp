@@ -118,8 +118,8 @@ void create_cell_types( void )
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 
-	int G0G1_index = Ki67_advanced.find_phase_index( PhysiCell_constants::G0G1_phase );
-	int S_index = Ki67_advanced.find_phase_index( PhysiCell_constants::S_phase );
+	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
+	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
 
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
@@ -197,6 +197,9 @@ void setup_microenvironment( void )
 	// if there are more substrates, resize accordingly 
 	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
+	
+	// set initial conditions 
+	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
 	
 	// initialize BioFVM 
 	

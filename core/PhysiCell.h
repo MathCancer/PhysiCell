@@ -72,7 +72,7 @@
 #include <fstream>
 #include <string>
 
-static std::string PhysiCell_Version = "1.4.1"; 
+static std::string PhysiCell_Version = "1.5.0"; 
 static std::string PhysiCell_URL = "http://PhysiCell.MathCancer.org"; 
 static std::string PhysiCell_DOI = "10.1371/journal.pcbi.1005991"; 
 

@@ -75,10 +75,11 @@
 
 #include "../BioFVM/BioFVM.h" 
 
+#include "../modules/PhysiCell_settings.h"
+
 using namespace BioFVM; 
 
 namespace PhysiCell{
-
 class Cell;
 class Cycle_Model; 
 class Phenotype; 
@@ -447,8 +448,93 @@ class Cell_Functions
 	
 	void (*contact_function)(Cell* pMyself, Phenotype& my_phenotype, 
 		Cell* pOther, Phenotype& other_phenotype, double dt ); 
+		
+	/* prototyping / beta in 1.5.0 */ 
+/*	
+	void (*internal_substrate_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
+	void (*molecular_model_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
+*/
 	
 	Cell_Functions(); // done 
+};
+
+class Bools
+{
+	public:
+		std::vector<bool> values; 
+		std::unordered_map<std::string,int> name_map; 
+		std::string& name( int i ); 
+		std::vector<std::string> units; 
+		
+		int size( void ); 
+		void resize( int n ); 
+		int add( std::string name , std::string units , bool value ); 
+		
+		bool& operator[]( int i ); 
+		bool& operator[]( std::string name ); 
+		
+		Bools(); 
+};
+
+class Molecular
+{
+	private:
+	public: 
+		Microenvironment* pMicroenvironment; 
+	
+		// model much of this from Secretion 
+		Molecular(); 
+ 	
+		// we'll set this to replace BioFVM's version		
+		std::vector<double> internalized_total_substrates; 
+
+		// for each substrate, a fraction 0 <= f <= 1 of the 
+		// total internalized substrate is released back inot
+		// the environment at death 
+		std::vector<double> fraction_released_at_death; 
+
+		// for each substrate, a fraction 0 <= f <= 1 of the 
+		// total internalized substrate is transferred to the  
+		// predatory cell when ingested 
+		std::vector<double> fraction_transferred_when_ingested; 
+		
+		/* prototyping / beta in 1.5.0 */ 
+		// Boolean, Integer, and Double parameters
+/*		
+		std::vector<bool> bools; 
+		std::unordered_map<std::string,int> bool_name_map; 
+		std::string& bool_name( int i ); 
+		std::vector<std::string> bool_units; 
+		void resize_bools( int n ); 
+		int add_bool( std::string name , std::string units , bool value ); 
+		bool& access_bool( std::string name ); 
+		
+		std::vector<int> ints; 
+		std::unordered_map<std::string,int> int_name_map; 
+		std::string& int_name( int i ); 
+		std::vector<std::string> int_units; 
+		int& access_int( std::string name ); 
+		
+		std::vector<int> doubles; 
+		std::unordered_map<std::string,int> double_name_map; 
+		std::string& double_name( int i ); 
+		std::vector<std::string> double_units; 
+		double& access_double( std::string name ); 
+*/
+	
+		// use this to properly size the secretion parameters to the 
+		// microenvironment in molecular.pMicroenvironment. 
+		void sync_to_current_microenvironment( void ); // done 
+		
+//		void advance( Basic_Agent* pCell, Phenotype& phenotype , double dt ); 
+		
+		// use this to properly size the secretion parameters to the microenvironment in 
+		// pMicroenvironment
+		void sync_to_microenvironment( Microenvironment* pNew_Microenvironment ); // done 
+		
+		// use this 
+		void sync_to_cell( Basic_Agent* pCell ); 
+		
 };
 
 class Phenotype
@@ -466,47 +552,17 @@ class Phenotype
 	Motility motility; 
 	Secretion secretion; 
 	
+	Molecular molecular; 
+	
 	Phenotype(); // done 
 	
 	void sync_to_functions( Cell_Functions& functions ); // done 
 	
+	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 
+	
 	// make sure cycle, death, etc. are synced to the defaults. 
 	void sync_to_default_functions( void ); // done 
 };
-
-/*
-class Microenvironment_Options
-{
- private:
- 
- public: 
-	Microenvironment* pMicroenvironment;
-	std::string name; 
- 
-	std::string time_units; 
-	std::string spatial_units; 
-	double dx;
-	double dy; 
-	double dz; 
-	
-	bool outer_Dirichlet_conditions; 
-	std::vector<double> Dirichlet_condition_vector; 
-	
-	bool simulate_2D; 
-	std::vector<double> X_range; 
-	std::vector<double> Y_range; 
-	std::vector<double> Z_range; 
-	
-	Microenvironment_Options(); 
-	
-	bool calculate_gradients; 
-};
-
-extern Microenvironment_Options default_microenvironment_options; 
-extern Microenvironment microenvironment;
-
-void initialize_microenvironment( void ); 
-*/
 
 };
 

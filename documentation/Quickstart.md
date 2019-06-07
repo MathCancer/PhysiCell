@@ -43,16 +43,16 @@ After installing brew, type `brew install gcc` from a Terminal command line. Thi
 should install a recent version of gcc/g++ (supporting OpenMP) into `/usr/local/bin`. You can verify this with:
 ```
 $ ls -l /usr/local/bin/g++*
-lrwxr-xr-x  1 heiland  admin  29 Oct  3 14:38 /usr/local/bin/g++-7@ -> ../Cellar/gcc/7.2.0/bin/g++-7
+   ...             /usr/local/bin/g++-8@ -> ../Cellar/gcc/8.2.0/bin/g++-8
 ```
 
 Set the following environment variable in your Terminal's shell, e.g., in the bash shell: 
 ```
-$ export PHYSICELL_CPP=/usr/local/bin/g++-7
+$ export PHYSICELL_CPP=/usr/local/bin/g++-8
 ```
 and the Makefile will use it. You should permanently set this in your environment via: 
 
-`$ echo export PHYSICELL_CPP=g++-7 >> ~/.bash_profile`.
+`$ echo export PHYSICELL_CPP=g++-8 >> ~/.bash_profile`.
 
 ### Linux
 

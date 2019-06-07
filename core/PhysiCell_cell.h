@@ -174,6 +174,7 @@ class Cell : public Basic_Agent
 	void flag_for_removal( void ); // done 
 	
 	void start_death( int death_model_index ); 
+	void lyse_cell( void ); 
 
 	Cell* divide( void );
 	void die( void );
@@ -198,6 +199,8 @@ class Cell : public Basic_Agent
 	
 	void update_voxel_in_container(void);
 	void copy_data(Cell *);
+	
+	void ingest_cell( Cell* pCell_to_eat ); // for use in predation, e.g., immune cells 
 
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 

@@ -74,7 +74,7 @@ bool PhysiCell_standard_models_initialized = false;
 bool PhysiCell_standard_death_models_initialized = false; 
 bool PhysiCell_standard_cycle_models_initialized = false; 
 	
-Cycle_Model Ki67_advanced, Ki67_basic, live, apoptosis, necrosis, inert; 
+Cycle_Model Ki67_advanced, Ki67_basic, live, apoptosis, necrosis; 
 Cycle_Model cycling_quiescent; 
 Death_Parameters apoptosis_parameters, necrosis_parameters; 
 
@@ -555,6 +555,10 @@ void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double 
 		* (1- phenotype.volume.calcified_fraction);
    
 	phenotype.volume.total = phenotype.volume.cytoplasmic + phenotype.volume.nuclear; 
+	
+	
+	phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
+		( 1e-16 + phenotype.volume.total ); 
    
 	phenotype.geometry.update( pCell,phenotype,dt );
 
@@ -652,18 +656,18 @@ void initialize_default_cell_definition( void )
 	cell_defaults.pMicroenvironment = NULL;
 	if( BioFVM::get_default_microenvironment() != NULL )
 	{ cell_defaults.pMicroenvironment = BioFVM::get_default_microenvironment(); }
-
+	
 	// make sure phenotype.secretions are correctly sized 
 	
 	cell_defaults.phenotype.secretion.sync_to_current_microenvironment();
-
+	
 	// set up the default parameters 
 		
 	cell_defaults.type = 0; 
 	cell_defaults.name = "breast epithelium"; 
 
 	cell_defaults.parameters.pReference_live_phenotype = &(cell_defaults.phenotype); 
-		
+	
 	// set up the default custom data 
 		// the default Custom_Cell_Data constructor should take care of this
 		
@@ -689,7 +693,9 @@ void initialize_default_cell_definition( void )
 	
 	// set up the default phenotype (to be consistent with the default functions)
 	cell_defaults.phenotype.cycle.sync_to_cycle_model( cell_defaults.functions.cycle_model ); 
-
+	
+	// set molecular defaults 
+	
 	return; 	
 }
 

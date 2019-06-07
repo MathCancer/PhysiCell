@@ -234,6 +234,7 @@ class Microenvironment
 	
 	void add_dirichlet_node( int voxel_index, std::vector<double>& value ); 
 	void update_dirichlet_node( int voxel_index , std::vector<double>& new_value ); 
+	void update_dirichlet_node( int voxel_index , int substrate_index , double new_value );
 	void remove_dirichlet_node( int voxel_index ); 
 	void apply_dirichlet_conditions( void ); 
 
@@ -300,6 +301,8 @@ class Microenvironment_Options
 	std::vector<double> Dirichlet_condition_vector; 
 	std::vector<bool> Dirichlet_activation_vector; 
 	
+	std::vector<double> initial_condition_vector; 
+	
 	bool simulate_2D; 
 	std::vector<double> X_range; 
 	std::vector<double> Y_range; 
@@ -310,6 +313,8 @@ class Microenvironment_Options
 	bool calculate_gradients; 
 	
 	bool use_oxygen_as_first_field;
+	
+	bool track_internalized_substrates_in_each_agent; 	
 };
 
 extern Microenvironment_Options default_microenvironment_options; 

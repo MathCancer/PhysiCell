@@ -16,7 +16,10 @@ number.
    recompile the LaTeX document. Don't forget to set \Version to x.y.z 
    at the top of the document. Set the \ReleaseDate to today (manually). 
 
-7) Sourceforge.net release 
+
+7) create (and approve) a pull request from the development branch to the master branch.
+
+8) Sourceforge.net release 
    a) Move one directory up. Zip everything in PhysiCell 
       into a new zip file. Use 
       
@@ -39,7 +42,7 @@ zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.giti
 
    g) Edit the README.md file (on SF) to exclude it from stats tracking. 
 
-8) GitHub release: 
+9) GitHub release: 
 
    a) Go to https://github.com/MathCancer/PhysiCell/releases
       Click "Draft a new release" 
@@ -55,7 +58,7 @@ zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.giti
 
    f) Click "" 
 
-9) Update MathCancer.org
+10) Update MathCancer.org
 
    a) Update the version number on http://MathCancer.org/OpenSource.php
 
@@ -65,3 +68,5 @@ zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.giti
       Follow prior examples as a template 
 
    d) Update the "downloads" section to include two table rules 
+
+11) Make a new development branch 

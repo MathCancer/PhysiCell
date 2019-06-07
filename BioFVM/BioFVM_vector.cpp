@@ -172,11 +172,13 @@ void operator/=( std::vector<double>& v1, const double& a )
 
 std::ostream& operator<<(std::ostream& os, const std::vector<double>& v )
 {
+ /*
  if( v.size() == 3 )
  {
   os << "x=\"" << v[0] << "\" y=\"" << v[1] << "\" z=\"" << v[2] << "\"" ; 
   return os; 
  }
+ */
 
  for( unsigned int i=0; i < v.size(); i++ )
  { os << v[i] << " " ; }

@@ -1,0 +1,294 @@
+\documentclass[11point]{article}
+
+\usepackage[letterpaper,margin=1in]{geometry}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{bbm}
+\usepackage{bm}
+
+
+\newcommand{\beq}{\begin{eqnarray}}
+\newcommand{\eeq}{\end{eqnarray}}
+\renewcommand{\d}[1]{\:\mathrm{d}#1}
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\grvec}[1]{\bm{#1}}
+
+
+\newcommand{\one}{\mathbbm{1}}
+\newcommand{\reals}{\mathbb{R}}
+
+\newcommand{\df}[1]{\delta \left( #1 \right)}
+\newcommand{\set}[1]{\left\{#1\right\}}
+
+\newcommand{\var}[1]{\texttt{#1}}
+
+\begin{document}
+\section{Notation}
+\begin{itemize}
+\item
+For any cell $i$ with center $\vec{x}_i$, let $R_i$ denote the 
+region of space occupied by it. Assume that for any other cell 
+$j$, that $R_i \cap R_j = \emptyset$. 
+\item 
+For any  computational 
+mesh with voxels $\set{ \Omega }$ and corresponding 
+volumes $\set{W}$, let $\rho( \Omega) $ denote the mean 
+substrate density in voxel $\Omega$, and let 
+$n(\Omega) = \int_\Omega \rho \d{V}$ denote the total
+ amount of substrate in the voxel. 
+
+Note that BioFVM tracks the mean substrate density in each voxel, 
+so $\rho \equiv \rho( \Omega )$ throughout $\Omega$. 
+\item 
+For any voxel $\Omega_k$ with an index $k$, let $W_k$ denote 
+its volume, define $\rho_k = \rho( \Omega_k )$, and 
+define $n_k = n( \Omega_k)$. 
+
+\item 
+For any cell $i$ with center $\vec{x}_i$, let $\Omega_i$ denote the 
+voxel containing cell $i$, with corresponding volume $W_i$. 
+\item
+Let $\one_i(\vec{x})$ be the characteristic  function for the cell, so that 
+$\one_i(\vec{x}) =1$ inside the cell (inside $R_i$), and 
+$\one_i(\vec{x}) = 0$ otherwise. 
+\item 
+Let $V_i = \int_{\reals^3} \one_i(\vec{x}) \d{V} = V_i$ be the total volume of cell $i$. 
+\item 
+For any cell $i$, let $N_i$ denote the \emph{internalized} total substrate. 
+
+\end{itemize}
+
+\section{Net extracellular substrate change 
+due to the $i^\textrm{th}$ cell}
+Note that in BioFVM the cells' contribution 
+to changes in total substrate in any volume $\Omega$ is given by 
+\beq
+\frac{ \partial }{ \partial t} 
+\int_\Omega \rho \d{V} & = &  
+\sum_{\textrm{cells } i} 
+\int_\Omega  \one_i(\vec{x})
+\Bigl(  S_i \left( \rho^T_i - \rho \right)  - U_i \rho   \Bigr) \d{V}\\
+& \approx & 
+\sum_{\textrm{cells } i}
+V_i \int_\Omega \df{ \vec{x} - \vec{x}_i }
+\Bigl(  S_i \left( \rho^T_i - \rho \right)  - U_i \rho   \Bigr) \d{V}.
+\eeq 
+
+Now, let $\Omega = \Omega_i$ be the voxel containing $\vec{x}_i$ as 
+defined above. Then assuming that only cell $i$ is in $\Omega_i$:  \beq
+\frac{ d{n_i} }{ d{t} }  
+= 
+\frac{ \partial }{ \partial t} 
+\int_{\Omega_i} \rho \d{V}
+ & \approx &  
+V_i 
+\Bigl(  S_i \left( \rho^T_i - \rho(\vec{x}_i) \right)  - U_i \rho(\vec{x}_i)   \Bigr)  \\
+& = & 
+V_i 
+\Bigl(  S_i \left( \rho^T_i - \rho_i \right)  - U_i \rho_i   \Bigr) .
+\eeq 
+(The case with multiple cells in a single computational voxel generalizes by performing this calculation separately for each cell contained in the voxel.)
+
+Now, because $n_i = \rho_i W_i $, and asssuming $W_i$ is constant or changes very slowly compared to substrate densities, 
+\beq
+W_i \frac{ d{\rho_i} }{ d{t} }  & \approx &  
+V_i 
+\Bigl(  S_i \left( \rho^T_i - \rho_i \right)  - U_i \rho_i   \Bigr)   \\
+\Longrightarrow 
+\frac{d\rho_i }{dt} & \approx & 
+\frac{ V_i }{W_i }
+\Bigl( S_i \left( \rho_i^T - \rho_i \right) - U_i \rho_i \Bigr) 
+\eeq 
+
+\subsection{BioFVM implementation}
+Now, let's apply a backward Euler scheme as in BioFVM, to determine the net change in total substrate in any time step with duration $\Delta t$: 
+\beq
+\frac{ \rho_i(t+\Delta t) - \rho_i(t)}{\Delta t} 
+& \approx & 
+\frac{ V_i }{W_i } 
+\Bigl( S_i \left( \rho_i^T - \rho_i(t+\Delta t) \right) 
+- U_i \rho_i( t + \Delta t ) \Bigr)\\
+\Longrightarrow 
+\rho_i( t+\Delta t) 
+& \approx & 
+\frac{\rho_i(t)  + c_1 }{c_2},
+\eeq
+where 
+\beq
+c_1 & = & \Delta t \frac{ V_i }{W_i } 
+\left( S_i \rho_i^T \right) \\ 
+c_2 & = & 1 + \Delta t \frac{ V_i }{W_i } 
+\left( S_i + U_i \right) .
+\eeq
+
+This is the algorithm in 
+
+\begin{center}\verb|void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt )|
+\end{center}
+
+The constants $c_1$ and $c_2$ are set in 
+\verb|void Basic_Agent::set_internal_uptake_constants( double dt )|. 
+
+\subsection{Net extracellular substrate change}
+
+Now, let's determine the change in total substrates in this implementation. First, 
+\beq
+n_i(t+\Delta t ) - n_i(t) & = & 
+W_i \rho_i(t+\Delta t) - W_i \rho_i(t) \\
+& = & 
+W_i \left( \frac{\rho_i(t)+c_1}{c_2} - \rho_i(t) \right) \\ 
+& = & 
+W_i \left( \frac{\rho_i(t) + c_1  - c_2 \rho_i(t) }{c_2} \right) \\ 
+& = & 
+W_i \left( \frac{ (1-c_2) \rho_i(t) + c_1  }{c_2} \right) \\ 
+\eeq
+Notice that this can be calculated completely using constants that are already computed and used in BioFVM. 
+\subsection{Algorithm}
+We will use the following operations in the cell secretion/uptake function. (In the actual implementation, 
+perform this on the entire vector of substrates, and use element-wise operations. i.e., Hadamard products and 
+quotients.) 
+\begin{enumerate}
+\item 
+\verb|change = 1 // 1|
+\item 
+\verb|change -= c2 // 1-c2|
+\item 
+\verb|change *= substrates // (1-c2)*rho|
+\item 
+\verb|change += c1 // (1-c2)*rho + c1|
+\item 
+\verb|change /= c2 // ((1-c2)*rho + c1)/c2|
+\item 
+\verb|change *= voxel_volume // W_i*((1-c2)*rho + c1)/c2|
+\end{enumerate}
+This is the net change in total substrates in $\Omega_i$. For conservation, 
+the net chnage in cell $i$ is equal and opposite. Thus 
+\begin{enumerate}
+\setcounter{enumi}{6}
+\item 
+\verb|internalized_substrates -= change|
+\end{enumerate}
+
+\section{Additional option(s)}
+If you set \verb|Basic_Agent::use_internal_densities_as_targets = true|, then whenever
+the internal constants are changed, it sets 
+\beq
+\rho_i^* & = & \frac{N_i}{V_i}
+\eeq
+This criterion would be appropriate for non-active, diffusive secretion from the cell. 
+
+Please note that 
+if $\rho_i^* < \rho_i$, there is nothing in the mathematical form to prevent diffusion of the substrate 
+back into the cell. If this is a concern, I suggest users manually test for that and set 
+the secretion rates to zero accordingly. 
+
+Future releases of PhysiCell may automate this testing, but we note that this test should be performed 
+substrate-by-substrate. 
+
+\section{Internal model}
+Without an internal model, internalized substrate will reflect the total history of 
+all uptaken substrates, or the sum tutoal fo all secreted substrates.  In particular, 
+in the case of secretion, the internalized value will be negative to upload mass conservation. (No thing made inside, minus the secreted amount.) 
+
+Users can provide their own internal model (e.g., for metabolomics), but we provide a ``sensible default.'' Inside the cell, we model: 
+\beq
+\frac{dN}{dt} & = & \overbrace{-u N}^\textrm{use} + \overbrace{c ( N^* -  n)}^\textrm{creation} \\
+& = & 
+-u \rho_I W + s( \rho_I^* - \rho_E ) W, 
+\eeq
+where $\rho_I$ is the internal density, and $c$, $u$, and $\rho_I^*$ are to be determined. We shall give the rationale for this form in the analysis below. 
+
+To determine these parameters, let us consider the total amount of substrate in the cell: 
+\beq
+\frac{dN}{dt} & =& 
+\overbrace{ U \rho_E W  }^\textrm{import} 
+- 
+\overbrace{ S \left( \rho_E^* - \rho_E \right) W }^\textrm{export} 
+- 
+\overbrace{ u \rho_I W }^\textrm{internal use} 
++ 
+\overbrace{ c \left( \rho_I^* - \rho_E \right)W  }^\textrm{internal creation}
+\eeq
+Now, consider the case where there is uptake and use but no creation or secretion. Then 
+\beq
+\frac{dN}{dt} & = & 
+U\rho_E W - u \rho_I W = \left( U \rho_E - u \rho_I \right) W. 
+\eeq
+In quasi-steady (or steady) conditions, we seek $u$ so that 
+$\rho_I \approx \rho_E$. Notice that if $u = U$, then 
+\beq
+\frac{dN}{dt}  & = & U \left( \rho_E - \rho_I \right) W, 
+\eeq
+and so $\rho_I = \rho_E$ in quasi-steady condition. This model 
+balances import with internal use. Moreover, if we balance all substrate in the 
+environment (assuming without loss of generality only one uptaking cell): 
+\beq
+\frac{d}{dt} \left( n + N \right) & = &
+- U \rho_E W + U \rho_E W - U \rho_I V = - U \rho_I W, 
+\eeq
+and over long times, $\rho_I \approx \rho_E$ , so we arrive at the 
+normal situation from BioFVM where the overall loss rate is 
+$- U \rho_E W$. 
+
+Next, consider the case of only creation and export. In that case, 
+\beq
+\frac{dN}{dt} & = & 
+-S ( \rho_E^* - \rho_E ) W + s ( \rho_I^* - \rho_E) W. 
+\eeq
+Suppose we follow our prior motivation and set $s = S$. Then 
+\beq
+\frac{dN}{dt} & = & 
+S \left( - \rho_E^*  + \rho_E + \rho_I^* - \rho_E \right) W 
+= S \left( -\rho_E^* + \rho_I^* \right)W. 
+\eeq
+If we choose $\rho_I^* = \rho_E^*$, then 
+\beq
+\frac{dN}{dt} &  = & 0
+\eeq
+and so we have successfully balanced creation and export. This the 
+motivation for the functional form $s ( \rho_I^* - \rho_E)$ instead 
+of the more obvious $s ( \rho_I^* - \rho_I)$. The biophysical interpretation 
+is that the cell internally creates the substrate until the extenral density 
+reaches the target value. 
+
+\subsection{Summary:}
+Returning now to the original notation where $\vec{\rho}$ is the vector of (extracellular) substrate densities, $\vec{N}$ is the vector of total internalized 
+substrates, then we use (as an internal model), and 
+\beq
+\frac{d\vec{N}}{dt} & = & 
+- \vec{u}\circ \vec{N} + \vec{c} \circ \left( \vec{\rho}^* - \vec{\rho}  \right)W
+\eeq
+and we set defaults: 
+\beq
+\vec{u} & = & \vec{U} \\
+\vec{c} & = & \vec{S} 
+\eeq
+
+\section{Key cellular processes}
+When a cell divides, it must distribute its internalized substrates to its daughter cells while maintaining conservation of mass. 
+
+In PhysiCell 1.5.0, we do this by dividing the substrate by half in each of the daughter cells. 
+
+When a cell dies and is removed by the simulation, multiple things could happen: for some substrates, it may make sense to 
+remove them from the environment entirely, release it entirely at the time of lysis, or slowly release it back into the environment 
+while the cell degrades. 
+
+In PhysiCell, we opt for the simplest solution: release (some fraction) of internalized substrates when the basic agent (and hence cell) calls 
+its destructor. Let $0 \le F \le 1$ denote the fraction of internalized 
+substrates released at the time of death. 
+
+We overwrite the density in the cell's voxel by first noting that there should be conservation of mass: 
+\beq
+n_i( t + \Delta t ) & = & 
+n_i( t ) + F N_i (t)  \\ 
+\Longrightarrow 
+V_i \rho_i(t + \Delta t) & = &
+V_i \rho_i(t) + F N_i(t) \\ 
+\Longrightarrow 
+\rho_i( t + \Delta t ) & = & 
+\rho_i(t) + \frac{F}{V_i} N_i 
+\eeq
+
+
+\end{document}

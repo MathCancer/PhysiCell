@@ -465,6 +465,29 @@ void Death::trigger_death( int death_model_index )
 {
 	dead = true; 
 	current_death_model_index = death_model_index; 
+	
+/*	
+	// if so, change the cycle model to the current death model 
+	phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() ); 
+	
+	// also, turn off motility.
+	
+	phenotype.motility.is_motile = false; 
+	phenotype.motility.motility_vector.assign( 3, 0.0 ); 
+	functions.update_migration_bias = NULL;
+	
+	// turn off secretion, and reduce uptake by a factor of 10 
+	phenotype.secretion.set_all_secretion_to_zero();
+	phenotype.secretion.scale_all_uptake_by_factor( 0.10 );
+	
+	// make sure to run the death entry function 
+	if( phenotype.cycle.current_phase().entry_function )
+	{
+		phenotype.cycle.current_phase().entry_function( this, phenotype, dt_ ); 
+	}
+*/
+		
+	
 	return; 
 }
 
@@ -877,6 +900,108 @@ void Secretion::scale_all_uptake_by_factor( double factor )
 	return; 
 }
 
+Molecular::Molecular()
+{
+	pMicroenvironment = get_default_microenvironment(); 
+	sync_to_current_microenvironment(); 
+
+	return; 
+}
+
+void Molecular::sync_to_current_microenvironment( void )
+{
+	if( pMicroenvironment )
+	{
+		sync_to_microenvironment( pMicroenvironment ); 
+	}
+	else
+	{
+		internalized_total_substrates.resize( 0 , 0.0 ); 
+		fraction_released_at_death.resize( 0 , 0.0 ); 
+		fraction_transferred_when_ingested.resize( 0, 0.0 ); 
+	}
+	return; 
+}
+	
+void Molecular::sync_to_microenvironment( Microenvironment* pNew_Microenvironment )
+{
+	pMicroenvironment = pNew_Microenvironment;
+	
+	int number_of_densities = pMicroenvironment->number_of_densities() ; 
+
+	internalized_total_substrates.resize( number_of_densities , 0.0 ); 
+	fraction_released_at_death.resize( number_of_densities , 0.0 ); 
+	fraction_transferred_when_ingested.resize( number_of_densities , 0.0 ); 
+	
+	return; 
+}
+
+void Molecular::sync_to_cell( Basic_Agent* pCell )
+{
+	delete pCell->internalized_substrates;
+	pCell->internalized_substrates = &internalized_total_substrates;
+	
+	delete pCell->fraction_released_at_death;
+	pCell->fraction_released_at_death = &fraction_released_at_death; 
+	
+	delete pCell->fraction_transferred_when_ingested; 
+	pCell->fraction_transferred_when_ingested = &fraction_transferred_when_ingested; 
+
+	return; 
+}
+
+
+/*
+void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
+{
+	// if this phenotype is not associated with a cell, exit 
+	if( pCell == NULL )
+	{ return; }
+
+	// if there is no microenvironment, attempt to sync. 
+	if( pMicroenvironment == NULL )
+	{
+		// first, try the cell's microenvironment
+		if( pCell->get_microenvironment() )
+		{
+			sync_to_microenvironment( pCell->get_microenvironment() ); 
+		}
+		// otherwise, try the default microenvironment
+		else
+		{
+			sync_to_microenvironment( get_default_microenvironment() ); 
+		}
+
+		// if we've still failed, return. 
+		if( pMicroenvironment == NULL ) 
+		{
+			return; 
+		}
+	}
+
+	// make sure the associated cell has the correct rate vectors 
+	if( pCell->internalized_substrates != &internalized_substrates )
+	{
+		// copy the data over 
+		internalized_substrates = *(pCell->internalized_substrates);
+		// remove the BioFVM copy 
+		delete pCell->internalized_substrates; 
+		// point BioFVM to this one  
+		pCell->internalized_substrates = &internalized_substrates; 
+	}
+
+	// now, call the functions 
+//	if( pCell->functions.internal_substrate_function )
+//	{ pCell->functions.internal_substrate_function( pCell,phenotype,dt);  }
+//	if( pCell->functions.molecular_model_function )
+//	{ pCell->functions.molecular_model_function( pCell,phenotype,dt);  }
+
+
+	return; 
+}
+*/
+
+
 Cell_Functions::Cell_Functions()
 {
 	volume_update_function = NULL; 
@@ -893,6 +1018,10 @@ Cell_Functions::Cell_Functions()
 	
 	contact_function = NULL; 
 
+/*	
+	internal_substrate_function = NULL; 
+	molecular_model_function = NULL; 
+*/
 	return; 
 }
 
@@ -908,117 +1037,50 @@ Phenotype::Phenotype()
 	flagged_for_division = false;
 	flagged_for_removal = false; 
 	
+	// sync the molecular stuff here automatically? 
+	
 	return; 
 }
 
 /*
-Microenvironment microenvironment; 
-
-Microenvironment_Options::Microenvironment_Options()
+class Bools
 {
-	pMicroenvironment = &microenvironment; 
-	name = "microenvironment"; 
-	
-	time_units = "min"; 
-	spatial_units = "micron"; 
-	dx = 20; 
-	dy = 20; 
-	dz = 20; 
-	
-	outer_Dirichlet_conditions = false; 
-	Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 0.0 ); 
-	
-	// set a far-field value for oxygen (assumed to be in the first field)
-	Dirichlet_condition_vector[0] = 38.0; 
-	
-	simulate_2D = false; 
-	
-	X_range.resize(2,500.0); 
-	X_range[0] *= -1.0;
-	
-	Y_range.resize(2,500.0); 
-	Y_range[0] *= -1.0;
-	
-	Z_range.resize(2,500.0); 
-	Z_range[0] *= -1.0;
-	
-	calculate_gradients = false; 
-	
+	public:
+		std::vector<bool> values; 
+		std::unordered_map<std::string,int> name_map; 
+		std::string& name( int i ); 
+		std::vector<std::string> units; 
+		void resize( int n ); 
+		int add( std::string name , std::string units , bool value ); 
+		
+		bool& operator[]( int i ); 
+		bool& operator[]( std::string name ); 
+		
+		Bools(); 
+}
+*/
+
+Bools::Bools()
+{
+	values.resize( 0 , true ); 
+	name_map.clear(); 
 	return; 
 }
 
-Microenvironment_Options default_microenvironment_options; 
+int Bools::size( void )
+{ return values.size(); } 
 
-void initialize_microenvironment( void )
+
+void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
 {
-	// create and name a microenvironment; 
-	microenvironment.name = default_microenvironment_options.name;
-	// register the diffusion solver 
-	if( default_microenvironment_options.simulate_2D == true )
-	{
-		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
-	}
-	else
-	{
-		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D; 
-	}
-	
-	// set the default substrate to oxygen (with typical units of mmHg)
-	microenvironment.set_density(0, "oxygen" , "mmHg" );
-	microenvironment.diffusion_coefficients[0] = 1e5; 
-	microenvironment.decay_rates[0] = 0.1; 
-	
-	// resize the microenvironment to 1 mm^2 (and dz thick), centered at (0,0,0)
-	if( default_microenvironment_options.simulate_2D == true )
-	{
-		default_microenvironment_options.Z_range[0] = -default_microenvironment_options.dz/2.0; 
-		default_microenvironment_options.Z_range[1] = default_microenvironment_options.dz/2.0;
-	}
-	microenvironment.resize_space( default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
-		default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1], 
-		default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], 
-		default_microenvironment_options.dx,default_microenvironment_options.dy,default_microenvironment_options.dz );
-		
-	// set units
-	microenvironment.spatial_units = default_microenvironment_options.spatial_units;
-	microenvironment.time_units = default_microenvironment_options.time_units;
-	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
+	secretion.sync_to_microenvironment( pMicroenvironment ); 
+	molecular.sync_to_microenvironment( pMicroenvironment ); 
 
-	// set the initial oxygenation to 38 mmHg (a typical normoxic tissue value of 5% O2)
-	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
-	{ microenvironment.density_vector(n) = default_microenvironment_options.Dirichlet_condition_vector; }
-	
-	// set Dirichlet conditions along the 4 outer edges 
-	for( int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
-	{
-		int J = microenvironment.mesh.y_coordinates.size()-1;
-		microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,0,0) , default_microenvironment_options.Dirichlet_condition_vector );
-		microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,0) , default_microenvironment_options.Dirichlet_condition_vector );
-	}
-	int I = microenvironment.mesh.x_coordinates.size()-1;
-	for( int j=1; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
-	{
-		microenvironment.add_dirichlet_node( microenvironment.voxel_index(0,j,0) , default_microenvironment_options.Dirichlet_condition_vector );
-		microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,0) , default_microenvironment_options.Dirichlet_condition_vector );
-	}		
-	
-	// if 3-D, also along the corresponding additional faces 
-	if( default_microenvironment_options.simulate_2D == false )
-	{
-		
-		for( int k=1 ; k < microenvironment.mesh.z_coordinates.size()-1 ; k++ )
-		{
-			int i = microenvironment.mesh.x_coordinates.size()-1;
-			for( int j=1; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
-			{
-				microenvironment.add_dirichlet_node( microenvironment.voxel_index(0,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
-				microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
-			}	
-		}	
-	}
-	
-	microenvironment.display_information( std::cout );
-	return;
+	return; 
 }
-*/	
+
+
+
 };
+
+
