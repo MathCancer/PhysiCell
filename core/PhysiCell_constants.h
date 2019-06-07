@@ -163,8 +163,6 @@ static double diffusion_dt = 0.01;
 static double mechanics_dt = 0.1;
 static double phenotype_dt = 6.0;
 
-static double molecular_dt = 0.01; 
-
 };
 
 #endif

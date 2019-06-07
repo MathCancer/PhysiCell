@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 \newcommand{\Version}{1.5.0} 
-\newcommand{\ReleaseDate}{May 30, 2019} 
+\newcommand{\ReleaseDate}{June 7, 2019} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -120,16 +120,21 @@ If you use PhysiCell, please cite it as: \\
 \phantom{ }\hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
 We implemented and solved our model using PhysiCell (Version \Version) [1]. \\
 
-[1] A. Ghaffarizadeh, R. Heiland, S.H. Friedman, S.M. Mumenthaler, and P. Macklin. PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: \href{https://dx.doi.org/10.1371/journal.pcbi.1005991}{10.1371/journal.pcbi.1005991}. \\
+[1] A. Ghaffarizadeh, R. Heiland, S.H. Friedman, S.M. Mumenthaler, and P. Macklin. PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: \href{https://dx.doi.org/10.1371/journal.pcbi.1005991}{10.1371/journal.pcbi.1005991}. } \\
+\\
+Because PhysiCell makes extensive use of BioFVM, we suggest you also cite it:  
 
-Because PhysiCell makes extensive use of BioFVM, we suggest you also cite it. Here's a good way to do that:  \\
-
+\phantom{ }\hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
 We implemented and solved the model using PhysiCell (Version \Version) [1], with BioFVM [2] to solve the transport equations. \\
 
 [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin. PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: \href{https://dx.doi.org/10.1371/journal.pcbi.1005991}{10.1371/journal.pcbi.1005991} \\
 
 [2] A Ghaffarizadeh, SH Friedman, and P Macklin. BioFVM: an efficient parallelized diffusive transport solver for 3-D biological simulations, Bioinformatics 32(8): 1256-8, 2016. DOI: \href{https://dx.doi.org/10.1093/bioinformatics/btv730}{10.1093/bioinformatics/btv730}  
 }
+
+\textbf{Please remember:} if you use an additional addon, please make sure to cite it, too! This is critical for scientific rigor (to correctly document your method), reproducibility, and good academic behavior. 
+
+We have started testing methods to auto-generate suggested citations for addons; see the auto-generated CITATION.txt when you run your model. This will be further developed in future versions of PhysiCell.  
 
 \TOClink
 
@@ -1269,7 +1274,7 @@ the net change in the cell's internalized substrates is
 \left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right), 
 % \left( \frac{ (1-\vec{c}_2) \grvec{\rho}_k + \vec{c}_1} }{ \vec{c}_2 } \right),
 \eeq
-If you set \v|default_microenvironment_options.track_internalized_substrates_in_each_agent = true|, then 
+If \v|default_microenvironment_options.track_internalized_substrates_in_each_agent = true|, then 
 PhysiCell will automatically perform these calculations in every cell at every diffusion time step. 
 
 Note that users should \emph{access} these internalized substrates via the \v|molecular| part of the 
@@ -1386,7 +1391,7 @@ class Cell : public Basic_Agent
     Custom_Cell_Data custom_data;
     Cell_Parameters parameters;
     Cell_Functions functions; 
-
+    
     Cell_State state; 
     Phenotype phenotype; 
     
@@ -1403,8 +1408,9 @@ class Cell : public Basic_Agent
     
     void flag_for_division( void );   
     void flag_for_removal( void );   
-	
+    
     void start_death( int death_model_index ); 
+    void lyse_cell( void ); 
 
     Cell* divide( void );
     void die( void );
@@ -1427,6 +1433,8 @@ class Cell : public Basic_Agent
     
     void update_voxel_in_container(void);
     void copy_data(Cell *);
+	
+    void ingest_cell( Cell* pCell_to_eat ); 	
 
     void set_phenotype( Phenotype& phenotype );  
     void update_radius();
@@ -1616,6 +1624,13 @@ of ten, and executes any ``entry'' functions for the associated
 death model. 
 
 \item 
+\smallcode{void lyse\_cell( void )} triggers immediate degradation and 
+removal of the cell. If already enabled, none, some, or all of the cell's 
+internalized substrates will be released to the microenvironment, as 
+set in \v|phenotype.molecular.fraction_released_at_death|. See Section 
+\ref{sec:phenotype_molecular}. 
+
+\item 
 \smallcode{Cell* divide( void )} performs cell division, and returns 
 the memory address of the newly-created cell. 
 
@@ -1676,6 +1691,22 @@ cell's position within the interaction testing data structure.
 \smallcode{void copy\_data(Cell *)} copies the member data 
 (including \v|custom_data|, \v|parameters|, but \emph{not} \v|phenotype| 
 from the Cell at \v|Cell*|. 
+
+\item 
+\smallcode{void ingest\_cell( Cell* pCell\_to\_eat )} allows a cell 
+to ingest (e.g., phagocytose) a cell. When this happens, the cell gains: 
+\begin{enumerate}
+\item 
+all of the cell's fluid volume; 
+\item 
+all of the cell's nuclear solid and cytoplasmic solid volume (which are added to 
+the nuclear cytoplasmic solid volume); 
+\item 
+none, some, or all of the cell's internalized substrates, as set in \hfill\break 
+\v|pCell_to_eat->phenotype.molecular.fraction_transferred_when_ingested|. See 
+Section \ref{sec:phenotype_molecular}. 
+\end{enumerate}
+
 
 \item 
 \smallcode{void set\_phenotype( Phenotype\& phenotype )} is no longer used 

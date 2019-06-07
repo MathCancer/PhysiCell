@@ -18,35 +18,29 @@ This release also added clearer methods to specify the microenvironment initial 
  
 ### Major new features and changes:
 
-+ Added functionality in BioFVM to (optionally) track the total amount of substrates in each cell, based upon tracking uptake and secretion. Note that without additional, user-defined functions to internally create or consume substrate (e.g., synthesizing proteins, or using oxygen in metabolism), this can result in negative internal values (if cells only secrete but no internal creation functions have been set) or unbounded positive values (if cells uptake a substrate but do not use it). In particular, Basic_Agents (and hence Cells) now have: 
++ Added functionality in BioFVM to (optionally) track the total amount of substrates in each cell, based upon tracking uptake and secretion. Note that without additional, user-defined functions to internally create or consume substrate (e.g., synthesizing proteins, or using oxygen in metabolism), this can result in negative internal values (if cells only secrete but no internal creation functions have been set) or unbounded positive values (if cells uptake a substrate but do not consume it). In particular, Basic_Agents (and hence Cells) now have: 
+++ std::vector<double>* internalized_substrates (tracks internalized substrates)
+++ std::vector<double>* fraction_released_at_death (sets the fraction of each substrate that is released at cell death)
+++ std::vector<double>* fraction_transferred_when_ingested (sets the fraction of each substrate that is transferred to a predatory cell if the cell is eaten). 
 
+Users should access these via the cell's (new) molecular portion of the phenotype. See below. 
 
+In BioFVM::Microenvironment_Options class, we added: 
+++ bool track_internalized_substrates_in_each_agent. Set this to true to enable the tracking. 
 
++ In BioFVM::Microenvironment_Options, we added the ability to set the (uniform) microenvironment initial conditions, via: 
+++ std::vector<double> initial_condition_vector. 
 
+If this has size zero, then BioFVM will use the std::vector<double> Dirichlet_condition_vector as a reasonable guess at initial conditions as in prior versions. 
 
-++ std::vector<double> internalized_substrates 
-++ bool use_internal_densities_as_targets (get rid of this!)
++ We added a new function to Basic_Agent (and hence Cell) to facilitate registering with the microenvironment: 
+++ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )
 
-In BioFVM::Microenvironment_Options class   
-++ bool track_internalized_substrates_in_each_agent; 
+This function will ensure that the secretion, uptake, and internalization tracking data structures of the individual cell agent are properly matched to the microenvironment. 
 
-initial_condition_vector 
++ Added new "Molecular" block to Phenotype, for storing internalized substrates and for eventual inclusion of molecular-scale models (via SBML). 
 
-(it defaults to false); 
-
-updated: 
-
-void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )
  
- added to 
- 
-(need ot track this one down ... )
-
-
-+ Added new "Molecular" block to Phenotype 
-
-+ Added molecular_dt to PhysiCell_constants // ditch for now? 
-
 + added functions to Cell_Functions class / 
 
 + add itinitial condition vector ot microenvironment
@@ -57,6 +51,12 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 
 + 	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 
  
+ 
+ 
+lyse_cell (add to user manual)
+
+ingest_cell (add to user manual) 
+
  
  
 ### Beta features (not fully supported):

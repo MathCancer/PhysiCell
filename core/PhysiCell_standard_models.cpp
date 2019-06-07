@@ -74,7 +74,7 @@ bool PhysiCell_standard_models_initialized = false;
 bool PhysiCell_standard_death_models_initialized = false; 
 bool PhysiCell_standard_cycle_models_initialized = false; 
 	
-Cycle_Model Ki67_advanced, Ki67_basic, live, apoptosis, necrosis, inert; 
+Cycle_Model Ki67_advanced, Ki67_basic, live, apoptosis, necrosis; 
 Cycle_Model cycling_quiescent; 
 Death_Parameters apoptosis_parameters, necrosis_parameters; 
 
@@ -818,35 +818,5 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	
 	return; 
 }
-
-/*
-void advance_molecular_models( double molecular_dt_ )
-{
-	static double time_since_last_update = molecular_dt_; 
-	static double tolerance = 0.001 * molecular_dt_; 
-	
-	extern std::vector<Cell*> *all_cells;
-	
-	// is it time to update? 
-	if( fabs( time_since_last_update - molecular_dt_ ) < tolerance )
-	{
-		
-		#pragma omp parallel for
-		for( int i=0 ; i < (*all_cells).size() ; i++ )
-		{
-			void (*func)(Cell*,Phenotype&,double) = (*all_cells)[i]->functions.internal_substrate_function;
-			if( func )
-			{ func( (*all_cells)[i] , (*all_cells)[i]->phenotype, time_since_last_update );  }
-			func = (*all_cells)[i]->functions.molecular_model_function;
-			if( func ) 
-			{ func( (*all_cells)[i] , (*all_cells)[i]->phenotype, time_since_last_update );  }		
-		}
-		
-		time_since_last_update -= molecular_dt_; 
-	}
-	
-	return; 
-}
-*/
 
 };
