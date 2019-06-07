@@ -38,26 +38,20 @@ If this has size zero, then BioFVM will use the std::vector<double> Dirichlet_co
 
 This function will ensure that the secretion, uptake, and internalization tracking data structures of the individual cell agent are properly matched to the microenvironment. 
 
-+ Added new "Molecular" block to Phenotype, for storing internalized substrates and for eventual inclusion of molecular-scale models (via SBML). 
++ Added new "Molecular" block to Phenotype, for storing internalized substrates and for eventual inclusion of molecular-scale models (via SBML). The major elements are: 
+++ std::vector<double> internalized_substrates (tracks internalized substrates)
+++ std::vector<double> fraction_released_at_death (sets the fraction of each substrate that is released at cell death)
+++ std::vector<double> fraction_transferred_when_ingested (sets the fraction of each substrate that is transferred to a predatory cell if the cell is eaten). 
 
++ Added lyse_cell() to Cell, to allow a cell to immediately be lysed and potentially release its internalized substrates. Lysed cells are removed from the simulation. 
  
-+ added functions to Cell_Functions class / 
-
-+ add itinitial condition vector ot microenvironment
++ Added ingest_cell(Cell*) to Cell, to allow a cell to ingest (e.g., phagocytose) another cell, acquire its volume, and also (optionally) acquire its internalized substrates. This should be useful for immunology.  
  
 ### Minor new features and changes: 
  
-+ Add void Microenvironment::update_dirichlet_node( int voxel_index , int substrate_index , double new_value ) based on pc4nanobio changes, whihc allows you to update a single substrate's dirichlet condition at specific voxel, rather than all of them. 
++ Added void Microenvironment::update_dirichlet_node( int voxel_index , int substrate_index , double new_value ) based on pc4nanobio changes, which allows you to update a single substrate's dirichlet condition at specific voxel, rather than all of them. 
 
-+ 	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 
- 
- 
- 
-lyse_cell (add to user manual)
-
-ingest_cell (add to user manual) 
-
- 
++ Added void sync_to_microenvironment( Microenvironment* pMicroenvironment ) to Phenotype to facilitate syncing the cell's phenotype to the microenvironment (and subsequently calls the functions in phenotype.secretion and phenotype.molecular). This isn't used yet, but perhaps it should be. 
  
 ### Beta features (not fully supported):
  
@@ -67,7 +61,7 @@ ingest_cell (add to user manual)
 
 + Updated BioFVM's operator<< on std::vector<double> so that it doesn't output x="value", y="value", z = "value" for 3-D vectors. 
 
-+ Fixed the search for cycle phase indices in the 2D adn 3D template projects, to make sure it searches teh flow_cytometry_separated_cycle_model model and not the Ki67_advanced model, as part of the create_cell_types() function in the custom.cpp files. 
++ Fixed the search for cycle phase indices in the 2D and 3D template projects, to make sure it searches teh flow_cytometry_separated_cycle_model model and not the Ki67_advanced model, as part of the create_cell_types() function in the custom.cpp files. 
 
 + In PhysiCell_standard_models, standard_volume_update_function is now fixed to update phenotype.volume.fluid. (This was not used in any mechanics or other calculations, so it does not affect prior modeling results.) 
 
@@ -81,6 +75,10 @@ ingest_cell (add to user manual)
 
 + We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
 
++ We will introduce improvements to placement of daughter cells after division. 
+
++ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+
 ### Planned future improvements: 
  
 + Further XML-based simulation setup. 
@@ -93,7 +91,7 @@ ingest_cell (add to user manual)
   
 + integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
   
-+ Develop contact-based cell-cell interactions. (Likely in next release.)
++ Develop contact-based cell-cell interactions. 
 
 + Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
  
@@ -104,8 +102,6 @@ ingest_cell (add to user manual)
 + create an angiogenesis sample project 
  
 + create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
-
-+ (optionally) track internalized substrate, coupled with BioFVM
 
 * * * 
 

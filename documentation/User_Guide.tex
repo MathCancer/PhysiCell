@@ -1107,6 +1107,11 @@ If the voxel was not previously a Dirichlet node, it is automatically
 changed to a Dirichlet node. 
 
 \item 
+\smallcode{void Microenvironment::update\_dirichlet\_node( int voxel\_index , \\ 
+\phantom{void }int substrate\_index , double new\_value )} can be used to 
+update a single substrate's dirichlet condition at specific voxel, rather than all of them. 
+
+\item 
 \smallcode{void Microenvironment::remove\_dirichlet\_node( int voxel\_index )} 
 removes the Dirichlet node at voxel \v|voxel_index|. 
 

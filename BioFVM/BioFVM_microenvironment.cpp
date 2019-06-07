@@ -1085,13 +1085,6 @@ Microenvironment_Options default_microenvironment_options;
 
 void initialize_microenvironment( void )
 {
-	/*
-	if( default_microenvironment_options.use_oxygen_as_first_field == false )
-	{
-		std::cout << "wha???" << std::endl; 
-	}
-	*/
-	
 	// create and name a microenvironment; 
 	microenvironment.name = default_microenvironment_options.name;
 	// register the diffusion solver 
