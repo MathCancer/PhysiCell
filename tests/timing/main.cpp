@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -66,101 +64,76 @@
 #                                                                             #
 ###############################################################################
 */
---> 
 
-<!--
-<user_details />
--->
+#include <iostream>
+#include <string>
+#include <random>
+#include <chrono>
 
-<PhysiCell_settings version="devel-version">
-	<domain>
-		<x_min>-750</x_min>
-		<x_max>750</x_max>
-		<y_min>-750</y_min>
-		<y_max>750</y_max>
-		<z_min>-750</z_min>
-		<z_max>750</z_max>
-		<dx>20</dx>
-		<dy>20</dy>
-		<dz>20</dz>
-		<use_2D>false</use_2D>
-	</domain>
-	
-	<overall>
-		<max_time units="min">30240</max_time> <!-- 21 days * 24 h * 60 min -->
-		<time_units>min</time_units>
-		<space_units>micron</space_units>
-	</overall>
-	
-	<parallel>
-		<omp_num_threads>8</omp_num_threads>
-	</parallel> 
-	
-	<save>
-		<folder>output</folder> <!-- use . for root --> 
+#include "PhysiCell_standard_models.h" 
+#include "PhysiCell_cell.h" 
 
-		<full_data>
-			<interval units="min">60</interval>
-			<enable>true</enable>
-		</full_data>
-		
-		<SVG>
-			<interval units="min">60</interval>
-			<enable>true</enable>
-		</SVG>
-		
-		<legacy_data>
-			<enable>false</enable>
-		</legacy_data>
-	</save>
-	
-	<user_parameters>
-		<random_seed type="int" units="dimensionless">0</random_seed> 
+//using namespace PhysiCell;   // bad practice
 
-		<!-- main --> 
-		<immune_activation_time type="double" units="min">20160</immune_activation_time>
-			<!-- activate in 7 days --> 
-		<save_interval_after_therapy_start type="double" units="min">3.0</save_interval_after_therapy_start>
-		
-		<!-- immune cell properties --> 
-		<immune_o2_relative_uptake type="double" units="dimensionless">0.1</immune_o2_relative_uptake>
-		<immune_apoptosis_rate type="double" units="1/min">6.944e-5</immune_apoptosis_rate> 
-			<!-- 10 day survival time --> 
-		<immune_motility_persistence_time type="double" units="min">10</immune_motility_persistence_time>
-		<immune_migration_speed type="double" units="micron/min">1.0</immune_migration_speed>
-		<immune_migration_bias type="double" units="dimensionless">0.5</immune_migration_bias>
-		<immune_relative_adhesion type="double" units="dimensionless">0</immune_relative_adhesion>
-		<immune_relative_repulsion type="double" units="dimensionless">5</immune_relative_repulsion> 	
-		
-		<!-- some extra immune parameters --> 
-		<immune_kill_rate type="double" units="1/min">0.06667</immune_kill_rate> <!-- 15 min--> 
-		<immune_attachment_lifetime type="double" units="min">60.0</immune_attachment_lifetime> 
-		<immune_attachment_rate type="double" units="1/min">0.2</immune_attachment_rate> <!-- 5 min--> 
+static PhysiCell::Cell_Definition mycell; 
 
-		<elastic_coefficient type="double" units="1/min">0.01</elastic_coefficient>		
+int ncells = 1000000;
 
-		<!-- immune seeding parameters --> 
-		
-		<number_of_immune_cells type="int" units="dimensionless">7500</number_of_immune_cells> 
-		<initial_min_immune_distance_from_tumor type="double" units="micron">30</initial_min_immune_distance_from_tumor>
-		<thickness_of_immune_seeding_region type="double" units="micron">75</thickness_of_immune_seeding_region>
-		
-		<!-- tissue setup -->
-		<tumor_radius type="double" units="micron">250</tumor_radius> 
-		<tumor_mean_immunogenicity type="double" units="dimensionless">1.0</tumor_mean_immunogenicity>
-		<tumor_immunogenicity_standard_deviation type="double" units="dimensionless">0.25</tumor_immunogenicity_standard_deviation>
-		
-		<!-- some attachment parameters --> 
-		<oncoprotein_saturation type="double" units="dimensionless">2.0</oncoprotein_saturation>
-			<!-- above this value, more oncoprotein doesn't make cells any further immunogenic -->
-		<oncoprotein_threshold type="double" units="dimensionless">0.5</oncoprotein_threshold>
-			<!-- below this vlaue, cells are not immunogenic --> 
-		<max_attachment_distance type="double" units="micron">18.0</max_attachment_distance>
-			<!-- cells do not remain attached beyond this distance --> 
-		<min_attachment_distance type="double" units="micron">14.0</min_attachment_distance>
-			<!-- analogous ot resting spring length --> 
+int time_custom_vars1()
+{
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_real_distribution<> dis(-1.0, 1.0);
 
-		
-	</user_parameters>
-	
-</PhysiCell_settings>
+    std::cout << "--------------  " << __FUNCTION__ << " -------------- " << std::endl;
+    double mechanics_voxel_size = 30; 
+    PhysiCell::Cell_Container* cell_container = PhysiCell::create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+
+    PhysiCell::cell_defaults.custom_data.add_variable( "myvar0" , "dimensionless", 42.0); 
+    PhysiCell::cell_defaults.custom_data.add_variable( "myvar1" , "dimensionless", 42.1); 
+    PhysiCell::cell_defaults.custom_data.add_variable( "myvar2" , "dimensionless", 42.2); 
+
+    mycell = PhysiCell::cell_defaults;
+    // std::cout << "-- retrieving: " << std::endl;
+    // name = "myvar1";    // reminder that retrieving an undefined var value will return the 0th defined.
+    // std::cout << name << " = " << mycell.custom_data[name] << std::endl;
+
+    PhysiCell::Cell* pCell = NULL; 
+    double x,y;
+    double sum = 0;
+    std::cout << "ncells = " << ncells << std::endl;
+    auto start = std::chrono::steady_clock::now();
+
+    for (int idx=0; idx<ncells; idx++)
+    {
+        // std::cout << "idx=" << idx << std::endl;
+        pCell = PhysiCell::create_cell(); 
+        x = 1000*dis(gen);  // we don't need to create x,y for this test, but do
+        y = 1000*dis(gen);
+        pCell->assign_position( x, y, 0.0 );
+        // std::cout << x << y << std::endl;
+        // std::cout << pCell->custom_data["myvar0"] << std::endl;
+        // std::cout << pCell->custom_data["myvar1"] << std::endl;
+        // std::cout << pCell->custom_data["myvar2"] << std::endl;
+        sum += (pCell->custom_data["myvar0"] + pCell->custom_data["myvar1"]) / pCell->custom_data["myvar2"] ; // = ~2
+        // std::cout << pCell->custom_data["notfound"] << std::endl;
+    }
+    std::cout << "sum = " << sum << std::endl;  // ~ 2*ncells
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "Elapsed time in milliseconds : " 
+        << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+
+    // This will throw an error if we check for a valid var name in the "[]" operator:
+    // Invalid custom variable: notfound
+    std::cout << "pCell->custom_data['notfound'] = " << pCell->custom_data["notfound"] << std::endl;
+
+    return 1;
+}
+
+int main()
+{
+    std::cout << ">>>>>>>>>  Timing tests" << std::endl;
+    time_custom_vars1();
+
+    return 1;
+}

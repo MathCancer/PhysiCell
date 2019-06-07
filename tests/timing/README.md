@@ -1,0 +1,2 @@
+# Perform timing tests
+
