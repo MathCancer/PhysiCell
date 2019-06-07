@@ -82,7 +82,11 @@ This minor release fixes bugs in the new virus-macrophage sample project. Users 
 + In the virus-macrophage sample project, switch cell death (in epithelial_function) from apoptosis to cell_lysis to demonstrate the new function. 
 
 + In the virus-macrophage sample project, enable internalized substrate tracking in the setup_microenvironment() function. 
- 
+
++ In the virus-macrophage sample project, use a slower viral replication rate. (Should take 240 minutes to reach the lysis threshold.) 
+
++ In the virus-macrophage sample project, switched to a maximum simulation time of 24 hours (1440 minutes). 
+  
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
