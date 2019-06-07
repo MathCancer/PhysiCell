@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">5760</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">1440</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -119,7 +119,7 @@
 		<!-- example parameters from the template --> 
 		
 		<!-- virus properties --> 
-		<viral_replication_rate type="double" units="viral particles/min" description="rate at which infected cells create new viral particles">1</viral_replication_rate> 
+		<viral_replication_rate type="double" units="viral particles/min" description="rate at which infected cells create new viral particles">0.4167</viral_replication_rate> 
 		<min_virion_count type="double" units="none" description="minimum number of virions to start replication">1</min_virion_count>
 		<burst_virion_count type="double" units="none" description="max virion load, where infected cells lyse to release viral particles">100</burst_virion_count>
 		<viral_internalization_rate type="double" units="1/min" description="internalization rate for viral particles">10</viral_internalization_rate> 

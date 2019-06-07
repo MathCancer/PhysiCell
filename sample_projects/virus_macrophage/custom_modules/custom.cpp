@@ -220,6 +220,10 @@ void setup_microenvironment( void )
 
 	default_microenvironment_options.outer_Dirichlet_conditions = false;
 	
+	// track internalized total substrates
+	
+	default_microenvironment_options.track_internalized_substrates_in_each_agent = true; 
+	
 	// if there are more substrates, resize accordingly 
 	std::vector<double> bc_vector( 1 , 0.0 ); // 5% o2
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
@@ -414,7 +418,7 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 				> parameters.doubles("min_virion_detection_threshold") &&
 				distance < max_distance )
 			{
-				std::cout << "nom nom nom" << std::endl; 
+				std::cout << "\t\tnom nom nom" << std::endl; 
 				pCell->ingest_cell( pTestCell ); 
 			}
 		}
@@ -435,8 +439,8 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 	double virus = phenotype.molecular.internalized_total_substrates[nVirus]; 
 	if( virus >= parameters.doubles("burst_virion_count") )
 	{
-		std::cout << "burst!" << std::endl; 
-		pCell->start_death( apoptosis_model_index );
+		std::cout << "\t\tburst!" << std::endl; 
+		pCell->lyse_cell(); // start_death( apoptosis_model_index );
 		pCell->functions.update_phenotype = NULL; 
 		return; 
 	}
