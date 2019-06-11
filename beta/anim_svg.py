@@ -1,8 +1,8 @@
 #
-# anim_svg_step.py:  render/animate PhysiCell .svg files, using left/right arrows on keyboard
+# anim_svg.py:  render/animate PhysiCell .svg files, using left/right arrows on keyboard
 #
 # Usage:
-#  python anim_svg_step.py <show_nucleus start_index axes_min axes_max scale_radius>
+#  python anim_svg.py <show_nucleus start_index axes_min axes_max>
 #    i.e., the arguments <...> are optional and have defaults.
 # 
 # Keyboard arrows: right/left arrows will single step forward/backward; up/down will increment/decrement step size
@@ -10,10 +10,10 @@
 # Dependencies include matplotlib and numpy. We recommend installing the Anaconda Python3 distribution.
 #
 # Examples (run from directory containing the .svg files):
-#  python anim_svg_step.py 
-#  python anim_svg_step.py 0 5 700 1300 12
+#  python anim_svg.py 
+#  python anim_svg.py 0 5 700 1300 
 #
-# Author: Randy Heiland
+# Author: Randy Heiland (except for the circles() function)
 #
 #
 __author__ = "Randy Heiland"
@@ -27,6 +27,8 @@ join_our_list = "(Join/ask questions at https://groups.google.com/forum/#!forum/
 try:
   import matplotlib
   import matplotlib.colors as mplc
+  from matplotlib.patches import Circle, Ellipse, Rectangle
+  from matplotlib.collections import PatchCollection
 except:
   print("\n---Error: cannot import matplotlib")
   print("---Try: python -m pip install matplotlib")
@@ -62,8 +64,7 @@ show_nucleus = 0
 current_idx = 0
 axes_min = 0.0
 axes_max = 1000  # but overridden by "width" attribute in .svg
-scale_radius = 1.0
-if (len(sys.argv) == 6):
+if (len(sys.argv) == 5):
   use_defaults = False
   kdx = 1
   show_nucleus = int(sys.argv[kdx])
@@ -73,14 +74,12 @@ if (len(sys.argv) == 6):
   axes_min = float(sys.argv[kdx])
   kdx += 1
   axes_max = float(sys.argv[kdx])
-  kdx += 1
-  scale_radius = float(sys.argv[kdx])
 elif (len(sys.argv) != 1):
-  print("Please provide either no args or 5 args:")
-  usage_str = "show_nucleus start_index axes_min axes_max scale_radius"
+  print("Please provide either no args or 4 args:")
+  usage_str = "show_nucleus start_index axes_min axes_max"
   print(usage_str)
   print("e.g.,")
-  eg_str = "%s 0 0 0 2000 1" % (sys.argv[0])
+  eg_str = "%s 0 0 0 2000" % (sys.argv[0])
   print(eg_str)
   sys.exit(1)
 
@@ -89,7 +88,6 @@ print("show_nucleus=",show_nucleus)
 print("current_idx=",current_idx)
 print("axes_min=",axes_min)
 print("axes_max=",axes_max)
-print("scale_radius=",scale_radius)
 #"""
 
 """
@@ -98,14 +96,12 @@ if (len(sys.argv) > 1):
 if (len(sys.argv) > 2):
    axes_min = float(sys.argv[2])
    axes_max = float(sys.argv[3])
-if (len(sys.argv) == 5):
-   scale_radius = float(sys.argv[4])
 
-if (len(sys.argv) > 5):
-  usage_str = "[<start_index> [<axes_min axes_max [scale_radius]]]"
+if (len(sys.argv) > 4):
+  usage_str = "[<start_index> [<axes_min axes_max>]]"
   print(usage_str)
   print("e.g.,")
-  eg_str = "%s 10 700 1300 4" % (sys.argv[0])
+  eg_str = "%s 1 10 700 1300" % (sys.argv[0])
   print(eg_str)
   sys.exit(1)
 """
@@ -134,6 +130,82 @@ time_delay = 0.1
 
 count = -1
 #while True:
+
+#-----------------------------------------------------
+def circles(x, y, s, c='b', vmin=None, vmax=None, **kwargs):
+    """
+    See https://gist.github.com/syrte/592a062c562cd2a98a83 
+
+    Make a scatter plot of circles. 
+    Similar to plt.scatter, but the size of circles are in data scale.
+    Parameters
+    ----------
+    x, y : scalar or array_like, shape (n, )
+        Input data
+    s : scalar or array_like, shape (n, ) 
+        Radius of circles.
+    c : color or sequence of color, optional, default : 'b'
+        `c` can be a single color format string, or a sequence of color
+        specifications of length `N`, or a sequence of `N` numbers to be
+        mapped to colors using the `cmap` and `norm` specified via kwargs.
+        Note that `c` should not be a single numeric RGB or RGBA sequence 
+        because that is indistinguishable from an array of values
+        to be colormapped. (If you insist, use `color` instead.)  
+        `c` can be a 2-D array in which the rows are RGB or RGBA, however. 
+    vmin, vmax : scalar, optional, default: None
+        `vmin` and `vmax` are used in conjunction with `norm` to normalize
+        luminance data.  If either are `None`, the min and max of the
+        color array is used.
+    kwargs : `~matplotlib.collections.Collection` properties
+        Eg. alpha, edgecolor(ec), facecolor(fc), linewidth(lw), linestyle(ls), 
+        norm, cmap, transform, etc.
+    Returns
+    -------
+    paths : `~matplotlib.collections.PathCollection`
+    Examples
+    --------
+    a = np.arange(11)
+    circles(a, a, s=a*0.2, c=a, alpha=0.5, ec='none')
+    plt.colorbar()
+    License
+    --------
+    This code is under [The BSD 3-Clause License]
+    (http://opensource.org/licenses/BSD-3-Clause)
+    """
+
+    if np.isscalar(c):
+        kwargs.setdefault('color', c)
+        c = None
+
+    if 'fc' in kwargs:
+        kwargs.setdefault('facecolor', kwargs.pop('fc'))
+    if 'ec' in kwargs:
+        kwargs.setdefault('edgecolor', kwargs.pop('ec'))
+    if 'ls' in kwargs:
+        kwargs.setdefault('linestyle', kwargs.pop('ls'))
+    if 'lw' in kwargs:
+        kwargs.setdefault('linewidth', kwargs.pop('lw'))
+    # You can set `facecolor` with an array for each patch,
+    # while you can only set `facecolors` with a value for all.
+
+    zipped = np.broadcast(x, y, s)
+    patches = [Circle((x_, y_), s_)
+               for x_, y_, s_ in zipped]
+    collection = PatchCollection(patches, **kwargs)
+    if c is not None:
+        c = np.broadcast_to(c, zipped.shape).ravel()
+        collection.set_array(c)
+        collection.set_clim(vmin, vmax)
+
+    ax = plt.gca()
+    ax.add_collection(collection)
+    ax.autoscale_view()
+    plt.draw_if_interactive()
+    if c is not None:
+        plt.sci(collection)
+    return collection
+
+#-----------------------------------------------------
 def plot_svg():
   global current_idx, axes_max
   fname = "snapshot%08d.svg" % current_idx
@@ -218,12 +290,13 @@ def plot_svg():
         break
 
       rval = float(circle.attrib['r'])
-#      if (rgb[0] > rgb[1]):
-#        print(num_cells,rgb, rval)
+#      print('rval=',rval)
+
       xlist.append(xval)
       ylist.append(yval)
       rlist.append(rval)
       rgb_list.append(rgb)
+#      print('rgb_list = ',rgb_list)
 
 #     For .svg files with cells that *have* a nucleus, there will be a 2nd
       if (show_nucleus == 0):
@@ -242,6 +315,8 @@ def plot_svg():
   yvals = np.array(ylist)
   rvals = np.array(rlist)
   rgbs =  np.array(rgb_list)
+#  print('type(rgbs) = ',type(rgbs))
+#  print('rgbs = ',rgbs)
 #print("xvals[0:5]=",xvals[0:5])
 #print("rvals[0:5]=",rvals[0:5])
 #  print("rvals.min, max=",rvals.min(),rvals.max())
@@ -251,7 +326,13 @@ def plot_svg():
   plt.title(title_str)
   plt.xlim(axes_min,axes_max)
   plt.ylim(axes_min,axes_max)
-  plt.scatter(xvals,yvals, s=rvals*scale_radius, c=rgbs)
+#  plt.scatter(xvals,yvals, s=rvals*scale_radius, c=rgbs)
+#  plt.scatter(xvals,yvals, s=rvals*scale_radius, c=rgbs, alpha=0.5, edgecolor='black')
+#  plt.scatter(xvals,yvals, s=rvals*scale_radius, c=rgbs, alpha=1.0, edgecolor='black')
+#  circles(xvals,yvals, s=rvals, c=rgbs, alpha=1.0, edgecolor='black')
+#  circles(xvals,yvals, s=rvals)
+#  circles(xvals,yvals, s=rvals, c=rgbs)
+  circles(xvals,yvals, s=rvals, color=rgbs)
 #plt.xlim(0,2000)  # TODO - get these values from width,height in .svg at top
 #plt.ylim(0,2000)
   plt.pause(time_delay)

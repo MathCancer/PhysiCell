@@ -180,10 +180,7 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	return; 
 }
 
-Microenvironment* Basic_Agent::get_microenvironment( void )
-{ return microenvironment; }
-
-Basic_Agent::~Basic_Agent()
+void Basic_Agent::release_internalized_substrates( void )
 {
 	Microenvironment* pS = get_default_microenvironment(); 
 	
@@ -198,10 +195,17 @@ Basic_Agent::~Basic_Agent()
 	
 	// release this amount into the environment 
 	
-	(*pS)(current_voxel_index) += *internalized_substrates; 
+	(*pS)(current_voxel_index) += *internalized_substrates; 	
+	
+	// zero out the now-removed substrates 
+	
+	internalized_substrates->assign( internalized_substrates->size() , 0.0 ); 
 	
 	return; 
 }
+
+Microenvironment* Basic_Agent::get_microenvironment( void )
+{ return microenvironment; }
 
 Basic_Agent* create_basic_agent( void )
 {

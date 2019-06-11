@@ -1,12 +1,11 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:**      1.5.1
+**Version:**      1.5.2
 
-**Release date:** 7 June 2019
+**Release date:** 11 June 2019
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
-
 
 **Reference:** A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
 
@@ -61,7 +60,9 @@ See changes.md for the full change log.
 
 ## Release summary: 
 
-This minor release fixes bugs in the new virus-macrophage sample project. Users should also consult the reslease notes for 1.5.0. 
+This minor release fixes bugs that affected the release of internalized substrates at cell death on Linux and OSX operating systems, relating to system differences in order of evaluating destructor functions. The release of internalized substrates has been moved to a new function, and placed in cell death functions. There is no change in APIs or high-level usage / syntax for end users. 
+
+Users should also consult the release notes for 1.5.0. 
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
@@ -71,22 +72,30 @@ This minor release fixes bugs in the new virus-macrophage sample project. Users 
  
 ### Minor new features and changes: 
  
-+ None 
++ Introduced new function Basic_Agent::release_internalized_substrates() to explicitly release a cell's internalized substrates, rather assuming it can be properly done in the Basic_Agent destructor function. 
+
++ Removed the Basic_Agent destructor function to allow the compiler to automatically generate this. 
+
++ Very minor revisions to the release protocol. 
+
++ Minor updates to the user guide to reflect the release_internalized_substrates() function. 
  
 ### Beta features (not fully supported):
  
-+ None 
++ anim_svg.py - now plots correctly sized cells; manually step via arrow keys
+
++ anim_svg_cycle.py - same as above, but automatically cycles through .svg files
   
 ### Bugfixes: 
 
-+ In the virus-macrophage sample project, switch cell death (in epithelial_function) from apoptosis to cell_lysis to demonstrate the new function. 
++ Move code for internalized substrate release from the Basic_Agent destructor to the new Basic_Agent::release_internalized_substrates() function. 
 
-+ In the virus-macrophage sample project, enable internalized substrate tracking in the setup_microenvironment() function. 
++ Basic_Agent::release_internalized_substrates() is now called from delete_cell(int) in PhysiCell_cell.cpp. 
 
-+ In the virus-macrophage sample project, use a slower viral replication rate. (Should take 240 minutes to reach the lysis threshold.) 
++ Basic_Agent::release_internalized_substrates() explicitly sets internalized_substrates to a zero vector, just in case users want to call this function on non-dead cells. 
 
-+ In the virus-macrophage sample project, switched to a maximum simulation time of 24 hours (1440 minutes). 
-  
++ Cell::Cell() now initializes updated_current_mechanics_voxel_index = 0 (avoids a possible segfault in GDB)
+ 
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  

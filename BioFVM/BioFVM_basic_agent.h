@@ -88,6 +88,7 @@ class Basic_Agent
 	std::vector<double> * internalized_substrates; 
 	std::vector<double> * fraction_released_at_death; 
 	std::vector<double> * fraction_transferred_when_ingested; 
+	void release_internalized_substrates( void ); 
 
 	void set_internal_uptake_constants( double dt ); // any time you update the cell volume or rates, should call this function. 
 
@@ -106,7 +107,7 @@ class Basic_Agent
 	void update_position( double dt );
 	
 	Basic_Agent(); 
-	~Basic_Agent(); 
+
 	// simulate secretion and uptake at the nearest voxel at the indicated microenvironment.
 	// if no microenvironment indicated, use the currently selected microenvironment. 
 	void simulate_secretion_and_uptake( Microenvironment* M, double dt ); 
