@@ -1,3 +1,13 @@
+0) Make sure everything is cleaned up:
+
+   a) make reset
+
+   b) make data-cleanup 
+
+   c) only PhysiCell_settings.xml in ./config
+
+   d) only empty.txt in ./output
+
 1) update version number in core/PhysiCell.h 
 
 (See static std::string PhysiCell_version.) 
@@ -15,7 +25,6 @@ number.
 6) Make appropriate changes to ./documentation/User_Guide.tex, and 
    recompile the LaTeX document. Don't forget to set \Version to x.y.z 
    at the top of the document. Set the \ReleaseDate to today (manually). 
-
 
 7) create (and approve) a pull request from the development branch to the master branch.
 
@@ -56,7 +65,7 @@ zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.giti
    e) On the "attach binaries", use the zip file you created for the 
       SourceForge release.  
 
-   f) Click "" 
+   f) Click "publish release" 
 
 10) Update MathCancer.org
 

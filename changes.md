@@ -23,6 +23,10 @@ Users should also consult the release notes for 1.5.0.
 + Introduced new function Basic_Agent::release_internalized_substrates() to explicitly release a cell's internalized substrates, rather assuming it can be properly done in the Basic_Agent destructor function. 
 
 + Removed the Basic_Agent destructor function to allow the compiler to automatically generate this. 
+
++ Very minor revisions to the release protocol. 
+
++ Minor updates to the user guide to reflect the release_internalized_substrates() function. 
  
 ### Beta features (not fully supported):
  

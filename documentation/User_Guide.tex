@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.5.0} 
-\newcommand{\ReleaseDate}{June 7, 2019} 
+\newcommand{\Version}{1.5.2} 
+\newcommand{\ReleaseDate}{June 11, 2019} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -1378,6 +1378,18 @@ This is useful for things like chemotaxis.
 returns a vector of \emph{all} the substrate gradients at the 
 cell's position. Each \v|gradient| is a 
 \v|std::vector<double>| of size 3. 
+
+\item
+\smallcode{void release\_internalized\_substrates( void )} immediately 
+releases none / some / all internalized substrates to the cell's position 
+in extracellular space, according to the release fraction specified in the 
+phenotype. It sets all internalized substrate levels to zero thereafter. 
+This function is automatically called when a cell is about to be removed 
+from the simulation, as long as internalized substrate tracking is enabled. 
+See Sections \ref{sec:BioFVM_internalization_tracking}, 
+\ref{sec:BioFVM_auto_release_at_death}, and \ref{sec:phenotype_molecular}. 
+(Introduced in 1.5.2.) 
+
 \end{enumerate}
  
 Here is how the \v|Cell| class is defined in 
