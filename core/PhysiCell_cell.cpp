@@ -834,6 +834,9 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 
 void delete_cell( int index )
 {
+	// released internalized substrates (as of 1.5.x releases)
+	(*all_cells)[index]->release_internalized_substrates(); 
+	
 	// deregister agent in from the agent container
 	(*all_cells)[index]->get_container()->remove_agent((*all_cells)[index]);
 	// de-allocate (delete) the cell; 
