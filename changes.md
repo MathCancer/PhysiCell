@@ -26,7 +26,9 @@ Users should also consult the release notes for 1.5.0.
  
 ### Beta features (not fully supported):
  
-+ None 
++ anim_svg.py - now plots correctly sized cells; manually step via arrow keys
+
++ anim_svg_cycle.py - same as above, but automatically cycles through .svg files
   
 ### Bugfixes: 
 
