@@ -10,7 +10,7 @@
 
 This minor release fixes bugs that affected the release of internalized substrates at cell death on Linux and OSX operating systems, relating to system differences in order of evaluating destructor functions. The release of internalized substrates has been moved to a new function, and placed in cell death functions. There is no change in APIs or high-level usage / syntax for end users. 
 
-Users should also consult the reslease notes for 1.5.0. 
+Users should also consult the release notes for 1.5.0. 
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
@@ -35,6 +35,8 @@ Users should also consult the reslease notes for 1.5.0.
 + Basic_Agent::release_internalized_substrates() is now called from delete_cell(int) in PhysiCell_cell.cpp. 
 
 + Basic_Agent::release_internalized_substrates() explicitly sets internalized_substrates to a zero vector, just in case users want to call this function on non-dead cells. 
+
++ Cell::Cell() now initializes updated_current_mechanics_voxel_index = 0 (avoids a possible segfault in GDB)
  
 ### Notices for intended changes that may affect backwards compatibility:
  

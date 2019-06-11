@@ -316,6 +316,8 @@ Cell::Cell()
 	
 	current_mechanics_voxel_index=-1;
 	
+	updated_current_mechanics_voxel_index = 0;
+	
 	is_movable = true;
 	is_out_of_domain = false;
 	displacement.resize(3,0.0); // state? 
