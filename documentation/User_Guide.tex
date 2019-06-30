@@ -1459,7 +1459,9 @@ class Cell : public Basic_Agent
     
     std::vector<Cell*>& cells_in_my_container( void ); 
     
-    void Cell::convert_to_cell_definition( Cell_Definition& cd )
+    void differentiate(Cell* parentCell, Cell* daughterCell);
+    void convert_to_cell_definition( Cell_Definition& cd ); 
+    void convert_to_cell_definition_preserving_volume( Cell_Definition& cd ); 
 };
 \end{verbatim}
 
@@ -1748,15 +1750,21 @@ access functions, including better lists of neighbors and lists of
 nearby mechanics voxels. 
 
 \item 
+\smallcode{void differentiate(Cell* parentCell, Cell* daughterCell)} is called by the \smallcode{divide} function to determine whether a cell is allowed to differerentiate, and if so, what cell types the two daughter cells will take on. See \ref{sec:Differentiation} for more on cell differentiation.
+
+\item 
 \smallcode{void convert\_to\_cell\_definition( Cell\_Definition\& cd )} converts 
 the cell to match the name, type, custom data, parameters, function, and phenotype 
 stored in the Cell Definition in \verb+cd+. (See Section \ref{sec:Cell_Definition} for more 
 information on cell definitions.) As of Version 1.2.2, this function does not overwrite 
 the \v|is_movable|, \v|is_out_of_domain|, and \v|displacement| data of the cell. 
 
+\item 
+\smallcode{void convert\_to\_cell\_definition\_preserving\_volume( Cell\_Definition\& cd )} functions the same as \smallcode{convert\_to\_cell\_definition}, except volume goes unchanged.
+
 This function is particularly useful if you want to do thinks like stem cell hierarchies, where you 
 might ``convert'' a stem cell to a differentiated cell, each of which has been defined 
-separately. 
+separately.  See \ref{sec:Differentiation} for more on cell differentiation.
 
 \end{enumerate} 
 
@@ -2558,6 +2566,11 @@ completely deterministic along the current bias direction. See Section \ref{sec:
 saturation density (at which secretion ends). See Section \ref{sec:Secretion}. 
 
 \item 
+\textbf{Differentiation} defines whether a cell can differentiate into other cell types, and if so, what possible differentiation outcomes can occur. See Section \ref{sec:Differentiation}. 
+\item 
+\textbf{Differentiation\_Ouctome} defines the cell types that result from a possible differentiation outcome. See Section \ref{sec:Differentiation_Outcome}. 
+
+\item 
 \textbf{Molecular} is used to model molecular-scale details, particularly 
 tracking internalized substrates. In future versions of PhysiCell, molecular-scale 
 models (e.g., SBML models) will likely be attached here. See Section \ref{sec:phenotype_molecular}. 
@@ -2580,6 +2593,7 @@ class Phenotype
     Mechanics mechanics; 
     Motility motility; 
     Secretion secretion; 
+    Differentiation differentiation;
     Molecular molecular; 
     
     Phenotype();   
@@ -4075,6 +4089,62 @@ all the uptake rates by \v|factor|.
 
 \end{enumerate}
 \TOClink
+
+\subsection{Differentiation \DONE}
+\label{sec:Differentiation}
+\v|Differentiation| contains information about a Cell's ability (or lack there of) to convert to other cell types during cell division. Its main data elements include:
+\begin{enumerate}
+\item 
+\smallcode{bool differentiation\_possible} this variable should be set to true if it is possible for the cell to differentiate during cell divison. Set to false by default.
+\item 
+\smallcode{std::vector<Differentiation\_Outcome> outcomes} when a cell with \smallcode{differentiation\_possible} set to true divides, one outcome will be chosen from this vector to determine the cell type of each of the two daughter cells that result. See \ref{sec:Differentiation_Outcome} for more information.
+\item 
+\smallcode{std::vector<double> probabilities} this vector sets the probability of each possible differentiation outcome. The size of the vector should be equal to the size of \smallcode{outcomes}, and the elements of this vector should sum to 1. 
+\end{enumerate}
+Here is the full class declaration:
+\begin{verbatim}
+class Differentiation
+{
+  public:
+    Differentiation();
+      bool differentiation_possible;
+      std::vector<double> probabilities;
+      std::vector<Differentiation_Outcome> outcomes;
+};
+\end{verbatim}
+\subsubsection{Member functions}
+\begin{enumerate}
+\item 
+\smallcode{Differentatiation()} is the default constructor. It sets \smallcode{differentiation\_possible} to false.
+\end{enumerate}
+\TOClink
+\subsection{Differentiation\_Outcome \DONE}
+\label{sec:Differentiation_Outcome}
+\v|Differentiation_Ouctome| contains two \smallcode{Cell\_Definition} objects. When a cell that is allowed to differentiate divides, a \smallcode{Differentiation\_Outcome} is chosen to determine the cell types that two daughter cells will take on. See  \ref{sec:Differentiation} for more information on cell differentiation. Its main data elements include:
+\begin{enumerate}
+\item 
+\smallcode{Cell\_Definition* first\_type} the cell type that one of the two daughter cells will take on when this outcome occurs.
+\item 
+\smallcode{Cell\_Definition* second\_type} the cell type that the other daughter cell will take on when this outcome occurs.
+\end{enumerate}
+Note that the ordering of these two variables is arbitrary and should not have any meaningful impact, as which daughter cell recieves which of the two types is random.
+Here is the full class declaration:
+\begin{verbatim}
+class Differentiation_Outcome
+{
+  public:
+      Differentiation_Outcome(Cell_Definition*, Cell_Definition*);
+      Cell_Definition* first_type;
+      Cell_Definition* second_type;
+};
+\end{verbatim}
+\subsubsection{Member functions}
+\begin{enumerate}
+\item 
+\smallcode{Differentiation\_Outcome(Cell\_Definition*, Cell\_Definition*)} is the default constructor. It sets both class variables.
+\end{enumerate}
+\TOClink
+
 
 \subsection{Molecular}
 \label{sec:phenotype_molecular}
