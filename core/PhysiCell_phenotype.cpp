@@ -75,6 +75,16 @@ using namespace BioFVM;
 
 namespace PhysiCell{
 	
+Differentiation::Differentiation()
+{
+	differentiation_possible = false;	
+}
+
+Differentiation_Outcome::Differentiation_Outcome(Cell_Definition* first_type, Cell_Definition* second_type){
+	this->first_type = first_type;
+	this->second_type = second_type; 
+}	
+	
 Phase::Phase()
 {
 	index = 0; 

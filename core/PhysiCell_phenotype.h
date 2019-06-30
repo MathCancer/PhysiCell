@@ -100,6 +100,25 @@ class BM_Point
 };
 */
 
+class Cell_Definition;
+
+class Differentiation_Outcome
+{
+  public:
+    Differentiation_Outcome(Cell_Definition*, Cell_Definition*);
+	Cell_Definition* first_type;
+	Cell_Definition* second_type;
+};
+
+class Differentiation
+{
+  public:
+    Differentiation();
+	bool differentiation_possible;
+	std::vector<double> probabilities;
+	std::vector<Differentiation_Outcome> outcomes;
+};
+
 class Phase
 {
  public:
@@ -550,7 +569,8 @@ class Phenotype
 	Geometry geometry; 
 	Mechanics mechanics; 
 	Motility motility; 
-	Secretion secretion; 
+	Secretion secretion;
+	Differentiation differentiation;	
 	
 	Molecular molecular; 
 	

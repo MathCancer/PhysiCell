@@ -65,168 +65,155 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_cell_h__
-#define __PhysiCell_cell_h__
+#include "./custom.h"
 
-#include "./PhysiCell_custom.h" 
+// declare cell definitions here 
 
-#include "../BioFVM/BioFVM.h"
-#include "./PhysiCell_phenotype.h"
-#include "./PhysiCell_cell_container.h"
-#include "./PhysiCell_constants.h"
+Cell_Definition stem_cell; 
+Cell_Definition tumor_cell_a; 
+Cell_Definition tumor_cell_b; 
 
-using namespace BioFVM; 
 
-namespace PhysiCell{
-class Cell_Container;
-
-class Cell_Parameters
+void create_cell_types( void )
 {
- private:
- public:
-	// oxygen values (in mmHg) for critical phenotype changes
-	double o2_hypoxic_threshold; // value at which hypoxic signaling starts
-	double o2_hypoxic_response; // value at which omics changes are observed 
-	double o2_hypoxic_saturation; // value at which hypoxic signalign saturates 
-	// o2_hypoxic_saturation < o2_hypoxic_threshold
+	// use the same random seed so that future experiments have the 
+	// same initial histogram of oncoprotein, even if threading means 
+	// that future division and other events are still not identical 
+	// for all runs 
 	
-	double o2_proliferation_saturation; // value at which extra o2 does not increase proliferation
-	double o2_proliferation_threshold; // value at which o2 is sufficient for proliferation
+	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
+	
+	// housekeeping 
+	
+	initialize_default_cell_definition();
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	
+	// Force 2D sim BEFORE using cell_defaults to define our custom cell types
+	cell_defaults.functions.set_orientation = up_orientation; 
+	cell_defaults.phenotype.geometry.polarity = 1.0;
+	cell_defaults.phenotype.motility.restrict_to_2D = true; 
+	
+	// make sure the defaults are self-consistent. 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions );
+	
+	// Name the default cell type 
+	
+	stem_cell = cell_defaults;
+	stem_cell.type = 0;
+	
+	tumor_cell_a = cell_defaults;
+	tumor_cell_a.type = 1;
+	
+	tumor_cell_b = cell_defaults;
+	tumor_cell_b.type = 2;
+	
+	
+	stem_cell.phenotype.differentiation.differentiation_possible = true;
+	
+	std::vector<double> probabilities;
+	probabilities.push_back(0.4);
+	probabilities.push_back(0.2);
+	probabilities.push_back(0.2);
+	probabilities.push_back(0.1);
+	probabilities.push_back(0.1);
+	stem_cell.phenotype.differentiation.probabilities = probabilities;
+	
+	std::vector<Differentiation_Outcome> outcomes;
+	Differentiation_Outcome* symmetric_stem = new Differentiation_Outcome(&stem_cell, &stem_cell);
+	Differentiation_Outcome* asymmetric_a = new Differentiation_Outcome(&stem_cell, &tumor_cell_a);
+	Differentiation_Outcome* asymmetric_b = new Differentiation_Outcome(&stem_cell, &tumor_cell_b);
+	Differentiation_Outcome* symmetric_a = new Differentiation_Outcome(&tumor_cell_a, &tumor_cell_a);
+	Differentiation_Outcome* symmetric_b = new Differentiation_Outcome(&tumor_cell_b, &tumor_cell_b);
+	outcomes.push_back(*symmetric_stem);
+	outcomes.push_back(*asymmetric_a);
+	outcomes.push_back(*asymmetric_b);
+	outcomes.push_back(*symmetric_a);
+	outcomes.push_back(*symmetric_b);
+	stem_cell.phenotype.differentiation.outcomes = outcomes;
+	
+	
+	
+	return; 
+}
 
-	double o2_reference; // physioxic reference value, in the linked reference Phenotype
-	// o2_proliferation_threshold < o2_reference < o2_proliferation_saturation; 
-	
-	double o2_necrosis_threshold; // value at which cells start experiencing necrotic death 
-	double o2_necrosis_max; // value at which necrosis reaches its maximum rate 
-	// o2_necrosis_max < o2_necrosis_threshold
-	
-	Phenotype* pReference_live_phenotype; // reference live phenotype (typically physioxic) 
-	// Phenotype* pReference_necrotic_phenotype; // reference live phenotype (typically physioxic) 
-
-	// necrosis parameters (may evenually be moved into a reference necrotic phenotype 
-	double max_necrosis_rate; // deprecate
-	int necrosis_type; // deprecate 
-	
-	Cell_Parameters(); 
-}; 
-
-class Cell_Definition
+void setup_microenvironment( void )
 {
- private:
- public: 
-	int type; 
-	std::string name; 
- 
-	Microenvironment* pMicroenvironment; 
+	// set domain parameters 
 	
-	Cell_Parameters parameters; 
-	Custom_Cell_Data custom_data; 
-	Cell_Functions functions; 
-	Phenotype phenotype; 
+/* now this is in XML 
+	default_microenvironment_options.X_range = {-1000, 1000}; 
+	default_microenvironment_options.Y_range = {-1000, 1000}; 
+	default_microenvironment_options.simulate_2D = true; 
+*/
+	// make sure to override and go back to 2D 
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
+		default_microenvironment_options.simulate_2D = true; 
+	}
+	
+	// no gradients need for this example 
 
-	Cell_Definition();  // done 
-	Cell_Definition( Cell_Definition& cd ); // copy constructor 
-	Cell_Definition& operator=( const Cell_Definition& cd ); // copy assignment 
-};
+	default_microenvironment_options.calculate_gradients = false; 
+	
+	// set Dirichlet conditions 
 
-extern Cell_Definition cell_defaults; 
+	default_microenvironment_options.outer_Dirichlet_conditions = true;
+	
+	// if there are more substrates, resize accordingly 
+	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
+	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
+	
+	// initialize BioFVM 
+	
+	initialize_microenvironment(); 	
+	
+	return; 
+}
 
-class Cell_State
+void setup_tissue( void )
 {
- public:
-	std::vector<Cell*> neighbors; // not currently tracked! 
-	std::vector<double> orientation;
+	// create some cells near the origin
 	
-	double simple_pressure; 
+	double cell_radius = cell_defaults.phenotype.geometry.radius; 
+	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	
-	Cell_State(); 
-};
+	double tumor_radius = 60; 
+	
+	
+	
+	for(int i = -tumor_radius; i < tumor_radius; i+=cell_spacing)
+	{
+		for(int j = -tumor_radius; j < tumor_radius; j+=15){
+			if(pow(i,2) + pow(j,2) <=  pow(tumor_radius,2))
+			{
+				Cell* bC;
+				bC = create_cell( stem_cell );
+				bC->assign_position( j+25, i, 0.0 );
+			}
+		}
+	}
+	
+	return; 
+}
 
-class Cell : public Basic_Agent 
+std::vector<std::string> my_coloring_function( Cell* pCell )
 {
- private: 
-	Cell_Container * container;
-	int current_mechanics_voxel_index;
-	int updated_current_mechanics_voxel_index; // keeps the updated voxel index for later adjusting of current voxel index
+	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
 		
- public:
-	std::string type_name; 
- 
-	Custom_Cell_Data custom_data;
-	Cell_Parameters parameters;
-	Cell_Functions functions; 
+	if(pCell->type == 0 )
+	{
+		 output[0] = "green"; 
+		 output[2] = "green"; 
+	} else if(pCell->type == 1 ){
+		 output[0] = "red"; 
+		 output[2] = "red"; 
+	} else if(pCell->type == 2 ){
+		 output[0] = "blue"; 
+		 output[2] = "blue"; 
+	}
+	
+	return output; 
+}
 
-	Cell_State state; 
-	Phenotype phenotype; 
-	
-	void update_motility_vector( double dt_ );
-	void advance_bundled_phenotype_functions( double dt_ ); 
-	
-	void add_potentials(Cell*);       // Add repulsive and adhesive forces.
-	void set_previous_velocity(double xV, double yV, double zV);
-	int get_current_mechanics_voxel_index();
-	void turn_off_reactions(double); 		  // Turn off all the reactions of the cell
-	
-	bool is_out_of_domain;
-	bool is_movable;
-	
-	void flag_for_division( void ); // done 
-	void flag_for_removal( void ); // done 
-	
-	void start_death( int death_model_index ); 
-	void lyse_cell( void ); 
-
-	Cell* divide( void );
-	void die( void );
-	void step(double dt);
-	Cell();
-	
-	bool assign_position(std::vector<double> new_position);
-	bool assign_position(double, double, double);
-	void set_total_volume(double);
-	
-	double& get_total_volume(void); // NEW
-	
-	// mechanics 
-	void update_position( double dt ); //
-	std::vector<double> displacement; // this should be moved to state, or made private  
-
-	
-	void assign_orientation();  // if set_orientaion is defined, uses it to assign the orientation
-								// otherwise, it assigns a random orientation to the cell.
-	
-	void copy_function_pointers(Cell*);
-	
-	void update_voxel_in_container(void);
-	void copy_data(Cell *);
-	
-	void ingest_cell( Cell* pCell_to_eat ); // for use in predation, e.g., immune cells 
-
-	// I want to eventually deprecate this, by ensuring that 
-	// critical BioFVM and PhysiCell data elements are synced when they are needed 
-	
-	void set_phenotype( Phenotype& phenotype ); // no longer needed?
-	void update_radius();
-	Cell_Container * get_container();
-	
-	std::vector<Cell*>& cells_in_my_container( void ); 
-	
-	void differentiate(Cell* parentCell, Cell* daughterCell);
-	void convert_to_cell_definition( Cell_Definition& cd ); 
-	void convert_to_cell_definition_preserving_volume( Cell_Definition& cd ); 
-};
-
-Cell* create_cell( void );  
-Cell* create_cell( Cell_Definition& cd );  
-
-
-void delete_cell( int ); 
-void delete_cell( Cell* ); 
-void save_all_cells_to_matlab( std::string filename ); 
-
-//function to check if a neighbor voxel contains any cell that can interact with me
-bool is_neighbor_voxel(Cell* pCell, std::vector<double> myVoxelCenter, std::vector<double> otherVoxelCenter, int otherVoxelIndex);  
-
-};
-
-#endif
