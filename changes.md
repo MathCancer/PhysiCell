@@ -1,3 +1,18 @@
+
+
+PhysiCell_settings 
+
+
+
+
+
+bool setup_microenvironment_from_XML( pugi::xml_node root_node )
+
+bool setup_microenvironment_from_XML( void )
+// this one assumes you already defined the root node 
+
+
+
 * * * 
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.

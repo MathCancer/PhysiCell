@@ -515,6 +515,113 @@ template std::ostream& operator<<(std::ostream& os, const Parameter<bool>& param
 template std::ostream& operator<<(std::ostream& os, const Parameter<int>& param);
 template std::ostream& operator<<(std::ostream& os, const Parameter<double>& param);
 template std::ostream& operator<<(std::ostream& os, const Parameter<std::string>& param);
+
+bool setup_microenvironment_from_XML( pugi::xml_node root_node )
+{
+	pugi::xml_node node; 
+
+	// First, look for the correct XML node. 
+	// If it isn't there, return false. 
+	
+	node = xml_find_node( root_node , "microenvironment_setup" );
+	if( !node )
+	{ return false; }
+
+	// now that we're using the XML to specify the microenvironment, don't 
+	// use old defaults 
+	
+	// Don't let BioFVM use oxygen as the default 
+	
+	default_microenvironment_options.use_oxygen_as_first_field = false; 
+
+	std::vector<double> initial_condition_vector = {}; 
+	std::vector<double> Dirichlet_condition_vector = {}; 
+	std::vector<bool> Dirichlet_activation_vector = {}; 
+
+	// next, add all the substrates to the microenvironment
+	// build the initial conditions and Dirichlet conditions as we go 
+
+	// find the first substrate 
+	pugi::xml_node node1 = node.child( "variable" ); // xml_find_node( node , "variable" ); 
+	node = node1; 
+	int i = 0; 
+	while( node )
+	{
+		// get the name and units 
+		std::string name = node.attribute( "name" ).value(); 
+		std::string units = node.attribute( "units" ).value(); 
+		
+		// add the substrate 
+		if( i == 0 )
+		{ microenvironment.set_density( 0, name, units ); }
+		else
+		{ microenvironment.add_density( name, units ); }
+		
+		// get the diffusion and decay parameters 
+		node1 = xml_find_node( node, "physical_parameter_set" ); 
+		
+		microenvironment.diffusion_coefficients[i] = 
+			xml_get_double_value( node1, "diffusion_coefficient" ); 
+		microenvironment.decay_rates[i] = 
+			xml_get_double_value( node1, "decay_rate" ); 
+			
+		// now, get the initial value  
+		node1 = xml_find_node( node, "initial_condition" ); 
+		initial_condition_vector.push_back( xml_get_my_double_value(node1) );
+		
+		// now, get the Dirichlet value
+		node1 = xml_find_node( node, "Dirichlet_boundary_condition" ); 
+		Dirichlet_condition_vector.push_back( xml_get_my_double_value(node1) );
+		// now, decide whether or not to enable it 
+		Dirichlet_activation_vector.push_back( node1.attribute("enable").as_bool() );
+		
+		// move on to the next variable (if any!)
+		node = node.next_sibling( "variable" ); 
+		i++; 
+	}
+
+	// now that all the variables and boundary / initial conditions are defined, 
+	// make sure that BioFVM knows about them 
+
+	default_microenvironment_options.Dirichlet_condition_vector = Dirichlet_condition_vector;  
+	default_microenvironment_options.Dirichlet_activation_vector = Dirichlet_activation_vector;
+	default_microenvironment_options.initial_condition_vector = initial_condition_vector; 
+	
+	// because outer boundary Dirichlet conditions are defined in the XML, 
+	// make sure we don't accidentally disable them 
+	
+	default_microenvironment_options.outer_Dirichlet_conditions = true;
+	
+	// now, get the options 
+	node = node.parent(); // back up to microenvironment_setup
+	
+	// calculate gradients? 
+	default_microenvironment_options.calculate_gradients = xml_get_bool_value( node, "calculate_gradients" ); 
+	// track internalized substrates in each agent? 
+	default_microenvironment_options.track_internalized_substrates_in_each_agent 
+		= xml_get_bool_value( node, "track_internalized_substrates_in_each_agent" ); 
+	
+	// not yet supported 
+	/*
+			<!-- not yet supported --> 
+			<initial_condition type="matlab" enabled="false">
+				<filename>./config/initial.mat</filename>
+			</initial_condition>
+	*/
+	// not yet supported 
+	/*
+			<!-- not yet supported --> 
+			<dirichlet_nodes type="matlab" enabled="false">
+				<filename>./config/dirichlet.mat</filename>
+			</dirichlet_nodes>
+	*/	
+	
+	return true;  
+}
+
+bool setup_microenvironment_from_XML( void )
+{ return setup_microenvironment_from_XML( physicell_config_root ); }
+
 } 
  
 

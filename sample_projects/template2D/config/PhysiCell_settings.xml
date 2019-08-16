@@ -182,7 +182,7 @@
 				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
 			<initial_condition units="mmHg">38.0</initial_condition>
-			<boundary_condition units="mmHg" enabled="true">38.0</boundary_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
 		</variable>
 		<variable name="glucose" units="dimensionless" ID="1">
 			<physical_parameter_set>

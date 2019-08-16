@@ -203,6 +203,9 @@ extern PhysiCell_Settings PhysiCell_settings;
 
 extern User_Parameters parameters; 
 
+bool setup_microenvironment_from_XML( pugi::xml_node root_node );
+bool setup_microenvironment_from_XML( void );
+
 }
 
 #endif 
