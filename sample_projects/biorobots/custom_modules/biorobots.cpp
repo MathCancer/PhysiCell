@@ -522,9 +522,8 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	static double threshold = parameters.doubles("drop_threshold"); // 0.4; 
 	
-	int cargo_ID = microenvironment.find_density_index( "cargo signal" ); // 1 
-	int director_ID = microenvironment.find_density_index( "director signal" ); // 0 
-	
+	static int cargo_ID = microenvironment.find_density_index( "cargo signal" ); // 1 
+	static int director_ID = microenvironment.find_density_index( "director signal" ); // 0 
 	
 	// have I arrived? If so, release my cargo 
 	if( pCell->nearest_density_vector()[director_ID] > threshold )

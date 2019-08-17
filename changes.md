@@ -12,6 +12,8 @@ biorobots sample project:
 * Converted biorobots project to use the new XML-based microenvironment setup.
 * Improved biorobots project to properly search for substrate indices instead of hard coding them. 
 
+cancer biorobots sample project: 
+* Refined "reset" rule in biorobots Makefile. 
 
 
 

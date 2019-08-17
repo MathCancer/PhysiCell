@@ -86,13 +86,17 @@ void create_cargo_cell_type( void )
 	
 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
+	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
+	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
+	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2
+	
 	// reduce o2 uptake 
 	
-	cargo_cell.phenotype.secretion.uptake_rates[0] *= 
+	cargo_cell.phenotype.secretion.uptake_rates[oxygen_ID] *= 
 		parameters.doubles("cargo_o2_relative_uptake"); // 0.1; 
 	
 	// set secretion of the chemoattractant
-	cargo_cell.phenotype.secretion.secretion_rates[1] = 10; 
+	cargo_cell.phenotype.secretion.secretion_rates[attract_ID] = 10; 
 	
 	// set apoptosis to survive 10 days (on average) 
 	
@@ -140,9 +144,13 @@ void create_worker_cell_type( void )
 	
 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
+	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
+	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
+	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2	
+	
 	// reduce o2 uptake 
 	
-	worker_cell.phenotype.secretion.uptake_rates[0] *= 
+	worker_cell.phenotype.secretion.uptake_rates[oxygen_ID] *= 
 		parameters.doubles("worker_o2_relative_uptake"); // 0.1; 
 	
 	// set apoptosis zero
@@ -217,16 +225,20 @@ void create_cell_types( void )
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
 	cell_defaults.parameters.o2_reference = 38.0; 
 	
+	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
+	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
+	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2	
+	
 	// set default uptake and secretion 
 	// oxygen 
-	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[0] = 10; 
-	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
+	cell_defaults.phenotype.secretion.secretion_rates[oxygen_ID] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates[oxygen_ID] = 10; 
+	cell_defaults.phenotype.secretion.saturation_densities[oxygen_ID] = 38; 
 
 	// chemoattractant 
-	cell_defaults.phenotype.secretion.saturation_densities[1] = 1; 
+	cell_defaults.phenotype.secretion.saturation_densities[attract_ID] = 1; 
 	// therapeutic  
-	cell_defaults.phenotype.secretion.saturation_densities[2] = 1; 
+	cell_defaults.phenotype.secretion.saturation_densities[therapy_ID] = 1; 
 	
 	// set the default cell type to o2-based proliferation with the effect of the 
 	// on oncoprotein, and secretion of the immunostimulatory factor 
@@ -289,14 +301,21 @@ void setup_microenvironment( void )
 		default_microenvironment_options.simulate_2D = true; 
 	}
 	
+	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
+	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
+	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2
+	
+/*
+	all this is in XML now 
 	// gradients are needed for this example 
 	
 	default_microenvironment_options.calculate_gradients = true; 
 	
 	// add cargo cell chemokine
 
-	/* A future release of PhysiCell will handle setup of chemical factors 
-	   more elegantly. So, let's skip XML specification for now. */
+	// Earlier: A future release of PhysiCell will handle setup of chemical factors 
+	// more elegantly. So, let's skip XML specification for now.
+	// August 2019: but now it's in XML in 1.6.0! Yay! 
 	
 	// add therapeutic 
 	
@@ -326,6 +345,7 @@ void setup_microenvironment( void )
 	
 	// set initial conditions 
 	default_microenvironment_options.initial_condition_vector = { 38.0 , 0.0, 0.0 }; 
+*/	
 			
 	initialize_microenvironment(); 	
 
@@ -499,7 +519,7 @@ void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_c
 	if( norm_squared( displacement ) > max_displacement_squared )
 	{
 		dettach_cells( pActingOn , pAttachedTo );
-		std::cout << "\t\tDETTACH!!!!!" << std::endl; 
+		std::cout << "\t\tDETACH!!!!!" << std::endl; 
 		return; 
 	}
 	
