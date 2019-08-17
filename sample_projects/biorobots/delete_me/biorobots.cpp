@@ -87,6 +87,8 @@ void setup_microenvironment( void )
 	int cargo_ID = microenvironment.find_density_index( "cargo signal" ); 
 	int director_ID = microenvironment.find_density_index( "director signal" ); 
 	
+	std::cout << __LINE__ << " " << cargo_ID << " " << director_ID << std::endl; 
+	
 	microenvironment.diffusion_coefficients[cargo_ID] = 
 		parameters.doubles("cargo_signal_D");  
 	microenvironment.decay_rates[cargo_ID] = 
@@ -100,6 +102,7 @@ void setup_microenvironment( void )
 	// display the microenvironment again 
 	
 	microenvironment.display_information( std::cout ); 
+	system("pause"); 
 	
 	return; 
 }

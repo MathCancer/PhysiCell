@@ -71,35 +71,39 @@ void setup_microenvironment( void )
 {
 	// set domain parameters
 	
-	// No longer needed, but more efficient because 
-	// the setup function won't add and use the 
-	// Dirichlet nodes if this is set false 
 	default_microenvironment_options.outer_Dirichlet_conditions = false;
+
+/*
+	// this is in the XML now 
+	default_microenvironment_options.X_range = {-1000, 1000}; 
+	default_microenvironment_options.Y_range = {-1000, 1000}; 
+	default_microenvironment_options.simulate_2D = true; 
+*/	
+	
+	default_microenvironment_options.calculate_gradients = true;
+
+	microenvironment.add_density( "cargo signal", "dimensionless" ); 
+	microenvironment.diffusion_coefficients[1] = 
+		parameters.doubles("cargo_signal_D"); // 1e3; 
+	microenvironment.decay_rates[1] = 
+		parameters.doubles("cargo_signal_decay"); // .4; // 50 micron length scale 
+		
+	// set initial conditions 
+	default_microenvironment_options.initial_condition_vector = { 0.0 , 0.0  }; 
 	
 	initialize_microenvironment(); 	
+
+	// update the first diffusing substrate (gets overwritten by BioFVM::initialize_microenvironment()
 	
-	// these will ***overwrite*** values specified in the 
-	// microenvironment_setup part of the XML,
-	// based on what's in the user_parameters section 
+	microenvironment.set_density( 0 , "director signal", "dimensionless" ); 
+	microenvironment.diffusion_coefficients[0] = 
+		parameters.doubles("director_signal_D"); // 1e3; 
+	microenvironment.decay_rates[0] = 
+		parameters.doubles("director_signal_decay"); // 0.1;  // 100 micron length scale 
 	
 	microenvironment.name = "synthetic tissue"; 
-	
-	int cargo_ID = microenvironment.find_density_index( "cargo signal" ); 
-	int director_ID = microenvironment.find_density_index( "director signal" ); 
-	
-	microenvironment.diffusion_coefficients[cargo_ID] = 
-		parameters.doubles("cargo_signal_D");  
-	microenvironment.decay_rates[cargo_ID] = 
-		parameters.doubles("cargo_signal_decay");  
-	
-	microenvironment.diffusion_coefficients[director_ID] = 
-		parameters.doubles("director_signal_D");  
-	microenvironment.decay_rates[director_ID] = 
-		parameters.doubles("director_signal_decay"); 
-	
-	// display the microenvironment again 
-	
-	microenvironment.display_information( std::cout ); 
+
+	microenvironment.display_information( std::cout );
 	
 	return; 
 }
@@ -133,17 +137,14 @@ void create_cell_types( void )
 	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; 
 	cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0; 
 	
-	int cargo_ID = microenvironment.find_density_index( "cargo signal" ); // 1 
-	int director_ID = microenvironment.find_density_index( "director signal" ); // 0 
-	
 	// set uptake and secretion to zero 
-	cell_defaults.phenotype.secretion.secretion_rates[director_ID] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[director_ID] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[director_ID] = 1; 
+	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates[0] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[0] = 1; 
 	
-	cell_defaults.phenotype.secretion.secretion_rates[cargo_ID] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[cargo_ID] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[cargo_ID] = 1; 
+	cell_defaults.phenotype.secretion.secretion_rates[1] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates[1] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[1] = 1; 
 
 	// set the default cell type to no phenotype updates 
 	
@@ -167,7 +168,7 @@ void create_cell_types( void )
 	
 	// seed cell secrete the signal 
 	
-	director_cell.phenotype.secretion.secretion_rates[director_ID] = 9.9; 
+	director_cell.phenotype.secretion.secretion_rates[0] = 9.9; 
 	
 	// seed cell rule 
 	
@@ -184,7 +185,7 @@ void create_cell_types( void )
 	
 	cargo_cell.custom_data["receptor"] = 1.0; 
 
-	cargo_cell.phenotype.secretion.secretion_rates[cargo_ID] = 9.9; 
+	cargo_cell.phenotype.secretion.secretion_rates[1] = 9.9; 
 	cargo_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; // 7e-4
 	
 	//
@@ -522,12 +523,8 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	static double threshold = parameters.doubles("drop_threshold"); // 0.4; 
 	
-	int cargo_ID = microenvironment.find_density_index( "cargo signal" ); // 1 
-	int director_ID = microenvironment.find_density_index( "director signal" ); // 0 
-	
-	
 	// have I arrived? If so, release my cargo 
-	if( pCell->nearest_density_vector()[director_ID] > threshold )
+	if( pCell->nearest_density_vector()[0] > threshold )
 	{
 		for( int i=0; i < pCell->state.neighbors.size(); i++ )
 		{

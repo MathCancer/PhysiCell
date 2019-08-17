@@ -118,7 +118,7 @@
 		<variable name="director signal" units="dimensionless" ID="0">
 			<physical_parameter_set>
 				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
+				<decay_rate units="1/min">.4</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
 			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
@@ -127,7 +127,7 @@
 		<variable name="cargo signal" units="dimensionless" ID="1">
 			<physical_parameter_set>
 				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-				<decay_rate units="1/min">.4</decay_rate> <!-- 1 for cells  --> 
+				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
 			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
@@ -151,10 +151,10 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 
 		<!-- for microenvironment setup --> 
-		<cargo_signal_D type="double" units="micron/min^2">1e3</cargo_signal_D>
-		<cargo_signal_decay type="double" units="1/min">.4</cargo_signal_decay> <!-- 50 micron length scale -->
-		<director_signal_D type="double" units="micron/min^2">1e3</director_signal_D>
-		<director_signal_decay type="double" units="1/min">.1</director_signal_decay> <!-- 100 micron length scale -->
+		<cargo_signal_D type="double" units="micron/min^2">1.1e3</cargo_signal_D>
+		<cargo_signal_decay type="double" units="1/min">.41</cargo_signal_decay> <!-- 50 micron length scale -->
+		<director_signal_D type="double" units="micron/min^2">1.1e3</director_signal_D>
+		<director_signal_decay type="double" units="1/min">.11</director_signal_decay> <!-- 100 micron length scale -->
 		
 		<!-- for cell definitions -->
 		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>

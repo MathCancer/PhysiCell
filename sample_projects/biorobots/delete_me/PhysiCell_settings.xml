@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-500</x_min>
-		<x_max>500</x_max>
-		<y_min>-500</y_min>
-		<y_max>500</y_max>
+		<x_min>-1000</x_min>
+		<x_max>1000</x_max>
+		<y_min>-1000</y_min>
+		<y_max>1000</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">2880</max_time> <!-- 2 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -100,12 +100,12 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">360</interval>
+			<interval units="min">2</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">2</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -114,83 +114,23 @@
 		</legacy_data>
 	</save>
 	
-<!--
-
-
-// override oxygen as first. we'll set it ourselves. 
-	// Don't let BioFVM use oxygen as the default 
-	
-	default_microenvironment_options.use_oxygen_as_first_field = false; 
-
-	
-	node = xml_find_node( physicell_config_root , "substrates" ); 
-	
-	pugi::xml_node node1 = node.child( "variable" ); // xml_find_node( node , "variable" ); 
-	node = node1; 
-	int i = 0; 
-	while( node )
-	{
-		// name and units 
-		std::string name = node.attribute( "name" ).value(); 
-		std::string units = node.attribute( "units" ).value(); 
-		
-		if( i == 0 )
-		{ microenvironment.set_density( 0, name, units ); }
-		else
-		{ microenvironment.add_density( name, units ); }
-		
-		node1 = xml_find_node( node, "physical_parameter_set" ); 
-		
-		microenvironment.diffusion_coefficients[i] = 
-			xml_get_double_value( node1, "diffusion_coefficient" ); 
-		microenvironment.decay_rates[i] = 
-			xml_get_double_value( node1, "decay_rate" ); 
-			
-		// if this is one of our nanoparticles, use those properties.
-		if( i == nanobio_parameters.NP_preform.substrate_ID )
-		{
-			microenvironment.set_density( i, nanobio_parameters.NP_preform.name, nanobio_parameters.NP_preform.units ); 
-			microenvironment.diffusion_coefficients[i] = nanobio_parameters.NP_preform.diffusion_coefficient; 
-			microenvironment.decay_rates[i] = nanobio_parameters.NP_preform.degradation_rate;
-		}
-		if( i == nanobio_parameters.NP_reconfigured.substrate_ID )
-		{
-			microenvironment.set_density( i, nanobio_parameters.NP_reconfigured.name, nanobio_parameters.NP_reconfigured.units ); 
-			microenvironment.diffusion_coefficients[i] = nanobio_parameters.NP_reconfigured.diffusion_coefficient; 
-			microenvironment.decay_rates[i] = nanobio_parameters.NP_reconfigured.degradation_rate;
-		}
-		
-//		node1 = node1.parent(); 
-		
-		node = node.next_sibling( "variable" ); 
-		i++; 
-	}
-	
-	// calculate gradients? 
-	
-	default_microenvironment_options.calculate_gradients = xml_get_bool_value( node, "calculate_gradients" );  
-
-
-
--->	
-	
-	
 	<microenvironment_setup>
-		<variable name="oxygen" units="mmHg" ID="0">
+		<variable name="director signal" units="dimensionless" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.000000</diffusion_coefficient>
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
 				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
-			<initial_condition units="mmHg">38.0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
 		</variable>
-		<variable name="glucose" units="dimensionless" ID="1">
+		
+		<variable name="cargo signal" units="dimensionless" ID="1">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">30000</diffusion_coefficient>
-				<decay_rate units="1/min">0.00003</decay_rate> <!-- 0.3 for glycolytic cells. 0.003 for normal tumor  --> 
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">.4</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
-			<initial_condition units="dimensionless">1</initial_condition>
-			<boundary_condition units="dimensionless" enabled="false">1</boundary_condition>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
 		</variable>
 		
 		<options>
@@ -205,18 +145,38 @@
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
 		</options>
-	</microenvironment_setup>	
+	</microenvironment_setup>		
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
-		<!-- example parameters from the template --> 
+
+		<!-- for microenvironment setup --> 
+		<cargo_signal_D type="double" units="micron/min^2">1.1e3</cargo_signal_D>
+		<cargo_signal_decay type="double" units="1/min">.4</cargo_signal_decay> <!-- 50 micron length scale -->
+		<director_signal_D type="double" units="micron/min^2">1e3</director_signal_D>
+		<director_signal_decay type="double" units="1/min">.1</director_signal_decay> <!-- 100 micron length scale -->
 		
-		<!-- motile cell type parameters --> 
-		<motile_cell_persistence_time type="double" units="min">15</motile_cell_persistence_time>
-		<motile_cell_migration_speed type="double" units="micron/min">0.5</motile_cell_migration_speed> 
-		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
-		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
-		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.1</motile_cell_relative_cycle_entry_rate>
+		<!-- for cell definitions -->
+		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>
+
+		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
+		<worker_migration_speed type="double" units="micron/min">5.0</worker_migration_speed>
+		<attached_worker_migration_bias type="double" units="dimensionless">1.0</attached_worker_migration_bias>
+		<unattached_worker_migration_bias type="double" units="dimensionless">0.5</unattached_worker_migration_bias>
+
+		<!-- tissue setup --> 
+		<number_of_directors type="int" units="none">15</number_of_directors> 
+		<number_of_cargo_clusters type="int" units="none">100</number_of_cargo_clusters>
+		<number_of_workers type="int" units="none">50</number_of_workers>
+		
+		<!-- cargo parameters --> 
+		<drop_threshold type="double" units="dimensionless">0.4</drop_threshold> 
+		
+		<!-- colors --> 
+		<worker_color type="string" units="none">red</worker_color>
+		<cargo_color type="string" units="none">blue</cargo_color>
+		<director_color type="string" units="none">limegreen</director_color> 
+	
 	</user_parameters>
 	
 </PhysiCell_settings>
