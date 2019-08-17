@@ -3,8 +3,13 @@
 PhysiCell_settings 
 
 template2D sample project: 
-* Refined "reset" and "data-cleanup" rules in template2D Makefile
-* Converted template2D project ot use the new XML-based microenvironment setup. 
+* Refined "reset" and "data-cleanup" rules in Makefile
+* Converted project to use the new XML-based microenvironment setup. 
+
+template3D sample project: 
+* Refined "reset" and "data-cleanup" rules in Makefile
+* Converted project to use the new XML-based microenvironment setup. 
+
 
 
 biorobots sample project: 
@@ -18,7 +23,7 @@ cancer biorobots sample project:
 * Converted project to use the new XML-based microenvironment setup.
 * Improved project to properly search for substrate indices instead of hard coding them. 
 
-
+Refined "reset" and "data-cleanup" rules in default Makefile 
 
 Created new function to access the (private) microenvironment dirichlet_activation_vector 
 double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
