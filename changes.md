@@ -10,6 +10,8 @@ template3D sample project:
 * Refined "reset" and "data-cleanup" rules in Makefile
 * Converted project to use the new XML-based microenvironment setup. 
 
+heterogeneity sample project: 
+* Refined "reset" and "data-cleanup" rules in Makefile
 
 
 biorobots sample project: 
