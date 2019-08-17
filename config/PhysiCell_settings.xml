@@ -114,67 +114,6 @@
 		</legacy_data>
 	</save>
 	
-<!--
-
-
-// override oxygen as first. we'll set it ourselves. 
-	// Don't let BioFVM use oxygen as the default 
-	
-	default_microenvironment_options.use_oxygen_as_first_field = false; 
-
-	
-	node = xml_find_node( physicell_config_root , "substrates" ); 
-	
-	pugi::xml_node node1 = node.child( "variable" ); // xml_find_node( node , "variable" ); 
-	node = node1; 
-	int i = 0; 
-	while( node )
-	{
-		// name and units 
-		std::string name = node.attribute( "name" ).value(); 
-		std::string units = node.attribute( "units" ).value(); 
-		
-		if( i == 0 )
-		{ microenvironment.set_density( 0, name, units ); }
-		else
-		{ microenvironment.add_density( name, units ); }
-		
-		node1 = xml_find_node( node, "physical_parameter_set" ); 
-		
-		microenvironment.diffusion_coefficients[i] = 
-			xml_get_double_value( node1, "diffusion_coefficient" ); 
-		microenvironment.decay_rates[i] = 
-			xml_get_double_value( node1, "decay_rate" ); 
-			
-		// if this is one of our nanoparticles, use those properties.
-		if( i == nanobio_parameters.NP_preform.substrate_ID )
-		{
-			microenvironment.set_density( i, nanobio_parameters.NP_preform.name, nanobio_parameters.NP_preform.units ); 
-			microenvironment.diffusion_coefficients[i] = nanobio_parameters.NP_preform.diffusion_coefficient; 
-			microenvironment.decay_rates[i] = nanobio_parameters.NP_preform.degradation_rate;
-		}
-		if( i == nanobio_parameters.NP_reconfigured.substrate_ID )
-		{
-			microenvironment.set_density( i, nanobio_parameters.NP_reconfigured.name, nanobio_parameters.NP_reconfigured.units ); 
-			microenvironment.diffusion_coefficients[i] = nanobio_parameters.NP_reconfigured.diffusion_coefficient; 
-			microenvironment.decay_rates[i] = nanobio_parameters.NP_reconfigured.degradation_rate;
-		}
-		
-//		node1 = node1.parent(); 
-		
-		node = node.next_sibling( "variable" ); 
-		i++; 
-	}
-	
-	// calculate gradients? 
-	
-	default_microenvironment_options.calculate_gradients = xml_get_bool_value( node, "calculate_gradients" );  
-
-
-
--->	
-	
-	
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
 			<physical_parameter_set>
@@ -183,14 +122,6 @@
 			</physical_parameter_set>
 			<initial_condition units="mmHg">38.0</initial_condition>
 			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
-		</variable>
-		<variable name="glucose" units="dimensionless" ID="1">
-			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">30000</diffusion_coefficient>
-				<decay_rate units="1/min">0.00003</decay_rate> <!-- 0.3 for glycolytic cells. 0.003 for normal tumor  --> 
-			</physical_parameter_set>
-			<initial_condition units="dimensionless">1</initial_condition>
-			<boundary_condition units="dimensionless" enabled="false">1</boundary_condition>
 		</variable>
 		
 		<options>

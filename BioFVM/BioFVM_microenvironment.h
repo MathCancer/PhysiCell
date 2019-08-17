@@ -127,9 +127,8 @@ class Microenvironment
 	*/
 	std::vector< std::vector<double> > dirichlet_value_vectors; 
 	std::vector<bool> dirichlet_activation_vector; 	
-		
  public:
- 
+	
 	/*! The mesh for the diffusing quantities */ 
 	Cartesian_Mesh mesh;
 	Agent_Container * agent_container;	
@@ -239,6 +238,7 @@ class Microenvironment
 	void apply_dirichlet_conditions( void ); 
 
 	void set_substrate_dirichlet_activation( int substrate_index , bool new_value ); 
+	double get_substrate_dirichlet_activation( int substrate_index ); 
 	
 	bool& is_dirichlet_node( int voxel_index ); 
 

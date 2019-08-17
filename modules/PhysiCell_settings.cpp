@@ -98,15 +98,10 @@ bool load_PhysiCell_config_file( std::string filename )
 	
 	if( !setup_microenvironment_from_XML( physicell_config_root ) )
 	{
-		std::cout << "Warning: microenvironment_setup not found in " << filename << std::endl 
+		std::cout << std::endl 
+				  << "Warning: microenvironment_setup not found in " << filename << std::endl 
 				  << "         Either manually setup microenvironment in setup_microenvironment() (custom.cpp)" << std::endl
 				  << "         or consult documentation to add microenvironment_setup to your configuration file." << std::endl << std::endl; 
-	}
-	else
-	{
-		std::cout << "did it!" << std::endl; 
-		microenvironment.display_information( std::cout );
-		system("pause"); 
 	}
 	
 	// now read user parameters
@@ -588,7 +583,7 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 		node1 = xml_find_node( node, "Dirichlet_boundary_condition" ); 
 		Dirichlet_condition_vector.push_back( xml_get_my_double_value(node1) );
 		// now, decide whether or not to enable it 
-		Dirichlet_activation_vector.push_back( node1.attribute("enable").as_bool() );
+		Dirichlet_activation_vector.push_back( node1.attribute("enabled").as_bool() );
 		
 		// move on to the next variable (if any!)
 		node = node.next_sibling( "variable" ); 

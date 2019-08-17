@@ -2,6 +2,14 @@
 
 PhysiCell_settings 
 
+Refined "reset" and "data-cleanup" rules in template2D Makefile 
+
+	double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
+
+
+update 
+void Microenvironment::display_information( std::ostream& os )
+to display information on initial and boundary conditions 
 
 
 

@@ -267,6 +267,11 @@ void Microenvironment::set_substrate_dirichlet_activation( int substrate_index ,
 	return; 
 }
 
+double Microenvironment::get_substrate_dirichlet_activation( int substrate_index )
+{
+	return dirichlet_activation_vector[substrate_index]; 
+}
+
 void Microenvironment::apply_dirichlet_conditions( void )
 {
 	/*
@@ -716,13 +721,23 @@ void Microenvironment::display_information( std::ostream& os )
 		os << "   " << density_names[i] << ":" << std::endl
 		<< "     units: " << density_units[i] << std::endl 
 		<< "     diffusion coefficient: " << diffusion_coefficients[i]  
-		<< " " << spatial_units << "^2 / " << time_units << std::endl
+			<< " " << spatial_units << "^2 / " << time_units << std::endl
 		<< "     decay rate: " << decay_rates[i] 
-		<< " " << time_units << "^-1" << std::endl 
-		<< "     diffusion length scale: " << sqrt( diffusion_coefficients[i] / ( 1e-12 + decay_rates[i] ) ) << " " 
-		<< spatial_units << std::endl << std::endl; 
+			<< " " << time_units << "^-1" << std::endl 
+		<< "     diffusion length scale: " << sqrt( diffusion_coefficients[i] / ( 1e-12 + decay_rates[i] ) ) 
+			<< " " << spatial_units << std::endl 
+		<< "     initial condition: " << default_microenvironment_options.initial_condition_vector[i] 
+			<< " " << density_units[i] << std::endl 
+		<< "     boundary condition: " << default_microenvironment_options.Dirichlet_condition_vector[i] 
+			<< " " << density_units[i] << " (enabled: "; 
+		if( dirichlet_activation_vector[i] == true )
+		{ os << "true"; }
+		else
+		{ os << "false"; }
+		os << ")" << std::endl; 
 	}
 	os << std::endl; 
+	
 	return; 
 }
 	
@@ -1170,6 +1185,12 @@ void initialize_microenvironment( void )
 			}	
 		}
 		
+	}
+	
+	// set the Dirichlet condition activation vector to match the microenvironment options 
+	for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
+	{
+		microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
 	}
 	
 	microenvironment.display_information( std::cout );
