@@ -2,36 +2,35 @@
 
 PhysiCell_settings 
 
-Refined "reset" and "data-cleanup" rules in template2D Makefile
-
-Converted template2D project ot use the new XML-based microenvironment setup. 
-
-
-Refined "reset" rule in biorobots Makefile. 
-
-Converted biorobots project to use the new XML-based microenvironment setup.
-
-Improved biorobots project to properly search for substrate indices instead of hard coding them. 
+template2D sample project: 
+* Refined "reset" and "data-cleanup" rules in template2D Makefile
+* Converted template2D project ot use the new XML-based microenvironment setup. 
 
 
-
-
-	double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
-
-
-update 
-void Microenvironment::display_information( std::ostream& os )
-to display information on initial and boundary conditions 
+biorobots sample project: 
+* Refined "reset" rule in biorobots Makefile. 
+* Converted biorobots project to use the new XML-based microenvironment setup.
+* Improved biorobots project to properly search for substrate indices instead of hard coding them. 
 
 
 
 
-bool setup_microenvironment_from_XML( pugi::xml_node root_node )
+Created new function to access the (private) microenvironment dirichlet_activation_vector 
+double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
 
-bool setup_microenvironment_from_XML( void )
-// this one assumes you already defined the root node 
 
-XML parsing calls these functions. It processes user parameters afterwards. 
+updated main microenvironment display function Microenvironment::display_information to display information on initial and boundary conditions 
+
+wrote two new functions to parse XML with microenvironment_setup to add substrates and 
+options 
+* bool setup_microenvironment_from_XML( pugi::xml_node root_node )
+* bool setup_microenvironment_from_XML( void )
+The second one assumes you already defined the root node and access the global (pugi)xml node for it. 
+
+
+The main XML parsing function ( ) now calls setup_microenvironment_from_XML(), just before processing user-defined parameters. 
+
+
 
 * * * 
 
