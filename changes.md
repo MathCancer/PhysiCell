@@ -8,12 +8,15 @@ template2D sample project:
 
 
 biorobots sample project: 
-* Refined "reset" rule in biorobots Makefile. 
-* Converted biorobots project to use the new XML-based microenvironment setup.
-* Improved biorobots project to properly search for substrate indices instead of hard coding them. 
+* Refined "reset" rule in Makefile. 
+* Converted project to use the new XML-based microenvironment setup.
+* Note that values in user_parameters will override values in microenvironment_setup. 
+* Improved project to properly search for substrate indices instead of hard coding them. 
 
 cancer biorobots sample project: 
-* Refined "reset" rule in biorobots Makefile. 
+* Refined "reset" rule in Makefile. 
+* Converted project to use the new XML-based microenvironment setup.
+* Improved project to properly search for substrate indices instead of hard coding them. 
 
 
 
