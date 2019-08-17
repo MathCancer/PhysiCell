@@ -94,6 +94,21 @@ bool load_PhysiCell_config_file( std::string filename )
 	
 	PhysiCell_settings.read_from_pugixml(); 
 	
+	// now read the microenvironment (optional) 
+	
+	if( !setup_microenvironment_from_XML( physicell_config_root ) )
+	{
+		std::cout << "Warning: microenvironment_setup not found in " << filename << std::endl 
+				  << "         Either manually setup microenvironment in setup_microenvironment() (custom.cpp)" << std::endl
+				  << "         or consult documentation to add microenvironment_setup to your configuration file." << std::endl << std::endl; 
+	}
+	else
+	{
+		std::cout << "did it!" << std::endl; 
+		microenvironment.display_information( std::cout );
+		system("pause"); 
+	}
+	
 	// now read user parameters
 	
 	parameters.read_from_pugixml( physicell_config_root ); 
@@ -597,19 +612,28 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	
 	// calculate gradients? 
 	default_microenvironment_options.calculate_gradients = xml_get_bool_value( node, "calculate_gradients" ); 
+	
 	// track internalized substrates in each agent? 
 	default_microenvironment_options.track_internalized_substrates_in_each_agent 
 		= xml_get_bool_value( node, "track_internalized_substrates_in_each_agent" ); 
 	
-	// not yet supported 
+	// not yet supported : read initial conditions 
 	/*
+	// read in initial conditions from an external file 
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
 			</initial_condition>
 	*/
-	// not yet supported 
+	
+	// not yet supported : read Dirichlet nodes (including boundary)
 	/*
+	// Read in Dirichlet nodes from an external file.
+	// Note that if they are defined this way, then 
+	// set 	default_microenvironment_options.outer_Dirichlet_conditions = false;
+	// so that the microenvironment initialization in BioFVM does not 
+	// also add Dirichlet nodes at the outer boundary
+
 			<!-- not yet supported --> 
 			<dirichlet_nodes type="matlab" enabled="false">
 				<filename>./config/dirichlet.mat</filename>
@@ -623,6 +647,3 @@ bool setup_microenvironment_from_XML( void )
 { return setup_microenvironment_from_XML( physicell_config_root ); }
 
 } 
- 
-
- 
