@@ -93,7 +93,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>8</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -155,8 +155,6 @@
 			</dirichlet_nodes>
 		</options>
 	</microenvironment_setup>	
-
-	
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 

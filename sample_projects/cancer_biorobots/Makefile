@@ -156,7 +156,7 @@ data-cleanup:
 	rm -f *.xml
 	rm -f *.svg
 	rm -f ./output/*
-	touch ./config/empty.txt
+	touch ./output/empty.txt
 	
 # archival 
 	
