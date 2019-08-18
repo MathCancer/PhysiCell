@@ -35,7 +35,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2019, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-500</x_min>
-		<x_max>500</x_max>
-		<y_min>-500</y_min>
-		<y_max>500</y_max>
+		<x_min>-750</x_min>
+		<x_max>750</x_max>
+		<y_min>-750</y_min>
+		<y_max>750</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1440</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">14400</max_time> <!-- 10 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -105,7 +105,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">10</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -115,18 +115,36 @@
 	</save>
 	
 	<microenvironment_setup>
-		<variable name="virus" units="particles/micron^3" ID="0">
+		<variable name="oxygen" units="mmHg" ID="0">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">100000.000000</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="mmHg">38.0</initial_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
+		</variable>
+	
+		<variable name="chemoattractant" units="dimensionless" ID="1">
 			<physical_parameter_set>
 				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-				<decay_rate units="1/min">0</decay_rate>  
+				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
-			<initial_condition units="particles/micron^3">0</initial_condition>
-			<Dirichlet_boundary_condition units="particles/micron^3" enabled="false">0</Dirichlet_boundary_condition>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
+		</variable>
+		
+		<variable name="therapeutic" units="dimensionless" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">.15625</decay_rate> <!-- 1 for cells  --> 
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
 		</variable>
 	
 		<options>
 			<calculate_gradients>true</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
@@ -138,32 +156,62 @@
 		</options>
 	</microenvironment_setup>	
 	
-	
-	
 	<user_parameters>
-		<random_seed type="int" units="dimensionless" hidden="true">0</random_seed> 
-		<!-- example parameters from the template --> 
+		<random_seed type="int" units="dimensionless">0</random_seed> 
 		
-		<!-- virus properties --> 
-		<viral_replication_rate type="double" units="viral particles/min" description="rate at which infected cells create new viral particles">0.4167</viral_replication_rate> 
-		<min_virion_count type="double" units="none" description="minimum number of virions to start replication">1e-15</min_virion_count>
-		<burst_virion_count type="double" units="none" description="max virion load, where infected cells lyse to release viral particles">100</burst_virion_count>
-		<viral_internalization_rate type="double" units="1/min" description="internalization rate for viral particles">10</viral_internalization_rate> 
-		<viral_diffusion_coefficient type="double" units="micron^2/min" description="diffusion coefficient for viral particles">1e3</viral_diffusion_coefficient>
-		<number_of_infected_cells type="int" units="none" description="initial number of infected cells">10</number_of_infected_cells>
+		<!-- for main --> 
+		<therapy_activation_time type="double" units="min">10080</therapy_activation_time> 
+			<!-- activate in 7 days --> 
+		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
 		
-		<!-- virus diffusion coefficient ~ 1e3 micron^2/min : https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105894 --> 
+		<!-- cargo cell setup --> 
+		<cargo_o2_relative_uptake type="double" units="dimensionless">0.1</cargo_o2_relative_uptake>
+		<cargo_apoptosis_rate type="double" units="1/min">4.065e-5</cargo_apoptosis_rate> 
+			<!-- survive 10 days -->
+		<cargo_relative_adhesion type="double" units="dimensionless">0</cargo_relative_adhesion>
+		<cargo_relative_repulsion type="double" units="dimensionless">5</cargo_relative_repulsion> 
 		
-		<!-- macrophage properties --> 
-		<number_of_macrophages type="int" units="none" description="initial number of macrophages">0</number_of_macrophages> 
-		<min_virion_detection_threshold type="double" units="none" description="minimal viral load for microphages to detect as infected">1</min_virion_detection_threshold>
-		<virus_digestion_rate type="double" units="1/min" description="rate that macrophages digest internalized viral particles">0.01</virus_digestion_rate> 
-		<macrophage_persistence_time type="double" units="min">15</macrophage_persistence_time>
-		<macrophage_migration_speed type="double" units="micron/min">1</macrophage_migration_speed> 
-		<macrophage_migration_bias type="double" units="dimensionless">0.1</macrophage_migration_bias> 
-		<macrophage_relative_adhesion type="double" units="dimensionless">0.05</macrophage_relative_adhesion>
-				
+
+		<!-- worker cell setup --> 
+		<worker_o2_relative_uptake type="double" units="1/min">0.1</worker_o2_relative_uptake>
+		<worker_apoptosis_rate type="double" units="1/min">0</worker_apoptosis_rate>
+		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
+		<worker_migration_speed type="double" units="micron/min">2.0</worker_migration_speed>
+		<worker_relative_adhesion type="double" units="dimensionless">0</worker_relative_adhesion>
+		<worker_relative_repulsion type="double" units="dimensionless">5</worker_relative_repulsion> 
+
+		<!-- for cell definitions -->
+		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>		
+		<receptor type="double" units="dimensionless">0.0</receptor>
+		<cargo_release_o2_threshold type="double" units="mmHg">10</cargo_release_o2_threshold>
+		
+		<max_relative_cell_adhesion_distance type="double" units="dimensionless">1.25</max_relative_cell_adhesion_distance>
+			<!-- how far out can cancer cells "feel" to close gaps? default is 1.25 -->
+		
+		<!-- for therapy --> 
+		<damage_rate type="double" units="1/min">0.03333</damage_rate> <!-- 1/30 --> 
+		<repair_rate type="double" units="1/min">0.004167</repair_rate> <!-- 1/240 --> 
+		<drug_death_rate type="double" units="1/min">0.004167</drug_death_rate> <!-- 1/240 --> 
+		
+		<worker_fraction type="double" units="dimensionless">0.10</worker_fraction>
+		<number_of_injected_cells type="int" units="dimensionless">500</number_of_injected_cells>
+		
+		<!-- tissue setup -->
+		<tumor_radius type="double" units="micron">200</tumor_radius> 
+		
+		<!-- custom mechanics --> 
+		<max_elastic_displacement type="double" units="micron">50.0</max_elastic_displacement>
+		
+		<!-- attachment parameters --> 
+		<attachment_receptor_threshold type="double" units="dimensionless">0.1</attachment_receptor_threshold>
+		<max_attachment_distance type="double" units="micron">18.0</max_attachment_distance>
+		<min_attachment_distance type="double" units="micron">14.0</min_attachment_distance>
+		
+		<!-- worker cell motility parameters -->
+		<motility_shutdown_detection_threshold type="double" units="dimensionless">0.001</motility_shutdown_detection_threshold>
+			<!-- shut down worker motility if signal < motility_shutdown_detection_threshold -->
+		<attached_worker_migration_bias type="double" units="dimensionless">0.5</attached_worker_migration_bias>
+		<unattached_worker_migration_bias type="double" units="dimensionless">0.5</unattached_worker_migration_bias>
 	</user_parameters>
-	
 	
 </PhysiCell_settings>

@@ -85,9 +85,12 @@ void create_immune_cell_type( void )
 	
 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
+	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
+	static int immuno_ID = microenvironment.find_density_index( "immunostimulatory factor" ); // 1
+	
 	// reduce o2 uptake 
 	
-	immune_cell.phenotype.secretion.uptake_rates[0] *= 
+	immune_cell.phenotype.secretion.uptake_rates[oxygen_ID] *= 
 		parameters.doubles("immune_o2_relative_uptake"); // 0.1; 
 	
 	// set apoptosis to survive 10 days (on average) 
@@ -167,14 +170,17 @@ void create_cell_types( void )
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
 	cell_defaults.parameters.o2_reference = 38.0; 
 	
+	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
+	static int immuno_ID = microenvironment.find_density_index( "immunostimulatory factor" ); // 1
+	
 	// set default uptake and secretion 
 	// oxygen 
-	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[0] = 10; 
-	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
+	cell_defaults.phenotype.secretion.secretion_rates[oxygen_ID] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates[oxygen_ID] = 10; 
+	cell_defaults.phenotype.secretion.saturation_densities[oxygen_ID] = 38; 
 
 	// immunostimulatory 
-	cell_defaults.phenotype.secretion.saturation_densities[1] = 1; 
+	cell_defaults.phenotype.secretion.saturation_densities[immuno_ID] = 1; 
 
 	// set the default cell type to o2-based proliferation with the effect of the 
 	// on oncoprotein, and secretion of the immunostimulatory factor 
@@ -226,6 +232,9 @@ void setup_microenvironment( void )
 		default_microenvironment_options.simulate_2D = false; 
 	}
 	
+/* 
+	In XML as of version 1.6.0 
+	
 	// gradients are needed for this example 
 	
 	default_microenvironment_options.calculate_gradients = true; 
@@ -251,6 +260,7 @@ void setup_microenvironment( void )
 
 	// set initial conditions 
 	default_microenvironment_options.initial_condition_vector = { 38.0 , 0 }; 
+*/
 	
 	initialize_microenvironment(); 	
 
@@ -498,7 +508,6 @@ std::vector<std::string> cancer_immune_coloring_function( Cell* pCell )
 	
 	return output; 
 }
-
 
 void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant )
 {

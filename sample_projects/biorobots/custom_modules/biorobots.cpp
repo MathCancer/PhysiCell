@@ -71,11 +71,6 @@ void setup_microenvironment( void )
 {
 	// set domain parameters
 	
-	// No longer needed, but more efficient because 
-	// the setup function won't add and use the 
-	// Dirichlet nodes if this is set false 
-	default_microenvironment_options.outer_Dirichlet_conditions = false;
-	
 	initialize_microenvironment(); 	
 	
 	// these will ***overwrite*** values specified in the 
