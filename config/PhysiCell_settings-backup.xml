@@ -35,7 +35,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2019, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -87,25 +87,25 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">1440</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>8</omp_num_threads>
 	</parallel> 
 	
 	<save>
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">360</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">10</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -115,18 +115,18 @@
 	</save>
 	
 	<microenvironment_setup>
-		<variable name="oxygen" units="mmHg" ID="0">
+		<variable name="virus" units="particles/micron^3" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.000000</diffusion_coefficient>
-				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">0</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="mmHg">38.0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
+			<initial_condition units="particles/micron^3">0</initial_condition>
+			<Dirichlet_boundary_condition units="particles/micron^3" enabled="false">0</Dirichlet_boundary_condition>
 		</variable>
-		
+	
 		<options>
 			<calculate_gradients>true</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
+			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
@@ -138,16 +138,32 @@
 		</options>
 	</microenvironment_setup>	
 	
+	
+	
 	<user_parameters>
-		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<random_seed type="int" units="dimensionless" hidden="true">0</random_seed> 
 		<!-- example parameters from the template --> 
 		
-		<!-- motile cell type parameters --> 
-		<motile_cell_persistence_time type="double" units="min">15</motile_cell_persistence_time>
-		<motile_cell_migration_speed type="double" units="micron/min">0.5</motile_cell_migration_speed> 
-		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
-		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
-		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.1</motile_cell_relative_cycle_entry_rate>
+		<!-- virus properties --> 
+		<viral_replication_rate type="double" units="viral particles/min" description="rate at which infected cells create new viral particles">0.4167</viral_replication_rate> 
+		<min_virion_count type="double" units="none" description="minimum number of virions to start replication">1e-15</min_virion_count>
+		<burst_virion_count type="double" units="none" description="max virion load, where infected cells lyse to release viral particles">100</burst_virion_count>
+		<viral_internalization_rate type="double" units="1/min" description="internalization rate for viral particles">10</viral_internalization_rate> 
+		<viral_diffusion_coefficient type="double" units="micron^2/min" description="diffusion coefficient for viral particles">1e3</viral_diffusion_coefficient>
+		<number_of_infected_cells type="int" units="none" description="initial number of infected cells">10</number_of_infected_cells>
+		
+		<!-- virus diffusion coefficient ~ 1e3 micron^2/min : https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105894 --> 
+		
+		<!-- macrophage properties --> 
+		<number_of_macrophages type="int" units="none" description="initial number of macrophages">0</number_of_macrophages> 
+		<min_virion_detection_threshold type="double" units="none" description="minimal viral load for microphages to detect as infected">1</min_virion_detection_threshold>
+		<virus_digestion_rate type="double" units="1/min" description="rate that macrophages digest internalized viral particles">0.01</virus_digestion_rate> 
+		<macrophage_persistence_time type="double" units="min">15</macrophage_persistence_time>
+		<macrophage_migration_speed type="double" units="micron/min">1</macrophage_migration_speed> 
+		<macrophage_migration_bias type="double" units="dimensionless">0.1</macrophage_migration_bias> 
+		<macrophage_relative_adhesion type="double" units="dimensionless">0.05</macrophage_relative_adhesion>
+				
 	</user_parameters>
+	
 	
 </PhysiCell_settings>

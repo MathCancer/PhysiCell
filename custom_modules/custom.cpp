@@ -224,7 +224,6 @@ void setup_microenvironment( void )
 	
 	// track internalized total substrates
 	
-	default_microenvironment_options.track_internalized_substrates_in_each_agent = true; 
 	
 	// if there are more substrates, resize accordingly 
 	std::vector<double> bc_vector( 1 , 0.0 ); // 5% o2

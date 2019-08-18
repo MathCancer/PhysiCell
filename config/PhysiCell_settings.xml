@@ -93,7 +93,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>8</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -155,7 +155,7 @@
 		<!-- virus diffusion coefficient ~ 1e3 micron^2/min : https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105894 --> 
 		
 		<!-- macrophage properties --> 
-		<number_of_macrophages type="int" units="none" description="initial number of macrophages">50</number_of_macrophages> 
+		<number_of_macrophages type="int" units="none" description="initial number of macrophages">0</number_of_macrophages> 
 		<min_virion_detection_threshold type="double" units="none" description="minimal viral load for microphages to detect as infected">1</min_virion_detection_threshold>
 		<virus_digestion_rate type="double" units="1/min" description="rate that macrophages digest internalized viral particles">0.01</virus_digestion_rate> 
 		<macrophage_persistence_time type="double" units="min">15</macrophage_persistence_time>

@@ -602,15 +602,28 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
 	
+	// if *any* of the substrates have outer Dirichlet conditions enables, 
+	// then set teh outer_Dirichlet_conditions = true; 
+	
+	
+	
+	
+	
+	
 	// now, get the options 
-	node = node.parent(); // back up to microenvironment_setup
+	node = xml_find_node( root_node , "microenvironment_setup" );
+	node = xml_find_node( node , "options" ); 
 	
 	// calculate gradients? 
 	default_microenvironment_options.calculate_gradients = xml_get_bool_value( node, "calculate_gradients" ); 
+		std::cout << "gradients?" << (int) default_microenvironment_options.calculate_gradients << std::endl << std::endl; 
 	
 	// track internalized substrates in each agent? 
 	default_microenvironment_options.track_internalized_substrates_in_each_agent 
 		= xml_get_bool_value( node, "track_internalized_substrates_in_each_agent" ); 
+		std::cout << "track?" << (int) default_microenvironment_options.track_internalized_substrates_in_each_agent << std::endl << std::endl; 
+	
+	system("pause"); 
 	
 	// not yet supported : read initial conditions 
 	/*
