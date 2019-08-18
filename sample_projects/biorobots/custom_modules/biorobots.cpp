@@ -567,19 +567,22 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 		parameters.doubles("attached_worker_migration_bias"); 
 	static double unattached_worker_migration_bias = 
 		parameters.doubles("unattached_worker_migration_bias"); 
+		
+	static int cargo_ID = microenvironment.find_density_index( "cargo signal" ); // 1 
+	static int director_ID = microenvironment.find_density_index( "director signal" ); // 0 
 	
 	if( pCell->state.neighbors.size() > 0 )
 	{
 		phenotype.motility.migration_bias = attached_worker_migration_bias; 
 
-		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(0);	
+		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(director_ID);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			
 	}
 	else
 	{
 		phenotype.motility.migration_bias = unattached_worker_migration_bias; 
 		
-		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(1);	
+		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(cargo_ID);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			
 	}
 	

@@ -877,6 +877,7 @@ std::vector<gradient>& Microenvironment::gradient_vector(int n )
 		compute_gradient_vector( n );
 	}
 	
+	
 	return gradient_vectors[n];
 }
 	
@@ -893,7 +894,6 @@ std::vector<gradient>& Microenvironment::nearest_gradient_vector( std::vector<do
 
 void Microenvironment::compute_all_gradient_vectors( void )
 {
-	// 
 	static double two_dx = mesh.dx; 
 	static double two_dy = mesh.dy; 
 	static double two_dz = mesh.dz; 

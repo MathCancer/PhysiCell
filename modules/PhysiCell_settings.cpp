@@ -555,6 +555,9 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	pugi::xml_node node1 = node.child( "variable" ); // xml_find_node( node , "variable" ); 
 	node = node1; 
 	int i = 0; 
+	
+	bool activated_Dirichlet_boundary_detected = false; 
+	
 	while( node )
 	{
 		// get the name and units 
@@ -585,6 +588,9 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 		// now, decide whether or not to enable it 
 		Dirichlet_activation_vector.push_back( node1.attribute("enabled").as_bool() );
 		
+		if( node1.attribute("enabled").as_bool() )
+		{ activated_Dirichlet_boundary_detected = true; } 
+		
 		// move on to the next variable (if any!)
 		node = node.next_sibling( "variable" ); 
 		i++; 
@@ -600,15 +606,16 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	// because outer boundary Dirichlet conditions are defined in the XML, 
 	// make sure we don't accidentally disable them 
 	
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
+	default_microenvironment_options.outer_Dirichlet_conditions = false;
 	
 	// if *any* of the substrates have outer Dirichlet conditions enables, 
 	// then set teh outer_Dirichlet_conditions = true; 
 	
-	
-	
-	
-	
+	if( activated_Dirichlet_boundary_detected ) 
+	{
+		default_microenvironment_options.outer_Dirichlet_conditions = true;
+	}
+	std::cout << "boundary?: " << (int) default_microenvironment_options.outer_Dirichlet_conditions << std::endl << std::endl; 
 	
 	// now, get the options 
 	node = xml_find_node( root_node , "microenvironment_setup" );
