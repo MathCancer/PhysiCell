@@ -14,9 +14,9 @@ heterogeneity sample project:
 * Refined "reset" and "data-cleanup" rules in Makefile
 * Converted project to use the new XML-based microenvironment setup. 
 
-cancer immune sampel rpoject: 
+cancer immune sample rpoject: 
 * Refined "reset" and "data-cleanup" rules in Makefile
-
+* Converted project to use the new XML-based microenvironment setup. 
 
 virus macrophage sample project: 
 * Refined "reset" and "data-cleanup" rules in Makefile
