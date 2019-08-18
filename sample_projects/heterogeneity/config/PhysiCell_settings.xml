@@ -125,7 +125,7 @@
 		</variable>
 		
 		<options>
-			<calculate_gradients>true</calculate_gradients>
+			<calculate_gradients>false</calculate_gradients>
 			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">

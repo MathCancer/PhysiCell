@@ -13,6 +13,10 @@ template3D sample project:
 heterogeneity sample project: 
 * Refined "reset" and "data-cleanup" rules in Makefile
 
+virus macrophage sample project: 
+* Refined "reset" and "data-cleanup" rules in Makefile
+* Converted project to use the new XML-based microenvironment setup. 
+* Enabled gradient calculations (were previously off, although we wanted macrophage chemotaxis) 
 
 biorobots sample project: 
 * Refined "reset" and "data-cleanup" rules in Makefile. 
