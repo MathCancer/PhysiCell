@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.5.2} 
-\newcommand{\ReleaseDate}{June 11, 2019} 
+\newcommand{\Version}{1.6.0} 
+\newcommand{\ReleaseDate}{August 20, 2019} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -93,7 +93,7 @@ urlcolor=blue
 \newcommand{\DONE}{}%{\textbf{\blue{[DONE]}}}
 \newcommand{\FINISH}{}%{\magenta{[FINISH ME]}}
 
-\newcommand{\TOClink}{\begin{center}\hrule\vskip-10pt\phantom{.}\hfill[Return to \hyperlink{TOC}{Table of Contents}.]\hfill\phantom{.}\vskip3pt\hrule\end{center}}
+\newcommand{\TOClink}{\begin{center}\hrule\vskip-5pt\phantom{.}\hfill[Return to \hyperlink{TOC}{Table of Contents}.]\hfill\phantom{.}\vskip3pt\hrule\end{center}}
 \begin{document}
 
 
@@ -4522,6 +4522,9 @@ are subject to extension.
       </legacy_data>
    </save>
    
+   <microenvironment_setup>
+   </microenvironment_setup>
+   
    <user_parameters>
    </user_parameters>
 
@@ -4547,9 +4550,34 @@ and maximum simulation time.
 \smallcode{save} stores settings for where and how often data are saved. 
 
 \item 
+\smallcode{microenvironment\_setup} specifies the chemical substrates in the microenvironment, 
+including their diffusion and decay parameters and initial and boundary conditions. This block 
+also sets some options for the diffusion solvers in BioFVM. 
+See \ref{sec:XML_microenvironment_setup} for more details. 
+
+\item 
 \smallcode{user\_parameters} stores user-defined parameters, specific to their 
 simulation. See \ref{sec:XML_user_parameters} for more details. 
 \end{enumerate}
+
+\TOClink 
+
+\subsection{Microenvironment Setup}
+\label{sec:XML_microenvironment_setup}
+As of Version 1.6.0, PhysiCell can fully define the chemical microenvironment by simple 
+modifications to the XML configuration file. 
+(See Sec \ref{?} to learn more about the BioFVM chemical microenvironment.) 
+In Section \ref{sec:XML_microenvironment_setup_XML_structure}, we show how to 
+structure this block of XML. 
+
+% A detailed tutorial on these parameters is provided at: 
+% \begin{center}
+% \href{http://www.mathcancer.org/blog/user-parameters-in-physicell/}{http://www.mathcancer.org/blog/user- parameters-in-physicell/}
+% \end{center}
+
+\TOClink 
+\subsubsection{Defining chemical microenvironmental substrates in the XML configuration}
+\label{sec:XML_microenvironment_setup_XML_structure}
 
 \TOClink 
 
