@@ -16,15 +16,15 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 
 ### Key makefile rules:
 
-make               : compiles the current project. If no 
+**make**               : compiles the current project. If no 
                      project has been defined, it first 
                      populates the cancer heterogeneity 2D 
                      sample project and compiles it 
    
-make <project-name>: populates the indicated sample project. 
+**make \[project-name\]**: populates the indicated sample project. 
                      Use "make" to compile it. 
 
-  <project_name> choices:
+  \[project-name\] choices:
     template2D 
     template3D
     biorobots-sample
@@ -33,11 +33,11 @@ make <project-name>: populates the indicated sample project.
     cancer-immune-sample 
     virus-macrophage-sample
 
-make clean         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
+**make clean**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
 
-make data-cleanup  : clears out all simulation data 
+**make data-cleanup**  : clears out all simulation data 
 
-make reset         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
+**make reset**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
 
 
 **Homepage:**     http://PhysiCell.MathCancer.org
