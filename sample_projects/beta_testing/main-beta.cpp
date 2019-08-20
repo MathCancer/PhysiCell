@@ -72,6 +72,7 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
+#include <string> 
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
@@ -82,9 +83,6 @@
 	
 using namespace BioFVM;
 using namespace PhysiCell;
-
-// set number of threads for OpenMP (parallel computing)
-// int omp_num_threads = 8; // set this to # of CPU cores x 2 (for hyperthreading)
 
 int main( int argc, char* argv[] )
 {
@@ -97,7 +95,7 @@ int main( int argc, char* argv[] )
 	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
 	if( !XML_status )
 	{ exit(-1); }
-	
+
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
@@ -106,14 +104,6 @@ int main( int argc, char* argv[] )
 	
 	// time setup 
 	std::string time_units = "min"; 
-/*	
-	double t = 0.0; // current simulation time 
-	
-	double t_output_interval = 60; // output once per hour 
-	double t_max = 60*24*45;  // 45 days 
-	double t_next_output_time = t; 
-	int output_index = 0; // used for creating unique output filenames 
-*/
 
 	/* Microenvironment setup */ 
 	
@@ -140,7 +130,7 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_cell_data_as_custom_matlab( true );
 	
 	// save a simulation snapshot 
-
+	
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
@@ -153,7 +143,7 @@ int main( int argc, char* argv[] )
 	// for simplicity, set a pathology coloring function 
 	
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = heterogeneity_coloring_function;
-
+	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
@@ -214,13 +204,13 @@ int main( int argc, char* argv[] )
 			
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
-
+			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
-			PhysiCell_globals.current_time += diffusion_dt; 
+			PhysiCell_globals.current_time += diffusion_dt;
 		}
-
+		
 		if( PhysiCell_settings.enable_legacy_saves == true )
 		{			
 			log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file);
@@ -236,7 +226,7 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
-
+	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	

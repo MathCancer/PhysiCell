@@ -105,10 +105,13 @@ void create_cell_types( void )
 	cell_defaults.parameters.o2_reference = 38.0; 
 	
 	// set default uptake and secretion 
+	
+	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0
+	
 	// oxygen 
-	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[0] = 10; 
-	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
+	cell_defaults.phenotype.secretion.secretion_rates[oxygen_ID] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates[oxygen_ID] = 10; 
+	cell_defaults.phenotype.secretion.saturation_densities[oxygen_ID] = 38; 
 
 	// set the default cell type to no phenotype updates 
 	
@@ -140,6 +143,9 @@ void setup_microenvironment( void )
 		default_microenvironment_options.simulate_2D = true; 
 	}
 	
+/*
+	All this is now in XML as of 1.6.0 
+	
 	// no gradients needed for this example 
 	
 	default_microenvironment_options.calculate_gradients = false; 
@@ -155,6 +161,7 @@ void setup_microenvironment( void )
 	
 	// set initial conditions 
 	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
+*/	
 			
 	initialize_microenvironment(); 	
 
@@ -172,7 +179,6 @@ void setup_tissue( void )
 	
 	// Parameter<double> temp; 
 	
-	std::cout << parameters << std::endl; 
 	int i = parameters.doubles.find_index( "tumor_radius" ); 
 	
 	Cell* pCell = NULL; 
