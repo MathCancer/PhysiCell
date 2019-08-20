@@ -37,7 +37,7 @@ in APIs or high-level usage / syntax for end users; old projects should continue
 modification, although we highly recommend migrating to the simplified microenvironment setup. 
 A short blog tutorial on this new functionality can be found at 
 
-[http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml] 
+http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
@@ -48,8 +48,8 @@ A short blog tutorial on this new functionality can be found at
 ### Minor new features and changes: 
  
 + template2D sample project: 
-++ Refined "reset" and "data-cleanup" rules in Makefile
-++ Converted project to use the new XML-based microenvironment setup. 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
 
 template3D sample project: 
 * Refined "reset" and "data-cleanup" rules in Makefile
