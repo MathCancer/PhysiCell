@@ -4369,7 +4369,9 @@ Note that Booleans can be represented as 0 and 1, or \v|false| and \v|true|.
 \label{sec:XML_options}
 PhysiCell 1.3.0 introduced preliminary support for XML configuration files, via \hfill\break
 \v|./modules/PhysiCell_settings.*|. Version 1.4.0 introduced further refinements that are 
-detailed in Sections \ref{sec:XML_PhysiCell_structure} and \ref{sec:XML_user_parameters}.
+detailed in Sections \ref{sec:XML_PhysiCell_structure} and \ref{sec:XML_user_parameters}. 
+Version 1.6.0 introduced an XML-based specification of the chemical microenvironment. 
+See Section \ref{sec:XML_microenvironment_setup}. 
 
 XML options in PhysiCell work  primarily  by creating two data 
 structures defined as: 
@@ -4432,6 +4434,8 @@ Note that PhysiCell will default to \v|./config/PhysiCell_settings.xml|
 in the sample projects if no XML file is supplied: 
 
 \v|> ./run_me |
+
+
 
 Lastly, we point out that the settings in the XML figuration files and the settings 
 data structures will likely be expanded in the next several PhysiCell releases. 
@@ -4499,7 +4503,7 @@ based upon the DOM that has previously been loaded with
 
 \subsection{Structure of PhysiCell XML parameter files}
 \label{sec:XML_PhysiCell_structure}
-PhysiCell's XML files look like this (as of Version 1.4.0); they 
+PhysiCell's XML files look like this (as of Version 1.6.0); they 
 are subject to extension. 
 
 \begin{verbatim}
@@ -4736,16 +4740,22 @@ but do not track internalized substrates.
 </microenvironment_setup>    
 \end{verbatim}
 
-Notice that the end of the \verb+microenvironment_setup+ block sets additional options: 
+\TOClink 
+
+\subsubsection{Key microenvironment parsing functions}
+\label{sec:microenvironment_xml_parsing_functions}
 
 \begin{itemize}
-\item \textbf{parameter\_name} is the name of the parameter. Note that this cannot begin with a digit. 
-\item \textbf{type} is the type of parameter. Allowed types are bool (Boolean), int (integer), double (floating point double precision), and string (std::string). Note that if this attribute is not supplied, PhysiCell will attempt to process the parameter as a double. 
-\item \textbf{units} are the units (default: none). Note that PhysiCell does not convert units, so supplying units here is important communication between users to ensure all are using correct units. By default, PhysiCell works in microns for spatial units and minutes for time units. 
-\item \textbf{value} is the actual value of the parameter. 
+\item \smallcode{bool setup\_microenvironment\_from\_XML( pugi::xml\_node root\_node )} 
+parses the XML DOM (in the supplied pugixml \verb+xml_node+) to find 
+the \verb+microenvironment_setup+ node and process the variables and 
+options. 
+
+It returns true if successful, and false if not. 
+
+\item \smallcode{bool setup\_microenvironment\_from\_XML( void )} calls the 
+prior function using \hfill\newline \verb+physicell_config_root+.   
 \end{itemize}
-
-
 
 \TOClink 
 

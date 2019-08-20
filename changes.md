@@ -4,11 +4,6 @@ PhysiCell_settings
 
 
 
-Created new function to access the (private) microenvironment dirichlet_activation_vector 
-double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
-
-
-updated main microenvironment display function Microenvironment::display_information to display information on initial and boundary conditions 
 
 wrote two new functions to parse XML with microenvironment_setup to add substrates and 
 options 
@@ -47,40 +42,46 @@ http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml
  
 ### Minor new features and changes: 
  
-+ template2D sample project: 
++ Updated template2D sample project: 
   + Refined "reset" and "data-cleanup" rules in Makefile
   + Converted project to use the new XML-based microenvironment setup. 
 
-template3D sample project: 
-* Refined "reset" and "data-cleanup" rules in Makefile
-* Converted project to use the new XML-based microenvironment setup. 
++ Updated template3D sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
 
-heterogeneity sample project: 
-* Refined "reset" and "data-cleanup" rules in Makefile
-* Converted project to use the new XML-based microenvironment setup. 
++ Updated heterogeneity sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
 
-cancer immune sample rpoject: 
-* Refined "reset" and "data-cleanup" rules in Makefile
-* Converted project to use the new XML-based microenvironment setup. 
++ Updated cancer immune sample rpoject: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
 
-virus macrophage sample project: 
-* Refined "reset" and "data-cleanup" rules in Makefile
-* Converted project to use the new XML-based microenvironment setup. 
-* Enabled gradient calculations (were previously off, although we wanted macrophage chemotaxis) 
++ Updated virus macrophage sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
+  + Enabled gradient calculations (were previously off, although we wanted macrophage chemotaxis) 
 
-biorobots sample project: 
-* Refined "reset" and "data-cleanup" rules in Makefile. 
-* Converted project to use the new XML-based microenvironment setup.
-* Note that values in user_parameters will override values in microenvironment_setup. 
-* Improved project to properly search for substrate indices instead of hard coding them. 
++ Updated biorobots sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile. 
+  + Converted project to use the new XML-based microenvironment setup.
+  + Note that values in user_parameters will override values in microenvironment_setup. 
+  + Improved project to properly search for substrate indices instead of hard coding them. 
 
-cancer biorobots sample project: 
-* Refined "reset" rule in Makefile. 
-* Converted project to use the new XML-based microenvironment setup.
-* Improved project to properly search for substrate indices instead of hard coding them. 
-
++ Updated cancer biorobots sample project: 
+  + Refined "reset" rule in Makefile. 
+  + Converted project to use the new XML-based microenvironment setup.
+  + Improved project to properly search for substrate indices instead of hard coding them. 
 
 + Refined "reset" and "data-cleanup" rules in default Makefile 
+
++ Created new function to access the (private) microenvironment dirichlet_activation_vector: 
+ 
+double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
+
++ Updated the main microenvironment display function Microenvironment::display_information to summarize the initial and boundary conditions for each substrate 
+
  
 ### Beta features (not fully supported):
  
