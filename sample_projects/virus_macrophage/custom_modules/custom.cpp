@@ -179,8 +179,7 @@ void create_cell_types( void )
 	
 	// no birth 
 	macrophage.phenotype.cycle.data.transition_rate(G0G1_index, S_index ) = 0.0 ; 
-
-
+	
 	// macrophages do not uptake viral particles 
 	macrophage.phenotype.secretion.uptake_rates[virus_index] = 
 		parameters.doubles("viral_internalization_rate"); 
@@ -204,6 +203,9 @@ void setup_microenvironment( void )
 		default_microenvironment_options.simulate_2D = true; 
 	}
 	
+/*
+	// in XML since version 1.6.0
+	
 	// no gradients need for this example 
 
 	default_microenvironment_options.calculate_gradients = false; 
@@ -222,7 +224,6 @@ void setup_microenvironment( void )
 	
 	// track internalized total substrates
 	
-	default_microenvironment_options.track_internalized_substrates_in_each_agent = true; 
 	
 	// if there are more substrates, resize accordingly 
 	std::vector<double> bc_vector( 1 , 0.0 ); // 5% o2
@@ -230,6 +231,12 @@ void setup_microenvironment( void )
 	
 	default_microenvironment_options.initial_condition_vector = { 0.0 }; 
 	// 
+*/
+
+	// override BioFVM setup with user parameters 
+
+	int virus_ID = microenvironment.find_density_index( "virus" ); 
+	microenvironment.diffusion_coefficients[virus_ID] = parameters.doubles("viral_diffusion_coefficient"); 
 	
 	// initialize BioFVM 
 	
@@ -375,8 +382,6 @@ std::vector<Cell*> get_possible_neighbors( Cell* pCell )
 	
 	return neighbors; 
 }
-
-
 
 void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 {

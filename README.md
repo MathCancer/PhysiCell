@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:**      1.5.2
+**Version:**      1.6.0
 
-**Release date:** 11 June 2019
+**Release date:** 20 August 2019
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -16,15 +16,15 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 
 ### Key makefile rules:
 
-make               : compiles the current project. If no 
+**make**               : compiles the current project. If no 
                      project has been defined, it first 
                      populates the cancer heterogeneity 2D 
                      sample project and compiles it 
    
-make <project-name>: populates the indicated sample project. 
+**make \[project-name\]**: populates the indicated sample project. 
                      Use "make" to compile it. 
 
-  <project_name> choices:
+  \[project-name\] choices:
     template2D 
     template3D
     biorobots-sample
@@ -33,11 +33,11 @@ make <project-name>: populates the indicated sample project.
     cancer-immune-sample 
     virus-macrophage-sample
 
-make clean         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
+**make clean**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
 
-make data-cleanup  : clears out all simulation data 
+**make data-cleanup**  : clears out all simulation data 
 
-make reset         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
+**make reset**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
 
 
 **Homepage:**     http://PhysiCell.MathCancer.org
@@ -60,25 +60,70 @@ See changes.md for the full change log.
 
 ## Release summary: 
 
-This minor release fixes bugs that affected the release of internalized substrates at cell death on Linux and OSX operating systems, relating to system differences in order of evaluating destructor functions. The release of internalized substrates has been moved to a new function, and placed in cell death functions. There is no change in APIs or high-level usage / syntax for end users. 
+This release introduces a new XML-based configuration for the chemical microenvironment. All 
+the sample projects have been updated to use this new functionality. There is no change 
+in APIs or high-level usage / syntax for end users; old projects should continue to work without 
+modification, although we highly recommend migrating to the simplified microenvironment setup. 
+A short blog tutorial on this new functionality can be found at 
 
-Users should also consult the release notes for 1.5.0. 
+http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
 ### Major new features and changes:
 
-+ None 
++ XML-based setup of the chemical microenvironment.  
  
 ### Minor new features and changes: 
  
-+ Introduced new function Basic_Agent::release_internalized_substrates() to explicitly release a cell's internalized substrates, rather assuming it can be properly done in the Basic_Agent destructor function. 
++ Updated template2D sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
 
-+ Removed the Basic_Agent destructor function to allow the compiler to automatically generate this. 
++ Updated template3D sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
 
-+ Very minor revisions to the release protocol. 
++ Updated heterogeneity sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
 
-+ Minor updates to the user guide to reflect the release_internalized_substrates() function. 
++ Updated cancer immune sample rpoject: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
+
++ Updated virus macrophage sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile
+  + Converted project to use the new XML-based microenvironment setup. 
+  + Enabled gradient calculations (were previously off, although we wanted macrophage chemotaxis) 
+
++ Updated biorobots sample project: 
+  + Refined "reset" and "data-cleanup" rules in Makefile. 
+  + Converted project to use the new XML-based microenvironment setup.
+  + Note that values in user_parameters will override values in microenvironment_setup. 
+  + Improved project to properly search for substrate indices instead of hard coding them. 
+
++ Updated cancer biorobots sample project: 
+  + Refined "reset" rule in Makefile. 
+  + Converted project to use the new XML-based microenvironment setup.
+  + Improved project to properly search for substrate indices instead of hard coding them. 
+
++ Refined "reset" and "data-cleanup" rules in default Makefile 
+
++ Created new function to access the (private) microenvironment dirichlet_activation_vector: 
+ 
+double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
+
++ Updated the main microenvironment display function Microenvironment::display_information to summarize the initial and boundary conditions for each substrate 
+
++ Wrote two new functions to parse the XML in microenvironment_setup to add substrates and 
+options:  
+  + bool setup_microenvironment_from_XML( pugi::xml_node root_node )
+  + bool setup_microenvironment_from_XML( void )
+The second one assumes you already defined the root node and access the 
+global (pugi)xml node for it. 
+
++ The main XML parsing function now calls setup_microenvironment_from_XML(), just before processing user-defined parameters. 
  
 ### Beta features (not fully supported):
  
@@ -88,13 +133,7 @@ Users should also consult the release notes for 1.5.0.
   
 ### Bugfixes: 
 
-+ Move code for internalized substrate release from the Basic_Agent destructor to the new Basic_Agent::release_internalized_substrates() function. 
-
-+ Basic_Agent::release_internalized_substrates() is now called from delete_cell(int) in PhysiCell_cell.cpp. 
-
-+ Basic_Agent::release_internalized_substrates() explicitly sets internalized_substrates to a zero vector, just in case users want to call this function on non-dead cells. 
-
-+ Cell::Cell() now initializes updated_current_mechanics_voxel_index = 0 (avoids a possible segfault in GDB)
++ None.
  
 ### Notices for intended changes that may affect backwards compatibility:
  

@@ -175,6 +175,7 @@ void setup_microenvironment( void )
 	default_microenvironment_options.Y_range = {-1000, 1000}; 
 	default_microenvironment_options.simulate_2D = true; 
 */
+	
 	// make sure to override and go back to 2D 
 	if( default_microenvironment_options.simulate_2D == false )
 	{
@@ -182,6 +183,7 @@ void setup_microenvironment( void )
 		default_microenvironment_options.simulate_2D = true; 
 	}
 	
+/* now this is in XML 	
 	// no gradients need for this example 
 
 	default_microenvironment_options.calculate_gradients = false; 
@@ -196,6 +198,10 @@ void setup_microenvironment( void )
 	
 	// set initial conditions 
 	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
+*/
+	
+	// put any custom code to set non-homogeneous initial conditions or 
+	// extra Dirichlet nodes here. 
 	
 	// initialize BioFVM 
 	

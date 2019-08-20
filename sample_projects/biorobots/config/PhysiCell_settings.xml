@@ -114,6 +114,39 @@
 		</legacy_data>
 	</save>
 	
+	<microenvironment_setup>
+		<variable name="director signal" units="dimensionless" ID="0">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
+		</variable>
+		
+		<variable name="cargo signal" units="dimensionless" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">.4</decay_rate> <!-- 1 for cells  --> 
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
+		</variable>
+		
+		<options>
+			<calculate_gradients>true</calculate_gradients>
+			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
+			<!-- not yet supported --> 
+			<initial_condition type="matlab" enabled="false">
+				<filename>./config/initial.mat</filename>
+			</initial_condition>
+			<!-- not yet supported --> 
+			<dirichlet_nodes type="matlab" enabled="false">
+				<filename>./config/dirichlet.mat</filename>
+			</dirichlet_nodes>
+		</options>
+	</microenvironment_setup>		
+	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 

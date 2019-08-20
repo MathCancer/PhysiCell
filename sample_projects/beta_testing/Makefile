@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := beta-testing
+PROGRAM_NAME := beta
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -44,7 +44,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := heterogeneity.o 
+PhysiCell_custom_module_OBJECTS := heterogeneity.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -127,11 +127,9 @@ PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
-
-PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 	
-# beta PhysiCell modules 
+PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
 # user-defined PhysiCell modules
 
@@ -147,8 +145,7 @@ reset:
 	touch ./custom_modules/empty.txt 
 	touch ALL_CITATIONS.txt 
 	rm ALL_CITATIONS.txt 
-	cp ./config/PhysiCell_settings_default.xml ./config/PhysiCell_settings.xml  
-	touch ./output/empty.txt
+	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	
 clean:
 	rm -f *.o

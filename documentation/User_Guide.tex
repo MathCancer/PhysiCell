@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.5.2} 
-\newcommand{\ReleaseDate}{June 11, 2019} 
+\newcommand{\Version}{1.6.0} 
+\newcommand{\ReleaseDate}{August 20, 2019} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -13,6 +13,9 @@
 \usepackage{hyperref}
 \usepackage{changepage}
 \usepackage[dvipsnames,usenames]{color}
+
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
 
 \usepackage{caption}
 \captionsetup{justification=raggedright,singlelinecheck=false}
@@ -93,7 +96,7 @@ urlcolor=blue
 \newcommand{\DONE}{}%{\textbf{\blue{[DONE]}}}
 \newcommand{\FINISH}{}%{\magenta{[FINISH ME]}}
 
-\newcommand{\TOClink}{\begin{center}\hrule\vskip-10pt\phantom{.}\hfill[Return to \hyperlink{TOC}{Table of Contents}.]\hfill\phantom{.}\vskip3pt\hrule\end{center}}
+\newcommand{\TOClink}{\begin{center}\hrule\vskip-5pt\phantom{.}\hfill[Return to \hyperlink{TOC}{Table of Contents}.]\hfill\phantom{.}\vskip3pt\hrule\end{center}}
 \begin{document}
 
 
@@ -691,7 +694,8 @@ To reset to a clean slate (e.g., to clear out a sample project and populate anot
 
 \TOClink 
 
-\section{The BioFVM microenvironment \DONE}
+\section{The BioFVM microenvironment}
+\label{sec:BioFVM}
 PhysiCell is built upon BioFVM \cite{ref:BioFVM}, and so it uses the (bio)chemical microenvironment from BioFVM, 
 including diffusion, decay, cell-based secretions/uptake, and bulk supply/uptake functions. All 
 PhysiCell projects already include bioFVM once you have included PhysiCell: 
@@ -733,18 +737,38 @@ BioFVM applies Neumann (no flux) conditions at the outer simulation boundaries.
 
 \TOClink 
 
-
 \subsection{Setting up and using the microenvironment}
 \label{sec:set_up_BioFVM}
+
+\subsubsection{Specifying the microenvironment via XML (\sc{Preferred Method})}
+\label{sec:BioFVM_setup_XML}
+As of PhysiCell version 1.6.0, the chemical microenvironment can be completely 
+set up via the XML configuration file. (See also Section \ref{sec:XML_PhysiCell_structure} to 
+learn about the XML structure.) This is now the preferred method of setting up the chemical microenvironment, 
+as it can be done without recompiling a PhysiCell application and it provides easy 
+access to modify the physical parameters (diffusion and decay rates), boundary conditions, 
+and initial conditions. 
+
+See Section \ref{sec:XML_microenvironment_setup} for full documentation, including examples. 
+
+All these properties can also be manually edited within a PhysiCell 
+project via the C++ commands in Section \ref{sec:BioFVM_manual_setup_options}. 
+
+\TOClink 
+
+\subsubsection{Manual configuration via C++ function calls (\sc{Less Preferred Method})}
+\label{sec:BioFVM_manual_setup_options}
 
 Within your main program loop (\v|int main( int argc, char* argv[])|), you need to declare and 
 set up a Microenvironment. (Here, we also include some useful tips for setting space and time 
 units.) We make use of BioFVM 1.1.5 improvements that 
 include simplified setup functions. 
 
-\subsubsection{Setting BioFVM options}
+%\subsubsection{Setting BioFVM options}
+\paragraph{Setting BioFVM options}
 \label{sec:BioFVM_options}
-BioFVM 1.1.5 and later versions includes a data structure 
+
+BioFVM 1.1.5 and later versions includes a data structure \hfill \newline 
 (\verb+default_microenvironment_options+, of type 
 \verb+Microenvironment_Options+) for setup options. 
 This data type is defined in \verb+BioFVM_microenvironment.h+ as: 
@@ -825,7 +849,8 @@ default_microenvironment_options.track_internalized_substrates_in_each_agent = t
 
 
 \TOClink 
-\subsubsection{Adding new diffusing substrates to the tissue environment}
+%\subsubsection{Adding new diffusing substrates to the tissue environment}
+\paragraph{Adding new diffusing substrates to the tissue environment}
 \label{sec:BioFVM_add_substrates}
 By default, the BioFVM microenvironment has a single substrate (with index 0). 
 To add (append) a new substrate to the microenvironment, use one of these functions: 
@@ -883,7 +908,8 @@ Section \ref{sec:BioFVM_initialize}
 
 \TOClink 
 
-\subsubsection{Initializing the BioFVM tissue microenvironment}
+% \subsubsection{Initializing the BioFVM tissue microenvironment}
+\paragraph{Initializing the BioFVM tissue microenvironment}
 \label{sec:BioFVM_initialize}
 
 \begin{verbatim}
@@ -4343,7 +4369,9 @@ Note that Booleans can be represented as 0 and 1, or \v|false| and \v|true|.
 \label{sec:XML_options}
 PhysiCell 1.3.0 introduced preliminary support for XML configuration files, via \hfill\break
 \v|./modules/PhysiCell_settings.*|. Version 1.4.0 introduced further refinements that are 
-detailed in Sections \ref{sec:XML_PhysiCell_structure} and \ref{sec:XML_user_parameters}.
+detailed in Sections \ref{sec:XML_PhysiCell_structure} and \ref{sec:XML_user_parameters}. 
+Version 1.6.0 introduced an XML-based specification of the chemical microenvironment. 
+See Section \ref{sec:XML_microenvironment_setup}. 
 
 XML options in PhysiCell work  primarily  by creating two data 
 structures defined as: 
@@ -4406,6 +4434,8 @@ Note that PhysiCell will default to \v|./config/PhysiCell_settings.xml|
 in the sample projects if no XML file is supplied: 
 
 \v|> ./run_me |
+
+
 
 Lastly, we point out that the settings in the XML figuration files and the settings 
 data structures will likely be expanded in the next several PhysiCell releases. 
@@ -4473,7 +4503,7 @@ based upon the DOM that has previously been loaded with
 
 \subsection{Structure of PhysiCell XML parameter files}
 \label{sec:XML_PhysiCell_structure}
-PhysiCell's XML files look like this (as of Version 1.4.0); they 
+PhysiCell's XML files look like this (as of Version 1.6.0); they 
 are subject to extension. 
 
 \begin{verbatim}
@@ -4522,6 +4552,9 @@ are subject to extension.
       </legacy_data>
    </save>
    
+   <microenvironment_setup>
+   </microenvironment_setup>
+   
    <user_parameters>
    </user_parameters>
 
@@ -4547,9 +4580,182 @@ and maximum simulation time.
 \smallcode{save} stores settings for where and how often data are saved. 
 
 \item 
+\smallcode{microenvironment\_setup} specifies the chemical substrates in the microenvironment, 
+including their diffusion and decay parameters and initial and boundary conditions. This block 
+also sets some options for the diffusion solvers in BioFVM. 
+See \ref{sec:XML_microenvironment_setup} for more details. 
+
+\item 
 \smallcode{user\_parameters} stores user-defined parameters, specific to their 
 simulation. See \ref{sec:XML_user_parameters} for more details. 
 \end{enumerate}
+
+\TOClink 
+
+\subsection{Microenvironment Setup}
+\label{sec:XML_microenvironment_setup}
+As of Version 1.6.0, PhysiCell users can fully define the chemical microenvironment by simple 
+modifications to the XML configuration file. 
+(See Section \ref{sec:BioFVM} to learn more about the BioFVM chemical microenvironment.) 
+In Section \ref{sec:XML_microenvironment_setup_XML_structure}, we show how to 
+structure this block of XML. 
+
+A detailed tutorial on these parameters is provided at: 
+\begin{center}
+\href{http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml}{http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml}
+\end{center}
+
+\TOClink 
+\subsubsection{Defining chemical microenvironmental substrates as XML}
+\label{sec:XML_microenvironment_setup_XML_structure}
+The \smallcode{microenvironment\_setup} section of the XML configuration file 
+defines a number of \verb+variable+s, followed by \verb+options+:
+
+\begin{verbatim}
+<microenvironment_setup>
+   <variable />
+   </variable />
+ 
+   <options />
+</microenvironment_setup>
+\end{verbatim}
+
+Each chemical substrate is defined in a \smallcode{variable} of the following form: 
+\begin{verbatim}
+<variable name="NAME" units="UNITS" ID="#">
+   <physical_parameter_set>
+      <diffusion_coefficient units="LENGTH_UNITS^2/TIME_UNITS">VALUE1
+         </diffusion_coefficient>
+      <decay_rate units="1/TIME_UNITS">VALUE2</decay_rate>  
+   </physical_parameter_set>
+   <initial_condition units="UNITS">VALUE3</initial_condition>
+   <Dirichlet_boundary_condition units="UNITS" enabled="true">VALUE4
+      </Dirichlet_boundary_condition>
+</variable>
+\end{verbatim}
+Each \smallcode{variable} has the following attributes: 
+\begin{itemize}
+\item \smallcode{name} is the name of the substrate. Specifying this is necessary to allow you to search 
+for that substrate within PhysiCell applications. (See Section \ref{sec:sample_microenvironment}). 
+\item \smallcode{units} gives the physical units of the substrate density or concentration. These could very well be ``dimensionless.'' 
+PhysiCell does not actively enforce or convert units, but specifying the units may help prevent errors in your work. 
+\item \smallcode{ID} is a unique integer index to allow cross-referencing your substrate. These should be sequential and 
+start counting at zero. 
+\end{itemize}
+
+\smallcode{variable} has several sub-elements, which must all be present:  
+\begin{itemize} 
+\item \smallcode{physical\_parameter\_set} to indicate physical characteristics of the 
+substrate. (The structure is chosen for compatibilty with MultiCellDS \cite{ref:MultiCellDS}.) It contains: 
+\begin{itemize}
+\item \smallcode{diffusion\_coefficient} is the diffusion coefficient (recorded in \verb+VALUE1+), with units 
+indicated as an attribute. As before, note that PhysiCell does not convert units. Use this recording for your 
+own clarity and to help ensure unit consistency. By default, PhysiCell uses $\micron$ for \verb+LENGTH_UNITS+ 
+and minutes for \verb+TIME_UNITS+ throughout its calculations. 
+
+\item \smallcode{decay\_rate} is the s
+ubstrate's background decay rate (recorded in \verb+VALUE2+), 
+with units indicated as an attribute. 
+\end{itemize}
+
+\item \smallcode{initial\_condition} gives the initial condition for the substrate (recorded in 
+\verb+VALUE3+), applied \emph{uniformly} throughout the domain. The units are indicated as the 
+\smallcode{units} attribute. If your units are self-consistent, they should match UNITS in the \smallcode{variable} above.
+
+\item \smallcode{Dirichlet\_boundary\_condition} gives the boundary value of the substrate 
+(recorded in \verb+VALUE4+), to be applied uniformly to all simulation boundaries. 
+This condition is only applied 
+if the attribute \smallcode{enabled} is set to \verb+true+. If \smallcode{enabled} is 
+set to false, then BioFVM will default to a Neuman (no flux) condition for that substrate 
+on the simulation boundary. 
+
+The units are indicated as the \smallcode{units} attribute. 
+If your units are self-consistent, they should match UNITS in the \smallcode{variable} above.
+\end{itemize}
+
+Next, \smallcode{options} helps configure additional code behaviors: 
+\begin{itemize}
+\item \smallcode{calculate\_gradients} is set to \verb+true+ if the gradient of each substrate 
+is to be computed at each voxel at each mechanical time step. Enable this if you use 
+chemotaxis anywhere in your model. 
+\item \smallcode{track\_internalized\_substrates} is set to 
+\verb+true+ if each individual agent is to track its total amount of internalized substrates 
+(based on mass conservation with cell-based uptake and secretion in the biotransport PDEs). 
+See Sections \ref{sec:BioFVM_internalization_tracking} and 
+\ref{sec:phenotype_molecular} for more details. 
+
+\item \smallcode{initial\_condition} is not yet supported, but it will eventually provide a 
+place to indicate pre-computed non-uniform conditions, as saved in an external file. For 
+now, a user can manually overwrite the unifrom initial conditions after calling 
+\verb+initialize_microenvironment()+ (typically in a \verb+setup_microenvironment()+ function). 
+
+\item \smallcode{dirichlet\_nodes} is not yet supported, but it will eventually provide a 
+place to indicate which voxels in the microenvironment should be Dirichlet nodes, and 
+what the boundary values of the substrates should be in those voxels. As in 
+\smallcode{initial\_condition}, these will be read from an external file. For now, 
+users can set Dirichlet nodes using the functions in Section 
+\ref{sec:Dirichlet}. 
+
+\end{itemize}
+
+Here is a sample of a microenvironment with two substrates (oxygen and glucose), 
+where there is a Dirichlet boundary condition for oxygen, but none for glucose. 
+(Note that all units are in $\micron$ and minutes.) Here, we compute all gradients, 
+but do not track internalized substrates.  
+\begin{verbatim}
+<microenvironment_setup>
+   <variable name="oxygen" units="mmHg" ID="0">
+      <physical_parameter_set>
+         <diffusion_coefficient units="micron^2/min">100000</diffusion_coefficient>
+         <decay_rate units="1/min">0.1</decay_rate>  
+      </physical_parameter_set>
+      <initial_condition units="mmHg">60</initial_condition>
+      <Dirichlet_boundary_condition units="mmHg" 
+        enabled="true">38</Dirichlet_boundary_condition>
+   </variable>
+   
+   <variable name="immunostimulatory factor" units="dimensionless" ID="1">
+      <physical_parameter_set>
+         <diffusion_coefficient units="micron^2/min">18000</diffusion_coefficient>
+         <decay_rate units="1/min">0.0</decay_rate>  
+      </physical_parameter_set>
+      <initial_condition units="dimensionless">1</initial_condition>
+      <Dirichlet_boundary_condition units="dimensionless"
+         enabled="false">0</Dirichlet_boundary_condition>
+   </variable>      
+
+   <options>
+      <calculate_gradients>true</calculate_gradients>
+      <track_internalized_substrates_in_each_agent>false
+         </track_internalized_substrates_in_each_agent>
+      <!-- not yet supported --> 
+      <initial_condition type="matlab" enabled="false">
+         <filename>./config/initial.mat</filename>
+      </initial_condition>
+      <!-- not yet supported --> 
+      <dirichlet_nodes type="matlab" enabled="false">
+         <filename>./config/dirichlet.mat</filename>
+      </dirichlet_nodes>
+   </options>
+</microenvironment_setup>    
+\end{verbatim}
+
+\TOClink 
+
+\subsubsection{Key microenvironment parsing functions}
+\label{sec:microenvironment_xml_parsing_functions}
+
+\begin{itemize}
+\item \smallcode{bool setup\_microenvironment\_from\_XML( pugi::xml\_node root\_node )} 
+parses the XML DOM (in the supplied pugixml \verb+xml_node+) to find 
+the \verb+microenvironment_setup+ node and process the variables and 
+options. 
+
+It returns true if successful, and false if not. 
+
+\item \smallcode{bool setup\_microenvironment\_from\_XML( void )} calls the 
+prior function using \hfill\newline \verb+physicell_config_root+.   
+\end{itemize}
 
 \TOClink 
 

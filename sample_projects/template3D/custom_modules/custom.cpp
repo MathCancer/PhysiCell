@@ -186,6 +186,8 @@ void setup_microenvironment( void )
 	}	
 	
 	
+/*
+	// all this is in XML as of August 2019 (1.6.0)
 	// no gradients need for this example 
 
 	default_microenvironment_options.calculate_gradients = false; 
@@ -200,6 +202,7 @@ void setup_microenvironment( void )
 	
 	// set initial conditions 
 	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
+*/
 	
 	// initialize BioFVM 
 	
