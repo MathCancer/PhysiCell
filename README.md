@@ -155,15 +155,15 @@ global (pugi)xml node for it.
  
 + integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
   
-+ integrate Boolean network support from PhysiBoSS into the mainline code (See [http://dx.doi.org/10.1093/bioinformatics/bty766]. )
++ integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
   
 + Develop contact-based cell-cell interactions. 
 
 + Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
  
-+ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See [https://twitter.com/MathCancer/status/1022555441518338048].) 
++ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
  
-+ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See [https://nanohub.org/resources/pc4nanobio].) 
++ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
  
 + create an angiogenesis sample project 
  
