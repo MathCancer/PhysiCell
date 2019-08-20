@@ -1,23 +1,3 @@
-
-
-PhysiCell_settings 
-
-
-
-
-wrote two new functions to parse XML with microenvironment_setup to add substrates and 
-options 
-* bool setup_microenvironment_from_XML( pugi::xml_node root_node )
-* bool setup_microenvironment_from_XML( void )
-The second one assumes you already defined the root node and access the global (pugi)xml node for it. 
-
-
-The main XML parsing function ( ) now calls setup_microenvironment_from_XML(), just before processing user-defined parameters. 
-
-
-
-* * * 
-
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
 **Version:** 1.6.0
@@ -82,6 +62,14 @@ double Microenvironment::get_substrate_dirichlet_activation( int substrate_index
 
 + Updated the main microenvironment display function Microenvironment::display_information to summarize the initial and boundary conditions for each substrate 
 
++ Wrote two new functions to parse the XML in microenvironment_setup to add substrates and 
+options:  
+  + bool setup_microenvironment_from_XML( pugi::xml_node root_node )
+  + bool setup_microenvironment_from_XML( void )
+The second one assumes you already defined the root node and access the 
+global (pugi)xml node for it. 
+
++ The main XML parsing function now calls setup_microenvironment_from_XML(), just before processing user-defined parameters. 
  
 ### Beta features (not fully supported):
  
@@ -91,7 +79,7 @@ double Microenvironment::get_substrate_dirichlet_activation( int substrate_index
   
 ### Bugfixes: 
 
-+ 
++ None.
  
 ### Notices for intended changes that may affect backwards compatibility:
  
