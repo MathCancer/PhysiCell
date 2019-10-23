@@ -316,6 +316,8 @@ Cell::Cell()
 	
 	current_mechanics_voxel_index=-1;
 	
+	updated_current_mechanics_voxel_index = 0;
+	
 	is_movable = true;
 	is_out_of_domain = false;
 	displacement.resize(3,0.0); // state? 
@@ -834,6 +836,9 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 
 void delete_cell( int index )
 {
+	// released internalized substrates (as of 1.5.x releases)
+	(*all_cells)[index]->release_internalized_substrates(); 
+	
 	// deregister agent in from the agent container
 	(*all_cells)[index]->get_container()->remove_agent((*all_cells)[index]);
 	// de-allocate (delete) the cell; 

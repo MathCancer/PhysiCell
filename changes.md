@@ -2,6 +2,82 @@
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
  
+**Version:** 1.5.2
+
+**Release date:** 11 June 2019
+
+## Release summary: 
+
+This minor release fixes bugs that affected the release of internalized substrates at cell death on Linux and OSX operating systems, relating to system differences in order of evaluating destructor functions. The release of internalized substrates has been moved to a new function, and placed in cell death functions. There is no change in APIs or high-level usage / syntax for end users. 
+
+Users should also consult the release notes for 1.5.0. 
+
+**NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
+ 
+### Major new features and changes:
+
++ None 
+ 
+### Minor new features and changes: 
+ 
++ Introduced new function Basic_Agent::release_internalized_substrates() to explicitly release a cell's internalized substrates, rather assuming it can be properly done in the Basic_Agent destructor function. 
+
++ Removed the Basic_Agent destructor function to allow the compiler to automatically generate this. 
+ 
+### Beta features (not fully supported):
+ 
++ None 
+  
+### Bugfixes: 
+
++ Move code for internalized substrate release from the Basic_Agent destructor to the new Basic_Agent::release_internalized_substrates() function. 
+
++ Basic_Agent::release_internalized_substrates() is now called from delete_cell(int) in PhysiCell_cell.cpp. 
+
++ Basic_Agent::release_internalized_substrates() explicitly sets internalized_substrates to a zero vector, just in case users want to call this function on non-dead cells. 
+
++ Cell::Cell() now initializes updated_current_mechanics_voxel_index = 0 (avoids a possible segfault in GDB)
+ 
+### Notices for intended changes that may affect backwards compatibility:
+ 
++ We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
+
++ We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
+
++ We will introduce improvements to placement of daughter cells after division. 
+
++ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+
+### Planned future improvements: 
+ 
++ Further XML-based simulation setup. 
+ 
++ read saved simulation states (as MultiCellDS digital snapshots)
+ 
++ "mainline" prototype cell attach/detach mechanics as standard models (currently in the biorobots and immune examples)
+ 
++ integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
+  
++ integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
+  
++ Develop contact-based cell-cell interactions. 
+
++ Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
+ 
++ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
+ 
++ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
+ 
++ create an angiogenesis sample project 
+ 
++ create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
+
++ improved plotting options in SVG 
+
+* * * 
+
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
+ 
 **Version:** 1.5.1
 
 **Release date:** 7 June 2019
