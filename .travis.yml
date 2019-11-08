@@ -1,0 +1,27 @@
+# Enable C++ support
+language: cpp
+
+os: linux
+
+# Compiler selection
+compiler:
+  - g++
+
+# Build steps
+script:
+  - make
+  - make reset
+  - make biorobots-sample
+  - make reset
+  - make cancer-biorobots-sample
+  - make reset
+  - make cancer-immune-sample
+  - make reset
+  - make virus-macrophage-sample
+
+notifications:
+  email:
+    recipients:
+      - randy.heiland@gmail.com
+    on_success: always # default: change  (always, never)
+    on_failure: always # default: always
