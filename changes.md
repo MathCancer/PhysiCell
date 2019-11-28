@@ -24,7 +24,7 @@ This release ...
   
 ### Bugfixes: 
 
-+ List here. 
++ Randy will write a line about his fix to the biorobots sample code here. 
  
 ### Notices for intended changes that may affect backwards compatibility:
  
