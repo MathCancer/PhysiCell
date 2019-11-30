@@ -211,7 +211,9 @@ class Cell : public Basic_Agent
 	
 	std::vector<Cell*>& cells_in_my_container( void ); 
 	
+	void differentiate(Cell* parentCell, Cell* daughterCell);
 	void convert_to_cell_definition( Cell_Definition& cd ); 
+	void convert_to_cell_definition_preserving_volume( Cell_Definition& cd );
 };
 
 Cell* create_cell( void );  

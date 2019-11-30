@@ -366,6 +366,30 @@ void Cell::start_death( int death_model_index )
 	return; 
 }
 
+void Cell::differentiate(Cell* parentCell, Cell* daughterCell)
+{
+	if(phenotype.differentiation.outcomes.size() == 0)
+	{
+		return ;
+	}
+
+	int event = choose_event(phenotype.differentiation.probabilities);
+	Differentiation_Outcome outcome = phenotype.differentiation.outcomes[event];
+
+	Cell_Definition* first = outcome.first_type;
+	Cell_Definition* second = outcome.second_type;
+
+	double rand_number = UniformRandom(); 
+	if(rand_number > 0.5)
+	{
+		parentCell->convert_to_cell_definition_preserving_volume(*first);
+		daughterCell->convert_to_cell_definition_preserving_volume(*second);
+	} else {
+		parentCell->convert_to_cell_definition_preserving_volume(*second);
+		daughterCell->convert_to_cell_definition_preserving_volume(*first);
+	}	
+}
+
 void Cell::assign_orientation()
 {
 	state.orientation.resize(3,0.0);
@@ -445,7 +469,21 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 	
+	if(phenotype.differentiation.differentiation_possible)
+	{
+		differentiate(this, child);
+	}
+	
 	return child;
+}
+
+void Cell::convert_to_cell_definition_preserving_volume( Cell_Definition& cd )
+{
+	Volume vol = phenotype.volume; 
+	convert_to_cell_definition( cd ); 
+	phenotype.volume = vol; 
+
+	return; 
 }
 
 bool Cell::assign_position(std::vector<double> new_position)
