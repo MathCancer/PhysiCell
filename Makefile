@@ -118,6 +118,24 @@ cancer-immune-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/cancer_immune/config/* ./config/
 	
+differentiation:
+	cp ./sample_projects/differentiation/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/differentiation/main-differentiation.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/differentiation/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/differentiation/config/* ./config/
+
+differentiation-oxygen:
+	cp ./sample_projects/differentiation_oxygen/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/differentiation_oxygen/main-differentiation.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/differentiation_oxygen/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/differentiation_oxygen/config/* ./config/
+	
 virus-macrophage-sample:
 	cp ./sample_projects/virus_macrophage/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
