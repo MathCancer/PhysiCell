@@ -24,6 +24,10 @@ This release ...
   
 ### Bugfixes: 
 
++ BioFVM's diffusion_decay_solver__constant_coefficients_LOD_3D, diffusion_decay_solver__constant_coefficients_LOD_2D check for regular meshes instead of uniform meshes. 
+
+regular_mesh
+
 + Randy will write a line about his fix to the biorobots sample code here. 
  
 ### Notices for intended changes that may affect backwards compatibility:
