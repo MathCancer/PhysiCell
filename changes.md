@@ -2,7 +2,7 @@
 
 **Version:** 1.6.?
 
-**Release date:** ?? November 2019
+**Release date:** ?? November 2020
 
 ## Release summary: 
 
@@ -16,7 +16,7 @@ This release ...
  
 ### Minor new features and changes: 
  
-+ List here.
++ "make list-projects" now displayed to standard output a list of all the sample projects. 
  
 ### Beta features (not fully supported):
  
