@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.6.0} 
-\newcommand{\ReleaseDate}{August 20, 2019} 
+\newcommand{\Version}{1.6.1} 
+\newcommand{\ReleaseDate}{January 26, 2020} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -514,6 +514,23 @@ projects and instructions to build them.
 
 \end{enumerate}
 
+\subsection{Time step sizes in PhysiCell}
+\label{sec:time_steps}
+PhysiCell uses three time step sizes: 
+\begin{enumerate}
+\item 
+\v|diffusion_dt| is the step size used in the diffusion solver, including the secretion and uptake processes. 
+The default value is 0.01 min. 
+\item 
+\v|mechanics_dt| is the step size for the cell mechanics solver, including cell motility. 
+Each cell's custom function is also evaluated on this time scale. The default value is 0.1 min.
+\item 
+\v|phenotype_dt| is the step size for phenotype processes (e.g., cycle progression, volume changes). 
+The default value is 6 min. 
+\end{enumerate}
+As of PhysiCell 1.6.1, these values can be set in the XML configuration file. See Section 
+\ref{sec:XML_PhysiCell_structure}. 
+
 \TOClink 
 
 \section{Using project templates \DONE}
@@ -691,6 +708,10 @@ To clear out the compiler-generated objects (which would allow you to recompile 
 To reset to a clean slate (e.g., to clear out a sample project and populate another): 
 
 \v|make reset|
+
+To get a list of all sample projects: 
+
+\v|make list-projects|
 
 \TOClink 
 
@@ -1664,7 +1685,10 @@ kills the cell (with the death model indicated by
 \v|death_model_index|), sets \v|cell.phenotype.death.dead = true|, sets 
 motility to zero, sets secretion to zero, cuts all uptake by a factor 
 of ten, and executes any ``entry'' functions for the associated 
-death model. 
+death model. Note that this function does not by default set all the 
+cell's custom functions to \v|NULL|. 
+
+\red{This is the preffered method to trigger death in a cell.} 
 
 \item 
 \smallcode{void lyse\_cell( void )} triggers immediate degradation and 
@@ -3384,6 +3408,9 @@ the corresponding death model, and returns \v|true|.
 \smallcode{void trigger\_death( int death\_model\_index )} immediately sets the cell to \v|dead = true| 
 and \v|current_death_model_index = death_model_index|. 
 
+\red{\textbf{Note: this function is used internally by PhysiCell, but will not fully start cell death. 
+Users should use v|Cell::start_death(int)| instead. See Section \ref{sec:cell_member_functions}.} 
+
 \item 
 \smallcode{Cycle\_Model\& current\_model( void )} returns (by reference) the current cell death model 
 (if \hfill\break\v|dead == true|). 
@@ -4528,6 +4555,10 @@ are subject to extension.
       <max_time units="min">7200</max_time>  
       <time_units>min</time_units>
       <space_units>micron</space_units>
+      
+      <dt_diffusion units="min">0.01</dt_diffusion>
+      <dt_mechanics units="min">0.1</dt_mechanics>
+      <dt_phenotype units="min">6</dt_phenotype>	
    </overall>
    
    <parallel>
@@ -6086,11 +6117,11 @@ class PhysiCell_constants
     static const int debris=104; 
 };
 
-static std::string time_units = "min";
-static std::string space_units = "micron";
-static double diffusion_dt = 0.01; 
-static double mechanics_dt = 0.1;
-static double phenotype_dt = 6.0;
+extern std::string time_units = "min";
+extern std::string space_units = "micron";
+extern double diffusion_dt = 0.01; 
+extern double mechanics_dt = 0.1;
+extern double phenotype_dt = 6.0;
 \end{verbatim}
 
 \TOClink 

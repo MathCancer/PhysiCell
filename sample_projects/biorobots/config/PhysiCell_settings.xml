@@ -90,6 +90,10 @@
 		<max_time units="min">2880</max_time> <!-- 2 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
+	
+		<dt_diffusion units="min">0.01</dt_diffusion>
+		<dt_mechanics units="min">0.1</dt_mechanics>
+		<dt_phenotype units="min">6</dt_phenotype>	
 	</overall>
 	
 	<parallel>

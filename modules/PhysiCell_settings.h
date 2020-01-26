@@ -80,6 +80,8 @@
 #include "./PhysiCell_pugixml.h"
 #include "../BioFVM/BioFVM.h"
 
+#include "../core/PhysiCell_constants.h" 
+
 using namespace BioFVM; 
 
 namespace PhysiCell{

@@ -17,6 +17,14 @@ This release ...
 ### Minor new features and changes: 
  
 + "make list-projects" now displayed to standard output a list of all the sample projects. 
+
++ dt_diffusion, dt_mechanics, and dt_phenotype can now be set via the XML configuration file in the options section. 
+
++ Added documetation on the time step sizes to the User Guide. 
+
++ Preliminary work to support Travis CI testing. 
+
++ Updated documentation to note that Cell::start_death is the preferred method to trigger cell death, and NOT Death::trigger_death. 
  
 ### Beta features (not fully supported):
  
@@ -26,9 +34,7 @@ This release ...
 
 + BioFVM's diffusion_decay_solver__constant_coefficients_LOD_3D, diffusion_decay_solver__constant_coefficients_LOD_2D check for regular meshes instead of uniform meshes. 
 
-
-
-+ Randy will write a line about his fix to the biorobots sample code here. 
++ Biorobots sample project fixed bugs on searching for substrates vs. searching for cell types. 
  
 ### Notices for intended changes that may affect backwards compatibility:
  
