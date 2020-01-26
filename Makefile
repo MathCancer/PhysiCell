@@ -61,7 +61,6 @@ all:
 	make 
 
 # sample projects 	
-
 list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
 	@echo "                 cancer-immune-sample virus-macrophage-sample"
