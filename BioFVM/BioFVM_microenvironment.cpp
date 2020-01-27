@@ -911,6 +911,29 @@ void Microenvironment::compute_all_gradient_vectors( void )
 	{
 		for( unsigned int j=0; j < mesh.y_coordinates.size() ; j++ )
 		{
+			// endcaps 
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int i = 0; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][0] = (*p_density_vectors)[n+thomas_i_jump][q]; 
+				gradient_vectors[n][q][0] -= (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][0] /= mesh.dx; 
+				
+				gradient_vector_computed[n] = true; 
+			}
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int i = mesh.x_coordinates.size()-1; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][0] = (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][0] -= (*p_density_vectors)[n-thomas_i_jump][q]; 
+				gradient_vectors[n][q][0] /= mesh.dx; 
+				
+				gradient_vector_computed[n] = true; 
+			}
 			
 			for( unsigned int i=1; i < mesh.x_coordinates.size()-1 ; i++ )
 			{
@@ -934,6 +957,29 @@ void Microenvironment::compute_all_gradient_vectors( void )
 	{
 		for( unsigned int i=0; i < mesh.x_coordinates.size() ; i++ )
 		{
+			// endcaps 
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int j = 0; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][1] = (*p_density_vectors)[n+thomas_j_jump][q]; 
+				gradient_vectors[n][q][1] -= (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][1] /= mesh.dy; 
+				
+				gradient_vector_computed[n] = true; 
+			}
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int j = mesh.y_coordinates.size()-1; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][1] = (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][1] -= (*p_density_vectors)[n-thomas_j_jump][q]; 
+				gradient_vectors[n][q][1] /= mesh.dy; 
+				
+				gradient_vector_computed[n] = true; 
+			}		
 			
 			for( unsigned int j=1; j < mesh.y_coordinates.size()-1 ; j++ )
 			{
@@ -950,12 +996,39 @@ void Microenvironment::compute_all_gradient_vectors( void )
 			
 		}
 	}
+	
+	// don't bother computing z component if there is no z-directoin 
+	if( mesh.z_coordinates.size() == 1 )
+	{ return; }
 
 	#pragma omp parallel for 
 	for( unsigned int j=0; j < mesh.y_coordinates.size() ; j++ )
 	{
 		for( unsigned int i=0; i < mesh.x_coordinates.size() ; i++ )
 		{
+			// endcaps 
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int k = 0; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][2] = (*p_density_vectors)[n+thomas_k_jump][q]; 
+				gradient_vectors[n][q][2] -= (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][2] /= mesh.dz; 
+				
+				gradient_vector_computed[n] = true; 
+			}
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int k = mesh.z_coordinates.size()-1; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][2] = (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][2] -= (*p_density_vectors)[n-thomas_k_jump][q]; 
+				gradient_vectors[n][q][2] /= mesh.dz; 
+				
+				gradient_vector_computed[n] = true; 
+			}			
 			
 			for( unsigned int k=1; k < mesh.z_coordinates.size()-1 ; k++ )
 			{
@@ -1006,6 +1079,10 @@ void Microenvironment::compute_gradient_vector( int n )
 		}
 	}
 	
+	// don't bother computing y and z component if there is no y-direction. (1D)
+	if( mesh.y_coordinates.size() == 1 )
+	{ return; }	
+	
 	// d/dy 
 	if( indices[1] > 0 && indices[1] < mesh.y_coordinates.size()-1 )
 	{
@@ -1017,6 +1094,10 @@ void Microenvironment::compute_gradient_vector( int n )
 			gradient_vector_computed[n] = true; 
 		}
 	}
+	
+	// don't bother computing z component if there is no z-direction (2D) 
+	if( mesh.z_coordinates.size() == 1 )
+	{ return; }
 	
 	// d/dz 
 	if( indices[2] > 0 && indices[2] < mesh.z_coordinates.size()-1 )

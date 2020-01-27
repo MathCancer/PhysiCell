@@ -170,10 +170,10 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
-			if((*all_cells)[i]->is_out_of_domain)
-			{ continue; }
-			// (*all_cells)[i]->phenotype.advance_bundled_models( (*all_cells)[i] , time_since_last_cycle ); 
-			(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
+			if( (*all_cells)[i]->is_out_of_domain == false )
+			{
+				(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
+			}
 		}
 		
 		// process divides / removes 
@@ -273,10 +273,10 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
-			if((*all_cells)[i]->is_out_of_domain)
-			{ continue; }
-			// (*all_cells)[i]->phenotype.advance_bundled_models( (*all_cells)[i] , time_since_last_cycle ); 
-			(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
+			if( (*all_cells)[i]->is_out_of_domain == false )
+			{
+				(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
+			}
 		}
 		
 		// process divides / removes 

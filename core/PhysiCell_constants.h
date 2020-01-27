@@ -157,11 +157,11 @@ class PhysiCell_constants
 	static const int debris=104; 
 };
 
-static std::string time_units = "min";
-static std::string space_units = "micron";
-static double diffusion_dt = 0.01; 
-static double mechanics_dt = 0.1;
-static double phenotype_dt = 6.0;
+extern std::string time_units;
+extern std::string space_units;
+extern double diffusion_dt; 
+extern double mechanics_dt;
+extern double phenotype_dt;
 
 };
 

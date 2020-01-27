@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:**      1.6.0
+**Version:** 1.6.1
 
-**Release date:** 20 August 2019
+**Release date:** 26 January 2020
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -33,6 +33,8 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
     cancer-immune-sample 
     virus-macrophage-sample
 
+**make list-projects** : list all available sample projects 
+
 **make clean**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
 
 **make data-cleanup**  : clears out all simulation data 
@@ -60,80 +62,51 @@ See changes.md for the full change log.
 
 ## Release summary: 
 
-This release introduces a new XML-based configuration for the chemical microenvironment. All 
-the sample projects have been updated to use this new functionality. There is no change 
-in APIs or high-level usage / syntax for end users; old projects should continue to work without 
-modification, although we highly recommend migrating to the simplified microenvironment setup. 
-A short blog tutorial on this new functionality can be found at 
-
-http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml
+This release fixes minor bugs and improves the documentation. It also adds some minor new capabilities, such as setting time step sizes in the XML configuration file. 
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
 ### Major new features and changes:
 
-+ XML-based setup of the chemical microenvironment.  
++ List here. 
  
 ### Minor new features and changes: 
  
-+ Updated template2D sample project: 
-  + Refined "reset" and "data-cleanup" rules in Makefile
-  + Converted project to use the new XML-based microenvironment setup. 
++ "make list-projects" now displayed to standard output a list of all the sample projects. 
 
-+ Updated template3D sample project: 
-  + Refined "reset" and "data-cleanup" rules in Makefile
-  + Converted project to use the new XML-based microenvironment setup. 
++ dt_diffusion, dt_mechanics, and dt_phenotype can now be set via the XML configuration file in the options section. 
 
-+ Updated heterogeneity sample project: 
-  + Refined "reset" and "data-cleanup" rules in Makefile
-  + Converted project to use the new XML-based microenvironment setup. 
++ Added documentation on the time step sizes to the User Guide. 
 
-+ Updated cancer immune sample rpoject: 
-  + Refined "reset" and "data-cleanup" rules in Makefile
-  + Converted project to use the new XML-based microenvironment setup. 
++ Preliminary work to support Travis CI testing. 
 
-+ Updated virus macrophage sample project: 
-  + Refined "reset" and "data-cleanup" rules in Makefile
-  + Converted project to use the new XML-based microenvironment setup. 
-  + Enabled gradient calculations (were previously off, although we wanted macrophage chemotaxis) 
++ Updated documentation to note that Cell::start_death is the preferred method to trigger cell death, and NOT Death::trigger_death. 
 
-+ Updated biorobots sample project: 
-  + Refined "reset" and "data-cleanup" rules in Makefile. 
-  + Converted project to use the new XML-based microenvironment setup.
-  + Note that values in user_parameters will override values in microenvironment_setup. 
-  + Improved project to properly search for substrate indices instead of hard coding them. 
++ Updated Microenvironment::compute_all_gradient_vectors to now compute one-sized gradients on edge voxels. (Previously, no gradient was computed here.) 
 
-+ Updated cancer biorobots sample project: 
-  + Refined "reset" rule in Makefile. 
-  + Converted project to use the new XML-based microenvironment setup.
-  + Improved project to properly search for substrate indices instead of hard coding them. 
++ Updated Microenvironment::compute_all_gradient_vectors to check if there is no z-direction (i.e., 2D) and exit early if so. 
 
-+ Refined "reset" and "data-cleanup" rules in default Makefile 
++ Updated Microenvironment::compute_all_gradient_vectors to check if there is no y-direction (i.e., 1D) and exit early if so. 
 
-+ Created new function to access the (private) microenvironment dirichlet_activation_vector: 
- 
-double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
++ Made PhysiCell_constants.cpp (and added this to the core of all project makefiles) so that dt and other variables can be non-static (i.e., set by XML options). 
 
-+ Updated the main microenvironment display function Microenvironment::display_information to summarize the initial and boundary conditions for each substrate 
-
-+ Wrote two new functions to parse the XML in microenvironment_setup to add substrates and 
-options:  
-  + bool setup_microenvironment_from_XML( pugi::xml_node root_node )
-  + bool setup_microenvironment_from_XML( void )
-The second one assumes you already defined the root node and access the 
-global (pugi)xml node for it. 
-
-+ The main XML parsing function now calls setup_microenvironment_from_XML(), just before processing user-defined parameters. 
++ Added "make checkpoint" rule to makefiles. This zips up the user-custom stuff (./config, ./, ./custom_modules) into a timestamped zip file. Use this before upgrading PhysiCell to make sure you keep your own Makefile, etc. 
  
 ### Beta features (not fully supported):
  
-+ anim_svg.py - now plots correctly sized cells; manually step via arrow keys
-
-+ anim_svg_cycle.py - same as above, but automatically cycles through .svg files
++ List here. 
   
 ### Bugfixes: 
 
-+ None.
++ BioFVM's diffusion_decay_solver__constant_coefficients_LOD_3D, diffusion_decay_solver__constant_coefficients_LOD_2D check for regular meshes instead of uniform meshes. 
+
++ Biorobots sample project fixed bugs on searching for substrates vs. searching for cell types. 
+
++ In BioFVM_vectors, the normalize functions now return a zero vector if the vector's norm is less than 1e-16. This is for John Metzcar. 
+
++ In PhysiCell_Cell.cpp, made fixes to Cell::divide() and Cell::assign_position() to fix a bug where cells dividing on the edge of the domain woudl place a daughter cell at (0,0,0). Thanks, Andrew Eckel!
+
++ Code cleanup in PhysiCell_cell_container in Cell_Container::update_all_cells() as suggested by Andrew Eckel. Thanks! 
  
 ### Notices for intended changes that may affect backwards compatibility:
  
@@ -144,6 +117,10 @@ global (pugi)xml node for it.
 + We will introduce improvements to placement of daughter cells after division. 
 
 + Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+ 
++ We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
+
++ We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
 
 ### Planned future improvements: 
  

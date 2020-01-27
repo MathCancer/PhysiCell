@@ -107,7 +107,7 @@ bool load_PhysiCell_config_file( std::string filename )
 	// now read user parameters
 	
 	parameters.read_from_pugixml( physicell_config_root ); 
-	
+
 	return true; 	
 }
 
@@ -146,6 +146,33 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	max_time = xml_get_double_value( node , "max_time" );
 	time_units = xml_get_string_value( node, "time_units" ) ;
 	space_units = xml_get_string_value( node, "space_units" ) ;
+	
+	// check to see if dt is specified in overall options
+	// if so, set from XML 
+	
+	pugi::xml_node search_result;  
+	search_result = xml_find_node( node , "dt_diffusion" ); 
+	if( search_result )
+	{ diffusion_dt = xml_get_my_double_value( search_result ); }
+
+	search_result = xml_find_node( node , "dt_mechanics" ); 
+	if( search_result )
+	{ mechanics_dt = xml_get_my_double_value( search_result ); }
+
+	search_result = xml_find_node( node , "dt_phenotype" ); 
+	if( search_result )
+	{ phenotype_dt = xml_get_my_double_value( search_result ); }
+	
+/*
+	diffusion_dt
+	
+	
+		<dt_diffusion units="min">0.01</dt_diffusion>
+		<dt_mechanics units="min">0.1</dt_mechanics>
+		<dt_phenotype units="min">6</dt_phenotype>
+	<!--	phenotype_dt, mechanics_dt , diffusion_dt -->
+*/			
+	
 
 	node = node.parent(); 
 	
@@ -656,4 +683,4 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 bool setup_microenvironment_from_XML( void )
 { return setup_microenvironment_from_XML( physicell_config_root ); }
 
-} 
+}; 

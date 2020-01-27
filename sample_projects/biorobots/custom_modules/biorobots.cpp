@@ -79,17 +79,17 @@ void setup_microenvironment( void )
 	
 	microenvironment.name = "synthetic tissue"; 
 	
-	int cargo_ID = microenvironment.find_density_index( "cargo signal" ); 
-	int director_ID = microenvironment.find_density_index( "director signal" ); 
+	int cargo_index = microenvironment.find_density_index( "cargo signal" ); 
+	int director_index = microenvironment.find_density_index( "director signal" ); 
 	
-	microenvironment.diffusion_coefficients[cargo_ID] = 
+	microenvironment.diffusion_coefficients[cargo_index] = 
 		parameters.doubles("cargo_signal_D");  
-	microenvironment.decay_rates[cargo_ID] = 
+	microenvironment.decay_rates[cargo_index] = 
 		parameters.doubles("cargo_signal_decay");  
 	
-	microenvironment.diffusion_coefficients[director_ID] = 
+	microenvironment.diffusion_coefficients[director_index] = 
 		parameters.doubles("director_signal_D");  
-	microenvironment.decay_rates[director_ID] = 
+	microenvironment.decay_rates[director_index] = 
 		parameters.doubles("director_signal_decay"); 
 	
 	// display the microenvironment again 
@@ -128,17 +128,17 @@ void create_cell_types( void )
 	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; 
 	cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0; 
 	
-	int cargo_ID = microenvironment.find_density_index( "cargo signal" ); // 1 
-	int director_ID = microenvironment.find_density_index( "director signal" ); // 0 
+	int cargo_index = microenvironment.find_density_index( "cargo signal" ); // 1 
+	int director_index = microenvironment.find_density_index( "director signal" ); // 0 
 	
 	// set uptake and secretion to zero 
-	cell_defaults.phenotype.secretion.secretion_rates[director_ID] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[director_ID] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[director_ID] = 1; 
+	cell_defaults.phenotype.secretion.secretion_rates[director_index] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates[director_index] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[director_index] = 1; 
 	
-	cell_defaults.phenotype.secretion.secretion_rates[cargo_ID] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[cargo_ID] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[cargo_ID] = 1; 
+	cell_defaults.phenotype.secretion.secretion_rates[cargo_index] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates[cargo_index] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[cargo_index] = 1; 
 
 	// set the default cell type to no phenotype updates 
 	
@@ -162,7 +162,7 @@ void create_cell_types( void )
 	
 	// seed cell secrete the signal 
 	
-	director_cell.phenotype.secretion.secretion_rates[director_ID] = 9.9; 
+	director_cell.phenotype.secretion.secretion_rates[director_index] = 9.9; 
 	
 	// seed cell rule 
 	
@@ -179,7 +179,7 @@ void create_cell_types( void )
 	
 	cargo_cell.custom_data["receptor"] = 1.0; 
 
-	cargo_cell.phenotype.secretion.secretion_rates[cargo_ID] = 9.9; 
+	cargo_cell.phenotype.secretion.secretion_rates[cargo_index] = 9.9; 
 	cargo_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; // 7e-4
 	
 	//
@@ -244,14 +244,13 @@ std::vector<std::string> robot_coloring_function( Cell* pCell )
 
 	if( pCell->type == worker_ID )
 	{ color = worker_color; }
-	if( pCell->type == cargo_ID )
+	else if( pCell->type == cargo_ID )
 	{ color = cargo_color; }
-	if( pCell->type == linker_ID )
+	else if( pCell->type == linker_ID )
 	{ color = "aquamarine"; }
-
-	if( pCell->type == director_ID )
+	else if( pCell->type == director_ID )
 	{ color = director_color; }
-
+	
 	output[0] = color; 
 	output[2] = color; 
 	
@@ -343,18 +342,16 @@ void setup_tissue( void )
 	double relative_margin = 0.2;  
 	double relative_outer_margin = 0.02; 
 	
-	std::cout << "\tPlacing director cells ... " << std::endl; 
+	std::cout << "\tPlacing " << number_of_directors << " director cells ... " << std::endl; 
 	for( int i=0; i < number_of_directors ; i++ )
 	{
 		// pick a random location 
-		
 		position[0] = default_microenvironment_options.X_range[0] + x_range*( relative_margin + (1.0-2*relative_margin)*UniformRandom() ); 
 		
 		position[1] = default_microenvironment_options.Y_range[0] + y_range*( relative_outer_margin + (1.0-2*relative_outer_margin)*UniformRandom() ); 
 		
 		// place the cell
 		Cell* pC;
-
 		pC = create_cell( director_cell ); 
 		pC->assign_position( position );
 		pC->is_movable = false; 
@@ -517,11 +514,11 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	static double threshold = parameters.doubles("drop_threshold"); // 0.4; 
 	
-	static int cargo_ID = microenvironment.find_density_index( "cargo signal" ); // 1 
-	static int director_ID = microenvironment.find_density_index( "director signal" ); // 0 
+	static int cargo_index = microenvironment.find_density_index( "cargo signal" ); // 1 
+	static int director_index = microenvironment.find_density_index( "director signal" ); // 0 
 	
 	// have I arrived? If so, release my cargo 
-	if( pCell->nearest_density_vector()[director_ID] > threshold )
+	if( pCell->nearest_density_vector()[director_index] > threshold )
 	{
 		for( int i=0; i < pCell->state.neighbors.size(); i++ )
 		{
@@ -563,21 +560,21 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	static double unattached_worker_migration_bias = 
 		parameters.doubles("unattached_worker_migration_bias"); 
 		
-	static int cargo_ID = microenvironment.find_density_index( "cargo signal" ); // 1 
-	static int director_ID = microenvironment.find_density_index( "director signal" ); // 0 
+	static int cargo_index = microenvironment.find_density_index( "cargo signal" ); // 1 
+	static int director_index = microenvironment.find_density_index( "director signal" ); // 0 
 	
 	if( pCell->state.neighbors.size() > 0 )
 	{
 		phenotype.motility.migration_bias = attached_worker_migration_bias; 
 
-		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(director_ID);	
+		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(director_index);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			
 	}
 	else
 	{
 		phenotype.motility.migration_bias = unattached_worker_migration_bias; 
 		
-		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(cargo_ID);	
+		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(cargo_index);	
 		normalize( &( phenotype.motility.migration_bias_direction ) );			
 	}
 	

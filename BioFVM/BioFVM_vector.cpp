@@ -199,6 +199,22 @@ std::vector<double> normalize( std::vector<double>& v )
 
  for( unsigned int i=0; i < v.size(); i++ )
  { output[i] /= norm ; }
+
+ // If the norm is small, normalizing doens't make sense. 
+ // Just set the entire vector to zero. 
+ static bool I_warned_you = false; 
+ if( norm <= 1e-16 )
+ { 
+  if( I_warned_you == false )
+  {
+   std::cout << "Warning and FYI: Very small vector are normalized to 0 vector" << std::endl << std::endl; 
+   I_warned_you = true; 
+  }
+
+  for( unsigned int i=0; i < v.size(); i++ )
+  { output[i] = 0.0; }
+ }
+
  return output; 
 }
 
@@ -213,6 +229,22 @@ void normalize( std::vector<double>* v )
 
  for( unsigned int i=0; i < v->size(); i++ )
  { (*v)[i] /=  norm ; }
+
+ // If the norm is small, normalizing doens't make sense. 
+ // Just set the entire vector to zero. 
+ static bool I_warned_you = false; 
+ if( norm <= 1e-16 )
+ { 
+  if( I_warned_you == false )
+  {
+   std::cout << "Warning and FYI: Very small vectors are normalized to 0 vector" << std::endl << std::endl; 
+   I_warned_you = true; 
+  }
+
+  for( unsigned int i=0; i < v->size(); i++ )
+  { (*v)[i] = 0.0; }
+ }
+
  return; 
 }
 

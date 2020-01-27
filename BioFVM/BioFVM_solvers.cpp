@@ -84,8 +84,8 @@ void diffusion_decay_solver__constant_coefficients_explicit_uniform_mesh( Microe
 		std::cout	<< std::endl << "Using solver: " << __FUNCTION__ << std::endl 
 					<< "     (constant diffusion coefficient with explicit stepping, implicit decay, uniform mesh) ... " << std::endl << std::endl;  
 
-		if( M.mesh.uniform_mesh == false )
-		{ std::cout << "Error. This code is only supported for uniform meshes." << std::endl; }
+		if( M.mesh.regular_mesh == false )
+		{ std::cout << "Error. This code is only supported for regular meshes." << std::endl; }
 
 		precomputations_and_constants_done = true; 
 	}
@@ -95,9 +95,9 @@ void diffusion_decay_solver__constant_coefficients_explicit_uniform_mesh( Microe
 
 void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, double dt )
 {
-	if( M.mesh.uniform_mesh == false || M.mesh.Cartesian_mesh == false )
+	if( M.mesh.regular_mesh == false || M.mesh.Cartesian_mesh == false )
 	{
-		std::cout << "Error: This algorithm is written for uniform Cartesian meshes. Try: other solvers!" << std::endl << std::endl; 
+		std::cout << "Error: This algorithm is written for regular Cartesian meshes. Try: other solvers!" << std::endl << std::endl; 
 	return; 
 	}
 
@@ -301,9 +301,9 @@ void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, 
 
 void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& M, double dt )
 {
-	if( M.mesh.uniform_mesh == false )
+	if( M.mesh.regular_mesh == false )
 	{
-		std::cout << "Error: This algorithm is written for uniform Cartesian meshes. Try: something else." << std::endl << std::endl; 
+		std::cout << "Error: This algorithm is written for regular Cartesian meshes. Try: something else." << std::endl << std::endl; 
 		return; 
 	}
 	
