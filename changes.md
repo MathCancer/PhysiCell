@@ -49,7 +49,6 @@ This release fixes minor bugs and improves the documentation. It also adds some 
 + In PhysiCell_Cell.cpp, made fixes to Cell::divide() and Cell::assign_position() to fix a bug where cells dividing on the edge of the domain woudl place a daughter cell at (0,0,0). Thanks, Andrew Eckel!
 
 + Code cleanup in PhysiCell_cell_container in Cell_Container::update_all_cells() as suggested by Andrew Eckel. Thanks! 
-
  
 ### Notices for intended changes that may affect backwards compatibility:
  
