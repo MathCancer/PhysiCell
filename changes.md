@@ -20,7 +20,7 @@ This release fixes minor bugs and improves the documentation. It also adds some 
 
 + dt_diffusion, dt_mechanics, and dt_phenotype can now be set via the XML configuration file in the options section. 
 
-+ Added documetation on the time step sizes to the User Guide. 
++ Added documentation on the time step sizes to the User Guide. 
 
 + Preliminary work to support Travis CI testing. 
 
@@ -32,6 +32,7 @@ This release fixes minor bugs and improves the documentation. It also adds some 
 
 + Updated Microenvironment::compute_all_gradient_vectors to check if there is no y-direction (i.e., 1D) and exit early if so. 
 
++ Made PhysiCell_constants.cpp (and added this to the core of all project makefiles) so that dt and other variables can be non-static (i.e., set by XML options). 
  
 ### Beta features (not fully supported):
  
