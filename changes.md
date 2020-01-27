@@ -88,7 +88,6 @@ This release fixes minor bugs and improves the documentation. It also adds some 
 
 * * * 
 
-
 **Version:** 1.6.0
 
 **Release date:** 20 August 2019
