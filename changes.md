@@ -45,6 +45,10 @@ This release fixes minor bugs and improves the documentation. It also adds some 
 + Biorobots sample project fixed bugs on searching for substrates vs. searching for cell types. 
 
 + In BioFVM_vectors, the normalize functions now return a zero vector if the vector's norm is less than 1e-16. This is for John Metzcar. 
+
++ In PhysiCell_Cell.cpp, made fixes to Cell::divide() and Cell::assign_position() to fix a bug where cells dividing on the edge of the domain woudl place a daughter cell at (0,0,0). Thanks, Andrew Eckel!
+
++ 
  
 ### Notices for intended changes that may affect backwards compatibility:
  
