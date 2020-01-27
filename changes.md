@@ -43,6 +43,8 @@ This release fixes minor bugs and improves the documentation. It also adds some 
 + BioFVM's diffusion_decay_solver__constant_coefficients_LOD_3D, diffusion_decay_solver__constant_coefficients_LOD_2D check for regular meshes instead of uniform meshes. 
 
 + Biorobots sample project fixed bugs on searching for substrates vs. searching for cell types. 
+
++ In BioFVM_vectors, the normalize functions now return a zero vector if the vector's norm is less than 1e-16. This is for John Metzcar. 
  
 ### Notices for intended changes that may affect backwards compatibility:
  
