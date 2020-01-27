@@ -3408,8 +3408,8 @@ the corresponding death model, and returns \v|true|.
 \smallcode{void trigger\_death( int death\_model\_index )} immediately sets the cell to \v|dead = true| 
 and \v|current_death_model_index = death_model_index|. 
 
-\red{\textbf{Note: this function is used internally by PhysiCell, but will not fully start cell death. 
-Users should use v|Cell::start_death(int)| instead. See Section \ref{sec:cell_member_functions}.} 
+\red{\textbf{Note:} this function is used internally by PhysiCell, but will not fully start cell death. 
+Users should use } \v|Cell::start_death(int)| \red{ instead. See Section \ref{sec:cell_member_functions}.} 
 
 \item 
 \smallcode{Cycle\_Model\& current\_model( void )} returns (by reference) the current cell death model 
