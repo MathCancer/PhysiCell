@@ -1,12 +1,12 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:** 1.6.?
+**Version:** 1.6.1
 
-**Release date:** ?? November 2020
+**Release date:** 26 January 2020
 
 ## Release summary: 
 
-This release ...
+This release fixes minor bugs and improves the documentation. It also adds some minor new capabilities, such as setting time step sizes in the XML configuration file. 
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
@@ -25,6 +25,13 @@ This release ...
 + Preliminary work to support Travis CI testing. 
 
 + Updated documentation to note that Cell::start_death is the preferred method to trigger cell death, and NOT Death::trigger_death. 
+
++ Updated Microenvironment::compute_all_gradient_vectors to now compute one-sized gradients on edge voxels. (Previously, no gradient was computed here.) 
+
++ Updated Microenvironment::compute_all_gradient_vectors to check if there is no z-direction (i.e., 2D) and exit early if so. 
+
++ Updated Microenvironment::compute_all_gradient_vectors to check if there is no y-direction (i.e., 1D) and exit early if so. 
+
  
 ### Beta features (not fully supported):
  
