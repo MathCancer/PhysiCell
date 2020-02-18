@@ -802,6 +802,20 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	
 	// Update necrosis rate
 	multiplier = 0.0;
+
+    // necrosis Type
+    double type_of_necrosis = pCell->parameters.necrosis_type;
+    
+    if (type_of_necrosis == 0) // deterministic necrosis
+    {
+    if( pO2 < pCell->parameters.o2_necrosis_threshold )
+	{
+        // if they are in below o2_necrosis_threshold, cells instantly become necrotic
+        multiplier = 99e99;
+    }
+    }
+    else if (type_of_necrosis == 1) // stochastic necrosis
+    { 
 	if( pO2 < pCell->parameters.o2_necrosis_threshold )
 	{
 		multiplier = ( pCell->parameters.o2_necrosis_threshold - pO2 ) 
@@ -811,11 +825,9 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	{ 
 		multiplier = 1.0; 
 	}	
-	
-	// now, update the necrosis rate 
-	
-	pCell->phenotype.death.rates[necrosis_index] = multiplier * pCell->parameters.max_necrosis_rate; 
-	
+	}
+    // now, update the necrosis rate 
+    pCell->phenotype.death.rates[necrosis_index] = multiplier * pCell->parameters.max_necrosis_rate; 
 	return; 
 }
 
