@@ -124,7 +124,7 @@
 				<diffusion_coefficient units="micron^2/min">100000.00</diffusion_coefficient>
 				<decay_rate units="1/min">0</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="mmHg">0.0</initial_condition>
+			<initial_condition units="mmHg">0.000333375</initial_condition>
 			<Dirichlet_boundary_condition units="mmHg" enabled="false">0.0</Dirichlet_boundary_condition>
 		</variable>
 		

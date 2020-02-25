@@ -99,9 +99,9 @@ double add_substrates( void )
 		
 		pC->functions.update_phenotype = NULL; 
 		
-		pC->phenotype.molecular.internalized_total_substrates[0] += 6; 
+		pC->phenotype.molecular.internalized_total_substrates[0] -= 6; 
 		
-		pC->phenotype.secretion.net_export_rates[0] = .16666666667; 
+		pC->phenotype.secretion.net_export_rates[0] = -.16666666667; 
 		pC->phenotype.secretion.uptake_rates[0] = 0; 
 		pC->phenotype.secretion.secretion_rates[0] = 0; 
 		
