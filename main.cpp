@@ -84,6 +84,38 @@
 using namespace BioFVM;
 using namespace PhysiCell;
 
+double add_substrates( void )
+{
+	double output = 0.0;
+	for( int i=0 ; i < microenvironment.mesh.voxels.size() ; i++ )
+	{
+		output += microenvironment(i)[0]; 
+	}
+	output *= microenvironment.mesh.voxels[0].volume; 
+	
+	for( int i=0 ; i < (*all_cells).size(); i++ )
+	{
+		Cell* pC = (*all_cells)[i];
+		
+		pC->functions.update_phenotype = NULL; 
+		
+		pC->phenotype.molecular.internalized_total_substrates[0] += 6; 
+		
+		pC->phenotype.secretion.net_export_rates[0] = .16666666667; 
+		pC->phenotype.secretion.uptake_rates[0] = 0; 
+		pC->phenotype.secretion.secretion_rates[0] = 0; 
+		
+		pC->phenotype.cycle.data.transition_rate(0,0) = 0.0;
+		
+		pC->set_internal_uptake_constants( 0.01 ); 
+		
+		output += pC->phenotype.molecular.internalized_total_substrates[0]; 
+	}
+		
+	return output; 
+}
+
+
 int main( int argc, char* argv[] )
 {
 	// load and parse settings file(s)
@@ -98,8 +130,6 @@ int main( int argc, char* argv[] )
 
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
-	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
 
 	// PNRG setup 
 	SeedRandom(); 
@@ -108,29 +138,16 @@ int main( int argc, char* argv[] )
 	std::string time_units = "min"; 
 
 	/* Microenvironment setup */ 
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
-	
 	setup_microenvironment(); 
-	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
 
 	/* PhysiCell setup */ 
- 	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
 
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
-	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
 
 	create_cell_types();
-
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
-
 	setup_tissue();
-
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
 	
 	/* Users typically start modifying here. START USERMODS */ 
 	
@@ -142,16 +159,12 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_data_as_matlab( true ); 
 	set_save_biofvm_cell_data( true ); 
 	set_save_biofvm_cell_data_as_custom_matlab( true );
-	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
 
 	// save a simulation snapshot 
 	
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
-	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl <<std::endl; 
 
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
@@ -183,6 +196,8 @@ int main( int argc, char* argv[] )
 	
 	// main loop 
 	
+	std::cout << "total oxygen: " << add_substrates() << std::endl; 
+	
 	try 
 	{	
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
@@ -190,6 +205,8 @@ int main( int argc, char* argv[] )
 			// save data if it's time. 
 			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
 			{
+				std::cout << "total oxygen: " << add_substrates() << std::endl; 
+				
 				display_simulation_status( std::cout ); 
 				if( PhysiCell_settings.enable_legacy_saves == true )
 				{	

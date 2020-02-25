@@ -55,8 +55,7 @@
 #include "BioFVM_vector.h"
 
 namespace BioFVM{
-
-
+	
 class Basic_Agent
 {
  private:

@@ -123,6 +123,8 @@ void Basic_Agent::update_voxel_index()
 	current_voxel_index= microenvironment->nearest_voxel_index( position );
 }
 
+int mycount = 0; 
+
 void Basic_Agent::set_internal_uptake_constants( double dt )
 {
 	// overall form: dp/dt = S*(T-p) - U*p 
@@ -157,9 +159,11 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 	
 	// temp for net export 
 	cell_source_sink_solver_temp_export1 = *net_export_rates; 
-	cell_source_sink_solver_temp_export1 *= dt; 
+	cell_source_sink_solver_temp_export1 *= dt; // amount exported in dt of time 
+		
 	cell_source_sink_solver_temp_export2 = cell_source_sink_solver_temp_export1;
 	cell_source_sink_solver_temp_export2 /= ( (microenvironment->voxels(current_voxel_index)).volume ) ; 
+	// change in surrounding density 
 	
 	volume_is_changed = false; 
 	
@@ -178,8 +182,8 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	cell_source_sink_solver_temp1.resize( microenvironment->density_vector(0).size() , 0.0 );
 	cell_source_sink_solver_temp2.resize( microenvironment->density_vector(0).size() , 1.0 );
 	
-	cell_source_sink_solver_temp_export1.resize( microenvironment->density_vector(0).size() , 1.0 );
-	cell_source_sink_solver_temp_export2.resize( microenvironment->density_vector(0).size() , 1.0 );
+	cell_source_sink_solver_temp_export1.resize( microenvironment->density_vector(0).size() , 0.0 );
+	cell_source_sink_solver_temp_export2.resize( microenvironment->density_vector(0).size() , 0.0 );
 
 	// new for internalized substrate tracking 
 	internalized_substrates->resize( microenvironment->density_vector(0).size() , 0.0 );
