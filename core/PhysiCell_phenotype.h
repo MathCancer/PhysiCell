@@ -331,7 +331,10 @@ class Volume
 	void divide( void ); // done 
 	void multiply_by_ratio(double); // done 
 	
-	void update( Cell* pCell, Phenotype& phenotype, double dt ); // done 
+	// new helper functions in February 2020 (PhysiCell 1.7.0) 
+	
+	void set_target_radius( double new_radius ); 
+	void set_target_total_volume( double new_volume ); 
 };
 
 class Geometry

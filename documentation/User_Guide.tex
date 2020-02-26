@@ -758,6 +758,34 @@ BioFVM applies Neumann (no flux) conditions at the outer simulation boundaries.
 
 \TOClink 
 
+\subsubsection{Biotransport equations}
+\label{sec:biotransport_equations}
+Based upon BioFVM \cite{ref:BioFVM}, PhysiCell solves the following system of partial differential equations (PDEs):
+
+\beq
+\frac{ \partial \grvec{\rho}}{\partial t} 
+= \vec{D} \circ \nabla^2 \grvec{\rho} - \grvec{\lambda} \circ \grvec{\rho} + \sum_i \delta \left( \vec{x} - \vec{x}_i \right) 
+\Bigl[ V_i \vec{S}_i \circ \left( \grvec{\rho}^*_i - \grvec{\rho} \right) - V_i \vec{U}_i \circ \grvec{\rho} + \vec{E}_i \Bigr], 
+\eeq
+where 
+\begin{center}
+\begin{tabular}{c|ll}
+\textbf{Symbol} & Meaning & Dimensions\\
+\hline \hline 
+$\boldrho $ & vector of substrate densities (or concentrations)  & substance/volume \\
+ $\vec{D}$ & vector of diffusion coefficients & length$^2$/time  \\
+ $\grvec{\lambda}$ & vector of decay rates & 1/time \\ 
+ $V_i$ & volume of cell $i$ & volume \\
+ $\vec{x}_i$ & cell $i$'s position (center) & length \\
+ $\vec{S}_i$ & vector of cell $i$'s secretion rates & 1/time \\
+ $\grvec{\rho}^*_i$ & vector of cell $i$'s secretion saturations & substance/volume\\
+ $\vec{U}_i$ & vector of cell $i$'s uptake rates & 1/time \\
+ $\vec{E}_i$ & vector of cell $i$'s net export rates & substance/time  
+\end{tabular}
+\end{center}
+
+\TOClink 
+
 \subsection{Setting up and using the microenvironment}
 \label{sec:set_up_BioFVM}
 
@@ -1804,7 +1832,7 @@ stored in the Cell Definition in \verb+cd+. (See Section \ref{sec:Cell_Definitio
 information on cell definitions.) As of Version 1.2.2, this function does not overwrite 
 the \v|is_movable|, \v|is_out_of_domain|, and \v|displacement| data of the cell. 
 
-This function is particularly useful if you want to do thinks like stem cell hierarchies, where you 
+This function is particularly useful if you want to do looks like stem cell hierarchies, where you 
 might ``convert'' a stem cell to a differentiated cell, each of which has been defined 
 separately. 
 
@@ -2604,7 +2632,7 @@ scalar bias parameter that can vary motility between purely Brownian and
 completely deterministic along the current bias direction. See Section \ref{sec:Motility}. 
 
 \item 
-\textbf{Secretion} records cell secretion and uptake rates, as well as a 
+\textbf{Secretion} records cell secretion/export and uptake rates, as well as a 
 saturation density (at which secretion ends). See Section \ref{sec:Secretion}. 
 
 \item 
@@ -3699,8 +3727,8 @@ a generic breast epithelium line (calibrated to MCF-10A).
 % \v|*volume_update_function|, and then makes sure that the cell (if one is given) is made 
 % consistent with this new volume in BioFVM. 
 % \item
-\smallcode{void update( Cell* pCell, Phenotype\& phenotype, double dt )} is 
-neither used nor implemented. It will be deprecated. 
+% \smallcode{void update( Cell* pCell, Phenotype\& phenotype, double dt )} is 
+% neither used nor implemented. It will be deprecated. 
 \end{enumerate}
 
 % \subsubsection{Default functions}
@@ -4050,6 +4078,11 @@ See Section \ref{sec:cell_member_functions} for more information on how the
 \smallcode{std::vector<double> uptake\_rates} is a vector of uptake rates for the substrates in the microenvironment. 
 
 \item 
+\smallcode{std::vector<double> net\_export\_rates} is a vector of net export rates for substrates in the environment, which was 
+added to PhysiCell in Version 1.7.0. It allows more generic secretion models (including both net positive and net negative secretion). 
+Users generally should \emph{either} use \verb|secretion_rates| \emph{or} \verb|net_export_rates|, but generally not both. 
+
+\item 
 \smallcode{std::vector<double> saturation\_densities} is a vector of densities at which secretions saturate. See \cite{ref:BioFVM}. 
 \end{enumerate}
 
@@ -4064,6 +4097,7 @@ class Secretion
     std::vector<double> secretion_rates; 
     std::vector<double> uptake_rates; 
     std::vector<double> saturation_densities;
+    std::vector<double> net_export_rates; 
 
     Secretion();      
 
@@ -4091,24 +4125,24 @@ set to 0.0.
 
 \item
 \smallcode{void sync\_to\_current\_microenvironment(void)} resizes 
-\v|secretion_rates|, \v|uptake_rates|, and \v|saturation_densities| 
+\v|secretion_rates|, \v|uptake_rates|, \v|net_export_rates|, and \v|saturation_densities| 
 consistency with \v|pMicroenvironment| and sets all vector entries to 0.0. 
 
 \item
 \smallcode{void sync\_to\_microenvironment(Microenvironment* pNew\_Microenvironment)}
 sets \hfill\break \v|pMicroenvironment = pNew_Microenvironment|, resizes 
-\v|secretion_rates|, \v|uptake_rates|, and \hfill\break \v|saturation_densities| 
+\v|secretion_rates|, \v|uptake_rates|, \v|net_export_rates|, and \hfill\break \v|saturation_densities| 
 for consistency with \v|pMicroenvironment|, and sets all vector entries to 0.0. 
 
 \item 
 \smallcode{void advance( Basic\_Agent* pCell, Phenotype\& phenotype, 
-double dt)} evaluates the \\ BioFVM secretion and uptake functions 
+double dt)} evaluates the \\ BioFVM secretion/export and uptake functions 
 for this individual cell. Consistency checks with BioFVM (including 
 those from volume changes) are fully automated. 
 
 \item 
 \smallcode{void set\_all\_secretion\_to\_zero( void )} sets all the 
-secretion rates to zero. (Please note that settings 
+secretion and net export rates to zero. (Please note that settings 
 \v|pCell->is_active = false| is the most efficient way to set 
 all secretion and uptake to zero in a cell.) 
 
@@ -4120,7 +4154,7 @@ all secretion and uptake to zero in a cell.)
 
 \item 
 \smallcode{void scale\_all\_secretion\_by\_factor(double factor)} multiplies 
-all the secretion rates by \v|factor|. 
+all the secretion and net export rates by \v|factor|. 
 
 \item 
 \smallcode{void scale\_all\_uptake\_by\_factor(double factor)} multiplies 

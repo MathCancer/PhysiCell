@@ -14,8 +14,11 @@ This release ...
 
 + Added "net_export_rates" to "secretion" part of Phenotype, and to the Basic_Agent class in BioFVM. 
 
++ Added new helper functions to the Volume class (within phenotype):
 
-
+++ void set_target_radius( double new_radius )  
+++ void set_target_total_volume( double new_volume )  
+++ 
 
  
 ### Minor new features and changes: 
@@ -31,6 +34,18 @@ This release ...
 + Cell::turn_off_reactions acts on net_export_rates as well. 
 
 + BioFVM::Basic_Agent::simulate_secretion_and_uptake now updates net_export processes, including impact on internal tracked substrate totals. (And all appropriate initializatoin functions have been updated. 
+
++ Updated documentation to reflect the new net export rates. 
+ 
++ Updated the documentation to fully state the biotransport PDEs (for better clarity), including notes on the dimensions of the parameters. 
+
++ Deprecated the following (unimplemented) function from the Volume class definition, as promised: 
+
+ void update( Cell* pCell, Phenotype& phenotype, double dt )
+ 
++ 
+
+
 
 
 
