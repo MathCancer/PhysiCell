@@ -9,8 +9,6 @@ compiler:
 
 # Build steps
 script:
-  - make
-  - make reset
   - make biorobots-sample
   - make reset
   - make cancer-biorobots-sample
