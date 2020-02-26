@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.6.1} 
-\newcommand{\ReleaseDate}{January 26, 2020} 
+\newcommand{\Version}{1.7.0} 
+\newcommand{\ReleaseDate}{March ?, 2020} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -519,7 +519,7 @@ projects and instructions to build them.
 PhysiCell uses three time step sizes: 
 \begin{enumerate}
 \item 
-\v|diffusion_dt| is the step size used in the diffusion solver, including the secretion and uptake processes. 
+\v|diffusion_dt| is the step size used in the diffusion solver, including the secretion/export and uptake processes. 
 The default value is 0.01 min. 
 \item 
 \v|mechanics_dt| is the step size for the cell mechanics solver, including cell motility. 
@@ -718,7 +718,7 @@ To get a list of all sample projects:
 \section{The BioFVM microenvironment}
 \label{sec:BioFVM}
 PhysiCell is built upon BioFVM \cite{ref:BioFVM}, and so it uses the (bio)chemical microenvironment from BioFVM, 
-including diffusion, decay, cell-based secretions/uptake, and bulk supply/uptake functions. All 
+including diffusion, decay, cell-based secretions/export/uptake, and bulk supply/uptake functions. All 
 PhysiCell projects already include bioFVM once you have included PhysiCell: 
 
 \v|#include "./core/PhysiCell.h"|
@@ -1051,7 +1051,7 @@ while( t < t_max )
 }
 \end{verbatim}
 
-As of Version 1.2.0, PhysiCell has automated cell secretions/uptake as part of its phenotype 
+As of Version 1.2.0, PhysiCell has automated cell secretions/export/uptake as part of its phenotype 
 updates. There is no need to explicitly call the BioFVM cell-based functions in the main program loop.
 
 As of Version 1.3.1, PhysiCell has automated calculation of gradients once per $\Delta t_\textrm{mechanics}$ 
@@ -1295,27 +1295,27 @@ void setup_microenvironment( void )
 \subsection{Automated tracking of internalized substrates}
 \label{sec:BioFVM_internalization_tracking}
 As of PhysiCell 1.5.0, each individual \v|Basic_Agent| can track the net total amount of substrates 
-uptaken and secreted over its lifetime, conserving mass with the uptake/secretion terms in the 
+uptaken and secreted over its lifetime, conserving mass with the uptake/secretion/export terms in the 
 governing PDEs in \cite{ref:BioFVM}.  By matching to system of PDEs in BioFVM (with the Dirac delta
 function approximation used in the code), in any time step $\Delta t$, the total amount of net mass 
 transferred from the $i^{th}$ cell (sitting in voxel $\Omega_n$) into the microenvironment is given by: 
 \beqa
 \Delta t \int_{\Omega_n} \grvec{\rho} \: dV 
-& = & \Delta t \int_{\Omega_n } V_i \delta( \vec{x} - \vec{x}_i ) 
-\Bigl( \vec{S}_i \circ 
-\left( \grvec{\rho}^*_i - \grvec{\rho} \right) - \vec{U}_i \circ \grvec{\rho} \Bigr) dV 
+& = & \Delta t \int_{\Omega_n }  \delta( \vec{x} - \vec{x}_i ) 
+\Bigl( V_i \vec{S}_i \circ 
+\left( \grvec{\rho}^*_i - \grvec{\rho} \right) - V_i \vec{U}_i \circ \grvec{\rho} + \vec{E}_i \Bigr) dV 
 \nonumber \\
 & = & 
-\Delta t V_i 
-\Bigl( \vec{S}_i \circ 
-\left( \grvec{\rho}^*_i - \grvec{\rho}(\vec{x}_n) \right) - \vec{U}_i \circ \grvec{\rho}(\vec{x}_n) \Bigr)   
+\Delta t 
+\Bigl( V_i \vec{S}_i \circ 
+\left( \grvec{\rho}^*_i - \grvec{\rho}(\vec{x}_n) \right) - V_i \vec{U}_i \circ \grvec{\rho}(\vec{x}_n) + \vec{E}_i \Bigr)   
 \eeqa
 After comparing against the numerical implementation in BioFVM to calculate 
 $\Delta \grvec{\rho}$, and multiplying this by the volume of the voxel, we get that the net 
 total change in external substrates between $t$ and $t+\Delta t$ is
 \beq
 \Delta \vec{n}_k = W_k 
-\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right), 
+\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right) + \vec{E}_i , 
 % \left( \frac{ (1-\vec{c}_2) \grvec{\rho}_k + \vec{c}_1} }{ \vec{c}_2 } \right),
 \eeq
 where $W_k$ is the volume of the voxel, $\vec{c}_i$ are internal constants already calculated for the 
@@ -1323,7 +1323,7 @@ BioFVM secretion/uptake functions, and division of vectors is element-wise. For 
 the net change in the cell's internalized substrates is 
 \beq
 -W_k 
-\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right), 
+\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right) - \vec{E}_i, 
 % \left( \frac{ (1-\vec{c}_2) \grvec{\rho}_k + \vec{c}_1} }{ \vec{c}_2 } \right),
 \eeq
 If \v|default_microenvironment_options.track_internalized_substrates_in_each_agent = true|, then 
