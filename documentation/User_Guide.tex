@@ -1629,7 +1629,7 @@ and necrosis) by calling \hfill\break
 death model, evaluate any death entry functions, and 
 set motility to zero. Cell secretions are set to zero, 
 and cell uptake is cut by a factor of 10. 
-(Users can make further changes to secretion and uptake 
+(Users can make further changes to secretion/export and uptake 
 using \v|entry_function|s that are called at the start 
 of a death model phase. See Section \ref{sec:Phase}.) 
 See Section \ref{sec:Death} for more information on cell death, 
@@ -1668,7 +1668,7 @@ index of the \v|Container| currently containing the cell.
 
 \item 
 \smallcode{void turn\_off\_reactions(double)} turns off all 
-secretions and uptake by the cell. 
+secretions/exports and uptake by the cell. 
 
 \item   
 \smallcode{void flag\_for\_division( void )} adds the cell to the 

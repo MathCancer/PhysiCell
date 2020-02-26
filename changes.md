@@ -20,7 +20,25 @@ This release ...
  
 ### Minor new features and changes: 
  
-+ "make list-projects" now displayed to standard output a list of all the sample projects. 
++ scale_all_secretion_by_factor also scales net_export_rates.
+
++ sync_to_current_microenvironment and sync_to_microenvironment set up net_export_rates 
+
++ Secretion::advance now updates net_export processes 
+
++ Secretion::set_all_secretion_to_zero and Secretion::scale_all_secretion_by_factor act on net_export_rates as well. 
+
++ Cell::turn_off_reactions acts on net_export_rates as well. 
+
++ BioFVM::Basic_Agent::simulate_secretion_and_uptake now updates net_export processes, including impact on internal tracked substrate totals. (And all appropriate initializatoin functions have been updated. 
+
+
+
+
+
+... old ... 
+
+"make list-projects" now displayed to standard output a list of all the sample projects. 
 
 + dt_diffusion, dt_mechanics, and dt_phenotype can now be set via the XML configuration file in the options section. 
 
