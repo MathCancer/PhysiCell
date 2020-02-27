@@ -14,19 +14,12 @@ This release ...
 
 + Added "net_export_rates" to "secretion" part of Phenotype, and to the Basic_Agent class in BioFVM. This is in response to SourceForge ticket 19. 
 
-+ Added new helper functions to the Volume class (within phenotype):
-   + void set_target_radius( double new_radius )  
-   + void set_target_total_volume( double new_volume )  
++ Added new helper functions to help users to more easily set the *target* cell size: 
+   + void Cell::set_target_volume( double new_volume ) sets the target total cell volume, while preserving the desired nuclear:cytoplasmic ratio and desired fluid fraction. In the default cell volume model, the cell will now approach this value by shrinking or growing. 
+   + void Cell::set_target_radius( double new_radius ) behaves similarly, but using a radius instead. 
 
-// acutally, no! Put it in Cell class. Need to document and instruct, add
++ Added Cell:set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
 
-+ more stuff
-
-
-	// new helper functions in February 2020 (PhysiCell 1.7.0) 
-	
-	void set_target_radius( Cell* pCell, double new_radius ); 
-	void set_target_total_volume( Cell* pCell, double new_volume ); 
 
 
 + Cell_Definitions in XML. This is in response to SourceForge ticket 5. 

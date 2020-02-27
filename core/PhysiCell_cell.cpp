@@ -525,6 +525,59 @@ void Cell::set_total_volume(double volume)
 	return; 
 }
 
+
+void Cell::set_target_volume( double new_volume )
+{
+	
+	// this function will keep the prior ratios (from targets)
+	
+	// first compute the actual raw totals on all these things 
+	double old_target_solid = phenotype.volume.target_solid_nuclear + 
+		phenotype.volume.target_solid_cytoplasmic; 
+	double old_target_total = old_target_solid / ( 1.0 - phenotype.volume.target_fluid_fraction ); 
+	double old_target_fluid = phenotype.volume.target_fluid_fraction * old_target_total; 
+	
+	// next whats the relative new size? 
+	double ratio = new_volume / (1e-16 + old_target_total ); 
+	
+	// scale the target solid cyto and target solid nuclear by this ratio 
+	phenotype.volume.target_solid_cytoplasmic *= ratio; 
+	phenotype.volume.target_solid_nuclear *= ratio; 
+	
+	return; 
+}
+
+void Cell::set_target_radius(double new_radius )
+{
+	static double four_thirds_pi =  4.188790204786391;
+
+	// calculate the new target volume 
+	double new_volume = four_thirds_pi; 
+	new_volume *= new_radius; 
+	new_volume *= new_radius; 
+	new_volume *= new_radius; 
+	
+	// now call the set_target_volume funciton 
+	this->set_target_volume( new_volume ); 
+	return; 
+}
+
+void Cell::set_radius(double new_radius )
+{
+	static double four_thirds_pi =  4.188790204786391;
+
+	// calculate the new target volume 
+	double new_volume = four_thirds_pi; 
+	new_volume *= new_radius; 
+	new_volume *= new_radius; 
+	new_volume *= new_radius; 
+	
+	this->set_total_volume( new_volume ); 
+	return; 
+}
+
+
+
 double& Cell::get_total_volume(void)
 {
 	static bool I_warned_you = false; 

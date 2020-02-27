@@ -1512,7 +1512,11 @@ class Cell : public Basic_Agent
     bool assign_position(std::vector<double> new_position);
     bool assign_position(double, double, double);
     void set_total_volume(double);
-
+    void set_radius(double); 
+    
+    void set_target_volume(double); 
+    void set_target_radius(double); 
+    
     double& get_total_volume(void);
     
     // mechanics 
@@ -1754,7 +1758,23 @@ separately.
 
 \item 
 \smallcode{void set\_total\_volume(double)} safely sets the cell's total volume. 
-It also sets the cell's sub-volumes proportionally. 
+It also sets the cell's sub-volumes proportionally. Note that this does not change the 
+\emph{target} value, so the cell will still grow or shrink towards its (unaltered) targets. 
+
+\item 
+\smallcode{void set\_radius(double)} safely sets the cell's radius (by calling 
+\v|set_total_volume(double)|. Note that this does not change the 
+\emph{target} value, so the cell will still grow or shrink towards its (unaltered) targets. 
+
+\item 
+\smallcode{void set\_target\_volume(double)} safely sets the cell's total target volume. 
+It also sets the cell's sub-volumes proportionally. Note that this does not change the 
+\emph{current} value, so the cell need to shrink or grow towards this new target. 
+
+\item 
+\smallcode{void set\_radius(double)} safely sets the cell's total target radius. 
+It also sets the cell's sub-volumes proportionally. Note that this does not change the 
+\emph{current} value, so the cell need to shrink or grow towards this new target. 
 
 \item 
 \smallcode{double\& get\_total\_volume(void)} returns the cell's 
