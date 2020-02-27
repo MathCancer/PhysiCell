@@ -1149,10 +1149,16 @@ void display_cell_definitions( std::ostream& os )
 	{
 		Cell_Definition* pCD = cell_definitions_by_index[n]; 
 		os << n << " :: type:" << pCD->type << " name: " << pCD->name << std::endl; 
-		
-		os << "\t cycle model: " << pCD->phenotype.cycle.model().name  
-			<< " (code=" << pCD->phenotype.cycle.model().code << ")" << std::endl; 
-		os << "\t death models: " << std::endl; 
+
+		if( pCD->phenotype.cycle.pCycle_Model != NULL )
+		{
+			os << "\t cycle model: " << pCD->phenotype.cycle.model().name  
+				<< " (code=" << pCD->phenotype.cycle.model().code << ")" << std::endl; 
+			os << "\t death models: " << std::endl; 
+		}
+		else
+		{ 	os << "\t cycle model not initialized" << std::endl; } 
+
 		for( int k=0 ; k < pCD->phenotype.death.models.size(); k++ )
 		{
 			os << "\t\t" << k << " : " << pCD->phenotype.death.models[k]->name 
