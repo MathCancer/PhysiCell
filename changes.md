@@ -12,12 +12,26 @@ This release ...
  
 ### Major new features and changes:
 
-+ Added "net_export_rates" to "secretion" part of Phenotype, and to the Basic_Agent class in BioFVM. 
++ Added "net_export_rates" to "secretion" part of Phenotype, and to the Basic_Agent class in BioFVM. This is in response to SourceForge ticket 19. 
 
 + Added new helper functions to the Volume class (within phenotype):
    + void set_target_radius( double new_radius )  
    + void set_target_total_volume( double new_volume )  
+
+// acutally, no! Put it in Cell class. Need to document and instruct, add
+
 + more stuff
+
+
+	// new helper functions in February 2020 (PhysiCell 1.7.0) 
+	
+	void set_target_radius( Cell* pCell, double new_radius ); 
+	void set_target_total_volume( Cell* pCell, double new_volume ); 
+
+
++ Cell_Definitions in XML. This is in response to SourceForge ticket 5. 
+   +
+   +
 
 ### Minor new features and changes: 
  
@@ -38,10 +52,10 @@ This release ...
 + Updated the documentation to fully state the biotransport PDEs (for better clarity), including notes on the dimensions of the parameters. 
 
 + Deprecated the following (unimplemented) function from the Volume class definition, as promised: 
-
+```
  void update( Cell* pCell, Phenotype& phenotype, double dt )
- 
-+ 
+```
+
 
 
 
@@ -51,31 +65,33 @@ This release ...
 
 ... old ... 
 
-"make list-projects" now displayed to standard output a list of all the sample projects. 
-
-+ dt_diffusion, dt_mechanics, and dt_phenotype can now be set via the XML configuration file in the options section. 
-
-+ Added documentation on the time step sizes to the User Guide. 
-
-+ Preliminary work to support Travis CI testing. 
-
-+ Updated documentation to note that Cell::start_death is the preferred method to trigger cell death, and NOT Death::trigger_death. 
-
-+ Updated Microenvironment::compute_all_gradient_vectors to now compute one-sized gradients on edge voxels. (Previously, no gradient was computed here.) 
-
-+ Updated Microenvironment::compute_all_gradient_vectors to check if there is no z-direction (i.e., 2D) and exit early if so. 
-
-+ Updated Microenvironment::compute_all_gradient_vectors to check if there is no y-direction (i.e., 1D) and exit early if so. 
-
-+ Made PhysiCell_constants.cpp (and added this to the core of all project makefiles) so that dt and other variables can be non-static (i.e., set by XML options). 
-
-+ Added "make checkpoint" rule to makefiles. This zips up the user-custom stuff (./config, ./, ./custom_modules) into a timestamped zip file. Use this before upgrading PhysiCell to make sure you keep your own Makefile, etc. 
  
 ### Beta features (not fully supported):
  
 + List here. 
   
 ### Bugfixes: 
+
++ In response to GitHub issue 33, fixed issue where data-cleanup makefile rule gets a list of too many files. This is what it will look like: 
+
+```
+data-cleanup:
+	rm -f *.mat
+	rm -f *.xml
+	rm -f *.svg
+	rm -rf ./output
+	mkdir ./output
+	touch ./output/empty.txt
+```
++ Updated Cell::Cell(), create_cell(), create_cell(Cell_Defintion), and convert_to_cell_definition() to call set_total_volume( phenotype.volume.total ). This makes sure that BioFVM knows the correct volume at the time of creation (or major update) so that it can save the correct values to outputs. This is in response to GitHub issue 22. 
+
++ Removed the false statement from the user manual that stated that the cytoplasmic:nuclear ratio is between 0 and 1. 
+
++ Removed the false statement from the user manual that stated that relative cell rupture volume is between 0 and 1. 
+ 
+
+
+#### old 
 
 + BioFVM's diffusion_decay_solver__constant_coefficients_LOD_3D, diffusion_decay_solver__constant_coefficients_LOD_2D check for regular meshes instead of uniform meshes. 
 

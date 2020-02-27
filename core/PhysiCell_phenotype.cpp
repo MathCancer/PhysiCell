@@ -604,20 +604,6 @@ void Volume::divide( void )
 	return; 
 }
 
-void Volume::set_target_radius( double new_radius )
-{
-	// equivalent target total volume 
-	double volume = 
-
-	// preserve target nuclear and cytoplasmic fraction 
-	double nuclear_fraction = 
-	double cytoplasmic_fraction = 
-
-	
-	
-	return; 
-}
-
 Geometry::Geometry()
 {
 	// reference values for MCF-7, based on 

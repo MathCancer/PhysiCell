@@ -325,6 +325,7 @@ Cell::Cell()
 	assign_orientation();
 	container = NULL;
 	
+	set_total_volume( phenotype.volume.total ); 
 	
 	return; 
 }
@@ -795,6 +796,8 @@ Cell* create_cell( void )
 	// All the phenotype and other data structures are already set 
 	// by virtue of the default Cell constructor. 
 	
+	pNew->set_total_volume( pNew->phenotype.volume.total ); 
+	
 	return pNew; 
 }
 
@@ -819,6 +822,8 @@ Cell* create_cell( Cell_Definition& cd )
 	
 	pNew->assign_orientation();
 	
+	pNew->set_total_volume( pNew->phenotype.volume.total ); 
+	
 	return pNew; 
 }
 
@@ -840,6 +845,8 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	// displacement.resize(3,0.0); // state? 
 	
 	assign_orientation();	
+	
+	set_total_volume( phenotype.volume.total ); 
 	
 	return; 
 }
