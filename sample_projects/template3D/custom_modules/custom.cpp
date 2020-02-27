@@ -166,6 +166,9 @@ void create_cell_types( void )
 	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
 		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); // 0.1; 
 	
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
+	
 	return; 
 }
 

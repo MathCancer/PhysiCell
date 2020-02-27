@@ -65,6 +65,8 @@ This release ...
 
 + Minor source code cleanup in PhysiCell_settings.cpp. 
 
++ All sample projects now automatically build (and display) the registries of cell definitions via build_cell_definitions_maps() and display_cell_definitions(). 
+
 ### Beta features (not fully supported):
  
 + List here. 

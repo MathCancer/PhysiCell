@@ -183,6 +183,9 @@ void create_cell_types( void )
 	// macrophages do not uptake viral particles 
 	macrophage.phenotype.secretion.uptake_rates[virus_index] = 
 		parameters.doubles("viral_internalization_rate"); 
+		
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
 
 	return; 
 }
