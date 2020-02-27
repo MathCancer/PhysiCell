@@ -1945,6 +1945,45 @@ if( pCell->custom_data[ "infected" ] == true )
     delete_cell( pCell ); 
 }
 \end{verbatim}
+
+
+
+\item 
+\smallcode{void display\_cell\_definitions( std::ostream\& os )} does a basic display of all 
+cell definitions, including basic information on which cell cycle and death models are included, 
+custom functions, and custom data. 
+
+\underline{Example:} 
+\begin{verbatim}
+display_cell_definitions( std::cout ); 
+\end{verbatim}
+
+\item 
+\smallcode{void build\_cell\_definitions\_maps( void )} builds the internal registries of all cell definitions, 
+which can be searched by name or type (integer code). This is vest to use at the end of \v|setup_tissue()|. 
+
+\item 
+\smallcode{Cell\_Definition* find\_cell\_definition( std::string search\_string )} returns a pointer to 
+the cell definition with name as searched. If none is found, it returns \v|NULL|. 
+
+\underline{example:} Let's find the tumor cell definition and display its default apoptosis rate. 
+\begin{verbatim}
+Cell_Definition* pCD = find_cell_definition( "tumor" ); 
+std::cout << "Default apoptotic death rate: "; 
+int apop_index = pCD->phenotype.death.find_death_model_index( "apoptosis" ); 
+std::cout << pCD->phenotype.death.rates[ apop_index ] << std::endl; 
+\end{verbatim}
+
+\smallcode{Cell\_Definition* find\_cell\_definition( int search\_type )}
+Let's find the tumor cell definition with type 3 and display its name and default apoptosis rate. 
+\begin{verbatim}
+Cell_Definition* pCD = find_cell_definition( 3 ); 
+std::cout << "Cell type name for type 3: " << pCD->name << std::endl; 
+std::cout << "Default apoptotic death rate: "; 
+int apop_index = pCD->phenotype.death.find_death_model_index( "apoptosis" ); 
+std::cout << pCD->phenotype.death.rates[ apop_index ] << std::endl; 
+\end{verbatim}
+
 \end{enumerate}
  
 
