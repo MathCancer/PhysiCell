@@ -15,12 +15,10 @@ This release ...
 + Added "net_export_rates" to "secretion" part of Phenotype, and to the Basic_Agent class in BioFVM. 
 
 + Added new helper functions to the Volume class (within phenotype):
+   + void set_target_radius( double new_radius )  
+   + void set_target_total_volume( double new_volume )  
++ more stuff
 
-++ void set_target_radius( double new_radius )  
-++ void set_target_total_volume( double new_volume )  
-++ 
-
- 
 ### Minor new features and changes: 
  
 + scale_all_secretion_by_factor also scales net_export_rates.
