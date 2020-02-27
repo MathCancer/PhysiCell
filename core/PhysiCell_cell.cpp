@@ -72,6 +72,9 @@
 #include "../BioFVM/BioFVM_vector.h" 
 #include<limits.h>
 
+std::vector<Cell_Definition*> cell_definitions; 
+Cell_Definition* 
+
 namespace PhysiCell{
 
 Cell_Parameters::Cell_Parameters()

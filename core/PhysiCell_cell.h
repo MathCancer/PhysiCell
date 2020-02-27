@@ -231,6 +231,12 @@ void save_all_cells_to_matlab( std::string filename );
 //function to check if a neighbor voxel contains any cell that can interact with me
 bool is_neighbor_voxel(Cell* pCell, std::vector<double> myVoxelCenter, std::vector<double> otherVoxelCenter, int otherVoxelIndex);  
 
+
+std::vector<Cell_Definition*> cell_definitions; 
+Cell_Definition* find_cell_definition( std::string search_string ); 
+
+
+
 };
 
 #endif
