@@ -74,7 +74,7 @@ This release ...
   
 ### Bugfixes: 
 
-+ In response to GitHub issue 33, fixed issue where data-cleanup makefile rule gets a list of too many files. This is what it will look like: 
++ In response to GitHub issue 33, fixed issue where data-cleanup makefile rule gets a list of too many files. Rolled the new rule through to all the sample Makefiles as well. 
 
 ```
 data-cleanup:
