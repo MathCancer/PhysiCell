@@ -49,8 +49,17 @@ This release ...
  void update( Cell* pCell, Phenotype& phenotype, double dt )
 ```
 
++ Added a new registry (unsorted map) of all cell definitions called cell_definitions_by_name and a vector of cell definitions called cell_definitions_by_index.  
 
++ The Cell_Definition default constructor and copy constructor automatically register all new cell definitions in cell_definitions_by_index; 
 
++ Created a display_cell_definitions(std::ostream&) function to quickly list all cell definitions and key information.  
+
++ Created build_cell_definitions_maps() to create cell_definitions_by_name and cell_definitions_by_type. This should go at the end of create_cell_types(). 
+
++ Created find_cell_definition(std::string) to return a pointer to the matching cell definition (search by name). Returns NULL if nothing found. 
+
++ Created find_cell_definition(int) to return a pointer to the matching cell definition (search by type). Returns NULL if nothing found. 
 
 
 

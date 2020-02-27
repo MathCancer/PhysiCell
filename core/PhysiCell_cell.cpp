@@ -72,10 +72,11 @@
 #include "../BioFVM/BioFVM_vector.h" 
 #include<limits.h>
 
-std::vector<Cell_Definition*> cell_definitions; 
-Cell_Definition* 
-
 namespace PhysiCell{
+
+std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name; 
+std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
+std::vector<Cell_Definition*> cell_definitions_by_index;
 
 Cell_Parameters::Cell_Parameters()
 {
@@ -131,6 +132,8 @@ Cell_Definition::Cell_Definition()
 	
 	functions.set_orientation = NULL;
 	
+	cell_definitions_by_index.push_back( this ); 
+	
 	return; 
 }
 
@@ -153,6 +156,8 @@ Cell_Definition::Cell_Definition( Cell_Definition& cd )
 	// this is the whole reason we need ot make a copy constructor 
 	parameters.pReference_live_phenotype = &phenotype; 
 	
+	cell_definitions_by_index.push_back( this ); 
+	
 	return; 
 }
 
@@ -174,6 +179,8 @@ Cell_Definition& Cell_Definition::operator=( const Cell_Definition& cd )
 	
 	// this is the whole reason we need ot make a copy constructor 
 	parameters.pReference_live_phenotype = &phenotype; 
+	
+	cell_definitions_by_index.push_back( this ); 
 	
 	return *this; 
 }
@@ -1096,6 +1103,136 @@ void Cell::lyse_cell( void )
 
 	return; 
 }
+
+bool cell_definitions_by_name_constructed = false; 
+
+void build_cell_definitions_maps( void )
+{
+//	cell_definitions_by_name.
+//	cell_definitions_by_index
+
+	for( int n=0; n < cell_definitions_by_index.size() ; n++ )
+	{
+		Cell_Definition* pCD = cell_definitions_by_index[n]; 
+		cell_definitions_by_name[ pCD->name ] = pCD; 
+		cell_definitions_by_type[ pCD->type ] = pCD; 
+	}
+
+	for( const auto& n : cell_definitions_by_name )
+	{
+		std::cout << "Key:[" << n.first << "] Value:[" << n.second << "]\n";
+	}	
+	std::cout << std::endl << std::endl;
+	for( const auto& n : cell_definitions_by_type )
+	{
+		std::cout << "Key:[" << n.first << "] Value:[" << n.second << "]\n";
+	}	
+	std::cout << std::endl << std::endl;
+
+
+
+	cell_definitions_by_name_constructed = true; 
+	
+	return;
+}
+
+void display_ptr_as_bool( void (*ptr)(Cell*,Phenotype&,double), std::ostream& os )
+{
+	if( ptr )
+	{ os << "true"; return; }
+	os << "false"; 
+	return;
+}
+
+void display_cell_definitions( std::ostream& os )
+{
+	for( int n=0; n < cell_definitions_by_index.size() ; n++ )
+	{
+		Cell_Definition* pCD = cell_definitions_by_index[n]; 
+		os << n << " :: type:" << pCD->type << " name: " << pCD->name << std::endl; 
+		
+		os << "\t cycle model: " << pCD->phenotype.cycle.model().name  
+			<< " (code=" << pCD->phenotype.cycle.model().code << ")" << std::endl; 
+		os << "\t death models: " << std::endl; 
+		for( int k=0 ; k < pCD->phenotype.death.models.size(); k++ )
+		{
+			os << "\t\t" << k << " : " << pCD->phenotype.death.models[k]->name 
+			<< " (code=" << pCD->phenotype.death.models[k]->code << ")" << std::endl; 
+		}
+		
+		Cell_Functions* pCF = &(pCD->functions); 
+		os << "\t key functions: " << std::endl; 
+		os << "\t\t migration: "; display_ptr_as_bool( pCF->update_migration_bias , std::cout ); 
+		os << std::endl; 
+		os << "\t\t custom rule: "; display_ptr_as_bool( pCF->custom_cell_rule , std::cout ); 
+		os << std::endl; 
+		os << "\t\t phenotype rule: "; display_ptr_as_bool( pCF->update_phenotype , std::cout ); 
+		os << std::endl; 
+		
+		Custom_Cell_Data* pCCD = &(pCD->custom_data); 
+		os << "\tcustom data: " << std::endl; 
+		for( int k=0; k < pCCD->variables.size(); k++)
+		{
+			os << "\t\t" << pCCD->variables[k].name << std::endl; 
+		}
+		os << "\tcustom vector data: " << std::endl; 
+		for( int k=0; k < pCCD->vector_variables.size(); k++)
+		{
+			os << "\t\t" << pCCD->vector_variables[k].name << std::endl; 
+		}
+		os << "\t\t\tNOTE: custom vector data will eventually be merged with custom data" << std::endl; 
+			
+	}
+	
+	return; 
+}
+
+Cell_Definition* find_cell_definition( std::string search_string )
+{
+	// if the registry isn't built yet, then do it! 
+	if( cell_definitions_by_name_constructed == false )
+	{
+		build_cell_definitions_maps(); 
+	}
+	
+	Cell_Definition* output = NULL;
+	if( cell_definitions_by_name.count( search_string ) > 0 )
+	{ 
+		output = cell_definitions_by_name.find( search_string )->second; 
+	} 
+	
+	if( output == NULL )
+	{
+		std::cout << "Warning! Cell_Definition for " << search_string << " not found!" << std::endl; 
+	}
+	
+	return output; 	
+}
+
+Cell_Definition* find_cell_definition( int search_type )
+{
+	// if the registry isn't built yet, then do it! 
+	if( cell_definitions_by_name_constructed == false )
+	{
+		build_cell_definitions_maps(); 
+	}
+	
+	Cell_Definition* output = NULL;
+	if( cell_definitions_by_type.count( search_type ) > 0 )
+	{ 
+		output = cell_definitions_by_type.find( search_type )->second; 
+	} 
+	
+	if( output == NULL )
+	{
+		std::cout << "Warning! Cell_Definition for " << search_type << " not found!" << std::endl; 
+	}
+	
+	return output; 	
+}
+
+
+
 
 };
 

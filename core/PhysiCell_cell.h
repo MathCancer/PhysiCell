@@ -232,10 +232,15 @@ void save_all_cells_to_matlab( std::string filename );
 bool is_neighbor_voxel(Cell* pCell, std::vector<double> myVoxelCenter, std::vector<double> otherVoxelCenter, int otherVoxelIndex);  
 
 
-std::vector<Cell_Definition*> cell_definitions; 
-Cell_Definition* find_cell_definition( std::string search_string ); 
+extern std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name; 
+extern std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
+extern std::vector<Cell_Definition*> cell_definitions_by_index; // works 
 
+void display_cell_definitions( std::ostream& os ); // done 
+void build_cell_definitions_maps( void ); // done 
 
+Cell_Definition* find_cell_definition( std::string search_string ); // done 
+Cell_Definition* find_cell_definition( int search_type );  
 
 };
 
