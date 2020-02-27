@@ -1118,6 +1118,7 @@ void build_cell_definitions_maps( void )
 		cell_definitions_by_type[ pCD->type ] = pCD; 
 	}
 
+/*
 	for( const auto& n : cell_definitions_by_name )
 	{
 		std::cout << "Key:[" << n.first << "] Value:[" << n.second << "]\n";
@@ -1128,9 +1129,7 @@ void build_cell_definitions_maps( void )
 		std::cout << "Key:[" << n.first << "] Value:[" << n.second << "]\n";
 	}	
 	std::cout << std::endl << std::endl;
-
-
-
+*/
 	cell_definitions_by_name_constructed = true; 
 	
 	return;
