@@ -163,17 +163,6 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	if( search_result )
 	{ phenotype_dt = xml_get_my_double_value( search_result ); }
 	
-/*
-	diffusion_dt
-	
-	
-		<dt_diffusion units="min">0.01</dt_diffusion>
-		<dt_mechanics units="min">0.1</dt_mechanics>
-		<dt_phenotype units="min">6</dt_phenotype>
-	<!--	phenotype_dt, mechanics_dt , diffusion_dt -->
-*/			
-	
-
 	node = node.parent(); 
 	
 	// save options 

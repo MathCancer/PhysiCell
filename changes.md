@@ -61,13 +61,10 @@ This release ...
 
 + Created find_cell_definition(int) to return a pointer to the matching cell definition (search by type). Returns NULL if nothing found. 
 
++ Deprecated oxygen_index, glucose_index, TUMOR_TYPE, and VESSEL_TYPE from PhysiCell_Constants as promised. 
 
++ Minor source code cleanup in PhysiCell_settings.cpp. 
 
-
-
-... old ... 
-
- 
 ### Beta features (not fully supported):
  
 + List here. 
@@ -90,21 +87,9 @@ data-cleanup:
 + Removed the false statement from the user manual that stated that the cytoplasmic:nuclear ratio is between 0 and 1. 
 
 + Removed the false statement from the user manual that stated that relative cell rupture volume is between 0 and 1. 
- 
 
++ Updated the list of PhysiCell_Constants in response to SourceForge ticket 11. 
 
-#### old 
-
-+ BioFVM's diffusion_decay_solver__constant_coefficients_LOD_3D, diffusion_decay_solver__constant_coefficients_LOD_2D check for regular meshes instead of uniform meshes. 
-
-+ Biorobots sample project fixed bugs on searching for substrates vs. searching for cell types. 
-
-+ In BioFVM_vectors, the normalize functions now return a zero vector if the vector's norm is less than 1e-16. This is for John Metzcar. 
-
-+ In PhysiCell_Cell.cpp, made fixes to Cell::divide() and Cell::assign_position() to fix a bug where cells dividing on the edge of the domain woudl place a daughter cell at (0,0,0). Thanks, Andrew Eckel!
-
-+ Code cleanup in PhysiCell_cell_container in Cell_Container::update_all_cells() as suggested by Andrew Eckel. Thanks! 
- 
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
