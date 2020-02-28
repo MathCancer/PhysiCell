@@ -564,6 +564,14 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	std::vector<double> Dirichlet_condition_vector = {}; 
 	std::vector<bool> Dirichlet_activation_vector = {}; 
 
+	std::vector<bool> Dirichlet_all = {}; 
+	std::vector<bool> Dirichlet_xmin = {}; 
+	std::vector<bool> Dirichlet_xmax = {}; 
+	std::vector<bool> Dirichlet_ymin = {}; 
+	std::vector<bool> Dirichlet_ymax = {}; 
+	std::vector<bool> Dirichlet_zmin = {}; 
+	std::vector<bool> Dirichlet_zmax = {}; 
+
 	// next, add all the substrates to the microenvironment
 	// build the initial conditions and Dirichlet conditions as we go 
 
@@ -604,6 +612,57 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 		// now, decide whether or not to enable it 
 		Dirichlet_activation_vector.push_back( node1.attribute("enabled").as_bool() );
 		
+		// now, figure out if individual boundaries are set 
+		if( node1.attribute("boundaries") )
+		{
+			std::string option_string = node1.attribute("boundaries").value(); 
+			Dirichlet_all.push_back(false); 
+
+			if( strstr( option_string.c_str() , "xmin" ) )
+			{ Dirichlet_xmin.push_back( true ); }
+			else
+			{ Dirichlet_xmin.push_back( false ); }
+			std::cout << Dirichlet_xmin[ Dirichlet_xmin.size()-1 ] << std::endl; 
+		
+			if( strstr( option_string.c_str() , "xmax" ) )
+			{ Dirichlet_xmax.push_back( true ); }
+			else
+			{ Dirichlet_xmax.push_back( false ); }
+			std::cout << Dirichlet_xmax[ Dirichlet_xmin.size()-1 ] << std::endl; 
+		
+			if( strstr( option_string.c_str() , "ymin" ) )
+			{ Dirichlet_ymin.push_back( true ); }
+			else
+			{ Dirichlet_ymin.push_back( false ); }
+			std::cout << Dirichlet_ymin[ Dirichlet_xmin.size()-1 ] << std::endl; 
+		
+			if( strstr( option_string.c_str() , "ymax" ) )
+			{ Dirichlet_ymax.push_back( true ); }
+			else
+			{ Dirichlet_ymax.push_back( false ); }
+			std::cout << Dirichlet_ymax[ Dirichlet_xmin.size()-1 ] << std::endl; 
+		
+			if( strstr( option_string.c_str() , "zmin" ) )
+			{ Dirichlet_zmin.push_back( true ); }
+			else
+			{ Dirichlet_zmin.push_back( false ); }
+			std::cout << Dirichlet_zmin[ Dirichlet_xmin.size()-1 ] << std::endl; 
+
+			if( strstr( option_string.c_str() , "zmax" ) )
+			{ Dirichlet_zmax.push_back( true ); }
+			else
+			{ Dirichlet_zmax.push_back( false ); }
+			std::cout << Dirichlet_zmax[ Dirichlet_xmin.size()-1 ] << std::endl; 
+
+
+
+		}
+		else
+		{	
+			Dirichlet_all.push_back(true); 
+		}
+		system( "pause" ); 
+		
 		if( node1.attribute("enabled").as_bool() )
 		{ activated_Dirichlet_boundary_detected = true; } 
 		
@@ -618,6 +677,14 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	default_microenvironment_options.Dirichlet_condition_vector = Dirichlet_condition_vector;  
 	default_microenvironment_options.Dirichlet_activation_vector = Dirichlet_activation_vector;
 	default_microenvironment_options.initial_condition_vector = initial_condition_vector; 
+
+	default_microenvironment_options.Dirichlet_all = Dirichlet_all; 
+	default_microenvironment_options.Dirichlet_xmin = Dirichlet_xmin; 
+	default_microenvironment_options.Dirichlet_xmax = Dirichlet_xmax; 
+	default_microenvironment_options.Dirichlet_ymin = Dirichlet_ymin; 
+	default_microenvironment_options.Dirichlet_ymax = Dirichlet_ymax; 
+	default_microenvironment_options.Dirichlet_zmin = Dirichlet_zmin; 
+	default_microenvironment_options.Dirichlet_zmax = Dirichlet_zmax; 
 	
 	// because outer boundary Dirichlet conditions are defined in the XML, 
 	// make sure we don't accidentally disable them 

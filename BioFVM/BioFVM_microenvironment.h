@@ -301,6 +301,16 @@ class Microenvironment_Options
 	std::vector<double> Dirichlet_condition_vector; 
 	std::vector<bool> Dirichlet_activation_vector; 
 	
+	/* new in PhysiCell 1.7.0 to enable setting Dirichlet conditions 
+	   on a boundary-by-boundary basis */
+	std::vector<bool> Dirichlet_all; 
+	std::vector<bool> Dirichlet_xmin; 
+	std::vector<bool> Dirichlet_xmax; 
+	std::vector<bool> Dirichlet_ymin; 
+	std::vector<bool> Dirichlet_ymax; 
+	std::vector<bool> Dirichlet_zmin; 
+	std::vector<bool> Dirichlet_zmax; 
+	
 	std::vector<double> initial_condition_vector; 
 	
 	bool simulate_2D; 
