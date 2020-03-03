@@ -74,6 +74,9 @@ namespace PhysiCell{
 
 int writePov(std::vector<Cell*> all_cells, double timepoint, double scale)
 {
+	static int TUMOR_TYPE=0; 
+	static int VESSEL_TYPE=1; 
+	
 	std::string filename; 
 	filename.resize( 1024 ); 
 //	sprintf( (char*) filename.c_str() , "output//cells_%i.pov" , (int)round(timepoint) ); 
@@ -100,9 +103,9 @@ int writePov(std::vector<Cell*> all_cells, double timepoint, double scale)
 			else
 				_nameCore="MISC";
 		}
-		else if(all_cells[i]->type==PhysiCell_constants::TUMOR_TYPE)
+		else if(all_cells[i]->type==TUMOR_TYPE)
 			_nameCore="LIVE";
-		else if(all_cells[i]->type==PhysiCell_constants::VESSEL_TYPE)
+		else if(all_cells[i]->type==VESSEL_TYPE)
 			_nameCore="ENDO";
 		else
 			_nameCore="MISC";

@@ -163,24 +163,6 @@ int main( int argc, char* argv[] )
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
 	
-	std::string blah = "xmin,xmax,zmin"; 
-	
-	std::string test = "xmin";	
-	std::cout << test << ": " << (bool) std::strstr( blah.c_str(), test.c_str() ) << std::endl; 
-	test = "xmax"; 
-	std::cout << test << ": " << (bool) std::strstr( blah.c_str(), test.c_str() ) << std::endl; 
-	test = "ymin"; 
-	std::cout << test << ": " << (bool) std::strstr( blah.c_str(), test.c_str() ) << std::endl; 
-	test = "ymax"; 
-	std::cout << test << ": " << (bool) std::strstr( blah.c_str(), test.c_str() ) << std::endl; 
-	test = "zmin"; 
-	std::cout << test << ": " << (bool) std::strstr( blah.c_str(), test.c_str() ) << std::endl; 
-	test = "zmax"; 
-	std::cout << test << ": " << (bool) std::strstr( blah.c_str(), test.c_str() ) << std::endl; 
-	
-	
-	return -1; 
-	
 	// main loop 
 	
 	try 
