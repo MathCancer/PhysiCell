@@ -622,46 +622,37 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 			{ Dirichlet_xmin.push_back( true ); }
 			else
 			{ Dirichlet_xmin.push_back( false ); }
-			std::cout << Dirichlet_xmin[ Dirichlet_xmin.size()-1 ] << std::endl; 
 		
 			if( strstr( option_string.c_str() , "xmax" ) )
 			{ Dirichlet_xmax.push_back( true ); }
 			else
 			{ Dirichlet_xmax.push_back( false ); }
-			std::cout << Dirichlet_xmax[ Dirichlet_xmin.size()-1 ] << std::endl; 
 		
 			if( strstr( option_string.c_str() , "ymin" ) )
 			{ Dirichlet_ymin.push_back( true ); }
 			else
 			{ Dirichlet_ymin.push_back( false ); }
-			std::cout << Dirichlet_ymin[ Dirichlet_xmin.size()-1 ] << std::endl; 
 		
 			if( strstr( option_string.c_str() , "ymax" ) )
 			{ Dirichlet_ymax.push_back( true ); }
 			else
 			{ Dirichlet_ymax.push_back( false ); }
-			std::cout << Dirichlet_ymax[ Dirichlet_xmin.size()-1 ] << std::endl; 
 		
 			if( strstr( option_string.c_str() , "zmin" ) )
 			{ Dirichlet_zmin.push_back( true ); }
 			else
 			{ Dirichlet_zmin.push_back( false ); }
-			std::cout << Dirichlet_zmin[ Dirichlet_xmin.size()-1 ] << std::endl; 
 
 			if( strstr( option_string.c_str() , "zmax" ) )
 			{ Dirichlet_zmax.push_back( true ); }
 			else
 			{ Dirichlet_zmax.push_back( false ); }
-			std::cout << Dirichlet_zmax[ Dirichlet_xmin.size()-1 ] << std::endl; 
-
-
 
 		}
 		else
 		{	
 			Dirichlet_all.push_back(true); 
 		}
-		system( "pause" ); 
 		
 		if( node1.attribute("enabled").as_bool() )
 		{ activated_Dirichlet_boundary_detected = true; } 
