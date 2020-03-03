@@ -96,8 +96,6 @@ data-cleanup:
 
 + Updated the list of PhysiCell_Constants in response to SourceForge ticket 11. 
 
-+ Removed unused "linker_cell" cell definition from the biorobots sample project. 
-
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  

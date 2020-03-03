@@ -76,6 +76,7 @@ using namespace PhysiCell;
 static Cell_Definition worker_cell; 
 static Cell_Definition cargo_cell; 
 static Cell_Definition director_cell; 
+static Cell_Definition linker_cell; 
 
 static int worker_ID = 0;
 static int cargo_ID = 1;
