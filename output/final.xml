@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<MultiCellDS version="0.5" type="snapshot/simulation">
+	<metadata>
+		<software>
+			<name>BioFVM</name>
+			<version>1.1.7</version>
+			<URL>http://BioFVM.MathCancer.org</URL>
+			<creator />
+			<citation />
+			<user />
+		</software>
+		<citation />
+		<current_time units="min">0.000000</current_time>
+		<current_runtime units="sec">0.119050</current_runtime>
+		<created>2020-03-04T23:40:04Z</created>
+		<last_modified>2020-03-04T23:40:04Z</last_modified>
+	</metadata>
+	<microenvironment>
+		<domain name="microenvironment">
+			<mesh type="Cartesian" uniform="true" regular="true" units="micron">
+				<bounding_box type="axis-aligned" units="micron">-1000.000000 -1000.000000 -10.000000 1000.000000 1000.000000 10.000000</bounding_box>
+				<x_coordinates delimiter=" ">-990.000000 -970.000000 -950.000000 -930.000000 -910.000000 -890.000000 -870.000000 -850.000000 -830.000000 -810.000000 -790.000000 -770.000000 -750.000000 -730.000000 -710.000000 -690.000000 -670.000000 -650.000000 -630.000000 -610.000000 -590.000000 -570.000000 -550.000000 -530.000000 -510.000000 -490.000000 -470.000000 -450.000000 -430.000000 -410.000000 -390.000000 -370.000000 -350.000000 -330.000000 -310.000000 -290.000000 -270.000000 -250.000000 -230.000000 -210.000000 -190.000000 -170.000000 -150.000000 -130.000000 -110.000000 -90.000000 -70.000000 -50.000000 -30.000000 -10.000000 10.000000 30.000000 50.000000 70.000000 90.000000 110.000000 130.000000 150.000000 170.000000 190.000000 210.000000 230.000000 250.000000 270.000000 290.000000 310.000000 330.000000 350.000000 370.000000 390.000000 410.000000 430.000000 450.000000 470.000000 490.000000 510.000000 530.000000 550.000000 570.000000 590.000000 610.000000 630.000000 650.000000 670.000000 690.000000 710.000000 730.000000 750.000000 770.000000 790.000000 810.000000 830.000000 850.000000 870.000000 890.000000 910.000000 930.000000 950.000000 970.000000 990.000000</x_coordinates>
+				<y_coordinates delimiter=" ">-990.000000 -970.000000 -950.000000 -930.000000 -910.000000 -890.000000 -870.000000 -850.000000 -830.000000 -810.000000 -790.000000 -770.000000 -750.000000 -730.000000 -710.000000 -690.000000 -670.000000 -650.000000 -630.000000 -610.000000 -590.000000 -570.000000 -550.000000 -530.000000 -510.000000 -490.000000 -470.000000 -450.000000 -430.000000 -410.000000 -390.000000 -370.000000 -350.000000 -330.000000 -310.000000 -290.000000 -270.000000 -250.000000 -230.000000 -210.000000 -190.000000 -170.000000 -150.000000 -130.000000 -110.000000 -90.000000 -70.000000 -50.000000 -30.000000 -10.000000 10.000000 30.000000 50.000000 70.000000 90.000000 110.000000 130.000000 150.000000 170.000000 190.000000 210.000000 230.000000 250.000000 270.000000 290.000000 310.000000 330.000000 350.000000 370.000000 390.000000 410.000000 430.000000 450.000000 470.000000 490.000000 510.000000 530.000000 550.000000 570.000000 590.000000 610.000000 630.000000 650.000000 670.000000 690.000000 710.000000 730.000000 750.000000 770.000000 790.000000 810.000000 830.000000 850.000000 870.000000 890.000000 910.000000 930.000000 950.000000 970.000000 990.000000</y_coordinates>
+				<z_coordinates delimiter=" ">0.000000</z_coordinates>
+				<voxels type="matlab">
+					<filename>initial_mesh0.mat</filename>
+				</voxels>
+			</mesh>
+			<variables>
+				<variable name="oxygen" units="mmHg" ID="0">
+					<physical_parameter_set>
+						<conditions />
+						<diffusion_coefficient units="micron^2/min">100000.000000</diffusion_coefficient>
+						<decay_rate units="1/min">0.100000</decay_rate>
+					</physical_parameter_set>
+				</variable>
+			</variables>
+			<data type="matlab">
+				<filename>final_microenvironment0.mat</filename>
+			</data>
+		</domain>
+	</microenvironment>
+	<cellular_information>
+		<cell_populations>
+			<cell_population type="individual">
+				<custom>
+					<simplified_data type="matlab" source="BioFVM">
+						<filename>final_cells.mat</filename>
+					</simplified_data>
+					<simplified_data type="matlab" source="PhysiCell">
+						<labels>
+							<label index="0" size="1">ID</label>
+							<label index="1" size="3">position</label>
+							<label index="4" size="1">total_volume</label>
+							<label index="5" size="1">cell_type</label>
+							<label index="6" size="1">cycle_model</label>
+							<label index="7" size="1">current_phase</label>
+							<label index="8" size="1">elapsed_time_in_phase</label>
+							<label index="9" size="1">nuclear_volume</label>
+							<label index="10" size="1">cytoplasmic_volume</label>
+							<label index="11" size="1">fluid_fraction</label>
+							<label index="12" size="1">calcified_fraction</label>
+							<label index="13" size="3">orientation</label>
+							<label index="16" size="1">polarity</label>
+							<label index="17" size="1">migration_speed</label>
+							<label index="18" size="3">motility_vector</label>
+							<label index="21" size="1">migration_bias</label>
+							<label index="22" size="3">motility_bias_direction</label>
+							<label index="25" size="1">persistence_time</label>
+							<label index="26" size="1">motility_reserved</label>
+							<label index="27" size="1">oncoprotein</label>
+						</labels>
+						<filename>final_cells_physicell.mat</filename>
+					</simplified_data>
+				</custom>
+			</cell_population>
+		</cell_populations>
+	</cellular_information>
+</MultiCellDS>
