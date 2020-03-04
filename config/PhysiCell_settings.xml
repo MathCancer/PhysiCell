@@ -126,10 +126,13 @@
 			</physical_parameter_set>
 			<initial_condition units="mmHg">38.0</initial_condition>
 			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
-			<!-- once enabled=true, xmin,xmax,ymin,ymax,zmin,zmax,interior = true with same value unless specified below --> 
+			<!-- once enabled=true, xmin,xmax,ymin,ymax,zmin,zmax = true with same value unless specified below --> 
+			<!-- interior default will use this -->
 			<Dirichlet_options> <!-- this block is optional --> 
-				<boundary ID="xmin" enabled="false">38.0</boundary>
-				<!-- allowed id: xmin,xmax,ymin,ymax,zmin,zmax,interior -->
+				<boundary ID="xmin" enabled="false"></boundary>
+				<boundary ID="xmax" enabled="true">80</boundary>
+				<boundary ID="ymin" enabled="false">80</boundary>
+				<!-- allowed id: xmin,xmax,ymin,ymax,zmin,zmax -->
 			</Dirichlet_options> 
 		</variable>
 		

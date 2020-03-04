@@ -133,6 +133,7 @@ void create_cell_types( void )
 void setup_microenvironment( void )
 {
 	// set domain parameters
+	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 
 /* now this is in XML 
 	default_microenvironment_options.X_range = {-1000, 1000}; 
@@ -166,7 +167,11 @@ void setup_microenvironment( void )
 	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
 */	
 			
+	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+
 	initialize_microenvironment(); 	
+
+	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 
 	return; 
 }	

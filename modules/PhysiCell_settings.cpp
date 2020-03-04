@@ -571,7 +571,15 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	std::vector<bool> Dirichlet_ymax = {}; 
 	std::vector<bool> Dirichlet_zmin = {}; 
 	std::vector<bool> Dirichlet_zmax = {}; 
-	std::vector<bool> Dirichlet_interior = {}; 
+
+	std::vector<double> Dirichlet_xmin_values = {}; 
+	std::vector<double> Dirichlet_xmax_values = {}; 
+	std::vector<double> Dirichlet_ymin_values = {}; 
+	std::vector<double> Dirichlet_ymax_values = {}; 
+	std::vector<double> Dirichlet_zmin_values = {}; 
+	std::vector<double> Dirichlet_zmax_values = {}; 
+	std::vector<double> Dirichlet_interior_values = {}; 
+
 
 	// next, add all the substrates to the microenvironment
 	// build the initial conditions and Dirichlet conditions as we go 
@@ -610,10 +618,157 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 		// now, get the Dirichlet value
 		node1 = xml_find_node( node, "Dirichlet_boundary_condition" ); 
 		Dirichlet_condition_vector.push_back( xml_get_my_double_value(node1) );
+
 		// now, decide whether or not to enable it 
 		Dirichlet_activation_vector.push_back( node1.attribute("enabled").as_bool() );
 		
+		// default interior activation will mirror the boundary 
+		
+		Dirichlet_xmin.push_back(true); 
+		Dirichlet_xmax.push_back(true); 
+		Dirichlet_ymin.push_back(true); 
+		Dirichlet_ymax.push_back(true); 
+		Dirichlet_zmin.push_back(true); 
+		Dirichlet_zmax.push_back(true); 
+		
+		Dirichlet_xmin_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_xmax_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_ymin_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_ymax_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_zmin_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_zmax_values.push_back( Dirichlet_condition_vector[i] ); 
+		
+		// now figure out finer-grained controls 
+		
+		node1 = node.child( "Dirichlet_options" );
+		if( node1 )
+		{
+			std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+			
+			Dirichlet_all.push_back(false); 
+			
+			std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+
+			// xmin, xmax, ymin, ymax, zmin, zmax, interior 
+			pugi::xml_node node2 = node1.child("boundary"); 
+			
+			std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+			
+			std::cout << "\t\t\t" << node2.name() << " " << node2.attribute("ID").value() << std::endl; 
+			if( std::strstr( node2.attribute("ID").value() , "xmin" ) )
+			{
+				std::cout << "\t\t\t yep" << std::endl; 
+			}
+			
+			while( node2 )
+			{
+				std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+				// which boundary? 
+				std::string boundary_ID = node2.attribute("ID").value(); 
+				
+				std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+
+				// xmin 
+				if( std::strstr( boundary_ID.c_str() , "xmin" ) )
+				{
+					std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+					
+					// on or off 
+					Dirichlet_xmin[i] = node2.attribute("enabled").as_bool();
+					
+					// which value 
+					if( Dirichlet_xmin[i] == true )
+					{ Dirichlet_xmin_values[i] = xml_get_my_double_value( node2 ); }
+				
+					std::cout << Dirichlet_xmin_values[i] << std::endl; 
+					
+					Dirichlet_all[i] = false ;
+					
+					std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+					
+				}
+				
+				std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+				
+				// xmax 
+				if( std::strstr( boundary_ID.c_str() , "xmax" ) )
+				{
+					// on or off 
+					Dirichlet_xmax[i] = node2.attribute("enabled").as_bool();
+					
+					// which value 
+					if( Dirichlet_xmax[i] == true )
+					{ Dirichlet_xmax_values[i] = xml_get_my_double_value( node2 ); }
+					
+					Dirichlet_all[i] = false ;
+				}
+				
+				// ymin 
+				if( std::strstr( boundary_ID.c_str() , "ymin" ) )
+				{
+					// on or off 
+					Dirichlet_ymin[i] = node2.attribute("enabled").as_bool();
+					
+					// which value 
+					if( Dirichlet_ymin[i] == true )
+					{ Dirichlet_ymin_values[i] = xml_get_my_double_value( node2 ); }
+					
+					Dirichlet_all[i] = false ;
+				}
+				
+				// ymax 
+				if( std::strstr( boundary_ID.c_str() , "ymax" ) )
+				{
+					// on or off 
+					Dirichlet_ymax[i] = node2.attribute("enabled").as_bool();
+					
+					// which value 
+					if( Dirichlet_ymax[i] == true )
+					{ Dirichlet_ymax_values[i] = xml_get_my_double_value( node2 ); }
+					
+					Dirichlet_all[i] = false ;
+				}				
+								
+				// zmin 
+				if( std::strstr( boundary_ID.c_str() , "zmin" ) )
+				{
+					// on or off 
+					Dirichlet_zmin[i] = node2.attribute("enabled").as_bool();
+					
+					// which value 
+					if( Dirichlet_zmin[i] == true )
+					{ Dirichlet_zmin_values[i] = xml_get_my_double_value( node2 ); }
+					
+					Dirichlet_all[i] = false ;
+				}
+				
+				// zmax 
+				if( std::strstr( boundary_ID.c_str() , "zmax" ) )
+				{
+					// on or off 
+					Dirichlet_zmax[i] = node2.attribute("enabled").as_bool();
+					
+					// which value 
+					if( Dirichlet_zmax[i] == true )
+					{ Dirichlet_zmax_values[i] = xml_get_my_double_value( node2 ); }
+					
+					Dirichlet_all[i] = false ;
+				}
+				
+				node2 = node2.next_sibling("boundary"); 
+				std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+			}
+			
+			std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+			
+		}
+		else
+		{
+			Dirichlet_all.push_back(true); 
+		}
+		
 		// now, figure out if individual boundaries are set 
+/*		
 		if( node1.attribute("boundaries") )
 		{
 			std::string option_string = node1.attribute("boundaries").value(); 
@@ -648,12 +803,12 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 			{ Dirichlet_zmax.push_back( true ); }
 			else
 			{ Dirichlet_zmax.push_back( false ); }
-
 		}
 		else
 		{	
 			Dirichlet_all.push_back(true); 
 		}
+*/		
 		
 		if( node1.attribute("enabled").as_bool() )
 		{ activated_Dirichlet_boundary_detected = true; } 
