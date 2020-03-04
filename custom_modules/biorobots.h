@@ -68,19 +68,49 @@
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
-using namespace BioFVM; 
+using namespace BioFVM;
 using namespace PhysiCell;
 
-// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
-void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
+// declare the cell types 
 
-// set the tumor cell properties, then call the function 
-// to set up the tumor cells 
+static Cell_Definition worker_cell; 
+static Cell_Definition cargo_cell; 
+static Cell_Definition director_cell; 
+static Cell_Definition linker_cell; 
+
+static int worker_ID = 0;
+static int cargo_ID = 1;
+static int linker_ID = 2; 
+static int director_ID = 3;
+
+// set up the microenvironment 
+
+void setup_microenvironment( void ); // done 
+
+// set up the cell types 
+
 void create_cell_types( void );
 
-void setup_tissue(); 
+// set up the problem geometry 
 
-// set up the microenvironment to include the immunostimulatory factor 
-void setup_microenvironment( void );  // done 
+void setup_tissue( void ); 
 
-std::vector<std::string> heterogeneity_coloring_function( Cell* );
+// coloring functions 
+
+std::vector<std::string> robot_coloring_function( Cell* pCell ); 
+
+// these are the custom functions for these cells 
+
+void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
+
+void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
+void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt ); 
+
+
+
+void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );  // done 
+
+
+

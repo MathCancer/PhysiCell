@@ -72,14 +72,13 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
-#include <string> 
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
 // custom user modules 
 
-#include "./custom_modules/heterogeneity.h" 
+#include "./custom_modules/biorobots.h" 
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -95,7 +94,7 @@ int main( int argc, char* argv[] )
 	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
 	if( !XML_status )
 	{ exit(-1); }
-
+	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
@@ -118,8 +117,6 @@ int main( int argc, char* argv[] )
 	create_cell_types();
 	setup_tissue();
 	
-	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-	
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	/* Users typically stop modifying here. END USERMODS */ 
@@ -131,16 +128,12 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_cell_data( true ); 
 	set_save_biofvm_cell_data_as_custom_matlab( true );
 	
-	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-	
 	// save a simulation snapshot 
-	
+
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
-	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
 
@@ -148,13 +141,11 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = heterogeneity_coloring_function;
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = robot_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
-	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-
 	display_citations(); 
 	
 	// set the performance timers 

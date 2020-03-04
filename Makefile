@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := heterogeneity
+PROGRAM_NAME := biorobots
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -44,15 +44,15 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := heterogeneity.o
+PhysiCell_custom_module_OBJECTS := biorobots.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
-# compile the project  
-
+#compile the project 
+	
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
 
@@ -136,8 +136,8 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-heterogeneity.o: ./custom_modules/heterogeneity.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/heterogeneity.cpp
+biorobots.o: ./custom_modules/biorobots.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/biorobots.cpp
 
 # cleanup
 

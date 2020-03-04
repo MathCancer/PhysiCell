@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">64800</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">2880</max_time> <!-- 2 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -104,12 +104,12 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">60</interval>
+			<interval units="min">2</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">2</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -119,25 +119,30 @@
 	</save>
 	
 	<microenvironment_setup>
-		<variable name="oxygen" units="mmHg" ID="0">
+		<variable name="director signal" units="dimensionless" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.00</diffusion_coefficient>
-				<decay_rate units="1/min">.1</decay_rate>  
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
-			<initial_condition units="mmHg">38.0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
-			<!-- once enabled=true, xmin,xmax,ymin,ymax,zmin,zmax = true with same value unless specified below --> 
-			<!-- interior default will use this -->
-			<Dirichlet_options> <!-- this block is optional --> 
-				<boundary ID="xmin" enabled="true"></boundary>
-				<boundary ID="xmax" enabled="true">80</boundary>
-				<boundary ID="ymin" enabled="true">160</boundary>
-				<!-- allowed id: xmin,xmax,ymin,ymax,zmin,zmax -->
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
+		</variable>
+		
+		<variable name="cargo signal" units="dimensionless" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">.4</decay_rate> <!-- 1 for cells  --> 
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
+			
+			<Dirichlet_options>
+				<boundary ID="xmin" enabled="true">0</boundary>
 			</Dirichlet_options> 
 		</variable>
 		
 		<options>
-			<calculate_gradients>false</calculate_gradients>
+			<calculate_gradients>true</calculate_gradients>
 			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
@@ -151,12 +156,35 @@
 	</microenvironment_setup>		
 	
 	<user_parameters>
-		<tumor_radius type="double" units="micron">250.0</tumor_radius>
-		<oncoprotein_mean type="double" units="dimensionless">1.0</oncoprotein_mean>
-		<oncoprotein_sd type="double" units="dimensionless">0.25</oncoprotein_sd>
-		<oncoprotein_min type="double" units="dimensionless">0.0</oncoprotein_min>
-		<oncoprotein_max type="double" units="dimensionless">2</oncoprotein_max>
-		<random_seed type="int" units="dimensionless">0</random_seed>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+
+		<!-- for microenvironment setup --> 
+		<cargo_signal_D type="double" units="micron/min^2">1e3</cargo_signal_D>
+		<cargo_signal_decay type="double" units="1/min">.4</cargo_signal_decay> <!-- 50 micron length scale -->
+		<director_signal_D type="double" units="micron/min^2">1e3</director_signal_D>
+		<director_signal_decay type="double" units="1/min">.1</director_signal_decay> <!-- 100 micron length scale -->
+		
+		<!-- for cell definitions -->
+		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>
+
+		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
+		<worker_migration_speed type="double" units="micron/min">5.0</worker_migration_speed>
+		<attached_worker_migration_bias type="double" units="dimensionless">1.0</attached_worker_migration_bias>
+		<unattached_worker_migration_bias type="double" units="dimensionless">0.5</unattached_worker_migration_bias>
+
+		<!-- tissue setup --> 
+		<number_of_directors type="int" units="none">15</number_of_directors> 
+		<number_of_cargo_clusters type="int" units="none">100</number_of_cargo_clusters>
+		<number_of_workers type="int" units="none">50</number_of_workers>
+		
+		<!-- cargo parameters --> 
+		<drop_threshold type="double" units="dimensionless">0.4</drop_threshold> 
+		
+		<!-- colors --> 
+		<worker_color type="string" units="none">red</worker_color>
+		<cargo_color type="string" units="none">blue</cargo_color>
+		<director_color type="string" units="none">limegreen</director_color> 
+	
 	</user_parameters>
 	
 </PhysiCell_settings>
