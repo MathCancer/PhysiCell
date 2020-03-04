@@ -126,7 +126,13 @@ class Microenvironment
 	std::vector<bool> dirichlet_node_map; 
 	*/
 	std::vector< std::vector<double> > dirichlet_value_vectors; 
-	std::vector<bool> dirichlet_activation_vector; 	
+	std::vector<bool> dirichlet_activation_vector; 
+	
+	/* new in Version 1.7.0 -- activation vectors can be specified 
+	   on a voxel-by-voxel basis */ 
+	   
+	std::vector< std::vector<bool> > dirichlet_activation_vectors; 
+	
  public:
 	
 	/*! The mesh for the diffusing quantities */ 
@@ -237,8 +243,14 @@ class Microenvironment
 	void remove_dirichlet_node( int voxel_index ); 
 	void apply_dirichlet_conditions( void ); 
 
-	void set_substrate_dirichlet_activation( int substrate_index , bool new_value ); 
-	double get_substrate_dirichlet_activation( int substrate_index ); 
+	// set for ALL Dirichlet nodes -- 1.7.0
+	void set_substrate_dirichlet_activation( int substrate_index , bool new_value );  
+	// not quite as relevant as it used to be ?? -- 1.7.0 
+	bool get_substrate_dirichlet_activation( int substrate_index );   
+	
+	// new functions for finer-grained control of Dirichlet conditions -- 1.7.0
+	void set_substrate_dirichlet_activation( int substrate_index , int index, bool new_value );  
+	bool get_substrate_dirichlet_activation( int substrate_index, int index );  
 	
 	bool& is_dirichlet_node( int voxel_index ); 
 
@@ -304,6 +316,7 @@ class Microenvironment_Options
 	/* new in PhysiCell 1.7.0 to enable setting Dirichlet conditions 
 	   on a boundary-by-boundary basis */
 	std::vector<bool> Dirichlet_all; 
+	std::vector<bool> Dirichlet_interior; 
 	std::vector<bool> Dirichlet_xmin; 
 	std::vector<bool> Dirichlet_xmax; 
 	std::vector<bool> Dirichlet_ymin; 

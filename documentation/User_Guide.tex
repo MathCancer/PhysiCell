@@ -1217,8 +1217,20 @@ the microenvironment, or at later times using the function
 
 \smallcode{void Microenvironment::set\_substrate\_dirichlet\_activation( int substrate\_index , bool new\_value )} 
 This function sets the substrate at index \v|substrate_index| to have/not have a Dirichlet condition 
-based on the \v|true|/\v|false| value of \v|new_value|.
+based on the \v|true|/\v|false| value of \v|new_value|. This activation vector is applied to \emph{all} voxels. 
 
+\smallcode{bool Microenvironment::get\_substrate\_dirichlet\_activation( int substrate\_index )} 
+This function returns the default enabled/disabled state of Dirichlet conditions for substrate with 
+index \break \v|substrate_index|. Note that if any particular voxel is not a Dirichlet node, then this value 
+is not relevant. 
+
+\smallcode{void Microenvironment::set\_substrate\_dirichlet\_activation( int substrate\_index , int index, bool new\_value  )} 
+This function sets the substrate at index \v|substrate_index| in voxel \v|index| to have/not have a Dirichlet condition 
+based on the \v|true|/\v|false| value of \v|new_value|. 
+
+\smallcode{bool Microenvironment::get\_substrate\_dirichlet\_activation( int substrate\_index , int index )} 
+This function returns the enabled/disabled state of Dirichlet conditions for substrate with 
+index \v|substrate_index| in voxel \v|index|. 
 
 For example: 
 \begin{verbatim}

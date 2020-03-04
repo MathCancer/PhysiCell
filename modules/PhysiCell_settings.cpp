@@ -571,6 +571,7 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	std::vector<bool> Dirichlet_ymax = {}; 
 	std::vector<bool> Dirichlet_zmin = {}; 
 	std::vector<bool> Dirichlet_zmax = {}; 
+	std::vector<bool> Dirichlet_interior = {}; 
 
 	// next, add all the substrates to the microenvironment
 	// build the initial conditions and Dirichlet conditions as we go 
