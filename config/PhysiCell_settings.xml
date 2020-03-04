@@ -129,9 +129,9 @@
 			<!-- once enabled=true, xmin,xmax,ymin,ymax,zmin,zmax = true with same value unless specified below --> 
 			<!-- interior default will use this -->
 			<Dirichlet_options> <!-- this block is optional --> 
-				<boundary ID="xmin" enabled="false"></boundary>
+				<boundary ID="xmin" enabled="true"></boundary>
 				<boundary ID="xmax" enabled="true">80</boundary>
-				<boundary ID="ymin" enabled="false">80</boundary>
+				<boundary ID="ymin" enabled="true">160</boundary>
 				<!-- allowed id: xmin,xmax,ymin,ymax,zmin,zmax -->
 			</Dirichlet_options> 
 		</variable>

@@ -677,7 +677,6 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					Dirichlet_xmin[i] = node2.attribute("enabled").as_bool();
 					
 					// which value 
-					if( Dirichlet_xmin[i] == true )
 					{ Dirichlet_xmin_values[i] = xml_get_my_double_value( node2 ); }
 				
 					std::cout << Dirichlet_xmin_values[i] << std::endl; 
@@ -697,9 +696,10 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					Dirichlet_xmax[i] = node2.attribute("enabled").as_bool();
 					
 					// which value 
-					if( Dirichlet_xmax[i] == true )
 					{ Dirichlet_xmax_values[i] = xml_get_my_double_value( node2 ); }
 					
+					std::cout << Dirichlet_xmax_values[i] << std::endl; 
+
 					Dirichlet_all[i] = false ;
 				}
 				
@@ -710,9 +710,10 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					Dirichlet_ymin[i] = node2.attribute("enabled").as_bool();
 					
 					// which value 
-					if( Dirichlet_ymin[i] == true )
 					{ Dirichlet_ymin_values[i] = xml_get_my_double_value( node2 ); }
 					
+					std::cout << Dirichlet_ymin_values[i] << std::endl; 
+
 					Dirichlet_all[i] = false ;
 				}
 				
@@ -723,9 +724,10 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					Dirichlet_ymax[i] = node2.attribute("enabled").as_bool();
 					
 					// which value 
-					if( Dirichlet_ymax[i] == true )
 					{ Dirichlet_ymax_values[i] = xml_get_my_double_value( node2 ); }
 					
+					std::cout << Dirichlet_ymax_values[i] << std::endl; 
+
 					Dirichlet_all[i] = false ;
 				}				
 								
@@ -736,7 +738,6 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					Dirichlet_zmin[i] = node2.attribute("enabled").as_bool();
 					
 					// which value 
-					if( Dirichlet_zmin[i] == true )
 					{ Dirichlet_zmin_values[i] = xml_get_my_double_value( node2 ); }
 					
 					Dirichlet_all[i] = false ;
@@ -749,7 +750,6 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					Dirichlet_zmax[i] = node2.attribute("enabled").as_bool();
 					
 					// which value 
-					if( Dirichlet_zmax[i] == true )
 					{ Dirichlet_zmax_values[i] = xml_get_my_double_value( node2 ); }
 					
 					Dirichlet_all[i] = false ;
