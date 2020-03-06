@@ -316,13 +316,21 @@ class Microenvironment_Options
 	/* new in PhysiCell 1.7.0 to enable setting Dirichlet conditions 
 	   on a boundary-by-boundary basis */
 	std::vector<bool> Dirichlet_all; 
-	std::vector<bool> Dirichlet_interior; 
+	
+//	std::vector<bool> Dirichlet_interior; 
 	std::vector<bool> Dirichlet_xmin; 
 	std::vector<bool> Dirichlet_xmax; 
 	std::vector<bool> Dirichlet_ymin; 
 	std::vector<bool> Dirichlet_ymax; 
 	std::vector<bool> Dirichlet_zmin; 
 	std::vector<bool> Dirichlet_zmax; 
+
+	std::vector<double> Dirichlet_xmin_values; 
+	std::vector<double> Dirichlet_xmax_values; 
+	std::vector<double> Dirichlet_ymin_values; 
+	std::vector<double> Dirichlet_ymax_values; 
+	std::vector<double> Dirichlet_zmin_values; 
+	std::vector<double> Dirichlet_zmax_values; 
 	
 	std::vector<double> initial_condition_vector; 
 	

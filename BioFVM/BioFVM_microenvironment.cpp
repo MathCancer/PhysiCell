@@ -164,6 +164,13 @@ Microenvironment::Microenvironment()
 	default_microenvironment_options.Dirichlet_zmin.assign( 1 , false ); 
 	default_microenvironment_options.Dirichlet_zmax.assign( 1 , false ); 
 	
+	default_microenvironment_options.Dirichlet_xmin_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.assign( 1 , 1.0 ); 
+	
 	if(default_microenvironment==NULL)
 	{ default_microenvironment=this; }
 
@@ -432,7 +439,7 @@ void Microenvironment::resize_densities( int new_size )
 	default_microenvironment_options.initial_condition_vector.assign( new_size , 1.0 ); 
 	
 	default_microenvironment_options.Dirichlet_all.assign( new_size , true ); 
-	default_microenvironment_options.Dirichlet_interior.assign( new_size, true );
+//	default_microenvironment_options.Dirichlet_interior.assign( new_size, true );
 	default_microenvironment_options.Dirichlet_xmin.assign( new_size , false ); 
 	default_microenvironment_options.Dirichlet_xmax.assign( new_size , false ); 
 	default_microenvironment_options.Dirichlet_ymin.assign( new_size , false ); 
@@ -440,6 +447,13 @@ void Microenvironment::resize_densities( int new_size )
 	default_microenvironment_options.Dirichlet_zmin.assign( new_size , false ); 
 	default_microenvironment_options.Dirichlet_zmax.assign( new_size , false ); 
 	
+	default_microenvironment_options.Dirichlet_xmin_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.assign( new_size , 1.0 ); 
+
 	return; 
 }
 
@@ -496,13 +510,20 @@ void Microenvironment::add_density( void )
 	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
 
 	default_microenvironment_options.Dirichlet_all.push_back( true ); 
-	default_microenvironment_options.Dirichlet_interior.push_back( true );
+//	default_microenvironment_options.Dirichlet_interior.push_back( true );
 	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
 	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
 	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
+	
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 
 	
 	return; 
 }
@@ -557,13 +578,20 @@ void Microenvironment::add_density( std::string name , std::string units )
 	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
 
 	default_microenvironment_options.Dirichlet_all.push_back( true ); 
-	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
+//	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
 	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
 	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
 	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
+	
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 	
 
 	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
 	
@@ -622,13 +650,20 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
 	
 	default_microenvironment_options.Dirichlet_all.push_back( true ); 
-	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
+//	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
 	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
 	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
 	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
+	
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 	
 
 	return; 
 }
@@ -1200,7 +1235,7 @@ Microenvironment_Options::Microenvironment_Options()
 	track_internalized_substrates_in_each_agent = false; 
 
 	Dirichlet_all.push_back( true ); 
-	Dirichlet_interior.push_back( true ); 
+//	Dirichlet_interior.push_back( true ); 
 	Dirichlet_xmin.push_back( false ); 
 	Dirichlet_xmax.push_back( false ); 
 	Dirichlet_ymin.push_back( false ); 
@@ -1208,6 +1243,12 @@ Microenvironment_Options::Microenvironment_Options()
 	Dirichlet_zmin.push_back( false ); 
 	Dirichlet_zmax.push_back( false ); 
 
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 
 	
 	return; 
 }
@@ -1264,12 +1305,81 @@ void initialize_microenvironment( void )
 				  << std::endl << std::endl;  
 		default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector; 
 	}
-	
+
+	// set the initial condition 
 	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
+
+	// now, figure out which sides have BCs (for at least one substrate): 
+
+	bool xmin = false; 
+	bool xmax = false; 
+	bool ymin = false; 
+	bool ymax = false; 
+	bool zmin = false; 
+	bool zmax = false; 
 	
+	if( default_microenvironment_options.outer_Dirichlet_conditions == true )
+	{
+		for( int n=0 ; n < microenvironment.number_of_densities() ; n++ )
+		{
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_xmin[n] )
+				{ xmin = true; }
+			
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_xmax[n] )
+				{ xmax = true; }
+			
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_ymin[n] )
+				{ ymin = true; }
+			
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_ymax[n] )
+				{ ymax = true; }
+				
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_zmin[n] )
+				{ zmin = true; }
+			
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_zmax[n] )
+				{ zmax = true; }
+		}
+		
+		// add the Dirichlet nodes in the right places 
+		
+	}
+	std::cout << "which boundaries?" << std::endl; 
+	std::cout << xmin << " " << xmax << " " << ymin << " " << ymax << " " << zmin << " " << zmax << std::endl; 
 	
+	exit(0); 
+
 	
+	if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
+	{
+		// set xmin if xmin = true or all = true 
+		
+		// set xmax if xmax = true or all = true 
+		
+		// set ymin if ymin = true or all = true 
+		
+		// set ymzx if ymax = true or all = true; 
+		
+		// if not 2D:
+		if( default_microenvironment_options.simulate_2D == false )
+		{
+			// set zmin if zmin = true or all = true 
+			
+			// set zmax if zmax = true or all = true 
+		}
+		
+		
+		
+	}
+	
+/*
 	if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
 	{
 		
@@ -1304,6 +1414,7 @@ void initialize_microenvironment( void )
 		}
 		
 	}
+*/
 	
 	// set the Dirichlet condition activation vector to match the microenvironment options 
 	for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
