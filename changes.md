@@ -83,6 +83,7 @@ This release ...
 
 + The various Microenvironment::add_density() functions now 
 
++ Added function Microenvironment::set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ) to set the entire vector of activatio at a specific voxel. 
 
 
 ### Beta features (not fully supported):

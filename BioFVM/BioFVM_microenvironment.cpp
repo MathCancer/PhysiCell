@@ -238,6 +238,13 @@ void Microenvironment::set_substrate_dirichlet_activation( int substrate_index ,
 	return; 
 }
 
+void Microenvironment::set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value )
+{
+	dirichlet_activation_vectors[index] = new_value; 
+	return; 
+}
+
+
 bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index )
 {
 	return dirichlet_activation_vector[substrate_index]; 
@@ -1353,29 +1360,129 @@ void initialize_microenvironment( void )
 	}
 	std::cout << "which boundaries?" << std::endl; 
 	std::cout << xmin << " " << xmax << " " << ymin << " " << ymax << " " << zmin << " " << zmax << std::endl; 
-	
-	exit(0); 
 
-	
+	// add the Dirichlet nodes in the right places 
+	// now, go in and set the values 
 	if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
 	{
 		// set xmin if xmin = true or all = true 
+		if( xmin == true )
+		{
+			for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+			{
+				int I = 0; 
+				// set Dirichlet conditions along the xmin outer edges 
+				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
+				{
+					// set the value 
+					microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_xmin_values );
+					
+					// set the activation 
+					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(I,j,k) , 
+					default_microenvironment_options.Dirichlet_xmin ); 
+					
+				}
+			}
+		}			
 		
 		// set xmax if xmax = true or all = true 
+		if( xmax == true )
+		{
+			for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+			{
+				int I = microenvironment.mesh.x_coordinates.size()-1;; 
+				// set Dirichlet conditions along the xmax outer edges 
+				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
+				{
+					// set the values 
+					microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_xmax_values );
+					
+					// set the activation 
+					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(I,j,k) , 
+					default_microenvironment_options.Dirichlet_xmax ); 
+				}
+			}
+		}			
 		
 		// set ymin if ymin = true or all = true 
+		if( ymin == true )
+		{
+			for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+			{
+				int J = 0; // microenvironment.mesh.x_coordinates.size()-1;; 
+				// set Dirichlet conditions along the ymin outer edges 
+				for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+				{
+					// set the values 
+					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_ymin_values );
+					
+					// set the activation 
+					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,J,k) , 
+					default_microenvironment_options.Dirichlet_ymin ); 
+				}
+			}
+		}	
 		
 		// set ymzx if ymax = true or all = true; 
+		if( ymax == true )
+		{
+			for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+			{
+				int J = microenvironment.mesh.y_coordinates.size()-1;; 
+				// set Dirichlet conditions along the ymin outer edges 
+				for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+				{
+					// set the value 
+					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_ymax_values );
+					
+					// set the activation 
+					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,J,k) , 
+					default_microenvironment_options.Dirichlet_ymax ); 
+				}
+			}
+		}	
 		
 		// if not 2D:
 		if( default_microenvironment_options.simulate_2D == false )
 		{
 			// set zmin if zmin = true or all = true 
+			if( zmin == true )
+			{
+				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
+				{
+					int K = 0; // microenvironment.mesh.z_coordinates.size()-1;; 
+					// set Dirichlet conditions along the ymin outer edges 
+					for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+					{
+						// set the value 
+						microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_zmin_values );
+					
+						// set the activation 
+						microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,j,K) , 
+						default_microenvironment_options.Dirichlet_zmin ); 
+					}
+				}
+			}				
 			
 			// set zmax if zmax = true or all = true 
+			if( zmax == true )
+			{
+				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
+				{
+					int K = microenvironment.mesh.z_coordinates.size()-1;; 
+					// set Dirichlet conditions along the ymin outer edges 
+					for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+					{
+						// set the value 
+						microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_zmax_values );
+						
+						// set the activation 
+						microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,j,K) , 
+						default_microenvironment_options.Dirichlet_zmax ); 						
+					}
+				}
+			}				
 		}
-		
-		
 		
 	}
 	

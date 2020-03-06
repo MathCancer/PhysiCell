@@ -250,6 +250,7 @@ class Microenvironment
 	
 	// new functions for finer-grained control of Dirichlet conditions -- 1.7.0
 	void set_substrate_dirichlet_activation( int substrate_index , int index, bool new_value );  
+	void set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ); 
 	bool get_substrate_dirichlet_activation( int substrate_index, int index );  
 	
 	bool& is_dirichlet_node( int voxel_index ); 
