@@ -87,12 +87,13 @@ void display_tree( pugi::xml_node& node , int level )
 {
 	for( int n = 0; n < level ; n++ )
 	{ std::cout << "  "; } 
-	std::cout << node.name() << " : " << node.value() << std::endl;
+	std::cout << node.name() << " : " << xml_get_my_string_value( node ) << std::endl; //  node.value() << std::endl;
 	
 	pugi::xml_node n1 = node.first_child(); 
 	while( n1 )
 	{
-		display_tree( n1 , level+1 ); 
+		if( std::strlen( n1.name() ) )
+		{ display_tree( n1 , level+1 ); }
 		n1 = n1.next_sibling(); 
 	}
 	
