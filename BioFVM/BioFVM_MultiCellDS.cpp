@@ -1042,10 +1042,13 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 
 void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M )
 {
+	
 	add_MultiCellDS_main_structure_to_open_xml_pugi( xml_dom ); 
+	
 	BioFVM_metadata.add_to_open_xml_pugi( current_simulation_time , xml_dom ); 
 
 	add_BioFVM_substrates_to_open_xml_pugi( xml_dom , filename_base, M  ); 
+
 	// add vessels (if there) 
 	// add basic agents (if there)
 	add_BioFVM_agents_to_open_xml_pugi( xml_dom , filename_base, M); 

@@ -2,7 +2,7 @@
 
 **Version:** 1.7.0
 
-**Release date:** ?? February 2020
+**Release date:** ?? March 2020
 
 ## Release summary: 
 
@@ -67,8 +67,23 @@ This release ...
 
 + All sample projects now automatically build (and display) the registries of cell definitions via build_cell_definitions_maps() and display_cell_definitions(). 
 
-+ added the following std::vector<bool> to Microenvironment_Options to facilitate setting Dirichlet conditions on specific boundaries for specific substates: Dirichlet_all, Dirichlet_xmin, Dirichlet_xmax, Dirichlet_ymin, Dirichlet_ymax, Dirichlet_zmin, Dirichlet_zmax. 
++ added the following std::vector<bool> to Microenvironment_Options to facilitate setting Dirichlet conditions on specific boundaries for specific substates: Dirichlet_all, Dirichlet_xmin, Dirichlet_xmax, Dirichlet_ymin, Dirichlet_ymax, Dirichlet_zmin, Dirichlet_zmax, Dirichlet_interior. 
 
++ Minor cleanup in BioFVM_microenvironment.cpp 
+
++ Microenvironment::update_dirichlet_node(voxel_index,substrate_index,value) now sets dirichlet_activation_vectors[voxel_index][substrate_index] = true; 
+
++ Microenvironment::set_substrate_dirichlet_activation( int substrate_index , bool new_value ) now sets dirichlet_activation_vectors[voxel_index][substrate_index] for ALL Dirichlet nodes. 
+
++ Microenvironment::apply_dirichlet_conditions() now checks the Dirichlet activation vector of the individual voxel. 
+
++ Microenvironment::resize_voxels() and the various Microenvironment::resize_space() functions now resize dirichlet_activation_vectors, using the default dirichlet_activation_vector as the initial uniform activation vector. 
+
++ Microenvironment::resize_densities() and the various Microenvironment::add_density() functions now resize dirichlet_activation_vector and use it to intialize dirichlet_activation_vectors at every voxel. 
+
++ The various Microenvironment::add_density() functions now 
+
++ Added function Microenvironment::set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ) to set the entire vector of activation at a specific voxel. 
 
 
 ### Beta features (not fully supported):
@@ -95,6 +110,10 @@ data-cleanup:
 + Removed the false statement from the user manual that stated that relative cell rupture volume is between 0 and 1. 
 
 + Updated the list of PhysiCell_Constants in response to SourceForge ticket 11. 
+
++ The various Microenvironment::add_density() functions now only set dirichlet_activation_vector = true for the newly added substrate, rather than *all* of them. This new vector is then used to initialize the activation vectors at every voxel. 
+
++ Microenvironment::get_substrate_dirichlet_activation() mistakenly returned a double. Now it returns bool. 
 
 ### Notices for intended changes that may affect backwards compatibility:
  
@@ -292,7 +311,7 @@ http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml
 
 + Created new function to access the (private) microenvironment dirichlet_activation_vector: 
  
-double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
+  double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
 
 + Updated the main microenvironment display function Microenvironment::display_information to summarize the initial and boundary conditions for each substrate 
 

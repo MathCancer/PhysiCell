@@ -1217,8 +1217,20 @@ the microenvironment, or at later times using the function
 
 \smallcode{void Microenvironment::set\_substrate\_dirichlet\_activation( int substrate\_index , bool new\_value )} 
 This function sets the substrate at index \v|substrate_index| to have/not have a Dirichlet condition 
-based on the \v|true|/\v|false| value of \v|new_value|.
+based on the \v|true|/\v|false| value of \v|new_value|. This activation vector is applied to \emph{all} voxels. 
 
+\smallcode{bool Microenvironment::get\_substrate\_dirichlet\_activation( int substrate\_index )} 
+This function returns the default enabled/disabled state of Dirichlet conditions for substrate with 
+index \break \v|substrate_index|. Note that if any particular voxel is not a Dirichlet node, then this value 
+is not relevant. 
+
+\smallcode{void Microenvironment::set\_substrate\_dirichlet\_activation( int substrate\_index , int index, bool new\_value  )} 
+This function sets the substrate at index \v|substrate_index| in voxel \v|index| to have/not have a Dirichlet condition 
+based on the \v|true|/\v|false| value of \v|new_value|. 
+
+\smallcode{bool Microenvironment::get\_substrate\_dirichlet\_activation( int substrate\_index , int index )} 
+This function returns the enabled/disabled state of Dirichlet conditions for substrate with 
+index \v|substrate_index| in voxel \v|index|. 
 
 For example: 
 \begin{verbatim}
@@ -4755,6 +4767,10 @@ Each chemical substrate is defined in a \smallcode{variable} of the following fo
    <initial_condition units="UNITS">VALUE3</initial_condition>
    <Dirichlet_boundary_condition units="UNITS" enabled="true">VALUE4
       </Dirichlet_boundary_condition>
+      <Dirichlet_options>
+         <boundary_value ID="VALUE5" enabled="false">VALUE6</boundary>
+         <!-- ... and so forth -->
+      </Dirichlet_options>
 </variable>
 \end{verbatim}
 Each \smallcode{variable} has the following attributes: 
@@ -4795,6 +4811,18 @@ on the simulation boundary.
 
 The units are indicated as the \smallcode{units} attribute. 
 If your units are self-consistent, they should match UNITS in the \smallcode{variable} above.
+
+\item \smallcode{Dirichlet\_options} is an \emph{optional} element that 
+allows finer grained control on Dirichlet conditions. If \smallcode{Dirchlet\_options} is missing, the Dirichlet condition is applied 
+to all or none of the boundaries with equal value (indicated by \v+VALUE4+). 
+
+If \smallcode{Dirichlet\_options} is present, any individual boundary can have a separate activated/deacticated state 
+and boundary condition value with a separate \smallcode{boundary\_value} element. The boundary is specified 
+with the \smallcode{ID} attribute, where \v+VALUE5+ is one of (\v+xmin+, \v+xmax+, \v+ymin+, \v+ymax+, \v+zmin+, 
+or \v+zmax+), and substrate concentration (density) on that boundary is given by \v+VALUE6+. Notice that 
+if \v+enabled=false+, then the Dirichlet condition is \emph{disabled} on the indicated boundary, leaving 
+instead a Neumann (zero flux) condition for this substrate on this boundary.
+
 \end{itemize}
 
 Next, \smallcode{options} helps configure additional code behaviors: 
@@ -4822,9 +4850,10 @@ users can set Dirichlet nodes using the functions in Section
 
 \end{itemize}
 
-Here is a sample of a microenvironment with two substrates (oxygen and glucose), 
-where there is a Dirichlet boundary condition for oxygen, but none for glucose. 
-(Note that all units are in $\micron$ and minutes.) Here, we compute all gradients, 
+Here is a sample of a microenvironment with three substrates (oxygen, glucose, and signal), 
+where there is a Dirichlet boundary condition for oxygen on all boundaries, 
+a Dirichlet condition for glucose on the bottom z boundary only, and no Dirichlet condition 
+for signal. (Note that all units are in $\micron$ and minutes.) Here, we compute all gradients, 
 but do not track internalized substrates.  
 \begin{verbatim}
 <microenvironment_setup>
@@ -4838,7 +4867,25 @@ but do not track internalized substrates.
         enabled="true">38</Dirichlet_boundary_condition>
    </variable>
    
-   <variable name="immunostimulatory factor" units="dimensionless" ID="1">
+   <variable name="glucose" units="dimensionless" ID="1">
+      <physical_parameter_set>
+         <diffusion_coefficient units="micron^2/min">18000</diffusion_coefficient>
+         <decay_rate units="1/min">0.0</decay_rate>  
+      </physical_parameter_set>
+      <initial_condition units="dimensionless">1</initial_condition>
+      <Dirichlet_boundary_condition units="dimensionless"
+         enabled="true">0</Dirichlet_boundary_condition>
+      <Dirichlet_options>
+         <boundary_value ID="xmin" enabled="false">0</boundary_value>
+         <boundary_value ID="xmax" enabled="false">0</boundary_value>
+         <boundary_value ID="ymin" enabled="false">0</boundary_value>
+         <boundary_value ID="ymax" enabled="false">0</boundary_value>
+         <boundary_value ID="zmin" enabled="true">1</boundary_value>
+         <boundary_value ID="zmax" enabled="false">0</boundary_value>
+      </Dirichlet_options>
+   </variable>      
+
+   <variable name="signal" units="dimensionless" ID="2">
       <physical_parameter_set>
          <diffusion_coefficient units="micron^2/min">18000</diffusion_coefficient>
          <decay_rate units="1/min">0.0</decay_rate>  
