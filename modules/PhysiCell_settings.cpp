@@ -650,7 +650,7 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 			std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 
 			// xmin, xmax, ymin, ymax, zmin, zmax, interior 
-			pugi::xml_node node2 = node1.child("boundary"); 
+			pugi::xml_node node2 = node1.child("boundary_value"); 
 			
 			while( node2 )
 			{
