@@ -125,16 +125,21 @@
 				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="true">1</Dirichlet_boundary_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="true">1000</Dirichlet_boundary_condition>
 			<Dirichlet_options>
-				<boundary ID="xmin" enabled="false">98</boundary>
-				<boundary ID="xmax" enabled="true">14</boundary>
-				<boundary ID="ymin" enabled="false">98</boundary>
-				<boundary ID="ymax" enabled="true">14</boundary>
-				<boundary ID="zmin" enabled="false">98</boundary>
-				<boundary ID="zmax" enabled="false">14</boundary>
+				<boundary_value ID="xmin" enabled="false">0</boundary>
+				<boundary ID="xmax" enabled="true">1</boundary>
 			</Dirichlet_options>
 		</variable>
+		
+<!--
+feedback: 
+make it clearer that vlaue is the boundary value 
+
+boundary ==> boundary_value
+
+
+-->		
 		
 		<variable name="cargo signal" units="dimensionless" ID="1">
 			<physical_parameter_set>
@@ -142,7 +147,7 @@
 				<decay_rate units="1/min">.4</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1000</Dirichlet_boundary_condition>
 
 		</variable>
 		
