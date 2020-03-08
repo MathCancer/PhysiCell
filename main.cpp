@@ -83,24 +83,6 @@
 using namespace BioFVM;
 using namespace PhysiCell;
 
-void display_tree( pugi::xml_node& node , int level )
-{
-	for( int n = 0; n < level ; n++ )
-	{ std::cout << "  "; } 
-	std::cout << node.name() << " : " << xml_get_my_string_value( node ) << std::endl; //  node.value() << std::endl;
-	
-	pugi::xml_node n1 = node.first_child(); 
-	while( n1 )
-	{
-		if( std::strlen( n1.name() ) )
-		{ display_tree( n1 , level+1 ); }
-		n1 = n1.next_sibling(); 
-	}
-	
-	return; 
-}
-
-
 int main( int argc, char* argv[] )
 {
 	// load and parse settings file(s)
@@ -181,69 +163,6 @@ int main( int argc, char* argv[] )
 	}
 	
 	// main loop 
-	
-	pugi::xml_node n0 = physicell_config_root;
-	std::cout << n0.name() << std::endl; 
-	
-	n0 = n0.child( "cell_definitions" );
-	
-	display_tree( n0 , 0 ); 
-	
-/*	
-	if( n0 )
-	{
-		pugi::xml_node n1 = n0.child( "cell_definition" ); 
-		while( n1 )
-		{
-			std::cout << n1.attribute( "name" ).value() << std::endl; 
-			
-			pugi::xml_node n2 = n1.first_child(); 
-			while( n2 )
-			{
-				std::cout << "\t" << n2.name() << " " << n2.value() << std::endl; 
-				n2 = n2.next_sibling(); 
-			}
-			
-			n1 = n1.next_sibling(); 
-		}
-	}
-*/	
-	
-	// now, let's try to "repair" the tree 
-	pugi::xml_node source = n0.child( "cell_definition" ); 
-	pugi::xml_node destination = source.next_sibling(); 
-	
-	destination = source; 
-	
-	n0 = physicell_config_root; 
-	n0 = n0.child( "cell_definitions" );
-	
-	display_tree( n0 , 0 ); 
-	
-	display_tree( physicell_config_root , 0 ); 
-	
-/*	
-	if( n0 )
-	{
-		pugi::xml_node n1 = n0.child( "cell_definition" ); 
-		while( n1 )
-		{
-			std::cout << n1.attribute( "name" ).value() << std::endl; 
-			
-			pugi::xml_node n2 = n1.first_child(); 
-			while( n2 )
-			{
-				std::cout << "\t" << n2.name() << " " << n2.value() << std::endl; 
-				n2 = n2.next_sibling(); 
-			}
-			
-			n1 = n1.next_sibling(); 
-		}
-	}
-*/	
-	
-	exit(0); 
-	
 	
 	try 
 	{	

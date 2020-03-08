@@ -125,21 +125,8 @@
 				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="true">1000</Dirichlet_boundary_condition>
-			<Dirichlet_options>
-				<boundary_value ID="xmin" enabled="false">0</boundary>
-				<boundary ID="xmax" enabled="true">1</boundary>
-			</Dirichlet_options>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
 		</variable>
-		
-<!--
-feedback: 
-make it clearer that vlaue is the boundary value 
-
-boundary ==> boundary_value
-
-
--->		
 		
 		<variable name="cargo signal" units="dimensionless" ID="1">
 			<physical_parameter_set>
@@ -147,8 +134,7 @@ boundary ==> boundary_value
 				<decay_rate units="1/min">.4</decay_rate> <!-- 1 for cells  --> 
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1000</Dirichlet_boundary_condition>
-
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
 		</variable>
 		
 		<options>
@@ -163,19 +149,7 @@ boundary ==> boundary_value
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
 		</options>
-	</microenvironment_setup>
-	
-	<cell_definitions>
-		<cell_definition name="default" ID="0">
-			<one>1</one>
-			<two>2</two>
-		</cell_definition> 
-		
-		<cell_definition name="cancer" ID="1" parent_type="default">
-			<one>0</one>
-		</cell_definition> 
-	
-	</cell_definitions>
+	</microenvironment_setup>		
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 

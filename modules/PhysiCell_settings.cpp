@@ -647,24 +647,17 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 		node1 = node.child( "Dirichlet_options" );
 		if( node1 )
 		{
-			std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-
 			// xmin, xmax, ymin, ymax, zmin, zmax, interior 
 			pugi::xml_node node2 = node1.child("boundary_value"); 
 			
 			while( node2 )
 			{
-				std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 				// which boundary? 
 				std::string boundary_ID = node2.attribute("ID").value(); 
 				
-				std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-
 				// xmin 
 				if( std::strstr( boundary_ID.c_str() , "xmin" ) )
 				{
-					std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-					
 					// on or off 
 					Dirichlet_xmin[i] = node2.attribute("enabled").as_bool();
 					// if there is at least one off bondary here, "all" is false for this substrate 
@@ -673,14 +666,7 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					
 					// which value 
 					{ Dirichlet_xmin_values[i] = xml_get_my_double_value( node2 ); }
-				
-					std::cout << Dirichlet_xmin_values[i] << std::endl; 
-					
-					std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-					
 				}
-				
-				std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 				
 				// xmax 
 				if( std::strstr( boundary_ID.c_str() , "xmax" ) )
@@ -693,8 +679,6 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 				
 					// which value 
 					{ Dirichlet_xmax_values[i] = xml_get_my_double_value( node2 ); }
-					
-					std::cout << Dirichlet_xmax_values[i] << std::endl; 
 				}
 				
 				// ymin 
@@ -708,9 +692,6 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 				
 					// which value 
 					{ Dirichlet_ymin_values[i] = xml_get_my_double_value( node2 ); }
-					
-					std::cout << Dirichlet_ymin_values[i] << std::endl; 
-
 				}
 				
 				// ymax 
@@ -724,8 +705,6 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					
 					// which value 
 					{ Dirichlet_ymax_values[i] = xml_get_my_double_value( node2 ); }
-					
-					std::cout << Dirichlet_ymax_values[i] << std::endl; 
 				}				
 								
 				// zmin 
@@ -755,13 +734,8 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 				}
 				
 				node2 = node2.next_sibling("boundary"); 
-				std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 			}
-			
-			std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-			
 		}
-
 		
 		// now, figure out if individual boundaries are set 
 /*		

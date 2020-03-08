@@ -644,25 +644,17 @@ void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base , Microen
 {
 	// start with a standard BioFVM save
 	
-	std::cout << "\t" << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
-	
 	add_BioFVM_to_open_xml_pugi( BioFVM::biofvm_doc , filename_base , current_simulation_time , M ); 
 	
 	// now, add the PhysiCell data 
-	
-	std::cout << "\t" << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 
 	add_PhysiCell_cells_to_open_xml_pugi( BioFVM::biofvm_doc , filename_base , M  ); 
 		
 	// Lastly, save to the indicated filename 
-	
-	std::cout << "\t" << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 
 	char filename[1024]; 
 	sprintf( filename , "%s.xml" , filename_base.c_str() ); 
 	BioFVM::biofvm_doc.save_file( filename );
-	
-	std::cout << "\t" << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 
 	return; 
 }
