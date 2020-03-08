@@ -83,7 +83,7 @@ This release ...
 
 + The various Microenvironment::add_density() functions now 
 
-+ Added function Microenvironment::set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ) to set the entire vector of activatio at a specific voxel. 
++ Added function Microenvironment::set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ) to set the entire vector of activation at a specific voxel. 
 
 
 ### Beta features (not fully supported):
@@ -311,7 +311,7 @@ http://mathcancer.org/blog/setting-up-the-physicell-microenvironment-with-xml
 
 + Created new function to access the (private) microenvironment dirichlet_activation_vector: 
  
-double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
+  double Microenvironment::get_substrate_dirichlet_activation( int substrate_index ); 
 
 + Updated the main microenvironment display function Microenvironment::display_information to summarize the initial and boundary conditions for each substrate 
 

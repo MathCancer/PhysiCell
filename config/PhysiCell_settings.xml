@@ -163,7 +163,19 @@ boundary ==> boundary_value
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
 		</options>
-	</microenvironment_setup>		
+	</microenvironment_setup>
+	
+	<cell_definitions>
+		<cell_definition name="default" ID="0">
+			<one>1</one>
+			<two>2</two>
+		</cell_definition> 
+		
+		<cell_definition name="cancer" ID="1" parent_type="default">
+			<one>0</one>
+		</cell_definition> 
+	
+	</cell_definitions>
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
