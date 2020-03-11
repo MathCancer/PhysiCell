@@ -65,188 +65,52 @@
 ###############################################################################
 */
 
-#include "./PhysiCell_custom.h" 
-#include <vector>
-#include <cstdio>
-#include <iostream>
-#include <cstring>
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-namespace PhysiCell
-{
-	
-Variable::Variable()
-{
-	name = "unnamed"; 
-	units = "dimensionless"; 
-	value = 0.0; 
-	return; 
-}
+using namespace BioFVM;
+using namespace PhysiCell;
 
-std::ostream& operator<<(std::ostream& os, const Variable& v)
-{
-	os << v.name << ": " << v.value << " " << v.units; 
-	return os; 
-}
+// declare the cell types 
 
+static Cell_Definition worker_cell; 
+static Cell_Definition cargo_cell; 
+static Cell_Definition director_cell; 
+static Cell_Definition linker_cell; 
 
-Vector_Variable::Vector_Variable()
-{
-	name = "unnamed"; 
-	units = "dimensionless"; 
-	value.resize(3, 0.0 );
-	return; 
-}
+static int worker_ID = 0;
+static int cargo_ID = 1;
+static int linker_ID = 2; 
+static int director_ID = 3;
 
-std::ostream& operator<<(std::ostream& os, const Vector_Variable& v)
-{
-	os << v.name << ": ";
-	for( int i=0; i < v.value.size()-1 ; i++ )
-	{ os << v.value[i] << ","; }
-	os << v.value[v.value.size()-1] << " (" << v.units << ")"; 
-	return os; 
-}
+// set up the microenvironment 
 
-	
-Custom_Cell_Data::Custom_Cell_Data()
-{
-//	std::cout << __FUNCTION__ << "(default)" << std::endl; 
-	variables.resize(0); 
-	vector_variables.resize(0); 
-	
-	name_to_index_map.clear(); 
-//	vector_name_to_index_map.clear();
-	
-	return;
-}
+void setup_microenvironment( void ); // done 
 
-Custom_Cell_Data::Custom_Cell_Data( const Custom_Cell_Data& ccd )
-{
-//	std::cout << __FUNCTION__ << "(copy)" << std::endl; 
-	variables = ccd.variables; 
-	vector_variables = ccd.vector_variables; 
-	
-	name_to_index_map= ccd.name_to_index_map; 
-	
-	return; 
-}
+// set up the cell types 
 
-int Custom_Cell_Data::add_variable( Variable& v )
-{
-	int n = variables.size(); 
-	variables.push_back( v ); 
-	name_to_index_map[ v.name ] = n; 
-	return n; 
-}
+void create_cell_types( void );
 
-int Custom_Cell_Data::add_variable( std::string name , std::string units , double value )
-{
-	int n = variables.size(); 
-	variables.resize( n+1 ); 
-	variables[n].name = name; 
-	variables[n].units = units; 
-	variables[n].value = value; 
-	name_to_index_map[ name ] = n; 
-	return n; 
-}
+// set up the problem geometry 
 
-int Custom_Cell_Data::add_variable( std::string name , double value )
-{
-	int n = variables.size(); 
-	variables.resize( n+1 ); 
-	variables[n].name = name; 
-	variables[n].units = "dimensionless"; 
-	variables[n].value = value; 
-	name_to_index_map[ name ] = n; 
-	return n; 
-}
+void setup_tissue( void ); 
 
-int Custom_Cell_Data::add_vector_variable( Vector_Variable& v )
-{
-	int n = vector_variables.size(); 
-	vector_variables.push_back( v ); 
-//	vector_name_to_index_map[ v.name ] = n; 
-	return n; 
-}
+// coloring functions 
 
-int Custom_Cell_Data::add_vector_variable( std::string name , std::string units , std::vector<double>& value )
-{
-	int n = vector_variables.size(); 
-	vector_variables.resize( n+1 ); 
-	vector_variables[n].name = name; 
-	vector_variables[n].units = units; 
-	vector_variables[n].value = value; 
-//	vector_name_to_index_map[ name ] = n; 
-	return n; 
-}
+std::vector<std::string> robot_coloring_function( Cell* pCell ); 
 
-int Custom_Cell_Data::add_vector_variable( std::string name , std::vector<double>& value )
-{
-	int n = vector_variables.size(); 
-	vector_variables.resize( n+1 ); 
-	vector_variables[n].name = name; 
-	vector_variables[n].units = "dimensionless"; 
-	vector_variables[n].value = value; 
-//	vector_name_to_index_map[ name ] = n; 
-	return n; 
-}
+// these are the custom functions for these cells 
 
-int Custom_Cell_Data::find_variable_index( std::string name )
-{
-	// this should return -1 if not found, not zero 
-	auto out = name_to_index_map.find( name ); 
-	if( out != name_to_index_map.end() )
-	{ return out->second; }
-	return -1; 
-	
-	return name_to_index_map[ name ]; 
-}
+void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
 
-/*
-int Custom_Cell_Data::find_vector_variable_index( std::string name )
-{
-	return vector_name_to_index_map[ name ]; 
-}
-*/
+void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
+void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-int Custom_Cell_Data::find_vector_variable_index( std::string name )
-{
-	int n = 0; 
-	while( n < vector_variables.size() )
-	{
-		if( std::strcmp( vector_variables[n].name.c_str() , name.c_str() ) == 0 )
-		{ return n; } 
-		n++; 
-	}
-	
-	return -1; 
-}
+void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt ); 
 
 
-double& Custom_Cell_Data::operator[](int i)
-{
-	return variables[i].value; 
-}
 
-double& Custom_Cell_Data::operator[]( std::string name )
-{
-	return variables[ name_to_index_map[name] ].value; 
-}
+void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );  // done 
 
-std::ostream& operator<<(std::ostream& os, const Custom_Cell_Data& ccd)
-{
-	os << "Custom data (scalar): " << std::endl; 
-	for( int i=0 ; i < ccd.variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.variables[i] << std::endl; 
-	}
 
-	os << "Custom data (vector): " << std::endl; 
-	for( int i=0 ; i < ccd.vector_variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.vector_variables[i] << std::endl; 
-	}
-	
-	return os;
-}
 
-};

@@ -73,7 +73,7 @@
 #include<limits.h>
 
 namespace PhysiCell{
-
+	
 std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name; 
 std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
 std::vector<Cell_Definition*> cell_definitions_by_index;
@@ -180,7 +180,8 @@ Cell_Definition& Cell_Definition::operator=( const Cell_Definition& cd )
 	// this is the whole reason we need ot make a copy constructor 
 	parameters.pReference_live_phenotype = &phenotype; 
 	
-	cell_definitions_by_index.push_back( this ); 
+	// commented out on March 10, 2020 
+	// cell_definitions_by_index.push_back( this ); 
 	
 	return *this; 
 }
@@ -1178,12 +1179,12 @@ void display_cell_definitions( std::ostream& os )
 		os << "\tcustom data: " << std::endl; 
 		for( int k=0; k < pCCD->variables.size(); k++)
 		{
-			os << "\t\t" << pCCD->variables[k].name << std::endl; 
+			os << "\t\t" << pCCD->variables[k] << std::endl; 
 		}
 		os << "\tcustom vector data: " << std::endl; 
 		for( int k=0; k < pCCD->vector_variables.size(); k++)
 		{
-			os << "\t\t" << pCCD->vector_variables[k].name << std::endl; 
+			os << "\t\t" << pCCD->vector_variables[k] << std::endl; 
 		}
 		os << "\t\t\tNOTE: custom vector data will eventually be merged with custom data" << std::endl; 
 			
@@ -1237,6 +1238,131 @@ Cell_Definition* find_cell_definition( int search_type )
 }
 
 
+Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node )
+{
+	Cell_Definition* pCD; 
+	
+	// if this is not "default" then create a new one 
+	if( std::strcmp( cd_node.attribute( "name" ).value() , "default" ) != 0 )
+	{ pCD = new Cell_Definition; }
+	else
+	{ pCD = &cell_defaults; }
+	
+	// set the name 
+	pCD->name = cd_node.attribute("name").value();
+	
+	// set the ID 
+	if( cd_node.attribute("ID" ) )
+	{ pCD->type = cd_node.attribute("ID").as_int(); }
+	else
+	{ pCD->type = -1; } 
+
+	// get the parent definition (if any) 
+	Cell_Definition* pParent = NULL;
+	if( cd_node.attribute( "parent_type" ) )
+	{ pParent = find_cell_definition( cd_node.attribute( "parent_type" ).value() ); }
+	// if it's not the default and no parent stated, inherit from default 
+	if( pParent == NULL && pCD != &cell_defaults )
+	{ pParent = &cell_defaults; } 
+
+	// if we found something to inherit from, then do it! 
+	if( pParent != NULL )
+	{
+		std::cout << "\tInheriting from type " << pParent->name << " ... " << std::endl; 
+		*pCD = *pParent; 
+		
+		// but recover the name and ID (type) 
+	} 
+
+	// set up the cell cycle 
+	pugi::xml_node node = cd_node.child( "cycle" ); 
+	int model = 1; 
+	
+	// set up custom data 
+	node = cd_node.child( "custom_data" );
+	pugi::xml_node node1 = node.first_child(); 
+	while( node1 )
+	{
+		// name of teh custom data 
+		std::string name = xml_get_my_name( node1 ); 
+		
+		// units 
+		std::string units = node1.attribute( "units").value(); 
+
+/*		
+		// size of the data 
+		int length = node1.attribute( "length").as_int(); 
+		if( length == 0 )
+		{ length = 1; } 
+*/
+		std::vector<double> values; // ( length, 0.0 ); 
+		
+		// get value(s)
+		std::string str_values = xml_get_my_string_value( node1 ); 
+		csv_to_vector( str_values.c_str() , values ); 
+		
+		std::cout << values << std::endl; 
+		
+		// add variable if cell defaults  
+		// if the custom data is not yet found, add it 
+		// first, try scalar 
+		if( values.size() == 1 )
+		{
+			// find the variable 
+			int n = pCD->custom_data.find_variable_index( name ); 
+			// if it exists, overwrite 
+			if( n > -1 )
+			{ pCD->custom_data.variables[n].value = values[0]; }
+			// otherwise, add 
+			else
+			{ pCD->custom_data.add_variable( name, units, values[0] ); }
+		}
+		// or vector 
+		else
+		{ 
+			// find the variable 
+			int n = pCD->custom_data.find_vector_variable_index( name ); 
+			// if it exists, overwrite 
+			if( n > -1 )
+			{ pCD->custom_data.vector_variables[n].value = values; }
+			// otherwise, add 
+			else
+			{ pCD->custom_data.add_vector_variable( name, units, values ); }
+		}
+		
+		node1 = node1.next_sibling(); 
+	}
+	
+	return pCD;
+}
+
+void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
+{
+	pugi::xml_node node = root.child( "cell_definitions" ); 
+	
+	node = node.child( "cell_definition" ); 
+	
+	while( node )
+	{
+		std::cout << "Processing " << node.attribute( "name" ).value() << " ... " << std::endl; 
+		
+		initialize_cell_definition_from_pugixml( node );	
+		build_cell_definitions_maps(); 
+		
+		node = node.next_sibling( "cell_definition" ); 
+	}
+	
+//	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
+	
+	return; 
+}	
+
+void initialize_cell_definitions_from_pugixml( void )
+{
+	initialize_cell_definitions_from_pugixml( physicell_config_root );
+	return; 
+}
 
 
 };
