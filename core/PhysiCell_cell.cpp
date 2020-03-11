@@ -1275,10 +1275,98 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pCD->name = cd_node.attribute("name").value();
 		pCD->type = cd_node.attribute("ID").as_int(); 
 	} 
+	
+	// sync to microenvironment
+	pCD->pMicroenvironment = NULL;
+	if( BioFVM::get_default_microenvironment() != NULL )
+	{ pCD->pMicroenvironment = BioFVM::get_default_microenvironment(); }
+	
+	// make sure phenotype.secretions are correctly sized 
+	
+	pCD->phenotype.secretion.sync_to_current_microenvironment();
+	
+	// set the reference phenotype 
+	pCD->parameters.pReference_live_phenotype = &(pCD->phenotype); 
+
+	
+
 
 	// set up the cell cycle 
-	pugi::xml_node node = cd_node.child( "cycle" ); 
-	int model = 1; 
+	pugi::xml_node node = cd_node.child( "phenotype" ); 
+	node = node.child( "cycle" ); 
+	if( node )
+	{
+		int model = node.attribute("code").as_int() ; 
+		// set the model 
+		switch( model )
+		{
+			case PhysiCell_constants::advanced_Ki67_cycle_model: 
+				pCD->functions.cycle_model = Ki67_advanced; 
+				break; 
+			case PhysiCell_constants::basic_Ki67_cycle_model: 
+				pCD->functions.cycle_model = Ki67_basic; 
+				break; 
+			case PhysiCell_constants::flow_cytometry_cycle_model: 
+				pCD->functions.cycle_model = flow_cytometry_cycle_model;  
+				break; 
+			case PhysiCell_constants::live_apoptotic_cycle_model: // ?
+				pCD->functions.cycle_model = Ki67_advanced;  // ?
+				std::cout << "Warning: live_apoptotic_cycle_model not directly supported." << std::endl		
+						  << "         Substituting live cells model. Set death rates=0." << std::endl; 
+				break; 
+			case PhysiCell_constants::total_cells_cycle_model: 
+				pCD->functions.cycle_model = live; 
+				std::cout << "Warning: total_cells_cycle_model not directly supported." << std::endl		
+						  << "         Substituting live cells model. Set death rates=0." << std::endl; 
+				break; 
+			case PhysiCell_constants::live_cells_cycle_model: 
+				pCD->functions.cycle_model = live; 
+				break; 
+			case PhysiCell_constants::flow_cytometry_separated_cycle_model: 
+				pCD->functions.cycle_model = flow_cytometry_separated_cycle_model; 
+				break; 
+			case PhysiCell_constants::cycling_quiescent_model: 
+				pCD->functions.cycle_model = cycling_quiescent; 
+				break; 
+			default:
+				std::cout << "Warning: Unknown cycle model " << std::endl;
+				exit(-1); 
+				break; 
+		}
+		
+		// set the rates 
+		node = node.parent();
+		node = node.child( "transition_rates");
+		if( node )
+		{
+			node = node.child( "rate");
+			while( node )
+			{
+				// which rate 
+				int start = node.attribute("start_index").as_int(); 
+				int end = node.attribute("end_index").as_int(); 
+				// fixed duration? 
+				bool fixed = false; 
+				if( node.attribute( "fixed_duration" ) )
+				{ fixed = node.attribute("fixed_duration").as_bool(); }
+				// actual value of transition rate 
+				double value = xml_get_my_double_value( node ); 
+				
+				
+	//			pCD->phenotype.cycle.
+				
+//				flow_cytometry_separated_cycle_model.transition_rate(0,1) = 0.00335; // 4.98 hours in G0/G1
+
+				
+				node = node.next_sibling( "rate" ); 
+			}
+			
+		}
+		
+		
+		
+	}
+	pCD->phenotype.cycle.sync_to_cycle_model( pCD->functions.cycle_model ); 
 	
 	// set up custom data 
 	node = cd_node.child( "custom_data" );

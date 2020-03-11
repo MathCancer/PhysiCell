@@ -154,7 +154,11 @@
 	<cell_definitions>
 		<cell_definition name="default" ID="0">
 			<phenotype>
-				<cycle />
+				<cycle code="5"> <!-- live-->
+					<transition_rates units="1/min"> <!-- units here since all transition rates have same units -->
+						<rate start_index="0" end_index="0">7.2e-4</rate>
+					</transition_rates>
+				</cycle>
 				<death />
 				<volume />
 				<mechanics />
