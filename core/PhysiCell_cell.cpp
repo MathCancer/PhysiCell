@@ -1271,7 +1271,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		std::cout << "\tInheriting from type " << pParent->name << " ... " << std::endl; 
 		*pCD = *pParent; 
 		
-		// but recover the name and ID (type) 
+		// but recover the name and ID (type)
+		pCD->name = cd_node.attribute("name").value();
+		pCD->type = cd_node.attribute("ID").as_int(); 
 	} 
 
 	// set up the cell cycle 
