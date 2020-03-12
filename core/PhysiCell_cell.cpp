@@ -1287,12 +1287,12 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	
 	// set the reference phenotype 
 	pCD->parameters.pReference_live_phenotype = &(pCD->phenotype); 
-
-	
-
+	pugi::xml_node node = cd_node.child( "phenotype" ); 
 
 	// set up the cell cycle 
-	pugi::xml_node node = cd_node.child( "phenotype" ); 
+	// make sure the standard cycle models are defined 
+	create_standard_cycle_and_death_models();
+
 	node = node.child( "cycle" ); 
 	if( node )
 	{
@@ -1333,9 +1333,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				exit(-1); 
 				break; 
 		}
+		pCD->phenotype.cycle.sync_to_cycle_model( pCD->functions.cycle_model ); 
 		
 		// set the rates 
-		node = node.parent();
 		node = node.child( "transition_rates");
 		if( node )
 		{
@@ -1352,21 +1352,23 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				// actual value of transition rate 
 				double value = xml_get_my_double_value( node ); 
 				
-				
-	//			pCD->phenotype.cycle.
-				
-//				flow_cytometry_separated_cycle_model.transition_rate(0,1) = 0.00335; // 4.98 hours in G0/G1
-
+				// set the transition rate 
+				pCD->phenotype.cycle.model().transition_rate(start,end) = value; 
+				// set it to fixed / non-fixed 
+				pCD->phenotype.cycle.model().phase_link(start,end).fixed_duration = fixed; 
 				
 				node = node.next_sibling( "rate" ); 
 			}
 			
 		}
-		
-		
-		
 	}
-	pCD->phenotype.cycle.sync_to_cycle_model( pCD->functions.cycle_model ); 
+	
+	
+	// set up the death models 
+	
+
+
+
 	
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
