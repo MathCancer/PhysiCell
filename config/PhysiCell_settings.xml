@@ -154,12 +154,46 @@
 	<cell_definitions>
 		<cell_definition name="default" ID="0">
 			<phenotype>
-				<cycle code="5"> <!-- live-->
+				<cycle code="5"> <!-- live -->
 					<transition_rates units="1/min"> 
-					<!-- units here since all transition rates have same units -->
-						<rate start_index="0" end_index="0">7.21e-4</rate>
+						<rate start_index="0" end_index="0">7.2e-4</rate>
 					</transition_rates>
 				</cycle>
+				
+				<death>
+					<model code="100" name="apoptosis">
+						<rate units="1/min">5.316666666666667e-5</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="true">1.937984496124031e-03</rate>
+						</transition_rates>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.666666666666667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.833333333333333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<rate units="1/min">0.0</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+							<rate start_index="1" end_index="2" fixed_duration="true">1.157407407407407e-5</rate>
+						</transition_rates>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min" />
+							<lysed_fluid_change_rate units="1/min" />
+							<cytoplasmic_biomass_change_rate units="1/min" />
+							<nuclear_biomass_change_rate units="1/min" />
+							<calcification_rate units="1/min" />
+							<relative_rupture_volume units="dimensionless" />
+						</parameters>
+					</model> 
+				</death>					
+				
+				
 				<death />
 				<volume />
 				<mechanics />

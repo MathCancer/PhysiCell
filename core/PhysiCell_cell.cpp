@@ -1365,6 +1365,97 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	
 	
 	// set up the death models 
+	node = cd_node.child( "phenotype" ); 
+	node = node.child( "death" ); 
+	if( node )
+	{
+		node = node.child( "model" );
+		while( node )
+		{
+			int model = node.attribute("code").as_int() ; 
+			std::cout << "death model: " << model << std::endl; 
+	
+			double rate = xml_get_double_value(node,"rate");
+					
+			// set the model 
+			switch( model )
+			{
+				case PhysiCell_constants::apoptosis_death_model: 
+					pCD->phenotype.death.add_death_model( rate , &apoptosis , apoptosis_parameters );
+					break; 
+				case PhysiCell_constants::necrosis_death_model: 
+					pCD->phenotype.death.add_death_model( rate , &necrosis , necrosis_parameters );
+					break; 
+				case PhysiCell_constants::autophagy_death_model: 
+					std::cout << "Warning: autophagy_death_model not yet supported." << std::endl		
+							  << "         Skipping this model." << std::endl; 
+					break; 
+				default:
+					std::cout << "Warning: Unknown death model " << std::endl;
+					exit(-1); 
+					break; 
+			}
+			
+			// now get rates 
+			
+			// now set death parameters 
+			
+			/*
+			
+ apoptosis_death_model = 100; 
+	static const int necrosis_death_model = 101; 
+	static const int autophagy_death_model = 102; 
+	
+	static const int custom_cycle_model=9999; 			
+			
+			
+			
+		int model = node.attribute("code").as_int() ; 
+		// set the model 
+		switch( model )
+		{
+			case PhysiCell_constants::advanced_Ki67_cycle_model: 
+				pCD->functions.cycle_model = Ki67_advanced; 
+				break; 
+			case PhysiCell_constants::basic_Ki67_cycle_model: 
+				pCD->functions.cycle_model = Ki67_basic; 
+				break; 
+			case PhysiCell_constants::flow_cytometry_cycle_model: 
+				pCD->functions.cycle_model = flow_cytometry_cycle_model;  
+				break; 
+			case PhysiCell_constants::live_apoptotic_cycle_model: // ?
+				pCD->functions.cycle_model = Ki67_advanced;  // ?
+				std::cout << "Warning: live_apoptotic_cycle_model not directly supported." << std::endl		
+						  << "         Substituting live cells model. Set death rates=0." << std::endl; 
+				break; 
+			case PhysiCell_constants::total_cells_cycle_model: 
+				pCD->functions.cycle_model = live; 
+				std::cout << "Warning: total_cells_cycle_model not directly supported." << std::endl		
+						  << "         Substituting live cells model. Set death rates=0." << std::endl; 
+				break; 
+			case PhysiCell_constants::live_cells_cycle_model: 
+				pCD->functions.cycle_model = live; 
+				break; 
+			case PhysiCell_constants::flow_cytometry_separated_cycle_model: 
+				pCD->functions.cycle_model = flow_cytometry_separated_cycle_model; 
+				break; 
+			case PhysiCell_constants::cycling_quiescent_model: 
+				pCD->functions.cycle_model = cycling_quiescent; 
+				break; 
+			default:
+				std::cout << "Warning: Unknown cycle model " << std::endl;
+				exit(-1); 
+				break; 
+		}
+			
+			
+			*/
+			
+			node = node.next_sibling( "model" ); 
+		}
+		
+		
+	}
 	
 
 
