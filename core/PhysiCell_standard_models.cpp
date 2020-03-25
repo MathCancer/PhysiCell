@@ -565,6 +565,14 @@ void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double 
 	return; 
 }
 
+void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	
+	
+	
+	return; 
+}
+
 void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 {
 	if( pCell->functions.add_cell_basement_membrane_interactions )

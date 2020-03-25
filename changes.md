@@ -18,7 +18,7 @@ This release ...
    + void Cell::set_target_volume( double new_volume ) sets the target total cell volume, while preserving the desired nuclear:cytoplasmic ratio and desired fluid fraction. In the default cell volume model, the cell will now approach this value by shrinking or growing. 
    + void Cell::set_target_radius( double new_radius ) behaves similarly, but using a radius instead. 
 
-+ Added Cell:set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
++ Added Cell::set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
 
 
 
