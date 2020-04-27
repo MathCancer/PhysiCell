@@ -226,7 +226,7 @@ class Cell : public Basic_Agent
 
 Cell* create_cell( void );  
 Cell* create_cell( Cell_Definition& cd );  
-
+extern Cell* (*instantiate_cell)();
 
 void delete_cell( int ); 
 void delete_cell( Cell* ); 

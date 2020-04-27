@@ -84,6 +84,11 @@ std::vector<Cell_Definition*> cell_definitions_by_index;
 // in case you want the legacy method 
 std::vector<double> (*cell_division_orientation)(void) = UniformOnUnitSphere; // LegacyRandomOnUnitSphere; 
 
+Cell* standard_instantiate_cell()
+{ return new Cell; }
+
+Cell* (*instantiate_cell)() = standard_instantiate_cell;
+
 Cell_Parameters::Cell_Parameters()
 {
 	o2_hypoxic_threshold = 15.0; // HIF-1alpha at half-max around 1.5-2%, and tumors often are below 2%
@@ -871,7 +876,8 @@ void Cell::add_potentials(Cell* other_agent)
 Cell* create_cell( void )
 {
 	Cell* pNew; 
-	pNew = new Cell;		
+	pNew = instantiate_cell();
+	
 	(*all_cells).push_back( pNew ); 
 	pNew->index=(*all_cells).size()-1;
 	
