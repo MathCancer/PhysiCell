@@ -692,7 +692,7 @@ void initialize_default_cell_definition( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
 	cell_defaults.functions.set_orientation = NULL;
-
+	cell_defaults.functions.custom_adhesion = NULL;
 	// add the standard death models to the default phenotype. 
 	cell_defaults.phenotype.death.add_death_model( 0.00319/60.0 , &apoptosis , apoptosis_parameters );
 		// MCF10A, to get a 2% apoptotic index 
