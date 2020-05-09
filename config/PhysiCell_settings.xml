@@ -154,14 +154,14 @@
 	<cell_definitions>
 		<cell_definition name="default" ID="0">
 			<phenotype>
-				<cycle code="5"> <!-- live -->
+				<cycle code="5" name="live"> <!-- live --> <!-- done --> 
 					<transition_rates units="1/min"> 
 						<rate start_index="0" end_index="0">7.2e-4</rate>
 					</transition_rates>
 				</cycle>
 				
-				<death>
-					<model code="100" name="apoptosis">
+				<death> <!-- done --> 
+					<model code="100" name="apoptosis"> 
 						<rate units="1/min">5.316666666666667e-5</rate>
 						<transition_rates units="1/min">
 							<rate start_index="0" end_index="1" fixed_duration="true">1.937984496124031e-03</rate>

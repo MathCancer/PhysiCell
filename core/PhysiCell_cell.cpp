@@ -1336,7 +1336,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pCD->phenotype.cycle.sync_to_cycle_model( pCD->functions.cycle_model ); 
 		
 		// set the rates 
-		node = node.child( "transition_rates");
+		node = node.child( "transition_rates" );
 		if( node )
 		{
 			node = node.child( "rate");
@@ -1363,28 +1363,80 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 	}
 	
-	
 	// set up the death models 
-	node = cd_node.child( "phenotype" ); 
+	int death_model_index = 0; 
+	node = cd_node.child( "phenotype" );
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	node = node.child( "death" ); 
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	if( node )
 	{
 		node = node.child( "model" );
+std::cout << __LINE__ << " node: " << node << " " << xml_get_my_name(node) << std::endl; 	
 		while( node )
 		{
 			int model = node.attribute("code").as_int() ; 
 			std::cout << "death model: " << model << std::endl; 
+			
+			// add the death model and its death rate 
 	
 			double rate = xml_get_double_value(node,"rate");
+			
+			// get death model parameters 
+			
+			Death_Parameters death_params; 
+			node = node.child( "parameters" );
+std::cout << __LINE__ << " node: " <<  node << " " << xml_get_my_name(node) << std::endl; 	
+			
+			// only read these parameters if they are specified. 
+			
+			pugi::xml_node node_temp = node.child( "unlysed_fluid_change_rate" );
+			if( node_temp )
+			{ death_params.unlysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
+
+			node_temp = node.child( "lysed_fluid_change_rate" );
+			if( node_temp )
+			{ death_params.lysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
+		
+			node_temp = node.child( "cytoplasmic_biomass_change_rate" );
+			if( node_temp )
+			{ death_params.cytoplasmic_biomass_change_rate = xml_get_my_double_value( node_temp ); }
+
+			node_temp = node.child( "nuclear_biomass_change_rate" );
+			if( node_temp )
+			{ death_params.nuclear_biomass_change_rate = xml_get_my_double_value( node_temp ); }
+
+			node_temp = node.child( "calcification_rate" );
+			if( node_temp )
+			{ death_params.calcification_rate = xml_get_my_double_value( node_temp ); }
+
+			node_temp = node.child( "relative_rupture_volume" );
+			if( node_temp )
+			{ death_params.relative_rupture_volume = xml_get_my_double_value( node_temp ); }
+
+			node_temp = node.child( "lysed_fluid_change_rate" );
+			if( node_temp )
+			{ death_params.lysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
+
+//			death_params.time_units = 
+//				get_string_attribute_value( node, "unlysed_fluid_change_rate", "units" ); 
+			
+			node = node.parent(); 
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 					
 			// set the model 
 			switch( model )
 			{
 				case PhysiCell_constants::apoptosis_death_model: 
-					pCD->phenotype.death.add_death_model( rate , &apoptosis , apoptosis_parameters );
+//					pCD->phenotype.death.add_death_model( rate , &apoptosis , apoptosis_parameters );
+					pCD->phenotype.death.add_death_model( rate , &apoptosis , death_params );
+					std::cout << "apoptosis " << " " << std::endl; 
 					break; 
 				case PhysiCell_constants::necrosis_death_model: 
-					pCD->phenotype.death.add_death_model( rate , &necrosis , necrosis_parameters );
+					// set necrosis parameters 
+//					pCD->phenotype.death.add_death_model( rate , &necrosis , necrosis_parameters );
+					pCD->phenotype.death.add_death_model( rate , &necrosis , death_params );
+					std::cout << "necrosis " << " "  << std::endl; 
 					break; 
 				case PhysiCell_constants::autophagy_death_model: 
 					std::cout << "Warning: autophagy_death_model not yet supported." << std::endl		
@@ -1396,62 +1448,45 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					break; 
 			}
 			
-			// now get rates 
+			// now get transition rates within the death model 
+			// set the rates 
+			node = node.child( "transition_rates" );
+std::cout << __LINE__ << " node: " <<  node << " " << xml_get_my_name(node) << std::endl; 	
+			if( node )
+			{
+				pugi::xml_node node1 = node.child( "rate");
+std::cout << __LINE__ << " node1: " <<  node1 << " " << xml_get_my_name(node1) << std::endl; 	
+				while( node1 )
+				{
+					// which rate 
+					int start = node1.attribute("start_index").as_int(); 
+					int end = node1.attribute("end_index").as_int(); 
+					// fixed duration? 
+					bool fixed = false; 
+					if( node1.attribute( "fixed_duration" ) )
+					{ fixed = node1.attribute("fixed_duration").as_bool(); }
+					// actual value of transition rate 
+					double value = xml_get_my_double_value( node1 ); 
+					
+					// set the transition rate 
+					pCD->phenotype.death.models[death_model_index]->transition_rate(start,end) = value; 
+					// set it to fixed / non-fixed 
+					pCD->phenotype.death.models[death_model_index]->phase_link(start,end).fixed_duration = fixed; 
+					
+					node1 = node1.next_sibling( "rate" ); 
+std::cout << __LINE__ << " node1: " <<  node1 << " " << xml_get_my_name(node1) << std::endl; 	
+				}
+			}	
+			node = node.parent(); 
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 			
-			// now set death parameters 
-			
-			/*
-			
- apoptosis_death_model = 100; 
-	static const int necrosis_death_model = 101; 
-	static const int autophagy_death_model = 102; 
-	
-	static const int custom_cycle_model=9999; 			
-			
-			
-			
-		int model = node.attribute("code").as_int() ; 
-		// set the model 
-		switch( model )
-		{
-			case PhysiCell_constants::advanced_Ki67_cycle_model: 
-				pCD->functions.cycle_model = Ki67_advanced; 
-				break; 
-			case PhysiCell_constants::basic_Ki67_cycle_model: 
-				pCD->functions.cycle_model = Ki67_basic; 
-				break; 
-			case PhysiCell_constants::flow_cytometry_cycle_model: 
-				pCD->functions.cycle_model = flow_cytometry_cycle_model;  
-				break; 
-			case PhysiCell_constants::live_apoptotic_cycle_model: // ?
-				pCD->functions.cycle_model = Ki67_advanced;  // ?
-				std::cout << "Warning: live_apoptotic_cycle_model not directly supported." << std::endl		
-						  << "         Substituting live cells model. Set death rates=0." << std::endl; 
-				break; 
-			case PhysiCell_constants::total_cells_cycle_model: 
-				pCD->functions.cycle_model = live; 
-				std::cout << "Warning: total_cells_cycle_model not directly supported." << std::endl		
-						  << "         Substituting live cells model. Set death rates=0." << std::endl; 
-				break; 
-			case PhysiCell_constants::live_cells_cycle_model: 
-				pCD->functions.cycle_model = live; 
-				break; 
-			case PhysiCell_constants::flow_cytometry_separated_cycle_model: 
-				pCD->functions.cycle_model = flow_cytometry_separated_cycle_model; 
-				break; 
-			case PhysiCell_constants::cycling_quiescent_model: 
-				pCD->functions.cycle_model = cycling_quiescent; 
-				break; 
-			default:
-				std::cout << "Warning: Unknown cycle model " << std::endl;
-				exit(-1); 
-				break; 
-		}
-			
-			
-			*/
+/*
+
+*/
 			
 			node = node.next_sibling( "model" ); 
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+			death_model_index++; 
 		}
 		
 		

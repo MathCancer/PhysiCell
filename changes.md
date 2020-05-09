@@ -20,7 +20,11 @@ This release ...
 
 + Added Cell::set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
 
++ Added 1-D diffusion solvers to BioFVM (useful for some coarse-grained problems). It solves for diffusion in the x-direction only. Use it by setting: 
 
+  microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_1D
+  
+  Use this right after setup_microenvironment() in your main.cpp file. Future versions will include an XML option to use 1D. Most users will never need this. 
 
 + Cell_Definitions in XML. This is in response to SourceForge ticket 5. 
    +
@@ -89,6 +93,12 @@ This release ...
 ### Beta features (not fully supported):
  
 + List here. 
+
+
++ Cell definitions 
+
+
+
   
 ### Bugfixes: 
 
