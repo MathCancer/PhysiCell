@@ -235,7 +235,44 @@
 					</options>
 				</motility>
 				
-				<secretion />
+				<secretion>
+					<substrate name="director signal">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+						
+					<substrate name="cargo signal">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 	
+				</secretion>
+				
+				
+				<old_secretion>
+					<!-- generally use this OR net export rates -->
+					<secretion_rates units="1/min">
+						<secretion_rate name="director signal">0</secretion_rate>
+						<secretion_rate name="cargo signal">0</secretion_rate>
+					</secretion_rates>
+					<secretion_targets units="substrate density">
+						<secretion_target name="director signal">1.0</secretion_target>
+						<secretion_target name="cargo signal">1.0</secretion_target>
+					</secretion_targets>
+					<uptake_rates units="1/min">
+						<uptake_rate name="director signal">10.0</uptake_rate>
+						<uptake_rate name="cargo signal">1.0</uptake_rate>
+					</uptake_rates>
+					<!-- generally use this OR secretion_rates -->
+					<net_export_rates units="total substrate/min">
+						<net_export_rate name="director signal">0.0</net_export_rate>
+						<net_export_rate name="cargo signal">0.0</net_export_rate>
+					</net_export_rates>
+				</old_secretion>
+
 				<molecular />
 			</phenotype>
 			<custom_data> <!-- done --> 

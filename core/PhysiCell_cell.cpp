@@ -1283,7 +1283,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	
 	// make sure phenotype.secretions are correctly sized 
 	
-	pCD->phenotype.secretion.sync_to_current_microenvironment();
+	// pCD->phenotype.secretion.sync_to_current_microenvironment();
+	pCD->phenotype.secretion.sync_to_microenvironment( (pCD->pMicroenvironment) ); 
+	pCD->phenotype.molecular.sync_to_microenvironment( (pCD->pMicroenvironment) );
+	
 	
 	// set the reference phenotype 
 	pCD->parameters.pReference_live_phenotype = &(pCD->phenotype); 
@@ -1682,42 +1685,64 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 		}
 	}	
 
-/*
-
-
-
-	bool  ; 
-	bool restrict_to_2D; 
-		// if true, set random motility to 2D only. 
+	// secretion
+	
+	node = cd_node.child( "phenotype" );
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+	node = node.child( "secretion" ); 
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+	if( node )
+	{
+		Secretion* pS = &(pCD->phenotype.secretion);
 		
-		
-		 
- 
+		// find the first substrate 
+		pugi::xml_node node_sec = node.child( "substrate" );
+		while( node_sec )
+		{
+			// which substrate? 
+			
+			std::string substrate_name = node_sec.attribute( "name").value(); 
+			int index = microenvironment.find_density_index( substrate_name ); 
+			std::string actual_name = microenvironment.density_names[ index ]; 
+			
+			std::cout << substrate_name << " " << actual_name << " " << index << std::endl; 
+			
+			// error check 
+			if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )
+			{
+				std::cout << "Error: attempted to set secretion/uptake/export for \"" 
+					<< substrate_name << "\", which was not found in the microenvironment." << std::endl 
+				<< "       Please double-check your substrate name in the config file." << std::endl << std::endl; 
+				exit(-1); 
+			}			
+			std::cout << pS->secretion_rates << std::endl;
 	
-	int chemotaxis_index; 
-	int chemotaxis_direction; 
+			// secretion rate
+			pugi::xml_node node_sec1 = node_sec.child( "secretion_rate" ); 
+			if( node_sec1 )
+			{ pS->secretion_rates[index] = xml_get_my_double_value( node_sec1 ); }
+			
+			std::cout << pS->saturation_densities << std::endl;
+			// secretion target 
+			node_sec1 = node_sec.child( "secretion_target" ); 
+			if( node_sec1 )
+			{ pS->saturation_densities[index] = xml_get_my_double_value( node_sec1 ); }
 	
-	
-
-				<motility>
-					<speed units="micron/min" />
-					<persistence_time units="min" />
-					<migration_bias units="dimensionless" />
-					
-					<options>
-						<enabled>true</enabled>
-						<use_2D>true</use_2D>
-						<chemotaxis>
-							<!-- name matches one of the microenvironment substrates above -->
-							<!-- 1 if up gradient, -1 if against gradient -->
-							<enabled>true</enabled>
-							<substrate>director signal</substrate>
-							<direction>1</direction>
-						</chemotaxis>
-					</options>
-				</motility>
-*/
-
+			std::cout << pS->uptake_rates << std::endl;
+			// uptake rate 
+			node_sec1 = node_sec.child( "uptake_rate" ); 
+			if( node_sec1 )
+			{ pS->uptake_rates[index] = xml_get_my_double_value( node_sec1 ); }
+			
+			std::cout << pS->net_export_rates << std::endl;
+			// net export rate 
+			node_sec1 = node_sec.child( "net_export_rate" ); 
+			if( node_sec1 )
+			{ pS->net_export_rates[index] = xml_get_my_double_value( node_sec1 ); }
+			
+			node_sec = node_sec.next_sibling( "substrate" ); 
+		}
+	}	
 
 	
 	// set up custom data 
