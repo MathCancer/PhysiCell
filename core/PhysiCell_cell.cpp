@@ -1151,21 +1151,46 @@ void display_cell_definitions( std::ostream& os )
 		Cell_Definition* pCD = cell_definitions_by_index[n]; 
 		os << n << " :: type:" << pCD->type << " name: " << pCD->name << std::endl; 
 
+		// summarize cycle model 
 		if( pCD->phenotype.cycle.pCycle_Model != NULL )
 		{
 			os << "\t cycle model: " << pCD->phenotype.cycle.model().name  
 				<< " (code=" << pCD->phenotype.cycle.model().code << ")" << std::endl; 
-			os << "\t death models: " << std::endl; 
+				
+			// let's show the transition rates 
+			Cycle_Model* pCM = &(pCD->phenotype.cycle.model() ); 
+			for( int n=0 ; n < pCM->phases.size() ; n++ )
+			{
+				os << "\t\tPhase " << n << ": " << pCM->phases[n].name << std::endl; 
+			}
+			os << "\t\tCycle transitions: " << std::endl 
+			   << "\t\t-----------------" << std::endl; 
+			for( int n=0 ; n < pCM->phase_links.size() ; n++ )
+			{
+				for( int k=0; k < pCM->phase_links[n].size() ; k++ )
+				{
+					int start = pCM->phase_links[n][k].start_phase_index;
+					int end = pCM->phase_links[n][k].end_phase_index; 
+					os << "\t\t" << pCM->phases[start].name << " --> " 
+						<< pCM->phases[end].name << " w mean duration " 
+						<< 1.0 / pCM->transition_rate( start,end) << " min" << std::endl; 
+				}
+			}			
+			
 		}
 		else
 		{ 	os << "\t cycle model not initialized" << std::endl; } 
 
+		// summarize death models 
+		os << "\t death models: " << std::endl; 
 		for( int k=0 ; k < pCD->phenotype.death.models.size(); k++ )
 		{
 			os << "\t\t" << k << " : " << pCD->phenotype.death.models[k]->name 
-			<< " (code=" << pCD->phenotype.death.models[k]->code << ")" << std::endl; 
+			<< " (code=" << pCD->phenotype.death.models[k]->code << ")" 
+			<< " with rate " << pCD->phenotype.death.rates[k] << " 1/min" << std::endl; 
 		}
 		
+		// summarize functions 
 		Cell_Functions* pCF = &(pCD->functions); 
 		os << "\t key functions: " << std::endl; 
 		os << "\t\t migration: "; display_ptr_as_bool( pCF->update_migration_bias , std::cout ); 
@@ -1174,6 +1199,38 @@ void display_cell_definitions( std::ostream& os )
 		os << std::endl; 
 		os << "\t\t phenotype rule: "; display_ptr_as_bool( pCF->update_phenotype , std::cout ); 
 		os << std::endl; 
+		
+		// summarize motility 
+		
+		Motility* pM = &(pCD->phenotype.motility); 
+		std::string val = "true";
+		if( pM->is_motile == false )
+		{ val = "false"; } 
+	
+		std::string dimen = "3D"; 
+		if( pM->restrict_to_2D == true )
+		{ dimen = "2D"; } 
+
+		os << "\tmotility (enabled: " << val << " in " << dimen << ")" << std::endl 
+			<< "\t\tspeed: " << pM->migration_speed << " micron/min" << std::endl 
+			<< "\t\tbias: " << pM->migration_bias << " " << std::endl 
+			<< "\t\tpersistence time: " << pM->persistence_time << " min" << std::endl 
+			<< "\t\tchemotaxis (enabled: ";
+			
+			val = "true" ;
+			if( pCD->functions.update_migration_bias != chemotaxis_function )
+			{ val = "false"; } 
+		os << val << ")" << std::endl 
+			<< "\t\t\talong " 
+			<< pM->chemotaxis_direction << " * grad(" 
+			<< microenvironment.density_names[ pM->chemotaxis_index ] << ") " << std::endl; 
+			
+		// secretion
+		
+		// mechanics
+		
+		// size 
+	
 		
 		Custom_Cell_Data* pCCD = &(pCD->custom_data); 
 		os << "\tcustom data: " << std::endl; 
@@ -1300,43 +1357,63 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	if( node )
 	{
 		int model = node.attribute("code").as_int() ; 
-		// set the model 
-		switch( model )
+		
+		// Set the model, but only if it was specified. 
+		if( strlen( node.attribute("code").value() ) > 0 )
 		{
-			case PhysiCell_constants::advanced_Ki67_cycle_model: 
-				pCD->functions.cycle_model = Ki67_advanced; 
-				break; 
-			case PhysiCell_constants::basic_Ki67_cycle_model: 
-				pCD->functions.cycle_model = Ki67_basic; 
-				break; 
-			case PhysiCell_constants::flow_cytometry_cycle_model: 
-				pCD->functions.cycle_model = flow_cytometry_cycle_model;  
-				break; 
-			case PhysiCell_constants::live_apoptotic_cycle_model: // ?
-				pCD->functions.cycle_model = Ki67_advanced;  // ?
-				std::cout << "Warning: live_apoptotic_cycle_model not directly supported." << std::endl		
-						  << "         Substituting live cells model. Set death rates=0." << std::endl; 
-				break; 
-			case PhysiCell_constants::total_cells_cycle_model: 
-				pCD->functions.cycle_model = live; 
-				std::cout << "Warning: total_cells_cycle_model not directly supported." << std::endl		
-						  << "         Substituting live cells model. Set death rates=0." << std::endl; 
-				break; 
-			case PhysiCell_constants::live_cells_cycle_model: 
-				pCD->functions.cycle_model = live; 
-				break; 
-			case PhysiCell_constants::flow_cytometry_separated_cycle_model: 
-				pCD->functions.cycle_model = flow_cytometry_separated_cycle_model; 
-				break; 
-			case PhysiCell_constants::cycling_quiescent_model: 
-				pCD->functions.cycle_model = cycling_quiescent; 
-				break; 
-			default:
-				std::cout << "Warning: Unknown cycle model " << std::endl;
-				exit(-1); 
-				break; 
+			// set the model 
+			switch( model )
+			{
+				case PhysiCell_constants::advanced_Ki67_cycle_model: 
+					pCD->functions.cycle_model = Ki67_advanced; 
+					break; 
+				case PhysiCell_constants::basic_Ki67_cycle_model: 
+					pCD->functions.cycle_model = Ki67_basic; 
+					break; 
+				case PhysiCell_constants::flow_cytometry_cycle_model: 
+					pCD->functions.cycle_model = flow_cytometry_cycle_model;  
+					break; 
+				case PhysiCell_constants::live_apoptotic_cycle_model: // ?
+					pCD->functions.cycle_model = Ki67_advanced;  // ?
+					std::cout << "Warning: live_apoptotic_cycle_model not directly supported." << std::endl		
+							  << "         Substituting live cells model. Set death rates=0." << std::endl; 
+					break; 
+				case PhysiCell_constants::total_cells_cycle_model: 
+					pCD->functions.cycle_model = live; 
+					std::cout << "Warning: total_cells_cycle_model not directly supported." << std::endl		
+							  << "         Substituting live cells model. Set death rates=0." << std::endl; 
+					break; 
+				case PhysiCell_constants::live_cells_cycle_model: 
+					pCD->functions.cycle_model = live; 
+					break; 
+				case PhysiCell_constants::flow_cytometry_separated_cycle_model: 
+					pCD->functions.cycle_model = flow_cytometry_separated_cycle_model; 
+					break; 
+				case PhysiCell_constants::cycling_quiescent_model: 
+					pCD->functions.cycle_model = cycling_quiescent; 
+					break; 
+				default:
+					std::cout << "Warning: Unknown cycle model " << std::endl;
+					exit(-1); 
+					break; 
+			}
+			pCD->phenotype.cycle.sync_to_cycle_model( pCD->functions.cycle_model ); 
 		}
-		pCD->phenotype.cycle.sync_to_cycle_model( pCD->functions.cycle_model ); 
+		
+		// now, if we inherited from another cell, AND 
+		// if that parent type has the same cylce model, 
+		// then overwrite with their transition rates 
+		
+		if( pParent != NULL )
+		{
+			if( pCD->phenotype.cycle.model().code == pParent->phenotype.cycle.model().code )
+			{
+				std::cout << "copying data ... " << std::endl; 
+				std::cout<< pParent->name << " to " << pCD->name << std::endl; 
+				system("pause");
+				pCD->phenotype.cycle.data = pParent->phenotype.cycle.data; 
+			}
+		}
 		
 		// set the rates 
 		node = node.child( "transition_rates" );

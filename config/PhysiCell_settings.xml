@@ -156,7 +156,7 @@
 			<phenotype>
 				<cycle code="5" name="live"> <!-- live --> <!-- done --> 
 					<transition_rates units="1/min"> 
-						<rate start_index="0" end_index="0">7.2e-4</rate>
+						<rate start_index="0" end_index="1">7.2e-4</rate>
 					</transition_rates>
 				</cycle>
 				
@@ -221,14 +221,14 @@
 				
 				<motility> <!-- done --> 
 					<speed units="micron/min">1</speed>
-					<persistence_time units="min">1</persistence_time>
-					<migration_bias units="dimensionless">0</migration_bias>
+					<persistence_time units="min">2</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
 					
 					<options>
 						<enabled>true</enabled>
-						<use_2D>true</use_2D>
+						<use_2D>false</use_2D>
 						<chemotaxis>
-							<enabled>true</enabled>
+							<enabled>false</enabled>
 							<substrate>director signal</substrate>
 							<direction>-1</direction>
 						</chemotaxis>
@@ -281,7 +281,7 @@
 			</custom_data>
 		</cell_definition>
 		
-		<cell_definition name="bill" parent_type="default" ID="1">
+		<cell_definition name="huh" parent_type="default" ID="1">
 			<phenotype>
 				<cycle />
 				<death />
