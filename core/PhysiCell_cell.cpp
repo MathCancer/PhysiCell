@@ -1449,8 +1449,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// if the model is not yet there, then add it
 	// otherwise, modify properties of that model 
 	
-	
-	
 	// set up the death models 
 	int death_model_index = 0; 
 	node = cd_node.child( "phenotype" );
@@ -1466,6 +1464,17 @@ std::cout << __LINE__ << " node: " << node << " " << xml_get_my_name(node) << st
 			int model = node.attribute("code").as_int() ; 
 			std::cout << "death model: " << model << std::endl; 
 			
+			// check: is that death model already there? 
+			
+			Death* pD = &( pCD->phenotype.death ); 
+			int death_index = pD->find_death_model_index( model );
+			bool death_model_already_exists = false; 
+			if( pD->rates.size() > death_index )
+			{
+				if( pD->models[death_index]->code == model )
+				{ death_model_already_exists = true; } 
+			}
+			
 			// add the death model and its death rate 
 	
 			double rate = xml_get_double_value(node,"rate");
@@ -1473,6 +1482,13 @@ std::cout << __LINE__ << " node: " << node << " " << xml_get_my_name(node) << st
 			// get death model parameters 
 			
 			Death_Parameters death_params; 
+			// if there is a parent and we already found this model, 
+			// start with the inherited parameters 
+			if( death_model_already_exists && pParent != NULL )
+			{
+				death_params = pParent->phenotype.death.parameters[death_index]; 
+			}
+			
 			node = node.child( "parameters" );
 std::cout << __LINE__ << " node: " <<  node << " " << xml_get_my_name(node) << std::endl; 	
 			
@@ -1513,17 +1529,30 @@ std::cout << __LINE__ << " node: " <<  node << " " << xml_get_my_name(node) << s
 std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 					
 			// set the model 
+			// if the model already exists, just overwrite the parameters 
 			switch( model )
 			{
 				case PhysiCell_constants::apoptosis_death_model: 
 //					pCD->phenotype.death.add_death_model( rate , &apoptosis , apoptosis_parameters );
-					pCD->phenotype.death.add_death_model( rate , &apoptosis , death_params );
+					if( death_model_already_exists == false )
+					{ pCD->phenotype.death.add_death_model( rate , &apoptosis , death_params ); }
+					else
+					{
+						pCD->phenotype.death.parameters[death_index] = death_params; 
+						pCD->phenotype.death.rates[death_index] = rate; 
+					}
 					std::cout << "apoptosis " << " " << std::endl; 
 					break; 
 				case PhysiCell_constants::necrosis_death_model: 
 					// set necrosis parameters 
 //					pCD->phenotype.death.add_death_model( rate , &necrosis , necrosis_parameters );
-					pCD->phenotype.death.add_death_model( rate , &necrosis , death_params );
+					if( death_model_already_exists == false )
+					{ pCD->phenotype.death.add_death_model( rate , &necrosis , death_params ); }
+					else
+					{
+						pCD->phenotype.death.parameters[death_index] = death_params; 
+						pCD->phenotype.death.rates[death_index] = rate; 						
+					}
 					std::cout << "necrosis " << " "  << std::endl; 
 					break; 
 				case PhysiCell_constants::autophagy_death_model: 

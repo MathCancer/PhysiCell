@@ -284,7 +284,22 @@
 		<cell_definition name="huh" parent_type="default" ID="1">
 			<phenotype>
 				<cycle />
-				<death />
+				<death>
+					<model code="101" name="necrosis"> 
+						<rate units="1/min">1e-2</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="true">1.937984496124031e-03</rate>
+						</transition_rates>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.666666666666667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.833333333333333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>
 				<volume />
 				<mechanics />
 				<motility />
