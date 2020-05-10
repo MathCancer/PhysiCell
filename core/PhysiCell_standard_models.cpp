@@ -82,7 +82,6 @@ Death_Parameters apoptosis_parameters, necrosis_parameters;
 
 Cycle_Model flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model; 
 
-	
 void standard_Ki67_positive_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// the cell wants to double its volume 
@@ -826,5 +825,21 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	
 	return; 
 }
+
+void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt )
+{
+	Motility* pM = &(phenotype.motility); 
+
+	// bias direction is gradient for the indicated substrate 
+	pM->migration_bias_direction = pCell->nearest_gradient(pM->chemotaxis_index);
+	// move up or down gradient based on this direction 
+	pM->migration_bias_direction *= pM->chemotaxis_direction; 
+
+	// normalize 
+	normalize( &( pM->migration_bias_direction ) );
+	
+	return;
+}
+
 
 };

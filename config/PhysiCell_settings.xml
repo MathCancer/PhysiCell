@@ -192,53 +192,49 @@
 						</parameters>
 					</model> 
 				</death>					
-		
-<!--
-// need to integrate in these parameters 
-	
-	necrosis_parameters.cytoplasmic_biomass_change_rate = 0.0032 / 60.0; 
-	necrosis_parameters.nuclear_biomass_change_rate = 0.013 / 60.0; 
-		
-	necrosis_parameters.unlysed_fluid_change_rate = 0.67 / 60.0; 
-	necrosis_parameters.lysed_fluid_change_rate = 0.050 / 60.0; 
-	
-	necrosis_parameters.calcification_rate = 0.0042 / 60.0; 
 
-	necrosis_parameters.relative_rupture_volume = 2.0; 
- 
-	// set up the necrosis model 
-	necrosis.name = "Necrosis"; 
-	necrosis.code = PhysiCell_constants::necrosis_death_model; 
-
-	necrosis.add_phase( PhysiCell_constants::necrotic_swelling , "Necrotic (swelling)" );
-	necrosis.phases[0].entry_function = standard_necrosis_entry_function; 
-
-	necrosis.add_phase( PhysiCell_constants::necrotic_lysed , "Necrotic (lysed)" );
-	necrosis.phases[1].entry_function = standard_lysis_entry_function; 
-	necrosis.phases[1].removal_at_phase_exit = true;
-	
-		// add an empty junk debris phase for this model 
-	necrosis.add_phase( PhysiCell_constants::debris , "Debris" ); 
-
-
-	necrosis.add_phase_link( 0, 1, standard_necrosis_arrest_function ); 
-	necrosis.add_phase_link( 1, 2, NULL ); 
-
-	necrosis.transition_rate( 0, 1 ) = 9e9; // set high so it's always evaluating against the "arrest" 
-	necrosis.transition_rate( 1, 2 ) = 1.0 / (60.0 * 24.0 * 60.0 ); // 60 days max  
-
-	// Deterministically remove the necrotic cell if it has been 60 days
-	necrosis.phase_link(1,2).fixed_duration = true; 
-
-
--->
-
-		
+				<volume> <!-- done --> 
+					<total units="micron^3">2494</total>
+					<fluid_fraction units="dimensionless">0.75</fluid_fraction>
+					<nuclear units="micron^3">540</nuclear>
+					
+					<fluid_change_rate units="1/min">0.05</fluid_change_rate>
+					<cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+					<nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+					
+					<calcified_fraction units="dimensionless">0</calcified_fraction>
+					<calcification_rate units="1/min">0</calcification_rate>
+					
+					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+				</volume> 				
 				
-				<death />
-				<volume />
-				<mechanics />
-				<motility />
+				<mechanics> <!-- done --> 
+					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+					
+					<options>
+						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
+				<motility> <!-- done --> 
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">0</migration_bias>
+					
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>true</enabled>
+							<substrate>director signal</substrate>
+							<direction>-1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				
 				<secretion />
 				<molecular />
 			</phenotype>

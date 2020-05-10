@@ -127,6 +127,10 @@ bool create_standard_cell_death_models( void ); // done
 bool create_standard_cycle_and_death_models( void ); // done 
 
 void initialize_default_cell_definition( void ); // done 
+
+
+void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
+
 	
 };
 

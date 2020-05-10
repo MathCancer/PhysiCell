@@ -1363,6 +1363,14 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 	}
 	
+	// here's what it ***should*** do: 
+	// parse the model, get its code 
+	// look for that model 
+	// if the model is not yet there, then add it
+	// otherwise, modify properties of that model 
+	
+	
+	
 	// set up the death models 
 	int death_model_index = 0; 
 	node = cd_node.child( "phenotype" );
@@ -1492,7 +1500,223 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 		
 	}
 	
+	// volume 
+	node = cd_node.child( "phenotype" );
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+	node = node.child( "volume" ); 
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+	if( node )
+	{
+		Volume* pV = &(pCD->phenotype.volume);
+		
+		pugi::xml_node node_vol = node.child( "total" );
+		if( node_vol )
+		{ pV->total = xml_get_my_double_value( node_vol ); }
 
+		node_vol = node.child( "fluid_fraction" );
+		if( node_vol )
+		{ pV->fluid_fraction = xml_get_my_double_value( node_vol ); }
+		
+		node_vol = node.child( "nuclear" );
+		if( node_vol )
+		{ pV->nuclear = xml_get_my_double_value( node_vol ); }
+
+		node_vol = node.child( "fluid_change_rate" );
+		if( node_vol )
+		{ pV->fluid_change_rate = xml_get_my_double_value( node_vol ); }
+
+		node_vol = node.child( "cytoplasmic_biomass_change_rate" );
+		if( node_vol )
+		{ pV->cytoplasmic_biomass_change_rate = xml_get_my_double_value( node_vol ); }
+
+		node_vol = node.child( "nuclear_biomass_change_rate" );
+		if( node_vol )
+		{ pV->nuclear_biomass_change_rate = xml_get_my_double_value( node_vol ); }
+
+		node_vol = node.child( "calcified_fraction" );
+		if( node_vol )
+		{ pV->calcified_fraction = xml_get_my_double_value( node_vol ); }
+
+		node_vol = node.child( "calcification_rate" );
+		if( node_vol )
+		{ pV->calcification_rate = xml_get_my_double_value( node_vol ); }
+	
+		node_vol = node.child( "relative_rupture_volume" );
+		if( node_vol )
+		{ pV->relative_rupture_volume = xml_get_my_double_value( node_vol ); }
+
+		// set all the parameters to be self-consistent 
+		
+		pV->fluid = pV->fluid_fraction * pV->total; 
+		pV->solid = pV->total-pV->fluid; 
+
+		pV->nuclear_fluid = pV->fluid_fraction * pV->nuclear; 
+		pV->nuclear_solid = pV->nuclear - pV->nuclear_fluid;
+
+		pV->cytoplasmic = pV->total - pV->nuclear;
+		pV->cytoplasmic_fluid = pV->fluid_fraction*pV->cytoplasmic; 
+		pV->cytoplasmic_solid = pV->cytoplasmic - pV->cytoplasmic_fluid; 
+		
+
+		pV->target_solid_cytoplasmic = pV->cytoplasmic_solid;
+		pV->target_solid_nuclear = pV->nuclear_solid;
+		pV->target_fluid_fraction = pV->fluid_fraction;
+		
+		pV->cytoplasmic_to_nuclear_ratio = pV->cytoplasmic / ( 1e-16 + pV->nuclear);
+		pV->target_cytoplasmic_to_nuclear_ratio = pV->cytoplasmic_to_nuclear_ratio; 
+		
+		pV->rupture_volume = pV->relative_rupture_volume * pV->total; // in volume units 
+	}
+	
+	// mechanics 
+	node = cd_node.child( "phenotype" );
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+	node = node.child( "mechanics" ); 
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+	if( node )
+	{
+		Mechanics* pM = &(pCD->phenotype.mechanics);
+		
+		pugi::xml_node node_mech = node.child( "cell_cell_adhesion_strength" );
+		if( node_mech )
+		{ pM->cell_cell_adhesion_strength = xml_get_my_double_value( node_mech ); }	
+
+		node_mech = node.child( "cell_cell_repulsion_strength" );
+		if( node_mech )
+		{ pM->cell_cell_repulsion_strength = xml_get_my_double_value( node_mech ); }	
+
+		node_mech = node.child( "relative_maximum_adhesion_distance" );
+		if( node_mech )
+		{ pM->relative_maximum_adhesion_distance = xml_get_my_double_value( node_mech ); }	
+
+		node_mech = node.child( "options" );
+		if( node_mech )
+		{
+			pugi::xml_node node_mech1 = node_mech.child( "set_relative_equilibrium_distance" ); 
+			if( node_mech1 )
+			{
+				if( node_mech1.attribute("enabled").as_bool() )
+				{
+					double temp = xml_get_my_double_value( node_mech1 ); 
+					pM->set_relative_equilibrium_distance( temp ); 
+				}
+			}
+
+			node_mech1 = node_mech.child( "set_absolute_equilibrium_distance" ); 
+			if( node_mech1 )
+			{
+				if( node_mech1.attribute("enabled").as_bool() )
+				{
+					double temp = xml_get_my_double_value( node_mech1 ); 
+					pM->set_absolute_equilibrium_distance( pCD->phenotype , temp ); 
+				}
+			}
+		}
+	}
+	
+	// motility 
+	node = cd_node.child( "phenotype" );
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+	node = node.child( "motility" ); 
+std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
+	if( node )
+	{
+		Motility* pM = &(pCD->phenotype.motility);
+		
+		pugi::xml_node node_mot = node.child( "speed" );
+		if( node_mot )
+		{ pM->migration_speed = xml_get_my_double_value( node_mot ); }	
+
+		node_mot = node.child( "migration_bias" );
+		if( node_mot )
+		{ pM->migration_bias = xml_get_my_double_value( node_mot ); }	
+
+		node_mot = node.child( "persistence_time" );
+		if( node_mot )
+		{ pM->persistence_time = xml_get_my_double_value( node_mot ); }	
+
+		node_mot = node.child( "options" );
+		if( node_mot )
+		{
+			// enable motility? 
+			pugi::xml_node node_mot1 = node_mot.child( "enabled" ); 
+			pM->is_motile = xml_get_my_bool_value( node_mot1 ); 
+			
+			// restrict to 2D? 
+			node_mot1 = node_mot.child( "use_2D" ); 
+			pM->restrict_to_2D = xml_get_my_bool_value( node_mot1 ); 
+			
+			// automated chemotaxis setup 
+			node_mot1 = node_mot.child( "chemotaxis" ); 
+			if( node_mot1 )
+			{
+				// enabled? if so, set the standard chemotaxis function
+				if( xml_get_bool_value( node_mot1, "enabled" ) )
+				{
+					pCD->functions.update_migration_bias = chemotaxis_function;
+				}	
+				
+				// search for the right chemo index 
+				
+				std::string substrate_name = xml_get_string_value( node_mot1 , "substrate" ); 
+				pM->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
+				
+				std::string actual_name = microenvironment.density_names[ pM->chemotaxis_index ]; 
+				
+				// error check 
+				if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )
+				{
+					std::cout << "Error: attempted to set chemotaxis to \"" 
+						<< substrate_name << "\", which was not found in the microenvironment." << std::endl 
+					<< "       Please double-check your substrate name in the config file." << std::endl << std::endl; 
+					exit(-1); 
+				}
+				
+				// set the direction 
+				
+				pM->chemotaxis_direction = xml_get_int_value( node_mot1 , "direction" ); 
+				
+				std::cout << pM->chemotaxis_direction << " * grad( " << substrate_name << " )" << std::endl; 
+
+			}
+		}
+	}	
+
+/*
+
+
+
+	bool  ; 
+	bool restrict_to_2D; 
+		// if true, set random motility to 2D only. 
+		
+		
+		 
+ 
+	
+	int chemotaxis_index; 
+	int chemotaxis_direction; 
+	
+	
+
+				<motility>
+					<speed units="micron/min" />
+					<persistence_time units="min" />
+					<migration_bias units="dimensionless" />
+					
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<!-- name matches one of the microenvironment substrates above -->
+							<!-- 1 if up gradient, -1 if against gradient -->
+							<enabled>true</enabled>
+							<substrate>director signal</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+*/
 
 
 	
