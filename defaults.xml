@@ -154,15 +154,15 @@
 	<cell_definitions>
 		<cell_definition name="default" ID="0">
 			<phenotype>
-				<cycle code="5" name="live">  
+				<cycle code="5" name="live"> <!-- live --> <!-- done --> 
 					<transition_rates units="1/min"> 
-						<rate start_index="0" end_index="1">0</rate>
+						<rate start_index="0" end_index="1">7.2e-4</rate>
 					</transition_rates>
 				</cycle>
 				
-				<death>  
+				<death> <!-- done --> 
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">0</rate>
+						<rate units="1/min">5.316666666666667e-5</rate>
 						<transition_rates units="1/min">
 							<rate start_index="0" end_index="1" fixed_duration="true">1.937984496124031e-03</rate>
 						</transition_rates>
@@ -175,9 +175,25 @@
 							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
 						</parameters>
 					</model> 
+
+					<model code="101" name="necrosis">
+						<rate units="1/min">0.0</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+							<rate start_index="1" end_index="2" fixed_duration="true">1.157407407407407e-5</rate>
+						</transition_rates>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.666666666666667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.833333333333333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
 				</death>					
 
-				<volume>   
+				<volume> <!-- done --> 
 					<total units="micron^3">2494</total>
 					<fluid_fraction units="dimensionless">0.75</fluid_fraction>
 					<nuclear units="micron^3">540</nuclear>
@@ -192,7 +208,7 @@
 					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
 				</volume> 				
 				
-				<mechanics> 
+				<mechanics> <!-- done --> 
 					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
 					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
 					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
@@ -203,14 +219,14 @@
 					</options>
 				</mechanics>
 				
-				<motility>   
+				<motility> <!-- done --> 
 					<speed units="micron/min">1</speed>
 					<persistence_time units="min">2</persistence_time>
 					<migration_bias units="dimensionless">.5</migration_bias>
 					
 					<options>
 						<enabled>true</enabled>
-						<use_2D>true</use_2D>
+						<use_2D>false</use_2D>
 						<chemotaxis>
 							<enabled>false</enabled>
 							<substrate>director signal</substrate>
@@ -234,24 +250,35 @@
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 	
 				</secretion>
+				
+				
+				<old_secretion>
+					<!-- generally use this OR net export rates -->
+					<secretion_rates units="1/min">
+						<secretion_rate name="director signal">0</secretion_rate>
+						<secretion_rate name="cargo signal">0</secretion_rate>
+					</secretion_rates>
+					<secretion_targets units="substrate density">
+						<secretion_target name="director signal">1.0</secretion_target>
+						<secretion_target name="cargo signal">1.0</secretion_target>
+					</secretion_targets>
+					<uptake_rates units="1/min">
+						<uptake_rate name="director signal">10.0</uptake_rate>
+						<uptake_rate name="cargo signal">1.0</uptake_rate>
+					</uptake_rates>
+					<!-- generally use this OR secretion_rates -->
+					<net_export_rates units="total substrate/min">
+						<net_export_rate name="director signal">0.0</net_export_rate>
+						<net_export_rate name="cargo signal">0.0</net_export_rate>
+					</net_export_rates>
+				</old_secretion>
 
 				<molecular />
 			</phenotype>
 			<custom_data> <!-- done --> 
-				<receptor units="dimensionless">0.0</receptor>
-				<elastic_coefficient units="1/min">0.05</elastic_coefficient>
+				<elastic_coefficient units="1/min">1.0</elastic_coefficient>
 				<attachment_point units="micron">-12.8,13.9,0.0</attachment_point>
 			</custom_data>
-			
-	cell_defaults.custom_data.add_variable( "receptor" , "dimensionless", 0.0 ); 
-	/*
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 );  // 0.1; 
-	*/
-	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; 
-			
-			
-			
 		</cell_definition>
 		
 		<cell_definition name="huh" parent_type="default" ID="1">

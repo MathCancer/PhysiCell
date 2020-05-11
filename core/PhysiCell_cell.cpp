@@ -1337,6 +1337,16 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	pCD->pMicroenvironment = NULL;
 	if( BioFVM::get_default_microenvironment() != NULL )
 	{ pCD->pMicroenvironment = BioFVM::get_default_microenvironment(); }
+
+	// figure out if this ought to be 2D
+	if( default_microenvironment_options.simulate_2D )
+	{
+		std::cout << "Note: setting cell definition to 2D based on microenvironment domain settings ... "
+		<< std::endl; 
+		pCD->functions.set_orientation = up_orientation; 
+		pCD->phenotype.geometry.polarity = 1.0; 
+		pCD->phenotype.motility.restrict_to_2D = true; 
+	}
 	
 	// make sure phenotype.secretions are correctly sized 
 	
@@ -1754,6 +1764,14 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 			// restrict to 2D? 
 			node_mot1 = node_mot.child( "use_2D" ); 
 			pM->restrict_to_2D = xml_get_my_bool_value( node_mot1 ); 
+			
+			if( default_microenvironment_options.simulate_2D )
+			{
+				std::cout << "Note: Overriding to set cell motility to 2D based on " 
+							<< "microenvironment domain settings ... "
+				<< std::endl; 				
+				pM->restrict_to_2D = true; 
+			}
 			
 			// automated chemotaxis setup 
 			node_mot1 = node_mot.child( "chemotaxis" ); 

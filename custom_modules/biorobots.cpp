@@ -104,6 +104,11 @@ void create_cell_types( void )
 	SeedRandom( parameters.ints("random_seed") ); 
 	// housekeeping 
 	
+	initialize_cell_definitions_from_pugixml();
+
+/*	
+	// this is in initialize_cell_definitions_from_pugixml
+
 	initialize_default_cell_definition();
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
@@ -111,15 +116,21 @@ void create_cell_types( void )
 	// so it's easier to turn off proliferation
 	
 	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
+*/
 	
 	// Make sure we're ready for 2D
-	
+
+/*	
+	// this is in initialize_cell_definitions_from_pugixml
+
 	cell_defaults.functions.set_orientation = up_orientation; 
 	cell_defaults.phenotype.geometry.polarity = 1.0; 
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
+*/
 	
 	// turn off proliferation and death 
 	
+/*	
 	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
 	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
 	
@@ -130,7 +141,9 @@ void create_cell_types( void )
 	
 	int cargo_index = microenvironment.find_density_index( "cargo signal" ); // 1 
 	int director_index = microenvironment.find_density_index( "director signal" ); // 0 
+*/
 	
+/*	
 	// set uptake and secretion to zero 
 	cell_defaults.phenotype.secretion.secretion_rates[director_index] = 0; 
 	cell_defaults.phenotype.secretion.uptake_rates[director_index] = 0; 
@@ -139,17 +152,17 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.secretion_rates[cargo_index] = 0; 
 	cell_defaults.phenotype.secretion.uptake_rates[cargo_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[cargo_index] = 1; 
-
+*/
 	// set the default cell type to no phenotype updates 
 	
+	
+	
 	cell_defaults.functions.update_phenotype = NULL; 
+		// put this earlier than the parsing, so it's inherited?? 
 	
 	// add custom data 
 	
 	cell_defaults.custom_data.add_variable( "receptor" , "dimensionless", 0.0 ); 
-	/*
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 );  // 0.1; 
-	*/
 	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
 	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; 
 	

@@ -114,13 +114,7 @@ int main( int argc, char* argv[] )
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
-	std::cout << cell_defaults.phenotype.secretion.uptake_rates << std::endl; 
-	system("pause");
-	
-	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-	initialize_cell_definitions_from_pugixml(  );
-	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-	exit(-1); 
+//	initialize_cell_definitions_from_pugixml(  );
 	
 	create_cell_types();
 	setup_tissue();
