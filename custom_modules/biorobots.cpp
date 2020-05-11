@@ -65,7 +65,29 @@
 ###############################################################################
 */
 
-#include "./biorobots.h"
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
+
+using namespace BioFVM;
+using namespace PhysiCell;
+
+// static Cell_Definition worker_cell; 
+// static Cell_Definition cargo_cell; 
+// static Cell_Definition director_cell; 
+// static Cell_Definition linker_cell; 
+
+static int worker_ID = 0;
+static int cargo_ID = 1;
+// static int linker_ID = 2; 
+static int director_ID = 3;
+
+// declare all functions that will be referenced before they are defined
+void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );
+void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );
+void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt );
+void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt );
+void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
+
 
 void setup_microenvironment( void )
 {
@@ -99,118 +121,118 @@ void setup_microenvironment( void )
 	return; 
 }
 
-void create_cell_types( void )
-{
-	SeedRandom( parameters.ints("random_seed") ); 
-	// housekeeping 
+// void create_cell_types( void )
+// {
+// 	SeedRandom( parameters.ints("random_seed") ); 
+// 	// housekeeping 
 	
-	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+// 	initialize_default_cell_definition();
+// 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
-	// turn the default cycle model to live, 
-	// so it's easier to turn off proliferation
+// 	// turn the default cycle model to live, 
+// 	// so it's easier to turn off proliferation
 	
-	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
+// 	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
 	
-	// Make sure we're ready for 2D
+// 	// Make sure we're ready for 2D
 	
-	cell_defaults.functions.set_orientation = up_orientation; 
-	cell_defaults.phenotype.geometry.polarity = 1.0; 
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
+// 	cell_defaults.functions.set_orientation = up_orientation; 
+// 	cell_defaults.phenotype.geometry.polarity = 1.0; 
+// 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	
-	// turn off proliferation and death 
+// 	// turn off proliferation and death 
 	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
+// 	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
+// 	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
 	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+// 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
-	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; 
-	cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0; 
+// 	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; 
+// 	cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0; 
 	
-	int cargo_index = microenvironment.find_density_index( "cargo signal" ); // 1 
-	int director_index = microenvironment.find_density_index( "director signal" ); // 0 
+// 	int cargo_index = microenvironment.find_density_index( "cargo signal" ); // 1 
+// 	int director_index = microenvironment.find_density_index( "director signal" ); // 0 
 	
-	// set uptake and secretion to zero 
-	cell_defaults.phenotype.secretion.secretion_rates[director_index] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[director_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[director_index] = 1; 
+// 	// set uptake and secretion to zero 
+// 	cell_defaults.phenotype.secretion.secretion_rates[director_index] = 0; 
+// 	cell_defaults.phenotype.secretion.uptake_rates[director_index] = 0; 
+// 	cell_defaults.phenotype.secretion.saturation_densities[director_index] = 1; 
 	
-	cell_defaults.phenotype.secretion.secretion_rates[cargo_index] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[cargo_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[cargo_index] = 1; 
+// 	cell_defaults.phenotype.secretion.secretion_rates[cargo_index] = 0; 
+// 	cell_defaults.phenotype.secretion.uptake_rates[cargo_index] = 0; 
+// 	cell_defaults.phenotype.secretion.saturation_densities[cargo_index] = 1; 
 
-	// set the default cell type to no phenotype updates 
+// 	// set the default cell type to no phenotype updates 
 	
-	cell_defaults.functions.update_phenotype = NULL; 
+// 	cell_defaults.functions.update_phenotype = NULL; 
 	
-	// add custom data 
+// 	// add custom data 
 	
-	cell_defaults.custom_data.add_variable( "receptor" , "dimensionless", 0.0 ); 
-	/*
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 );  // 0.1; 
-	*/
-	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; 
+// 	cell_defaults.custom_data.add_variable( "receptor" , "dimensionless", 0.0 ); 
+// 	/*
+// 	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 );  // 0.1; 
+// 	*/
+// 	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
+// 	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; 
 	
-	//
-	// Define "seed" cells 
+// 	//
+// 	// Define "seed" cells 
 	
-	director_cell = cell_defaults; 
-	director_cell.type = director_ID; 
-	director_cell.name = "director cell"; 
+// 	director_cell = cell_defaults; 
+// 	director_cell.type = director_ID; 
+// 	director_cell.name = "director cell"; 
 	
-	// seed cell secrete the signal 
+// 	// seed cell secrete the signal 
 	
-	director_cell.phenotype.secretion.secretion_rates[director_index] = 9.9; 
+// 	director_cell.phenotype.secretion.secretion_rates[director_index] = 9.9; 
 	
-	// seed cell rule 
+// 	// seed cell rule 
 	
-	director_cell.functions.update_phenotype = director_cell_rule; 
+// 	director_cell.functions.update_phenotype = director_cell_rule; 
 	
-	// define "cargo" cells 
+// 	// define "cargo" cells 
 	
-	cargo_cell = cell_defaults; 
-	cargo_cell.type = cargo_ID; 
-	cargo_cell.name = "cargo cell";
+// 	cargo_cell = cell_defaults; 
+// 	cargo_cell.type = cargo_ID; 
+// 	cargo_cell.name = "cargo cell";
 	
-	cargo_cell.functions.update_phenotype = cargo_cell_rule; 
-	cargo_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
+// 	cargo_cell.functions.update_phenotype = cargo_cell_rule; 
+// 	cargo_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
 	
-	cargo_cell.custom_data["receptor"] = 1.0; 
+// 	cargo_cell.custom_data["receptor"] = 1.0; 
 
-	cargo_cell.phenotype.secretion.secretion_rates[cargo_index] = 9.9; 
-	cargo_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; // 7e-4
+// 	cargo_cell.phenotype.secretion.secretion_rates[cargo_index] = 9.9; 
+// 	cargo_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; // 7e-4
 	
-	//
-	// Define "worker" cells 
+// 	//
+// 	// Define "worker" cells 
 	
-	worker_cell = cell_defaults; 
-	worker_cell.type = worker_ID; 
-	worker_cell.name = "worker cell";
+// 	worker_cell = cell_defaults; 
+// 	worker_cell.type = worker_ID; 
+// 	worker_cell.name = "worker cell";
 	
-	// make them motile, and unadhesive  
+// 	// make them motile, and unadhesive  
 	
-	worker_cell.phenotype.motility.is_motile = true; 
-	worker_cell.phenotype.motility.persistence_time = 
-		parameters.doubles("worker_motility_persistence_time"); // 5.0; 
-	worker_cell.phenotype.motility.migration_speed = 
-		parameters.doubles("worker_migration_speed"); // 5; 
-	worker_cell.phenotype.motility.migration_bias = 
-		parameters.doubles("unattached_worker_migration_bias"); // 0.0; 
+// 	worker_cell.phenotype.motility.is_motile = true; 
+// 	worker_cell.phenotype.motility.persistence_time = 
+// 		parameters.doubles("worker_motility_persistence_time"); // 5.0; 
+// 	worker_cell.phenotype.motility.migration_speed = 
+// 		parameters.doubles("worker_migration_speed"); // 5; 
+// 	worker_cell.phenotype.motility.migration_bias = 
+// 		parameters.doubles("unattached_worker_migration_bias"); // 0.0; 
 	
 
-	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0; 
+// 	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0; 
 	
-	worker_cell.functions.update_phenotype = worker_cell_rule; 
-	worker_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
-	worker_cell.functions.update_migration_bias = worker_cell_motility;
+// 	worker_cell.functions.update_phenotype = worker_cell_rule; 
+// 	worker_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
+// 	worker_cell.functions.update_migration_bias = worker_cell_motility;
 	
-	build_cell_definitions_maps(); 
-	display_cell_definitions( std::cout ); 
+// 	build_cell_definitions_maps(); 
+// 	display_cell_definitions( std::cout ); 
 	
-	return; 
-}
+// 	return; 
+// }
 
 void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt )
 {
@@ -249,8 +271,8 @@ std::vector<std::string> robot_coloring_function( Cell* pCell )
 	{ color = worker_color; }
 	else if( pCell->type == cargo_ID )
 	{ color = cargo_color; }
-	else if( pCell->type == linker_ID )
-	{ color = "aquamarine"; }
+	// else if( pCell->type == linker_ID )
+	// { color = "aquamarine"; }
 	else if( pCell->type == director_ID )
 	{ color = director_color; }
 	
@@ -260,71 +282,71 @@ std::vector<std::string> robot_coloring_function( Cell* pCell )
 	return output; 
 }
 
-void create_cargo_cluster_6( std::vector<double>& center )
-{
-	// create a hollow cluster at position, with random orientation 
+// void create_cargo_cluster_6( std::vector<double>& center )
+// {
+// 	// create a hollow cluster at position, with random orientation 
 	
-	static double spacing = 0.95 * cargo_cell.phenotype.geometry.radius * 2.0; 
-	static double d_Theta = 1.047197551196598 ; // 2*pi / 6.0 
+// 	static double spacing = 0.95 * cargo_cell.phenotype.geometry.radius * 2.0; 
+// 	static double d_Theta = 1.047197551196598 ; // 2*pi / 6.0 
 	
-	double theta = 6.283185307179586 * UniformRandom(); 
+// 	double theta = 6.283185307179586 * UniformRandom(); 
 	
-	static std::vector<double> position(3,0.0); 
+// 	static std::vector<double> position(3,0.0); 
 	
-	Cell* pC; 
-	for( int i=0; i < 6; i++ )
-	{
-		pC = create_cell( cargo_cell ); 
+// 	Cell* pC; 
+// 	for( int i=0; i < 6; i++ )
+// 	{
+// 		pC = create_cell( cargo_cell ); 
 		
-		position[0] = center[0] + spacing*cos( theta ); 
-		position[1] = center[1] + spacing*sin( theta ); 
+// 		position[0] = center[0] + spacing*cos( theta ); 
+// 		position[1] = center[1] + spacing*sin( theta ); 
 		
-		pC->assign_position( position ); 
+// 		pC->assign_position( position ); 
 		
-		theta += d_Theta; 
-	}
+// 		theta += d_Theta; 
+// 	}
 	
-	return; 
-}
+// 	return; 
+// }
 
-void create_cargo_cluster_7( std::vector<double>& center )
-{
-	// create a filled cluster at position, with random orientation 
+// void create_cargo_cluster_7( std::vector<double>& center )
+// {
+// 	// create a filled cluster at position, with random orientation 
 
-	create_cargo_cluster_6( center );
-	Cell* pC = create_cell( cargo_cell ); 
-	pC->assign_position( center ); 
+// 	create_cargo_cluster_6( center );
+// 	Cell* pC = create_cell( cargo_cell ); 
+// 	pC->assign_position( center ); 
 	
-	return; 
-}
+// 	return; 
+// }
 
 
-void create_cargo_cluster_3( std::vector<double>& center )
-{
-	// create a small cluster at position, with random orientation 
+// void create_cargo_cluster_3( std::vector<double>& center )
+// {
+// 	// create a small cluster at position, with random orientation 
 	
-	static double spacing = 0.95 * cargo_cell.phenotype.geometry.radius * 1.0; 
-	static double d_Theta = 2.094395102393195 ; // 2*pi / 3.0 
+// 	static double spacing = 0.95 * cargo_cell.phenotype.geometry.radius * 1.0; 
+// 	static double d_Theta = 2.094395102393195 ; // 2*pi / 3.0 
 	
-	double theta = 6.283185307179586 * UniformRandom(); 
+// 	double theta = 6.283185307179586 * UniformRandom(); 
 	
-	static std::vector<double> position(3,0.0); 
+// 	static std::vector<double> position(3,0.0); 
 	
-	Cell* pC; 
-	for( int i=0; i < 3; i++ )
-	{
-		pC = create_cell( cargo_cell ); 
+// 	Cell* pC; 
+// 	for( int i=0; i < 3; i++ )
+// 	{
+// 		pC = create_cell( cargo_cell ); 
 		
-		position[0] = center[0] + spacing*cos( theta ); 
-		position[1] = center[1] + spacing*sin( theta ); 
+// 		position[0] = center[0] + spacing*cos( theta ); 
+// 		position[1] = center[1] + spacing*sin( theta ); 
 		
-		pC->assign_position( position ); 
+// 		pC->assign_position( position ); 
 		
-		theta += d_Theta; 
-	}
+// 		theta += d_Theta; 
+// 	}
 	
-	return; 
-}
+// 	return; 
+// }
 
 
 void setup_tissue( void )
@@ -355,52 +377,53 @@ void setup_tissue( void )
 		
 		// place the cell
 		Cell* pC;
-		pC = create_cell( director_cell ); 
+		// pC = create_cell( director_cell ); 
+		pC = create_cell( *cell_definitions_by_name["director cell"] ); 
 		pC->assign_position( position );
 		pC->is_movable = false; 
 	}
 	
 	// place cargo clusters on the fringes 
 	
-	std::cout << "\tPlacing cargo cells ... " << std::endl; 
-	for( int i=0; i < number_of_cargo_clusters ; i++ )
-	{
-		// pick a random location 
+	// std::cout << "\tPlacing cargo cells ... " << std::endl; 
+	// for( int i=0; i < number_of_cargo_clusters ; i++ )
+	// {
+	// 	// pick a random location 
 		
-		position[0] = default_microenvironment_options.X_range[0] + 
-				x_range*( relative_outer_margin + (1-2.0*relative_outer_margin)*UniformRandom() ); 
+	// 	position[0] = default_microenvironment_options.X_range[0] + 
+	// 			x_range*( relative_outer_margin + (1-2.0*relative_outer_margin)*UniformRandom() ); 
 		
-		position[1] = default_microenvironment_options.Y_range[0] + 
-				y_range*( relative_outer_margin + (1-2.0*relative_outer_margin)*UniformRandom() ); 
+	// 	position[1] = default_microenvironment_options.Y_range[0] + 
+	// 			y_range*( relative_outer_margin + (1-2.0*relative_outer_margin)*UniformRandom() ); 
 		
-		if( UniformRandom() < 0.5 )
-		{
-			Cell* pCell = create_cell( cargo_cell ); 
-			pCell->assign_position( position ); 
-		}
-		else
-		{
-			create_cargo_cluster_7( position ); 
-		}
-	}
+	// 	if( UniformRandom() < 0.5 )
+	// 	{
+	// 		Cell* pCell = create_cell( cargo_cell ); 
+	// 		pCell->assign_position( position ); 
+	// 	}
+	// 	else
+	// 	{
+	// 		create_cargo_cluster_7( position ); 
+	// 	}
+	// }
 	
-	// place "workersworkers"
+	// // place "workersworkers"
 
-	std::cout << "\tPlacing worker cells ... " << std::endl; 
-	for( int i=0; i < number_of_workers ; i++ )
-	{
-		// pick a random location 
+	// std::cout << "\tPlacing worker cells ... " << std::endl; 
+	// for( int i=0; i < number_of_workers ; i++ )
+	// {
+	// 	// pick a random location 
 		
-		position[0] = default_microenvironment_options.X_range[0] + x_range*( relative_margin + (1.0-2*relative_margin)*UniformRandom() ); 
+	// 	position[0] = default_microenvironment_options.X_range[0] + x_range*( relative_margin + (1.0-2*relative_margin)*UniformRandom() ); 
 		
-		position[1] = default_microenvironment_options.Y_range[0] + y_range*( relative_outer_margin + (1.0-2*relative_outer_margin)*UniformRandom() ); 
+	// 	position[1] = default_microenvironment_options.Y_range[0] + y_range*( relative_outer_margin + (1.0-2*relative_outer_margin)*UniformRandom() ); 
 		
-		// place the cell
-		Cell* pC;
+	// 	// place the cell
+	// 	Cell* pC;
 
-		pC = create_cell( worker_cell ); 
-		pC->assign_position( position );
-	}	
+	// 	pC = create_cell( worker_cell ); 
+	// 	pC->assign_position( position );
+	// }	
 	
 
 	std::cout << "done!" << std::endl; 
