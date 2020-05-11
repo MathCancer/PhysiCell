@@ -72,24 +72,20 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
+#include <string> 
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
 // custom user modules 
 
-#include "./custom_modules/biorobots.h" 
+#include "./custom_modules/heterogeneity.h" 
 	
 using namespace BioFVM;
 using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
-
-	std::cout << "--------- start of main() ------------"<< std::endl; 
-	// display_cell_definitions( std::cout ); 
-
-
 	// load and parse settings file(s)
 	
 	bool XML_status = false; 
@@ -100,9 +96,6 @@ int main( int argc, char* argv[] )
 	if( !XML_status )
 	{ exit(-1); }
 
-	// std::cout << "\n--------- main(): after load config------------"<< std::endl; 
-	// display_cell_definitions( std::cout ); 
-	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
@@ -122,23 +115,7 @@ int main( int argc, char* argv[] )
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
-	// std::cout << "\n--------- main(): secretion.uptake_rates ------------"<< std::endl; 
-	// display_cell_definitions( std::cout ); 
-	std::cout << cell_defaults.phenotype.secretion.uptake_rates << std::endl; 
-	// system("pause");
-	
-	// std::cout << "\n--------- main(): pre init cell defns ------------"<< std::endl; 
-	// display_cell_definitions( std::cout ); 
-
-	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-	initialize_cell_definitions_from_pugixml(  );
-	std::cout << "\n--------- main(): post init cell defns from pugixml ------------"<< std::endl; 
-	display_cell_definitions( std::cout ); 
-
-	// std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-	// exit(-1); 
-	
-	// create_cell_types();
+	create_cell_types();
 	setup_tissue();
 	
 	/* Users typically start modifying here. START USERMODS */ 
@@ -153,7 +130,7 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_cell_data_as_custom_matlab( true );
 	
 	// save a simulation snapshot 
-
+	
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
@@ -165,7 +142,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = robot_coloring_function;
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = heterogeneity_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );

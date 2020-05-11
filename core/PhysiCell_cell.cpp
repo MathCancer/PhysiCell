@@ -1301,6 +1301,46 @@ Cell_Definition* find_cell_definition( int search_type )
 	return output; 	
 }
 
+Cell_Definition& get_cell_definition( std::string search_string )
+{
+	// if the registry isn't built yet, then do it! 
+	if( cell_definitions_by_name_constructed == false )
+	{
+		build_cell_definitions_maps(); 
+	}
+	
+	if( cell_definitions_by_name.count( search_string ) > 0 )
+	{ 
+		return *(cell_definitions_by_name.find( search_string )->second ); 
+	} 
+	
+	std::cout << "Warning! Cell_Definition for " << search_string << " not found!" << std::endl; 
+	std::cout << "Returning the default cell definition instead ... " << std::endl; 
+	
+	return cell_defaults; 	
+}
+
+Cell_Definition& get_cell_definition( int search_type )
+{
+	// if the registry isn't built yet, then do it! 
+	if( cell_definitions_by_name_constructed == false )
+	{
+		build_cell_definitions_maps(); 
+	}
+	
+	if( cell_definitions_by_type.count( search_type ) > 0 )
+	{ 
+		return *(cell_definitions_by_type.find( search_type )->second); 
+	} 
+	
+	std::cout << "Warning! Cell_Definition for " << search_type << " not found!" << std::endl; 
+	std::cout << "Returning the default cell definition instead ... " << std::endl; 
+	
+	return cell_defaults; 	
+}
+
+
+
 
 Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node )
 {

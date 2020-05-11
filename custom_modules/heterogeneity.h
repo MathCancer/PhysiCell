@@ -68,26 +68,19 @@
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
-using namespace BioFVM;
+using namespace BioFVM; 
 using namespace PhysiCell;
 
-static int worker_ID = 0;
-static int cargo_ID = 1;
-static int linker_ID = 2; 
-static int director_ID = 3;
+// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-// set up the microenvironment 
-
-void setup_microenvironment( void ); // done 
-
-// set up the cell types 
-
+// set the tumor cell properties, then call the function 
+// to set up the tumor cells 
 void create_cell_types( void );
 
-// set up the problem geometry 
+void setup_tissue(); 
 
-void setup_tissue( void ); 
+// set up the microenvironment to include the immunostimulatory factor 
+void setup_microenvironment( void );  // done 
 
-// coloring functions 
-
-std::vector<std::string> robot_coloring_function( Cell* pCell ); 
+std::vector<std::string> heterogeneity_coloring_function( Cell* );

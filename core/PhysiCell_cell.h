@@ -246,6 +246,9 @@ void build_cell_definitions_maps( void ); // done
 Cell_Definition* find_cell_definition( std::string search_string ); // done 
 Cell_Definition* find_cell_definition( int search_type );  
 
+Cell_Definition& get_cell_definition( std::string search_string ); // done 
+Cell_Definition& get_cell_definition( int search_type );  
+
 Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node ); 
 void initialize_cell_definitions_from_pugixml( pugi::xml_node root ); 
 void initialize_cell_definitions_from_pugixml( void );
