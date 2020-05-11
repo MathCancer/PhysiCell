@@ -151,9 +151,7 @@
 		</options>
 	</microenvironment_setup>		
 
-	<!--   ====================== define cell types  ================================================== -->
 	<cell_definitions>
-		<!--   ======================  default  ================================= -->
 		<cell_definition name="default" ID="0">
 			<phenotype>
 				<cycle code="5" name="live"> <!-- live --> <!-- done --> 
@@ -282,46 +280,8 @@
 				<attachment_point units="micron">-12.8,13.9,0.0</attachment_point>
 			</custom_data>
 		</cell_definition>
-
-		<!--   ======================  worker  ================================= -->
-		<cell_definition name="worker cell" parent_type="default" ID="0">
-			<phenotype />
-		</cell_definition>
 		
-		<!--   ======================  cargo  ================================= -->
-		<cell_definition name="cargo cell" parent_type="default" ID="1">
-			<phenotype>
-				<cycle />
-				<death>
-					<model code="101" name="necrosis"> 
-						<rate units="1/min">1e-2</rate>
-						<transition_rates units="1/min">
-							<rate start_index="0" end_index="1" fixed_duration="true">1.937984496124031e-03</rate>
-						</transition_rates>
-						<parameters>
-							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-							<cytoplasmic_biomass_change_rate units="1/min">1.666666666666667e-02</cytoplasmic_biomass_change_rate>
-							<nuclear_biomass_change_rate units="1/min">5.833333333333333e-03</nuclear_biomass_change_rate>
-							<calcification_rate units="1/min">0</calcification_rate>
-							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-						</parameters>
-					</model> 
-				</death>
-				<volume />
-				<mechanics />
-				<motility />
-				<secretion />
-				<molecular />
-			</phenotype>
-			<custom_data>
-				<elastic_coefficient length="1" units="1/min">2.0</elastic_coefficient>
-				<attachment_point length="3" units="micron">2.8,133.9,-0.0</attachment_point>
-			</custom_data>
-		</cell_definition>
-
-		<!--   ======================  cargo  ================================= -->
-		<cell_definition name="director cell" parent_type="default" ID="3">
+		<cell_definition name="huh" parent_type="default" ID="1">
 			<phenotype>
 				<cycle />
 				<death>
