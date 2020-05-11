@@ -85,6 +85,11 @@ using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
+
+	std::cout << "--------- start of main() ------------"<< std::endl; 
+	// display_cell_definitions( std::cout ); 
+
+
 	// load and parse settings file(s)
 	
 	bool XML_status = false; 
@@ -94,6 +99,9 @@ int main( int argc, char* argv[] )
 	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
 	if( !XML_status )
 	{ exit(-1); }
+
+	// std::cout << "\n--------- main(): after load config------------"<< std::endl; 
+	// display_cell_definitions( std::cout ); 
 	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
@@ -114,15 +122,23 @@ int main( int argc, char* argv[] )
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
+	// std::cout << "\n--------- main(): secretion.uptake_rates ------------"<< std::endl; 
+	// display_cell_definitions( std::cout ); 
 	std::cout << cell_defaults.phenotype.secretion.uptake_rates << std::endl; 
-	system("pause");
+	// system("pause");
 	
+	// std::cout << "\n--------- main(): pre init cell defns ------------"<< std::endl; 
+	// display_cell_definitions( std::cout ); 
+
 	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
 	initialize_cell_definitions_from_pugixml(  );
-	std::cout << __FILE__ << " " << __LINE__ << std::endl; 
-	exit(-1); 
+	std::cout << "\n--------- main(): post init cell defns from pugixml ------------"<< std::endl; 
+	display_cell_definitions( std::cout ); 
+
+	// std::cout << __FILE__ << " " << __LINE__ << std::endl; 
+	// exit(-1); 
 	
-	create_cell_types();
+	// create_cell_types();
 	setup_tissue();
 	
 	/* Users typically start modifying here. START USERMODS */ 
