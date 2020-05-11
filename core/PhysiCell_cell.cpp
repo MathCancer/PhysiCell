@@ -72,6 +72,8 @@
 #include "../BioFVM/BioFVM_vector.h" 
 #include<limits.h>
 
+#include <signal.h>  // for segfault
+
 namespace PhysiCell{
 	
 std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name; 
@@ -133,7 +135,11 @@ Cell_Definition::Cell_Definition()
 	functions.set_orientation = NULL;
 	
 	cell_definitions_by_index.push_back( this ); 
+	std::cout << "--- cell_definitions_by_index(1) size= " << cell_definitions_by_index.size() << std::endl;
 	
+	// if (cell_definitions_by_index.size() == 6)
+    // 	raise(SIGSEGV);   // needs #include <signal.h>
+
 	return; 
 }
 
@@ -157,6 +163,7 @@ Cell_Definition::Cell_Definition( Cell_Definition& cd )
 	parameters.pReference_live_phenotype = &phenotype; 
 	
 	cell_definitions_by_index.push_back( this ); 
+	std::cout << "----- cell_definitions_by_index(2) size= " << cell_definitions_by_index.size() << std::endl;
 	
 	return; 
 }
