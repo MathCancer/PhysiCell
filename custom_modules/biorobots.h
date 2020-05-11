@@ -71,13 +71,6 @@
 using namespace BioFVM;
 using namespace PhysiCell;
 
-// declare the cell types 
-
-static Cell_Definition worker_cell; 
-static Cell_Definition cargo_cell; 
-static Cell_Definition director_cell; 
-static Cell_Definition linker_cell; 
-
 static int worker_ID = 0;
 static int cargo_ID = 1;
 static int linker_ID = 2; 
@@ -98,19 +91,3 @@ void setup_tissue( void );
 // coloring functions 
 
 std::vector<std::string> robot_coloring_function( Cell* pCell ); 
-
-// these are the custom functions for these cells 
-
-void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
-
-void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
-void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
-
-void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt ); 
-
-
-
-void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );  // done 
-
-
-
