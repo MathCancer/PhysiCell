@@ -80,6 +80,21 @@ void create_cell_types( void )
 	
 	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
 	
+	/* Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
+	
+	cell_defaults.functions.update_phenotype = NULL; 
+	
+	// This parses the cell definitions in the XML config file. 
+	
+	initialize_cell_definitions_from_pugixml(); 
+	
+	exit(-1); 
+	
+/*	
 	// housekeeping 
 	
 	initialize_default_cell_definition();

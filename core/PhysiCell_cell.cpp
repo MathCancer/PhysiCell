@@ -1166,6 +1166,7 @@ void display_cell_definitions( std::ostream& os )
 				
 			// let's show the transition rates 
 			Cycle_Model* pCM = &(pCD->phenotype.cycle.model() ); 
+			Cycle_Data* pCMD = &(pCD->phenotype.cycle.data ); 
 			for( int n=0 ; n < pCM->phases.size() ; n++ )
 			{
 				os << "\t\tPhase " << n << ": " << pCM->phases[n].name << std::endl; 
@@ -1180,7 +1181,7 @@ void display_cell_definitions( std::ostream& os )
 					int end = pCM->phase_links[n][k].end_phase_index; 
 					os << "\t\t" << pCM->phases[start].name << " --> " 
 						<< pCM->phases[end].name << " w mean duration " 
-						<< 1.0 / pCM->transition_rate( start,end) << " min" << std::endl; 
+						<< 1.0 / pCMD->transition_rate( start,end) << " min" << std::endl; 
 				}
 			}			
 			
@@ -1431,7 +1432,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					pCD->functions.cycle_model = flow_cytometry_cycle_model;  
 					break; 
 				case PhysiCell_constants::live_apoptotic_cycle_model: // ?
-					pCD->functions.cycle_model = Ki67_advanced;  // ?
+					pCD->functions.cycle_model = live;  // ?
 					std::cout << "Warning: live_apoptotic_cycle_model not directly supported." << std::endl		
 							  << "         Substituting live cells model. Set death rates=0." << std::endl; 
 					break; 
@@ -1490,7 +1491,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				double value = xml_get_my_double_value( node ); 
 				
 				// set the transition rate 
-				pCD->phenotype.cycle.model().transition_rate(start,end) = value; 
+				std::cout << __LINE__ << " setting rate" << pCD->phenotype.cycle.data.transition_rate(start,end) << " " ; 
+				pCD->phenotype.cycle.data.transition_rate(start,end) = value; 
+				std::cout << __LINE__ << " setting rate" << pCD->phenotype.cycle.data.transition_rate(start,end) << std::endl; 
+				system("pause");
 				// set it to fixed / non-fixed 
 				pCD->phenotype.cycle.model().phase_link(start,end).fixed_duration = fixed; 
 				
