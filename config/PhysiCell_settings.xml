@@ -245,13 +245,14 @@
 				<attachment_point units="micron">-12.8,13.9,0.0</attachment_point>
 			</custom_data>
 			
+<!-- 			
 	cell_defaults.custom_data.add_variable( "receptor" , "dimensionless", 0.0 ); 
 	/*
 	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 );  // 0.1; 
 	*/
 	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
 	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; 
-			
+-->			
 			
 			
 		</cell_definition>
