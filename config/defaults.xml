@@ -126,6 +126,17 @@
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
 			<Dirichlet_boundary_condition units="dimensionless" enabled="false">1</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
 		</variable>
 		
 		<variable name="cargo signal" units="dimensionless" ID="1">
