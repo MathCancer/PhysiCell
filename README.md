@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:** 1.6.1
+**Version:** 1.7.0
 
-**Release date:** 26 January 2020
+**Release date:** 12 May 2020
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -32,6 +32,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
     heterogeneity-sample
     cancer-immune-sample 
     virus-macrophage-sample
+    temlate 
 
 **make list-projects** : list all available sample projects 
 
@@ -59,55 +60,143 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 See changes.md for the full change log. 
 
 * * * 
-
 ## Release summary: 
 
-This release fixes minor bugs and improves the documentation. It also adds some minor new capabilities, such as setting time step sizes in the XML configuration file. 
+This release (1) adds "net export" as a new form of more generalized substrate secretion, (2) adds helper funtions for cell size and volume for esier configuration, (3) adds a new, standardized chemotaxis function, (4) adds 1D diffusion, and (5) introduces XML-based cell definitions as a beta feature. It also incorporates a variety of bugfixes.   
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
 ### Major new features and changes:
 
-+ List here. 
- 
++ Added "net_export_rates" to "secretion" part of Phenotype, and to the Basic_Agent class in BioFVM. This is in response to SourceForge ticket 19. 
+
++ Added new helper functions to help users to more easily set the *target* cell size: 
+   + void Cell::set_target_volume( double new_volume ) sets the target total cell volume, while preserving the desired nuclear:cytoplasmic ratio and desired fluid fraction. In the default cell volume model, the cell will now approach this value by shrinking or growing. 
+   + void Cell::set_target_radius( double new_radius ) behaves similarly, but using a radius instead. 
+
++ Added Cell::set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
+
++ Added 1-D diffusion solvers to BioFVM (useful for some coarse-grained problems). It solves for diffusion in the x-direction only. Use it by setting: 
+
+  microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_1D
+  
+  Use this right after setup_microenvironment() in your main.cpp file. Future versions will include an XML option to use 1D. Most users will never need this. 
+  
++ Added a standardized chemotaxis function to the standard models: 
+
+     void chemotaxis_direction( Cell* pCell , Phenotype& phenotype , double dt ); 
+
+  This sets:
+  
+     phenotype.motility.motility_bias_direction = direction * grad( index ), where 
+    
+     direction = phenotype.motility.chemotaxis_direction 
+        (1 to go up gradient, -1 to go down gradient)
+     index = phenotype.motility.chemotaxis_index 
+        (the index of one of hte diffusing substrates)
+
++ Added Cell_Definitions in XML (beta feature) in response to SourceForge ticket 5. Users will be able to set the cell defaults definition by XML, as well as additional cell definitions that "inherit" phenotype parameters from cell defaults. This vastly reduces teh amount of necessary C++ to define a model. The new "template" sample project unifies 2D and 3D model specification using the new XML-based cell definitions. The next few releases will refine documentation and roll teh new XML-based cell definitions out to all the other sample projects. 
+
 ### Minor new features and changes: 
+
++ Created get_cell_definition(std::string) to return by reference the matching cell definition (search by name). Returns cell_defaults if nothing found. 
+
++ Created get_cell_definition(int) to return by reference the matching cell definition (search by type). Returns cell_defaults if nothing found. 
+
++ added int chemotaxis_index and chemotaxis_direction to the Motility class to assist with a new standard chemotaxis function. 
  
-+ "make list-projects" now displayed to standard output a list of all the sample projects. 
++ scale_all_secretion_by_factor also scales net_export_rates.
 
-+ dt_diffusion, dt_mechanics, and dt_phenotype can now be set via the XML configuration file in the options section. 
++ sync_to_current_microenvironment and sync_to_microenvironment set up net_export_rates 
 
-+ Added documentation on the time step sizes to the User Guide. 
++ Secretion::advance now updates net_export processes 
 
-+ Preliminary work to support Travis CI testing. 
++ Secretion::set_all_secretion_to_zero and Secretion::scale_all_secretion_by_factor act on net_export_rates as well. 
 
-+ Updated documentation to note that Cell::start_death is the preferred method to trigger cell death, and NOT Death::trigger_death. 
++ Cell::turn_off_reactions acts on net_export_rates as well. 
 
-+ Updated Microenvironment::compute_all_gradient_vectors to now compute one-sized gradients on edge voxels. (Previously, no gradient was computed here.) 
++ BioFVM::Basic_Agent::simulate_secretion_and_uptake now updates net_export processes, including impact on internal tracked substrate totals. (And all appropriate initializatoin functions have been updated. 
 
-+ Updated Microenvironment::compute_all_gradient_vectors to check if there is no z-direction (i.e., 2D) and exit early if so. 
-
-+ Updated Microenvironment::compute_all_gradient_vectors to check if there is no y-direction (i.e., 1D) and exit early if so. 
-
-+ Made PhysiCell_constants.cpp (and added this to the core of all project makefiles) so that dt and other variables can be non-static (i.e., set by XML options). 
-
-+ Added "make checkpoint" rule to makefiles. This zips up the user-custom stuff (./config, ./, ./custom_modules) into a timestamped zip file. Use this before upgrading PhysiCell to make sure you keep your own Makefile, etc. 
++ Updated documentation to reflect the new net export rates. 
  
++ Updated the documentation to fully state the biotransport PDEs (for better clarity), including notes on the dimensions of the parameters. 
+
++ Deprecated the following (unimplemented) function from the Volume class definition, as promised: 
+```
+ void update( Cell* pCell, Phenotype& phenotype, double dt )
+```
+
++ Added a new registry (unsorted map) of all cell definitions called cell_definitions_by_name and a vector of cell definitions called cell_definitions_by_index.  
+
++ The Cell_Definition default constructor and copy constructor automatically register all new cell definitions in cell_definitions_by_index; 
+
++ Created a display_cell_definitions(std::ostream&) function to quickly list all cell definitions and key information.  
+
++ Created build_cell_definitions_maps() to create cell_definitions_by_name and cell_definitions_by_type. This should go at the end of create_cell_types(). 
+
++ Created find_cell_definition(std::string) to return a pointer to the matching cell definition (search by name). Returns NULL if nothing found. 
+
++ Created find_cell_definition(int) to return a pointer to the matching cell definition (search by type). Returns NULL if nothing found. 
+
++ Deprecated oxygen_index, glucose_index, TUMOR_TYPE, and VESSEL_TYPE from PhysiCell_Constants as promised. 
+
++ Minor source code cleanup in PhysiCell_settings.cpp. 
+
++ All sample projects now automatically build (and display) the registries of cell definitions via build_cell_definitions_maps() and display_cell_definitions(). 
+
++ added the following std::vector<bool> to Microenvironment_Options to facilitate setting Dirichlet conditions on specific boundaries for specific substates: Dirichlet_all, Dirichlet_xmin, Dirichlet_xmax, Dirichlet_ymin, Dirichlet_ymax, Dirichlet_zmin, Dirichlet_zmax, Dirichlet_interior. 
+
++ Minor cleanup in BioFVM_microenvironment.cpp 
+
++ Microenvironment::update_dirichlet_node(voxel_index,substrate_index,value) now sets dirichlet_activation_vectors[voxel_index][substrate_index] = true; 
+
++ Microenvironment::set_substrate_dirichlet_activation( int substrate_index , bool new_value ) now sets dirichlet_activation_vectors[voxel_index][substrate_index] for ALL Dirichlet nodes. 
+
++ Microenvironment::apply_dirichlet_conditions() now checks the Dirichlet activation vector of the individual voxel. 
+
++ Microenvironment::resize_voxels() and the various Microenvironment::resize_space() functions now resize dirichlet_activation_vectors, using the default dirichlet_activation_vector as the initial uniform activation vector. 
+
++ Microenvironment::resize_densities() and the various Microenvironment::add_density() functions now resize dirichlet_activation_vector and use it to intialize dirichlet_activation_vectors at every voxel. 
+
++ The various Microenvironment::add_density() functions now 
+
++ Added function Microenvironment::set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ) to set the entire vector of activation at a specific voxel. 
+
+
 ### Beta features (not fully supported):
  
-+ List here. 
++ Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined in the next few releases while still in beta. 
+
   
 ### Bugfixes: 
 
-+ BioFVM's diffusion_decay_solver__constant_coefficients_LOD_3D, diffusion_decay_solver__constant_coefficients_LOD_2D check for regular meshes instead of uniform meshes. 
++ In response to SourceForge ticket 25, added cell_defaults.phenotype.molecular.sync_to_microenvironment( &microenvironment ); to the create_cell_types() functions in the 2D and 3D template projects. 
 
-+ Biorobots sample project fixed bugs on searching for substrates vs. searching for cell types. 
++ In response to SourceForge ticket 18, update_cell_and_death_parameters_O2_based() now checks for deterministic necrosis. 
 
-+ In BioFVM_vectors, the normalize functions now return a zero vector if the vector's norm is less than 1e-16. This is for John Metzcar. 
++ In response to GitHub issue 33, fixed issue where data-cleanup makefile rule gets a list of too many files. Rolled the new rule through to all the sample Makefiles as well. 
 
-+ In PhysiCell_Cell.cpp, made fixes to Cell::divide() and Cell::assign_position() to fix a bug where cells dividing on the edge of the domain woudl place a daughter cell at (0,0,0). Thanks, Andrew Eckel!
+```
+data-cleanup:
+	rm -f *.mat
+	rm -f *.xml
+	rm -f *.svg
+	rm -rf ./output
+	mkdir ./output
+	touch ./output/empty.txt
+```
++ Updated Cell::Cell(), create_cell(), create_cell(Cell_Defintion), and convert_to_cell_definition() to call set_total_volume( phenotype.volume.total ). This makes sure that BioFVM knows the correct volume at the time of creation (or major update) so that it can save the correct values to outputs. This is in response to GitHub issue 22. 
 
-+ Code cleanup in PhysiCell_cell_container in Cell_Container::update_all_cells() as suggested by Andrew Eckel. Thanks! 
- 
++ Removed the false statement from the user manual that stated that the cytoplasmic:nuclear ratio is between 0 and 1. 
+
++ Removed the false statement from the user manual that stated that relative cell rupture volume is between 0 and 1. 
+
++ Updated the list of PhysiCell_Constants in response to SourceForge ticket 11. 
+
++ The various Microenvironment::add_density() functions now only set dirichlet_activation_vector = true for the newly added substrate, rather than *all* of them. This new vector is then used to initialize the activation vectors at every voxel. 
+
++ Microenvironment::get_substrate_dirichlet_activation() mistakenly returned a double. Now it returns bool. 
+
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
