@@ -128,36 +128,6 @@ void setup_microenvironment( void )
 {
 	// set domain parameters 
 	
-/* now this is in XML 
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
-	default_microenvironment_options.simulate_2D = true; 
-*/
-	
-	// make sure to override and go back to 2D 
-	if( default_microenvironment_options.simulate_2D == false )
-	{
-		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
-		default_microenvironment_options.simulate_2D = true; 
-	}
-	
-/* now this is in XML 	
-	// no gradients need for this example 
-
-	default_microenvironment_options.calculate_gradients = false; 
-	
-	// set Dirichlet conditions 
-
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	
-	// if there are more substrates, resize accordingly 
-	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
-	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
-	
-	// set initial conditions 
-	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
-*/
-	
 	// put any custom code to set non-homogeneous initial conditions or 
 	// extra Dirichlet nodes here. 
 	
