@@ -823,6 +823,11 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	
 	pCell->phenotype.death.rates[necrosis_index] = multiplier * pCell->parameters.max_necrosis_rate; 
 	
+	// check for deterministic necrosis 
+	
+	if( pCell->parameters.necrosis_type == PhysiCell_constants::deterministic_necrosis && multiplier > 1e-16 )
+	{ pCell->phenotype.death.rates[necrosis_index] = 9e99; } 
+	
 	return; 
 }
 

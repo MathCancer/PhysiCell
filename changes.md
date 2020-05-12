@@ -117,6 +117,10 @@ This release ...
   
 ### Bugfixes: 
 
++ In response to SourceForge ticket 25, added cell_defaults.phenotype.molecular.sync_to_microenvironment( &microenvironment ); to the create_cell_types() functions in the 2D and 3D template projects. 
+
++ In response to SourceForge ticket 18, update_cell_and_death_parameters_O2_based() now checks for deterministic necrosis. 
+
 + In response to GitHub issue 33, fixed issue where data-cleanup makefile rule gets a list of too many files. Rolled the new rule through to all the sample Makefiles as well. 
 
 ```
