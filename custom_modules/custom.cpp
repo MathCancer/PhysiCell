@@ -73,12 +73,8 @@ Cell_Definition motile_cell;
 
 void create_cell_types( void )
 {
-	// use the same random seed so that future experiments have the 
-	// same initial histogram of oncoprotein, even if threading means 
-	// that future division and other events are still not identical 
-	// for all runs 
-	
-	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
+	// set the random seed 
+	SeedRandom( parameters.ints("random_seed") );  
 	
 	/* 
 	   Put any modifications to default cell definition here if you 
@@ -97,8 +93,9 @@ void create_cell_types( void )
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
-	
-	// This parses the cell definitions in the XML config file. 
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
 	
 	initialize_cell_definitions_from_pugixml(); 
 	
@@ -108,99 +105,18 @@ void create_cell_types( void )
 	   This is a good place to set custom functions. 
 	*/ 
 	
-	
-	// exit(-1); 
-/*	
-	// May 2020: all this is done in initialize_cell_definitions_from_pugixml now. 
-	
-	// housekeeping 
-	
-	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
-	
-	// Name the default cell type 
-	
-	cell_defaults.type = 0; 
-	cell_defaults.name = "tumor cell"; 
-	
-	// set default cell cycle model 
+	if( parameters.bools("predators_eat_prey") == true )
+	{ get_cell_definition("predator").functions.custom_cell_rule = predator_hunting_function; }
 
-	cell_defaults.functions.cycle_model = flow_cytometry_separated_cycle_model; 
-	
-	// set default_cell_functions; 
-	
-	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
-	
-	// needed for a 2-D simulation: 
-	
-	/* grab code from heterogeneity */ 
+	if( parameters.bools("predators_cycle_if_big") == true )
+	{ get_cell_definition("predator").functions.update_phenotype = predator_cycling_function; }
 
- 
-
-/* 
-	// May 2020: all this is done in initialize_cell_definitions_from_pugixml now. 
-
-	cell_defaults.functions.set_orientation = up_orientation; 
-	cell_defaults.phenotype.geometry.polarity = 1.0;
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	
-	// make sure the defaults are self-consistent. 
-	
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
-	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
-
-	// set the rate terms in the default phenotype 
-
-	// first find index for a few key variables. 
-	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
-	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
-	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
-
-	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
-	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
-
-	// initially no necrosis 
-	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
-
-	// set oxygen uptake / secretion parameters for the default cell type 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
-	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
-	
-	// add custom data here, if any 
-	
-
-	// Now, let's define another cell type. 
-	// It's best to just copy the default and modify it. 
-	
-	// make this cell type randomly motile, less adhesive, greater survival, 
-	// and less proliferative 
-	
-	motile_cell = cell_defaults; 
-	motile_cell.type = 1; 
-	motile_cell.name = "motile tumor cell"; 
-	
-	// make sure the new cell type has its own reference phenotype
-	
-	motile_cell.parameters.pReference_live_phenotype = &( motile_cell.phenotype ); 
-	
-	// enable random motility 
-	motile_cell.phenotype.motility.is_motile = true; 
-	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; 
-	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
-	motile_cell.phenotype.motility.migration_bias = 0.0;// completely random 
-	
-	// Set cell-cell adhesion to 5% of other cells 
-	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
-	
-	// Set apoptosis to zero 
-	motile_cell.phenotype.death.rates[apoptosis_model_index] = parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
-	
-	// Set proliferation to 10% of other cells. 
-	// Alter the transition rate from G0G1 state to S state
-	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
-		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); // 0.1; 
-*/		
+	if( parameters.bools("prey_quorom_effect") == true )
+	{ get_cell_definition("prey").functions.update_phenotype = prey_cycling_function; }
+		
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
 		
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
@@ -313,12 +229,16 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	// start with flow cytometry coloring 
 	
 	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
+	
+	// color live prey 
 		
 	if( pCell->phenotype.death.dead == false && pCell->type == prey_type )
 	{
 		 output[0] = parameters.strings("prey_color");  
 		 output[2] = parameters.strings("prey_color");  
 	}
+	
+	// color live predators 
 
 	if( pCell->phenotype.death.dead == false && pCell->type == predator_type )
 	{
@@ -327,4 +247,59 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	}
 	
 	return output; 
+}
+
+
+void predator_hunting_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	Cell* pTestCell = NULL; 
+	
+	double sated_volume = pCell->parameters.pReference_live_phenotype->volume.total * 
+		parameters.doubles("relative_sated_volume" ); 
+	
+	for( int n=0; n < pCell->cells_in_my_container().size() ; n++ )
+	{
+		pTestCell = pCell->cells_in_my_container()[n]; 
+		// if it's not me, not dead, and not my type, eat it 
+		
+		if( pTestCell != pCell && pTestCell->type != pCell->type && pTestCell->phenotype.death.dead == false )
+		{
+			// only eat if I'm not full 
+			if( phenotype.volume.total < sated_volume )
+			{
+				pCell->ingest_cell(pTestCell); 
+				return; 
+			}
+	
+		}
+	}
+	
+	return; 
+}
+
+void predator_cycling_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	double sated_volume = pCell->parameters.pReference_live_phenotype->volume.total * 
+		parameters.doubles("relative_sated_volume" ); 
+	
+	if( phenotype.volume.total > sated_volume )
+	{ phenotype.cycle.data.transition_rate(0,1) = get_cell_definition("prey").phenotype.cycle.data.transition_rate(0,1) * 0.01; }
+	else
+	{ phenotype.cycle.data.transition_rate(0,1) = 0; }
+	return; 
+}
+
+void prey_cycling_function( Cell* pCell , Phenotype& phenotype, double dt )
+{
+	static int signal_index = microenvironment.find_density_index( "prey signal" ); 
+	
+	double threshold = parameters.doubles("prey_quorom_threshold" ) + 1e-16 ; 
+	double factor = (threshold - pCell->nearest_density_vector()[signal_index] )/threshold; 
+	if( factor < 0 )
+	{ factor = 0.0; } 
+	
+	phenotype.cycle.data.transition_rate(0,1) = get_cell_definition("prey").phenotype.cycle.data.transition_rate(0,1); 
+	phenotype.cycle.data.transition_rate(0,1) *= factor; 
+	
+	return; 
 }

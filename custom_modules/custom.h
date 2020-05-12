@@ -85,5 +85,7 @@ std::vector<std::string> my_coloring_function( Cell* );
 
 // custom functions can go here 
 
-void predator_motion_function( Cell* pCell, Phenotype& phenotype, double dt ) ; 
-void predator_cycling_function( Cell* pCell, Phenotype& phenotype, double dt ) ; 
+void predator_hunting_function( Cell* pCell, Phenotype& phenotype, double dt ); 
+void predator_cycling_function( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+void prey_cycling_function( Cell* pCell , Phenotype& phenotype, double dt ); 
