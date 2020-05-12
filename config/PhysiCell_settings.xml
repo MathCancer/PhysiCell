@@ -145,16 +145,16 @@
 				<decay_rate units="1/min">10</decay_rate>  
 			</physical_parameter_set>
 			<initial_condition units="mmHg">0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="false">1</Dirichlet_boundary_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">1</Dirichlet_boundary_condition>
 <!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
 <!-- Here, we're using it as a "fence" to keep prey inside the simulation domain --> 
 			<Dirichlet_options>
-				<boundary_value ID="xmin" enabled="true">1</boundary_value>
-				<boundary_value ID="xmax" enabled="true">1</boundary_value>
-				<boundary_value ID="ymin" enabled="true">1</boundary_value>
-				<boundary_value ID="ymax" enabled="true">1</boundary_value>
-				<boundary_value ID="zmin" enabled="true">1</boundary_value>
-				<boundary_value ID="zmax" enabled="true">1</boundary_value>
+				<boundary_value ID="xmin" enabled="true">.1</boundary_value>
+				<boundary_value ID="xmax" enabled="true">.1</boundary_value>
+				<boundary_value ID="ymin" enabled="true">.1</boundary_value>
+				<boundary_value ID="ymax" enabled="true">.1</boundary_value>
+				<boundary_value ID="zmin" enabled="false">.1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">.1</boundary_value>
 			</Dirichlet_options>
  		</variable>
 
@@ -250,7 +250,7 @@
 				
 				<motility>  
 					<speed units="micron/min">1</speed>
-					<persistence_time units="min">2</persistence_time>
+					<persistence_time units="min">1</persistence_time>
 					<migration_bias units="dimensionless">.5</migration_bias>
 					
 					<options>
@@ -290,6 +290,7 @@
 		<cell_definition name="prey" parent_type="default" ID="1">
 			<phenotype>
 				<motility>  
+					<speed>0.5</speed>
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
@@ -322,7 +323,11 @@
 						<rate units="1/min">0</rate>
 					</model>	
 				</death> 
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
+				</mechanics>
 				<motility>  
+					<speed>2</speed>
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
@@ -351,12 +356,20 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
 		
-		<!-- motile cell type parameters --> 
-		<motile_cell_persistence_time type="double" units="min">15</motile_cell_persistence_time>
-		<motile_cell_migration_speed type="double" units="micron/min">0.5</motile_cell_migration_speed> 
-		<motile_cell_relative_adhesion type="double" units="dimensionless">0.05</motile_cell_relative_adhesion>
-		<motile_cell_apoptosis_rate type="double" units="1/min">0.0</motile_cell_apoptosis_rate> 
-		<motile_cell_relative_cycle_entry_rate type="double" units="dimensionless">0.1</motile_cell_relative_cycle_entry_rate>
+		<div_initialization type="divider" description="---Initialization settings---"/>
+		
+		<number_of_prey type="int" units="none" description="initial number of prey">5</number_of_prey>
+		<number_of_predators type="int" units="none" description="initial number of predators">5</number_of_predators> 
+		
+		<div_coloring type="divider" description="---Coloring settings---"/>
+
+		<prey_color type="string" description="color for prey">blue</prey_color>
+		<predator_color type="string" description="color for prey">orange</predator_color>
+		
+		<div_predator type="divider" description="---Predator settings---"/>
+		<predators_eat_prey type="bool" description="set to true if predators can eat prey">false</predators_eat_prey>
+		<predators_cycle_if_big type="bool" description="set to true if predators should cycle if they are well-fed (and thus big)">true</predators_cycle_if_big>
+		
 	</user_parameters>
 	
 </PhysiCell_settings>

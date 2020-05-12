@@ -71,14 +71,6 @@
 using namespace BioFVM; 
 using namespace PhysiCell;
 
-void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
-
-// any additional cell types (beyond cell_defaults)
-
-extern Cell_Definition motile_cell; 
-
-// custom cell phenotype functions could go here 
-
 // setup functions to help us along 
 
 void create_cell_types( void );
@@ -90,3 +82,8 @@ void setup_microenvironment( void );
 // custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
+
+// custom functions can go here 
+
+void predator_motion_function( Cell* pCell, Phenotype& phenotype, double dt ) ; 
+void predator_cycling_function( Cell* pCell, Phenotype& phenotype, double dt ) ; 

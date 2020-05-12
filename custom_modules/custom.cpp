@@ -80,21 +80,39 @@ void create_cell_types( void )
 	
 	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
 	
-	/* Put any modifications to default cell definition here if you 
+	/* 
+	   Put any modifications to default cell definition here if you 
 	   want to have "inherited" by other cell types. 
 	   
 	   This is a good place to set default functions. 
 	*/ 
 	
-	cell_defaults.functions.update_phenotype = NULL; 
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
+
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
 	
 	// This parses the cell definitions in the XML config file. 
 	
 	initialize_cell_definitions_from_pugixml(); 
 	
-	exit(-1); 
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
 	
+	
+	// exit(-1); 
 /*	
+	// May 2020: all this is done in initialize_cell_definitions_from_pugixml now. 
+	
 	// housekeeping 
 	
 	initialize_default_cell_definition();
@@ -116,7 +134,12 @@ void create_cell_types( void )
 	// needed for a 2-D simulation: 
 	
 	/* grab code from heterogeneity */ 
-	
+
+ 
+
+/* 
+	// May 2020: all this is done in initialize_cell_definitions_from_pugixml now. 
+
 	cell_defaults.functions.set_orientation = up_orientation; 
 	cell_defaults.phenotype.geometry.polarity = 1.0;
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
@@ -177,6 +200,7 @@ void create_cell_types( void )
 	// Alter the transition rate from G0G1 state to S state
 	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
 		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); // 0.1; 
+*/		
 		
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
@@ -230,37 +254,76 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	// create some cells near the origin
+	double Xmin = microenvironment.mesh.bounding_box[0]; 
+	double Ymin = microenvironment.mesh.bounding_box[1]; 
+	double Zmin = microenvironment.mesh.bounding_box[2]; 
+
+	double Xmax = microenvironment.mesh.bounding_box[3]; 
+	double Ymax = microenvironment.mesh.bounding_box[4]; 
+	double Zmax = microenvironment.mesh.bounding_box[5]; 
+	
+	if( default_microenvironment_options.simulate_2D == true )
+	{
+		Zmin = 0.0; 
+		Zmax = 0.0; 
+	}
+	
+	double Xrange = Xmax - Xmin; 
+	double Yrange = Ymax - Ymin; 
+	double Zrange = Zmax - Zmin; 
+	
+	// create some of each type of cell 
 	
 	Cell* pC;
-
-	pC = create_cell(); 
-	pC->assign_position( 0.0, 0.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -100, 0, 0.0 );
 	
-	pC = create_cell(); 
-	pC->assign_position( 0, 100, 0.0 );
+	// place prey 
 	
-	// now create a motile cell 
+	for( int n = 0 ; n < parameters.ints("number_of_prey") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( get_cell_definition("prey") ); 
+		pC->assign_position( position );
+	}
 	
-	pC = create_cell( motile_cell ); 
-	pC->assign_position( 15.0, -18.0, 0.0 );
+	// place predators 
+	
+	for( int n = 0 ; n < parameters.ints("number_of_predators") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( get_cell_definition("predator") ); 
+		pC->assign_position( position );
+	}	
 	
 	return; 
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
+	static int prey_type = get_cell_definition( "prey" ).type; 
+	static int predator_type = get_cell_definition( "predator" ).type; 
+	
 	// start with flow cytometry coloring 
 	
 	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
 		
-	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
+	if( pCell->phenotype.death.dead == false && pCell->type == prey_type )
 	{
-		 output[0] = "black"; 
-		 output[2] = "black"; 
+		 output[0] = parameters.strings("prey_color");  
+		 output[2] = parameters.strings("prey_color");  
+	}
+
+	if( pCell->phenotype.death.dead == false && pCell->type == predator_type )
+	{
+		 output[0] = parameters.strings("predator_color");  
+		 output[2] = parameters.strings("predator_color");  
 	}
 	
 	return output; 

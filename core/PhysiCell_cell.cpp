@@ -135,7 +135,7 @@ Cell_Definition::Cell_Definition()
 	functions.set_orientation = NULL;
 	
 	cell_definitions_by_index.push_back( this ); 
-	std::cout << "--- cell_definitions_by_index(1) size= " << cell_definitions_by_index.size() << std::endl;
+	// std::cout << "--- cell_definitions_by_index(1) size= " << cell_definitions_by_index.size() << std::endl;
 	
 	// if (cell_definitions_by_index.size() == 6)
     // 	raise(SIGSEGV);   // needs #include <signal.h>
@@ -163,7 +163,7 @@ Cell_Definition::Cell_Definition( Cell_Definition& cd )
 	parameters.pReference_live_phenotype = &phenotype; 
 	
 	cell_definitions_by_index.push_back( this ); 
-	std::cout << "----- cell_definitions_by_index(2) size= " << cell_definitions_by_index.size() << std::endl;
+	// std::cout << "----- cell_definitions_by_index(2) size= " << cell_definitions_by_index.size() << std::endl;
 	
 	return; 
 }
@@ -1201,12 +1201,46 @@ void display_cell_definitions( std::ostream& os )
 		// summarize functions 
 		Cell_Functions* pCF = &(pCD->functions); 
 		os << "\t key functions: " << std::endl; 
-		os << "\t\t migration: "; display_ptr_as_bool( pCF->update_migration_bias , std::cout ); 
+		os << "\t\t migration bias rule: "; display_ptr_as_bool( pCF->update_migration_bias , std::cout ); 
 		os << std::endl; 
 		os << "\t\t custom rule: "; display_ptr_as_bool( pCF->custom_cell_rule , std::cout ); 
 		os << std::endl; 
 		os << "\t\t phenotype rule: "; display_ptr_as_bool( pCF->update_phenotype , std::cout ); 
 		os << std::endl; 
+		os << "\t\t volume update function: "; display_ptr_as_bool( pCF->volume_update_function , std::cout ); 
+		os << std::endl; 
+		os << "\t\t mechanics function: "; display_ptr_as_bool( pCF->update_velocity , std::cout ); 
+		os << std::endl; 
+		
+/*		
+	// set up the default functions 
+	cell_defaults.functions.cycle_model = Ki67_advanced; 
+	
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_migration_bias = NULL; 
+	
+	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; // NULL; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	void (*volume_update_function)( Cell* pCell, Phenotype& phenotype , double dt ); // used in cell 
+	void (*update_migration_bias)( Cell* pCell, Phenotype& phenotype, double dt ); 
+	
+	void (*custom_cell_rule)( Cell* pCell, Phenotype& phenotype, double dt ); 
+	void (*update_phenotype)( Cell* pCell, Phenotype& phenotype, double dt ); // used in celll
+	
+	void (*update_velocity)( Cell* pCell, Phenotype& phenotype, double dt ); 
+	
+	void (*add_cell_basement_membrane_interactions)(Cell* pCell, Phenotype& phenotype, double dt );
+	double (*calculate_distance_to_membrane)( Cell* pCell, Phenotype& phenotype, double dt );
+	
+	void (*set_orientation)(Cell* pCell, Phenotype& phenotype, double dt );
+	
+	void (*contact_function)(Cell* pMyself, Phenotype& my_phenotype, 
+		Cell* pOther, Phenotype& other_phenotype, double dt ); 
+*/		
 		
 		// summarize motility 
 		
@@ -1468,7 +1502,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			{
 				std::cout << "copying data ... " << std::endl; 
 				std::cout<< pParent->name << " to " << pCD->name << std::endl; 
-				system("pause");
 				pCD->phenotype.cycle.data = pParent->phenotype.cycle.data; 
 			}
 		}
@@ -1491,10 +1524,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				double value = xml_get_my_double_value( node ); 
 				
 				// set the transition rate 
-				std::cout << __LINE__ << " setting rate" << pCD->phenotype.cycle.data.transition_rate(start,end) << " " ; 
 				pCD->phenotype.cycle.data.transition_rate(start,end) = value; 
-				std::cout << __LINE__ << " setting rate" << pCD->phenotype.cycle.data.transition_rate(start,end) << std::endl; 
-				system("pause");
 				// set it to fixed / non-fixed 
 				pCD->phenotype.cycle.model().phase_link(start,end).fixed_duration = fixed; 
 				
@@ -1513,13 +1543,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// set up the death models 
 	int death_model_index = 0; 
 	node = cd_node.child( "phenotype" );
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	node = node.child( "death" ); 
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	if( node )
 	{
 		node = node.child( "model" );
-std::cout << __LINE__ << " node: " << node << " " << xml_get_my_name(node) << std::endl; 	
 		while( node )
 		{
 			int model = node.attribute("code").as_int() ; 
@@ -1551,7 +1578,6 @@ std::cout << __LINE__ << " node: " << node << " " << xml_get_my_name(node) << st
 			}
 			
 			node = node.child( "parameters" );
-std::cout << __LINE__ << " node: " <<  node << " " << xml_get_my_name(node) << std::endl; 	
 			
 			// only read these parameters if they are specified. 
 			
@@ -1587,7 +1613,6 @@ std::cout << __LINE__ << " node: " <<  node << " " << xml_get_my_name(node) << s
 //				get_string_attribute_value( node, "unlysed_fluid_change_rate", "units" ); 
 			
 			node = node.parent(); 
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 					
 			// set the model 
 			// if the model already exists, just overwrite the parameters 
@@ -1629,11 +1654,9 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 			// now get transition rates within the death model 
 			// set the rates 
 			node = node.child( "transition_rates" );
-std::cout << __LINE__ << " node: " <<  node << " " << xml_get_my_name(node) << std::endl; 	
 			if( node )
 			{
 				pugi::xml_node node1 = node.child( "rate");
-std::cout << __LINE__ << " node1: " <<  node1 << " " << xml_get_my_name(node1) << std::endl; 	
 				while( node1 )
 				{
 					// which rate 
@@ -1652,29 +1675,19 @@ std::cout << __LINE__ << " node1: " <<  node1 << " " << xml_get_my_name(node1) <
 					pCD->phenotype.death.models[death_model_index]->phase_link(start,end).fixed_duration = fixed; 
 					
 					node1 = node1.next_sibling( "rate" ); 
-std::cout << __LINE__ << " node1: " <<  node1 << " " << xml_get_my_name(node1) << std::endl; 	
 				}
 			}	
 			node = node.parent(); 
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
-			
-/*
-
-*/
 			
 			node = node.next_sibling( "model" ); 
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 			death_model_index++; 
 		}
-		
 		
 	}
 	
 	// volume 
 	node = cd_node.child( "phenotype" );
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	node = node.child( "volume" ); 
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	if( node )
 	{
 		Volume* pV = &(pCD->phenotype.volume);
@@ -1740,9 +1753,7 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 	
 	// mechanics 
 	node = cd_node.child( "phenotype" );
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	node = node.child( "mechanics" ); 
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	if( node )
 	{
 		Mechanics* pM = &(pCD->phenotype.mechanics);
@@ -1786,42 +1797,40 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 	
 	// motility 
 	node = cd_node.child( "phenotype" );
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	node = node.child( "motility" ); 
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	if( node )
 	{
-		Motility* pM = &(pCD->phenotype.motility);
+		Motility* pMot = &(pCD->phenotype.motility);
 		
 		pugi::xml_node node_mot = node.child( "speed" );
 		if( node_mot )
-		{ pM->migration_speed = xml_get_my_double_value( node_mot ); }	
+		{ pMot->migration_speed = xml_get_my_double_value( node_mot ); }	
 
 		node_mot = node.child( "migration_bias" );
 		if( node_mot )
-		{ pM->migration_bias = xml_get_my_double_value( node_mot ); }	
+		{ pMot->migration_bias = xml_get_my_double_value( node_mot ); }	
 
 		node_mot = node.child( "persistence_time" );
 		if( node_mot )
-		{ pM->persistence_time = xml_get_my_double_value( node_mot ); }	
+		{ pMot->persistence_time = xml_get_my_double_value( node_mot ); }	
 
 		node_mot = node.child( "options" );
 		if( node_mot )
 		{
 			// enable motility? 
 			pugi::xml_node node_mot1 = node_mot.child( "enabled" ); 
-			pM->is_motile = xml_get_my_bool_value( node_mot1 ); 
+			pMot->is_motile = xml_get_my_bool_value( node_mot1 ); 
 			
 			// restrict to 2D? 
 			node_mot1 = node_mot.child( "use_2D" ); 
-			pM->restrict_to_2D = xml_get_my_bool_value( node_mot1 ); 
+			pMot->restrict_to_2D = xml_get_my_bool_value( node_mot1 ); 
 			
 			if( default_microenvironment_options.simulate_2D )
 			{
 				std::cout << "Note: Overriding to set cell motility to 2D based on " 
 							<< "microenvironment domain settings ... "
 				<< std::endl; 				
-				pM->restrict_to_2D = true; 
+				pMot->restrict_to_2D = true; 
 			}
 			
 			// automated chemotaxis setup 
@@ -1837,9 +1846,9 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 				// search for the right chemo index 
 				
 				std::string substrate_name = xml_get_string_value( node_mot1 , "substrate" ); 
-				pM->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
+				pMot->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
 				
-				std::string actual_name = microenvironment.density_names[ pM->chemotaxis_index ]; 
+				std::string actual_name = microenvironment.density_names[ pMot->chemotaxis_index ]; 
 				
 				// error check 
 				if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )
@@ -1852,9 +1861,9 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 				
 				// set the direction 
 				
-				pM->chemotaxis_direction = xml_get_int_value( node_mot1 , "direction" ); 
+				pMot->chemotaxis_direction = xml_get_int_value( node_mot1 , "direction" ); 
 				
-				std::cout << pM->chemotaxis_direction << " * grad( " << substrate_name << " )" << std::endl; 
+				std::cout << pMot->chemotaxis_direction << " * grad( " << actual_name << " )" << std::endl; 
 
 			}
 		}
@@ -1863,9 +1872,7 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 	// secretion
 	
 	node = cd_node.child( "phenotype" );
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	node = node.child( "secretion" ); 
-std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << std::endl; 	
 	if( node )
 	{
 		Secretion* pS = &(pCD->phenotype.secretion);
@@ -1880,8 +1887,6 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 			int index = microenvironment.find_density_index( substrate_name ); 
 			std::string actual_name = microenvironment.density_names[ index ]; 
 			
-			std::cout << substrate_name << " " << actual_name << " " << index << std::endl; 
-			
 			// error check 
 			if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )
 			{
@@ -1890,26 +1895,22 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 				<< "       Please double-check your substrate name in the config file." << std::endl << std::endl; 
 				exit(-1); 
 			}			
-			std::cout << pS->secretion_rates << std::endl;
 	
 			// secretion rate
 			pugi::xml_node node_sec1 = node_sec.child( "secretion_rate" ); 
 			if( node_sec1 )
 			{ pS->secretion_rates[index] = xml_get_my_double_value( node_sec1 ); }
 			
-			std::cout << pS->saturation_densities << std::endl;
 			// secretion target 
 			node_sec1 = node_sec.child( "secretion_target" ); 
 			if( node_sec1 )
 			{ pS->saturation_densities[index] = xml_get_my_double_value( node_sec1 ); }
 	
-			std::cout << pS->uptake_rates << std::endl;
 			// uptake rate 
 			node_sec1 = node_sec.child( "uptake_rate" ); 
 			if( node_sec1 )
 			{ pS->uptake_rates[index] = xml_get_my_double_value( node_sec1 ); }
 			
-			std::cout << pS->net_export_rates << std::endl;
 			// net export rate 
 			node_sec1 = node_sec.child( "net_export_rate" ); 
 			if( node_sec1 )
@@ -1930,20 +1931,12 @@ std::cout << __LINE__ << " node: " <<   node << " " << xml_get_my_name(node) << 
 		
 		// units 
 		std::string units = node1.attribute( "units").value(); 
-
-/*		
-		// size of the data 
-		int length = node1.attribute( "length").as_int(); 
-		if( length == 0 )
-		{ length = 1; } 
-*/
+		
 		std::vector<double> values; // ( length, 0.0 ); 
 		
 		// get value(s)
 		std::string str_values = xml_get_my_string_value( node1 ); 
 		csv_to_vector( str_values.c_str() , values ); 
-		
-		std::cout << values << std::endl; 
 		
 		// add variable if cell defaults  
 		// if the custom data is not yet found, add it 
@@ -1995,7 +1988,7 @@ void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
 	}
 	
 //	build_cell_definitions_maps(); 
-	display_cell_definitions( std::cout ); 
+//	display_cell_definitions( std::cout ); 
 	
 	return; 
 }	

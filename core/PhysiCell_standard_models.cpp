@@ -828,15 +828,21 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 
 void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt )
 {
-	Motility* pM = &(phenotype.motility); 
-
 	// bias direction is gradient for the indicated substrate 
-	pM->migration_bias_direction = pCell->nearest_gradient(pM->chemotaxis_index);
+	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(phenotype.motility.chemotaxis_index);
 	// move up or down gradient based on this direction 
-	pM->migration_bias_direction *= pM->chemotaxis_direction; 
+	phenotype.motility.migration_bias_direction *= phenotype.motility.chemotaxis_direction; 
 
 	// normalize 
-	normalize( &( pM->migration_bias_direction ) );
+	normalize( &( phenotype.motility.migration_bias_direction ) );
+
+/*	
+	#pragma omp critical 
+	{
+		std::cout << pCell->type << " mot: " << phenotype.motility.chemotaxis_index << " " << phenotype.motility.migration_speed << std::endl; 
+		std::cout << pCell->type << " sec: " << phenotype.secretion.secretion_rates << std::endl; 
+	}	
+*/	
 	
 	return;
 }
