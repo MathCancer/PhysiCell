@@ -109,6 +109,7 @@ void create_cell_types( void )
 	// make sure the defaults are self-consistent. 
 	
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.molecular.sync_to_microenvironment( &microenvironment );	
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 
 	// set the rate terms in the default phenotype 
@@ -162,6 +163,9 @@ void create_cell_types( void )
 	// Alter the transition rate from G0G1 state to S state
 	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
 		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); // 0.1; 
+		
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
 	
 	return; 
 }

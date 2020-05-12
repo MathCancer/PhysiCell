@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.6.1} 
-\newcommand{\ReleaseDate}{January 26, 2020} 
+\newcommand{\Version}{1.7.0} 
+\newcommand{\ReleaseDate}{March ?, 2020} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -519,7 +519,7 @@ projects and instructions to build them.
 PhysiCell uses three time step sizes: 
 \begin{enumerate}
 \item 
-\v|diffusion_dt| is the step size used in the diffusion solver, including the secretion and uptake processes. 
+\v|diffusion_dt| is the step size used in the diffusion solver, including the secretion/export and uptake processes. 
 The default value is 0.01 min. 
 \item 
 \v|mechanics_dt| is the step size for the cell mechanics solver, including cell motility. 
@@ -718,7 +718,7 @@ To get a list of all sample projects:
 \section{The BioFVM microenvironment}
 \label{sec:BioFVM}
 PhysiCell is built upon BioFVM \cite{ref:BioFVM}, and so it uses the (bio)chemical microenvironment from BioFVM, 
-including diffusion, decay, cell-based secretions/uptake, and bulk supply/uptake functions. All 
+including diffusion, decay, cell-based secretions/export/uptake, and bulk supply/uptake functions. All 
 PhysiCell projects already include bioFVM once you have included PhysiCell: 
 
 \v|#include "./core/PhysiCell.h"|
@@ -755,6 +755,34 @@ substrate values at any voxel within the simulation domain. This is useful for m
 in irregular domains, setting substrate values along blood vessels, or applying classical Dirichlet conditions 
 along the outer edges of the simulation domain. Note that without specifying Dirichlet conditions, 
 BioFVM applies Neumann (no flux) conditions at the outer simulation boundaries. 
+
+\TOClink 
+
+\subsubsection{Biotransport equations}
+\label{sec:biotransport_equations}
+Based upon BioFVM \cite{ref:BioFVM}, PhysiCell solves the following system of partial differential equations (PDEs):
+
+\beq
+\frac{ \partial \grvec{\rho}}{\partial t} 
+= \vec{D} \circ \nabla^2 \grvec{\rho} - \grvec{\lambda} \circ \grvec{\rho} + \sum_i \delta \left( \vec{x} - \vec{x}_i \right) 
+\Bigl[ V_i \vec{S}_i \circ \left( \grvec{\rho}^*_i - \grvec{\rho} \right) - V_i \vec{U}_i \circ \grvec{\rho} + \vec{E}_i \Bigr], 
+\eeq
+where 
+\begin{center}
+\begin{tabular}{c|ll}
+\textbf{Symbol} & Meaning & Dimensions\\
+\hline \hline 
+$\boldrho $ & vector of substrate densities (or concentrations)  & substance/volume \\
+ $\vec{D}$ & vector of diffusion coefficients & length$^2$/time  \\
+ $\grvec{\lambda}$ & vector of decay rates & 1/time \\ 
+ $V_i$ & volume of cell $i$ & volume \\
+ $\vec{x}_i$ & cell $i$'s position (center) & length \\
+ $\vec{S}_i$ & vector of cell $i$'s secretion rates & 1/time \\
+ $\grvec{\rho}^*_i$ & vector of cell $i$'s secretion saturations & substance/volume\\
+ $\vec{U}_i$ & vector of cell $i$'s uptake rates & 1/time \\
+ $\vec{E}_i$ & vector of cell $i$'s net export rates & substance/time  
+\end{tabular}
+\end{center}
 
 \TOClink 
 
@@ -1051,7 +1079,7 @@ while( t < t_max )
 }
 \end{verbatim}
 
-As of Version 1.2.0, PhysiCell has automated cell secretions/uptake as part of its phenotype 
+As of Version 1.2.0, PhysiCell has automated cell secretions/export/uptake as part of its phenotype 
 updates. There is no need to explicitly call the BioFVM cell-based functions in the main program loop.
 
 As of Version 1.3.1, PhysiCell has automated calculation of gradients once per $\Delta t_\textrm{mechanics}$ 
@@ -1180,7 +1208,7 @@ evaluates the diffusion solver.
 \subsubsection{Refined control of Dirichlet conditions}
 \label{sec:refined_Dirichlet_conditions}
 
-As of Version 1.2.1, you can now now control Dirichlet conditions on a 
+As of Version 1.2.1, you can now control Dirichlet conditions on a 
 substrate-by-substrate basis. That is, you can apply the Dirichlet condition to just one or two 
 substrates (e.g., oxygen in index 0 and doxorubicin in index 12), while not applying them 
 to the remaining substrates. For a microenvironment \v|M|, you can set these options 
@@ -1189,8 +1217,20 @@ the microenvironment, or at later times using the function
 
 \smallcode{void Microenvironment::set\_substrate\_dirichlet\_activation( int substrate\_index , bool new\_value )} 
 This function sets the substrate at index \v|substrate_index| to have/not have a Dirichlet condition 
-based on the \v|true|/\v|false| value of \v|new_value|.
+based on the \v|true|/\v|false| value of \v|new_value|. This activation vector is applied to \emph{all} voxels. 
 
+\smallcode{bool Microenvironment::get\_substrate\_dirichlet\_activation( int substrate\_index )} 
+This function returns the default enabled/disabled state of Dirichlet conditions for substrate with 
+index \break \v|substrate_index|. Note that if any particular voxel is not a Dirichlet node, then this value 
+is not relevant. 
+
+\smallcode{void Microenvironment::set\_substrate\_dirichlet\_activation( int substrate\_index , int index, bool new\_value  )} 
+This function sets the substrate at index \v|substrate_index| in voxel \v|index| to have/not have a Dirichlet condition 
+based on the \v|true|/\v|false| value of \v|new_value|. 
+
+\smallcode{bool Microenvironment::get\_substrate\_dirichlet\_activation( int substrate\_index , int index )} 
+This function returns the enabled/disabled state of Dirichlet conditions for substrate with 
+index \v|substrate_index| in voxel \v|index|. 
 
 For example: 
 \begin{verbatim}
@@ -1295,27 +1335,27 @@ void setup_microenvironment( void )
 \subsection{Automated tracking of internalized substrates}
 \label{sec:BioFVM_internalization_tracking}
 As of PhysiCell 1.5.0, each individual \v|Basic_Agent| can track the net total amount of substrates 
-uptaken and secreted over its lifetime, conserving mass with the uptake/secretion terms in the 
+uptaken and secreted over its lifetime, conserving mass with the uptake/secretion/export terms in the 
 governing PDEs in \cite{ref:BioFVM}.  By matching to system of PDEs in BioFVM (with the Dirac delta
 function approximation used in the code), in any time step $\Delta t$, the total amount of net mass 
 transferred from the $i^{th}$ cell (sitting in voxel $\Omega_n$) into the microenvironment is given by: 
 \beqa
 \Delta t \int_{\Omega_n} \grvec{\rho} \: dV 
-& = & \Delta t \int_{\Omega_n } V_i \delta( \vec{x} - \vec{x}_i ) 
-\Bigl( \vec{S}_i \circ 
-\left( \grvec{\rho}^*_i - \grvec{\rho} \right) - \vec{U}_i \circ \grvec{\rho} \Bigr) dV 
+& = & \Delta t \int_{\Omega_n }  \delta( \vec{x} - \vec{x}_i ) 
+\Bigl( V_i \vec{S}_i \circ 
+\left( \grvec{\rho}^*_i - \grvec{\rho} \right) - V_i \vec{U}_i \circ \grvec{\rho} + \vec{E}_i \Bigr) dV 
 \nonumber \\
 & = & 
-\Delta t V_i 
-\Bigl( \vec{S}_i \circ 
-\left( \grvec{\rho}^*_i - \grvec{\rho}(\vec{x}_n) \right) - \vec{U}_i \circ \grvec{\rho}(\vec{x}_n) \Bigr)   
+\Delta t 
+\Bigl( V_i \vec{S}_i \circ 
+\left( \grvec{\rho}^*_i - \grvec{\rho}(\vec{x}_n) \right) - V_i \vec{U}_i \circ \grvec{\rho}(\vec{x}_n) + \vec{E}_i \Bigr)   
 \eeqa
 After comparing against the numerical implementation in BioFVM to calculate 
 $\Delta \grvec{\rho}$, and multiplying this by the volume of the voxel, we get that the net 
 total change in external substrates between $t$ and $t+\Delta t$ is
 \beq
 \Delta \vec{n}_k = W_k 
-\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right), 
+\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right) + \vec{E}_i , 
 % \left( \frac{ (1-\vec{c}_2) \grvec{\rho}_k + \vec{c}_1} }{ \vec{c}_2 } \right),
 \eeq
 where $W_k$ is the volume of the voxel, $\vec{c}_i$ are internal constants already calculated for the 
@@ -1323,7 +1363,7 @@ BioFVM secretion/uptake functions, and division of vectors is element-wise. For 
 the net change in the cell's internalized substrates is 
 \beq
 -W_k 
-\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right), 
+\left( \frac{(\grvec{1}-\vec{c}_2) \circ \grvec{\rho}_k + \vec{c}_1 }{ \vec{c}_2 } \right) - \vec{E}_i, 
 % \left( \frac{ (1-\vec{c}_2) \grvec{\rho}_k + \vec{c}_1} }{ \vec{c}_2 } \right),
 \eeq
 If \v|default_microenvironment_options.track_internalized_substrates_in_each_agent = true|, then 
@@ -1484,7 +1524,11 @@ class Cell : public Basic_Agent
     bool assign_position(std::vector<double> new_position);
     bool assign_position(double, double, double);
     void set_total_volume(double);
-
+    void set_radius(double); 
+    
+    void set_target_volume(double); 
+    void set_target_radius(double); 
+    
     double& get_total_volume(void);
     
     // mechanics 
@@ -1629,7 +1673,7 @@ and necrosis) by calling \hfill\break
 death model, evaluate any death entry functions, and 
 set motility to zero. Cell secretions are set to zero, 
 and cell uptake is cut by a factor of 10. 
-(Users can make further changes to secretion and uptake 
+(Users can make further changes to secretion/export and uptake 
 using \v|entry_function|s that are called at the start 
 of a death model phase. See Section \ref{sec:Phase}.) 
 See Section \ref{sec:Death} for more information on cell death, 
@@ -1668,7 +1712,7 @@ index of the \v|Container| currently containing the cell.
 
 \item 
 \smallcode{void turn\_off\_reactions(double)} turns off all 
-secretions and uptake by the cell. 
+secretions/exports and uptake by the cell. 
 
 \item   
 \smallcode{void flag\_for\_division( void )} adds the cell to the 
@@ -1726,7 +1770,23 @@ separately.
 
 \item 
 \smallcode{void set\_total\_volume(double)} safely sets the cell's total volume. 
-It also sets the cell's sub-volumes proportionally. 
+It also sets the cell's sub-volumes proportionally. Note that this does not change the 
+\emph{target} value, so the cell will still grow or shrink towards its (unaltered) targets. 
+
+\item 
+\smallcode{void set\_radius(double)} safely sets the cell's radius (by calling 
+\v|set_total_volume(double)|. Note that this does not change the 
+\emph{target} value, so the cell will still grow or shrink towards its (unaltered) targets. 
+
+\item 
+\smallcode{void set\_target\_volume(double)} safely sets the cell's total target volume. 
+It also sets the cell's sub-volumes proportionally. Note that this does not change the 
+\emph{current} value, so the cell needs to shrink or grow towards this new target. 
+
+\item 
+\smallcode{void set\_radius(double)} safely sets the cell's total target radius. 
+It also sets the cell's sub-volumes proportionally. Note that this does not change the 
+\emph{current} value, so the cell need to shrink or grow towards this new target. 
 
 \item 
 \smallcode{double\& get\_total\_volume(void)} returns the cell's 
@@ -1804,7 +1864,7 @@ stored in the Cell Definition in \verb+cd+. (See Section \ref{sec:Cell_Definitio
 information on cell definitions.) As of Version 1.2.2, this function does not overwrite 
 the \v|is_movable|, \v|is_out_of_domain|, and \v|displacement| data of the cell. 
 
-This function is particularly useful if you want to do thinks like stem cell hierarchies, where you 
+This function is particularly useful if you want to do looks like stem cell hierarchies, where you 
 might ``convert'' a stem cell to a differentiated cell, each of which has been defined 
 separately. 
 
@@ -1897,6 +1957,45 @@ if( pCell->custom_data[ "infected" ] == true )
     delete_cell( pCell ); 
 }
 \end{verbatim}
+
+
+
+\item 
+\smallcode{void display\_cell\_definitions( std::ostream\& os )} does a basic display of all 
+cell definitions, including basic information on which cell cycle and death models are included, 
+custom functions, and custom data. 
+
+\underline{Example:} 
+\begin{verbatim}
+display_cell_definitions( std::cout ); 
+\end{verbatim}
+
+\item 
+\smallcode{void build\_cell\_definitions\_maps( void )} builds the internal registries of all cell definitions, 
+which can be searched by name or type (integer code). This is vest to use at the end of \v|setup_tissue()|. 
+
+\item 
+\smallcode{Cell\_Definition* find\_cell\_definition( std::string search\_string )} returns a pointer to 
+the cell definition with name as searched. If none is found, it returns \v|NULL|. 
+
+\underline{example:} Let's find the tumor cell definition and display its default apoptosis rate. 
+\begin{verbatim}
+Cell_Definition* pCD = find_cell_definition( "tumor" ); 
+std::cout << "Default apoptotic death rate: "; 
+int apop_index = pCD->phenotype.death.find_death_model_index( "apoptosis" ); 
+std::cout << pCD->phenotype.death.rates[ apop_index ] << std::endl; 
+\end{verbatim}
+
+\smallcode{Cell\_Definition* find\_cell\_definition( int search\_type )}
+Let's find the tumor cell definition with type 3 and display its name and default apoptosis rate. 
+\begin{verbatim}
+Cell_Definition* pCD = find_cell_definition( 3 ); 
+std::cout << "Cell type name for type 3: " << pCD->name << std::endl; 
+std::cout << "Default apoptotic death rate: "; 
+int apop_index = pCD->phenotype.death.find_death_model_index( "apoptosis" ); 
+std::cout << pCD->phenotype.death.rates[ apop_index ] << std::endl; 
+\end{verbatim}
+
 \end{enumerate}
  
 
@@ -2604,7 +2703,7 @@ scalar bias parameter that can vary motility between purely Brownian and
 completely deterministic along the current bias direction. See Section \ref{sec:Motility}. 
 
 \item 
-\textbf{Secretion} records cell secretion and uptake rates, as well as a 
+\textbf{Secretion} records cell secretion/export and uptake rates, as well as a 
 saturation density (at which secretion ends). See Section \ref{sec:Secretion}. 
 
 \item 
@@ -3580,11 +3679,11 @@ of ductal carcinoma in situ of the breast.) Note that
 \eeq
      
 \item 
-\smallcode{double cytoplasmic\_to\_nuclear\_ratio} is \v|volume.cytoplasmic / volume.nuclear|. Note that 
-
-\beq
-0 \le \texttt{cytoplasmic\_to\_nuclear\_ratio} \le 1.
-\eeq
+\smallcode{double cytoplasmic\_to\_nuclear\_ratio} is \v|volume.cytoplasmic / volume.nuclear|. 
+% Note that 
+% \beq
+% 0 \le \texttt{cytoplasmic\_to\_nuclear\_ratio} \le 1.
+% \eeq
 
 \item 
 \smallcode{double rupture\_volume} is the (dimensional) volume at which a cell will burst or lyse.  
@@ -3624,10 +3723,10 @@ at which a cell, written as a
 multiple of the cell's total volume at the onset of a swelling process. 
 (For example, at the start of necrosis.) 
 
-Note that 
-\beq
-0 \le \texttt{relative\_rupture\_volume} \le 1.
-\eeq 
+% Note that 
+% \beq
+% 0 \le \texttt{relative\_rupture\_volume} \le 1.
+% \eeq 
 
 \end{enumerate}
 
@@ -3699,8 +3798,8 @@ a generic breast epithelium line (calibrated to MCF-10A).
 % \v|*volume_update_function|, and then makes sure that the cell (if one is given) is made 
 % consistent with this new volume in BioFVM. 
 % \item
-\smallcode{void update( Cell* pCell, Phenotype\& phenotype, double dt )} is 
-neither used nor implemented. It will be deprecated. 
+% \smallcode{void update( Cell* pCell, Phenotype\& phenotype, double dt )} is 
+% neither used nor implemented. It will be deprecated. 
 \end{enumerate}
 
 % \subsubsection{Default functions}
@@ -4050,6 +4149,11 @@ See Section \ref{sec:cell_member_functions} for more information on how the
 \smallcode{std::vector<double> uptake\_rates} is a vector of uptake rates for the substrates in the microenvironment. 
 
 \item 
+\smallcode{std::vector<double> net\_export\_rates} is a vector of net export rates for substrates in the environment, which was 
+added to PhysiCell in Version 1.7.0. It allows more generic secretion models (including both net positive and net negative secretion). 
+Users generally should \emph{either} use \verb|secretion_rates| \emph{or} \verb|net_export_rates|, but generally not both. 
+
+\item 
 \smallcode{std::vector<double> saturation\_densities} is a vector of densities at which secretions saturate. See \cite{ref:BioFVM}. 
 \end{enumerate}
 
@@ -4064,6 +4168,7 @@ class Secretion
     std::vector<double> secretion_rates; 
     std::vector<double> uptake_rates; 
     std::vector<double> saturation_densities;
+    std::vector<double> net_export_rates; 
 
     Secretion();      
 
@@ -4091,24 +4196,24 @@ set to 0.0.
 
 \item
 \smallcode{void sync\_to\_current\_microenvironment(void)} resizes 
-\v|secretion_rates|, \v|uptake_rates|, and \v|saturation_densities| 
+\v|secretion_rates|, \v|uptake_rates|, \v|net_export_rates|, and \v|saturation_densities| 
 consistency with \v|pMicroenvironment| and sets all vector entries to 0.0. 
 
 \item
 \smallcode{void sync\_to\_microenvironment(Microenvironment* pNew\_Microenvironment)}
 sets \hfill\break \v|pMicroenvironment = pNew_Microenvironment|, resizes 
-\v|secretion_rates|, \v|uptake_rates|, and \hfill\break \v|saturation_densities| 
+\v|secretion_rates|, \v|uptake_rates|, \v|net_export_rates|, and \hfill\break \v|saturation_densities| 
 for consistency with \v|pMicroenvironment|, and sets all vector entries to 0.0. 
 
 \item 
 \smallcode{void advance( Basic\_Agent* pCell, Phenotype\& phenotype, 
-double dt)} evaluates the \\ BioFVM secretion and uptake functions 
+double dt)} evaluates the \\ BioFVM secretion/export and uptake functions 
 for this individual cell. Consistency checks with BioFVM (including 
 those from volume changes) are fully automated. 
 
 \item 
 \smallcode{void set\_all\_secretion\_to\_zero( void )} sets all the 
-secretion rates to zero. (Please note that settings 
+secretion and net export rates to zero. (Please note that settings 
 \v|pCell->is_active = false| is the most efficient way to set 
 all secretion and uptake to zero in a cell.) 
 
@@ -4120,7 +4225,7 @@ all secretion and uptake to zero in a cell.)
 
 \item 
 \smallcode{void scale\_all\_secretion\_by\_factor(double factor)} multiplies 
-all the secretion rates by \v|factor|. 
+all the secretion and net export rates by \v|factor|. 
 
 \item 
 \smallcode{void scale\_all\_uptake\_by\_factor(double factor)} multiplies 
@@ -4662,6 +4767,10 @@ Each chemical substrate is defined in a \smallcode{variable} of the following fo
    <initial_condition units="UNITS">VALUE3</initial_condition>
    <Dirichlet_boundary_condition units="UNITS" enabled="true">VALUE4
       </Dirichlet_boundary_condition>
+      <Dirichlet_options>
+         <boundary_value ID="VALUE5" enabled="false">VALUE6</boundary>
+         <!-- ... and so forth -->
+      </Dirichlet_options>
 </variable>
 \end{verbatim}
 Each \smallcode{variable} has the following attributes: 
@@ -4702,6 +4811,18 @@ on the simulation boundary.
 
 The units are indicated as the \smallcode{units} attribute. 
 If your units are self-consistent, they should match UNITS in the \smallcode{variable} above.
+
+\item \smallcode{Dirichlet\_options} is an \emph{optional} element that 
+allows finer grained control on Dirichlet conditions. If \smallcode{Dirchlet\_options} is missing, the Dirichlet condition is applied 
+to all or none of the boundaries with equal value (indicated by \v+VALUE4+). 
+
+If \smallcode{Dirichlet\_options} is present, any individual boundary can have a separate activated/deacticated state 
+and boundary condition value with a separate \smallcode{boundary\_value} element. The boundary is specified 
+with the \smallcode{ID} attribute, where \v+VALUE5+ is one of (\v+xmin+, \v+xmax+, \v+ymin+, \v+ymax+, \v+zmin+, 
+or \v+zmax+), and substrate concentration (density) on that boundary is given by \v+VALUE6+. Notice that 
+if \v+enabled=false+, then the Dirichlet condition is \emph{disabled} on the indicated boundary, leaving 
+instead a Neumann (zero flux) condition for this substrate on this boundary.
+
 \end{itemize}
 
 Next, \smallcode{options} helps configure additional code behaviors: 
@@ -4729,9 +4850,10 @@ users can set Dirichlet nodes using the functions in Section
 
 \end{itemize}
 
-Here is a sample of a microenvironment with two substrates (oxygen and glucose), 
-where there is a Dirichlet boundary condition for oxygen, but none for glucose. 
-(Note that all units are in $\micron$ and minutes.) Here, we compute all gradients, 
+Here is a sample of a microenvironment with three substrates (oxygen, glucose, and signal), 
+where there is a Dirichlet boundary condition for oxygen on all boundaries, 
+a Dirichlet condition for glucose on the bottom z boundary only, and no Dirichlet condition 
+for signal. (Note that all units are in $\micron$ and minutes.) Here, we compute all gradients, 
 but do not track internalized substrates.  
 \begin{verbatim}
 <microenvironment_setup>
@@ -4745,7 +4867,25 @@ but do not track internalized substrates.
         enabled="true">38</Dirichlet_boundary_condition>
    </variable>
    
-   <variable name="immunostimulatory factor" units="dimensionless" ID="1">
+   <variable name="glucose" units="dimensionless" ID="1">
+      <physical_parameter_set>
+         <diffusion_coefficient units="micron^2/min">18000</diffusion_coefficient>
+         <decay_rate units="1/min">0.0</decay_rate>  
+      </physical_parameter_set>
+      <initial_condition units="dimensionless">1</initial_condition>
+      <Dirichlet_boundary_condition units="dimensionless"
+         enabled="true">0</Dirichlet_boundary_condition>
+      <Dirichlet_options>
+         <boundary_value ID="xmin" enabled="false">0</boundary_value>
+         <boundary_value ID="xmax" enabled="false">0</boundary_value>
+         <boundary_value ID="ymin" enabled="false">0</boundary_value>
+         <boundary_value ID="ymax" enabled="false">0</boundary_value>
+         <boundary_value ID="zmin" enabled="true">1</boundary_value>
+         <boundary_value ID="zmax" enabled="false">0</boundary_value>
+      </Dirichlet_options>
+   </variable>      
+
+   <variable name="signal" units="dimensionless" ID="2">
       <physical_parameter_set>
          <diffusion_coefficient units="micron^2/min">18000</diffusion_coefficient>
          <decay_rate units="1/min">0.0</decay_rate>  
@@ -6037,92 +6177,94 @@ for( int i=0; i < (*all_cells).size(); i++ )
 }
 \end{verbatim}
 %
-Here is the list of all current constants (in Version 1.2.0): 
+Here is the list of all current constants (current as of Version 1.7.0): 
 %
 \begin{verbatim}
 class PhysiCell_constants
 {
  public:
-    static constexpr double pi=3.1415926535897932384626433832795;
-    
-    static constexpr double cell_removal_threshold_volume = 20; 
-        // 20 cubic microns -- about 1% of typical cell 
-    static const int keep_pushed_out_cells_in_outer_voxel=1;
-    static const int solid_boundary = 2;
-    static const int default_boundary_condition_for_pushed_out_agents 
-        = keep_pushed_out_cells_in_outer_voxel;        
-    
-    static const int deterministic_necrosis = 0;
-    static const int stochastic_necrosis = 1;
+   static constexpr double pi=3.1415926535897932384626433832795;
+   
+   static constexpr double cell_removal_threshold_volume = 20; 
+   static const int keep_pushed_out_cells_in_outer_voxel=1;
+   static const int solid_boundary = 2;
+   static const int default_boundary_condition_for_pushed_out_agents 
+      = keep_pushed_out_cells_in_outer_voxel;      
+   
+   static const int deterministic_necrosis = 0;
+   static const int stochastic_necrosis = 1;
 
-    static const int oxygen_index = 0; // deprecate
-    static const int glucose_index = 1; // deprecate 
-    
-    static const int TUMOR_TYPE=0; // deprecate 
-    static const int VESSEL_TYPE=1; // deprecate 
-
-    static const int mesh_min_x_index=0;
-    static const int mesh_min_y_index=1;
-    static const int mesh_min_z_index=2;
-    static const int mesh_max_x_index=3;
-    static const int mesh_max_y_index=4;
-    static const int mesh_max_z_index=5;            
-    
-    static const int mesh_lx_face_index=0;
-    static const int mesh_ly_face_index=1;
-    static const int mesh_lz_face_index=2;
-    static const int mesh_ux_face_index=3;
-    static const int mesh_uy_face_index=4;
-    static const int mesh_uz_face_index=5;
-    
-    // currently recognized cell cycle models 
-    static const int advanced_Ki67_cycle_model= 0;
-    static const int basic_Ki67_cycle_model=1;
-    static const int flow_cytometry_cycle_model=2;
-    static const int live_apoptotic_cycle_model=3;
-    static const int total_cells_cycle_model=4;
-    static const int live_cells_cycle_model = 5; 
-    
-    // currently recognized death models 
-    static const int apoptosis_death_model = 6; 
-    static const int necrosis_death_model = 7; 
-    static const int autophagy_death_model = 8; 
-    
-    static const int custom_cycle_model=9999; 
-    
-    // currently recognized cell cycle and death phases 
-    // cycle phases
-    static const int Ki67_positive_premitotic=0; 
-    static const int Ki67_positive_postmitotic=1; 
-    static const int Ki67_positive=2; 
-    static const int Ki67_negative=3; 
-    static const int G0G1_phase=4;
-    static const int G0_phase=5;
-    static const int G1_phase=6; 
-    static const int G1a_phase=7; 
-    static const int G1b_phase=8;
-    static const int G1c_phase=9;
-    static const int S_phase=10;
-    static const int G2M_phase=11;
-    static const int G2_phase=12;
-    static const int M_phase=13;
-    static const int live=14;
-    
-    static const int custom_phase = 9999;
-    // death phases
-    static const int apoptotic=100;
-    static const int necrotic_swelling=101;
-    static const int necrotic_lysed=102;
-    static const int necrotic=103; 
-    static const int debris=104; 
+   static const int mesh_min_x_index=0;
+   static const int mesh_min_y_index=1;
+   static const int mesh_min_z_index=2;
+   static const int mesh_max_x_index=3;
+   static const int mesh_max_y_index=4;
+   static const int mesh_max_z_index=5;         
+   
+   static const int mesh_lx_face_index=0;
+   static const int mesh_ly_face_index=1;
+   static const int mesh_lz_face_index=2;
+   static const int mesh_ux_face_index=3;
+   static const int mesh_uy_face_index=4;
+   static const int mesh_uz_face_index=5;
+   
+   // currently recognized cell cycle models 
+   static const int advanced_Ki67_cycle_model= 0;
+   static const int basic_Ki67_cycle_model=1;
+   static const int flow_cytometry_cycle_model=2;
+   static const int live_apoptotic_cycle_model=3;
+   static const int total_cells_cycle_model=4;
+   static const int live_cells_cycle_model = 5; 
+   static const int flow_cytometry_separated_cycle_model = 6; 
+   static const int cycling_quiescent_model = 7; 
+   
+   // currently recognized death models 
+   static const int apoptosis_death_model = 100; 
+   static const int necrosis_death_model = 101; 
+   static const int autophagy_death_model = 102; 
+   
+   static const int custom_cycle_model=9999; 
+   
+   // currently recognized cell cycle and death phases 
+   // cycle phases
+   static const int Ki67_positive_premitotic=0; 
+   static const int Ki67_positive_postmitotic=1; 
+   static const int Ki67_positive=2; 
+   static const int Ki67_negative=3; 
+   static const int G0G1_phase=4;
+   static const int G0_phase=5;
+   static const int G1_phase=6; 
+   static const int G1a_phase=7; 
+   static const int G1b_phase=8;
+   static const int G1c_phase=9;
+   static const int S_phase=10;
+   static const int G2M_phase=11;
+   static const int G2_phase=12;
+   static const int M_phase=13;
+   static const int live=14;
+   
+   static const int G1pm_phase = 15;
+   static const int G1ps_phase = 16; 
+   
+   static const int cycling = 17; 
+   static const int quiescent = 18; 
+      
+   static const int custom_phase = 9999;
+   // death phases
+   static const int apoptotic=100;
+   static const int necrotic_swelling=101;
+   static const int necrotic_lysed=102;
+   static const int necrotic=103; 
+   static const int debris=104; 
 };
-
-extern std::string time_units = "min";
-extern std::string space_units = "micron";
-extern double diffusion_dt = 0.01; 
-extern double mechanics_dt = 0.1;
-extern double phenotype_dt = 6.0;
+extern std::string time_units;
+extern std::string space_units;
+extern double diffusion_dt; 
+extern double mechanics_dt;
+extern double phenotype_dt;
 \end{verbatim}
+
+Notice in particular that cycle models under 100 denote live cells, and cycle models 100 or greater indicate dead cells. 
 
 \TOClink 
 

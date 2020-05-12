@@ -208,6 +208,9 @@ void create_cell_types( void )
 	// create the immune cell type 
 	create_immune_cell_type(); 
 	
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
+	
 	return; 
 }
 

@@ -206,6 +206,9 @@ void create_cell_types( void )
 	worker_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
 	worker_cell.functions.update_migration_bias = worker_cell_motility;
 	
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
+	
 	return; 
 }
 

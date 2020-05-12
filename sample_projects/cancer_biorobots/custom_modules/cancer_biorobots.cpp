@@ -124,7 +124,7 @@ void create_cargo_cell_type( void )
 	cargo_cell.custom_data[ "damage rate" ] = 0.00;  
 	cargo_cell.custom_data[ "repair rate" ] = 0.0;  
 	cargo_cell.custom_data[ "drug death rate" ] = 0.0;  
-
+	
 	return;
 }	
 
@@ -281,6 +281,9 @@ void create_cell_types( void )
 	// create the biorobot types 
 	create_cargo_cell_type(); 
 	create_worker_cell_type(); 
+	
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
 	
 	return; 
 }

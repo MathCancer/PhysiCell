@@ -126,7 +126,13 @@ class Microenvironment
 	std::vector<bool> dirichlet_node_map; 
 	*/
 	std::vector< std::vector<double> > dirichlet_value_vectors; 
-	std::vector<bool> dirichlet_activation_vector; 	
+	std::vector<bool> dirichlet_activation_vector; 
+	
+	/* new in Version 1.7.0 -- activation vectors can be specified 
+	   on a voxel-by-voxel basis */ 
+	   
+	std::vector< std::vector<bool> > dirichlet_activation_vectors; 
+	
  public:
 	
 	/*! The mesh for the diffusing quantities */ 
@@ -237,8 +243,15 @@ class Microenvironment
 	void remove_dirichlet_node( int voxel_index ); 
 	void apply_dirichlet_conditions( void ); 
 
-	void set_substrate_dirichlet_activation( int substrate_index , bool new_value ); 
-	double get_substrate_dirichlet_activation( int substrate_index ); 
+	// set for ALL Dirichlet nodes -- 1.7.0
+	void set_substrate_dirichlet_activation( int substrate_index , bool new_value );  
+	// not quite as relevant as it used to be ?? -- 1.7.0 
+	bool get_substrate_dirichlet_activation( int substrate_index );   
+	
+	// new functions for finer-grained control of Dirichlet conditions -- 1.7.0
+	void set_substrate_dirichlet_activation( int substrate_index , int index, bool new_value );  
+	void set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ); 
+	bool get_substrate_dirichlet_activation( int substrate_index, int index );  
 	
 	bool& is_dirichlet_node( int voxel_index ); 
 
@@ -247,6 +260,7 @@ class Microenvironment
 
 	friend void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& S, double dt ); 
 	friend void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& S, double dt ); 
+	friend void diffusion_decay_solver__constant_coefficients_LOD_1D( Microenvironment& S, double dt ); 
 	
 	friend void diffusion_decay_explicit_uniform_rates( Microenvironment& M, double dt );
 	
@@ -268,6 +282,8 @@ extern void diffusion_decay_solver__variable_coefficients_explicit_uniform_mesh(
 
 extern void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& S, double dt ); 
 extern void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& S, double dt ); 
+extern void diffusion_decay_solver__constant_coefficients_LOD_1D( Microenvironment& S, double dt ); 
+
 
 extern void diffusion_decay_solver__variable_coefficients_LOD_3D( Microenvironment& S, double dt ); 
 extern void diffusion_decay_solver__variable_coefficients_LOD_2D( Microenvironment& S, double dt ); 
@@ -300,6 +316,25 @@ class Microenvironment_Options
 	bool outer_Dirichlet_conditions; 
 	std::vector<double> Dirichlet_condition_vector; 
 	std::vector<bool> Dirichlet_activation_vector; 
+	
+	/* new in PhysiCell 1.7.0 to enable setting Dirichlet conditions 
+	   on a boundary-by-boundary basis */
+	std::vector<bool> Dirichlet_all; 
+	
+//	std::vector<bool> Dirichlet_interior; 
+	std::vector<bool> Dirichlet_xmin; 
+	std::vector<bool> Dirichlet_xmax; 
+	std::vector<bool> Dirichlet_ymin; 
+	std::vector<bool> Dirichlet_ymax; 
+	std::vector<bool> Dirichlet_zmin; 
+	std::vector<bool> Dirichlet_zmax; 
+
+	std::vector<double> Dirichlet_xmin_values; 
+	std::vector<double> Dirichlet_xmax_values; 
+	std::vector<double> Dirichlet_ymin_values; 
+	std::vector<double> Dirichlet_ymax_values; 
+	std::vector<double> Dirichlet_zmin_values; 
+	std::vector<double> Dirichlet_zmax_values; 
 	
 	std::vector<double> initial_condition_vector; 
 	
