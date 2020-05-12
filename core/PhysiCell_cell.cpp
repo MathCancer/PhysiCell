@@ -1212,36 +1212,6 @@ void display_cell_definitions( std::ostream& os )
 		os << "\t\t mechanics function: "; display_ptr_as_bool( pCF->update_velocity , std::cout ); 
 		os << std::endl; 
 		
-/*		
-	// set up the default functions 
-	cell_defaults.functions.cycle_model = Ki67_advanced; 
-	
-	cell_defaults.functions.volume_update_function = standard_volume_update_function;
-	cell_defaults.functions.update_migration_bias = NULL; 
-	
-	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; // NULL; 
-	cell_defaults.functions.custom_cell_rule = NULL; 
-	
-	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
-	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
-	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
-	void (*volume_update_function)( Cell* pCell, Phenotype& phenotype , double dt ); // used in cell 
-	void (*update_migration_bias)( Cell* pCell, Phenotype& phenotype, double dt ); 
-	
-	void (*custom_cell_rule)( Cell* pCell, Phenotype& phenotype, double dt ); 
-	void (*update_phenotype)( Cell* pCell, Phenotype& phenotype, double dt ); // used in celll
-	
-	void (*update_velocity)( Cell* pCell, Phenotype& phenotype, double dt ); 
-	
-	void (*add_cell_basement_membrane_interactions)(Cell* pCell, Phenotype& phenotype, double dt );
-	double (*calculate_distance_to_membrane)( Cell* pCell, Phenotype& phenotype, double dt );
-	
-	void (*set_orientation)(Cell* pCell, Phenotype& phenotype, double dt );
-	
-	void (*contact_function)(Cell* pMyself, Phenotype& my_phenotype, 
-		Cell* pOther, Phenotype& other_phenotype, double dt ); 
-*/		
-		
 		// summarize motility 
 		
 		Motility* pM = &(pCD->phenotype.motility); 
@@ -1268,6 +1238,8 @@ void display_cell_definitions( std::ostream& os )
 			<< microenvironment.density_names[ pM->chemotaxis_index ] << ") " << std::endl; 
 			
 		// secretion
+		
+		
 		
 		// mechanics
 		

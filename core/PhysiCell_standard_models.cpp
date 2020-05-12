@@ -835,14 +835,6 @@ void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt )
 
 	// normalize 
 	normalize( &( phenotype.motility.migration_bias_direction ) );
-
-/*	
-	#pragma omp critical 
-	{
-		std::cout << pCell->type << " mot: " << phenotype.motility.chemotaxis_index << " " << phenotype.motility.migration_speed << std::endl; 
-		std::cout << pCell->type << " sec: " << phenotype.secretion.secretion_rates << std::endl; 
-	}	
-*/	
 	
 	return;
 }
