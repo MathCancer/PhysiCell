@@ -18,15 +18,34 @@ This release ...
    + void Cell::set_target_volume( double new_volume ) sets the target total cell volume, while preserving the desired nuclear:cytoplasmic ratio and desired fluid fraction. In the default cell volume model, the cell will now approach this value by shrinking or growing. 
    + void Cell::set_target_radius( double new_radius ) behaves similarly, but using a radius instead. 
 
-+ Added Cell:set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
++ Added Cell::set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
 
++ Added 1-D diffusion solvers to BioFVM (useful for some coarse-grained problems). It solves for diffusion in the x-direction only. Use it by setting: 
 
+  microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_1D
+  
+  Use this right after setup_microenvironment() in your main.cpp file. Future versions will include an XML option to use 1D. Most users will never need this. 
+  
++ Added a standardized chemotaxis function to the standard models: 
+
+     void chemotaxis_direction( Cell* pCell , Phenotype& phenotype , double dt ); 
+
+  This sets:
+  
+     phenotype.motility.motility_bias_direction = direction * grad( index ), where 
+    
+     direction = phenotype.motility.chemotaxis_direction 
+        (1 to go up gradient, -1 to go down gradient)
+     index = phenotype.motility.chemotaxis_index 
+        (the index of one of hte diffusing substrates)
 
 + Cell_Definitions in XML. This is in response to SourceForge ticket 5. 
    +
    +
 
 ### Minor new features and changes: 
+
++ added int chemotaxis_index and chemotaxis_direction to the Motility class to assist with a new standard chemotaxis function. 
  
 + scale_all_secretion_by_factor also scales net_export_rates.
 
@@ -89,6 +108,12 @@ This release ...
 ### Beta features (not fully supported):
  
 + List here. 
+
+
++ Cell definitions 
+
+
+
   
 ### Bugfixes: 
 

@@ -543,7 +543,9 @@ Volume::Volume()
 	fluid = fluid_fraction * total; 
 	solid = total-fluid; 
 	
-	nuclear = 540.0; 
+	nuclear = 540.0;
+
+	
 	nuclear_fluid = fluid_fraction * nuclear; 
 	nuclear_solid = nuclear - nuclear_fluid;
 
@@ -784,6 +786,9 @@ Motility::Motility()
 	// update_migration_bias_direction = NULL; 
 	
 	motility_vector.resize( 3 , 0.0 ); 
+	
+	chemotaxis_index = 0; 
+	chemotaxis_direction = 1; 
 	
 	return; 
 }
@@ -1087,8 +1092,6 @@ void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
 
 	return; 
 }
-
-
 
 };
 

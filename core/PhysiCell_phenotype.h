@@ -392,6 +392,9 @@ class Motility
 		// if true, set random motility to 2D only. 
 		
 	std::vector<double> motility_vector; 
+	
+	int chemotaxis_index; 
+	int chemotaxis_direction; 
 		
 	Motility(); // done 
 };
