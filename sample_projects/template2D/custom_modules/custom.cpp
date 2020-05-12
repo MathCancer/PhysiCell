@@ -109,6 +109,7 @@ void create_cell_types( void )
 	// make sure the defaults are self-consistent. 
 	
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.molecular.sync_to_microenvironment( &microenvironment );	
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 
 	// set the rate terms in the default phenotype 
