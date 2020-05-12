@@ -2,11 +2,11 @@
 
 **Version:** 1.7.0
 
-**Release date:** ?? March 2020
+**Release date:** 12 May 2020
 
 ## Release summary: 
 
-This release ...  
+This release (1) adds "net export" as a new form of more generalized substrate secretion, (2) adds helper funtions for cell size and volume for esier configuration, (3) adds a new, standardized chemotaxis function, (4) adds 1D diffusion, and (5) introduces XML-based cell definitions as a beta feature. It also incorporates a variety of bugfixes.   
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
@@ -39,11 +39,13 @@ This release ...
      index = phenotype.motility.chemotaxis_index 
         (the index of one of hte diffusing substrates)
 
-+ Cell_Definitions in XML. This is in response to SourceForge ticket 5. 
-   +
-   +
++ Added Cell_Definitions in XML (beta feature) in response to SourceForge ticket 5. Users will be able to set the cell defaults definition by XML, as well as additional cell definitions that "inherit" phenotype parameters from cell defaults. This vastly reduces teh amount of necessary C++ to define a model. The new "template" sample project unifies 2D and 3D model specification using the new XML-based cell definitions. The next few releases will refine documentation and roll teh new XML-based cell definitions out to all the other sample projects. 
 
 ### Minor new features and changes: 
+
++ Created get_cell_definition(std::string) to return by reference the matching cell definition (search by name). Returns cell_defaults if nothing found. 
+
++ Created get_cell_definition(int) to return by reference the matching cell definition (search by type). Returns cell_defaults if nothing found. 
 
 + added int chemotaxis_index and chemotaxis_direction to the Motility class to assist with a new standard chemotaxis function. 
  
@@ -107,12 +109,7 @@ This release ...
 
 ### Beta features (not fully supported):
  
-+ List here. 
-
-
-+ Cell definitions 
-
-
++ Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined in the next few releases while still in beta. 
 
   
 ### Bugfixes: 
