@@ -1,5 +1,78 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
+**Version:** 1.7.1
+
+**Release date:** ?? May 2020
+
+## Release summary: 
+
+This release ...   
+
+**NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
+ 
+### Major new features and changes:
+
++ No major changes. See 1.7.0 for most recent major changes. 
+
+### Minor new features and changes: 
+
++ No minor changes. See 1.7.0 for most recent minor changes.
+
+
+### Beta features (not fully supported):
+ 
++ Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined in the next few releases while still in beta. 
+  
+### Bugfixes: 
+
++ In response to SourceForge ticket 26, fixed placement of parent cell in Cell::divide()
+
++ Removed errant Cell_Definition in the new template sample project. 
+
+### Notices for intended changes that may affect backwards compatibility:
+ 
++ We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
+
++ We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
+
++ We will introduce improvements to placement of daughter cells after division. 
+
++ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+ 
++ We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
+
++ We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
+
+### Planned future improvements: 
+ 
++ Further XML-based simulation setup. 
+ 
++ read saved simulation states (as MultiCellDS digital snapshots)
+ 
++ "mainline" prototype cell attach/detach mechanics as standard models (currently in the biorobots and immune examples)
+ 
++ integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
+  
++ integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
+  
++ Develop contact-based cell-cell interactions. 
+
++ Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
+ 
++ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
+ 
++ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
+ 
++ create an angiogenesis sample project 
+ 
++ create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
+
++ improved plotting options in SVG 
+
+* * * 
+
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
+
 **Version:** 1.7.0
 
 **Release date:** 12 May 2020

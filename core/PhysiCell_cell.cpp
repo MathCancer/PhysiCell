@@ -444,20 +444,21 @@ Cell* Cell::divide( )
 		std::cout<<"************ERROR********************"<<std::endl;
 	}
 	normalize( &rand_vec ); 
-	// rand_vec/= norm(rand_vec);
-	child->assign_position(position[0] + 0.5 * radius*rand_vec[0],
-						 position[1] + 0.5 * radius*rand_vec[1],
-						 position[2] + 0.5 * radius*rand_vec[2]);
-	//change my position to keep the center of mass intact and then see if I need to update my voxel index
+	rand_vec *= radius; // multiply direction times the displacement 
+
+	child->assign_position(position[0] + rand_vec[0],
+						   position[1] + rand_vec[1],
+						   position[2] + rand_vec[2]);
+						 
+	//change my position to keep the center of mass intact 
+	// and then see if I need to update my voxel index
 	static double negative_one_half = -0.5; 
-	naxpy( &position, negative_one_half , rand_vec );// position = position - 0.5*rand_vec; 
-	// position[0] -= 0.5*radius*rand_vec[0];
-	// position[1] -= 0.5*radius*rand_vec[1]; 
-	// position[2] -= 0.5*radius*rand_vec[2]; 
-	
+	axpy( &position, negative_one_half , rand_vec ); // position = position - 0.5*rand_vec; 
+
 	//If this cell has been moved outside of the boundaries, mark it as such.
 	//(If the child cell is outside of the boundaries, that has been taken care of in the assign_position function.)
-	if( !get_container()->underlying_mesh.is_position_valid(position[0], position[1], position[2])){
+	if( !get_container()->underlying_mesh.is_position_valid(position[0], position[1], position[2]))
+	{
 		is_out_of_domain = true;
 		is_active = false;
 		is_movable = false;
