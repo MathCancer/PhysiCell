@@ -67,10 +67,6 @@
 
 #include "./custom.h"
 
-// declare cell definitions here 
-
-Cell_Definition motile_cell; 
-
 void create_cell_types( void )
 {
 	// set the random seed 
