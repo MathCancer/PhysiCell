@@ -86,6 +86,9 @@ double NormalRandom( double mean, double standard_deviation );
 std::vector<double> UniformOnUnitSphere( void ); 
 std::vector<double> UniformOnUnitCircle( void ); 
 
+std::vector<double> LegacyRandomOnUnitSphere( void ); 
+
+
 double dist_squared(std::vector<double> p1, std::vector<double> p2);
 double dist(std::vector<double> p1, std::vector<double> p2);
 

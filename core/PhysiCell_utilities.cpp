@@ -143,6 +143,38 @@ std::vector<double> UniformOnUnitCircle( void )
 	return output; 
 }
 
+std::vector<double> LegacyRandomOnUnitSphere( void )
+{
+	static bool warned = false; 
+	if( warned == false )
+	{
+		std::cout << "Warning! LegacyRandomOnUnitSphere() has bad random properties. " << std::endl 
+				  << "         It generates points that aren't uniform on the random sphere," << std::endl 
+				  << "         but instead are concentrated towards the poles." << std::endl 
+				  << "         Use UniformOnUnitSphere() instead!" << std::endl << std::endl; 
+		warned = true; 
+	}
+	
+	std::vector<double> output = {0,0,0}; 
+
+	static double pi = 3.1415926535897932384626433832795; 
+	static double two_pi = 6.283185307179586476925286766559; 
+	double theta = UniformRandom();
+	
+	
+	double temp_angle = two_pi*UniformRandom();
+	double temp_phi = pi*UniformRandom();
+	
+	
+	output[0]= cos( temp_angle );
+	output[1]= sin( temp_angle );
+	output *= sin( temp_phi );
+	output[2]= cos( temp_phi );
+	
+	return output; 
+}
+
+
 // Squared distance between two points
 // This is already in BioFVM_vector as: 
 // double norm_squared( const std::vector<double>& v ); 
