@@ -103,6 +103,46 @@ double NormalRandom( double mean, double standard_deviation )
 	return d(gen); 
 }
 
+std::vector<double> UniformOnUnitSphere( void )
+{
+	std::vector<double> output = {0,0,0}; 
+
+	double z = UniformRandom();
+	z *= 2.0; 
+	z -= 1.0; // Choose z uniformly distributed in [-1,1].
+
+	static double two_pi = 6.283185307179586476925286766559; 
+	double theta = UniformRandom();
+	theta *= two_pi; // Choose theta uniformly distributed on [0, 2*pi).
+
+	double r = z; 
+	r *= z; 
+	r *= -1;
+	r += 1; 
+	r = sqrt(r); // Let r = sqrt(1-z^2).
+
+	output[0] = cos(theta); 
+	output[1] = sin(theta);
+	output *= r; 
+	output[2] = z; // (r*cos(theta) , r*sin(theta) , z )
+
+	return output; 
+}
+
+std::vector<double> UniformOnUnitCircle( void )
+{
+	std::vector<double> output = {0,0,0}; 
+
+	static double two_pi = 6.283185307179586476925286766559; 
+	double theta = UniformRandom();
+	theta *= two_pi; // Choose theta uniformly distributed on [0, 2*pi).
+
+	output[0] = cos(theta); 
+	output[1] = sin(theta); // (cos(t) , sin(t) , 0 )
+
+	return output; 
+}
+
 // Squared distance between two points
 // This is already in BioFVM_vector as: 
 // double norm_squared( const std::vector<double>& v ); 

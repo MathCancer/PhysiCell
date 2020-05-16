@@ -16,8 +16,11 @@ This release ...
 
 ### Minor new features and changes: 
 
-+ No minor changes. See 1.7.0 for most recent minor changes.
++ Created new function std::vector<double> UniformOnUnitSphere( void ) that returns a (uniformly) random vector (x,y,z) on the unit sphere. 
 
++ Created new function std::vector<double> UniformOnUnitCircle( void ) that returns a (uniformly) random vector (x,y,0) on the unit circle (in the z = 0 plane).  
+
++ See 1.7.0 for other recent minor changes.
 
 ### Beta features (not fully supported):
  
