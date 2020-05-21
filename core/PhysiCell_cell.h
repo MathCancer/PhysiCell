@@ -224,9 +224,8 @@ class Cell : public Basic_Agent
 	void convert_to_cell_definition( Cell_Definition& cd ); 
 };
 
-Cell* create_cell( void );  
+Cell* create_cell( Cell* (*custom_instantiate)() );  
 Cell* create_cell( Cell_Definition& cd );  
-extern Cell* (*instantiate_cell)();
 
 void delete_cell( int ); 
 void delete_cell( Cell* ); 

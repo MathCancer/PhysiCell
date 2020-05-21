@@ -433,6 +433,8 @@ class Cell_Functions
 {
  private:
  public:
+	Cell* (*instantiate_cell)(); 
+
 	Cycle_Model cycle_model; 
 
 	void (*volume_update_function)( Cell* pCell, Phenotype& phenotype , double dt ); // used in cell 

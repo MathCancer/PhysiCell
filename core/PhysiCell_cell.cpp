@@ -87,8 +87,6 @@ std::vector<double> (*cell_division_orientation)(void) = UniformOnUnitSphere; //
 Cell* standard_instantiate_cell()
 { return new Cell; }
 
-Cell* (*instantiate_cell)() = standard_instantiate_cell;
-
 Cell_Parameters::Cell_Parameters()
 {
 	o2_hypoxic_threshold = 15.0; // HIF-1alpha at half-max around 1.5-2%, and tumors often are below 2%
@@ -131,6 +129,7 @@ Cell_Definition::Cell_Definition()
 		// the default Custom_Cell_Data constructor should take care of this
 		
 	// set up the default functions 
+	functions.instantiate_cell = standard_instantiate_cell;
 	functions.volume_update_function = NULL; // standard_volume_update_function;
 	functions.update_migration_bias = NULL; 
 	
@@ -422,7 +421,7 @@ Cell* Cell::divide( )
 	// phenotype.flagged_for_division = false; 
 	// phenotype.flagged_for_removal = false; 
 	
-	Cell* child = create_cell();
+	Cell* child = create_cell(functions.instantiate_cell);
 	child->copy_data( this );	
 	child->copy_function_pointers(this);
 	child->parameters = parameters;
@@ -873,10 +872,10 @@ void Cell::add_potentials(Cell* other_agent)
 	return;
 }
 
-Cell* create_cell( void )
+Cell* create_cell( Cell* (*custom_instantiate)())
 {
 	Cell* pNew; 
-	pNew = instantiate_cell();
+	pNew = custom_instantiate();
 	
 	(*all_cells).push_back( pNew ); 
 	pNew->index=(*all_cells).size()-1;
@@ -900,7 +899,7 @@ Cell* create_cell( void )
 // In that "create_cell()" uses "create_cell( cell_defaults )" 
 Cell* create_cell( Cell_Definition& cd )
 {
-	Cell* pNew = create_cell(); 
+	Cell* pNew = create_cell(cd.functions.instantiate_cell); 
 	
 	// use the cell defaults; 
 	pNew->type = cd.type; 
