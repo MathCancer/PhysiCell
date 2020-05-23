@@ -875,7 +875,12 @@ void Cell::add_potentials(Cell* other_agent)
 Cell* create_cell( Cell* (*custom_instantiate)())
 {
 	Cell* pNew; 
-	pNew = custom_instantiate();
+	
+	if (custom_instantiate) {
+		pNew = custom_instantiate();
+	} else {
+		pNew = standard_instantiate_cell();
+	}
 	
 	(*all_cells).push_back( pNew ); 
 	pNew->index=(*all_cells).size()-1;
