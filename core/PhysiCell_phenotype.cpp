@@ -1031,6 +1031,8 @@ Cell_Functions::Cell_Functions()
 	set_orientation = NULL; 
 	
 	contact_function = NULL; 
+	
+	custom_adhesion = NULL;
 
 /*	
 	internal_substrate_function = NULL; 
