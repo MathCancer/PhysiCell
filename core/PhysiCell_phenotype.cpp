@@ -1033,6 +1033,7 @@ Cell_Functions::Cell_Functions()
 	contact_function = NULL; 
 	
 	custom_adhesion = NULL;
+	custom_repulsion = NULL;
 
 /*	
 	internal_substrate_function = NULL; 

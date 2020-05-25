@@ -827,7 +827,13 @@ void Cell::add_potentials(Cell* other_agent)
 	}
 	
 	// August 2017 - back to the original if both have same coefficient 
-	double effective_repulsion = sqrt( phenotype.mechanics.cell_cell_repulsion_strength * other_agent->phenotype.mechanics.cell_cell_repulsion_strength ); 
+	double effective_repulsion;
+	if (functions.custom_repulsion) {
+		effective_repulsion = functions.custom_repulsion(this, other_agent);
+	} else {
+		effective_repulsion = sqrt( phenotype.mechanics.cell_cell_repulsion_strength * other_agent->phenotype.mechanics.cell_cell_repulsion_strength ); 
+	}
+	
 	temp_r *= effective_repulsion; 
 	
 	// temp_r *= phenotype.mechanics.cell_cell_repulsion_strength; // original 
