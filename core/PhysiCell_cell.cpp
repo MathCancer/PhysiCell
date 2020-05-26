@@ -129,7 +129,7 @@ Cell_Definition::Cell_Definition()
 		// the default Custom_Cell_Data constructor should take care of this
 		
 	// set up the default functions 
-	functions.instantiate_cell = standard_instantiate_cell;
+	functions.instantiate_cell = NULL;
 	functions.volume_update_function = NULL; // standard_volume_update_function;
 	functions.update_migration_bias = NULL; 
 	
