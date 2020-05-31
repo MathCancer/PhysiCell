@@ -253,6 +253,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 void initialize_cell_definitions_from_pugixml( pugi::xml_node root ); 
 void initialize_cell_definitions_from_pugixml( void );
 
+extern std::vector<double> (*cell_division_orientation)(void);
+
+
 };
 
 #endif

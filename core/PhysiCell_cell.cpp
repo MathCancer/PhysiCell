@@ -80,6 +80,10 @@ std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name;
 std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
 std::vector<Cell_Definition*> cell_definitions_by_index;
 
+// function pointer on how to choose cell orientation at division
+// in case you want the legacy method 
+std::vector<double> (*cell_division_orientation)(void) = UniformOnUnitSphere; // LegacyRandomOnUnitSphere; 
+
 Cell_Parameters::Cell_Parameters()
 {
 	o2_hypoxic_threshold = 15.0; // HIF-1alpha at half-max around 1.5-2%, and tumors often are below 2%
@@ -406,6 +410,8 @@ void Cell::assign_orientation()
 	return; 
 }
 
+
+
 Cell* Cell::divide( )
 {
 	// phenotype.flagged_for_division = false; 
@@ -427,6 +433,10 @@ Cell* Cell::divide( )
 	// randomly place the new agent close to me, accounting for orientation and 
 	// polarity (if assigned)
 		
+	// May 30, 2020: 
+	// Set cell_division_orientation = LegacyRandomOnUnitSphere to 
+	// reproduce this code 
+	/*
 	double temp_angle = 6.28318530717959*UniformRandom();
 	double temp_phi = 3.1415926535897932384626433832795*UniformRandom();
 	
@@ -436,6 +446,7 @@ Cell* Cell::divide( )
 	rand_vec[0]= cos( temp_angle ) * sin( temp_phi );
 	rand_vec[1]= sin( temp_angle ) * sin( temp_phi );
 	rand_vec[2]= cos( temp_phi );
+	
 	rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
 		rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;
 	
@@ -445,6 +456,12 @@ Cell* Cell::divide( )
 	}
 	normalize( &rand_vec ); 
 	rand_vec *= radius; // multiply direction times the displacement 
+	*/
+	
+	std::vector<double> rand_vec = cell_division_orientation(); 
+	rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
+		rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;	
+	rand_vec *= phenotype.geometry.radius;
 
 	child->assign_position(position[0] + rand_vec[0],
 						   position[1] + rand_vec[1],
