@@ -1502,7 +1502,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if( node.child( "transition_rates" ) )
 		{
 			node = node.child( "transition_rates" ); 
-			std::cout << "Warning: " << node.name() << " is deprecated. Use cycle->phase_transition_rates." 
+			std::cout << "Warning: " << node.name() << " is deprecated. Use cycle.phase_transition_rates." 
 				<< std::endl; 
 		}
 		if( node )
@@ -1580,7 +1580,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		while( node )
 		{
 			int model = node.attribute("code").as_int() ; 
-			std::cout << "death model: " << model << std::endl; 
 			
 			// check: is that death model already there? 
 			
@@ -1595,19 +1594,18 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			
 			// add the death model and its death rate 
 
-/*			
-			if( node.child( "phase_transition_rates" ) )
-			{ node = node.child( "phase_transition_rates" ); }
-			if( node.child( "transition_rates" ) )
+			if( node.child( "death_rate" ) )
 			{
-				node = node.child( "transition_rates" ); 
-				std::cout << "Warning: " << node.name() << " is deprecated. Use cycle->phase_transition_rates." 
+				node = node.child( "death_rate" ); 
+			}
+			if( node.child( "rate" ) )
+			{
+				node = node.child( "rate" ); 
+				std::cout << "Warning: " << node.name() << " is deprecated. Use death.model.death_rate." 
 					<< std::endl; 
 			}
-*/
-
-	
-			double rate = xml_get_double_value(node,"rate");
+			double rate = xml_get_my_double_value(node);
+			node = node.parent();
 			
 			// get death model parameters 
 			
@@ -1618,43 +1616,46 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			{
 				death_params = pParent->phenotype.death.parameters[death_index]; 
 			}
+
+			if( node.child("parameters" ) )
+			{
+				node = node.child( "parameters" );
 			
-			node = node.child( "parameters" );
+				// only read these parameters if they are specified. 
+				
+				pugi::xml_node node_temp = node.child( "unlysed_fluid_change_rate" );
+				if( node_temp )
+				{ death_params.unlysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
+
+				node_temp = node.child( "lysed_fluid_change_rate" );
+				if( node_temp )
+				{ death_params.lysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
 			
-			// only read these parameters if they are specified. 
-			
-			pugi::xml_node node_temp = node.child( "unlysed_fluid_change_rate" );
-			if( node_temp )
-			{ death_params.unlysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
+				node_temp = node.child( "cytoplasmic_biomass_change_rate" );
+				if( node_temp )
+				{ death_params.cytoplasmic_biomass_change_rate = xml_get_my_double_value( node_temp ); }
 
-			node_temp = node.child( "lysed_fluid_change_rate" );
-			if( node_temp )
-			{ death_params.lysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
-		
-			node_temp = node.child( "cytoplasmic_biomass_change_rate" );
-			if( node_temp )
-			{ death_params.cytoplasmic_biomass_change_rate = xml_get_my_double_value( node_temp ); }
+				node_temp = node.child( "nuclear_biomass_change_rate" );
+				if( node_temp )
+				{ death_params.nuclear_biomass_change_rate = xml_get_my_double_value( node_temp ); }
 
-			node_temp = node.child( "nuclear_biomass_change_rate" );
-			if( node_temp )
-			{ death_params.nuclear_biomass_change_rate = xml_get_my_double_value( node_temp ); }
+				node_temp = node.child( "calcification_rate" );
+				if( node_temp )
+				{ death_params.calcification_rate = xml_get_my_double_value( node_temp ); }
 
-			node_temp = node.child( "calcification_rate" );
-			if( node_temp )
-			{ death_params.calcification_rate = xml_get_my_double_value( node_temp ); }
+				node_temp = node.child( "relative_rupture_volume" );
+				if( node_temp )
+				{ death_params.relative_rupture_volume = xml_get_my_double_value( node_temp ); }
 
-			node_temp = node.child( "relative_rupture_volume" );
-			if( node_temp )
-			{ death_params.relative_rupture_volume = xml_get_my_double_value( node_temp ); }
+				node_temp = node.child( "lysed_fluid_change_rate" );
+				if( node_temp )
+				{ death_params.lysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
 
-			node_temp = node.child( "lysed_fluid_change_rate" );
-			if( node_temp )
-			{ death_params.lysed_fluid_change_rate = xml_get_my_double_value( node_temp ); }
-
-//			death_params.time_units = 
-//				get_string_attribute_value( node, "unlysed_fluid_change_rate", "units" ); 
-			
-			node = node.parent(); 
+	//			death_params.time_units = 
+	//				get_string_attribute_value( node, "unlysed_fluid_change_rate", "units" ); 
+				
+				node = node.parent(); 
+			}
 					
 			// set the model 
 			// if the model already exists, just overwrite the parameters 
@@ -1669,7 +1670,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 						pCD->phenotype.death.parameters[death_index] = death_params; 
 						pCD->phenotype.death.rates[death_index] = rate; 
 					}
-					std::cout << "apoptosis " << " " << std::endl; 
 					break; 
 				case PhysiCell_constants::necrosis_death_model: 
 					// set necrosis parameters 
@@ -1681,7 +1681,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 						pCD->phenotype.death.parameters[death_index] = death_params; 
 						pCD->phenotype.death.rates[death_index] = rate; 						
 					}
-					std::cout << "necrosis " << " "  << std::endl; 
 					break; 
 				case PhysiCell_constants::autophagy_death_model: 
 					std::cout << "Warning: autophagy_death_model not yet supported." << std::endl		
@@ -1695,9 +1694,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			
 			// now get transition rates within the death model 
 			// set the rates 
-			node = node.child( "transition_rates" );
-			if( node )
+			// node = node.child( "transition_rates" );
+			if( node.child( "transition_rates" ) )
 			{
+				node = node.child( "transition_rates" );
 				pugi::xml_node node1 = node.child( "rate");
 				while( node1 )
 				{
@@ -1718,8 +1718,18 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					
 					node1 = node1.next_sibling( "rate" ); 
 				}
+				node = node.parent();
 			}	
-			node = node.parent(); 
+
+			if( node.child( "durations" ) )
+			{
+				node = node.child("durations");
+				
+				
+				node = node.parent();
+			}				
+			
+			// node = node.parent(); 
 			
 			node = node.next_sibling( "model" ); 
 			death_model_index++; 
