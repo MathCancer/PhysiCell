@@ -22,6 +22,14 @@ This release ...
 
 + Created std::vector<double> LegacyRandomOnUnitSphere() that reproduces old behaviors of creating a random vector on the unit sphere. Never use this except if trying to replicate old results. Always use UniformOnUnitSphere() instead. 
 
++ Changed default placement of daughter cells to use UniformOnUnitCircle(), in response to longstanding "future plan" to "introduce improvements to placement of daughter cells after division."
+
++ All sample projects now check for <options> in their XML config files. 
+
++ Template projects calculate gradients and perform internal substrate tracking by default. 
+
++ Moved the bool is_active from "protected" to "public" in the Basic_Agent class in BioFVM_basic_agent.h, so that cells be be moved back into the domain and reactivated as needed. 
+
 + See 1.7.0 for other recent minor changes.
 
 ### Beta features (not fully supported):
@@ -34,13 +42,13 @@ This release ...
 
 + Removed errant Cell_Definition in the new template sample project. 
 
++ Added an extra check for bad chemotaxis definitions in response ot SourceForge ticket 28.  
+
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
 
 + We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
-
-+ We will introduce improvements to placement of daughter cells after division. 
 
 + Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
  
@@ -50,6 +58,8 @@ This release ...
 
 ### Planned future improvements: 
  
++ Current "template" project will be rolled into a new "predator-prey" sample project, and "template" will be tidied up. 
+
 + Further XML-based simulation setup. 
  
 + read saved simulation states (as MultiCellDS digital snapshots)

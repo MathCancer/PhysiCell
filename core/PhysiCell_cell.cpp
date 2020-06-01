@@ -1496,8 +1496,15 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			}
 		}
 		
-		// set the rates 
-		node = node.child( "transition_rates" );
+		// set the transition rates 
+		if( node.child( "phase_transition_rates" ) )
+		{ node = node.child( "phase_transition_rates" ); }
+		if( node.child( "transition_rates" ) )
+		{
+			node = node.child( "transition_rates" ); 
+			std::cout << "Warning: " << node.name() << " is deprecated. Use cycle->phase_transition_rates." 
+				<< std::endl; 
+		}
 		if( node )
 		{
 			node = node.child( "rate");
@@ -1520,9 +1527,42 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				
 				node = node.next_sibling( "rate" ); 
 			}
+		}
+		
+		node = cd_node.child( "phenotype" );
+		node = node.child( "cycle" ); 
+		// Check for phase durations (as an alternative to transition rates)
+		if( node.child( "phase_durations" ) )
+		{ node = node.child( "phase_durations" ); }
+		if( node )
+		{
+			node = node.child( "duration");
+			while( node )
+			{
+				// which duration? 
+				int start = node.attribute("index").as_int(); 
+				// fixed duration? 
+				bool fixed = false; 
+				if( node.attribute( "fixed_duration" ) )
+				{ fixed = node.attribute("fixed_duration").as_bool(); }
+				// actual value of the duration 
+				double value = xml_get_my_double_value( node ); 
+				
+				// set the transition rate 
+				pCD->phenotype.cycle.data.exit_rate(start) = 1.0 / (value+1e-16); 
+				// set it to fixed / non-fixed 
+				pCD->phenotype.cycle.model().phase_links[start][0].fixed_duration = fixed; 
+				
+				node = node.next_sibling( "duration" ); 
+			}
 			
 		}
+
+		
+		
 	}
+
+
 	
 	// here's what it ***should*** do: 
 	// parse the model, get its code 
@@ -1554,6 +1594,18 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			}
 			
 			// add the death model and its death rate 
+
+/*			
+			if( node.child( "phase_transition_rates" ) )
+			{ node = node.child( "phase_transition_rates" ); }
+			if( node.child( "transition_rates" ) )
+			{
+				node = node.child( "transition_rates" ); 
+				std::cout << "Warning: " << node.name() << " is deprecated. Use cycle->phase_transition_rates." 
+					<< std::endl; 
+			}
+*/
+
 	
 			double rate = xml_get_double_value(node,"rate");
 			
@@ -1837,6 +1889,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				
 				std::string substrate_name = xml_get_string_value( node_mot1 , "substrate" ); 
 				pMot->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
+				if( pMot->chemotaxis_index < 0)
+				{
+					std::cout << __FUNCTION__ << ": Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" << std::endl << std::endl; 
+					exit(-1); 
+				}
 				
 				std::string actual_name = microenvironment.density_names[ pMot->chemotaxis_index ]; 
 				
