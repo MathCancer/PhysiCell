@@ -118,6 +118,10 @@
 		</legacy_data>
 	</save>
 	
+	<options>
+		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+	</options>	
+
 	<microenvironment_setup>
 		<variable name="virus" units="particles/micron^3" ID="0">
 			<physical_parameter_set>
@@ -141,8 +145,6 @@
 			</dirichlet_nodes>
 		</options>
 	</microenvironment_setup>	
-	
-	
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless" hidden="true">0</random_seed> 

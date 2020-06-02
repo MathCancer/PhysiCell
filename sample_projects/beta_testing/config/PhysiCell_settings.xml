@@ -118,6 +118,10 @@
 		</legacy_data>
 	</save>
 	
+	<options>
+		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+	</options>	
+
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
 			<physical_parameter_set>
@@ -129,8 +133,8 @@
 		</variable>
 		
 		<options>
-			<calculate_gradients>false</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
+			<calculate_gradients>true</calculate_gradients>
+			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
