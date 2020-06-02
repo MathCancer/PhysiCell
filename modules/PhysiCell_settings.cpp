@@ -192,6 +192,29 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	
 	node = node.parent(); 
 	
+	// legacy and other options 
+	
+	pugi::xml_node node_options; 
+	
+	node_options = xml_find_node( physicell_config_root , "options" ); 
+	if( node_options )
+	{
+		bool settings; 
+		
+		// look for legacy_random_points_on_sphere_in_divide 
+		settings = 
+			xml_get_bool_value( node_options, "legacy_random_points_on_sphere_in_divide" ); 
+		if( settings )
+		{
+			std::cout << "setting legacy unif" << std::endl; 
+			system("pause"); 
+			extern std::vector<double> (*cell_division_orientation)(void); 
+			cell_division_orientation = LegacyRandomOnUnitSphere; 
+		}
+	
+		// other options can go here, eventually 
+	}
+	
 	// domain options 
 	
 	node = xml_find_node( physicell_config_root , "domain" );
