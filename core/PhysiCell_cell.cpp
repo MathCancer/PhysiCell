@@ -1214,6 +1214,27 @@ void display_cell_definitions( std::ostream& os )
 			os << "\t\t" << k << " : " << pCD->phenotype.death.models[k]->name 
 			<< " (code=" << pCD->phenotype.death.models[k]->code << ")" 
 			<< " with rate " << pCD->phenotype.death.rates[k] << " 1/min" << std::endl; 
+
+			Cycle_Model* pCM = (pCD->phenotype.death.models[k] ); 
+			Cycle_Data* pCMD = &(pCD->phenotype.death.models[k]->data ); 
+
+			
+			os << "\t\tdeath phase transitions: " << std::endl 
+			   << "\t\t------------------------" << std::endl; 
+			for( int n=0 ; n < pCM->phase_links.size() ; n++ )
+			{
+				for( int k=0; k < pCM->phase_links[n].size() ; k++ )
+				{
+					int start = pCM->phase_links[n][k].start_phase_index;
+					int end = pCM->phase_links[n][k].end_phase_index; 
+					os << "\t\t" << pCM->phases[start].name << " --> " 
+						<< pCM->phases[end].name << " w mean duration " 
+						<< 1.0 / pCMD->transition_rate( start,end) << " min" << std::endl; 
+				}
+			}			
+			
+			
+			
 		}
 		
 		// summarize functions 
@@ -1695,10 +1716,21 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// now get transition rates within the death model 
 			// set the rates 
 			// node = node.child( "transition_rates" );
+			
+			
+			pugi::xml_node node_death_transitions = node.child( "phase_transition_rates" ); 
 			if( node.child( "transition_rates" ) )
 			{
-				node = node.child( "transition_rates" );
-				pugi::xml_node node1 = node.child( "rate");
+				node_death_transitions = node.child("transition_rates");
+				std::cout << "Warning: " << node_death_transitions.name() 
+					<< " is deprecated. Use death.model.phase_transition_rates." 
+					<< std::endl; 				
+			}
+			
+			
+			if( node_death_transitions )
+			{
+				pugi::xml_node node1 = node_death_transitions.child( "rate");
 				while( node1 )
 				{
 					// which rate 
@@ -1718,15 +1750,66 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					
 					node1 = node1.next_sibling( "rate" ); 
 				}
-				node = node.parent();
 			}	
 
-			if( node.child( "durations" ) )
+			if( node.child( "phase_durations" ) )
 			{
-				node = node.child("durations");
+				node = node.child("phase_durations"); // phase durations
+				node = node.child( "duration" ); // duration
+				while( node )
+				{
+					// which duration? 
+					int start = node.attribute("index").as_int(); 
+					// fixed duration? 
+					bool fixed = false; 
+					if( node.attribute( "fixed_duration" ) )
+					{ fixed = node.attribute("fixed_duration").as_bool(); }
+					// actual value of the duration 
+					double value = xml_get_my_double_value( node ); 
+					
+					// set the transition rate 
+					pCD->phenotype.death.models[death_model_index]->data.exit_rate(start) 
+						= 1.0 / (value+1e-16); 
+					// set it to fixed / non-fixed 
+					pCD->phenotype.death.models[death_model_index]->phase_links[start][0].fixed_duration 
+						= fixed; 
+					
+					node = node.next_sibling( "duration" ); 
+				}
 				
 				
-				node = node.parent();
+/*
+		if( node.child( "phase_durations" ) )
+		{ node = node.child( "phase_durations" ); }
+		if( node )
+		{
+			node = node.child( "duration");
+			while( node )
+			{
+				// which duration? 
+				int start = node.attribute("index").as_int(); 
+				// fixed duration? 
+				bool fixed = false; 
+				if( node.attribute( "fixed_duration" ) )
+				{ fixed = node.attribute("fixed_duration").as_bool(); }
+				// actual value of the duration 
+				double value = xml_get_my_double_value( node ); 
+				
+				// set the transition rate 
+				pCD->phenotype.cycle.data.exit_rate(start) = 1.0 / (value+1e-16); 
+				// set it to fixed / non-fixed 
+				pCD->phenotype.cycle.model().phase_links[start][0].fixed_duration = fixed; 
+				
+				node = node.next_sibling( "duration" ); 
+			}
+			
+		}
+
+*/				
+				
+				
+				node = node.parent(); // phase_durations 
+				node = node.parent(); // model 
 			}				
 			
 			// node = node.parent(); 
