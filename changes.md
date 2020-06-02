@@ -31,9 +31,9 @@ This release introduces bug fixes (particularly the placement of daughter cells 
 + Moved the bool is_active from "protected" to "public" in the Basic_Agent class in BioFVM_basic_agent.h, so that cells be be moved back into the domain and reactivated as needed. 
 
 + Changed beta implementation of XML cell definitions: 
-++ In cycle, transition_rates renamed to phase_transition_rates. PhysiCell will give a deprecatoin warning for transition_rates until the official release of XML cell definitions. 
-++ In death, rates renamed to death_rates. PhysiCell will give a deprecatoin warning for transition_rates until the official release of XML cell definitions. 
-++ In cycle and death, "phase_durations" can now be used in place of phase_transition rates. This may be more intuitive for some modelers. 
+  + In cycle, transition_rates renamed to phase_transition_rates. PhysiCell will give a deprecatoin warning for transition_rates until the official release of XML cell definitions. 
+  + In death, rates renamed to death_rates. PhysiCell will give a deprecatoin warning for transition_rates until the official release of XML cell definitions. 
+  + In cycle and death, "phase_durations" can now be used in place of phase_transition rates. This may be more intuitive for some modelers. 
 
 + See 1.7.0 for other recent minor changes.
 
