@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:** 1.7.0
+**Version:** 1.7.1
 
-**Release date:** 12 May 2020
+**Release date:** 2 June 2020
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -32,7 +32,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
     heterogeneity-sample
     cancer-immune-sample 
     virus-macrophage-sample
-    temlate 
+    template
 
 **make list-projects** : list all available sample projects 
 
