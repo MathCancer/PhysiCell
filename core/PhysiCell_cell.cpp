@@ -1592,7 +1592,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// otherwise, modify properties of that model 
 	
 	// set up the death models 
-	int death_model_index = 0; 
+//	int death_model_index = 0; 
 	node = cd_node.child( "phenotype" );
 	node = node.child( "death" ); 
 	if( node )
@@ -1685,7 +1685,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				case PhysiCell_constants::apoptosis_death_model: 
 //					pCD->phenotype.death.add_death_model( rate , &apoptosis , apoptosis_parameters );
 					if( death_model_already_exists == false )
-					{ pCD->phenotype.death.add_death_model( rate , &apoptosis , death_params ); }
+					{
+						pCD->phenotype.death.add_death_model( rate , &apoptosis , death_params ); 
+						death_index = pD->find_death_model_index( model );
+					}
 					else
 					{
 						pCD->phenotype.death.parameters[death_index] = death_params; 
@@ -1696,7 +1699,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					// set necrosis parameters 
 //					pCD->phenotype.death.add_death_model( rate , &necrosis , necrosis_parameters );
 					if( death_model_already_exists == false )
-					{ pCD->phenotype.death.add_death_model( rate , &necrosis , death_params ); }
+					{
+						pCD->phenotype.death.add_death_model( rate , &necrosis , death_params ); 
+						death_index = pD->find_death_model_index( model );
+					}
 					else
 					{
 						pCD->phenotype.death.parameters[death_index] = death_params; 
@@ -1744,9 +1750,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					double value = xml_get_my_double_value( node1 ); 
 					
 					// set the transition rate 
-					pCD->phenotype.death.models[death_model_index]->transition_rate(start,end) = value; 
+					pCD->phenotype.death.models[death_index]->transition_rate(start,end) = value; 
 					// set it to fixed / non-fixed 
-					pCD->phenotype.death.models[death_model_index]->phase_link(start,end).fixed_duration = fixed; 
+					pCD->phenotype.death.models[death_index]->phase_link(start,end).fixed_duration = fixed; 
 					
 					node1 = node1.next_sibling( "rate" ); 
 				}
@@ -1768,10 +1774,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					double value = xml_get_my_double_value( node ); 
 					
 					// set the transition rate 
-					pCD->phenotype.death.models[death_model_index]->data.exit_rate(start) 
+					pCD->phenotype.death.models[death_index]->data.exit_rate(start) 
 						= 1.0 / (value+1e-16); 
 					// set it to fixed / non-fixed 
-					pCD->phenotype.death.models[death_model_index]->phase_links[start][0].fixed_duration 
+					pCD->phenotype.death.models[death_index]->phase_links[start][0].fixed_duration 
 						= fixed; 
 					
 					node = node.next_sibling( "duration" ); 
@@ -1815,7 +1821,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// node = node.parent(); 
 			
 			node = node.next_sibling( "model" ); 
-			death_model_index++; 
+//			death_model_index++; 
 		}
 		
 	}
