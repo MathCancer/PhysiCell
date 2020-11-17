@@ -517,6 +517,17 @@ bool Cell::assign_position(double x, double y, double z)
 	update_voxel_index();
 	// update current_mechanics_voxel_index
 	current_mechanics_voxel_index= get_container()->underlying_mesh.nearest_voxel_index( position );
+	
+	// Since it is most likely our first position, we update the max_cell_interactive_distance_in_voxel
+	// which was not initialized at cell creation
+	if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
+		phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+	{
+		// get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()]= phenotype.geometry.radius*parameters.max_interaction_distance_factor;
+		get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
+			* phenotype.mechanics.relative_maximum_adhesion_distance;
+	}
+
 	get_container()->register_agent(this);
 	
 	if( !get_container()->underlying_mesh.is_position_valid(x,y,z) )
@@ -550,12 +561,16 @@ void Cell::set_total_volume(double volume)
 	// phenotype.update_radius();
 	//if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
 	//	phenotype.geometry.radius * parameters.max_interaction_distance_factor )
-	if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
-		phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
-	{
-		// get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()]= phenotype.geometry.radius*parameters.max_interaction_distance_factor;
-		get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
-			* phenotype.mechanics.relative_maximum_adhesion_distance;
+	
+	// Here the current mechanics voxel index may not be initialized, when position is still unknown. 
+	if (get_current_mechanics_voxel_index() >= 0){
+		if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
+			phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+		{
+			// get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()]= phenotype.geometry.radius*parameters.max_interaction_distance_factor;
+			get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
+				* phenotype.mechanics.relative_maximum_adhesion_distance;
+		}
 	}
 	
 	return; 
