@@ -70,6 +70,9 @@
 #include "../BioFVM/BioFVM_vector.h"
 #include "PhysiCell_cell.h"
 
+#include <algorithm>
+#include <iterator> 
+
 using namespace BioFVM;
 
 namespace PhysiCell{
@@ -154,7 +157,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// old functions prior to 1.2.1
 		/*
-		#pragma omp parallel for 
+		#pragma omp parallel for
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
 			if((*all_cells)[i]->is_out_of_domain)
@@ -167,7 +170,8 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
 		// checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
-		#pragma omp parallel for 
+		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "phenotype" << std::endl; 
+		#pragma omp parallel for
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
 			if( (*all_cells)[i]->is_out_of_domain == false )
@@ -176,6 +180,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			}
 		}
 		
+		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "divide / die " << std::endl; 
 		// process divides / removes 
 		for( int i=0; i < cells_ready_to_divide.size(); i++ )
 		{
@@ -218,6 +223,11 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{
 				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
 			}
+			
+			if( (*all_cells)[i]->functions.contact_function )
+			{
+				evaluate_interactions( (*all_cells)[i], (*all_cells)[i]->phenotype , time_since_last_mechanics);
+			}
 		}
 		// Calculate new positions
 		#pragma omp parallel for 
@@ -245,6 +255,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 {
 	// secretions and uptakes. Syncing with BioFVM is automated. 
 
+	// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "secretion" << std::endl; 
 	#pragma omp parallel for 
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
@@ -261,7 +272,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 	{
 		// Reset the max_radius in each voxel. It will be filled in set_total_volume
 		// It might be better if we calculate it before mechanics each time 
-		std::fill(max_cell_interactive_distance_in_voxel.begin(), max_cell_interactive_distance_in_voxel.end(), 0.0);
+		// std::fill(max_cell_interactive_distance_in_voxel.begin(), max_cell_interactive_distance_in_voxel.end(), 0.0);
 		
 		if(!initialzed)
 		{
@@ -270,6 +281,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
 		// checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
+		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "bundled phenotype" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -279,6 +291,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			}
 		}
 		
+		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "divide / die " << std::endl; 
 		// process divides / removes 
 		for( int i=0; i < cells_ready_to_divide.size(); i++ )
 		{
@@ -310,9 +323,53 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		// if we need gradients, compute them
 		if( default_microenvironment_options.calculate_gradients ) 
 		{ microenvironment.compute_all_gradient_vectors();  }
-		// end of new in Feb 2018 		
+		// end of new in Feb 2018 
 		
-		// Compute velocities
+		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "interactions" << std::endl; 
+		// perform interactions -- new in June 2020 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->functions.contact_function && pC->is_out_of_domain == false )
+			{ evaluate_interactions( pC,pC->phenotype,time_since_last_mechanics ); }
+		}
+		
+		// perform custom computations 
+
+		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "custom" << std::endl; 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->functions.custom_cell_rule && pC->is_out_of_domain == false )
+			{ pC->functions.custom_cell_rule( pC,pC->phenotype,time_since_last_mechanics ); }
+		}
+		
+		// update velocities 
+		
+		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "velocity" << std::endl; 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->functions.update_velocity && pC->is_out_of_domain == false && pC->is_movable )
+			{ pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); }
+		}
+
+		// update positions 
+		
+		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "position" << std::endl; 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->is_out_of_domain == false && pC->is_movable)
+			{ pC->update_position(time_since_last_mechanics); }
+		}
+		
+/*		
+		// Compute custom functions, interations, and velocities
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -328,6 +385,14 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{
 				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
 			}
+			
+			// contact interactions 
+			
+			if( (*all_cells)[i]->functions.contact_function )
+			{
+				evaluate_interactions( (*all_cells)[i] , (*all_cells)[i]->phenotype, time_since_last_mechanics );
+			}
+			
 		}
 		// Calculate new positions
 		#pragma omp parallel for 
@@ -338,6 +403,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 				(*all_cells)[i]->update_position(time_since_last_mechanics);
 			}
 		}
+*/		
 		
 		// When somebody reviews this code, let's add proper braces for clarity!!! 
 		
@@ -417,18 +483,25 @@ int find_escaping_face_index(Cell* agent)
 
 void Cell_Container::flag_cell_for_division( Cell* pCell )
 { 
-	#pragma omp critical 
-	{cells_ready_to_divide.push_back( pCell );} 
+	#pragma omp critical
+	{
+		auto result = std::find(std::begin(cells_ready_to_divide), std::end(cells_ready_to_divide), pCell );
+		if( result == std::end(cells_ready_to_divide) )
+		{ cells_ready_to_divide.push_back( pCell ); }
+	} 
 	return; 
 }
 
 void Cell_Container::flag_cell_for_removal( Cell* pCell )
 { 
-	#pragma omp critical 
-	{cells_ready_to_die.push_back( pCell );} 
+	#pragma omp critical
+	{
+		auto result = std::find(std::begin(cells_ready_to_die), std::end(cells_ready_to_die), pCell );
+		if( result == std::end(cells_ready_to_die) )
+		{ cells_ready_to_die.push_back( pCell ); }		
+	} 
 	return; 
 }
-
 
 Cell_Container* create_cell_container_for_microenvironment( BioFVM::Microenvironment& m , double mechanics_voxel_size )
 {

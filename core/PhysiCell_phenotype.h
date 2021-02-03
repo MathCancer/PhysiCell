@@ -352,6 +352,7 @@ class Geometry
 
 class Mechanics
 {
+ private:
  public:
 	double cell_cell_adhesion_strength; 
 	double cell_BM_adhesion_strength;
@@ -362,6 +363,11 @@ class Mechanics
 	double relative_maximum_adhesion_distance; 
 	// double maximum_adhesion_distance; // needed? 
 	
+	double relative_maximum_attachment_distance; 
+	double relative_detachment_distance; 
+	int maximum_number_of_attachments; 
+	double attachment_elastic_constant; 
+	double maximum_attachment_rate; 
 	
 	Mechanics(); // done 
 	
