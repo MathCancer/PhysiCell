@@ -521,6 +521,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 			}					  
 			os << "   </g>" << std::endl;
 		}
+		
 	}
 	os << "  </g>" << std::endl; 
 	
