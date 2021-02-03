@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -101,14 +101,12 @@ std::vector<std::string> robot_coloring_function( Cell* pCell );
 
 // these are the custom functions for these cells 
 
-void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
+// void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
 
 void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
 void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
 
 void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt ); 
-
-
 
 void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );  // done 
 

@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -151,8 +151,8 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 );  // 0.1; 
 	*/
 	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; 
-	
+	// cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; pre-1.8.0
+	cell_defaults.phenotype.mechanics.attachment_elastic_constant = paramD.value; 
 	//
 	// Define "seed" cells 
 	
@@ -175,7 +175,8 @@ void create_cell_types( void )
 	cargo_cell.name = "cargo cell";
 	
 	cargo_cell.functions.update_phenotype = cargo_cell_rule; 
-	cargo_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
+	cargo_cell.functions.custom_cell_rule = NULL; // extra_elastic_attachment_mechanics;  // pre-1.8.0
+	cargo_cell.functions.contact_function = standard_elastic_contact_function; 
 	
 	cargo_cell.custom_data["receptor"] = 1.0; 
 
@@ -203,7 +204,8 @@ void create_cell_types( void )
 	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0; 
 	
 	worker_cell.functions.update_phenotype = worker_cell_rule; 
-	worker_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
+	worker_cell.functions.custom_cell_rule = NULL; // extra_elastic_attachment_mechanics; // pre 1.8.0
+	worker_cell.functions.contact_function = standard_elastic_contact_function; 
 	worker_cell.functions.update_migration_bias = worker_cell_motility;
 	
 	build_cell_definitions_maps(); 
@@ -419,7 +421,7 @@ void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt )
 	return; 
 }
 
-
+/*
 void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 {
 	#pragma omp critical
@@ -447,7 +449,9 @@ void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 
 	return; 
 }
+*/
 
+/*
 void dettach_cells( Cell* pCell_1 , Cell* pCell_2 )
 {
 	#pragma omp critical
@@ -490,7 +494,9 @@ void dettach_cells( Cell* pCell_1 , Cell* pCell_2 )
 	
 	return; 
 }
+*/
 
+/*
 void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant )
 {
 	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
@@ -498,7 +504,9 @@ void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_c
 	
 	return; 
 }
+*/
 
+/*
 void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// if I am 
@@ -511,7 +519,7 @@ void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, doub
 
 	return; 
 }	
-
+*/
 
 void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
@@ -523,6 +531,18 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	// have I arrived? If so, release my cargo 
 	if( pCell->nearest_density_vector()[director_index] > threshold )
 	{
+		// set receptor = 0 for cells we're detaching from 
+		// and set their cycle rate to zero 
+		for( int k=0; k < pCell->state.attached_cells.size() ; k++ )
+		{
+			Cell* pTemp = pCell->state.attached_cells[k]; 
+			
+			pTemp->custom_data[ "receptor" ] = 0.0; 
+			pTemp->phenotype.cycle.data.transition_rate( 0,0 ) = 0; 
+		}
+		
+		pCell->remove_all_attached_cells(); 
+		/* // prior to 1.8.0 
 		for( int i=0; i < pCell->state.neighbors.size(); i++ )
 		{
 			Cell* pTemp = pCell->state.neighbors[i]; 
@@ -531,10 +551,12 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 			pTemp->custom_data[ "receptor" ] = 0.0; 
 			pTemp->phenotype.cycle.data.transition_rate( 0,0 ) = 0; 
 		}
+		*/
 	}
 	
 	// am I searching for cargo? if so, see if I've found it
-	if( pCell->state.neighbors.size() == 0 )
+	// if( pCell->state.neighbors.size() == 0 ) // pre 1.8.0 
+	if( pCell->state.number_of_attached_cells() == 0 )
 	{
 		std::vector<Cell*> nearby = pCell->cells_in_my_container(); 
 		for( int i=0; i < nearby.size(); i++ )
@@ -542,7 +564,7 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 			// if it is expressing the receptor, dock with it 
 			if( nearby[i]->custom_data["receptor"] > 0.5 )
 			{
-				attach_cells( pCell, nearby[i] ); 
+				attach_cells( pCell, nearby[i] );
 				nearby[i]->custom_data["receptor"] = 0.0; 
 				nearby[i]->phenotype.secretion.set_all_secretion_to_zero(); 
 			}
@@ -566,7 +588,8 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	static int cargo_index = microenvironment.find_density_index( "cargo signal" ); // 1 
 	static int director_index = microenvironment.find_density_index( "director signal" ); // 0 
 	
-	if( pCell->state.neighbors.size() > 0 )
+	// if( pCell->state.neighbors.size() > 0 ) // pre-1.8.0
+	if( pCell->state.number_of_attached_cells() > 0 )
 	{
 		phenotype.motility.migration_bias = attached_worker_migration_bias; 
 

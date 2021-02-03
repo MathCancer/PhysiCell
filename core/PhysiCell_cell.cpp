@@ -1280,6 +1280,14 @@ void display_ptr_as_bool( void (*ptr)(Cell*,Phenotype&,double), std::ostream& os
 	return;
 }
 
+void display_ptr_as_bool( void (*ptr)(Cell*,Phenotype&,Cell*,Phenotype&,double), std::ostream& os )
+{
+	if( ptr )
+	{ os << "true"; return; }
+	os << "false"; 
+	return;
+}
+
 void display_cell_definitions( std::ostream& os )
 {
 	for( int n=0; n < cell_definitions_by_index.size() ; n++ )
@@ -1360,6 +1368,8 @@ void display_cell_definitions( std::ostream& os )
 		os << "\t\t volume update function: "; display_ptr_as_bool( pCF->volume_update_function , std::cout ); 
 		os << std::endl; 
 		os << "\t\t mechanics function: "; display_ptr_as_bool( pCF->update_velocity , std::cout ); 
+		os << std::endl;
+		os << "\t\t contact function: "; display_ptr_as_bool( pCF->contact_function , std::cout ); 
 		os << std::endl; 
 		
 		// summarize motility 

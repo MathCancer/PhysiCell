@@ -133,8 +133,6 @@ void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt );
 
 void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt );
 void evaluate_interactions( Cell* pCell, Phenotype& phenotype, double dt );
-
-
 	
 };
 

@@ -165,7 +165,7 @@
 		<director_signal_decay type="double" units="1/min">.1</director_signal_decay> <!-- 100 micron length scale -->
 		
 		<!-- for cell definitions -->
-		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>
+		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient> 
 
 		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
 		<worker_migration_speed type="double" units="micron/min">5.0</worker_migration_speed>

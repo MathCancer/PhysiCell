@@ -859,7 +859,9 @@ void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phe
 	
 	std::vector<double> displacement = pC2->position;
 	displacement -= pC1->position; 
+	// std::cout << "vel: " << pC1->velocity << " disp: " << displacement << " e: " << p1.mechanics.attachment_elastic_constant << " vel new: "; 
 	axpy( &(pC1->velocity) , p1.mechanics.attachment_elastic_constant , displacement ); 
+	// std::cout << pC1->velocity << std::endl << std::endl; 
 	return; 
 }
 
