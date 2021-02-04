@@ -150,26 +150,18 @@
 		<cell_definition name="cancer cell" ID="0">
 			<phenotype>
 				<cycle code="5" name="live">  
-					<!-- phases are: G0/G1 , S, G2, M --> 
-
 					<!-- using higher than normal significant digits to match divisions in default code -->
 					<!-- use phase_transition_rates OR phase_durations -->
-					<!--
 					<phase_transition_rates units="1/min"> 
-						<rate start_index="0" end_index="1" fixed_duration="false">0.00334672</rate>
-						<rate start_index="1" end_index="2" fixed_duration="true">0.00208333</rate>
-						<rate start_index="2" end_index="3" fixed_duration="true">0.00416667</rate>
-						<rate start_index="3" end_index="0" fixed_duration="true">0.0166667</rate>
+						<rate start_index="0" end_index="0" fixed_duration="false">0.00072</rate>
 					</phase_transition_rates>
-					-->
 					
 					<!-- use phase_transition_rates OR phase_durations -->
+					<!--
 					<phase_durations units="min"> 
 						<duration index="0" fixed_duration="false">300.0</duration>
-						<duration index="1" fixed_duration="true">480</duration>
-						<duration index="2" fixed_duration="true">240</duration>
-						<duration index="3" fixed_duration="true">60</duration>
 					</phase_durations>
+					-->
 				</cycle>
 				
 				<death>  

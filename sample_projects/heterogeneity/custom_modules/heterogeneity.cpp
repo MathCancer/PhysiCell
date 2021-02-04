@@ -79,11 +79,15 @@ void create_cell_types( void )
 	   
 	   This is a good place to set default functions. 
 	*/ 
+	
+	initialize_default_cell_definition(); 
 
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
 	cell_defaults.parameters.o2_reference = 38.0; 
 	
 	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_oncoprotein;  
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;	
 	
  	/*
 	   This parses the cell definitions in the XML config file. 
@@ -97,9 +101,6 @@ void create_cell_types( void )
 	   This is a good place to set custom functions. 
 	*/ 
 	
-	cell_defaults.functions.update_phenotype = phenotype_function; 
-	cell_defaults.functions.custom_cell_rule = custom_function; 
-		
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
