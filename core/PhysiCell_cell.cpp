@@ -1511,7 +1511,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	Cell_Definition* pCD; 
 	
 	// if this is not "default" then create a new one 
-	if( std::strcmp( cd_node.attribute( "name" ).value() , "default" ) != 0 )
+	if( std::strcmp( cd_node.attribute( "name" ).value() , "default" ) != 0 
+	    && std::strcmp( cd_node.attribute( "ID" ).value() , "0" ) != 0 )
 	{ pCD = new Cell_Definition; }
 	else
 	{ pCD = &cell_defaults; }
