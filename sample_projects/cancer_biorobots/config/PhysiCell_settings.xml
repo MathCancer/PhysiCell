@@ -327,7 +327,7 @@
 					</model>
 				</death>
 				<secretion>
-					<substrate name="oxygen">
+					<substrate name="oxygen"> <!-- double-check this --> 
 						<uptake_rate units="1/min">0</uptake_rate>
 					</substrate> 				
 					<substrate name="chemoattractant">
@@ -360,10 +360,7 @@
 				<secretion>
 					<substrate name="oxygen">
 						<uptake_rate units="1/min">0</uptake_rate>
-					</substrate> 				
-					<substrate name="chemoattractant">
-						<secretion_rate units="1/min">10</secretion_rate>
-					</substrate> 
+					</substrate> 		
 				</secretion>
 				<motility>  
 					<speed units="micron/min">2</speed>
@@ -388,7 +385,7 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		
 		<!-- for main --> 
-		<therapy_activation_time type="double" units="min">10</therapy_activation_time> <!-- 10080 --> 
+		<therapy_activation_time type="double" units="min">10080</therapy_activation_time> 
 			<!-- activate in 7 days --> 
 		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
 		
@@ -397,7 +394,6 @@
 		<cargo_relative_adhesion type="double" units="dimensionless">0</cargo_relative_adhesion>
 		<cargo_relative_repulsion type="double" units="dimensionless">5</cargo_relative_repulsion> 
 		
-
 		<!-- worker cell setup --> 
 		<worker_o2_relative_uptake type="double" units="1/min">0.1</worker_o2_relative_uptake>
 		<worker_relative_adhesion type="double" units="dimensionless">0</worker_relative_adhesion>

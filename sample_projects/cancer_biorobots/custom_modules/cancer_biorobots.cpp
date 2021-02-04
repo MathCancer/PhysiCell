@@ -96,7 +96,7 @@ void create_cargo_cell_type( void )
 		= parameters.doubles( "max_attachment_distance" ) / cargo_cell->phenotype.geometry.radius ; 
 
 	cargo_cell->phenotype.mechanics.relative_detachment_distance 
-		= parameters.doubles( "max_attachment_distance" ) / cargo_cell->phenotype.geometry.radius ; 
+		= parameters.doubles( "max_elastic_displacement" ) / cargo_cell->phenotype.geometry.radius ; 
 		
 	cargo_cell->phenotype.mechanics.attachment_elastic_constant 
 		= parameters.doubles("elastic_coefficient"); 
@@ -142,12 +142,12 @@ void create_worker_cell_type( void )
 		= parameters.doubles("elastic_coefficient"); 		
 	
 	worker_cell->phenotype.mechanics.relative_detachment_distance 
-		= parameters.doubles( "max_attachment_distance" ) / worker_cell->phenotype.geometry.radius ; 
+		= parameters.doubles( "max_elastic_displacement" ) / worker_cell->phenotype.geometry.radius ; 
 
 	// set functions 
 	
-	worker_cell->functions.update_phenotype = worker_cell_rule; 
-	worker_cell->functions.custom_cell_rule = NULL;  
+	worker_cell->functions.update_phenotype = NULL; // worker_cell_rule; 
+	worker_cell->functions.custom_cell_rule = worker_cell_rule;  
 	worker_cell->functions.contact_function = biorobots_contact_function; 
 	worker_cell->functions.update_migration_bias = worker_cell_motility;	
 	
@@ -443,7 +443,8 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	{
 		std::vector<Cell*> nearby = pCell->cells_in_my_container(); 
 		bool attached = false; // want to limit to one attachment 
-		for( int i=0; i < nearby.size(); i++ )
+		int i =0;
+		while( i < nearby.size() && attached == false )
 		{
 			// if it is expressing the receptor, dock with it 
 			if( nearby[i]->custom_data["receptor"] > 0.5 && attached == false )
@@ -453,6 +454,7 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 				// nearby[i]->phenotype.secretion.set_all_secretion_to_zero(); // put into cargo rule instead? 
 				attached = true; 
 			}
+			i++; 
 		}
 		
 	}
@@ -506,8 +508,6 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 
 void cargo_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static int attach_lifetime_i = pCell->custom_data.find_variable_index( "attachment_lifetime" ); 
-	
 	if( phenotype.death.dead == true )
 	{
 		// the cell death functions don't automatically turn off custom functions, 
@@ -525,7 +525,6 @@ void cargo_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 		return; 
 	}
 	
-	
 	return; 
 }
 
@@ -536,7 +535,7 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	static int signal_index = microenvironment.find_density_index( "chemoattractant" ); 
 	static int drug_index = microenvironment.find_density_index( "therapeutic" ); 
 	
-	static int drop_index = pCell->custom_data.find_variable_index( "cargo_release_oxygen_threshold" ); 
+	static int drop_index = pCell->custom_data.find_variable_index( "cargo_release_o2_threshold" ); 
 	static int receptor_index = pCell->custom_data.find_variable_index( "receptor" ); 
 	
 	static int apoptosis_model_index = phenotype.death.find_death_model_index( "apoptosis" );
@@ -572,7 +571,6 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 		phenotype.secretion.secretion_rates[signal_index] = 0.0; 
 		phenotype.secretion.secretion_rates[drug_index] = 0.0; 
 		pCell->custom_data[receptor_index] = 0.0; 
-
 	}
 	else
 	{
@@ -585,8 +583,6 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	return; 
 }
-
-
 
 /* TUMOR CELL RULES */ 
 
@@ -658,12 +654,11 @@ void biorobots_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttache
 	static double max_elastic_displacement = pao.geometry.radius * pao.mechanics.relative_detachment_distance; 
 	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
 	
-	// dettach cells if too far apart 
+	// detach cells if too far apart 
 	
 	if( norm_squared( displacement ) > max_displacement_squared )
 	{
 		detach_cells( pActingOn , pAttachedTo );
-		std::cout << "\t\tDETACH!!!!!" << std::endl; 
 		return; 
 	}
 	
