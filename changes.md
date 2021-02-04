@@ -257,6 +257,8 @@ This release (1) adds "net export" as a new form of more generalized substrate s
 
 + Created find_cell_definition(int) to return a pointer to the matching cell definition (search by type). Returns NULL if nothing found. 
 
++ Created unit tests for cell definitions
+
 + Deprecated oxygen_index, glucose_index, TUMOR_TYPE, and VESSEL_TYPE from PhysiCell_Constants as promised. 
 
 + Minor source code cleanup in PhysiCell_settings.cpp. 
