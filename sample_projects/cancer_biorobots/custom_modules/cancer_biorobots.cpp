@@ -314,7 +314,7 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* pCell )
 	std::vector< std::string > output( 4, "black" ); 
 	
 	static int damage_i = pCell->custom_data.find_variable_index( "damage" ); 
-	static double max_damage = 1.0 * cell_defaults.custom_data["damage rate"] / (1e-16 + cell_defaults.custom_data[ "repair rate" ] );
+	static double max_damage = 1.0 * cell_defaults.custom_data["damage_rate"] / (1e-16 + cell_defaults.custom_data[ "repair_rate" ] );
 	
 	// cargo cell 
 	if( pCell->type == cargo_cell->type )
@@ -439,7 +439,7 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// am I searching for cargo? if so, see if I've found it
-	if( pCell->state.neighbors.size() == 0 )
+	if( pCell->state.number_of_attached_cells() == 0 )
 	{
 		std::vector<Cell*> nearby = pCell->cells_in_my_container(); 
 		bool attached = false; // want to limit to one attachment 
@@ -476,7 +476,7 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	static double unattached_worker_migration_bias = 
 		parameters.doubles("unattached_worker_migration_bias"); 
 	
-	if( pCell->state.neighbors.size() > 0 )
+	if( pCell->state.number_of_attached_cells() > 0 )
 	{
 		phenotype.motility.migration_bias = attached_worker_migration_bias; 
 
@@ -506,7 +506,7 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 
 void cargo_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static int attach_lifetime_i = pCell->custom_data.find_variable_index( "attachment lifetime" ); 
+	static int attach_lifetime_i = pCell->custom_data.find_variable_index( "attachment_lifetime" ); 
 	
 	if( phenotype.death.dead == true )
 	{
@@ -536,7 +536,7 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	static int signal_index = microenvironment.find_density_index( "chemoattractant" ); 
 	static int drug_index = microenvironment.find_density_index( "therapeutic" ); 
 	
-	static int drop_index = pCell->custom_data.find_variable_index( "cargo release oxygen threshold" ); 
+	static int drop_index = pCell->custom_data.find_variable_index( "cargo_release_oxygen_threshold" ); 
 	static int receptor_index = pCell->custom_data.find_variable_index( "receptor" ); 
 	
 	static int apoptosis_model_index = phenotype.death.find_death_model_index( "apoptosis" );
@@ -581,7 +581,6 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 		pCell->custom_data[receptor_index] = 0.0; 		
 		
 		pCell->remove_all_attached_cells(); 
-		
 	}
 	
 	return; 
