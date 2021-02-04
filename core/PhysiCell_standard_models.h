@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -128,9 +128,10 @@ bool create_standard_cycle_and_death_models( void ); // done
 
 void initialize_default_cell_definition( void ); // done 
 
-
 void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
 
+void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt );
+void evaluate_interactions( Cell* pCell, Phenotype& phenotype, double dt );
 	
 };
 

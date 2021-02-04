@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -844,5 +844,39 @@ void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt )
 	return;
 }
 
+void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt )
+{
+	if( pC1->position.size() != 3 || pC2->position.size() != 3 )
+	{
+		#pragma omp critical
+		{
+			std::cout << "what?! " << std::endl
+			<< pC1 << " : " << pC1->type << " " << pC1->type_name << " " << pC1->position << std::endl 
+			<< pC2 << " : " << pC2->type << " " << pC2->type_name << " " << pC2->position << std::endl ;
+		}
+		return; 
+	}
+	
+	std::vector<double> displacement = pC2->position;
+	displacement -= pC1->position; 
+	// std::cout << "vel: " << pC1->velocity << " disp: " << displacement << " e: " << p1.mechanics.attachment_elastic_constant << " vel new: "; 
+	axpy( &(pC1->velocity) , p1.mechanics.attachment_elastic_constant , displacement ); 
+	// std::cout << pC1->velocity << std::endl << std::endl; 
+	return; 
+}
+
+void evaluate_interactions( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	if( pCell->functions.contact_function == NULL )
+	{ return; }
+	
+	for( int n = 0; n < pCell->state.attached_cells.size() ; n++ )
+	{
+		pCell->functions.contact_function( pCell, phenotype , 
+			pCell->state.attached_cells[n] , pCell->state.attached_cells[n]->phenotype , dt ); 
+	}
+	
+	return; 
+}
 
 };

@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -67,23 +67,13 @@
 
 #include "./cancer_biorobots.h"
 
-Cell_Definition cargo_cell; 
-Cell_Definition worker_cell; 
+Cell_Definition* cargo_cell; 
+Cell_Definition* worker_cell; 
 
 void create_cargo_cell_type( void ) 
 {
-	cargo_cell = cell_defaults; 
-	
-	cargo_cell.name = "cargo cell";
-	cargo_cell.type = 1; 
+	cargo_cell = find_cell_definition( "cargo cell" ); 
 
-	// turn off proliferation; 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	cargo_cell.phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) = 0.0; 	
-	
 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
 	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
@@ -92,98 +82,76 @@ void create_cargo_cell_type( void )
 	
 	// reduce o2 uptake 
 	
-	cargo_cell.phenotype.secretion.uptake_rates[oxygen_ID] *= 
-		parameters.doubles("cargo_o2_relative_uptake"); // 0.1; 
+	cargo_cell->phenotype.secretion.uptake_rates[oxygen_ID] *= 
+		parameters.doubles("cargo_o2_relative_uptake");   
 	
-	// set secretion of the chemoattractant
-	cargo_cell.phenotype.secretion.secretion_rates[attract_ID] = 10; 
-	
-	// set apoptosis to survive 10 days (on average) 
-	
-	cargo_cell.phenotype.death.rates[apoptosis_index] = 
-		parameters.doubles("cargo_apoptosis_rate"); // 1.0 / (10.0 * 24.0 * 60.0 ); 
-	
-	// turn of motility; 
-	cargo_cell.phenotype.motility.is_motile = false; 
-	
-	cargo_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
+	cargo_cell->phenotype.mechanics.cell_cell_adhesion_strength *= 
 		parameters.doubles("cargo_relative_adhesion"); // 0.0;
-	cargo_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 
+	cargo_cell->phenotype.mechanics.cell_cell_repulsion_strength *= 
 		parameters.doubles("cargo_relative_repulsion"); // 5.0;
+		
+	// figure out mechanics parameters 
+	
+	cargo_cell->phenotype.mechanics.relative_maximum_attachment_distance 
+		= parameters.doubles( "max_attachment_distance" ) / cargo_cell->phenotype.geometry.radius ; 
+
+	cargo_cell->phenotype.mechanics.relative_detachment_distance 
+		= parameters.doubles( "max_elastic_displacement" ) / cargo_cell->phenotype.geometry.radius ; 
+		
+	cargo_cell->phenotype.mechanics.attachment_elastic_constant 
+		= parameters.doubles("elastic_coefficient"); 
 	
 	// set functions 
 	
-	cargo_cell.functions.update_phenotype = cargo_cell_phenotype_rule; 
-	cargo_cell.functions.custom_cell_rule = cargo_cell_rule; 
-	cargo_cell.functions.update_migration_bias = NULL;	
+	cargo_cell->functions.update_phenotype = cargo_cell_phenotype_rule; 
+	cargo_cell->functions.custom_cell_rule = cargo_cell_rule; 
+	cargo_cell->functions.contact_function = biorobots_contact_function; 
+	cargo_cell->functions.update_migration_bias = NULL;	
 	
 	// set custom data values 
 	
-	cargo_cell.custom_data[ "receptor" ] = 1.0; 
 	
-	cargo_cell.custom_data[ "damage rate" ] = 0.00;  
-	cargo_cell.custom_data[ "repair rate" ] = 0.0;  
-	cargo_cell.custom_data[ "drug death rate" ] = 0.0;  
 	
 	return;
 }	
 
 void create_worker_cell_type( void )
 {
-	worker_cell = cell_defaults; 
-	
-	worker_cell.name = "worker cell";
-	worker_cell.type = 2; 
+	worker_cell = find_cell_definition( "worker cell" ); 
 
-	// turn off proliferation; 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	worker_cell.phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) = 0.0; 	
-	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
-	
 	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
 	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
 	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2	
 	
 	// reduce o2 uptake 
 	
-	worker_cell.phenotype.secretion.uptake_rates[oxygen_ID] *= 
+	worker_cell->phenotype.secretion.uptake_rates[oxygen_ID] *= 
 		parameters.doubles("worker_o2_relative_uptake"); // 0.1; 
 	
-	// set apoptosis zero
-	
-	worker_cell.phenotype.death.rates[apoptosis_index] = 
-		parameters.doubles("worker_apoptosis_rate"); // 0.0; // 1.0 / (10.0 * 24.0 * 60.0 ); 
-	
-	// turn on motility; 
-	worker_cell.phenotype.motility.is_motile = true; 
-	worker_cell.phenotype.motility.persistence_time = 
-		parameters.doubles("worker_motility_persistence_time"); // 5.0; 
-	worker_cell.phenotype.motility.migration_speed = 
-		parameters.doubles("worker_migration_speed"); // 2;  
-	worker_cell.phenotype.motility.migration_bias = 
-		parameters.doubles("unattached_worker_migration_bias"); // 1;
-	
-	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
+	worker_cell->phenotype.mechanics.cell_cell_adhesion_strength *= 
 		parameters.doubles("worker_relative_adhesion"); // 0.0;
-	worker_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 
+	worker_cell->phenotype.mechanics.cell_cell_repulsion_strength *= 
 		parameters.doubles("worker_relative_repulsion"); // 5.0;
+		
+	// figure out mechanics parameters 
 	
+	worker_cell->phenotype.mechanics.relative_maximum_attachment_distance 
+		= parameters.doubles( "max_attachment_distance" ) / worker_cell->phenotype.geometry.radius ; 
+		
+	worker_cell->phenotype.mechanics.attachment_elastic_constant 
+		= parameters.doubles("elastic_coefficient"); 		
+	
+	worker_cell->phenotype.mechanics.relative_detachment_distance 
+		= parameters.doubles( "max_elastic_displacement" ) / worker_cell->phenotype.geometry.radius ; 
+
 	// set functions 
 	
-	worker_cell.functions.update_phenotype = worker_cell_rule; 
-	worker_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics;  
-	worker_cell.functions.update_migration_bias = worker_cell_motility;	
+	worker_cell->functions.update_phenotype = NULL; // worker_cell_rule; 
+	worker_cell->functions.custom_cell_rule = worker_cell_rule;  
+	worker_cell->functions.contact_function = biorobots_contact_function; 
+	worker_cell->functions.update_migration_bias = worker_cell_motility;	
 	
 	// set custom data values 
-	
-	worker_cell.custom_data[ "receptor" ] = 0.0; 
-	worker_cell.custom_data[ "damage rate" ] = 0.00;  
-	worker_cell.custom_data[ "repair rate" ] = 0.0;  
-	worker_cell.custom_data[ "drug death rate" ] = 0.0;  
 	
 	return; 
 }
@@ -199,28 +167,6 @@ void create_cell_types( void )
 	// housekeeping 
 	
 	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
-	
-	// turn the default cycle model to live, 
-	// so it's easier to turn off proliferation
-	
-	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
-	
-	// Make sure we're ready for 2D
-	
-	cell_defaults.functions.set_orientation = up_orientation; 
-	cell_defaults.phenotype.geometry.polarity = 1.0; 
-	cell_defaults.phenotype.motility.restrict_to_2D = true; // true; 
-	
-	// set to no motility for cancer cells 
-	cell_defaults.phenotype.motility.is_motile = false; 
-	
-	// use default proliferation and death 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
 	cell_defaults.parameters.o2_reference = 38.0; 
@@ -228,56 +174,25 @@ void create_cell_types( void )
 	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
 	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
 	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2	
-	
-	// set default uptake and secretion 
-	// oxygen 
-	cell_defaults.phenotype.secretion.secretion_rates[oxygen_ID] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_ID] = 10; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_ID] = 38; 
 
-	// chemoattractant 
-	cell_defaults.phenotype.secretion.saturation_densities[attract_ID] = 1; 
-	// therapeutic  
-	cell_defaults.phenotype.secretion.saturation_densities[therapy_ID] = 1; 
 	
 	// set the default cell type to o2-based proliferation with the effect of the 
 	// on oncoprotein, and secretion of the immunostimulatory factor 
 	
 	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_therapy; 
-	
-	// add the extra bit of "attachment" mechanics 
-	cell_defaults.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
 	
 	// change the max cell-cell adhesion distance 
 	cell_defaults.phenotype.mechanics.set_relative_maximum_adhesion_distance(parameters.doubles("max_relative_cell_adhesion_distance") );
 	
-	cell_defaults.name = "cancer cell"; 
-	cell_defaults.type = 0; 
+	cell_defaults.phenotype.mechanics.attachment_elastic_constant = parameters.doubles( "elastic_coefficient" );
+
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
 	
-	// add custom data 
-		
-	Parameter<double> paramD; 
-	
-	// for cargo-worker 
-	paramD = parameters.doubles["elastic_coefficient"]; 
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units, paramD.value ); 
-	
-	paramD = parameters.doubles["receptor"]; 
-	cell_defaults.custom_data.add_variable( "receptor" , paramD.units, paramD.value ); 
-	
-	paramD = parameters.doubles["cargo_release_o2_threshold"]; 
-	cell_defaults.custom_data.add_variable( "cargo release oxygen threshold" , paramD.units, paramD.value ); 
-	
-	// for therapy 
-	
-	paramD = parameters.doubles["damage_rate"]; 
-	cell_defaults.custom_data.add_variable( "damage rate" , paramD.units, paramD.value ); 
-	paramD = parameters.doubles["repair_rate"]; 
-	cell_defaults.custom_data.add_variable( "repair rate" , paramD.units, paramD.value ); 
-	paramD = parameters.doubles["drug_death_rate"]; 	
-	cell_defaults.custom_data.add_variable( "drug death rate" , paramD.units, paramD.value ); 
-	cell_defaults.custom_data.add_variable( "damage" , "dimensionless", 0.0 ); 
-	
+	initialize_cell_definitions_from_pugixml(); 
+
 	// create the biorobot types 
 	create_cargo_cell_type(); 
 	create_worker_cell_type(); 
@@ -292,63 +207,11 @@ void setup_microenvironment( void )
 {
 	// set domain parameters
 	
-/*
-	// in the XML now 
-	default_microenvironment_options.X_range = {-750, 750}; 
-	default_microenvironment_options.Y_range = {-750, 750}; 
-	// default_microenvironment_options.Z_range = {-750, 750}; 
-*/
 	if( default_microenvironment_options.simulate_2D == false )
 	{
 		std::cout << "WARNING: overriding from 3-D to 2-D" << std::endl; 
 		default_microenvironment_options.simulate_2D = true; 
 	}
-	
-	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
-	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
-	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2
-	
-/*
-	all this is in XML now 
-	// gradients are needed for this example 
-	
-	default_microenvironment_options.calculate_gradients = true; 
-	
-	// add cargo cell chemokine
-
-	// Earlier: A future release of PhysiCell will handle setup of chemical factors 
-	// more elegantly. So, let's skip XML specification for now.
-	// August 2019: but now it's in XML in 1.6.0! Yay! 
-	
-	// add therapeutic 
-	
-	microenvironment.add_density( "chemoattractant", "dimensionless" ); 
-	microenvironment.diffusion_coefficients[1] = 1e3; 
-	microenvironment.decay_rates[1] = .1; 	
-	
-	// add the immunostimulatory factor 
-	
-	microenvironment.add_density( "therapeutic", "dimensionless" ); 
-	microenvironment.diffusion_coefficients[2] = 1e3; 
-	microenvironment.decay_rates[2] = 0.15625; 	
-	
-	// let BioFVM use oxygen as the default 
-	
-	default_microenvironment_options.use_oxygen_as_first_field = true; 
-
-	// set Dirichlet conditions 
-	
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // physioxic conditions 
-	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; 
-	default_microenvironment_options.Dirichlet_condition_vector[2] = 0; 
-	
-	default_microenvironment_options.Dirichlet_activation_vector[1] = false;  // no Dirichlet for the chemoattractant 
-	default_microenvironment_options.Dirichlet_activation_vector[2] = false;  // no Dirichlet for the therapeutic  
-	
-	// set initial conditions 
-	default_microenvironment_options.initial_condition_vector = { 38.0 , 0.0, 0.0 }; 
-*/	
 			
 	initialize_microenvironment(); 	
 
@@ -380,9 +243,9 @@ void introduce_biorobots( void )
 		
 		Cell* pCell;  
 		if( UniformRandom() <= worker_fraction )
-		{ pCell = create_cell( worker_cell ); }
+		{ pCell = create_cell( *worker_cell ); }
 		else
-		{ pCell = create_cell( cargo_cell ); }
+		{ pCell = create_cell( *cargo_cell ); }
 		pCell->assign_position( position ); 
 	}
 	
@@ -451,10 +314,10 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* pCell )
 	std::vector< std::string > output( 4, "black" ); 
 	
 	static int damage_i = pCell->custom_data.find_variable_index( "damage" ); 
-	static double max_damage = 1.0 * cell_defaults.custom_data["damage rate"] / (1e-16 + cell_defaults.custom_data[ "repair rate" ] );
+	static double max_damage = 1.0 * cell_defaults.custom_data["damage_rate"] / (1e-16 + cell_defaults.custom_data[ "repair_rate" ] );
 	
 	// cargo cell 
-	if( pCell->type == 1 )
+	if( pCell->type == cargo_cell->type )
 	{
 		output[0] = "blue";
 		output[1] = "blue";
@@ -464,7 +327,7 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* pCell )
 	}
 	
 	// worker cell 
-	if( pCell->type == 2 )
+	if( pCell->type == worker_cell->type )
 	{
 		output[0] = "red";
 		output[1] = "red";
@@ -508,113 +371,6 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* pCell )
 	}
 	return output; 
 }
-
-
-// keep 
-void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant )
-{
-	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
-	
-	// dettach cells if too far apart 
-	static double max_elastic_displacement = parameters.doubles("max_elastic_displacement");
-	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
-	
-	if( norm_squared( displacement ) > max_displacement_squared )
-	{
-		dettach_cells( pActingOn , pAttachedTo );
-		std::cout << "\t\tDETACH!!!!!" << std::endl; 
-		return; 
-	}
-	
-	axpy( &(pActingOn->velocity) , elastic_constant , displacement ); 
-	
-	return; 
-}
-
-// keep 
-void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	for( int i=0; i < pCell->state.neighbors.size() ; i++ )
-	{
-		add_elastic_velocity( pCell, pCell->state.neighbors[i], pCell->custom_data["elastic coefficient"] ); 
-	}
-
-	return; 
-}	
-
-// keep 
-void attach_cells( Cell* pCell_1, Cell* pCell_2 )
-{
-	#pragma omp critical
-	{
-		
-	bool already_attached = false; 
-	for( int i=0 ; i < pCell_1->state.neighbors.size() ; i++ )
-	{
-		if( pCell_1->state.neighbors[i] == pCell_2 )
-		{ already_attached = true; }
-	}
-	if( already_attached == false )
-	{ pCell_1->state.neighbors.push_back( pCell_2 ); }
-	
-	already_attached = false; 
-	for( int i=0 ; i < pCell_2->state.neighbors.size() ; i++ )
-	{
-		if( pCell_2->state.neighbors[i] == pCell_1 )
-		{ already_attached = true; }
-	}
-	if( already_attached == false )
-	{ pCell_2->state.neighbors.push_back( pCell_1 ); }
-
-	}
-
-	return; 
-}
-
-// keep 
-void dettach_cells( Cell* pCell_1 , Cell* pCell_2 )
-{
-	#pragma omp critical
-	{
-		bool found = false; 
-		int i = 0; 
-		while( !found && i < pCell_1->state.neighbors.size() )
-		{
-			// if cell 2 is in cell 1's list, remove it
-			if( pCell_1->state.neighbors[i] == pCell_2 )
-			{
-				int n = pCell_1->state.neighbors.size(); 
-				// copy last entry to current position 
-				pCell_1->state.neighbors[i] = pCell_1->state.neighbors[n-1]; 
-				// shrink by one 
-				pCell_1->state.neighbors.pop_back(); 
-				found = true; 
-			}
-			i++; 
-		}
-	
-		found = false; 
-		i = 0; 
-		while( !found && i < pCell_2->state.neighbors.size() )
-		{
-			// if cell 1 is in cell 2's list, remove it
-			if( pCell_2->state.neighbors[i] == pCell_1 )
-			{
-				int n = pCell_2->state.neighbors.size(); 
-				// copy last entry to current position 
-				pCell_2->state.neighbors[i] = pCell_2->state.neighbors[n-1]; 
-				// shrink by one 
-				pCell_2->state.neighbors.pop_back(); 
-				found = true; 
-			}
-			i++; 
-		}
-
-	}
-	
-	return; 
-}
-
 
 // keep! 
 Cell* worker_cell_check_neighbors_for_attachment( Cell* pWorker , double dt )
@@ -668,8 +424,6 @@ bool worker_cell_attempt_attachment( Cell* pWorker, Cell* pCargo , double dt )
 	return false; 
 }
 
-
-
 void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// if I am dead, don't bother
@@ -685,11 +439,12 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// am I searching for cargo? if so, see if I've found it
-	if( pCell->state.neighbors.size() == 0 )
+	if( pCell->state.number_of_attached_cells() == 0 )
 	{
 		std::vector<Cell*> nearby = pCell->cells_in_my_container(); 
 		bool attached = false; // want to limit to one attachment 
-		for( int i=0; i < nearby.size(); i++ )
+		int i =0;
+		while( i < nearby.size() && attached == false )
 		{
 			// if it is expressing the receptor, dock with it 
 			if( nearby[i]->custom_data["receptor"] > 0.5 && attached == false )
@@ -699,6 +454,7 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 				// nearby[i]->phenotype.secretion.set_all_secretion_to_zero(); // put into cargo rule instead? 
 				attached = true; 
 			}
+			i++; 
 		}
 		
 	}
@@ -722,7 +478,7 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	static double unattached_worker_migration_bias = 
 		parameters.doubles("unattached_worker_migration_bias"); 
 	
-	if( pCell->state.neighbors.size() > 0 )
+	if( pCell->state.number_of_attached_cells() > 0 )
 	{
 		phenotype.motility.migration_bias = attached_worker_migration_bias; 
 
@@ -752,8 +508,6 @@ void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 
 void cargo_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static int attach_lifetime_i = pCell->custom_data.find_variable_index( "attachment lifetime" ); 
-	
 	if( phenotype.death.dead == true )
 	{
 		// the cell death functions don't automatically turn off custom functions, 
@@ -765,93 +519,11 @@ void cargo_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// if I'm docked
-	if( pCell->state.neighbors.size() > 0 )
+	if( pCell->state.number_of_attached_cells() > 0 )
 	{
-		extra_elastic_attachment_mechanics( pCell, phenotype, dt );
 		phenotype.motility.is_motile = false; 
 		return; 
 	}
-	
-	
-	return; 
-}
-
-
-
-// phenotype rule 
-void old_cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
-	static int signal_index = microenvironment.find_density_index( "chemoattractant" ); 
-	static int drug_index = microenvironment.find_density_index( "oxygen" ); 
-	
-	static int death_index = pCell->custom_data.find_variable_index( "cargo apoptosis oxygen threshold" ); 
-	static int receptor_index = pCell->custom_data.find_variable_index( "receptor" ); 
-	
-	static int apoptosis_model_index = phenotype.death.find_death_model_index( "apoptosis" );	
-	
-	// if I am attached, do not secrete chemoattractant. do not express receptor 
-	
-	if( pCell->state.neighbors.size() > 0 )
-	{
-		phenotype.secretion.secretion_rates[signal_index] = 0.0; 
-		pCell->custom_data[receptor_index] = 0.0; 
-	}
-	
-	// am I dead? 
-	
-	if( phenotype.death.dead == true )
-	{
-		// if attached to anything, release
-		
-		for( int i=0; i < pCell->state.neighbors.size() ; i++ )
-		{
-			dettach_cells( pCell , pCell->state.neighbors[i] ); 
-		}
-		
-		// set drug release rate
-		
-		phenotype.secretion.secretion_rates[drug_index] = 10.0; 
-	
-		// get rid of all extra functions 
-		
-		pCell->functions.update_phenotype = NULL; 
-		pCell->functions.custom_cell_rule = NULL; 
-	
-		return; 
-	}
-	
-	// should I die? 
-	
-	if( pCell->nearest_density_vector()[o2_index] <= pCell->custom_data[death_index] )
-	{
-		std::cout<< "arrrhhh!!!!!! " << std::endl; 
-		// if ready dead, don't bother!
-		if( phenotype.death.dead == true )
-		{ return; }
-
-		// trigger death 
-		pCell->start_death( apoptosis_model_index );
-		
-		// if attached to anything, release
-		
-		for( int i=0; i < pCell->state.neighbors.size() ; i++ )
-		{
-			dettach_cells( pCell , pCell->state.neighbors[i] ); 
-		}
-		
-		// set drug release rate
-		
-		phenotype.secretion.secretion_rates[drug_index] = 10.0; 
-	
-		// get rid of all extra functions 
-		
-		pCell->functions.update_phenotype = NULL; 
-		pCell->functions.custom_cell_rule = NULL; 		
-		
-		return; 
-	}
-
 	
 	return; 
 }
@@ -863,7 +535,7 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	static int signal_index = microenvironment.find_density_index( "chemoattractant" ); 
 	static int drug_index = microenvironment.find_density_index( "therapeutic" ); 
 	
-	static int drop_index = pCell->custom_data.find_variable_index( "cargo release oxygen threshold" ); 
+	static int drop_index = pCell->custom_data.find_variable_index( "cargo_release_o2_threshold" ); 
 	static int receptor_index = pCell->custom_data.find_variable_index( "receptor" ); 
 	
 	static int apoptosis_model_index = phenotype.death.find_death_model_index( "apoptosis" );
@@ -872,7 +544,7 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	// if dettached and receptor off, secrete chemo
 	
-	if( pCell->state.neighbors.size() == 0 )
+	if( pCell->state.number_of_attached_cells() == 0 )
 	{
 		if( pCell->custom_data[receptor_index] > 0.1 )
 		{
@@ -899,7 +571,6 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 		phenotype.secretion.secretion_rates[signal_index] = 0.0; 
 		phenotype.secretion.secretion_rates[drug_index] = 0.0; 
 		pCell->custom_data[receptor_index] = 0.0; 
-
 	}
 	else
 	{
@@ -907,17 +578,11 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 		phenotype.secretion.secretion_rates[drug_index] = 10.0; 
 		pCell->custom_data[receptor_index] = 0.0; 		
 		
-		for( int i=0; i < pCell->state.neighbors.size() ; i++ )
-		{
-			dettach_cells( pCell , pCell->state.neighbors[i] ); 
-		}		
-		
+		pCell->remove_all_attached_cells(); 
 	}
 	
 	return; 
 }
-
-
 
 /* TUMOR CELL RULES */ 
 
@@ -927,15 +592,15 @@ void tumor_cell_phenotype_with_therapy( Cell* pCell, Phenotype& phenotype, doubl
 	static int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
 	static int damage_i = pCell->custom_data.find_variable_index( "damage" ); 
 
-	static int damage_rate_i = pCell->custom_data.find_variable_index( "damage rate" ); 
-	static int repair_rate_i = pCell->custom_data.find_variable_index( "repair rate" ); 
-	static int death_rate_i = pCell->custom_data.find_variable_index( "drug death rate" ); 
+	static int damage_rate_i = pCell->custom_data.find_variable_index( "damage_rate" ); 
+	static int repair_rate_i = pCell->custom_data.find_variable_index( "repair_rate" ); 
+	static int death_rate_i = pCell->custom_data.find_variable_index( "drug_death_rate" ); 
 	
 	static int chemo_i = microenvironment.find_density_index( "therapeutic" ); 
 	
 	static int apoptosis_model_index = phenotype.death.find_death_model_index( "apoptosis" );	
 	
-	static double max_damage = 1.0 * cell_defaults.custom_data["damage rate"] / (1e-16 + cell_defaults.custom_data[ "repair rate" ] );
+	static double max_damage = 1.0 * cell_defaults.custom_data["damage_rate"] / (1e-16 + cell_defaults.custom_data[ "repair_rate" ] );
 	
 	// if I'm dead, don't bother. disable my phenotype rule
 	if( phenotype.death.dead == true )
@@ -982,4 +647,23 @@ void tumor_cell_phenotype_with_therapy( Cell* pCell, Phenotype& phenotype, doubl
 	return; 
 }
 
+void biorobots_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt )
+{
+	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
+	
+	static double max_elastic_displacement = pao.geometry.radius * pao.mechanics.relative_detachment_distance; 
+	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
+	
+	// detach cells if too far apart 
+	
+	if( norm_squared( displacement ) > max_displacement_squared )
+	{
+		detach_cells( pActingOn , pAttachedTo );
+		return; 
+	}
+	
+	axpy( &(pActingOn->velocity) , pao.mechanics.attachment_elastic_constant , displacement ); 
+	
+	return; 
+}
 

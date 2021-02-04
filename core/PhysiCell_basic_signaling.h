@@ -64,26 +64,48 @@
 #                                                                             #
 ###############################################################################
 */
+ 
+#include <vector>
+#include <string>
 
-#include "../core/PhysiCell.h"
-#include "../modules/PhysiCell_standard_modules.h" 
+#ifndef __PhysiCell_basic_signaling__
+#define __PhysiCell_basic_signaling__
 
-using namespace BioFVM; 
-using namespace PhysiCell;
+#include "./PhysiCell.h"
 
-// setup functions to help us along 
+namespace PhysiCell{
+	
 
-void create_cell_types( void );
-void setup_tissue( void ); 
+// signal increases/decreases parameter
+// options: hill power
+// options: half max
 
-// set up the BioFVM microenvironment 
-void setup_microenvironment( void ); 
+class Integrated_Signal
+{
+ private:
+ public: 
+	double base_activity; 
+	double max_activity; 
+	
+	std::vector<double> promoters; 
+	std::vector<double> promoter_weights; 
+	double promoters_Hill;
+	double promoters_half_max; 
+	
+	std::vector<double> inhibitors; 
+	std::vector<double> inhibitor_weights; 
+	double inhibitors_Hill;
+	double inhibitors_half_max; 
+	
+	Integrated_Signal();
+	void reset( void ); 
+	
+	void add_signal( char signal_type , double signal , double weight ); 
+	void add_signal( char signal_type , double signal );
 
-// custom pathology coloring function 
+	double compute_signal( void );
+};
 
-std::vector<std::string> my_coloring_function( Cell* );
+}; 
 
-// custom functions can go here 
-
-void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
-void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
+#endif 

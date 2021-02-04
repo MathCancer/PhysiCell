@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -72,10 +72,11 @@
 #include <fstream>
 #include <string>
 
-static std::string PhysiCell_Version = "1.7.1"; 
+static std::string PhysiCell_Version = "1.8.0-preview"; 
 static std::string PhysiCell_URL = "http://PhysiCell.MathCancer.org"; 
 static std::string PhysiCell_DOI = "10.1371/journal.pcbi.1005991"; 
 
+#include "PhysiCell_basic_signaling.h"
 #include "PhysiCell_phenotype.h"
 #include "PhysiCell_standard_models.h"
 #include "PhysiCell_cell.h"

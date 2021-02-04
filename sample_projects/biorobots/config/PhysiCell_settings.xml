@@ -35,7 +35,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -153,7 +153,190 @@
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
 		</options>
-	</microenvironment_setup>		
+	</microenvironment_setup>
+	
+	<cell_definitions>
+		<cell_definition name="default" ID="0">
+			<phenotype>
+				<cycle code="5" name="live">  
+					<!-- phases are: live --> 
+
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<!-- use phase_transition_rates OR phase_durations -->
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
+					</phase_transition_rates>
+					
+					<!-- use phase_transition_rates OR phase_durations -->
+					<!--
+					<phase_durations units="min"> 
+						<duration index="0" fixed_duration="false">300.0</duration>
+					</phase_durations>
+					-->
+				</cycle>
+				
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">0</death_rate>
+						<!-- use phase_transition_rates OR phase_durations -->
+						<!--
+						<phase_transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="true">0.00193798</rate>
+						</phase_transition_rates>
+						-->
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">516</duration>
+						</phase_durations>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.0</death_rate>
+						<!-- use phase_transition_rates OR phase_durations -->
+						<!-- necrosis uses phase_duration[0] = 0 so that it always immediately
+							 tries to transition and instead checks volume against the rupture
+							 volume --> 
+<!--						
+						<phase_transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
+						</phase_transition_rates>
+-->						
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">0</duration>
+							<duration index="1" fixed_duration="true">86400</duration>
+						</phase_durations>
+						
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>					
+
+				<volume>  
+					<total units="micron^3">2494</total>
+					<fluid_fraction units="dimensionless">0.75</fluid_fraction>
+					<nuclear units="micron^3">540</nuclear>
+					
+					<fluid_change_rate units="1/min">0.05</fluid_change_rate>
+					<cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+					<nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+					
+					<calcified_fraction units="dimensionless">0</calcified_fraction>
+					<calcification_rate units="1/min">0</calcification_rate>
+					
+					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+				</volume> 				
+				
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+					
+					<options>
+						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
+				<motility>  
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
+					
+					<options>
+						<enabled>false</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>false</enabled>
+							<substrate>director signal</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				
+				<secretion>
+					<substrate name="director signal">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+					
+					<substrate name="cargo signal">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 					
+				</secretion>
+
+				<molecular />
+			</phenotype>
+			<custom_data>  
+				<receptor units="dimensionless">0.0</receptor> 
+			</custom_data>
+		</cell_definition>
+		
+		<cell_definition name="director cell" ID="1" parent_type="default">
+			<phenotype>
+				<secretion>
+					<substrate name="director signal">
+						<secretion_rate units="1/min">9.9</secretion_rate>
+					</substrate> 
+				</secretion>		
+			</phenotype>
+		</cell_definition>
+		
+		<cell_definition name="cargo cell" ID="2" parent_type="default">
+			<phenotype>
+				<secretion>
+					<substrate name="cargo signal">
+						<secretion_rate units="1/min">9.9</secretion_rate>
+					</substrate> 
+				</secretion>	
+			</phenotype>
+			<custom_data>  
+				<receptor units="dimensionless">1.0</receptor> 
+			</custom_data>				
+		</cell_definition>
+	
+		<cell_definition name="worker cell" ID="3" parent_type="default">
+			<phenotype>
+				<motility>  
+					<speed units="micron/min">5.0</speed>
+					<persistence_time units="min">5.0</persistence_time>
+					<migration_bias units="dimensionless">0.5</migration_bias>
+					
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>false</enabled>
+							<substrate>director signal</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>			
+			</phenotype>
+			<custom_data>  
+				<receptor units="dimensionless">1.0</receptor> 
+			</custom_data>				
+		</cell_definition>	
+	
+	</cell_definitions>
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
@@ -165,10 +348,9 @@
 		<director_signal_decay type="double" units="1/min">.1</director_signal_decay> <!-- 100 micron length scale -->
 		
 		<!-- for cell definitions -->
-		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>
+		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient> 
 
-		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
-		<worker_migration_speed type="double" units="micron/min">5.0</worker_migration_speed>
+		<!-- <worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time> -->
 		<attached_worker_migration_bias type="double" units="dimensionless">1.0</attached_worker_migration_bias>
 		<unattached_worker_migration_bias type="double" units="dimensionless">0.5</unattached_worker_migration_bias>
 

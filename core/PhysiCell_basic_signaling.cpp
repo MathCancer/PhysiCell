@@ -64,26 +64,95 @@
 #                                                                             #
 ###############################################################################
 */
-
-#include "../core/PhysiCell.h"
-#include "../modules/PhysiCell_standard_modules.h" 
+ 
+#include "./PhysiCell_basic_signaling.h"
 
 using namespace BioFVM; 
-using namespace PhysiCell;
 
-// setup functions to help us along 
+namespace PhysiCell{
+	
+Integrated_Signal::Integrated_Signal()
+{
+	base_activity = 0.0; 
+	max_activity = 1.0; 
+	
+	promoters.clear(); 
+	promoter_weights.clear(); 
+	
+	promoters_half_max = 0.1;
+	promoters_Hill = 4; 
+	
+	inhibitors.clear(); 
+	inhibitor_weights.clear(); 
+	
+	inhibitors_half_max = 0.1; 
+	inhibitors_Hill = 4; 
+	
+	return; 
+}
 
-void create_cell_types( void );
-void setup_tissue( void ); 
+void Integrated_Signal::reset( void )
+{
+	promoters.clear(); 
+	promoter_weights.clear(); 
 
-// set up the BioFVM microenvironment 
-void setup_microenvironment( void ); 
+	inhibitors.clear(); 
+	inhibitor_weights.clear(); 
+	return; 
+}
 
-// custom pathology coloring function 
+double Integrated_Signal::compute_signal( void )
+{
+	double pr = 0.0; 
+	double w = 0.0; 
+	for( int k=0 ; k < promoters.size() ; k++ )
+	{ pr += promoters[k]; w += promoter_weights[k]; } 
+	w += 1e-16; 
+	pr /= w; 
+	
+	double inhib = 0.0; 
+	w = 0.0; 
+	for( int k=0 ; k < inhibitors.size() ; k++ )
+	{ inhib += inhibitors[k]; w += inhibitor_weights[k]; } 
+	w += 1e-16; 
+	inhib /= w; 
+	
+	double Pn = pow( pr , promoters_Hill ); 
+	double Phalf = pow( promoters_half_max , promoters_Hill ); 
 
-std::vector<std::string> my_coloring_function( Cell* );
+	double In = pow( inhib , inhibitors_Hill ); 
+	double Ihalf = pow( inhibitors_half_max , inhibitors_Hill ); 
+	
+	double P = Pn / ( Pn + Phalf ); 
+	double I = 1.0 / ( In + Ihalf ); 
+	
+	double output = max_activity; 
+	output -= base_activity; //(max-base)
+	output *= P; // (max-base)*P 
+	output += base_activity; // base + (max-base)*P 
+	output *= I; // (base + (max-base)*P)*I; 
 
-// custom functions can go here 
+	return output; 
+};
 
-void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
-void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
+void Integrated_Signal::add_signal( char signal_type , double signal , double weight )
+{
+	if( signal_type == 'P' || signal_type == 'p' )
+	{
+		promoters.push_back( signal ); 
+		promoter_weights.push_back( weight ); 
+		return; 
+	}
+	if( signal_type == 'I' || signal_type == 'i' )
+	{
+		inhibitors.push_back( signal ); 
+		inhibitor_weights.push_back( weight ); 
+		return; 
+	}
+	return; 
+}
+
+void Integrated_Signal::add_signal( char signal_type , double signal )
+{ return add_signal( signal_type , signal , 1.0 ); }
+
+}; 
