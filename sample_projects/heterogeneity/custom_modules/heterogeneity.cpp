@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,60 +70,40 @@
 
 void create_cell_types( void )
 {
-	// use the same random seed so that future experiments have the 
-	// same initial histogram of oncoprotein, even if threading means 
-	// that future division and other events are still not identical 
-	// for all runs 
+	// set the random seed 
+	SeedRandom( parameters.ints("random_seed") );  
 	
-	SeedRandom( parameters.ints( "random_seed" ) ); 
-	
-	// housekeeping 
-	
-	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
-	
-	// turn the default cycle model to live, 
-	// so it's easier to turn off proliferation
-	
-	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
-	
-	// Make sure we're ready for 2D
-	
-	cell_defaults.functions.set_orientation = up_orientation;  
-	
-	cell_defaults.phenotype.geometry.polarity = 1.0; 
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	
-	// use default proliferation and death 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
-	
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
+
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
 	cell_defaults.parameters.o2_reference = 38.0; 
 	
-	// set default uptake and secretion 
+	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_oncoprotein;  
 	
-	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0
+ 	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
 	
-	// oxygen 
-	cell_defaults.phenotype.secretion.secretion_rates[oxygen_ID] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_ID] = 10; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_ID] = 38; 
-
-	// set the default cell type to no phenotype updates 
+	initialize_cell_definitions_from_pugixml(); 
 	
-	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_oncoprotein; 
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
 	
-	cell_defaults.name = "cancer cell"; 
-	cell_defaults.type = 0; 
-	
-	// add custom data 
-	
-	cell_defaults.custom_data.add_variable( "oncoprotein" , "dimensionless", 1.0 ); 
-	
+	cell_defaults.functions.update_phenotype = phenotype_function; 
+	cell_defaults.functions.custom_cell_rule = custom_function; 
+		
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
 	
@@ -132,39 +112,12 @@ void create_cell_types( void )
 
 void setup_microenvironment( void )
 {
-	// set domain parameters
-
-/* now this is in XML 
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
-	default_microenvironment_options.simulate_2D = true; 
-*/
 	// make sure ot override and go back to 2D 
 	if( default_microenvironment_options.simulate_2D == false )
 	{
 		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
 		default_microenvironment_options.simulate_2D = true; 
 	}
-	
-/*
-	All this is now in XML as of 1.6.0 
-	
-	// no gradients needed for this example 
-	
-	default_microenvironment_options.calculate_gradients = false; 
-	
-	// let BioFVM use oxygen as the default 
-	
-	default_microenvironment_options.use_oxygen_as_first_field = true; 
-	
-	// set Dirichlet conditions 
-	
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // normoxic conditions 
-	
-	// set initial conditions 
-	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
-*/	
 			
 	initialize_microenvironment(); 	
 

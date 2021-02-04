@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -74,9 +74,6 @@ using namespace PhysiCell;
 // custom cell phenotype function to scale immunostimulatory factor with hypoxia 
 void tumor_cell_phenotype_with_therapy( Cell* pCell, Phenotype& phenotype, double dt ); // done 
 
-extern Cell_Definition cargo_cell; 
-extern Cell_Definition worker_cell; 
-
 void create_cargo_cell_type( void );  //done 
 void create_worker_cell_type( void ); // done 
 
@@ -95,21 +92,10 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* ); // done
 
 // cell rules for extra elastic adhesion
 
-void attach_cells( Cell* pCell_1, Cell* pCell_2 ); // done 
-void dettach_cells( Cell* pCell_1 , Cell* pCell_2 ); // done 
-
-void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant ); // done 
-void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-
-
 bool worker_cell_attempt_attachment( Cell* pWorker, Cell* pCargo , double dt ); // done 
-
 
 void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); // at mechanics time scale 
 void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
 
 void cargo_cell_phenotype_rule( Cell* pCell , Phenotype& phenotype , double dt ); // done 
 void cargo_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-
-
-

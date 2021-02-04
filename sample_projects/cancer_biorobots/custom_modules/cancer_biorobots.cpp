@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -72,18 +72,8 @@ Cell_Definition worker_cell;
 
 void create_cargo_cell_type( void ) 
 {
-	cargo_cell = cell_defaults; 
-	
-	cargo_cell.name = "cargo cell";
-	cargo_cell.type = 1; 
+	Cell_Definition* pCD = find_cell_definition( "cargo cell" ); 
 
-	// turn off proliferation; 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	cargo_cell.phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) = 0.0; 	
-	
 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
 	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
@@ -92,98 +82,50 @@ void create_cargo_cell_type( void )
 	
 	// reduce o2 uptake 
 	
-	cargo_cell.phenotype.secretion.uptake_rates[oxygen_ID] *= 
-		parameters.doubles("cargo_o2_relative_uptake"); // 0.1; 
+	pCD->phenotype.secretion.uptake_rates[oxygen_ID] *= 
+		parameters.doubles("cargo_o2_relative_uptake");   
 	
-	// set secretion of the chemoattractant
-	cargo_cell.phenotype.secretion.secretion_rates[attract_ID] = 10; 
-	
-	// set apoptosis to survive 10 days (on average) 
-	
-	cargo_cell.phenotype.death.rates[apoptosis_index] = 
-		parameters.doubles("cargo_apoptosis_rate"); // 1.0 / (10.0 * 24.0 * 60.0 ); 
-	
-	// turn of motility; 
-	cargo_cell.phenotype.motility.is_motile = false; 
-	
-	cargo_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
+	pCD->phenotype.mechanics.cell_cell_adhesion_strength *= 
 		parameters.doubles("cargo_relative_adhesion"); // 0.0;
-	cargo_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 
+	pCD->phenotype.mechanics.cell_cell_repulsion_strength *= 
 		parameters.doubles("cargo_relative_repulsion"); // 5.0;
 	
 	// set functions 
 	
-	cargo_cell.functions.update_phenotype = cargo_cell_phenotype_rule; 
-	cargo_cell.functions.custom_cell_rule = cargo_cell_rule; 
-	cargo_cell.functions.update_migration_bias = NULL;	
+	pCD->functions.update_phenotype = cargo_cell_phenotype_rule; 
+	pCD->functions.custom_cell_rule = cargo_cell_rule; 
+	pCD->functions.update_migration_bias = NULL;	
 	
 	// set custom data values 
-	
-	cargo_cell.custom_data[ "receptor" ] = 1.0; 
-	
-	cargo_cell.custom_data[ "damage rate" ] = 0.00;  
-	cargo_cell.custom_data[ "repair rate" ] = 0.0;  
-	cargo_cell.custom_data[ "drug death rate" ] = 0.0;  
 	
 	return;
 }	
 
 void create_worker_cell_type( void )
 {
-	worker_cell = cell_defaults; 
-	
-	worker_cell.name = "worker cell";
-	worker_cell.type = 2; 
+	Cell_Definition* pCD = find_cell_definition( "worker cell" ); 
 
-	// turn off proliferation; 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	worker_cell.phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) = 0.0; 	
-	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
-	
 	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
 	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
 	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2	
 	
 	// reduce o2 uptake 
 	
-	worker_cell.phenotype.secretion.uptake_rates[oxygen_ID] *= 
+	pCD->phenotype.secretion.uptake_rates[oxygen_ID] *= 
 		parameters.doubles("worker_o2_relative_uptake"); // 0.1; 
 	
-	// set apoptosis zero
-	
-	worker_cell.phenotype.death.rates[apoptosis_index] = 
-		parameters.doubles("worker_apoptosis_rate"); // 0.0; // 1.0 / (10.0 * 24.0 * 60.0 ); 
-	
-	// turn on motility; 
-	worker_cell.phenotype.motility.is_motile = true; 
-	worker_cell.phenotype.motility.persistence_time = 
-		parameters.doubles("worker_motility_persistence_time"); // 5.0; 
-	worker_cell.phenotype.motility.migration_speed = 
-		parameters.doubles("worker_migration_speed"); // 2;  
-	worker_cell.phenotype.motility.migration_bias = 
-		parameters.doubles("unattached_worker_migration_bias"); // 1;
-	
-	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
+	pCD->phenotype.mechanics.cell_cell_adhesion_strength *= 
 		parameters.doubles("worker_relative_adhesion"); // 0.0;
-	worker_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 
+	pCD->phenotype.mechanics.cell_cell_repulsion_strength *= 
 		parameters.doubles("worker_relative_repulsion"); // 5.0;
 	
 	// set functions 
 	
-	worker_cell.functions.update_phenotype = worker_cell_rule; 
-	worker_cell.functions.custom_cell_rule = extra_elastic_attachment_mechanics;  
-	worker_cell.functions.update_migration_bias = worker_cell_motility;	
+	pCD->functions.update_phenotype = worker_cell_rule; 
+	pCD->functions.custom_cell_rule = extra_elastic_attachment_mechanics;  
+	pCD->functions.update_migration_bias = worker_cell_motility;	
 	
 	// set custom data values 
-	
-	worker_cell.custom_data[ "receptor" ] = 0.0; 
-	worker_cell.custom_data[ "damage rate" ] = 0.00;  
-	worker_cell.custom_data[ "repair rate" ] = 0.0;  
-	worker_cell.custom_data[ "drug death rate" ] = 0.0;  
 	
 	return; 
 }
