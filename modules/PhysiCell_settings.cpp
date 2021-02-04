@@ -756,7 +756,7 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					{ Dirichlet_zmax_values[i] = xml_get_my_double_value( node2 ); }
 				}
 				
-				node2 = node2.next_sibling("boundary"); 
+				node2 = node2.next_sibling("boundary_value"); 
 			}
 		}
 		
