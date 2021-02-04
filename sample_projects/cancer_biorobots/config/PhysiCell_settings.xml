@@ -165,29 +165,26 @@
 	</microenvironment_setup>	
 	
 	<cell_definitions>
-		<cell_definition name="default" ID="0">
+		<cell_definition name="cancer cell" ID="0">
 			<phenotype>
 				<cycle code="5" name="live">  
 					<!-- phases are: G0/G1 , S, G2, M --> 
 
 					<!-- using higher than normal significant digits to match divisions in default code -->
 					<!-- use phase_transition_rates OR phase_durations -->
-					<!--
 					<phase_transition_rates units="1/min"> 
-						<rate start_index="0" end_index="1" fixed_duration="false">0.00334672</rate>
-						<rate start_index="1" end_index="2" fixed_duration="true">0.00208333</rate>
-						<rate start_index="2" end_index="3" fixed_duration="true">0.00416667</rate>
-						<rate start_index="3" end_index="0" fixed_duration="true">0.0166667</rate>
+						<rate start_index="0" end_index="0" fixed_duration="false">0.000072</rate>
 					</phase_transition_rates>
-					-->
 					
 					<!-- use phase_transition_rates OR phase_durations -->
+					<!--
 					<phase_durations units="min"> 
 						<duration index="0" fixed_duration="false">300.0</duration>
 						<duration index="1" fixed_duration="true">480</duration>
 						<duration index="2" fixed_duration="true">240</duration>
 						<duration index="3" fixed_duration="true">60</duration>
 					</phase_durations>
+					-->
 				</cycle>
 				
 				<death>  
@@ -285,8 +282,8 @@
 				<secretion>
 					<substrate name="oxygen">
 						<secretion_rate units="1/min">0</secretion_rate>
-						<secretion_target units="substrate density">1</secretion_target>
-						<uptake_rate units="1/min">0</uptake_rate>
+						<secretion_target units="substrate density">38</secretion_target>
+						<uptake_rate units="1/min">10</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 
 					
@@ -308,10 +305,12 @@
 				<molecular />
 			</phenotype>
 			<custom_data>  
-				<receptor units="dimensionless">1.0</receptor>
-				<damage_rate units="1/min">0</damage_rate>
-				<repair_rate units="1/min">0.0</repair_rate>
-				<drug_death_rate units="1/min">0.0</drug_death_rate>
+				<receptor units="dimensionless">0.0</receptor>
+				<cargo_release_o2_threshold units="mmHg">10</cargo_release_o2_threshold>
+				<damage_rate units="1/min">0.03333</damage_rate>
+				<repair_rate units="1/min">0.004167</repair_rate>
+				<drug_death_rate units="1/min">0.004167</drug_death_rate>
+				<damage units="dimensionless">0.0</damage> 
 			</custom_data>
 		</cell_definition>
 		
@@ -328,6 +327,9 @@
 					</model>
 				</death>
 				<secretion>
+					<substrate name="oxygen">
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 				
 					<substrate name="chemoattractant">
 						<secretion_rate units="1/min">10</secretion_rate>
 					</substrate> 
@@ -337,8 +339,10 @@
 						<enabled>false</enabled>
 					</options>
 				</motility>
-				
 			</phenotype>
+			<custom_data>  
+				<receptor units="dimensionless">1.0</receptor>
+			</custom_data>
 		</cell_definition> 
 		
 		<cell_definition name="worker cell" ID="2" parent_type="default">		
@@ -354,6 +358,9 @@
 					</model>
 				</death>
 				<secretion>
+					<substrate name="oxygen">
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 				
 					<substrate name="chemoattractant">
 						<secretion_rate units="1/min">10</secretion_rate>
 					</substrate> 
@@ -370,10 +377,6 @@
 				</motility>
 				
 			</phenotype>
-			
-			<custom_data>
-				<receptor units="dimensionless">0.0</receptor>
-			</custom_data>
 		</cell_definition> 
 
 
@@ -385,13 +388,12 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		
 		<!-- for main --> 
-		<therapy_activation_time type="double" units="min">10080</therapy_activation_time> 
+		<therapy_activation_time type="double" units="min">10</therapy_activation_time> <!-- 10080 --> 
 			<!-- activate in 7 days --> 
 		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
 		
 		<!-- cargo cell setup --> 
 		<cargo_o2_relative_uptake type="double" units="dimensionless">0.1</cargo_o2_relative_uptake>
-			<!-- survive 10 days -->
 		<cargo_relative_adhesion type="double" units="dimensionless">0</cargo_relative_adhesion>
 		<cargo_relative_repulsion type="double" units="dimensionless">5</cargo_relative_repulsion> 
 		
@@ -403,17 +405,11 @@
 
 		<!-- for cell definitions -->
 		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>		
-		<receptor type="double" units="dimensionless">0.0</receptor>
-		<cargo_release_o2_threshold type="double" units="mmHg">10</cargo_release_o2_threshold>
 		
 		<max_relative_cell_adhesion_distance type="double" units="dimensionless">1.25</max_relative_cell_adhesion_distance>
 			<!-- how far out can cancer cells "feel" to close gaps? default is 1.25 -->
 		
 		<!-- for therapy --> 
-		<damage_rate type="double" units="1/min">0.03333</damage_rate> <!-- 1/30 --> 
-		<repair_rate type="double" units="1/min">0.004167</repair_rate> <!-- 1/240 --> 
-		<drug_death_rate type="double" units="1/min">0.004167</drug_death_rate> <!-- 1/240 --> 
-		
 		<worker_fraction type="double" units="dimensionless">0.10</worker_fraction>
 		<number_of_injected_cells type="int" units="dimensionless">500</number_of_injected_cells>
 		

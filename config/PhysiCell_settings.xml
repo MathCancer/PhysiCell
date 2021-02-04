@@ -35,7 +35,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-500</x_min>
-		<x_max>500</x_max>
-		<y_min>-500</y_min>
-		<y_max>500</y_max>
+		<x_min>-750</x_min>
+		<x_max>750</x_max>
+		<y_min>-750</y_min>
+		<y_max>750</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">14400</max_time> <!-- 10 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -97,14 +97,14 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>6</omp_num_threads>
+		<omp_num_threads>8</omp_num_threads>
 	</parallel> 
 	
 	<save>
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">360</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		
@@ -121,31 +121,38 @@
 	<options>
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
 	</options>	
-	
+
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
-				<decay_rate units="1/min">10</decay_rate>  
+				<diffusion_coefficient units="micron^2/min">100000.000000</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="mmHg">0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="true">38</Dirichlet_boundary_condition>
-<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
-<!--
-			<Dirichlet_options>
-				<boundary_value ID="xmin" enabled="false">0</boundary_value>
-				<boundary_value ID="xmax" enabled="false">0</boundary_value>
-				<boundary_value ID="ymin" enabled="false">0</boundary_value>
-				<boundary_value ID="ymax" enabled="false">0</boundary_value>
-				<boundary_value ID="zmin" enabled="false">1</boundary_value>
-				<boundary_value ID="zmax" enabled="false">0</boundary_value>
-			</Dirichlet_options>
--->
+			<initial_condition units="mmHg">38.0</initial_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
 		</variable>
-
+	
+		<variable name="chemoattractant" units="dimensionless" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate> <!-- 1 for cells  --> 
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
+		</variable>
+		
+		<variable name="therapeutic" units="dimensionless" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+				<decay_rate units="1/min">.15625</decay_rate> <!-- 1 for cells  --> 
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
+		</variable>
+	
 		<options>
 			<calculate_gradients>true</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
@@ -158,28 +165,40 @@
 	</microenvironment_setup>	
 	
 	<cell_definitions>
-		<cell_definition name="default" ID="0">
+		<cell_definition name="cancer cell" ID="0">
 			<phenotype>
-				<cycle code="6" name="flow_cytometry_separated_cycle_model">  
+				<cycle code="5" name="live">  
+					<!-- phases are: G0/G1 , S, G2, M --> 
+
 					<!-- using higher than normal significant digits to match divisions in default code -->
-					<transition_rates units="1/min"> 
-						<!-- G0/G1 to S -->
-						<rate start_index="0" end_index="1" fixed_duration="false">0.00334672</rate>
-						<!-- S to G2 -->
-						<rate start_index="1" end_index="2" fixed_duration="true">0.00208333</rate>
-						<!-- G2 to M -->
-						<rate start_index="2" end_index="3" fixed_duration="true">0.00416667</rate>
-						<!-- M to G0/G1 -->
-						<rate start_index="3" end_index="0" fixed_duration="true">0.0166667</rate>
-					</transition_rates>
+					<!-- use phase_transition_rates OR phase_durations -->
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.000072</rate>
+					</phase_transition_rates>
+					
+					<!-- use phase_transition_rates OR phase_durations -->
+					<!--
+					<phase_durations units="min"> 
+						<duration index="0" fixed_duration="false">300.0</duration>
+						<duration index="1" fixed_duration="true">480</duration>
+						<duration index="2" fixed_duration="true">240</duration>
+						<duration index="3" fixed_duration="true">60</duration>
+					</phase_durations>
+					-->
 				</cycle>
 				
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">5.31667e-05</rate>
-						<transition_rates units="1/min">
+						<death_rate units="1/min">5.31667e-05</death_rate>
+						<!-- use phase_transition_rates OR phase_durations -->
+						<!--
+						<phase_transition_rates units="1/min">
 							<rate start_index="0" end_index="1" fixed_duration="true">0.00193798</rate>
-						</transition_rates>
+						</phase_transition_rates>
+						-->
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">516</duration>
+						</phase_durations>
 						<parameters>
 							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
 							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
@@ -191,11 +210,22 @@
 					</model> 
 
 					<model code="101" name="necrosis">
-						<rate units="1/min">0.0</rate>
-						<transition_rates units="1/min">
+						<death_rate units="1/min">0.0</death_rate>
+						<!-- use phase_transition_rates OR phase_durations -->
+						<!-- necrosis uses phase_duration[0] = 0 so that it always immediately
+							 tries to transition and instead checks volume against the rupture
+							 volume --> 
+<!--						
+						<phase_transition_rates units="1/min">
 							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
 							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
-						</transition_rates>
+						</phase_transition_rates>
+-->						
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">0</duration>
+							<duration index="1" fixed_duration="true">86400</duration>
+						</phase_durations>
+						
 						<parameters>
 							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
 							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
@@ -243,123 +273,162 @@
 						<use_2D>true</use_2D>
 						<chemotaxis>
 							<enabled>false</enabled>
-							<substrate>prey signal</substrate>
+							<substrate>oxygen</substrate>
 							<direction>1</direction>
 						</chemotaxis>
 					</options>
 				</motility>
 				
 				<secretion>
-					<substrate name="prey signal">
+					<substrate name="oxygen">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">38</secretion_target>
+						<uptake_rate units="1/min">10</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+					
+					<substrate name="chemoattractant">
 						<secretion_rate units="1/min">0</secretion_rate>
 						<secretion_target units="substrate density">1</secretion_target>
 						<uptake_rate units="1/min">0</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 
-						
-					<substrate name="predator signal">
+
+					<substrate name="therapeutic">
 						<secretion_rate units="1/min">0</secretion_rate>
 						<secretion_target units="substrate density">1</secretion_target>
 						<uptake_rate units="1/min">0</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
-					</substrate> 	
+					</substrate> 
 				</secretion>
 
 				<molecular />
 			</phenotype>
 			<custom_data>  
-				<relative_sated_volume units="dimensionless">1.5</relative_sated_volume>
+				<receptor units="dimensionless">0.0</receptor>
+				<cargo_release_o2_threshold units="mmHg">10</cargo_release_o2_threshold>
+				<damage_rate units="1/min">0.03333</damage_rate>
+				<repair_rate units="1/min">0.004167</repair_rate>
+				<drug_death_rate units="1/min">0.004167</drug_death_rate>
+				<damage units="dimensionless">0.0</damage> 
 			</custom_data>
 		</cell_definition>
 		
-		<cell_definition name="prey" parent_type="default" ID="1">
+		<cell_definition name="cargo cell" ID="1" parent_type="default">		
 			<phenotype>
-				<motility>  
-					<speed>0.5</speed>
-					<migration_bias>0.4</migration_bias>
-					<options>
-						<enabled>true</enabled>
-						<use_2D>true</use_2D>
-						<chemotaxis>
-							<enabled>true</enabled>
-							<substrate>predator signal</substrate>
-							<direction>-1</direction>
-						</chemotaxis>
-					</options>
-				</motility>
-				<secretion>
-					<substrate name="prey signal">
-						<secretion_rate units="1/min">10</secretion_rate>
-					</substrate>
-				</secretion>
-			</phenotype>
-			<custom_data>
-			</custom_data>
-		</cell_definition>
-		
-		<cell_definition name="predator" parent_type="default" ID="2">
-			<phenotype>
-				<cycle>
-					<transition_rates>
-						<rate start_index="0" end_index="1">0.0</rate>
-					</transition_rates>
-				</cycle>
-				<death>
+				<cycle code="5" name="live">  
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
+					</phase_transition_rates>
+				</cycle>	
+				<death>  
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">0</rate>
-					</model>	
-				</death> 
-				<mechanics> 
-					<cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
-				</mechanics>
+						<death_rate units="1/min">4.065e-5</death_rate>				
+					</model>
+				</death>
+				<secretion>
+					<substrate name="oxygen">
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 				
+					<substrate name="chemoattractant">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
 				<motility>  
-					<speed>2</speed>
+					<options>
+						<enabled>false</enabled>
+					</options>
+				</motility>
+			</phenotype>
+			<custom_data>  
+				<receptor units="dimensionless">1.0</receptor>
+			</custom_data>
+		</cell_definition> 
+		
+		<cell_definition name="worker cell" ID="2" parent_type="default">		
+			<phenotype>
+				<cycle code="5" name="live">  
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
+					</phase_transition_rates>
+				</cycle>	
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">0</death_rate>				
+					</model>
+				</death>
+				<secretion>
+					<substrate name="oxygen">
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 				
+					<substrate name="chemoattractant">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
+				<motility>  
+					<speed units="micron/min">2</speed>
+					<persistence_time units="min">5</persistence_time>
+					<migration_bias units="dimensionless">0.5</migration_bias>
+					
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
-						<chemotaxis>
-							<enabled>true</enabled>
-							<substrate>prey signal</substrate>
-							<direction>1</direction>
-						</chemotaxis>
 					</options>
 				</motility>
-				<secretion>
-					<substrate name="predator signal">
-						<secretion_rate units="1/min">10</secretion_rate>
-					</substrate>
-				</secretion>
+				
 			</phenotype>
-			<custom_data>
-			</custom_data>
-		</cell_definition>
-		
-	</cell_definitions>
+		</cell_definition> 
+
+
+	</cell_definitions>	
 	
 	
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
-		<!-- example parameters from the template --> 
 		
-		<div_initialization type="divider" description="---Initialization settings---"/>
+		<!-- for main --> 
+		<therapy_activation_time type="double" units="min">10</therapy_activation_time> 
+			<!-- activate in 7 days --> 
+		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
 		
-		<number_of_prey type="int" units="none" description="initial number of prey">50</number_of_prey>
-		<number_of_predators type="int" units="none" description="initial number of predators">5</number_of_predators> 
+		<!-- cargo cell setup --> 
+		<cargo_o2_relative_uptake type="double" units="dimensionless">0.1</cargo_o2_relative_uptake>
+		<cargo_relative_adhesion type="double" units="dimensionless">0</cargo_relative_adhesion>
+		<cargo_relative_repulsion type="double" units="dimensionless">5</cargo_relative_repulsion> 
 		
-		<div_coloring type="divider" description="---Coloring settings---"/>
 
-		<prey_color type="string" description="color for prey">blue</prey_color>
-		<predator_color type="string" description="color for prey">orange</predator_color>
+		<!-- worker cell setup --> 
+		<worker_o2_relative_uptake type="double" units="1/min">0.1</worker_o2_relative_uptake>
+		<worker_relative_adhesion type="double" units="dimensionless">0</worker_relative_adhesion>
+		<worker_relative_repulsion type="double" units="dimensionless">5</worker_relative_repulsion> 
+
+		<!-- for cell definitions -->
+		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>		
 		
-		<div_predator type="divider" description="---Predator settings---"/>
-		<predators_eat_prey type="bool" description="set to true if predators can eat prey">true</predators_eat_prey>
-		<predators_cycle_if_big type="bool" description="set to true if predators should cycle if they are well-fed (and thus big)">true</predators_cycle_if_big>
+		<max_relative_cell_adhesion_distance type="double" units="dimensionless">1.25</max_relative_cell_adhesion_distance>
+			<!-- how far out can cancer cells "feel" to close gaps? default is 1.25 -->
 		
-		<div_prey type="divider" description="---Prey settings---"/>
-		<prey_quorom_effect type="bool" description="set to true if prey signal down-regulates cycling">true</prey_quorom_effect>
-		<prey_quorom_threshold type="double" description="prey signal > threshold completely arrests cycling">0.2</prey_quorom_threshold>
+		<!-- for therapy --> 
+		<worker_fraction type="double" units="dimensionless">0.10</worker_fraction>
+		<number_of_injected_cells type="int" units="dimensionless">500</number_of_injected_cells>
 		
+		<!-- tissue setup -->
+		<tumor_radius type="double" units="micron">200</tumor_radius> 
+		
+		<!-- custom mechanics --> 
+		<max_elastic_displacement type="double" units="micron">50.0</max_elastic_displacement>
+		
+		<!-- attachment parameters --> 
+		<attachment_receptor_threshold type="double" units="dimensionless">0.1</attachment_receptor_threshold>
+		<max_attachment_distance type="double" units="micron">18.0</max_attachment_distance>
+		<min_attachment_distance type="double" units="micron">14.0</min_attachment_distance>
+		
+		<!-- worker cell motility parameters -->
+		<motility_shutdown_detection_threshold type="double" units="dimensionless">0.001</motility_shutdown_detection_threshold>
+			<!-- shut down worker motility if signal < motility_shutdown_detection_threshold -->
+		<attached_worker_migration_bias type="double" units="dimensionless">0.5</attached_worker_migration_bias>
+		<unattached_worker_migration_bias type="double" units="dimensionless">0.5</unattached_worker_migration_bias>
 	</user_parameters>
 	
 </PhysiCell_settings>
