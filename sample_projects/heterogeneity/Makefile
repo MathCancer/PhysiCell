@@ -134,6 +134,9 @@ PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
+PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 		
+	
 # user-defined PhysiCell modules
 
 heterogeneity.o: ./custom_modules/heterogeneity.cpp 

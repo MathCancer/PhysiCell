@@ -144,6 +144,9 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
+	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
+	create_plot_legend( filename , cell_coloring_function ); 
+	
 	display_citations(); 
 	
 	// set the performance timers 

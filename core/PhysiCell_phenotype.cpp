@@ -1100,5 +1100,3 @@ void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
 }
 
 };
-
-

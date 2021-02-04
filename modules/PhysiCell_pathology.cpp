@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -600,6 +600,139 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	os.close();
  
 	return; 
+}
+
+std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
+{
+	static std::vector< std::string > colors(0); 
+	static bool setup_done = false; 
+	if( setup_done == false )
+	{
+		colors.push_back( "grey" ); // default color will be grey 
+
+		colors.push_back( "red" );
+		colors.push_back( "yellow" ); 	
+		colors.push_back( "green" ); 	
+		colors.push_back( "blue" ); 
+		
+		colors.push_back( "magenta" ); 	
+		colors.push_back( "orange" ); 	
+		colors.push_back( "lime" ); 	
+		colors.push_back( "cyan" );
+		
+		colors.push_back( "hotpink" ); 	
+		colors.push_back( "peachpuff" ); 	
+		colors.push_back( "darkseagreen" ); 	
+		colors.push_back( "lightskyblue" );
+
+		setup_done = true; 
+	}
+	
+	// start all black 
+	
+	std::vector<std::string> output = { "black", "black", "black", "black" }; 
+	
+	// paint by number -- by cell type 
+	
+	std::string interior_color = "white"; 
+	if( pCell->type < 13 )
+	{ interior_color = colors[ pCell->type ]; }
+	
+	output[0] = interior_color; // set cytoplasm color 
+	
+	if( pCell->phenotype.death.dead == false ) // if live, color nucleus same color 
+	{
+		output[2] = interior_color; 
+		output[3] = interior_color; 
+	}
+	else
+	{
+		// apoptotic cells will retain a black nucleus 
+		// if necrotic, color the nucleus brown 
+		if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+			pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+			pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+		{
+			output[2] = "rgb(139,69,19)";
+			output[3] = "rgb(139,69,19)";
+		}
+	}
+	
+	return output; 
+}	
+
+void create_plot_legend( std::string filename , std::vector<std::string> (*cell_coloring_function)(Cell*) )
+{
+	int number_of_cell_types = cell_definitions_by_index.size(); 
+	
+	double temp_cell_radius = 25; 
+	double temp_cell_volume = 4.1887902047863909846168578443727 * pow( temp_cell_radius , 3.0 ); 
+
+	double relative_padding = 0.15; 
+	double padding = relative_padding * 2.0 * temp_cell_radius; 
+
+	double row_height = 2.0 * temp_cell_radius + 2*padding; 
+	
+	double font_size = 0.85 * 2.0 * temp_cell_radius; 
+	double row_width  = 2.0 * temp_cell_radius + 2*padding + ( 32 * font_size ) + 2 * padding; 
+	
+	double total_height = number_of_cell_types * row_height; 
+	double total_width  = row_width; 
+	
+	
+	std::ofstream os( filename , std::ios::out );
+	Write_SVG_start( os , total_width ,total_height ); 
+
+	// create a temporary cell 
+	Cell* pCell; 
+	pCell = create_cell(); 
+	
+	double cursor_x = padding + temp_cell_radius; 
+	double cursor_y = padding + temp_cell_radius; 
+	
+	for( int k=0 ; k < number_of_cell_types ; k++ )
+	{
+		// switch to the cell type 
+		pCell->convert_to_cell_definition( *(cell_definitions_by_index[k]) );
+		
+		// get the colors using the current coloring function 
+		std::vector<std::string> colors = cell_coloring_function(pCell); 
+		
+		// place a big circle with cytoplasm colors 
+		Write_SVG_circle(os,cursor_x, cursor_y , temp_cell_radius , 1.0 , colors[1] , colors[0] ); 
+		// place a small circle with nuclear colors 
+		Write_SVG_circle(os,cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[2] , colors[3] ); 
+		
+		// place the label 
+		
+		cursor_x += temp_cell_radius + 2*padding; 
+		cursor_y += 0.3*font_size; 
+		
+		Write_SVG_text( os , cell_definitions_by_index[k]->name.c_str() , cursor_x , cursor_y, font_size , 
+			PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+		
+		// move the cursor down to the next row 
+		
+		cursor_y -= 0.3*font_size; 
+		cursor_y += ( 2.0 * padding + 2.0*temp_cell_radius ); 
+		cursor_x = padding + temp_cell_radius;
+		
+	}
+	
+	// get rid of this temp cell at the earliest opportunity. 
+	// make it harmless for now 
+	pCell->assign_position( -9e99 , -9e99, -9e99 ); 
+	pCell->turn_off_reactions(0.0); 
+	pCell->is_active = false; 
+	pCell->set_total_volume( 0.0 ); 
+	pCell->is_movable = false; 
+	pCell->is_out_of_domain = true; 
+	pCell->start_death(0); 
+	
+ 	pCell->phenotype.cycle.data.exit_rate(0) = 9e99; 
+	
+	Write_SVG_end( os ); 
+	os.close(); 
 }
 
 };

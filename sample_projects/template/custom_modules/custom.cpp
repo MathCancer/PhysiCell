@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -175,140 +175,10 @@ void setup_tissue( void )
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{
-	static std::vector< std::string > colors(0); 
-	colors.push_back( "grey" ); // default color will be grey 
-
-	colors.push_back( "red" );
-	colors.push_back( "yellow" ); 	
-	colors.push_back( "green" ); 	
-	colors.push_back( "blue" ); 
-	
-	colors.push_back( "magenta" ); 	
-	colors.push_back( "orange" ); 	
-	colors.push_back( "lime" ); 	
-	colors.push_back( "cyan" );
-	
-	// start all black 
-	
-	std::vector<std::string> output = { "black", "black", "black", "black" }; 
-	
-	// paint by number -- by cell type 
-	
-	std::string interior_color = "white"; 
-	if( pCell->type < 9 )
-	{ interior_color = colors[ pCell->type ]; }
-	
-	output[0] = interior_color; // set cytoplasm color 
-	
-	if( pCell->phenotype.death.dead == false ) // if live, color nucleus same color 
-	{
-		output[2] = interior_color; 
-		output[3] = interior_color; 
-	}
-	else
-	{
-		// apoptotic cells will retain a black nucleus 
-		// if necrotic, color the nucleus brown 
-		if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
-			pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
-			pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
-		{
-			output[2] = "rgb(139,69,19)";
-			output[3] = "rgb(139,69,19)";
-		}
-	}
-	
-	return output; 
-}
+{ return paint_by_number_cell_coloring(pCell); }
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
 
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 { return; } 
-
-Integrated_Signal::Integrated_Signal()
-{
-	base_activity = 0.0; 
-	max_activity = 1.0; 
-	
-	promoters.clear(); 
-	promoter_weights.clear(); 
-	
-	promoters_half_max = 0.1;
-	promoters_Hill = 4; 
-	
-	inhibitors.clear(); 
-	inhibitor_weights.clear(); 
-	
-	inhibitors_half_max = 0.1; 
-	inhibitors_Hill = 4; 
-	
-	return; 
-}
-
-void Integrated_Signal::reset( void )
-{
-	promoters.clear(); 
-	promoter_weights.clear(); 
-
-	inhibitors.clear(); 
-	inhibitor_weights.clear(); 
-	return; 
-}
-
-double Integrated_Signal::compute_signal( void )
-{
-	double pr = 0.0; 
-	double w = 0.0; 
-	for( int k=0 ; k < promoters.size() ; k++ )
-	{ pr += promoters[k]; w += promoter_weights[k]; } 
-	w += 1e-16; 
-	pr /= w; 
-	
-	double inhib = 0.0; 
-	w = 0.0; 
-	for( int k=0 ; k < inhibitors.size() ; k++ )
-	{ inhib += inhibitors[k]; w += inhibitor_weights[k]; } 
-	w += 1e-16; 
-	inhib /= w; 
-	
-	double Pn = pow( pr , promoters_Hill ); 
-	double Phalf = pow( promoters_half_max , promoters_Hill ); 
-
-	double In = pow( inhib , inhibitors_Hill ); 
-	double Ihalf = pow( inhibitors_half_max , inhibitors_Hill ); 
-	
-	double P = Pn / ( Pn + Phalf ); 
-	double I = 1.0 / ( In + Ihalf ); 
-	
-	double output = max_activity; 
-	output -= base_activity; //(max-base)
-	output *= P; // (max-base)*P 
-	output += base_activity; // base + (max-base)*P 
-	output *= I; // (base + (max-base)*P)*I; 
-
-	return output; 
-};
-
-void Integrated_Signal::add_signal( char signal_type , double signal , double weight )
-{
-	if( signal_type == 'P' || signal_type == 'p' )
-	{
-		promoters.push_back( signal ); 
-		promoter_weights.push_back( weight ); 
-		return; 
-	}
-	if( signal_type == 'I' || signal_type == 'i' )
-	{
-		inhibitors.push_back( signal ); 
-		inhibitor_weights.push_back( weight ); 
-		return; 
-	}
-	return; 
-}
-
-void Integrated_Signal::add_signal( char signal_type , double signal )
-{ return add_signal( signal_type , signal , 1.0 ); }
-
