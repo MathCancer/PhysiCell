@@ -104,110 +104,64 @@ void create_cell_types( void )
 	SeedRandom( parameters.ints("random_seed") ); 
 	// housekeeping 
 	
-	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
 	
-	// turn the default cycle model to live, 
-	// so it's easier to turn off proliferation
-	
-	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
-	
-	// Make sure we're ready for 2D
-	
-	cell_defaults.functions.set_orientation = up_orientation; 
-	cell_defaults.phenotype.geometry.polarity = 1.0; 
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	
-	// turn off proliferation and death 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
-	
-	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; 
-	cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0; 
-	
-	int cargo_index = microenvironment.find_density_index( "cargo signal" ); // 1 
-	int director_index = microenvironment.find_density_index( "director signal" ); // 0 
-	
-	// set uptake and secretion to zero 
-	cell_defaults.phenotype.secretion.secretion_rates[director_index] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[director_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[director_index] = 1; 
-	
-	cell_defaults.phenotype.secretion.secretion_rates[cargo_index] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[cargo_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[cargo_index] = 1; 
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
-	// set the default cell type to no phenotype updates 
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = NULL;   
+	cell_defaults.functions.custom_cell_rule = NULL; 
 	
-	cell_defaults.functions.update_phenotype = NULL; 
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
-	// add custom data 
-	
-	cell_defaults.custom_data.add_variable( "receptor" , "dimensionless", 0.0 ); 
 	/*
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , "1/min" , 0.05 );  // 0.1; 
+	   This parses the cell definitions in the XML config file. 
 	*/
-	Parameter<double> paramD = parameters.doubles[ "elastic_coefficient" ]; 
-	// cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units , paramD.value );  // 0.1; pre-1.8.0
-	cell_defaults.phenotype.mechanics.attachment_elastic_constant = paramD.value; 
-	//
-	// Define "seed" cells 
 	
-	director_cell = cell_defaults; 
-	director_cell.type = director_ID; 
-	director_cell.name = "director cell"; 
+	initialize_cell_definitions_from_pugixml(); 
 	
-	// seed cell secrete the signal 
-	
-	director_cell.phenotype.secretion.secretion_rates[director_index] = 9.9; 
-	
-	// seed cell rule 
-	
-	director_cell.functions.update_phenotype = director_cell_rule; 
-	
-	// define "cargo" cells 
-	
-	cargo_cell = cell_defaults; 
-	cargo_cell.type = cargo_ID; 
-	cargo_cell.name = "cargo cell";
-	
-	cargo_cell.functions.update_phenotype = cargo_cell_rule; 
-	cargo_cell.functions.custom_cell_rule = NULL; // extra_elastic_attachment_mechanics;  // pre-1.8.0
-	cargo_cell.functions.contact_function = standard_elastic_contact_function; 
-	
-	cargo_cell.custom_data["receptor"] = 1.0; 
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
 
-	cargo_cell.phenotype.secretion.secretion_rates[cargo_index] = 9.9; 
-	cargo_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) = 0.0; // 7e-4
+	cell_defaults.phenotype.mechanics.attachment_elastic_constant = parameters.doubles( "elastic_coefficient" );
 	
-	//
-	// Define "worker" cells 
-	
-	worker_cell = cell_defaults; 
-	worker_cell.type = worker_ID; 
-	worker_cell.name = "worker cell";
-	
-	// make them motile, and unadhesive  
-	
-	worker_cell.phenotype.motility.is_motile = true; 
-	worker_cell.phenotype.motility.persistence_time = 
-		parameters.doubles("worker_motility_persistence_time"); // 5.0; 
-	worker_cell.phenotype.motility.migration_speed = 
-		parameters.doubles("worker_migration_speed"); // 5; 
-	worker_cell.phenotype.motility.migration_bias = 
-		parameters.doubles("unattached_worker_migration_bias"); // 0.0; 
-	
+	static int worker_ID = find_cell_definition( "worker cell" )->type; 
+	static int cargo_ID = find_cell_definition( "cargo cell" )->type; 
+	static int director_ID = find_cell_definition( "director cell" )->type; 
 
-	worker_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0; 
+	Cell_Definition* pCD = find_cell_definition( "director cell" ); 
+	pCD->functions.update_phenotype = director_cell_rule; 
+	pCD->phenotype.mechanics.attachment_elastic_constant = parameters.doubles( "elastic_coefficient" );
 	
-	worker_cell.functions.update_phenotype = worker_cell_rule; 
-	worker_cell.functions.custom_cell_rule = NULL; // extra_elastic_attachment_mechanics; // pre 1.8.0
-	worker_cell.functions.contact_function = standard_elastic_contact_function; 
-	worker_cell.functions.update_migration_bias = worker_cell_motility;
+	pCD = find_cell_definition( "cargo cell" ); 
+	pCD->functions.update_phenotype = cargo_cell_rule; 
+	pCD->functions.custom_cell_rule = NULL; // extra_elastic_attachment_mechanics;  // pre-1.8.0
+	pCD->functions.contact_function = standard_elastic_contact_function; 
+	pCD->phenotype.mechanics.attachment_elastic_constant = parameters.doubles( "elastic_coefficient" );
+
+	pCD = find_cell_definition( "worker cell" ); 
+	pCD->phenotype.mechanics.cell_cell_adhesion_strength = 0.0; 
 	
+	pCD->functions.update_phenotype = worker_cell_rule; 
+	pCD->functions.custom_cell_rule = NULL; // extra_elastic_attachment_mechanics; // pre 1.8.0
+	pCD->functions.contact_function = standard_elastic_contact_function; 
+	pCD->functions.update_migration_bias = worker_cell_motility;
+	pCD->phenotype.mechanics.attachment_elastic_constant = parameters.doubles( "elastic_coefficient" );
+	
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
 	
@@ -246,15 +200,19 @@ std::vector<std::string> robot_coloring_function( Cell* pCell )
 	static std::string worker_color = parameters.strings( "worker_color" ); 
 	static std::string cargo_color = parameters.strings( "cargo_color" ); 
 	static std::string director_color = parameters.strings( "director_color" ); 
+	
+	static int worker_ID = find_cell_definition( "worker cell" )->type; 
+	static int cargo_ID = find_cell_definition( "cargo cell" )->type; 
+	static int director_ID = find_cell_definition( "director cell" )->type; 
 
 	if( pCell->type == worker_ID )
 	{ color = worker_color; }
 	else if( pCell->type == cargo_ID )
 	{ color = cargo_color; }
-	else if( pCell->type == linker_ID )
-	{ color = "aquamarine"; }
 	else if( pCell->type == director_ID )
 	{ color = director_color; }
+	else
+	{ color = "white"; } 
 	
 	output[0] = color; 
 	output[2] = color; 
@@ -266,7 +224,9 @@ void create_cargo_cluster_6( std::vector<double>& center )
 {
 	// create a hollow cluster at position, with random orientation 
 	
-	static double spacing = 0.95 * cargo_cell.phenotype.geometry.radius * 2.0; 
+	static Cell_Definition* pCargoDef = find_cell_definition("cargo cell");
+	
+	static double spacing = 0.95 * pCargoDef->phenotype.geometry.radius * 2.0; 
 	static double d_Theta = 1.047197551196598 ; // 2*pi / 6.0 
 	
 	double theta = 6.283185307179586 * UniformRandom(); 
@@ -276,7 +236,7 @@ void create_cargo_cluster_6( std::vector<double>& center )
 	Cell* pC; 
 	for( int i=0; i < 6; i++ )
 	{
-		pC = create_cell( cargo_cell ); 
+		pC = create_cell( *pCargoDef ); 
 		
 		position[0] = center[0] + spacing*cos( theta ); 
 		position[1] = center[1] + spacing*sin( theta ); 
@@ -291,10 +251,12 @@ void create_cargo_cluster_6( std::vector<double>& center )
 
 void create_cargo_cluster_7( std::vector<double>& center )
 {
+	static Cell_Definition* pCargoDef = find_cell_definition("cargo cell");	
+	
 	// create a filled cluster at position, with random orientation 
 
 	create_cargo_cluster_6( center );
-	Cell* pC = create_cell( cargo_cell ); 
+	Cell* pC = create_cell( *pCargoDef ); 
 	pC->assign_position( center ); 
 	
 	return; 
@@ -303,9 +265,11 @@ void create_cargo_cluster_7( std::vector<double>& center )
 
 void create_cargo_cluster_3( std::vector<double>& center )
 {
+	static Cell_Definition* pCargoDef = find_cell_definition("cargo cell");	
+	
 	// create a small cluster at position, with random orientation 
 	
-	static double spacing = 0.95 * cargo_cell.phenotype.geometry.radius * 1.0; 
+	static double spacing = 0.95 * pCargoDef->phenotype.geometry.radius * 1.0; 
 	static double d_Theta = 2.094395102393195 ; // 2*pi / 3.0 
 	
 	double theta = 6.283185307179586 * UniformRandom(); 
@@ -315,7 +279,7 @@ void create_cargo_cluster_3( std::vector<double>& center )
 	Cell* pC; 
 	for( int i=0; i < 3; i++ )
 	{
-		pC = create_cell( cargo_cell ); 
+		pC = create_cell( *pCargoDef ); 
 		
 		position[0] = center[0] + spacing*cos( theta ); 
 		position[1] = center[1] + spacing*sin( theta ); 
@@ -334,6 +298,11 @@ void setup_tissue( void )
 	int number_of_directors = parameters.ints("number_of_directors"); // 15;  
 	int number_of_cargo_clusters = parameters.ints("number_of_cargo_clusters"); // 100;  
 	int number_of_workers = parameters.ints("number_of_workers"); // 50;  
+	
+	static Cell_Definition* pCargoDef = find_cell_definition("cargo cell");	
+	static Cell_Definition* pDirectorDef = find_cell_definition("director cell");	
+	static Cell_Definition* pWorkerDef = find_cell_definition("worker cell");	
+	
 
 	std::cout << "Placing cells ... " << std::endl; 
 	
@@ -357,7 +326,7 @@ void setup_tissue( void )
 		
 		// place the cell
 		Cell* pC;
-		pC = create_cell( director_cell ); 
+		pC = create_cell( *pDirectorDef ); 
 		pC->assign_position( position );
 		pC->is_movable = false; 
 	}
@@ -377,7 +346,7 @@ void setup_tissue( void )
 		
 		if( UniformRandom() < 0.5 )
 		{
-			Cell* pCell = create_cell( cargo_cell ); 
+			Cell* pCell = create_cell( *pCargoDef ); 
 			pCell->assign_position( position ); 
 		}
 		else
@@ -400,7 +369,7 @@ void setup_tissue( void )
 		// place the cell
 		Cell* pC;
 
-		pC = create_cell( worker_cell ); 
+		pC = create_cell( *pWorkerDef ); 
 		pC->assign_position( position );
 	}	
 	
