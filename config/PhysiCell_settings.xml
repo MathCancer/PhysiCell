@@ -315,7 +315,7 @@
 				
 				<secretion>
 					<substrate name="food">
-						<secretion_rate units="1/min">10</secretion_rate>
+						<secretion_rate units="1/min">100</secretion_rate>
 						<secretion_target units="substrate density">1</secretion_target>
 						<uptake_rate units="1/min">0</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
@@ -355,10 +355,10 @@
 						<secretion_rate units="1/min">10</secretion_rate>
 					</substrate> 
 				</secretion>
-					<speed units="micron/min">1</speed>
-					<persistence_time units="min">1</persistence_time>
-					<migration_bias units="dimensionless">.5</migration_bias>
 				<motility>
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">5</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
@@ -384,16 +384,17 @@
 						<secretion_rate units="1/min">10</secretion_rate>
 					</substrate> 
 				</secretion>
+				<motility>
 					<speed units="micron/min">1</speed>
 					<persistence_time units="min">1</persistence_time>
-					<migration_bias units="dimensionless">.5</migration_bias>
-				<motility>
+					<migration_bias units="dimensionless">.75</migration_bias>
+
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
 						<chemotaxis>
 							<enabled>true</enabled>
-							<substrate>predator signal</substrate>
+							<substrate>prey signal</substrate>
 							<direction>1</direction>
 						</chemotaxis>
 					</options>
