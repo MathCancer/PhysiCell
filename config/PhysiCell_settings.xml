@@ -199,7 +199,7 @@
 	</microenvironment_setup>	
 	
 	<cell_definitions>
-		<cell_definition name="farmer cell" ID="0">
+		<cell_definition name="farmer" ID="0">
 			<phenotype>
 				<cycle code="5" name="live">  
 					<!-- phases are: G0/G1 , S, G2, M --> 
@@ -342,6 +342,65 @@
 				<sample units="dimensionless">1.0</sample>
 			</custom_data>
 		</cell_definition>
+		
+		<cell_definition name="prey" ID="1" parent_type="farmer">
+			<phenotype>
+				<secretion>
+					<substrate name="food">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<uptake_rate units="1/min">0.1</uptake_rate>
+					</substrate> 
+
+					<substrate name="prey signal">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
+				<motility>
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>true</enabled>
+							<substrate>food</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+			</phenotype>
+		</cell_definition>
+		
+		<cell_definition name="predator" ID="2" parent_type="farmer">
+			<phenotype>
+				<secretion>
+					<substrate name="food">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 
+
+					<substrate name="predator signal">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
+				<motility>
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>true</enabled>
+							<substrate>predator signal</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+			</phenotype>
+		</cell_definition>
+		
 	</cell_definitions>
 	
 	<user_parameters>
