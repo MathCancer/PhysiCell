@@ -90,7 +90,18 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
 void weighted_motility_function( Cell* pCell, Phenotype& phenotype, double dt ); 
 
+void farmer_custom_function( Cell* pCell, Phenotype& phenotype , double dt ); 
+
 void prey_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
 void prey_custom_function( Cell* pCell, Phenotype& phenotype, double dt );
 void prey_motility_function( Cell* pCell, Phenotype& phenotype, double dt );
 
+void predator_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void predator_custom_function( Cell* pCell, Phenotype& phenotype, double dt );
+void predator_motility_function( Cell* pCell, Phenotype& phenotype, double dt );
+
+
+
+
+void wrap_boundaries( Cell* pCell ); 
+void avoid_boundaries( Cell* pCell ); 

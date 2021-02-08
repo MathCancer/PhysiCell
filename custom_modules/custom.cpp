@@ -105,6 +105,22 @@ void create_cell_types( void )
 	
 	cell_defaults.functions.update_phenotype = phenotype_function; 
 	cell_defaults.functions.custom_cell_rule = custom_function; 
+	
+	Cell_Definition* pFarmerDef = find_cell_definition( "farmer" ); 
+	Cell_Definition* pPreyDef = find_cell_definition( "prey" ); 
+	Cell_Definition* pPredDef = find_cell_definition( "predator" ); 
+
+	pFarmerDef->functions.custom_cell_rule = farmer_custom_function; 
+	// pFarmerDef->functions.update_phenotype = prey_phenotype_function; 
+	// pFarmerDef->functions.update_migration_bias = prey_motility_function; 
+	
+	pPreyDef->functions.custom_cell_rule = prey_custom_function; 
+	pPreyDef->functions.update_phenotype = prey_phenotype_function; 
+	pPreyDef->functions.update_migration_bias = prey_motility_function; 
+
+	pPredDef->functions.custom_cell_rule = predator_custom_function; 
+	pPredDef->functions.update_phenotype = predator_phenotype_function; 
+	pPredDef->functions.update_migration_bias = predator_motility_function; 
 		
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -177,7 +193,22 @@ void setup_tissue( void )
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{ return paint_by_number_cell_coloring(pCell); }
+{
+	static Cell_Definition* pFarmerDef = find_cell_definition( "farmer" ); 
+	static Cell_Definition* pPreyDef = find_cell_definition( "prey" ); 
+	static Cell_Definition* pPredDef = find_cell_definition( "predator" ); 
+	
+	if( pCell->type == pFarmerDef->type )
+	{ return { "grey", "black", "grey", "grey" }; } 
+	
+	if( pCell->type == pPreyDef->type )
+	{ return { "blue", "black", "blue", "blue" }; } 
+
+	if( pCell->type == pPredDef->type )
+	{ return { "orange", "black", "orange", "orange" }; } 
+
+	return paint_by_number_cell_coloring(pCell); 
+}
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
@@ -185,38 +216,7 @@ void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 { return; } 
 
-void prey_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	
-	
-	
-}
-
-void prey_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	
-	
-}
-
-void prey_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-}
+/* some help */ 
 
 void weighted_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
@@ -236,7 +236,12 @@ void weighted_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
 	axpy( pV, pCell->custom_data["predator_weight"] , pCell->nearest_gradient(predator_index) );
 	// v += food_weight * grad(food) 
 	axpy( pV, pCell->custom_data["food_weight"] , pCell->nearest_gradient(food_index) );
+	
+	normalize( pV ); 
+}
 
+void avoid_boundaries( Cell* pCell )
+{
 	// add velocity to steer clear of the boundaries 
 	static double Xmin = microenvironment.mesh.bounding_box[0]; 
 	static double Ymin = microenvironment.mesh.bounding_box[1]; 
@@ -245,25 +250,198 @@ void weighted_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
 	static double Xmax = microenvironment.mesh.bounding_box[3]; 
 	static double Ymax = microenvironment.mesh.bounding_box[4]; 
 	static double Zmax = microenvironment.mesh.bounding_box[5]; 
+	
+	static double avoid_zone = 40; 
+	
+	// near edge: 
+	bool near_edge = false; 
+	if( pCell->position[0] < Xmin + avoid_zone || pCell->position[0] > Xmax - avoid_zone )
+	{ near_edge = true; } 
+	
+	if( pCell->position[1] < Ymin + avoid_zone || pCell->position[1] > Ymax - avoid_zone )
+	{ near_edge = true; } 
+	
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		if( pCell->position[2] < Zmin + avoid_zone || pCell->position[2] > Zmax - avoid_zone )
+		{ near_edge = true; } 
+	}
+	
+	if( near_edge )
+	{
+		pCell->phenotype.motility.migration_bias_direction = pCell->position; 
+		pCell->phenotype.motility.migration_bias_direction *= -1; // move towards center 
+		pCell->phenotype.motility.migration_bias = 1.0; 
+	}
+	else
+	{
+		Cell_Definition* pCD = find_cell_definition( pCell->type );
+		pCell->phenotype.motility.migration_bias = pCD->phenotype.motility.migration_bias; 
+	}	
+	return; 
+}
 
-/*
+void wrap_boundaries( Cell* pCell )
+{
+//	std::cout << pCell->ID << ":" << std::endl; 
+	// add velocity to steer clear of the boundaries 
+	static double Xmin = microenvironment.mesh.bounding_box[0]; 
+	static double Ymin = microenvironment.mesh.bounding_box[1]; 
+	static double Zmin = microenvironment.mesh.bounding_box[2]; 
+
+	static double Xmax = microenvironment.mesh.bounding_box[3]; 
+	static double Ymax = microenvironment.mesh.bounding_box[4]; 
+	static double Zmax = microenvironment.mesh.bounding_box[5]; 
+	
 	static double avoid_zone = 20; 
-	static double avoid_strength = 100; 
+	static bool setup_done = false; 
+	if( setup_done == false )
+	{
+		Xmax -= avoid_zone; 
+		Xmin += avoid_zone; 
+		
+		Ymax -= avoid_zone;
+		Ymin += avoid_zone; 
+		
+		setup_done = true; 
+	}
 	
-	if( pCell->position[0] - Xmin < avoid_zone )
-	{ pCell->velocity[0] = 10; } 
-	if( Xmax - pCell->position[0] < avoid_zone )
-	{ pCell->velocity[0] = -10; } 
+	bool wrapped = false; 
 	
+	std::vector<double> p = pCell->position;
+	double Delta;
+
+	while( p[0] < Xmin )
+	{
+		Delta = Xmin - p[0]; 
+		p[0] = Xmax - Delta; 
+		wrapped = true; 
+	}
+	while( p[0] > Xmax )
+	{
+		Delta = p[0] - Xmax; 
+		p[0] = Xmin + Delta; 
+		wrapped = true; 
+	}
+	
+	while( p[1] < Ymin )
+	{
+		Delta = Ymin - p[1]; 
+		p[1] = Ymax - Delta; 
+		wrapped = true; 
+	}
+	while( p[1] > Ymax )
+	{
+		Delta = p[1] - Ymax; 
+		p[1] = Ymin + Delta; 
+		wrapped = true; 
+	}
 
 	if( default_microenvironment_options.simulate_2D == false )
 	{
-		if( pCell->position[2] - Zmin < 20 )
-		{ (*pV)[2] += 100; } 
-		if( Zmax - pCell->position[2] < 20 )
-		{ (*pV)[2] -= 100; } 
+		while( p[2] < Zmin )
+		{
+			Delta = Zmin - p[2]; 
+			p[2] = Zmax - Delta; 
+			wrapped = true; 
+		}
+		while( p[2] > Zmax )
+		{
+			Delta = p[2] - Zmax; 
+			p[2] = Zmin + Delta; 
+			wrapped = true; 
+		}
 	}
-*/
 
-	normalize( pV ); 
+	if( wrapped == true ) 
+	{ 
+		#pragma omp critical 
+		{ pCell->assign_position( p ); }
+	} 
+	return; 
 }
+
+/* prey functions */ 
+
+void prey_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// energy 
+	
+	
+	// death based on energy 
+	
+	
+	// division based on energy 
+	
+	
+}
+
+void prey_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// avoid_boundaries( pCell ); 
+	wrap_boundaries( pCell );
+}
+
+void prey_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	return weighted_motility_function(pCell, phenotype, dt ); 
+}
+
+/* predator functions */ 
+
+void predator_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// low energy kills
+	
+	// need energy to reproduce 
+	
+	return; 
+}
+
+void predator_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	static Cell_Definition* pFarmerDef = find_cell_definition( "farmer" ); 
+	static Cell_Definition* pPreyDef = find_cell_definition( "prey" ); 
+	static Cell_Definition* pPredDef = find_cell_definition( "predator" ); 	
+	
+	wrap_boundaries( pCell ); 
+	// avoid_boundaries( pCell ); 
+	
+	// see who is nearby 
+	
+	for( int i=0 ; i < pCell->cells_in_my_container().size() ; i++ )
+	{
+		Cell* pC = pCell->cells_in_my_container()[i]; 
+		// is it prey ? 
+		
+		if( pC->type == pPreyDef->type )
+		{
+			// am I hungry? 
+			
+			// eat it! 
+			pCell->ingest_cell( pC ); 
+			
+			// increase energy 
+			pCell->custom_data["energy"] += 10; 	
+		}
+	}
+	
+	// ingest 
+	
+	// gain energy from ingest 
+		
+	return; 
+}
+
+void predator_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	return weighted_motility_function(pCell,phenotype,dt); 	
+}
+
+/* farmer functions */ 
+
+void farmer_custom_function( Cell* pCell, Phenotype& phenotype , double dt )
+{
+	// return avoid_boundaries( pCell ); 
+	return wrap_boundaries( pCell ); 
+} 
