@@ -84,7 +84,7 @@ void create_cell_types( void )
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
-	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_migration_bias = weighted_motility_function; 
 	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
 	
@@ -184,3 +184,86 @@ void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 { return; } 
+
+void prey_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	
+	
+	
+}
+
+void prey_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	
+	
+}
+
+void prey_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}
+
+void weighted_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// find the indices for each major substrate 
+	static int prey_index = microenvironment.find_density_index( "prey signal"); 
+	static int predator_index = microenvironment.find_density_index( "predator signal"); 
+	static int food_index = microenvironment.find_density_index( "food"); 
+	
+	// zero out the motility bias direction. use a pointer to make this easier 
+	std::vector<double>* pV = &phenotype.motility.migration_bias_direction; 
+	(*pV) = {0,0,0}; // pCell->position; 
+	//*pV *= -0.00001; 
+ 	
+	// v += prey_weight * grad(prey) 
+	axpy( pV, pCell->custom_data["prey_weight"] , pCell->nearest_gradient(prey_index) );
+	// v += predator_weight * grad(predator) 
+	axpy( pV, pCell->custom_data["predator_weight"] , pCell->nearest_gradient(predator_index) );
+	// v += food_weight * grad(food) 
+	axpy( pV, pCell->custom_data["food_weight"] , pCell->nearest_gradient(food_index) );
+
+	// add velocity to steer clear of the boundaries 
+	static double Xmin = microenvironment.mesh.bounding_box[0]; 
+	static double Ymin = microenvironment.mesh.bounding_box[1]; 
+	static double Zmin = microenvironment.mesh.bounding_box[2]; 
+
+	static double Xmax = microenvironment.mesh.bounding_box[3]; 
+	static double Ymax = microenvironment.mesh.bounding_box[4]; 
+	static double Zmax = microenvironment.mesh.bounding_box[5]; 
+
+/*
+	static double avoid_zone = 20; 
+	static double avoid_strength = 100; 
+	
+	if( pCell->position[0] - Xmin < avoid_zone )
+	{ pCell->velocity[0] = 10; } 
+	if( Xmax - pCell->position[0] < avoid_zone )
+	{ pCell->velocity[0] = -10; } 
+	
+
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		if( pCell->position[2] - Zmin < 20 )
+		{ (*pV)[2] += 100; } 
+		if( Zmax - pCell->position[2] < 20 )
+		{ (*pV)[2] -= 100; } 
+	}
+*/
+
+	normalize( pV ); 
+}

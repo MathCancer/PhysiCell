@@ -87,3 +87,10 @@ std::vector<std::string> my_coloring_function( Cell* );
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
+
+void weighted_motility_function( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+void prey_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void prey_custom_function( Cell* pCell, Phenotype& phenotype, double dt );
+void prey_motility_function( Cell* pCell, Phenotype& phenotype, double dt );
+

@@ -97,7 +97,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>6</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -145,8 +145,8 @@
 		
 		<variable name="prey signal" units="dimensionless" ID="1">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">10000.0</diffusion_coefficient>
-				<decay_rate units="1/min">1</decay_rate>  
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
 			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
@@ -165,8 +165,8 @@
 
 		<variable name="predator signal" units="dimensionless" ID="2">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">10000.0</diffusion_coefficient>
-				<decay_rate units="1/min">1</decay_rate>  
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
 			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
@@ -207,7 +207,7 @@
 					<!-- using higher than normal significant digits to match divisions in default code -->
 					<!-- use phase_transition_rates OR phase_durations -->
 					<phase_transition_rates units="1/min"> 
-						<rate start_index="0" end_index="0" fixed_duration="false">0</rate>
+						<rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
 					</phase_transition_rates>
 					
 					<!-- use phase_transition_rates OR phase_durations -->
@@ -299,14 +299,14 @@
 				
 				<motility>  
 					<speed units="micron/min">0.25</speed>
-					<persistence_time units="min">1</persistence_time>
-					<migration_bias units="dimensionless">.5</migration_bias>
+					<persistence_time units="min">5</persistence_time>
+					<migration_bias units="dimensionless">1</migration_bias>
 					
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
 						<chemotaxis>
-							<enabled>true</enabled>
+							<enabled>false</enabled>
 							<substrate>food</substrate>
 							<direction>-1</direction>
 						</chemotaxis>
@@ -339,12 +339,27 @@
 				<molecular />
 			</phenotype>
 			<custom_data>  
-				<sample units="dimensionless">1.0</sample>
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
+				
+				<predator_weight units="dimensionless">-1</predator_weight>
+				<prey_weight units="dimensionless">0.1</prey_weight>
+				<food_weight units="dimensionless">-10</food_weight>
 			</custom_data>
 		</cell_definition>
 		
 		<cell_definition name="prey" ID="1" parent_type="farmer">
 			<phenotype>
+				<cycle code="5" name="live">  
+					<!-- phases are: G0/G1 , S, G2, M --> 
+
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<!-- use phase_transition_rates OR phase_durations -->
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.001</rate>
+					</phase_transition_rates>
+				</cycle> 
 				<secretion>
 					<substrate name="food">
 						<secretion_rate units="1/min">0</secretion_rate>
@@ -356,20 +371,29 @@
 					</substrate> 
 				</secretion>
 				<motility>
-					<speed units="micron/min">0.1</speed>
+					<speed units="micron/min">0.25</speed>
 					<persistence_time units="min">5</persistence_time>
-					<migration_bias units="dimensionless">.5</migration_bias>
+					<migration_bias units="dimensionless">1</migration_bias>
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
 						<chemotaxis>
-							<enabled>true</enabled>
+							<enabled>false</enabled>
 							<substrate>food</substrate>
 							<direction>1</direction>
 						</chemotaxis>
 					</options>
 				</motility>
 			</phenotype>
+			<custom_data>  
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
+				
+				<predator_weight units="dimensionless">-100</predator_weight>
+				<prey_weight units="dimensionless">10</prey_weight>
+				<food_weight units="dimensionless">1</food_weight>
+			</custom_data>
 		</cell_definition>
 		
 		<cell_definition name="predator" ID="2" parent_type="farmer">
@@ -385,21 +409,30 @@
 					</substrate> 
 				</secretion>
 				<motility>
-					<speed units="micron/min">1</speed>
-					<persistence_time units="min">1</persistence_time>
-					<migration_bias units="dimensionless">.75</migration_bias>
+					<speed units="micron/min">0.25</speed>
+					<persistence_time units="min">0.5</persistence_time>
+					<migration_bias units="dimensionless">1</migration_bias>
 
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
 						<chemotaxis>
-							<enabled>true</enabled>
+							<enabled>false</enabled>
 							<substrate>prey signal</substrate>
 							<direction>1</direction>
 						</chemotaxis>
 					</options>
 				</motility>
 			</phenotype>
+			<custom_data>  
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
+				
+				<predator_weight units="dimensionless">0.1</predator_weight>
+				<prey_weight units="dimensionless">10</prey_weight>
+				<food_weight units="dimensionless">0</food_weight>
+			</custom_data>
 		</cell_definition>
 		
 	</cell_definitions>
