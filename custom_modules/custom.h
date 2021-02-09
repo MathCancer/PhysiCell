@@ -105,3 +105,4 @@ void predator_motility_function( Cell* pCell, Phenotype& phenotype, double dt );
 
 void wrap_boundaries( Cell* pCell ); 
 void avoid_boundaries( Cell* pCell ); 
+std::vector<Cell*> get_possible_neighbors( Cell* pCell); 

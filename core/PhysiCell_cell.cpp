@@ -367,6 +367,7 @@ Cell::~Cell()
 	if( result != std::end(*all_cells) )
 	{
 		std::cout << "Warning: Cell was never removed from data structure " << std::endl ; 
+		std::cout << "I am of type " << this->type << " at " << this->position << std::endl; 
 
 		int temp_index = -1; 
 		bool found = false; 

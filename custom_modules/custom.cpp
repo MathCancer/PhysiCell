@@ -251,7 +251,8 @@ void avoid_boundaries( Cell* pCell )
 	static double Ymax = microenvironment.mesh.bounding_box[4]; 
 	static double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
-	static double avoid_zone = 40; 
+	static double avoid_zone = 20; 
+	static double avoid_speed = -1; // must be negative 
 	
 	// near edge: 
 	bool near_edge = false; 
@@ -269,20 +270,22 @@ void avoid_boundaries( Cell* pCell )
 	
 	if( near_edge )
 	{
-		pCell->phenotype.motility.migration_bias_direction = pCell->position; 
-		pCell->phenotype.motility.migration_bias_direction *= -1; // move towards center 
-		pCell->phenotype.motility.migration_bias = 1.0; 
+//		double speed = norm( pCell->velocity ); // remember original speed 
+//		if( speed < min_avoid_speed )
+//		{ speed = min_avoid_speed; } 
+		pCell->velocity = pCell->position; // move towards origin 
+		pCell->velocity *= avoid_speed; // move towards origin 
+//		pCell->velocity *= speed; // with original speed 
 	}
-	else
-	{
-		Cell_Definition* pCD = find_cell_definition( pCell->type );
-		pCell->phenotype.motility.migration_bias = pCD->phenotype.motility.migration_bias; 
-	}	
+	
 	return; 
 }
 
 void wrap_boundaries( Cell* pCell )
 {
+	avoid_boundaries( pCell ); 
+	return; 
+	
 //	std::cout << pCell->ID << ":" << std::endl; 
 	// add velocity to steer clear of the boundaries 
 	static double Xmin = microenvironment.mesh.bounding_box[0]; 
@@ -293,7 +296,8 @@ void wrap_boundaries( Cell* pCell )
 	static double Ymax = microenvironment.mesh.bounding_box[4]; 
 	static double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
-	static double avoid_zone = 20; 
+	static double avoid_zone = 40; 
+
 	static bool setup_done = false; 
 	if( setup_done == false )
 	{
@@ -310,6 +314,7 @@ void wrap_boundaries( Cell* pCell )
 	
 	std::vector<double> p = pCell->position;
 	double Delta;
+
 
 	while( p[0] < Xmin )
 	{
@@ -361,6 +366,33 @@ void wrap_boundaries( Cell* pCell )
 	return; 
 }
 
+std::vector<Cell*> get_possible_neighbors( Cell* pCell)
+{
+	std::vector<Cell*> neighbors = {};
+	
+	// First check the neighbors in my current voxel
+	std::vector<Cell*>::iterator neighbor;
+	std::vector<Cell*>::iterator end =
+		pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
+		
+	for( neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
+	{ neighbors.push_back( *neighbor ); }
+	
+	std::vector<int>::iterator neighbor_voxel_index;
+	std::vector<int>::iterator neighbor_voxel_index_end
+		= pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].end();
+	
+	for( neighbor_voxel_index = pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].begin(); neighbor_voxel_index!= neighbor_voxel_index_end; ++neighbor_voxel_index)
+	{
+		if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+		continue;
+		end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
+		for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
+		{ neighbors.push_back( *neighbor ); }
+	}
+	return neighbors;
+}	
+
 /* prey functions */ 
 
 void prey_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
@@ -391,6 +423,8 @@ void prey_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 void predator_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	// update energy 
+	
 	// low energy kills
 	
 	// need energy to reproduce 
@@ -404,32 +438,44 @@ void predator_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
 	static Cell_Definition* pPreyDef = find_cell_definition( "prey" ); 
 	static Cell_Definition* pPredDef = find_cell_definition( "predator" ); 	
 	
+	double max_detection_distance =5 ; 
+	
 	wrap_boundaries( pCell ); 
 	// avoid_boundaries( pCell ); 
 	
 	// see who is nearby 
 	
-	for( int i=0 ; i < pCell->cells_in_my_container().size() ; i++ )
+	std::vector<Cell*> nearby = get_possible_neighbors( pCell); 
+	
+	for( int i=0 ; i < nearby.size() ; i++ )
 	{
-		Cell* pC = pCell->cells_in_my_container()[i]; 
+		Cell* pC = nearby[i]; 
 		// is it prey ? 
 		
 		if( pC->type == pPreyDef->type )
 		{
+			bool eat_it = true; 
+			// in range? 
+			std::vector<double> displacement = pC->position; 
+			displacement -= pCell->position; 
+			double distance = norm( displacement ); 
+			if( distance > pCell->phenotype.geometry.radius + pC->phenotype.geometry.radius 
+				+ max_detection_distance )
+			{ eat_it = false; } 
+			
 			// am I hungry? 
 			
-			// eat it! 
-			pCell->ingest_cell( pC ); 
-			
-			// increase energy 
-			pCell->custom_data["energy"] += 10; 	
+			if( eat_it == true )
+			{
+				// eat it! 
+				pCell->ingest_cell( pC ); 
+				
+				// increase energy 
+				pCell->custom_data["energy"] += 10; 	
+			}
 		}
 	}
 	
-	// ingest 
-	
-	// gain energy from ingest 
-		
 	return; 
 }
 

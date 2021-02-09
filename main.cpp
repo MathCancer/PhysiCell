@@ -212,6 +212,17 @@ int main( int argc, char* argv[] )
 			  Custom add-ons could potentially go here. 
 			*/
 			
+			for( int n=0; n < (*all_cells).size() ; n++ )
+			{
+				Cell* pC = (*all_cells)[n]; 
+				if( fabs( pC->position[2] ) > 0.01 )
+				{ 
+					std::cout << pC->type << " " << pC->position << std::endl;  
+					system("pause"); 
+				}
+			}
+			
+			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 		
