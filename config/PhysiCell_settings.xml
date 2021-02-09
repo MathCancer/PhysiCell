@@ -101,7 +101,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>output3</folder> <!-- use . for root --> 
+		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
 			<interval units="min">60</interval>
@@ -128,8 +128,8 @@
 				<diffusion_coefficient units="micron^2/min">10.0</diffusion_coefficient>
 				<decay_rate units="1/min">0</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="dimensionless">1</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="true">1</Dirichlet_boundary_condition>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
 <!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
 <!--
 			<Dirichlet_options>

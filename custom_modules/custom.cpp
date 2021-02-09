@@ -283,9 +283,6 @@ void avoid_boundaries( Cell* pCell )
 
 void wrap_boundaries( Cell* pCell )
 {
-	avoid_boundaries( pCell ); 
-	return; 
-	
 //	std::cout << pCell->ID << ":" << std::endl; 
 	// add velocity to steer clear of the boundaries 
 	static double Xmin = microenvironment.mesh.bounding_box[0]; 
@@ -296,7 +293,7 @@ void wrap_boundaries( Cell* pCell )
 	static double Ymax = microenvironment.mesh.bounding_box[4]; 
 	static double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
-	static double avoid_zone = 40; 
+	static double avoid_zone = 20; 
 
 	static bool setup_done = false; 
 	if( setup_done == false )
@@ -410,7 +407,6 @@ void prey_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 void prey_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	// avoid_boundaries( pCell ); 
 	wrap_boundaries( pCell );
 }
 
@@ -438,10 +434,9 @@ void predator_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
 	static Cell_Definition* pPreyDef = find_cell_definition( "prey" ); 
 	static Cell_Definition* pPredDef = find_cell_definition( "predator" ); 	
 	
-	double max_detection_distance =5 ; 
+	static double max_detection_distance =5 ; 
 	
 	wrap_boundaries( pCell ); 
-	// avoid_boundaries( pCell ); 
 	
 	// see who is nearby 
 	
@@ -488,6 +483,5 @@ void predator_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 void farmer_custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 {
-	// return avoid_boundaries( pCell ); 
 	return wrap_boundaries( pCell ); 
 } 
