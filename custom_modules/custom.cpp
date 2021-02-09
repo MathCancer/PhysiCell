@@ -252,7 +252,7 @@ void avoid_boundaries( Cell* pCell )
 	static double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
 	static double avoid_zone = 20; 
-	static double avoid_speed = -1; // must be negative 
+	static double avoid_speed = -0.5; // must be negative 
 	
 	// near edge: 
 	bool near_edge = false; 
@@ -270,12 +270,8 @@ void avoid_boundaries( Cell* pCell )
 	
 	if( near_edge )
 	{
-//		double speed = norm( pCell->velocity ); // remember original speed 
-//		if( speed < min_avoid_speed )
-//		{ speed = min_avoid_speed; } 
 		pCell->velocity = pCell->position; // move towards origin 
 		pCell->velocity *= avoid_speed; // move towards origin 
-//		pCell->velocity *= speed; // with original speed 
 	}
 	
 	return; 
@@ -283,7 +279,8 @@ void avoid_boundaries( Cell* pCell )
 
 void wrap_boundaries( Cell* pCell )
 {
-//	std::cout << pCell->ID << ":" << std::endl; 
+	return avoid_boundaries( pCell ); 
+	
 	// add velocity to steer clear of the boundaries 
 	static double Xmin = microenvironment.mesh.bounding_box[0]; 
 	static double Ymin = microenvironment.mesh.bounding_box[1]; 
@@ -419,24 +416,13 @@ void prey_motility_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 void predator_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	// update energy 
-	
-	// low energy kills
-	
-	// need energy to reproduce 
-	
-	return; 
-}
-
-void predator_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
-{
 	static Cell_Definition* pFarmerDef = find_cell_definition( "farmer" ); 
 	static Cell_Definition* pPreyDef = find_cell_definition( "prey" ); 
 	static Cell_Definition* pPredDef = find_cell_definition( "predator" ); 	
 	
-	static double max_detection_distance =5 ; 
-	
-	wrap_boundaries( pCell ); 
+	// hunting 
+
+	static double max_detection_distance = 2; 
 	
 	// see who is nearby 
 	
@@ -470,6 +456,23 @@ void predator_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
 			}
 		}
 	}
+	
+	// update energy 
+	
+	// low energy kills
+	
+	// need energy to reproduce 
+	
+	return; 
+}
+
+void predator_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	static Cell_Definition* pFarmerDef = find_cell_definition( "farmer" ); 
+	static Cell_Definition* pPreyDef = find_cell_definition( "prey" ); 
+	static Cell_Definition* pPredDef = find_cell_definition( "predator" ); 	
+	
+	wrap_boundaries( pCell ); 
 	
 	return; 
 }
