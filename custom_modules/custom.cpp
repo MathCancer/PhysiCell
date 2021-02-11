@@ -189,6 +189,14 @@ void setup_tissue( void )
 	}
 	std::cout << std::endl; 
 	
+	fill_rectangle( {0,0,0,200,100,0} , cell_definitions_by_index[0] , 0.9 ); 
+	
+	fill_circle( {-143,-100,0} , 150 , 1 , 0.95 ); 
+	
+	draw_line( {-137,132,0} , {217,194,0} , 2 , 0.9 ); 
+	
+	fill_annulus( {300,300,0} , 150, 90 , 0 , 0.75 ); 
+	
 	return; 
 }
 
@@ -251,7 +259,7 @@ void avoid_boundaries( Cell* pCell )
 	static double Ymax = microenvironment.mesh.bounding_box[4]; 
 	static double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
-	static double avoid_zone = 20; 
+	static double avoid_zone = 25; 
 	static double avoid_speed = -0.5; // must be negative 
 	
 	// near edge: 
@@ -391,15 +399,27 @@ std::vector<Cell*> get_possible_neighbors( Cell* pCell)
 
 void prey_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	// energy 
+	// sample food
+	static int nFood = microenvironment.find_density_index("food"); 
+	double food = pCell->nearest_density_vector()[nFood]; 
 	
+	// death based on food
+	static int nNecrosis = phenotype.death.find_death_model_index( "necrosis" );
 	
-	// death based on energy 
+	if( food < 0.1 )
+	{
+		pCell->start_death( nNecrosis ); 
+		pCell->functions.update_phenotype = NULL; 
+		return; 
+	} 
 	
+	// division based on food
+	static Cell_Definition* pCD = find_cell_definition( "prey" ); 
+	phenotype.cycle.data.exit_rate(0) = pCD->phenotype.cycle.data.exit_rate(0); 
+	double multiplier = (food-0.1)/0.9; 
+	phenotype.cycle.data.exit_rate(0) *= multiplier; 
 	
-	// division based on energy 
-	
-	
+	return; 
 }
 
 void prey_custom_function( Cell* pCell, Phenotype& phenotype, double dt )
@@ -452,14 +472,28 @@ void predator_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 				pCell->ingest_cell( pC ); 
 				
 				// increase energy 
-				pCell->custom_data["energy"] += 10; 	
+				pCell->custom_data["energy"] += 100; 	
 			}
 		}
 	}
 	
 	// update energy 
 	
+	static double decay_rate = 0.0025; 
+	pCell->custom_data["energy"] /= (1.0 + dt*decay_rate); 
+	
 	// low energy kills
+	
+	// death based on food
+	static int nNecrosis = phenotype.death.find_death_model_index( "necrosis" );
+	
+	if( pCell->custom_data["energy"] < 0.1 )
+	{
+		pCell->start_death( nNecrosis ); 
+		pCell->functions.update_phenotype = NULL; 
+		return; 
+	} 	
+	
 	
 	// need energy to reproduce 
 	

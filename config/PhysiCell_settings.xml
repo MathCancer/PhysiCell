@@ -125,11 +125,11 @@
 	<microenvironment_setup>
 		<variable name="food" units="dimensionless" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">10.0</diffusion_coefficient>
+				<diffusion_coefficient units="micron^2/min">100.0</diffusion_coefficient>
 				<decay_rate units="1/min">0</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="dimensionless">0</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+			<initial_condition units="dimensionless">1</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
 <!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
 <!--
 			<Dirichlet_options>
@@ -149,7 +149,7 @@
 				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
 <!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
 <!--
 			<Dirichlet_options>
@@ -169,7 +169,7 @@
 				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
 <!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
 <!--
 			<Dirichlet_options>
@@ -363,7 +363,7 @@
 				<secretion>
 					<substrate name="food">
 						<secretion_rate units="1/min">0</secretion_rate>
-						<uptake_rate units="1/min">0.1</uptake_rate>
+						<uptake_rate units="1/min">1</uptake_rate>
 					</substrate> 
 
 					<substrate name="prey signal">
@@ -410,8 +410,8 @@
 				</secretion>
 				<motility>
 					<speed units="micron/min">0.5</speed>
-					<persistence_time units="min">0.5</persistence_time>
-					<migration_bias units="dimensionless">0.8</migration_bias>
+					<persistence_time units="min">2.5</persistence_time>
+					<migration_bias units="dimensionless">0.7</migration_bias>
 
 					<options>
 						<enabled>true</enabled>

@@ -65,20 +65,72 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_standard_modules_h__
-#define __PhysiCell_standard_modules_h__
+#ifndef __PhysiCell_geometry_h__
+#define __PhysiCell_geometry_h__
 
-#include <iostream>
-#include <fstream>
+#include <string>
+#include <vector>
 
-#include "./PhysiCell_SVG.h"
-#include "./PhysiCell_pathology.h"
-#include "./PhysiCell_MultiCellDS.h"
-#include "./PhysiCell_various_outputs.h"
+#include "../core/PhysiCell.h"
+// #include "../BioFVM/BioFVM_utilities.h"
 
-#include "./PhysiCell_pugixml.h"
-#include "./PhysiCell_settings.h" 
 
-#include "./PhysiCell_geometry.h" 
+namespace PhysiCell
+{
+// loaders 
+	
+void load_cells_csv( std::string filename ); 
+void load_cells_mat( std::string filename ); 
+	
+//	
+// 2D functions 
+//
+void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
+void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD ); 
+
+void fill_circle( std::vector<double> center , double radius , int cell_type , double compression );
+void fill_circle( std::vector<double> center , double radius , int cell_type ); 
+
+
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD , double compression ); 
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD ); 
+
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type , double compression );
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type ); 
+
+
+// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
+void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
+void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD ); 
+
+void fill_rectangle( std::vector<double> bounds , int cell_type , double compression );  
+void fill_rectangle( std::vector<double> bounds , int cell_type ); 
+
+
+//
+// 3D functions
+//
+void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
+void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD ); 
+
+void fill_sphere( std::vector<double> center , double radius , int cell_type , double compression ); 
+void fill_sphere( std::vector<double> center , double radius , int cell_type ); 
+
+// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
+void fill_box( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
+void fill_box( std::vector<double> bounds , Cell_Definition* pCD ); 
+
+void fill_box( std::vector<double> bounds , int cell_type , double compression ); 
+void fill_box( std::vector<double> bounds , int cell_type ); 
+
+void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD , double compression ); 
+void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD ); 
+
+void draw_line( std::vector<double> start , std::vector<double> end , int cell_type , double compression ); 
+void draw_line( std::vector<double> start , std::vector<double> end , int cell_type ); 
+
+
+
+};
 
 #endif

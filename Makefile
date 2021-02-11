@@ -41,7 +41,7 @@ PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o Physi
 PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
-PhysiCell_pugixml.o PhysiCell_settings.o
+PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o 
 
 # put your custom objects here (they should be in the custom_modules directory)
 
@@ -136,7 +136,10 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 	
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 		
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp
+	
+PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp 	
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp
 	
 # user-defined PhysiCell modules
 
@@ -153,6 +156,8 @@ reset:
 	touch ALL_CITATIONS.txt 
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
+	
+upgrade:
 	
 clean:
 	rm -f *.o
