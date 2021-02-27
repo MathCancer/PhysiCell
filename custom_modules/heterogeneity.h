@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,50 +65,22 @@
 ###############################################################################
 */
 
-#include "PhysiCell_constants.h" 
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-namespace PhysiCell{
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-std::string time_units = "min";
-std::string space_units = "micron";
-double diffusion_dt = 0.01; 
-double mechanics_dt = 0.1;
-double phenotype_dt = 6.0;
+// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-std::unordered_map<std::string,int> cycle_model_codes = 
-{
-	{ "Ki67 (advanced)", PhysiCell_constants::advanced_Ki67_cycle_model}, 
-	{ "Ki67 (basic)" ,PhysiCell_constants::basic_Ki67_cycle_model},
-	{ "Flow cytometry model (basic)",PhysiCell_constants::flow_cytometry_cycle_model},
-	// { ,PhysiCell_constants::live_apoptotic_cycle_model}, // not implemented 
-	// { ,PhysiCell_constants::total_cells_cycle_model}, // not implemented 
-	{ "Live",PhysiCell_constants::live_cells_cycle_model}, 
-	{ "Flow cytometry model (separated)",PhysiCell_constants::flow_cytometry_separated_cycle_model}, 
-	{ "Cycling-Quiescent model",PhysiCell_constants::cycling_quiescent_model}, 
-	
-	// currently recognized death models 
-	{ "Apoptosis",PhysiCell_constants::apoptosis_death_model}, 
-	{ "Necrosis",PhysiCell_constants::necrosis_death_model} , 
-	// { ,PhysiCell_constants::autophagy_death_model}, // not implemented 
-	
-	{ "ki67 (advanced)", PhysiCell_constants::advanced_Ki67_cycle_model}, 
-	{ "ki67 (basic)" ,PhysiCell_constants::basic_Ki67_cycle_model},
-	{ "flow cytometry model (basic)",PhysiCell_constants::flow_cytometry_cycle_model},
-	{ "live",PhysiCell_constants::live_cells_cycle_model}, 
-	{ "flow cytometry model (separated)",PhysiCell_constants::flow_cytometry_separated_cycle_model}, 
-	{ "cycling-quiescent model",PhysiCell_constants::cycling_quiescent_model}, 
-	{ "apoptosis",PhysiCell_constants::apoptosis_death_model}, 
-	{ "necrosis",PhysiCell_constants::necrosis_death_model} 
-	
-}; 
+// set the tumor cell properties, then call the function 
+// to set up the tumor cells 
+void create_cell_types( void );
 
-int find_cycle_model_code( std::string model_name )
-{
-	auto search = cycle_model_codes.find( model_name );
-	if( search == cycle_model_codes.end() )
-	{ return -1; }
-	else
-	{ return search->second; }
-}
+void setup_tissue(); 
 
-};
+// set up the microenvironment to include the immunostimulatory factor 
+void setup_microenvironment( void );  // done 
+
+std::vector<std::string> heterogeneity_coloring_function( Cell* );

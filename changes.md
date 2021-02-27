@@ -12,7 +12,7 @@ This release introduces bug fixes (particularly the placement of daughter cells 
  
 ### Major new features and changes:
 
-+ 
++ Full rollout of cell definitions in the XML configuration files. Many basic models can now be fully defined in XML with minimal or no C++. 
 
 + Unified the 2D and 3D template projects into a single "template" project. 
 
@@ -61,7 +61,7 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
 
 + New "paint by numbers" coloring function 
 
-
++ Cycle and Death in Cell_Definitions no longer require a "code" as long as the "name" is correct. 
 
 
 ### Beta features (not fully supported):

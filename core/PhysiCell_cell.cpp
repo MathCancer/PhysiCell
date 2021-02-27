@@ -1567,7 +1567,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	pCD->phenotype.secretion.sync_to_microenvironment( (pCD->pMicroenvironment) ); 
 	pCD->phenotype.molecular.sync_to_microenvironment( (pCD->pMicroenvironment) );
 	
-	
 	// set the reference phenotype 
 	pCD->parameters.pReference_live_phenotype = &(pCD->phenotype); 
 	pugi::xml_node node = cd_node.child( "phenotype" ); 
@@ -1579,7 +1578,18 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	node = node.child( "cycle" ); 
 	if( node )
 	{
-		int model = node.attribute("code").as_int() ; 
+		int model; // = node.attribute("code").as_int() ; 
+		if( strlen( node.attribute("code").as_string() ) > 0 )
+		{ model = node.attribute("code").as_int(); }
+		else
+		{ model = find_cycle_model_code( node.attribute("name").as_string() ); } 
+		if( model < 0 )
+		{ 
+			std::cout << "Error. Unable to identify cycle model " 
+				<< node.attribute("name").value() 
+				<< " (" << node.attribute("code").value() << ")" << std::endl;
+			exit(-1);
+		}		
 		
 		// Set the model, but only if it was specified. 
 		if( strlen( node.attribute("code").value() ) > 0 )
@@ -1718,7 +1728,19 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		node = node.child( "model" );
 		while( node )
 		{
-			int model = node.attribute("code").as_int() ; 
+			int model; // = node.attribute("code").as_int() ; 
+			if( strlen( node.attribute("code").as_string() ) > 0 )
+			{ model = node.attribute("code").as_int(); }
+			else
+			{ model = find_cycle_model_code( node.attribute("name").as_string() ); } 
+			if( model < 0 )
+			{ 
+				std::cout << "Error. Unable to identify death model " 
+					<< node.attribute("name").value() 
+					<< " (" << node.attribute("code").value() << ")" << std::endl;
+				exit(-1);
+			}		
+
 			
 			// check: is that death model already there? 
 			
@@ -2108,7 +2130,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				pMot->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
 				if( pMot->chemotaxis_index < 0)
 				{
-					std::cout << __FUNCTION__ << ": Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" << std::endl << std::endl; 
+					std::cout << __FUNCTION__ << ": Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" << std::endl; 
+					std::cout << substrate_name << " was not found in the microenvironment. Please check for typos!" << std::endl << std::endl; 
 					exit(-1); 
 				}
 				

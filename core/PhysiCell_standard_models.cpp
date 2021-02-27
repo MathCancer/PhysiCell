@@ -353,11 +353,6 @@ bool create_cytometry_cycle_models( void )
 	flow_cytometry_separated_cycle_model.phases[2].entry_function = NULL;		
 	flow_cytometry_separated_cycle_model.phases[3].entry_function = NULL;		
 	
-	
-	
-	
-	
-	
 	return true; 
 }
 
