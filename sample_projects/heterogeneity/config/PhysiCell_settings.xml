@@ -211,6 +211,16 @@
 							<calcification_rate units="1/min">0</calcification_rate>
 							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
 						</parameters>
+						
+					<basic_signaling>
+						<promoters hill="3" half_max="0.5">
+							<signal name="oxygen" />
+						</promosters>
+						<inhibitors hill="2" half_max="0.1">
+							<signal>presure</signal> 
+						</inhibitors>
+					</basic_signaling>
+						
 					</model> 
 				</death>					
 
@@ -227,6 +237,7 @@
 					<calcification_rate units="1/min">0</calcification_rate>
 					
 					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+					
 				</volume> 				
 				
 				<mechanics> 
@@ -245,13 +256,22 @@
 					<persistence_time units="min">1</persistence_time>
 					<migration_bias units="dimensionless">.5</migration_bias>
 					
+					<basic_signaling>
+						<promoters hill="3" half_max="0.5">
+							<signal name="oxygen" />
+						</promosters>
+						<inhibitors hill="2" half_max="0.1">
+							<signal>presure</signal> 
+						</inhibitors>
+					</basic_signaling>
+					
 					<options>
 						<enabled>false</enabled>
 						<use_2D>true</use_2D>
 						<chemotaxis>
 							<enabled>false</enabled>
 							<substrate>oxygen</substrate>
-							<direction>1</direction>
+							<direction>-1</direction>
 						</chemotaxis>
 					</options>
 				</motility>
@@ -266,6 +286,7 @@
 				</secretion>
 
 				<molecular />
+				<intracellular />
 			</phenotype>
 			<custom_data>  
 				<oncoprotein units="dimensionless">1.0</oncoprotein>

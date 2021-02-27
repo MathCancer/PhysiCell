@@ -225,5 +225,24 @@ void draw_line( std::vector<double> start , std::vector<double> end , Cell_Defin
 void draw_line( std::vector<double> start , std::vector<double> end , int cell_type , double compression )
 { return draw_line(start,end,find_cell_definition(cell_type),compression); }
 
+void load_cells_csv( std::string filename )
+{
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}
+
 
 }; 

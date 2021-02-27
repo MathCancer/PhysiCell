@@ -187,6 +187,7 @@ void setup_tissue( void )
 			pC->assign_position( position );
 		}
 	}
+/*	
 	std::cout << std::endl; 
 	
 	fill_rectangle( {0,0,0,200,100,0} , cell_definitions_by_index[0] , 0.9 ); 
@@ -196,6 +197,7 @@ void setup_tissue( void )
 	draw_line( {-137,132,0} , {217,194,0} , 2 , 0.9 ); 
 	
 	fill_annulus( {300,300,0} , 150, 90 , 0 , 0.75 ); 
+*/	
 	
 	return; 
 }

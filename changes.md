@@ -2,7 +2,7 @@
 
 **Version:** 1.8.0
 
-**Release date:** 4 February 2021
+**Release date:** 28 February 2021
 
 ## Release summary: 
 
@@ -12,18 +12,64 @@ This release introduces bug fixes (particularly the placement of daughter cells 
  
 ### Major new features and changes:
 
-+  
++ 
 
 + Unified the 2D and 3D template projects into a single "template" project. 
+
++ New predator_prey_farmer sample project 
+
++ Improved thread safety. 
+
++ Introduced new cell-cell contact functions with syntax: 
+
+void contact( Cell* pME, Phenotype& my_phenotype , Cell* pOther, Phenotype& other_phenotype, double dt )
+
+These are exexcuted once per mechanics time step. Best practice is to either only read pOther and other_phenotype, or use OMP critical locks. 
+
+For any cell (this), the contact function will be executed for any other cell (other) in this->state.attached_cells. 
+
++ Introduced a standardized cell-cell spring-like adhesion contact function: 
+
+standard_elastic_contact_function
+
+This will 
+
++ All sample projects now copy the configuration file to the output directory, to help keep track of settings and parameters used to create a simulation. 
+
+
+Cell::
+	void attach_cell( Cell* pAddMe ); // done 
+	void detach_cell( Cell* pRemoveMe ); // done 
+	void remove_all_attached_cells( void ); // done 
+	
+	
+void attach_cells( Cell* pCell_1, Cell* pCell_2 );
+void detach_cells( Cell* pCell_1 , Cell* pCell_2 );	
+
++ Updated the following sample projects to use the new Cell_Definitions and contact functions: 
+
+
+
 
 ### Minor new features and changes: 
 
 + Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined or modified in the next few releases while still in beta. 
 
++ All sample projects have a "make jpeg" rule that uses ImageMagick to convert SVG snapshots into JPG files. 
+
++ All sample projects have a "make movie" that uses ffmepg to convert JPG snapshots to an mp4 animation. 
+
++ New "paint by numbers" coloring function 
+
+
 
 
 ### Beta features (not fully supported):
  
++ Signaling 
+
++ Geometry stuff 
+
   
 ### Bugfixes: 
 

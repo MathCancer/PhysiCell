@@ -187,3 +187,17 @@ unzip:
 untar: 
 	cp ./archives/latest.tar .
 	tar -xzf latest.tar
+
+# easier animation 
+
+FRAMERATE := 24
+OUTPUT := output
+
+jpeg: 
+	magick mogrify -format jpg $(OUTPUT)/s*.svg
+	
+gif: 
+	magick convert $(OUTPUT)/s*.svg out.gif 
+	 
+movie:
+	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none out.mp4

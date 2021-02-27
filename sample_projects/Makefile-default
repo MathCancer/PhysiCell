@@ -63,7 +63,7 @@ all:
 # sample projects 	
 list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
-	@echo "                 cancer-immune-sample virus-macrophage-sample template"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -147,6 +147,15 @@ beta-testing:
 	cp ./sample_projects/beta_testing/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/beta_testing/config/* ./config/
+	
+pred-prey-farmer:
+	cp ./sample_projects/pred_prey_farmer/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/pred_prey_farmer/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/pred_prey_farmer/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/pred_prey_farmer/config/* ./config/	
 	
 # early examples for convergence testing 
 
@@ -281,7 +290,7 @@ data-cleanup:
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
-	
+
 # archival 
 
 checkpoint: 
@@ -306,3 +315,17 @@ unzip:
 untar: 
 	cp ./archives/latest.tar .
 	tar -xzf latest.tar
+
+# easier animation 
+
+FRAMERATE := 24
+OUTPUT := output
+
+jpeg: 
+	magick mogrify -format jpg $(OUTPUT)/s*.svg
+	
+gif: 
+	magick convert $(OUTPUT)/s*.svg out.gif 
+	 
+movie:
+	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none out.mp4
