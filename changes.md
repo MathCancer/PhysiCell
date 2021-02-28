@@ -6,7 +6,10 @@
 
 ## Release summary: 
 
-This release introduces bug fixes (particularly the placement of daughter cells after division), introduces new functions for uniformly random sampling of the unit circle and unit sphere, and refines the beta implementation of XML-based cell definitions. 
+This release ...
+
+
+ introduces bug fixes (particularly the placement of daughter cells after division), introduces new functions for uniformly random sampling of the unit circle and unit sphere, and refines the beta implementation of XML-based cell definitions. 
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
@@ -34,7 +37,10 @@ standard_elastic_contact_function
 
 This will 
 
-+ All sample projects now copy the configuration file to the output directory, to help keep track of settings and parameters used to create a simulation. 
++ All sample projects now copy the configuration file to the output directory, to help keep track of settings and parameters used to create a simulation result. 
+
++ "mainline" prototype cell attach/detach mechanics as standard models (currently in the biorobots and immune examples)
+
 
 
 Cell::
@@ -49,7 +55,7 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
 + Updated the following sample projects to use the new Cell_Definitions and contact functions: 
 
 
-
++ Develop contact-based cell-cell interactions.
 
 ### Minor new features and changes: 
 
@@ -63,10 +69,17 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
 
 + Cycle and Death in Cell_Definitions no longer require a "code" as long as the "name" is correct. 
 
++ Revised template project to a barebones minimum. 
+
+
+
++ Legend  
+
 
 ### Beta features (not fully supported):
  
 + Signaling 
+
 
 + Geometry stuff 
 
@@ -92,22 +105,16 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
 
 + Methods or scripts to make "upgrading" PhysiCell easier for existing projects (to avoid overwriting the config file, Makefile, or custom files. 
  
-+ Current "template" project will be rolled into a new "predator-prey" sample project, and "template" will be tidied up. 
-
 + Further XML-based simulation setup. 
 
 + current sample projects will be refactored to use XML cdell definitions. 
  
 + read saved simulation states (as MultiCellDS digital snapshots)
  
-+ "mainline" prototype cell attach/detach mechanics as standard models (currently in the biorobots and immune examples)
- 
 + integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
   
 + integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
   
-+ Develop contact-based cell-cell interactions. 
-
 + Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
  
 + Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 

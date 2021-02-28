@@ -2206,7 +2206,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			node_sec = node_sec.next_sibling( "substrate" ); 
 		}
 	}	
-
 	
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
