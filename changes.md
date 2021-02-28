@@ -6,7 +6,11 @@
 
 ## Release summary: 
 
-This release ...
+This release formally introduces Cell Definitions: a way to fully create cell types in the XML configuration file, including each cell type's initial phenotype and custom variables. This extends our recent work to shift specification of the microenvironment and boundary conditions to XML, and continues our trend towards a future release when many models can be designed and run without compiling any C++ at all. Most of the sample projects have been updated to use this new paradigm, including the a unified 2D/3D `template` project. We recommend using that template as the starting point for any PhysiCell model.
+
+This release also introduces contact functions: a way to specify cell-cell contact interactions for any cells that you attach (using new, standardized attach and detach functions). Look at the `cancer-biorobots` and `biorobots` sample projects for examples. 
+
+The release also re
 
 
  introduces bug fixes (particularly the placement of daughter cells after division), introduces new functions for uniformly random sampling of the unit circle and unit sphere, and refines the beta implementation of XML-based cell definitions. 
@@ -15,47 +19,50 @@ This release ...
  
 ### Major new features and changes:
 
-+ Full rollout of cell definitions in the XML configuration files. Many basic models can now be fully defined in XML with minimal or no C++. 
++ Full rollout of `Cell_Definition` in the XML configuration files. Many basic models can now be fully defined in XML with minimal or no C++. 
 
 + Unified the 2D and 3D template projects into a single "template" project. 
 
-+ New predator_prey_farmer sample project 
++ New predator-prey-farmer sample project. Prey look for and consume food that's released by farmers. Prey avoid predators, predators hunt and eat prey.  
 
-+ Improved thread safety. 
++ Improved thread safety, particularly when cells ingest cells. 
 
 + Introduced new cell-cell contact functions with syntax: 
 
-void contact( Cell* pME, Phenotype& my_phenotype , Cell* pOther, Phenotype& other_phenotype, double dt )
+`void contact( Cell* pME, Phenotype& my_phenotype , Cell* pOther, Phenotype& other_phenotype, double dt )`
 
-These are exexcuted once per mechanics time step. Best practice is to either only read pOther and other_phenotype, or use OMP critical locks. 
+These are exexcuted once per mechanics time step. Best practice is to either only read `pOther` and `other_phenotype`, or use OMP critical locks. 
 
-For any cell (this), the contact function will be executed for any other cell (other) in this->state.attached_cells. 
+For any cell (`this`), the contact function will be executed for any other cell (other) in `this->state.attached_cells`. The modeler will still need to decide which cells to attach. 
 
-+ Introduced a standardized cell-cell spring-like adhesion contact function: 
+All attached cells are automatically removed when a cell dies or divides. 
 
-standard_elastic_contact_function
++ Added new attachment and detachment functions to the `Cell` class: 
+++ `void attach_cell( Cell* pAddMe );` Add `pAddme` to the cell's `state.attached_cells` for use in contact functions. 
+++ `void detach_cell( Cell* pRemoveMe );` Remove `pRemoveMe` from the cell's `state.attached_cells` list.  
+++ `void remove_all_attached_cells( void );` Remove all attached cells.  
 
-This will 
++ Added additional attachment and detachment functions outside the `Cell` class: 
+++ `void attach_cells( Cell* pCell_1, Cell* pCell_2 );` Add `pCell_2` to `pCell_1->state.attached_cells` and add `pCell_1` to `pCell_2->state.attached_cells`
+++ `void detach_cells( Cell* pCell_1 , Cell* pCell_2 );` Remove the attachments. 
+
++ Introduced a standardized cell-cell spring-like adhesion contact function: `standard_elastic_contact_function.`
+
+This will add an additional Hookean spring attraction to cells in `state.attached_cells`. The modeler will still need to decide when to attach or detach cells. (Recommended practice: use the `custom` function that is evaluated once per mechanics time step.) 
 
 + All sample projects now copy the configuration file to the output directory, to help keep track of settings and parameters used to create a simulation result. 
 
-+ "mainline" prototype cell attach/detach mechanics as standard models (currently in the biorobots and immune examples)
-
-
-
-Cell::
-	void attach_cell( Cell* pAddMe ); // done 
-	void detach_cell( Cell* pRemoveMe ); // done 
-	void remove_all_attached_cells( void ); // done 
-	
-	
-void attach_cells( Cell* pCell_1, Cell* pCell_2 );
-void detach_cells( Cell* pCell_1 , Cell* pCell_2 );	
-
 + Updated the following sample projects to use the new Cell_Definitions and contact functions: 
+++ template2D
+++ template3D
+++ template
+++ biorobots
+++ 
 
-
-+ Develop contact-based cell-cell interactions.
++ Users can now pre-specify cell positions by creating a CSV file: 
+++ Each row corresponds to a cell:     x,y,z,typeID
+++ TypeID is the integer index of a `Cell_Definition` (ideally defined in XML!)
+++ Call the function `load_cells_csv( std::string filename )` to load these possitions and place the cells in corresponding positions. Ideally, cally this function at the end of `setup_tissue()`. The template projects will call this function automatically if a cell CSV file is specified in the `initialization` section of the XML configuration file. 
 
 ### Minor new features and changes: 
 
@@ -86,7 +93,9 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
   
 ### Bugfixes: 
 
-+ In response to SourceForge ticket #
++ In response to SourceForge ticket #43, fixed the bug where Dirichlet conditions weren't properly applied to individual boundaries. 
+
++ Cleaned up code as suggested in SourceForge Ticket #42.
 
 
 ### Notices for intended changes that may affect backwards compatibility:
