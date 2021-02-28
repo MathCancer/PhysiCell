@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,186 +65,26 @@
 ###############################################################################
 */
 
-#include "./PhysiCell_custom.h" 
-#include <vector>
-#include <cstdio>
-#include <iostream>
-#include <cstring>
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-namespace PhysiCell
-{
-	
-Variable::Variable()
-{
-	name = "unnamed"; 
-	units = "dimensionless"; 
-	value = 0.0; 
-	return; 
-}
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-std::ostream& operator<<(std::ostream& os, const Variable& v)
-{
-	os << v.name << ": " << v.value << " " << v.units; 
-	return os; 
-}
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 
+// any additional cell types (beyond cell_defaults)
 
-Vector_Variable::Vector_Variable()
-{
-	name = "unnamed"; 
-	units = "dimensionless"; 
-	value.resize(3, 0.0 );
-	return; 
-}
+// custom cell phenotype functions could go here 
 
-std::ostream& operator<<(std::ostream& os, const Vector_Variable& v)
-{
-	os << v.name << ": ";
-	for( int i=0; i < v.value.size()-1 ; i++ )
-	{ os << v.value[i] << ","; }
-	os << v.value[v.value.size()-1] << " (" << v.units << ")"; 
-	return os; 
-}
+// setup functions to help us along 
 
-	
-Custom_Cell_Data::Custom_Cell_Data()
-{
-//	std::cout << __FUNCTION__ << "(default)" << std::endl; 
-	variables.resize(0); 
-	vector_variables.resize(0); 
-	
-	name_to_index_map.clear(); 
-//	vector_name_to_index_map.clear();
-	
-	return;
-}
+void create_cell_types( void );
+void setup_tissue( void ); 
 
-Custom_Cell_Data::Custom_Cell_Data( const Custom_Cell_Data& ccd )
-{
-//	std::cout << __FUNCTION__ << "(copy)" << std::endl; 
-	variables = ccd.variables; 
-	vector_variables = ccd.vector_variables; 
-	
-	name_to_index_map= ccd.name_to_index_map; 
-	
-	return; 
-}
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
 
-int Custom_Cell_Data::add_variable( Variable& v )
-{
-	int n = variables.size(); 
-	variables.push_back( v ); 
-	name_to_index_map[ v.name ] = n; 
-	return n; 
-}
+// custom pathology coloring function 
 
-int Custom_Cell_Data::add_variable( std::string name , std::string units , double value )
-{
-	int n = variables.size(); 
-	variables.resize( n+1 ); 
-	variables[n].name = name; 
-	variables[n].units = units; 
-	variables[n].value = value; 
-	name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_variable( std::string name , double value )
-{
-	int n = variables.size(); 
-	variables.resize( n+1 ); 
-	variables[n].name = name; 
-	variables[n].units = "dimensionless"; 
-	variables[n].value = value; 
-	name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_vector_variable( Vector_Variable& v )
-{
-	int n = vector_variables.size(); 
-	vector_variables.push_back( v ); 
-//	vector_name_to_index_map[ v.name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_vector_variable( std::string name , std::string units , std::vector<double>& value )
-{
-	int n = vector_variables.size(); 
-	vector_variables.resize( n+1 ); 
-	vector_variables[n].name = name; 
-	vector_variables[n].units = units; 
-	vector_variables[n].value = value; 
-//	vector_name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_vector_variable( std::string name , std::vector<double>& value )
-{
-	int n = vector_variables.size(); 
-	vector_variables.resize( n+1 ); 
-	vector_variables[n].name = name; 
-	vector_variables[n].units = "dimensionless"; 
-	vector_variables[n].value = value; 
-//	vector_name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::find_variable_index( std::string name )
-{
-	// this should return -1 if not found, not zero 
-	auto out = name_to_index_map.find( name ); 
-	if( out != name_to_index_map.end() )
-	{ return out->second; }
-	return -1; 
-}
-
-/*
-int Custom_Cell_Data::find_vector_variable_index( std::string name )
-{
-	return vector_name_to_index_map[ name ]; 
-}
-*/
-
-int Custom_Cell_Data::find_vector_variable_index( std::string name )
-{
-	int n = 0; 
-	while( n < vector_variables.size() )
-	{
-		if( std::strcmp( vector_variables[n].name.c_str() , name.c_str() ) == 0 )
-		{ return n; } 
-		n++; 
-	}
-	
-	return -1; 
-}
-
-
-double& Custom_Cell_Data::operator[](int i)
-{
-	return variables[i].value; 
-}
-
-double& Custom_Cell_Data::operator[]( std::string name )
-{
-	return variables[ name_to_index_map[name] ].value; 
-}
-
-std::ostream& operator<<(std::ostream& os, const Custom_Cell_Data& ccd)
-{
-	os << "Custom data (scalar): " << std::endl; 
-	for( int i=0 ; i < ccd.variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.variables[i] << std::endl; 
-	}
-
-	os << "Custom data (vector): " << std::endl; 
-	for( int i=0 ; i < ccd.vector_variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.vector_variables[i] << std::endl; 
-	}
-	
-	return os;
-}
-
-};
+std::vector<std::string> my_coloring_function( Cell* );

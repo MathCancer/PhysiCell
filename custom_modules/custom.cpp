@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,186 +65,131 @@
 ###############################################################################
 */
 
-#include "./PhysiCell_custom.h" 
-#include <vector>
-#include <cstdio>
-#include <iostream>
-#include <cstring>
+#include "./custom.h"
 
-namespace PhysiCell
+void create_cell_types( void )
 {
+	// use the same random seed so that future experiments have the 
+	// same initial histogram of oncoprotein, even if threading means 
+	// that future division and other events are still not identical 
+	// for all runs 
 	
-Variable::Variable()
-{
-	name = "unnamed"; 
-	units = "dimensionless"; 
-	value = 0.0; 
+	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
+	
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
+	
+	initialize_default_cell_definition(); 	
+	
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
+
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
+	cell_defaults.functions.cycle_model = flow_cytometry_separated_cycle_model; 
+	
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
+	
+	initialize_cell_definitions_from_pugixml(); 
+	
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
+
+	// set the rate terms in the default phenotype 
+
+
+	Cell_Definition* pCD = find_cell_definition( "motile tumor cell" ); 
+	
+	// Set cell-cell adhesion to 5% of other cells 
+	pCD->phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); 
+	
+	// Set proliferation to 10% of other cells. 
+	// Alter the transition rate from G0G1 state to S state
+	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
+	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
+
+	pCD->phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
+		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); 
+		
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
+	
 	return; 
 }
 
-std::ostream& operator<<(std::ostream& os, const Variable& v)
+void setup_microenvironment( void )
 {
-	os << v.name << ": " << v.value << " " << v.units; 
-	return os; 
-}
-
-
-Vector_Variable::Vector_Variable()
-{
-	name = "unnamed"; 
-	units = "dimensionless"; 
-	value.resize(3, 0.0 );
-	return; 
-}
-
-std::ostream& operator<<(std::ostream& os, const Vector_Variable& v)
-{
-	os << v.name << ": ";
-	for( int i=0; i < v.value.size()-1 ; i++ )
-	{ os << v.value[i] << ","; }
-	os << v.value[v.value.size()-1] << " (" << v.units << ")"; 
-	return os; 
-}
-
+	// make sure to override and go back to 2D 
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
+		default_microenvironment_options.simulate_2D = true; 
+	}
 	
-Custom_Cell_Data::Custom_Cell_Data()
-{
-//	std::cout << __FUNCTION__ << "(default)" << std::endl; 
-	variables.resize(0); 
-	vector_variables.resize(0); 
+	// set domain parameters 
 	
-	name_to_index_map.clear(); 
-//	vector_name_to_index_map.clear();
+	// put any custom code to set non-homogeneous initial conditions or 
+	// extra Dirichlet nodes here. 
 	
-	return;
-}
-
-Custom_Cell_Data::Custom_Cell_Data( const Custom_Cell_Data& ccd )
-{
-//	std::cout << __FUNCTION__ << "(copy)" << std::endl; 
-	variables = ccd.variables; 
-	vector_variables = ccd.vector_variables; 
+	// initialize BioFVM 
 	
-	name_to_index_map= ccd.name_to_index_map; 
+	initialize_microenvironment(); 	
 	
 	return; 
 }
 
-int Custom_Cell_Data::add_variable( Variable& v )
+void setup_tissue( void )
 {
-	int n = variables.size(); 
-	variables.push_back( v ); 
-	name_to_index_map[ v.name ] = n; 
-	return n; 
+	// create some cells near the origin
+	
+	Cell* pC;
+
+	pC = create_cell(); 
+	pC->assign_position( 0.0, 0.0, 0.0 );
+
+	pC = create_cell(); 
+	pC->assign_position( -100, 0, 0.0 );
+	
+	pC = create_cell(); 
+	pC->assign_position( 0, 100, 0.0 );
+	
+	// now create a motile cell 
+	
+	pC = create_cell( get_cell_definition("motile tumor cell") ); 
+	pC->assign_position( 15.0, -18.0, 0.0 );
+	
+	return; 
 }
 
-int Custom_Cell_Data::add_variable( std::string name , std::string units , double value )
+std::vector<std::string> my_coloring_function( Cell* pCell )
 {
-	int n = variables.size(); 
-	variables.resize( n+1 ); 
-	variables[n].name = name; 
-	variables[n].units = units; 
-	variables[n].value = value; 
-	name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_variable( std::string name , double value )
-{
-	int n = variables.size(); 
-	variables.resize( n+1 ); 
-	variables[n].name = name; 
-	variables[n].units = "dimensionless"; 
-	variables[n].value = value; 
-	name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_vector_variable( Vector_Variable& v )
-{
-	int n = vector_variables.size(); 
-	vector_variables.push_back( v ); 
-//	vector_name_to_index_map[ v.name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_vector_variable( std::string name , std::string units , std::vector<double>& value )
-{
-	int n = vector_variables.size(); 
-	vector_variables.resize( n+1 ); 
-	vector_variables[n].name = name; 
-	vector_variables[n].units = units; 
-	vector_variables[n].value = value; 
-//	vector_name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_vector_variable( std::string name , std::vector<double>& value )
-{
-	int n = vector_variables.size(); 
-	vector_variables.resize( n+1 ); 
-	vector_variables[n].name = name; 
-	vector_variables[n].units = "dimensionless"; 
-	vector_variables[n].value = value; 
-//	vector_name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::find_variable_index( std::string name )
-{
-	// this should return -1 if not found, not zero 
-	auto out = name_to_index_map.find( name ); 
-	if( out != name_to_index_map.end() )
-	{ return out->second; }
-	return -1; 
-}
-
-/*
-int Custom_Cell_Data::find_vector_variable_index( std::string name )
-{
-	return vector_name_to_index_map[ name ]; 
-}
-*/
-
-int Custom_Cell_Data::find_vector_variable_index( std::string name )
-{
-	int n = 0; 
-	while( n < vector_variables.size() )
+	// start with flow cytometry coloring 
+	
+	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
+		
+	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
 	{
-		if( std::strcmp( vector_variables[n].name.c_str() , name.c_str() ) == 0 )
-		{ return n; } 
-		n++; 
+		 output[0] = "black"; 
+		 output[2] = "black"; 
 	}
 	
-	return -1; 
+	return output; 
 }
-
-
-double& Custom_Cell_Data::operator[](int i)
-{
-	return variables[i].value; 
-}
-
-double& Custom_Cell_Data::operator[]( std::string name )
-{
-	return variables[ name_to_index_map[name] ].value; 
-}
-
-std::ostream& operator<<(std::ostream& os, const Custom_Cell_Data& ccd)
-{
-	os << "Custom data (scalar): " << std::endl; 
-	for( int i=0 ; i < ccd.variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.variables[i] << std::endl; 
-	}
-
-	os << "Custom data (vector): " << std::endl; 
-	for( int i=0 ; i < ccd.vector_variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.vector_variables[i] << std::endl; 
-	}
-	
-	return os;
-}
-
-};

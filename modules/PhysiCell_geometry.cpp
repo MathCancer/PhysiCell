@@ -227,21 +227,33 @@ void draw_line( std::vector<double> start , std::vector<double> end , int cell_t
 
 void load_cells_csv( std::string filename )
 {
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	std::ifstream file( filename, std::ios::in );
+
+	std::string line;
+	while (std::getline(file, line))
+	{
+		std::vector<double> data;
+		csv_to_vector( line.c_str() , data ); 
+
+		if( data.size() != 4 )
+		{
+			std::cout << "Error! Importing cells from a CSV file expects each row to be x,y,z,typeID." << std::endl;
+			exit(-1);
+		}
+
+		std::vector<double> position = { data[0] , data[1] , data[2] };
+
+		int my_type = (int) data[3]; 
+		Cell_Definition* pCD = find_cell_definition( my_type ); 
+
+		std::cout << "Creating " << pCD->name << " (type=" << pCD->type << ") at " << position << std::endl; 
+
+		Cell* pCell = create_cell( *pCD ); 
+		pCell->assign_position( position ); 
+
+	}
+
+	file.close(); 	
 }
 
 
