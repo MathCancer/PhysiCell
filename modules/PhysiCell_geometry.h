@@ -72,16 +72,21 @@
 #include <vector>
 
 #include "../core/PhysiCell.h"
-// #include "../BioFVM/BioFVM_utilities.h"
+#include "./PhysiCell_settings.h"
 
 
 namespace PhysiCell
 {
 // loaders 
 	
-void load_cells_csv( std::string filename ); 
+void load_cells_csv( std::string filename ); // done 
 void load_cells_mat( std::string filename ); 
-	
+void load_cells_physicell( std::string filename ); 
+
+bool load_cells_from_pugixml( pugi::xml_node root ); 
+bool load_cells_from_pugixml( void ); // load cells based on default config XML root 
+
+
 //	
 // 2D functions 
 //

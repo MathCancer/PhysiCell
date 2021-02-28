@@ -359,7 +359,10 @@
 	<initial_conditions>
 		<!-- supported types: CSV -->
 		<!-- future: matlab, possible a sort of scene format (circle, annulus, rectangle, ... )-->
-		<cell_positions type="CSV" enabled="true">cells.csv</cell_positions>
+		<cell_positions type="CSV" enabled="true">
+			<folder>config</folder>  <!-- use . for root -->
+			<filename>cells.csv</filename> 
+		</cell_positions>
 
 		<!-- future: substrates -->
 
