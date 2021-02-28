@@ -228,6 +228,11 @@ void draw_line( std::vector<double> start , std::vector<double> end , int cell_t
 void load_cells_csv( std::string filename )
 {
 	std::ifstream file( filename, std::ios::in );
+	if( !file )
+	{ 
+		std::cout << "Error: " << filename << " not found during cell loading. Quitting." << std::endl; 
+		exit(-1);
+	}
 
 	std::string line;
 	while (std::getline(file, line))
@@ -263,11 +268,17 @@ bool load_cells_from_pugixml( pugi::xml_node root )
 {
 	pugi::xml_node node = root.child( "initial_conditions" ); 
 	if( !node )
-	{ return false; }
+	{ 
+		std::cout << "Warning: XML-based cell positions has wrong formating. Ignoring!" << std::endl; 
+		return false;
+	}
 
 	node = node.child( "cell_positions" ); 
 	if( !node )
-	{ return false; }
+	{
+		std::cout << "Warning: XML-based cell positions has wrong formating. Ignoring!" << std::endl; 
+		 return false;
+	}
 
 	// enabled? 
 	if( node.attribute("enabled").as_bool() == false )
@@ -280,7 +291,6 @@ bool load_cells_from_pugixml( pugi::xml_node root )
 	std::string input_filename = folder + "/" + filename; 
 
 	std::string filetype = node.attribute("type").value() ; 
-
 
 	// what kind? 
 	if( filetype == "csv" || filetype == "CSV" )
