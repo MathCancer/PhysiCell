@@ -170,23 +170,48 @@ void setup_tissue( void )
 	
 	Cell* pC;
 	
-	// place default cells 
-	
-	for( int k=0; k < cell_definitions_by_index.size() ; k++ )
+	// place farmers 
+	Cell_Definition* pCD = find_cell_definition( "farmer"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_farmers") ; n++ )
 	{
-		Cell_Definition* pCD = cell_definitions_by_index[k]; 
-		std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
-		for( int n = 0 ; n < parameters.ints("number_of_cells") ; n++ )
-		{
-			std::vector<double> position = {0,0,0}; 
-			position[0] = Xmin + UniformRandom()*Xrange; 
-			position[1] = Ymin + UniformRandom()*Yrange; 
-			position[2] = Zmin + UniformRandom()*Zrange; 
-			
-			pC = create_cell( *pCD ); 
-			pC->assign_position( position );
-		}
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
 	}
+
+	// place prey 
+	pCD = find_cell_definition( "prey"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_prey") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
+	// place predators 
+	pCD = find_cell_definition( "predator"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_predators") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
 /*	
 	std::cout << std::endl; 
 	

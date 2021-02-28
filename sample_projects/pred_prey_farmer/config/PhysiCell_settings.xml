@@ -411,7 +411,7 @@
 				<motility>
 					<speed units="micron/min">0.5</speed>
 					<persistence_time units="min">2.5</persistence_time>
-					<migration_bias units="dimensionless">0.7</migration_bias>
+					<migration_bias units="dimensionless">0.5</migration_bias>
 
 					<options>
 						<enabled>true</enabled>
@@ -419,14 +419,14 @@
 						<chemotaxis>
 							<enabled>false</enabled>
 							<substrate>prey signal</substrate>
-							<direction>1</direction>
+							<direction>-1</direction>
 						</chemotaxis>
 					</options>
 				</motility>
 			</phenotype>
 			<custom_data>  
 				<energy units="dimensionless">1.0</energy>
-				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_use_rate units="1/min">0.1</energy_use_rate>
 				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
 				
 				<predator_weight units="dimensionless">-2</predator_weight>
@@ -442,8 +442,10 @@
 		<!-- example parameters from the template --> 
 		
 		<div_initialization type="divider" description="---Initialization settings---"/>
-		
-		<number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">15</number_of_cells>
+
+		<number_of_farmers type="int" units="none" description="initial number of farmer cells">15</number_of_farmers>
+		<number_of_prey type="int" units="none" description="initial number of prey cells">50</number_of_prey>
+		<number_of_predators type="int" units="none" description="initial number of predators cells">20</number_of_predators>
 	</user_parameters>
 	
 </PhysiCell_settings>
