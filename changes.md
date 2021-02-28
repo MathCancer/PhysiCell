@@ -10,10 +10,7 @@ This release formally introduces Cell Definitions: a way to fully create cell ty
 
 This release also introduces contact functions: a way to specify cell-cell contact interactions for any cells that you attach (using new, standardized attach and detach functions). Look at the `cancer-biorobots` and `biorobots` sample projects for examples. 
 
-The release also re
-
-
- introduces bug fixes (particularly the placement of daughter cells after division), introduces new functions for uniformly random sampling of the unit circle and unit sphere, and refines the beta implementation of XML-based cell definitions. 
+The release also add a number of features to improve the ease of code use: a copy of the XML configuration  file is now saved in your output directory to help keep track of what parameters and settings generated the data. We will auto-generate a `legend.svg` file (also in output) based on your coloring function and cell defintions. The sample projects' Makefiles now include new rules to create animated GIFs, convert SVG to JPG, create a MP4 movie, and even auto-download the latest version of PhysiCell to update an existing project. A key new feature is the ability to pre-specify cell locations in a CSV file. The template projects will auto-parse this list if enabled to place cells at the start of the simulation.  
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
@@ -62,7 +59,7 @@ This will add an additional Hookean spring attraction to cells in `state.attache
 + Users can now pre-specify cell positions by creating a CSV file: 
 ++ Each row corresponds to a cell:     x,y,z,typeID
 ++ TypeID is the integer index of a `Cell_Definition` (ideally defined in XML!)
-++ Call the function `load_cells_csv( std::string filename )` to load these possitions and place the cells in corresponding positions. Ideally, cally this function at the end of `setup_tissue()`. The template projects will call this function automatically if a cell CSV file is specified in the `initialization` section of the XML configuration file. 
+++ Call the function `load_cells_csv( std::string filename )` to load these possitions and place the cells in corresponding positions. Ideally, cally this function at the end of `setup_tissue()`. The template projects will call this function automatically if a cell CSV file is specified in the `initial_conditions` section of the XML configuration file. 
 
 ### Minor new features and changes: 
 
