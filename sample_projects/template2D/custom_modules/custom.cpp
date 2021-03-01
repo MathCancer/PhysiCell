@@ -160,6 +160,8 @@ void setup_tissue( void )
 {
 	// create some cells near the origin
 	
+	/*
+		// these are now in cells.csv 
 	Cell* pC;
 
 	pC = create_cell(); 
@@ -175,6 +177,9 @@ void setup_tissue( void )
 	
 	pC = create_cell( get_cell_definition("motile tumor cell") ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
+	*/
+	
+	load_cells_from_pugixml(); 
 	
 	return; 
 }

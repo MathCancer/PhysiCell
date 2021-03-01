@@ -356,6 +356,13 @@
 		
 	</cell_definitions>
 	
+	<initial_conditions>
+		<cell_positions type="csv" enabled="true">
+			<folder>./config</folder>
+			<filename>cells.csv</filename>
+		</cell_positions>
+	</initial_conditions>
+	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 

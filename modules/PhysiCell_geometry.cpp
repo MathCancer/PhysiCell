@@ -261,9 +261,6 @@ void load_cells_csv( std::string filename )
 	file.close(); 	
 }
 
-// void load_cells_from_pugixml( physicell_config_root )
-// {
-
 bool load_cells_from_pugixml( pugi::xml_node root )
 {
 	pugi::xml_node node = root.child( "initial_conditions" ); 
