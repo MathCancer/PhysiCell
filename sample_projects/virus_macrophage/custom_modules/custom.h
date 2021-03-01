@@ -74,16 +74,10 @@ using namespace PhysiCell;
 void epithelial_cell_phenotype( Cell* pCell , Phenotype& phenotype , double dt ); 
 void macrophage_cell_phenotype( Cell* pCell , Phenotype& phenotype , double dt ); 
 
-// any additional cell types (beyond cell_defaults)
-
-extern Cell_Definition macrophage; 
-
 // custom cell phenotype functions could go here 
 
 void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt );
 void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt );
-
-void macrophage_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt );
 
 // setup functions to help us along 
 
@@ -100,3 +94,4 @@ std::vector<std::string> viral_coloring_function( Cell* pCell );
 
 std::vector<double> integrate_total_substrates( void ); 
 
+void avoid_boundaries( Cell* pCell , Phenotype& phenotype, double dt ); 

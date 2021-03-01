@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -67,126 +67,72 @@
 
 #include "./custom.h"
 
-// declare cell definitions here 
-
-Cell_Definition macrophage; 
-
 void create_cell_types( void )
 {
-	// use the same random seed so that future experiments have the 
-	// same initial histogram of oncoprotein, even if threading means 
-	// that future division and other events are still not identical 
-	// for all runs 
+	// set the random seed 
+	SeedRandom( parameters.ints("random_seed") );  
 	
-	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
-
-	// housekeeping 
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
 	
-	initialize_default_cell_definition();
+	initialize_default_cell_definition(); 
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 
-	// Name the default cell type 
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
+
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = NULL; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
 	
-	cell_defaults.type = 0; 
-	cell_defaults.name = "epithelial cell"; 
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 
-	// set default cell cycle model 
-
-	cell_defaults.functions.cycle_model = flow_cytometry_separated_cycle_model; 
-
-	// set default_cell_functions; 
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
 	
-	cell_defaults.functions.update_phenotype = epithelial_function;
-
-	// needed for a 2-D simulation: 
+	initialize_cell_definitions_from_pugixml(); 
 	
-	/* grab code from heterogeneity */ 
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
 	
-	cell_defaults.functions.set_orientation = up_orientation; 
-	cell_defaults.phenotype.geometry.polarity = 1.0;
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-
-	// make sure the defaults are self-consistent. 
-	
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
-	cell_defaults.phenotype.molecular.sync_to_microenvironment( &microenvironment );
-	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
-
-	// set the rate terms in the default phenotype 
-
 	// first find index for a few key variables. 
-	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
-	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int virus_index = microenvironment.find_density_index( "virus" ); 
-
-	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
-	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
-
-	// initially no death 
-	cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; 
-	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
-
-	// initially no birth 
-	cell_defaults.phenotype.cycle.data.transition_rate(G0G1_index, S_index ) = 0.0 ; 
-
-	// not motile 
-	cell_defaults.phenotype.motility.is_motile = false; 
-
-	// set virus uptake / secretion parameters for the default (epithelial) cell type 
-	cell_defaults.phenotype.secretion.uptake_rates[virus_index] = 
-		parameters.doubles("viral_internalization_rate"); 
-	cell_defaults.phenotype.secretion.secretion_rates[virus_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[virus_index] = 0; 
-
-	// add custom data here, if any 
 	
-	// release virus at death or when eaten 
-	cell_defaults.phenotype.molecular.fraction_released_at_death[ virus_index ]= 1.0; 
-	cell_defaults.phenotype.molecular.fraction_transferred_when_ingested[ virus_index ]= 1.0; 
-
-	// Now, let's define another cell type. 
-	// It's best to just copy the default and modify it. 
-	
-	macrophage = cell_defaults; 
-	macrophage.functions.update_phenotype = macrophage_function; 
-	macrophage.functions.update_migration_bias = macrophage_chemotaxis; 
-	macrophage.phenotype.sync_to_functions( macrophage.functions ); 
-
-	// make this cell type randomly motile, less adhesive, greater survival, 
-	// and less proliferative 
-	
-	macrophage.type = 1; 
-	macrophage.name = "macrophage"; 
-
-	// make sure the new cell type has its own reference phenotype
-	
-	macrophage.parameters.pReference_live_phenotype = &( macrophage.phenotype ); 
-
-	// macrophages do not release virus at death 
-	macrophage.phenotype.molecular.fraction_released_at_death[ virus_index ]= 0.0; 
+	Cell_Definition* pEpithelial = find_cell_definition( "epithelial cell" ); 
+	Cell_Definition* pMacrophage = find_cell_definition( "macrophage" ); 
 		
-	// macrophages don't get eaten 
-	macrophage.phenotype.molecular.fraction_transferred_when_ingested[ virus_index ]= 0.0; 
-
-	// enable random motility 
-	macrophage.phenotype.motility.is_motile = true; 
-	macrophage.phenotype.motility.persistence_time = parameters.doubles( "macrophage_persistence_time" );
-	macrophage.phenotype.motility.migration_speed = parameters.doubles( "macrophage_migration_speed" ); 
-	macrophage.phenotype.motility.migration_bias = 0.0;// completely random 
-
-	// Set cell-cell adhesion relative to other cells 
-	macrophage.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "macrophage_relative_adhesion" ); 
+	pEpithelial->functions.update_phenotype = epithelial_function;
 	
-	// no birth 
-	macrophage.phenotype.cycle.data.transition_rate(G0G1_index, S_index ) = 0.0 ; 
+	pEpithelial->phenotype.molecular.fraction_released_at_death[ virus_index ] = 
+		parameters.doubles("fraction_released_at_death"); 
+	pEpithelial->phenotype.molecular.fraction_transferred_when_ingested[ virus_index ] = 
+		parameters.doubles("fraction_transferred_when_ingested"); 
+		
+	pMacrophage->phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "macrophage_relative_adhesion" ); 
+	pMacrophage->phenotype.molecular.fraction_released_at_death[ virus_index ]= 0.0; 
+	pMacrophage->phenotype.molecular.fraction_transferred_when_ingested[ virus_index ]= 0.0; 
+		
+	pMacrophage->functions.update_phenotype = macrophage_function; 
+	pMacrophage->functions.custom_cell_rule = avoid_boundaries;
 	
-	// macrophages do not uptake viral particles 
-	macrophage.phenotype.secretion.uptake_rates[virus_index] = 
-		parameters.doubles("viral_internalization_rate"); 
+	// pMacrophage->phenotype.sync_to_functions( macrophage.functions ); 
+	
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
 		
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
-
+	
 	return; 
 }
 
@@ -194,52 +140,8 @@ void setup_microenvironment( void )
 {
 	// set domain parameters 
 	
-/* now this is in XML 
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
-	default_microenvironment_options.simulate_2D = true; 
-*/
-	// make sure to override and go back to 2D 
-	if( default_microenvironment_options.simulate_2D == false )
-	{
-		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
-		default_microenvironment_options.simulate_2D = true; 
-	}
-	
-/*
-	// in XML since version 1.6.0
-	
-	// no gradients need for this example 
-
-	default_microenvironment_options.calculate_gradients = false; 
-	
-	// do not use oxygen as first substrate 
-	default_microenvironment_options.use_oxygen_as_first_field = false; 
-	
-	// set properties 
-	microenvironment.set_density( 0 , "virus", "particles/micron^3" ); 
-	microenvironment.diffusion_coefficients[0] = parameters.doubles("viral_diffusion_coefficient"); 
-	microenvironment.decay_rates[0] = 0; 
-	
-	// set Dirichlet conditions 
-
-	default_microenvironment_options.outer_Dirichlet_conditions = false;
-	
-	// track internalized total substrates
-	
-	
-	// if there are more substrates, resize accordingly 
-	std::vector<double> bc_vector( 1 , 0.0 ); // 5% o2
-	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
-	
-	default_microenvironment_options.initial_condition_vector = { 0.0 }; 
-	// 
-*/
-
-	// override BioFVM setup with user parameters 
-
-	int virus_ID = microenvironment.find_density_index( "virus" ); 
-	microenvironment.diffusion_coefficients[virus_ID] = parameters.doubles("viral_diffusion_coefficient"); 
+	// put any custom code to set non-homogeneous initial conditions or 
+	// extra Dirichlet nodes here. 
 	
 	// initialize BioFVM 
 	
@@ -262,34 +164,37 @@ void setup_tissue( void )
 	Cell* pC;
 	
 	int number_of_infected_cells = parameters.ints( "number_of_infected_cells" ); 
+	
+	Cell_Definition* pCD = find_cell_definition( "epithelial cell" ); 
 
 	for( int n = 0 ; n < number_of_infected_cells; n++ )
 	{
-		pC = create_cell(); 
+		pC = create_cell(*pCD); 
 		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
 		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
 		pC->assign_position( x,y, 0.0 );
 		pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 1; 
 	}
 
-	for( int n = number_of_infected_cells ; n < 500 ; n++ )
+	int number_of_uninfected_cells = parameters.ints( "number_of_uninfected_cells" ); 
+
+	for( int n = 0 ; n < number_of_uninfected_cells ; n++ )
 	{
 		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
 		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
-		pC = create_cell(); 
+		pC = create_cell(*pCD); 
 		pC->assign_position( x,y, 0.0 );
-//		pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 0; 
 	}
-	// now create a motile cell 
+	
+	pCD = find_cell_definition( "macrophage" );
 	
 	for( int n= 0 ; n < parameters.ints( "number_of_macrophages" ); n++ )
 	{
 		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
 		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
-		pC = create_cell( macrophage ); 
+		pC = create_cell( *pCD ); 
 		pC->assign_position( x,y, 0.0 );
 	}
-	
 	
 	return; 
 }
@@ -316,9 +221,11 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 	std::vector<std::string> output = { "magenta" , "black" , "magenta", "black" }; 
 	static int nVirus = microenvironment.find_density_index( "virus" ); 
 	
-	static double min_virus = parameters.doubles( "min_virion_count" );
-	static double max_virus = parameters.doubles( "burst_virion_count" ); 
+	static double min_virus = pCell->custom_data[ "min_virion_count" ];
+	static double max_virus = pCell->custom_data[ "burst_virion_count" ]; 
 	static double denominator = max_virus - min_virus + 1e-15; 
+	
+	static Cell_Definition* pMacrophage = find_cell_definition( "macrophage" ); 
 				
 	// dead cells 
 	if( pCell->phenotype.death.dead == true )
@@ -328,7 +235,7 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 		 return output; 
 	}
 	
-	if( pCell->type != macrophage.type )
+	if( pCell->type != pMacrophage->type )
 	{
 		output[0] = "blue"; 
 		output[2] = "darkblue"; 
@@ -392,10 +299,12 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	static int nVirus = microenvironment.find_density_index( "virus" ); 
 	
+	static Cell_Definition* pMacrophage = find_cell_definition( "macrophage" ); 
+	
 	// digest virus particles inside me 
 	
 	static double implicit_Euler_constant = 
-		(1.0 + dt * parameters.doubles("virus_digestion_rate") );
+		(1.0 + dt * pCell->custom_data["virus_digestion_rate"] );
 	phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
 	
 	// check for contact with a cell
@@ -408,7 +317,7 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 	{
 		pTestCell = neighbors[n]; 
 		// if it is not me and not a macrophage 
-		if( pTestCell != pCell && pTestCell->type != macrophage.type )
+		if( pTestCell != pCell && pTestCell->type != pMacrophage->type )
 		{
 			// calculate distance to the cell 
 			std::vector<double> displacement = pTestCell->position;
@@ -423,7 +332,7 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 			// if high viral load, eat it. 
 		
 			if( pTestCell->phenotype.molecular.internalized_total_substrates[nVirus] 
-				> parameters.doubles("min_virion_detection_threshold") &&
+				> pCell->custom_data["min_virion_detection_threshold"] &&
 				distance < max_distance )
 			{
 				std::cout << "\t\tnom nom nom" << std::endl; 
@@ -445,7 +354,7 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 	// compare against viral load. Should I commit apoptosis? 
 	
 	double virus = phenotype.molecular.internalized_total_substrates[nVirus]; 
-	if( virus >= parameters.doubles("burst_virion_count") )
+	if( virus >= pCell->custom_data["burst_virion_count"] )
 	{
 		std::cout << "\t\tburst!" << std::endl; 
 		pCell->lyse_cell(); // start_death( apoptosis_model_index );
@@ -455,14 +364,14 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// replicate virus particles inside me 
 	
-	if( virus >= parameters.doubles("min_virion_count") ) 
+	if( virus >= pCell->custom_data["min_virion_count"] ) 
 	{
-		double new_virus = parameters.doubles( "viral_replication_rate" ); 
+		double new_virus = pCell->custom_data["viral_replication_rate"]; 
 		new_virus *= dt;
 		phenotype.molecular.internalized_total_substrates[nVirus] += new_virus; 
 	}
 //	static double implicit_Euler_constant = 
-//		(1.0 + dt * parameters.doubles("virus_digestion_rate") );
+//		(1.0 + dt * pCell->custom_data["virus_digestion_rate"] );
 //	phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
 	
 	
@@ -471,21 +380,6 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 	return; 
 } 
-
-void macrophage_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	static double bias = parameters.doubles("macrophage_migration_bias");
-	static int nVirus = microenvironment.find_density_index( "virus" ); 
-	
-	phenotype.motility.migration_bias = bias; 
-	
-	phenotype.motility.migration_bias_direction = pCell->nearest_gradient( nVirus ); 
-	double denominator =  norm( phenotype.motility.migration_bias_direction ) + 1e-17; 
-	
-	phenotype.motility.migration_bias_direction /= denominator; 
-	
-	return; 
-}
 
 std::vector<double> integrate_total_substrates( void )
 {
@@ -508,3 +402,43 @@ std::vector<double> integrate_total_substrates( void )
 	
 	return out; 
 }
+
+void avoid_boundaries( Cell* pCell )
+{
+	// add velocity to steer clear of the boundaries 
+	static double Xmin = microenvironment.mesh.bounding_box[0]; 
+	static double Ymin = microenvironment.mesh.bounding_box[1]; 
+	static double Zmin = microenvironment.mesh.bounding_box[2]; 
+
+	static double Xmax = microenvironment.mesh.bounding_box[3]; 
+	static double Ymax = microenvironment.mesh.bounding_box[4]; 
+	static double Zmax = microenvironment.mesh.bounding_box[5]; 
+	
+	static double avoid_zone = 25; 
+	static double avoid_speed = -0.5; // must be negative 
+	
+	// near edge: 
+	bool near_edge = false; 
+	if( pCell->position[0] < Xmin + avoid_zone || pCell->position[0] > Xmax - avoid_zone )
+	{ near_edge = true; } 
+	
+	if( pCell->position[1] < Ymin + avoid_zone || pCell->position[1] > Ymax - avoid_zone )
+	{ near_edge = true; } 
+	
+	if( default_microenvironment_options.simulate_2D == false )
+	{
+		if( pCell->position[2] < Zmin + avoid_zone || pCell->position[2] > Zmax - avoid_zone )
+		{ near_edge = true; } 
+	}
+	
+	if( near_edge )
+	{
+		pCell->velocity = pCell->position; // move towards origin 
+		pCell->velocity *= avoid_speed; // move towards origin 
+	}
+	
+	return; 
+}
+
+void avoid_boundaries( Cell* pCell , Phenotype& phenotype, double dt )
+{ return avoid_boundaries( pCell ); } 
