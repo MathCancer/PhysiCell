@@ -139,15 +139,6 @@ virus-macrophage-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/virus_macrophage/config/* ./config/
 	
-beta-testing:
-	cp ./sample_projects/beta_testing/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/beta_testing/main-beta.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/beta_testing/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/beta_testing/config/* ./config/
-	
 pred-prey-farmer:
 	cp ./sample_projects/pred_prey_farmer/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
@@ -289,9 +280,6 @@ clean:
 	rm -f $(PROGRAM_NAME)*
 	
 data-cleanup:
-	rm -f *.mat
-	rm -f *.xml
-	rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
