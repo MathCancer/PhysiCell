@@ -249,12 +249,19 @@ void load_cells_csv( std::string filename )
 		std::vector<double> position = { data[0] , data[1] , data[2] };
 
 		int my_type = (int) data[3]; 
-		Cell_Definition* pCD = find_cell_definition( my_type ); 
-
-		std::cout << "Creating " << pCD->name << " (type=" << pCD->type << ") at " << position << std::endl; 
-
-		Cell* pCell = create_cell( *pCD ); 
-		pCell->assign_position( position ); 
+		Cell_Definition* pCD = find_cell_definition( my_type );
+		if( pCD != NULL )
+		{
+			std::cout << "Creating " << pCD->name << " (type=" << pCD->type << ") at " 
+			<< position << std::endl; 
+			Cell* pCell = create_cell( *pCD ); 
+			pCell->assign_position( position ); 
+		}
+		else
+		{
+			std::cout << "Warning! No cell definition found for index " << my_type << "!" << std::endl
+			<< "\tIgnoring cell in " << filename << " at position " << position << std::endl; 
+		}
 
 	}
 

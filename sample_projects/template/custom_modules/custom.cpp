@@ -154,8 +154,6 @@ void setup_tissue( void )
 	
 	Cell* pC;
 	
-	// place default cells 
-	
 	for( int k=0; k < cell_definitions_by_index.size() ; k++ )
 	{
 		Cell_Definition* pCD = cell_definitions_by_index[k]; 
@@ -172,6 +170,9 @@ void setup_tissue( void )
 		}
 	}
 	std::cout << std::endl; 
+	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 	
 	
 	return; 
 }
