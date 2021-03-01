@@ -110,8 +110,6 @@ void create_cargo_cell_type( void )
 	
 	// set custom data values 
 	
-	
-	
 	return;
 }	
 
@@ -174,7 +172,6 @@ void create_cell_types( void )
 	int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
 	int attract_ID = microenvironment.find_density_index( "chemoattractant" ); // 1
 	int therapy_ID = microenvironment.find_density_index( "therapeutic" ); // 2	
-
 	
 	// set the default cell type to o2-based proliferation with the effect of the 
 	// on oncoprotein, and secretion of the immunostimulatory factor 
@@ -304,6 +301,9 @@ void setup_tissue( void )
 		y += cell_spacing * sqrt(3.0)/2.0; 
 		n++; 
 	}
+	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 		
 	
 	return; 
 }

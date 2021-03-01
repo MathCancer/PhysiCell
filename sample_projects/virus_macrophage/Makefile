@@ -153,6 +153,8 @@ reset:
 	touch ALL_CITATIONS.txt 
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
+	touch ./config/empty.csv
+	rm -f ./config/*.csv 
 	
 clean:
 	rm -f *.o
@@ -197,14 +199,20 @@ FRAMERATE := 24
 OUTPUT := output
 
 jpeg: 
-	magick mogrify -format jpg $(OUTPUT)/s*.svg
+	@magick identify -format "%h" $(OUTPUT)/initial.svg >> __H.txt 
+	@magick identify -format "%w" $(OUTPUT)/initial.svg >> __W.txt 
+	@expr 2 \* \( $$(grep . __H.txt) / 2 \) >> __H1.txt 
+	@expr 2 \* \( $$(grep . __W.txt) / 2 \) >> __W1.txt 
+	@echo "$$(grep . __W1.txt)!x$$(grep . __H1.txt)!" >> __resize.txt 
+	@magick mogrify -format jpg -resize $$(grep . __resize.txt) $(OUTPUT)/s*.svg
+	rm -f __H*.txt __W*.txt __resize.txt 
 	
 gif: 
-	magick convert $(OUTPUT)/s*.svg out.gif 
+	magick convert $(OUTPUT)/s*.svg $(OUTPUT)/out.gif 
 	 
 movie:
-	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none out.mp4
-
+	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/out.mp4
+	
 # upgrade rules 
 
 SOURCE := PhysiCell_upgrade.zip 

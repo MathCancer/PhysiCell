@@ -275,6 +275,13 @@
 		</cell_definition>
 	</cell_definitions>	
 	
+	<initial_conditions>
+		<cell_positions type="csv" enabled="false">
+			<folder>./config</folder>
+			<filename>cells.csv</filename>
+		</cell_positions>
+	</initial_conditions>		
+	
 	<user_parameters>
 		<tumor_radius type="double" units="micron">250.0</tumor_radius>
 		<oncoprotein_mean type="double" units="dimensionless">1.0</oncoprotein_mean>

@@ -234,6 +234,9 @@ void setup_tissue( void )
 	std::cout << "standard deviation: " << standard_deviation << std::endl; 
 	std::cout << "[min max]: [" << min << " " << max << "]" << std::endl << std::endl; 
 	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 		
+	
 	return; 
 }
 

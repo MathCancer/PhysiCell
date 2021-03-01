@@ -376,16 +376,20 @@
 			</phenotype>
 		</cell_definition> 
 
-
 	</cell_definitions>	
 	
-	
+	<initial_conditions>
+		<cell_positions type="csv" enabled="false">
+			<folder>./config</folder>
+			<filename>cells.csv</filename>
+		</cell_positions>
+	</initial_conditions>		
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		
 		<!-- for main --> 
-		<therapy_activation_time type="double" units="min">10080</therapy_activation_time> 
+		<therapy_activation_time type="double" units="min">10080</therapy_activation_time>
 			<!-- activate in 7 days --> 
 		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
 		
