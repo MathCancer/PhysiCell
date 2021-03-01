@@ -2,7 +2,7 @@
 
 **Version:** 1.8.0
 
-**Release date:** 28 February 2021
+**Release date:** 1 March 2021
 
 ## Release summary: 
 
@@ -53,8 +53,9 @@ This will add an additional Hookean spring attraction to cells in `state.attache
 ++ template2D
 ++ template3D
 ++ template
-++ biorobots
-++ 
+++ biorobots-sample
+++ cancer-biorobots-sample
+++ heterogeneity-sample
 
 + Users can now pre-specify cell positions by creating a CSV file: 
 ++ Each row corresponds to a cell:     x,y,z,typeID
@@ -75,7 +76,7 @@ This will add an additional Hookean spring attraction to cells in `state.attache
 
 + Revised template project to a barebones minimum. 
 
-
++ Removed beta-testing sample project 
 
 + Legend  
 
