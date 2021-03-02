@@ -377,6 +377,9 @@ void setup_tissue( void )
 	std::cout << "done!" << std::endl; 
 	// make a plot 
 	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 		
+	
 	PhysiCell_SVG_options.length_bar = 200; 
 	SVG_plot( "initial.svg" , microenvironment, 0.0 , 0.0 , robot_coloring_function );	
 	

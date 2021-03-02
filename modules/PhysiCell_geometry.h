@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,22 +65,77 @@
 ###############################################################################
 */
 
+#ifndef __PhysiCell_geometry_h__
+#define __PhysiCell_geometry_h__
+
+#include <string>
+#include <vector>
+
 #include "../core/PhysiCell.h"
-#include "../modules/PhysiCell_standard_modules.h" 
+#include "./PhysiCell_settings.h"
 
-using namespace BioFVM; 
-using namespace PhysiCell;
 
-// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
-void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
+namespace PhysiCell
+{
+// loaders 
+	
+void load_cells_csv( std::string filename ); // done 
+void load_cells_mat( std::string filename ); 
+void load_cells_physicell( std::string filename ); 
 
-// set the tumor cell properties, then call the function 
-// to set up the tumor cells 
-void create_cell_types( void );
+bool load_cells_from_pugixml( pugi::xml_node root ); 
+bool load_cells_from_pugixml( void ); // load cells based on default config XML root 
 
-void setup_tissue(); 
 
-// set up the microenvironment to include the immunostimulatory factor 
-void setup_microenvironment( void );  // done 
+//	
+// 2D functions 
+//
+void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
+void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD ); 
 
-std::vector<std::string> heterogeneity_coloring_function( Cell* );
+void fill_circle( std::vector<double> center , double radius , int cell_type , double compression );
+void fill_circle( std::vector<double> center , double radius , int cell_type ); 
+
+
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD , double compression ); 
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD ); 
+
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type , double compression );
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type ); 
+
+
+// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
+void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
+void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD ); 
+
+void fill_rectangle( std::vector<double> bounds , int cell_type , double compression );  
+void fill_rectangle( std::vector<double> bounds , int cell_type ); 
+
+
+//
+// 3D functions
+//
+void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
+void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD ); 
+
+void fill_sphere( std::vector<double> center , double radius , int cell_type , double compression ); 
+void fill_sphere( std::vector<double> center , double radius , int cell_type ); 
+
+// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
+void fill_box( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
+void fill_box( std::vector<double> bounds , Cell_Definition* pCD ); 
+
+void fill_box( std::vector<double> bounds , int cell_type , double compression ); 
+void fill_box( std::vector<double> bounds , int cell_type ); 
+
+void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD , double compression ); 
+void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD ); 
+
+void draw_line( std::vector<double> start , std::vector<double> end , int cell_type , double compression ); 
+void draw_line( std::vector<double> start , std::vector<double> end , int cell_type ); 
+
+
+
+};
+
+#endif

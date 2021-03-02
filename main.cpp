@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -72,14 +72,13 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
-#include <string> 
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
 // custom user modules 
 
-#include "./custom_modules/heterogeneity.h" 
+#include "./custom_modules/cancer_immune_3D.h" 
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -89,13 +88,23 @@ int main( int argc, char* argv[] )
 	// load and parse settings file(s)
 	
 	bool XML_status = false; 
+	char copy_command [1024]; 
 	if( argc > 1 )
-	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
+	{
+		XML_status = load_PhysiCell_config_file( argv[1] ); 
+		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+	}
 	else
-	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	{
+		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
+		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
+	}
 	if( !XML_status )
 	{ exit(-1); }
-
+	
+	// copy config file to output directry 
+	system( copy_command ); 
+	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
@@ -119,6 +128,9 @@ int main( int argc, char* argv[] )
 	setup_tissue();
 	
 	/* Users typically start modifying here. START USERMODS */ 
+
+	double immune_activation_time = 
+		parameters.doubles("immune_activation_time"); // 60 * 24 * 14; // activate immune response at 14 days 
 	
 	/* Users typically stop modifying here. END USERMODS */ 
 	
@@ -130,7 +142,7 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_cell_data_as_custom_matlab( true );
 	
 	// save a simulation snapshot 
-	
+
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
@@ -142,7 +154,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = heterogeneity_coloring_function;
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = cancer_immune_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
@@ -169,6 +181,23 @@ int main( int argc, char* argv[] )
 	{	
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
 		{
+			static bool immune_cells_introduced = false; 
+			if( PhysiCell_globals.current_time > immune_activation_time - 0.01*diffusion_dt && immune_cells_introduced == false )
+			{
+				std::cout << "Therapy activated!" << std::endl << std::endl; 
+				immune_cells_introduced = true; 
+				
+				PhysiCell_settings.full_save_interval = 
+					parameters.doubles("save_interval_after_therapy_start"); 
+				PhysiCell_settings.SVG_save_interval = 
+					parameters.doubles("SVG_interval_after_therapy_start"); 
+				
+				PhysiCell_globals.next_full_save_time = PhysiCell_globals.current_time; 
+				PhysiCell_globals.next_SVG_save_time = PhysiCell_globals.current_time; 
+				
+				introduce_immune_cells();
+			} 
+
 			// save data if it's time. 
 			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
 			{
@@ -204,6 +233,8 @@ int main( int argc, char* argv[] )
 			
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
+			// if( default_microenvironment_options.calculate_gradients )
+			// { microenvironment.compute_all_gradient_vectors(); }
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
@@ -229,11 +260,6 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-	
-	// timer 
-	
-	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
-	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
 
 	return 0; 
 }

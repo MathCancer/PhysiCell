@@ -80,6 +80,7 @@ void create_cell_types( void )
 	*/ 
 	
 	initialize_default_cell_definition(); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -154,8 +155,6 @@ void setup_tissue( void )
 	
 	Cell* pC;
 	
-	// place default cells 
-	
 	for( int k=0; k < cell_definitions_by_index.size() ; k++ )
 	{
 		Cell_Definition* pCD = cell_definitions_by_index[k]; 
@@ -172,6 +171,9 @@ void setup_tissue( void )
 		}
 	}
 	std::cout << std::endl; 
+	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 	
 	
 	return; 
 }

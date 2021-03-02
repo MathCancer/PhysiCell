@@ -721,14 +721,10 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 	
 	// get rid of this temp cell at the earliest opportunity. 
 	// make it harmless for now 
-	pCell->assign_position( -9e99 , -9e99, -9e99 ); 
+	pCell->assign_position( 0,0,0 ); 
 	pCell->turn_off_reactions(0.0); 
-	pCell->is_active = false; 
 	pCell->set_total_volume( 0.0 ); 
-	pCell->is_movable = false; 
-	pCell->is_out_of_domain = true; 
 	pCell->start_death(0); 
-	
  	pCell->phenotype.cycle.data.exit_rate(0) = 9e99; 
 	
 	Write_SVG_end( os ); 

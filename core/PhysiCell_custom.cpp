@@ -197,8 +197,6 @@ int Custom_Cell_Data::find_variable_index( std::string name )
 	if( out != name_to_index_map.end() )
 	{ return out->second; }
 	return -1; 
-	
-	return name_to_index_map[ name ]; 
 }
 
 /*

@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -66,93 +64,55 @@
 #                                                                             #
 ###############################################################################
 */
---> 
 
-<!--
-<user_details />
--->
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-<PhysiCell_settings version="devel-version">
-	<domain>
-		<x_min>-1000</x_min>
-		<x_max>1000</x_max>
-		<y_min>-1000</y_min>
-		<y_max>1000</y_max>
-		<z_min>-10</z_min>
-		<z_max>10</z_max>
-		<dx>20</dx>
-		<dy>20</dy>
-		<dz>20</dz>
-		<use_2D>true</use_2D>
-	</domain>
-	
-	<overall>
-		<max_time units="min">64800</max_time> <!-- 5 days * 24 h * 60 min -->
-		<time_units>min</time_units>
-		<space_units>micron</space_units>
-	
-		<dt_diffusion units="min">0.01</dt_diffusion>
-		<dt_mechanics units="min">0.1</dt_mechanics>
-		<dt_phenotype units="min">6</dt_phenotype>	
-	</overall>
-	
-	<parallel>
-		<omp_num_threads>4</omp_num_threads>
-	</parallel> 
-	
-	<save>
-		<folder>output</folder> <!-- use . for root --> 
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-		<full_data>
-			<interval units="min">60</interval>
-			<enable>true</enable>
-		</full_data>
-		
-		<SVG>
-			<interval units="min">60</interval>
-			<enable>true</enable>
-		</SVG>
-		
-		<legacy_data>
-			<enable>false</enable>
-		</legacy_data>
-	</save>
-	
-	<options>
-		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
-	</options>	
+// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
+void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-	<microenvironment_setup>
-		<variable name="oxygen" units="mmHg" ID="0">
-			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.00</diffusion_coefficient>
-				<decay_rate units="1/min">.1</decay_rate>  
-			</physical_parameter_set>
-			<initial_condition units="mmHg">38.0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
-		</variable>
-		
-		<options>
-			<calculate_gradients>true</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
-			<!-- not yet supported --> 
-			<initial_condition type="matlab" enabled="false">
-				<filename>./config/initial.mat</filename>
-			</initial_condition>
-			<!-- not yet supported --> 
-			<dirichlet_nodes type="matlab" enabled="false">
-				<filename>./config/dirichlet.mat</filename>
-			</dirichlet_nodes>
-		</options>
-	</microenvironment_setup>		
-	
-	<user_parameters>
-		<tumor_radius type="double" units="micron">250.0</tumor_radius>
-		<oncoprotein_mean type="double" units="dimensionless">1.0</oncoprotein_mean>
-		<oncoprotein_sd type="double" units="dimensionless">0.25</oncoprotein_sd>
-		<oncoprotein_min type="double" units="dimensionless">0.0</oncoprotein_min>
-		<oncoprotein_max type="double" units="dimensionless">2</oncoprotein_max>
-		<random_seed type="int" units="dimensionless">0</random_seed>
-	</user_parameters>
-	
-</PhysiCell_settings>
+extern Cell_Definition* pImmuneCell; 
+
+void create_immune_cell_type( void ); 
+
+// set the tumor cell properties, then call the function 
+// to set up the tumor cells 
+void create_cell_types( void );
+
+void setup_tissue(); 
+
+void introduce_immune_cells( void ); 
+
+// set up the microenvironment to include the immunostimulatory factor 
+void setup_microenvironment( void );   
+
+std::vector<std::string> cancer_immune_coloring_function( Cell* );
+
+// cell rules for extra elastic adhesion
+
+/*
+void attach_cells( Cell* pCell_1, Cell* pCell_2 );
+void dettach_cells( Cell* pCell_1 , Cell* pCell_2 );
+*/
+void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant ); 
+void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
+
+// immune cell functions for attacking a cell 
+Cell* immune_cell_check_neighbors_for_attachment( Cell* pAttacker , double dt ); 
+bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt ); // only attack if oncoprotein 
+bool immune_cell_attempt_apoptosis( Cell* pAttacker, Cell* pTarget, double dt ); 
+bool immune_cell_trigger_apoptosis( Cell* pAttacker, Cell* pTarget ); 
+
+void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+void immune_cell_attach( Cell* pAttacker, Cell* pTarget ); // use attach_cells?? 
+void immune_cell_dettach( Cell* pAttacker, Cell* pTarget ); // use dettach_cells ?? 
+
+void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt );
+
+// immune cell functions for motility 
+
+void immune_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 

@@ -2,32 +2,98 @@
 
 **Version:** 1.8.0
 
-**Release date:** 4 February 2021
+**Release date:** 1 March 2021
 
 ## Release summary: 
 
-This release introduces bug fixes (particularly the placement of daughter cells after division), introduces new functions for uniformly random sampling of the unit circle and unit sphere, and refines the beta implementation of XML-based cell definitions. 
+This release formally introduces Cell Definitions: a way to fully create cell types in the XML configuration file, including each cell type's initial phenotype and custom variables. This extends our recent work to shift specification of the microenvironment and boundary conditions to XML, and continues our trend towards a future release when many models can be designed and run without compiling any C++ at all. Most of the sample projects have been updated to use this new paradigm, including the a unified 2D/3D `template` project. We recommend using that template as the starting point for any PhysiCell model.
+
+This release also introduces contact functions: a way to specify cell-cell contact interactions for any cells that you attach (using new, standardized attach and detach functions). Look at the `cancer-biorobots` and `biorobots` sample projects for examples. 
+
+The release also add a number of features to improve the ease of code use: a copy of the XML configuration  file is now saved in your output directory to help keep track of what parameters and settings generated the data. We will auto-generate a `legend.svg` file (also in output) based on your coloring function and cell defintions. The sample projects' Makefiles now include new rules to create animated GIFs, convert SVG to JPG, create a MP4 movie, and even auto-download the latest version of PhysiCell to update an existing project. A key new feature is the ability to pre-specify cell locations in a CSV file. The template projects will auto-parse this list if enabled to place cells at the start of the simulation.  
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
 ### Major new features and changes:
 
-+  
++ Full rollout of `Cell_Definition` in the XML configuration files. Many basic models can now be fully defined in XML with minimal or no C++. 
 
 + Unified the 2D and 3D template projects into a single "template" project. 
+
++ New predator-prey-farmer sample project. Prey look for and consume food that's released by farmers. Prey avoid predators, predators hunt and eat prey.  
+
++ Improved thread safety, particularly when cells ingest cells. 
+
++ Introduced new cell-cell contact functions with syntax: 
+
+`void contact( Cell* pME, Phenotype& my_phenotype , Cell* pOther, Phenotype& other_phenotype, double dt )`
+
+These are exexcuted once per mechanics time step. Best practice is to either only read `pOther` and `other_phenotype`, or use OMP critical locks. 
+
+For any cell (`this`), the contact function will be executed for any other cell (other) in `this->state.attached_cells`. The modeler will still need to decide which cells to attach. 
+
+All attached cells are automatically removed when a cell dies or divides. 
+
++ Added new attachment and detachment functions to the `Cell` class: 
+++ `void attach_cell( Cell* pAddMe );` Add `pAddme` to the cell's `state.attached_cells` for use in contact functions. 
+++ `void detach_cell( Cell* pRemoveMe );` Remove `pRemoveMe` from the cell's `state.attached_cells` list.  
+++ `void remove_all_attached_cells( void );` Remove all attached cells.  
+
++ Added additional attachment and detachment functions outside the `Cell` class: 
+++ `void attach_cells( Cell* pCell_1, Cell* pCell_2 );` Add `pCell_2` to `pCell_1->state.attached_cells` and add `pCell_1` to `pCell_2->state.attached_cells`
+++ `void detach_cells( Cell* pCell_1 , Cell* pCell_2 );` Remove the attachments. 
+
++ Introduced a standardized cell-cell spring-like adhesion contact function: `standard_elastic_contact_function.`
+
+This will add an additional Hookean spring attraction to cells in `state.attached_cells`. The modeler will still need to decide when to attach or detach cells. (Recommended practice: use the `custom` function that is evaluated once per mechanics time step.) 
+
++ All sample projects now copy the configuration file to the output directory, to help keep track of settings and parameters used to create a simulation result. 
+
++ Updated the following sample projects to use the new Cell_Definitions and contact functions: 
+++ template2D
+++ template3D
+++ template
+++ biorobots-sample
+++ cancer-biorobots-sample
+++ heterogeneity-sample
+
++ Users can now pre-specify cell positions by creating a CSV file: 
+++ Each row corresponds to a cell:     x,y,z,typeID
+++ TypeID is the integer index of a `Cell_Definition` (ideally defined in XML!)
+++ Call the function `load_cells_csv( std::string filename )` to load these possitions and place the cells in corresponding positions. Ideally, cally this function at the end of `setup_tissue()`. The template projects will call this function automatically if a cell CSV file is specified in the `initial_conditions` section of the XML configuration file. 
 
 ### Minor new features and changes: 
 
 + Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined or modified in the next few releases while still in beta. 
 
++ All sample projects have a "make jpeg" rule that uses ImageMagick to convert SVG snapshots into JPG files. 
+
++ All sample projects have a "make movie" that uses ffmepg to convert JPG snapshots to an mp4 animation. 
+
++ New "paint by numbers" coloring function 
+
++ Cycle and Death in Cell_Definitions no longer require a "code" as long as the "name" is correct. 
+
++ Revised template project to a barebones minimum. 
+
++ Removed beta-testing sample project 
+
++ Legend  
 
 
 ### Beta features (not fully supported):
  
++ Signaling 
+
+
++ Geometry stuff 
+
   
 ### Bugfixes: 
 
-+ In response to SourceForge ticket #
++ In response to SourceForge ticket #43, fixed the bug where Dirichlet conditions weren't properly applied to individual boundaries. 
+
++ Cleaned up code as suggested in SourceForge Ticket #42.
 
 
 ### Notices for intended changes that may affect backwards compatibility:
@@ -46,22 +112,16 @@ This release introduces bug fixes (particularly the placement of daughter cells 
 
 + Methods or scripts to make "upgrading" PhysiCell easier for existing projects (to avoid overwriting the config file, Makefile, or custom files. 
  
-+ Current "template" project will be rolled into a new "predator-prey" sample project, and "template" will be tidied up. 
-
 + Further XML-based simulation setup. 
 
 + current sample projects will be refactored to use XML cdell definitions. 
  
 + read saved simulation states (as MultiCellDS digital snapshots)
  
-+ "mainline" prototype cell attach/detach mechanics as standard models (currently in the biorobots and immune examples)
- 
 + integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
   
 + integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
   
-+ Develop contact-based cell-cell interactions. 
-
 + Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
  
 + Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 

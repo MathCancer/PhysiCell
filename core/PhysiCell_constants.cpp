@@ -75,4 +75,40 @@ double diffusion_dt = 0.01;
 double mechanics_dt = 0.1;
 double phenotype_dt = 6.0;
 
+std::unordered_map<std::string,int> cycle_model_codes = 
+{
+	{ "Ki67 (advanced)", PhysiCell_constants::advanced_Ki67_cycle_model}, 
+	{ "Ki67 (basic)" ,PhysiCell_constants::basic_Ki67_cycle_model},
+	{ "Flow cytometry model (basic)",PhysiCell_constants::flow_cytometry_cycle_model},
+	// { ,PhysiCell_constants::live_apoptotic_cycle_model}, // not implemented 
+	// { ,PhysiCell_constants::total_cells_cycle_model}, // not implemented 
+	{ "Live",PhysiCell_constants::live_cells_cycle_model}, 
+	{ "Flow cytometry model (separated)",PhysiCell_constants::flow_cytometry_separated_cycle_model}, 
+	{ "Cycling-Quiescent model",PhysiCell_constants::cycling_quiescent_model}, 
+	
+	// currently recognized death models 
+	{ "Apoptosis",PhysiCell_constants::apoptosis_death_model}, 
+	{ "Necrosis",PhysiCell_constants::necrosis_death_model} , 
+	// { ,PhysiCell_constants::autophagy_death_model}, // not implemented 
+	
+	{ "ki67 (advanced)", PhysiCell_constants::advanced_Ki67_cycle_model}, 
+	{ "ki67 (basic)" ,PhysiCell_constants::basic_Ki67_cycle_model},
+	{ "flow cytometry model (basic)",PhysiCell_constants::flow_cytometry_cycle_model},
+	{ "live",PhysiCell_constants::live_cells_cycle_model}, 
+	{ "flow cytometry model (separated)",PhysiCell_constants::flow_cytometry_separated_cycle_model}, 
+	{ "cycling-quiescent model",PhysiCell_constants::cycling_quiescent_model}, 
+	{ "apoptosis",PhysiCell_constants::apoptosis_death_model}, 
+	{ "necrosis",PhysiCell_constants::necrosis_death_model} 
+	
+}; 
+
+int find_cycle_model_code( std::string model_name )
+{
+	auto search = cycle_model_codes.find( model_name );
+	if( search == cycle_model_codes.end() )
+	{ return -1; }
+	else
+	{ return search->second; }
+}
+
 };

@@ -80,7 +80,6 @@ extern Cycle_Model Ki67_advanced, Ki67_basic, live, flow_cytometry_cycle_model, 
 extern Cycle_Model apoptosis, necrosis; 
 extern Death_Parameters apoptosis_parameters, necrosis_parameters; 
 
-
 extern bool PhysiCell_standard_models_initialized; 
 extern bool PhysiCell_standard_death_models_initialized; 
 extern bool PhysiCell_standard_cycle_models_initialized; 
