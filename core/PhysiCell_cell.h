@@ -232,6 +232,7 @@ class Cell : public Basic_Agent
 	
 	std::vector<Cell*>& cells_in_my_container( void ); 
 	std::vector<Cell*> nearby_cells( void ); // new in 1.8.0 
+	std::vector<Cell*> nearby_interacting_cells( void ); // new in 1.8.0 
 	
 	void convert_to_cell_definition( Cell_Definition& cd ); 
 };
@@ -271,6 +272,7 @@ void attach_cells( Cell* pCell_1, Cell* pCell_2 );
 void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
 
 std::vector<Cell*> nearby_cells( Cell* pCell ); // new in 1.8.0
+std::vector<Cell*> nearby_interacting_cells( Cell* pCell ); // new in 1.8.0
 
 };
 
