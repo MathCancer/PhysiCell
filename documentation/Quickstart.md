@@ -3,13 +3,11 @@
 
 ## Download
 
-We currently provide 2 options for downloading PhysiCell:
+We currently provide 2 options for downloading the PhysiCell source code:
 
-1) Downloaded source code as a .zip file from http://physicell.mathcancer.org/ 
-(the link there takes you to the latest release on sourceforge).
-<!-- https://sourceforge.net/projects/physicell/files/PhysiCell/PhysiCell%201.2.1 -->
+* https://sourceforge.net/projects/physicell/.
 
-2) We have recently begun migrating our code to GitHub. So, you can also download from https://github.com/MathCancer/PhysiCell/releases.
+* https://github.com/MathCancer/PhysiCell/releases.
 
 For more detailed information, see Section 3 of the User Guide (in `/documentation`)
 and/or also http://www.mathcancer.org/blog/physicell-tutorials/.
@@ -40,19 +38,20 @@ To resolve this, we recommend using the `brew` package manager to install a rece
 installation instructions](https://docs.brew.sh/Installation.html).
 
 After installing brew, type `brew install gcc` from a Terminal command line. This 
-should install a recent version of gcc/g++ (supporting OpenMP) into `/usr/local/bin`. You can verify this with:
+should install a recent version of gcc/g++ (supporting OpenMP) into `/usr/local/bin`. 
+You can verify this with (note the g++ version # will change over time):
 ```
 $ ls -l /usr/local/bin/g++*
-   ...             /usr/local/bin/g++-8@ -> ../Cellar/gcc/8.2.0/bin/g++-8
+   ...             /usr/local/bin/g++-10@ -> ../Cellar/gcc/10.2.0/bin/g++-10
 ```
 
 Set the following environment variable in your Terminal's shell, e.g., in the bash shell: 
 ```
-$ export PHYSICELL_CPP=/usr/local/bin/g++-8
+$ export PHYSICELL_CPP=/usr/local/bin/g++-10
 ```
 and the Makefile will use it. You should permanently set this in your environment via: 
 
-`$ echo export PHYSICELL_CPP=g++-8 >> ~/.bash_profile`.
+`$ echo export PHYSICELL_CPP=g++-10 >> ~/.bash_profile`.
 
 ### Linux
 
@@ -63,8 +62,8 @@ building PhysiCell. If not, contact us!
 
 ## Build: sample projects
 
-In the current release of PhysiCell, we provide four sample projects to help you get started. Three
-of the projects are 2D models (<i>biorobots, anti-cancer biorobots, and cancer heterogeneity</i>); the fourth project
+We provide (at least) six sample projects to help you get started. Five
+of the projects are 2D models (<i>biorobots, anti-cancer biorobots, cancer heterogeneity, virus-macrophage, and predator-prey-farmer</i>); a sixth project
 is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of the sample projects follows the same
 pattern. For example, from your Terminal, in the root PhysiCell directory/folder:
 ```
@@ -103,6 +102,22 @@ and
 ```
 $ make data-cleanup
 $ make reset
+$ make virus-macrophage-sample
+$ make 
+$ ./virus-sample
+```
+and
+```
+$ make data-cleanup
+$ make reset
+$ make pred-prey-farmer
+$ make 
+$ ./pred_prey
+```
+and
+```
+$ make data-cleanup
+$ make reset
 $ make cancer-immune-sample
 $ make
 $ ./cancer_immune_3D
@@ -130,6 +145,11 @@ default, using a slice through the Z=0 plane, as depicted in the following image
 If you have access to MATLAB (or Octave), we have a [detailed tutorial](http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/) on how to visualize the
 MultiCellDS digital snapshots (.xml and .mat files).
 
+### Python
+
+If you want to use Python to visualize results, see this blog post http://www.mathcancer.org/blog/python-loader/ and also see various scripts in 
+the `/beta` directory, e.g., `anim_svg.py`.
+
 ### ImageMagick
 
 If you are able to install ImageMagick (with SVG support) on your computer, you will have access to several image processing command line
@@ -152,6 +172,15 @@ $ convert -size 1500x1605 tmp.gif -resize 20% small.gif
 $ magick animate small.gif
 ```
 
+Since PhysiCell 1.8.0, there are helper targets in the Makefile that will perform various functions, e.g.:
+```
+$ make jpeg   # convert all output/snapshot*.svg to .jpg
+$ make gif    # create out.gif from output/snapshot*.svg 
+$ make movie  # assuming you have ffmpeg, create out.mp4 from output/snapshot*.jpg
+  You can also specify the name of the output directory, e.g.:
+$ make jpeg OUTPUT=out1
+```
+
 ### ParaView
 
 If you install ParaView, you can visualize and interact with output from 3D models (the `.mat` files). Refer to our [blog post](http://www.mathcancer.org/blog/paraview-for-physicell-part-1/) to get started.
@@ -162,7 +191,8 @@ If you install ParaView, you can visualize and interact with output from 3D mode
 
 ## Support
 
-Please join the [PhysiCell Users](https://groups.google.com/forum/#!forum/physicell-users) forum and follow us on Twitter  (https://twitter.com/MathCancer).
+<!-- Please join the [PhysiCell Users](https://groups.google.com/forum/#!forum/physicell-users) forum and follow us on Twitter  (https://twitter.com/MathCancer). -->
+Please submit questions and report problems at https://sourceforge.net/p/physicell/tickets/ and follow us on Twitter (https://twitter.com/PhysiCell and https://twitter.com/MathCancer).
 
 <hr> <!---------------------------------------------->
 
@@ -173,4 +203,5 @@ Please join the [PhysiCell Users](https://groups.google.com/forum/#!forum/physic
 * http://www.mathcancer.org/blog/setting-up-gcc-openmp-on-osx-homebrew-edition/
 * http://www.mathcancer.org/blog/physicell-tutorials/
 * http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/
+* http://www.mathcancer.org/blog/python-loader/
 * https://github.com/MathCancer/PhysiCell/blob/master/documentation/User_Guide.pdf
