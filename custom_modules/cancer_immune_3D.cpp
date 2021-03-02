@@ -569,7 +569,7 @@ bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt 
 		
 		if( UniformRandom() < pAttacker->custom_data[attach_rate_i] * scale * dt * distance_scale )
 		{
-			std::cout << "\t attach!" << " " << pTarget->custom_data[oncoprotein_i] << std::endl; 
+//			std::cout << "\t attach!" << " " << pTarget->custom_data[oncoprotein_i] << std::endl; 
 			attach_cells( pAttacker, pTarget ); 
 		}
 		
@@ -604,7 +604,7 @@ bool immune_cell_attempt_apoptosis( Cell* pAttacker, Cell* pTarget, double dt )
 	
 	if( UniformRandom() < pAttacker->custom_data[kill_rate_index] * scale * dt )
 	{ 
-		std::cout << "\t\t kill!" << " " << pTarget->custom_data[oncoprotein_i] << std::endl; 
+//		std::cout << "\t\t kill!" << " " << pTarget->custom_data[oncoprotein_i] << std::endl; 
 		return true; 
 	}
 	return false; 
@@ -639,32 +639,28 @@ void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	// if I'm docked
 	if( pCell->state.number_of_attached_cells() > 0 )
 	{
-		/*
-		extra_elastic_attachment_mechanics( pCell, phenotype, dt );
-		
 		// attempt to kill my attached cell
 		
-		bool dettach_me = false; 
+		bool detach_me = false; 
 		
 		if( immune_cell_attempt_apoptosis( pCell, pCell->state.attached_cells[0], dt ) )
 		{
 			immune_cell_trigger_apoptosis( pCell, pCell->state.attached_cells[0] ); 
-			dettach_me = true; 
+			detach_me = true; 
 		}
 		
-		// decide whether ot dettach 
+		// decide whether to detach 
 		
 		if( UniformRandom() < dt / ( pCell->custom_data[attach_lifetime_i] + 1e-15 ) )
-		{ dettach_me = true; }
+		{ detach_me = true; }
 		
 		// if I dettach, resume motile behavior 
 		
-		if( dettach_me )
+		if( detach_me )
 		{
-			dettach_cells( pCell, pCell->state.attached_cells[0] ); 
+			detach_cells( pCell, pCell->state.attached_cells[0] ); 
 			phenotype.motility.is_motile = true; 
 		}
-		*/
 		return; 
 	}
 	

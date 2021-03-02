@@ -331,7 +331,8 @@
 		<!-- main --> 
 		<immune_activation_time type="double" units="min">12</immune_activation_time> <!--20160 -->
 			<!-- activate in 7 days --> 
-		<save_interval_after_therapy_start type="double" units="min">3.0</save_interval_after_therapy_start>
+		<save_interval_after_therapy_start type="double" units="min">15.0</save_interval_after_therapy_start>
+		<SVG_interval_after_therapy_start type="double" units="min">3.0</SVG_interval_after_therapy_start>
 		
 		<!-- immune cell properties --> 
 		<immune_o2_relative_uptake type="double" units="dimensionless">0.1</immune_o2_relative_uptake>

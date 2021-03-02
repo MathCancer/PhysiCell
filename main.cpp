@@ -188,9 +188,9 @@ int main( int argc, char* argv[] )
 				immune_cells_introduced = true; 
 				
 				PhysiCell_settings.full_save_interval = 
-					parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
+					parameters.doubles("save_interval_after_therapy_start"); 
 				PhysiCell_settings.SVG_save_interval = 
-					parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
+					parameters.doubles("SVG_interval_after_therapy_start"); 
 				
 				PhysiCell_globals.next_full_save_time = PhysiCell_globals.current_time; 
 				PhysiCell_globals.next_SVG_save_time = PhysiCell_globals.current_time; 
