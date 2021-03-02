@@ -97,7 +97,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>12</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -436,6 +436,14 @@
 		</cell_definition>
 		
 	</cell_definitions>
+
+	<initial_conditions>
+		<cell_positions type="csv" enabled="false">
+			<folder>./config</folder>
+			<filename>cells.csv</filename>
+		</cell_positions>
+
+	</initial_conditions> 
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 

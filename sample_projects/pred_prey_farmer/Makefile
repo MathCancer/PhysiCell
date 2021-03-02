@@ -159,16 +159,11 @@ reset:
 	touch ./config/empty.csv
 	rm -f ./config/*.csv 
 	
-upgrade:
-	
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 	
 data-cleanup:
-	rm -f *.mat
-	rm -f *.xml
-	rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt

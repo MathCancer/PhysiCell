@@ -223,6 +223,8 @@ void setup_tissue( void )
 	
 	fill_annulus( {300,300,0} , 150, 90 , 0 , 0.75 ); 
 */	
+	// XML-based cell placement as needed 
+	load_cells_from_pugixml(); 
 	
 	return; 
 }
