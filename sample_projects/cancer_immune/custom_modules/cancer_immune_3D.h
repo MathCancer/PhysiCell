@@ -74,7 +74,7 @@ using namespace PhysiCell;
 // custom cell phenotype function to scale immunostimulatory factor with hypoxia 
 void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-extern Cell_Definition immune_cell; 
+extern Cell_Definition* pImmuneCell; 
 
 void create_immune_cell_type( void ); 
 
@@ -93,9 +93,10 @@ std::vector<std::string> cancer_immune_coloring_function( Cell* );
 
 // cell rules for extra elastic adhesion
 
+/*
 void attach_cells( Cell* pCell_1, Cell* pCell_2 );
 void dettach_cells( Cell* pCell_1 , Cell* pCell_2 );
-
+*/
 void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant ); 
 void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
 
@@ -107,14 +108,11 @@ bool immune_cell_trigger_apoptosis( Cell* pAttacker, Cell* pTarget );
 
 void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-
-
 void immune_cell_attach( Cell* pAttacker, Cell* pTarget ); // use attach_cells?? 
 void immune_cell_dettach( Cell* pAttacker, Cell* pTarget ); // use dettach_cells ?? 
 
+void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt );
 
 // immune cell functions for motility 
 
 void immune_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
-
-
