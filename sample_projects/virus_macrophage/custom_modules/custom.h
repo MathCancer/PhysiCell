@@ -91,6 +91,7 @@ void setup_microenvironment( void );
 
 std::vector<std::string> my_coloring_function( Cell* );
 std::vector<std::string> viral_coloring_function( Cell* pCell );
+std::vector<std::string> viral_coloring_function_bar( Cell* pCell );
 
 std::vector<double> integrate_total_substrates( void ); 
 

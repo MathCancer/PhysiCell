@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1440</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">2880</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -97,7 +97,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>8</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -130,6 +130,15 @@
 			</physical_parameter_set>
 			<initial_condition units="particles/micron^3">0</initial_condition>
 			<Dirichlet_boundary_condition units="particles/micron^3" enabled="false">0</Dirichlet_boundary_condition>
+		</variable>
+		
+		<variable name="interferon" units="dimensionless" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1e4</diffusion_coefficient>
+				<decay_rate units="1/min">1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
 		</variable>
 	
 		<options>
@@ -271,6 +280,13 @@
 						<uptake_rate units="1/min">10</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 
+					
+					<substrate name="interferon">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
 				</secretion>
 				<molecular />
 			</phenotype>
@@ -279,6 +295,9 @@
 				<!-- 0.4167 -->
 				<min_virion_count units="none">1</min_virion_count>
 				<burst_virion_count units="none">100</burst_virion_count>
+				
+				<virion_threshold_for_interferon units="virions">10</virion_threshold_for_interferon>
+				<max_interferon_secretion_rate units="1/min">1</max_interferon_secretion_rate>
 
 				<min_virion_detection_threshold units="none">1</min_virion_detection_threshold>
 				<virus_digestion_rate units="1/min">0.01</virus_digestion_rate> 
@@ -288,16 +307,16 @@
 		<cell_definition name="macrophage" parent_type="epithelial cell" ID="1">
 			<phenotype>
 				<motility>  
-					<speed units="micron/min">1</speed>
+					<speed units="micron/min">0.5</speed> <!-- try 0.75 to see a very different outcome --> 
 					<persistence_time units="min">15</persistence_time>
-					<migration_bias units="dimensionless">0.25</migration_bias>
+					<migration_bias units="dimensionless">0.4</migration_bias>
 					
 					<options>
 						<enabled>true</enabled>
 						<use_2D>true</use_2D>
 						<chemotaxis>
 							<enabled>true</enabled>
-							<substrate>virus</substrate>
+							<substrate>interferon</substrate>
 							<direction>1</direction>
 						</chemotaxis>
 					</options>
@@ -325,7 +344,7 @@
 		
 		<!-- virus properties --> 
 		<number_of_infected_cells type="int" units="none" 
-			description="initial number of infected cells">3</number_of_infected_cells>
+			description="initial number of infected cells">10</number_of_infected_cells>
 		<number_of_uninfected_cells type="int" units="none" 
 			description="initial number of uninfected cells">1000</number_of_uninfected_cells>
 		<fraction_released_at_death type="double" units="dimensionless"
@@ -333,11 +352,6 @@
 		<fraction_transferred_when_ingested type="double" units="dimensionless" 
 			description="fraction of virions absorbed when phagocytosing a cell">1.0</fraction_transferred_when_ingested>
 		<!-- virus diffusion coefficient ~ 1e3 micron^2/min : https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105894 --> 
-		
-	pEpithelial->phenotype.molecular.fraction_released_at_death[ virus_index ] = 1.0; 
-	pEpithelial->phenotype.molecular.fraction_transferred_when_ingested[ virus_index ] = 1.0; 		
-		
-		
 		
 		<!-- macrophage properties --> 
 		<number_of_macrophages type="int" units="none" description="initial number of macrophages">50</number_of_macrophages> 

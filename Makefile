@@ -133,7 +133,7 @@ cancer-immune-sample:
 virus-macrophage-sample:
 	cp ./sample_projects/virus_macrophage/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/virus_macrophage/main-virus_macrophage.cpp ./main.cpp 
+	cp ./sample_projects/virus_macrophage/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/virus_macrophage/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 

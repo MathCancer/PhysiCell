@@ -106,6 +106,7 @@ void create_cell_types( void )
 	
 	// first find index for a few key variables. 
 	int virus_index = microenvironment.find_density_index( "virus" ); 
+	int nInterferon = microenvironment.find_density_index( "interferon" ); 
 	
 	Cell_Definition* pEpithelial = find_cell_definition( "epithelial cell" ); 
 	Cell_Definition* pMacrophage = find_cell_definition( "macrophage" ); 
@@ -116,7 +117,10 @@ void create_cell_types( void )
 		parameters.doubles("fraction_released_at_death"); 
 	pEpithelial->phenotype.molecular.fraction_transferred_when_ingested[ virus_index ] = 
 		parameters.doubles("fraction_transferred_when_ingested"); 
-		
+/*		
+	pEpithelial->phenotype.molecular.fraction_released_at_death[ nInterferon ] = 0;
+	pEpithelial->phenotype.molecular.fraction_transferred_when_ingested[ nInterferon ] = 0; 		
+*/		
 	pMacrophage->phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "macrophage_relative_adhesion" ); 
 	pMacrophage->phenotype.molecular.fraction_released_at_death[ virus_index ]= 0.0; 
 	pMacrophage->phenotype.molecular.fraction_transferred_when_ingested[ virus_index ]= 0.0; 
@@ -263,6 +267,65 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 	return output; 
 }
 
+std::vector<std::string> viral_coloring_function_bar( Cell* pCell )
+{
+	// start with flow cytometry coloring 
+	
+	std::vector<std::string> output = { "magenta" , "black" , "magenta", "black" }; 
+	static int nVirus = microenvironment.find_density_index( "virus" ); 
+	
+	static double min_virus = pCell->custom_data[ "min_virion_count" ];
+	static double max_virus = pCell->custom_data[ "burst_virion_count" ]; 
+	static double denominator = max_virus - min_virus + 1e-15; 
+	
+	static Cell_Definition* pMacrophage = find_cell_definition( "macrophage" ); 
+				
+	// dead cells 
+	if( pCell->phenotype.death.dead == true )
+	{
+		 output[0] = "red"; 
+		 output[2] = "darkred"; 
+		 return output; 
+	}
+	
+	if( pCell->type != pMacrophage->type )
+	{
+		output[0] = "blue"; 
+		output[2] = "darkblue"; 
+		
+		double virus = pCell->phenotype.molecular.internalized_total_substrates[nVirus]; 
+		
+		if( pCell->phenotype.molecular.internalized_total_substrates[nVirus] >= min_virus )
+		{
+			double interp = (virus - min_virus )/ denominator;  
+			if( interp > 1.0 )
+			{ interp = 1.0; } 
+			
+			if( interp > 0.75 )
+			{ interp = 1; } 
+			if( interp > 0.5 && interp <= 0.75 )
+			{ interp = 0.75; } 
+			if( interp > 0.25 && interp <= 0.5 )
+			{ interp = 0.5; } 
+			if( interp > 0.01 && interp <= 0.25 )
+			{ interp = 0.25; } 
+		
+			int Red   = (int) floor( 255.0*interp ); 
+			int Green = (int) floor( 255.0*interp ); 
+			int Blue  = (int) floor( 255.0 *(1-interp) ); 
+			
+			char szTempString [128];
+			sprintf( szTempString , "rgb(%u,%u,%u)", Red, Green, Blue );
+			output[0].assign( szTempString );
+			output[2].assign( szTempString );
+		}
+		
+	}
+	
+	return output; 
+}
+
+
 std::vector<Cell*> get_possible_neighbors( Cell* pCell )
 {
 	std::vector<Cell*> neighbors = {}; 
@@ -349,6 +412,7 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 	// bookkeeping
 	
 	static int nVirus = microenvironment.find_density_index( "virus" ); 
+	static int nInterferon = microenvironment.find_density_index( "interferon" ); 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
 	
 	// compare against viral load. Should I commit apoptosis? 
@@ -370,6 +434,12 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 		new_virus *= dt;
 		phenotype.molecular.internalized_total_substrates[nVirus] += new_virus; 
 	}
+	
+	if( virus >= pCell->custom_data["virion_threshold_for_interferon"] )
+	{
+		phenotype.secretion.secretion_rates[nInterferon] = pCell->custom_data["max_interferon_secretion_rate"];
+	}
+	
 //	static double implicit_Euler_constant = 
 //		(1.0 + dt * pCell->custom_data["virus_digestion_rate"] );
 //	phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 

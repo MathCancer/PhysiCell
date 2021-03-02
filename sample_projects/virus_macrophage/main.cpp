@@ -149,7 +149,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = viral_coloring_function; 
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = viral_coloring_function_bar; 
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
@@ -211,7 +211,8 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
 				
-				std::cout << "Total substrates " << integrate_total_substrates() << std::endl; 
+				std::vector<double> total_substrates = integrate_total_substrates(); 
+				std::cout << "Total virion " << total_substrates[0] << std::endl; 
 			}
 
 			// update the microenvironment
