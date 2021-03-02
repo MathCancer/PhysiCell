@@ -16,6 +16,8 @@ script:
   - make cancer-immune-sample
   - make reset
   - make virus-macrophage-sample
+  - make reset
+  - make pred-prey-farmer
 
 notifications:
   email:
