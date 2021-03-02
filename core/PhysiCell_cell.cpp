@@ -1119,6 +1119,9 @@ std::vector<Cell*>& Cell::cells_in_my_container( void )
 std::vector<Cell*> Cell::nearby_cells( void )
 { return PhysiCell::nearby_cells( this ); }
 
+std::vector<Cell*> Cell::nearby_interacting_cells( void )
+{ return PhysiCell::nearby_interacting_cells( this ); }
+
 void Cell::ingest_cell( Cell* pCell_to_eat )
 {
 	// don't ingest a cell that's already ingested 
@@ -2389,6 +2392,47 @@ std::vector<Cell*> nearby_cells( Cell* pCell )
 	
 	return neighbors; 
 }
+
+std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
+{
+	std::vector<Cell*> neighbors = {}; 
+
+	// First check the neighbors in my current voxel
+	std::vector<Cell*>::iterator neighbor;
+	std::vector<Cell*>::iterator end = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
+	for( neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
+	{
+		if( pCell->phenotype.geometry.radius + (*neighbor)->phenotype.geometry.radius <= 
+			pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius + 
+		(*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
+		{ neighbors.push_back( *neighbor ); }
+	}
+
+	std::vector<int>::iterator neighbor_voxel_index;
+	std::vector<int>::iterator neighbor_voxel_index_end = 
+		pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].end();
+	
+	for( neighbor_voxel_index = 
+		pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].begin();
+		neighbor_voxel_index != neighbor_voxel_index_end; 
+		++neighbor_voxel_index )
+	{
+		if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+			continue;
+		end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
+		for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
+		{
+			if( pCell->phenotype.geometry.radius + (*neighbor)->phenotype.geometry.radius <= 
+				pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius + 
+			(*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
+			{ neighbors.push_back( *neighbor ); }
+		}
+	}
+	
+	return neighbors; 
+}
+
+
 
 
 
