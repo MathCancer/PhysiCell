@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -67,68 +67,44 @@
 
 #include "./cancer_immune_3D.h"
 
-Cell_Definition immune_cell; 
+Cell_Definition* pImmuneCell; 
 
 void create_immune_cell_type( void )
 {
-	immune_cell = cell_defaults; 
+	pImmuneCell = find_cell_definition( "immune cell" ); 
 	
-	immune_cell.name = "immune cell";
-	immune_cell.type = 1; 
-
-	// turn off proliferation; 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	immune_cell.phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) = 0.0; 	
-	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
-	
-	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
-	static int immuno_ID = microenvironment.find_density_index( "immunostimulatory factor" ); // 1
+	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); 
+	static int immuno_ID = microenvironment.find_density_index( "immunostimulatory factor" ); 
 	
 	// reduce o2 uptake 
 	
-	immune_cell.phenotype.secretion.uptake_rates[oxygen_ID] *= 
-		parameters.doubles("immune_o2_relative_uptake"); // 0.1; 
+	pImmuneCell->phenotype.secretion.uptake_rates[oxygen_ID] *= 
+		parameters.doubles("immune_o2_relative_uptake");  
 	
-	// set apoptosis to survive 10 days (on average) 
+	pImmuneCell->phenotype.mechanics.cell_cell_adhesion_strength *= 
+		parameters.doubles("immune_relative_adhesion"); 
+	pImmuneCell->phenotype.mechanics.cell_cell_repulsion_strength *= 
+		parameters.doubles("immune_relative_repulsion"); 
+		
+	// figure out mechanics parameters 
 	
-	immune_cell.phenotype.death.rates[apoptosis_index] = 
-		parameters.doubles("immune_apoptosis_rate"); // 1.0 / (10.0 * 24.0 * 60.0 ); 
+	pImmuneCell->phenotype.mechanics.relative_maximum_attachment_distance 
+		= pImmuneCell->custom_data["max_attachment_distance"] / pImmuneCell->phenotype.geometry.radius ; 
+		
+	pImmuneCell->phenotype.mechanics.attachment_elastic_constant 
+		= pImmuneCell->custom_data["elastic_coefficient"]; 		
 	
-	// turn on motility; 
-	immune_cell.phenotype.motility.is_motile = true; 
-	immune_cell.phenotype.motility.persistence_time = 
-		parameters.doubles("immune_motility_persistence_time"); // 10.0; 
-	immune_cell.phenotype.motility.migration_speed = 
-		parameters.doubles("immune_migration_speed"); // 1;  
-	immune_cell.phenotype.motility.migration_bias = 
-		parameters.doubles("immune_migration_bias"); // 0.5;
-	
-	immune_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 
-		parameters.doubles("immune_relative_adhesion"); // 0.0;
-	immune_cell.phenotype.mechanics.cell_cell_repulsion_strength *= 
-		parameters.doubles("immune_relative_repulsion"); // 5.0;
+	pImmuneCell->phenotype.mechanics.relative_detachment_distance 
+		= pImmuneCell->custom_data["max_attachment_distance" ] / pImmuneCell->phenotype.geometry.radius ; 		
 	
 	// set functions 
 	
-	immune_cell.functions.update_phenotype = NULL; 
-	immune_cell.functions.custom_cell_rule = immune_cell_rule; 
-	immune_cell.functions.update_migration_bias = immune_cell_motility;	
+	pImmuneCell->functions.update_phenotype = NULL; 
+	pImmuneCell->functions.custom_cell_rule = immune_cell_rule; 
+	pImmuneCell->functions.update_migration_bias = immune_cell_motility;
+	pImmuneCell->functions.contact_function = adhesion_contact_function; 
 	
 	// set custom data values 
-	
-	Parameter<double> paramD; 
-	
-	immune_cell.custom_data[ "oncoprotein" ] = 0.0; 
-	immune_cell.custom_data[ "kill rate" ] = 
-		parameters.doubles("immune_kill_rate"); // 1.0/15.0; // how often it tries to kill
-	immune_cell.custom_data[ "attachment lifetime" ] = 
-		parameters.doubles("immune_attachment_lifetime"); // 60.00; // how long it can stay attached 
-	immune_cell.custom_data[ "attachment rate" ] = 
-		parameters.doubles("immune_attachment_rate"); // 1.0/5.0; // how long it wants to wander before attaching	
 	
 	return; 
 }
@@ -144,70 +120,38 @@ void create_cell_types( void )
 	// housekeeping 
 	
 	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
-	// turn the default cycle model to live, 
-	// so it's easier to turn off proliferation
-	
-	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
-	
-	// Make sure we're ready for 2D
-	
-	cell_defaults.functions.set_orientation = up_orientation; 
-	// cell_defaults.phenotype.geometry.polarity = 1.0; 
-	cell_defaults.phenotype.motility.restrict_to_2D = false; // true; 
-	
-	// set to no motility for cancer cells 
-	cell_defaults.phenotype.motility.is_motile = false; 
-	
-	// use default proliferation and death 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
 	cell_defaults.parameters.o2_reference = 38.0; 
-	
+
 	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
 	static int immuno_ID = microenvironment.find_density_index( "immunostimulatory factor" ); // 1
 	
-	// set default uptake and secretion 
-	// oxygen 
-	cell_defaults.phenotype.secretion.secretion_rates[oxygen_ID] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_ID] = 10; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_ID] = 38; 
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
 
-	// immunostimulatory 
-	cell_defaults.phenotype.secretion.saturation_densities[immuno_ID] = 1; 
-
-	// set the default cell type to o2-based proliferation with the effect of the 
-	// on oncoprotein, and secretion of the immunostimulatory factor 
+	initialize_cell_definitions_from_pugixml(); 
 	
+	// change the max cell-cell adhesion distance 
+	cell_defaults.phenotype.mechanics.relative_maximum_attachment_distance = 
+		cell_defaults.custom_data["max_attachment_distance"] / cell_defaults.phenotype.geometry.radius;
+		
+	cell_defaults.phenotype.mechanics.relative_detachment_distance 
+		= cell_defaults.custom_data["max_attachment_distance"] / cell_defaults.phenotype.geometry.radius ; 
+		
+	cell_defaults.phenotype.mechanics.attachment_elastic_constant 
+		= cell_defaults.custom_data[ "elastic_coefficient" ];	
+		
 	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_and_immune_stimulation; 
-	
-	// add the extra bit of "attachment" mechanics 
-	cell_defaults.functions.custom_cell_rule = extra_elastic_attachment_mechanics; 
-	
-	cell_defaults.name = "cancer cell"; 
-	cell_defaults.type = 0; 
-	
-	// add custom data 
-	
-	Parameter<double> paramD;
-	
-	cell_defaults.custom_data.add_variable( "oncoprotein" , "dimensionless", 1.0 ); 
-	paramD = parameters.doubles[ "elastic_coefficient" ]; 
-	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units, paramD.value ); 
-		// "1/min" , 0.01 );  /* param */ 
-	cell_defaults.custom_data.add_variable( "kill rate" , "1/min" , 0 ); // how often it tries to kill
-	cell_defaults.custom_data.add_variable( "attachment lifetime" , "min" , 0 ); // how long it can stay attached 
-	cell_defaults.custom_data.add_variable( "attachment rate" , "1/min" ,0 ); // how long it wants to wander before attaching
-	
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	cell_defaults.functions.contact_function = adhesion_contact_function; 
+	cell_defaults.functions.update_migration_bias = NULL; 
+
 	// create the immune cell type 
 	create_immune_cell_type(); 
-	
+
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
 	
@@ -216,54 +160,12 @@ void create_cell_types( void )
 
 void setup_microenvironment( void )
 {
-	// set domain parameters
-/*
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
-	default_microenvironment_options.Z_range = {-1000, 1000}; 
-*/	
-/*
-	// now in XML 
-	default_microenvironment_options.X_range = {-750, 750}; 
-	default_microenvironment_options.Y_range = {-750, 750}; 
-	default_microenvironment_options.Z_range = {-750, 750};
-*/
 	
 	if( default_microenvironment_options.simulate_2D == true )
 	{
 		std::cout << "Warning: overriding 2D setting to return to 3D" << std::endl; 
 		default_microenvironment_options.simulate_2D = false; 
 	}
-	
-/* 
-	In XML as of version 1.6.0 
-	
-	// gradients are needed for this example 
-	
-	default_microenvironment_options.calculate_gradients = true; 
-	
-	// add the immunostimulatory factor 
-	
-	// let's do these in XML later 
-	
-	microenvironment.add_density( "immunostimulatory factor", "dimensionless" ); 
-	microenvironment.diffusion_coefficients[1] = 1e3; 
-	microenvironment.decay_rates[1] = .016; 
-	
-	// let BioFVM use oxygen as the default 
-	
-	default_microenvironment_options.use_oxygen_as_first_field = true; 
-
-	// set Dirichlet conditions 
-	
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // physioxic conditions 
-	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; 
-	default_microenvironment_options.Dirichlet_activation_vector[1] = false;  // no Dirichlet for the immunostimulatory factor 
-
-	// set initial conditions 
-	default_microenvironment_options.initial_condition_vector = { 38.0 , 0 }; 
-*/
 	
 	initialize_microenvironment(); 	
 
@@ -291,7 +193,6 @@ void introduce_immune_cells( void )
 	
 	std::cout << "current tumor radius: " << tumor_radius << std::endl; 
 	
-	
 	// now seed immune cells 
 	
 	int number_of_immune_cells = 
@@ -311,7 +212,7 @@ void introduce_immune_cells( void )
 		
 		double radius = NormalRandom( mean_radius, std_radius ); 
 		
-		Cell* pCell = create_cell( immune_cell ); 
+		Cell* pCell = create_cell( *pImmuneCell ); 
 		pCell->assign_position( radius*cos(theta)*sin(phi), radius*sin(theta)*sin(phi), radius*cos(phi) ); 
 	}
 	
@@ -362,8 +263,6 @@ void setup_tissue( void )
 	
 	Cell* pCell = NULL; 
 	
-	
-	
 	std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,tumor_radius); 
 	std::cout << "creating " << positions.size() << " closely-packed tumor cells ... " << std::endl; 
 	
@@ -374,9 +273,9 @@ void setup_tissue( void )
 	{
 		pCell = create_cell(); // tumor cell 
 		pCell->assign_position( positions[i] );
-		pCell->custom_data[0] = NormalRandom( imm_mean, imm_sd );
-		if( pCell->custom_data[0] < 0.0 )
-		{ pCell->custom_data[0] = 0.0; } 
+		pCell->custom_data["oncoprotein"] = NormalRandom( imm_mean, imm_sd );
+		if( pCell->custom_data["oncoprotein"] < 0.0 )
+		{ pCell->custom_data["oncoprotein"] = 0.0; } 
 	}
 	
 	double sum = 0.0; 
@@ -384,7 +283,7 @@ void setup_tissue( void )
 	double max = -9e9; 
 	for( int i=0; i < all_cells->size() ; i++ )
 	{
-		double r = (*all_cells)[i]->custom_data[0]; 
+		double r = (*all_cells)[i]->custom_data["oncoprotein"]; 
 		sum += r;
 		if( r < min )
 		{ min = r; } 
@@ -396,7 +295,7 @@ void setup_tissue( void )
 	sum = 0.0; 
 	for( int i=0; i < all_cells->size(); i++ )
 	{
-		sum +=  ( (*all_cells)[i]->custom_data[0] - mean )*( (*all_cells)[i]->custom_data[0] - mean ); 
+		sum +=  ( (*all_cells)[i]->custom_data["oncoprotein"] - mean )*( (*all_cells)[i]->custom_data["oncoprotein"] - mean ); 
 	}
 	double standard_deviation = sqrt( sum / ( all_cells->size() - 1.0 + 1e-15 ) ); 
 	
@@ -422,18 +321,6 @@ void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& p
 	static int immune_factor_index = microenvironment.find_density_index( "immunostimulatory factor" ); 
 	double o2 = pCell->nearest_density_vector()[o2_index];	
 
-/*	
-	if( o2 > pCell->parameters.o2_hypoxic_response )
-	{
-		phenotype.secretion.secretion_rates[immune_factor_index] = 0.0; 
-	}
-	else
-	{
-		double hypoxia = ( pCell->parameters.o2_hypoxic_response - o2 ) / ( pCell->parameters.o2_hypoxic_response + 1e-13 ); 
-		phenotype.secretion.secretion_rates[ immune_factor_index ] = 10.0 * hypoxia; 	
-	}
-*/
-	// new 
 	phenotype.secretion.secretion_rates[immune_factor_index] = 10.0; 
 	
 	update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
@@ -469,7 +356,7 @@ std::vector<std::string> cancer_immune_coloring_function( Cell* pCell )
 	} 
 
 	// if I'm under attack, color me 
-	if( pCell->state.neighbors.size() > 0 )
+	if( pCell->state.attached_cells.size() > 0 )
 	{
 		output[0] = "darkcyan"; // orangered // "purple"; // 128,0,128
 		output[1] = "black"; // "magenta"; 
@@ -512,6 +399,7 @@ std::vector<std::string> cancer_immune_coloring_function( Cell* pCell )
 	return output; 
 }
 
+/*
 void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant )
 {
 	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
@@ -522,9 +410,9 @@ void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_c
 
 void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	for( int i=0; i < pCell->state.neighbors.size() ; i++ )
+	for( int i=0; i < pCell->state.attached_cells.size() ; i++ )
 	{
-		add_elastic_velocity( pCell, pCell->state.neighbors[i], pCell->custom_data["elastic coefficient"] ); 
+		add_elastic_velocity( pCell, pCell->state.attached_cells[i], pCell->custom_data["elastic_coefficient"] ); 
 	}
 
 	return; 
@@ -536,22 +424,22 @@ void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 	{
 		
 	bool already_attached = false; 
-	for( int i=0 ; i < pCell_1->state.neighbors.size() ; i++ )
+	for( int i=0 ; i < pCell_1->state.attached_cells.size() ; i++ )
 	{
-		if( pCell_1->state.neighbors[i] == pCell_2 )
+		if( pCell_1->state.attached_cells[i] == pCell_2 )
 		{ already_attached = true; }
 	}
 	if( already_attached == false )
-	{ pCell_1->state.neighbors.push_back( pCell_2 ); }
+	{ pCell_1->state.attached_cells.push_back( pCell_2 ); }
 	
 	already_attached = false; 
-	for( int i=0 ; i < pCell_2->state.neighbors.size() ; i++ )
+	for( int i=0 ; i < pCell_2->state.attached_cells.size() ; i++ )
 	{
-		if( pCell_2->state.neighbors[i] == pCell_1 )
+		if( pCell_2->state.attached_cells[i] == pCell_1 )
 		{ already_attached = true; }
 	}
 	if( already_attached == false )
-	{ pCell_2->state.neighbors.push_back( pCell_1 ); }
+	{ pCell_2->state.attached_cells.push_back( pCell_1 ); }
 
 	}
 
@@ -564,16 +452,16 @@ void dettach_cells( Cell* pCell_1 , Cell* pCell_2 )
 	{
 		bool found = false; 
 		int i = 0; 
-		while( !found && i < pCell_1->state.neighbors.size() )
+		while( !found && i < pCell_1->state.attached_cells.size() )
 		{
 			// if cell 2 is in cell 1's list, remove it
-			if( pCell_1->state.neighbors[i] == pCell_2 )
+			if( pCell_1->state.attached_cells[i] == pCell_2 )
 			{
-				int n = pCell_1->state.neighbors.size(); 
+				int n = pCell_1->state.attached_cells.size(); 
 				// copy last entry to current position 
-				pCell_1->state.neighbors[i] = pCell_1->state.neighbors[n-1]; 
+				pCell_1->state.attached_cells[i] = pCell_1->state.attached_cells[n-1]; 
 				// shrink by one 
-				pCell_1->state.neighbors.pop_back(); 
+				pCell_1->state.attached_cells.pop_back(); 
 				found = true; 
 			}
 			i++; 
@@ -581,16 +469,16 @@ void dettach_cells( Cell* pCell_1 , Cell* pCell_2 )
 	
 		found = false; 
 		i = 0; 
-		while( !found && i < pCell_2->state.neighbors.size() )
+		while( !found && i < pCell_2->state.attached_cells.size() )
 		{
 			// if cell 1 is in cell 2's list, remove it
-			if( pCell_2->state.neighbors[i] == pCell_1 )
+			if( pCell_2->state.attached_cells[i] == pCell_1 )
 			{
-				int n = pCell_2->state.neighbors.size(); 
+				int n = pCell_2->state.attached_cells.size(); 
 				// copy last entry to current position 
-				pCell_2->state.neighbors[i] = pCell_2->state.neighbors[n-1]; 
+				pCell_2->state.attached_cells[i] = pCell_2->state.attached_cells[n-1]; 
 				// shrink by one 
-				pCell_2->state.neighbors.pop_back(); 
+				pCell_2->state.attached_cells.pop_back(); 
 				found = true; 
 			}
 			i++; 
@@ -600,6 +488,7 @@ void dettach_cells( Cell* pCell_1 , Cell* pCell_2 )
 	
 	return; 
 }
+*/
 
 void immune_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 {
@@ -609,9 +498,8 @@ void immune_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	static int immune_factor_index = microenvironment.find_density_index( "immunostimulatory factor" ); 
 
 	// if not docked, attempt biased chemotaxis 
-	if( pCell->state.neighbors.size() == 0 )
+	if( pCell->state.attached_cells.size() == 0 )
 	{
-		// phenotype.motility.migration_bias = 0.25; 
 		phenotype.motility.is_motile = true; 
 		
 		phenotype.motility.migration_bias_direction = pCell->nearest_gradient(immune_factor_index);	
@@ -646,19 +534,19 @@ Cell* immune_cell_check_neighbors_for_attachment( Cell* pAttacker , double dt )
 bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt )
 {
 	static int oncoprotein_i = pTarget->custom_data.find_variable_index( "oncoprotein" ); 
-	static int attach_rate_i = pAttacker->custom_data.find_variable_index( "attachment rate" ); 
+	static int attach_rate_i = pAttacker->custom_data.find_variable_index( "attachment_rate" ); 
 
-	static double oncoprotein_saturation = 
-		parameters.doubles("oncoprotein_saturation"); // 2.0; 
-	static double oncoprotein_threshold =  
-		parameters.doubles("oncoprotein_threshold"); // 0.5; // 0.1; 
-	static double oncoprotein_difference = oncoprotein_saturation - oncoprotein_threshold;
+	double oncoprotein_saturation = 
+		pAttacker->custom_data["oncoprotein_saturation"];  
+	double oncoprotein_threshold =  
+		pAttacker->custom_data["oncoprotein_threshold"];   
+	double oncoprotein_difference = oncoprotein_saturation - oncoprotein_threshold;
 	
-	static double max_attachment_distance = 
-		parameters.doubles("max_attachment_distance"); // 18.0; 
-	static double min_attachment_distance = 
-		parameters.doubles("min_attachment_distance"); // 14.0; 
-	static double attachment_difference = max_attachment_distance - min_attachment_distance; 
+	double max_attachment_distance = 
+		pAttacker->custom_data["max_attachment_distance"];   
+	double min_attachment_distance = 
+		pAttacker->custom_data["min_attachment_distance"];   
+	double attachment_difference = max_attachment_distance - min_attachment_distance; 
 	
 	if( pTarget->custom_data[oncoprotein_i] > oncoprotein_threshold && pTarget->phenotype.death.dead == false )
 	{
@@ -695,17 +583,14 @@ bool immune_cell_attempt_apoptosis( Cell* pAttacker, Cell* pTarget, double dt )
 {
 	static int oncoprotein_i = pTarget->custom_data.find_variable_index( "oncoprotein" ); 
 	static int apoptosis_model_index = pTarget->phenotype.death.find_death_model_index( "apoptosis" );	
-	static int kill_rate_index = pAttacker->custom_data.find_variable_index( "kill rate" ); 
+	static int kill_rate_index = pAttacker->custom_data.find_variable_index( "kill_rate" ); 
 	
-	
-	
-	static double oncoprotein_saturation = 
-		parameters.doubles("oncoprotein_saturation"); // 2.0; 
-	static double oncoprotein_threshold =  
-		parameters.doubles("oncoprotein_threshold"); // 0.5; // 0.1; 
-	static double oncoprotein_difference = oncoprotein_saturation - oncoprotein_threshold;
+	double oncoprotein_saturation = 
+		pAttacker->custom_data["oncoprotein_saturation"]; // 2.0; 
+	double oncoprotein_threshold =  
+		pAttacker->custom_data["oncoprotein_threshold"]; // 0.5; // 0.1; 
+	double oncoprotein_difference = oncoprotein_saturation - oncoprotein_threshold;
 
-	
 	// new 
 	if( pTarget->custom_data[oncoprotein_i] < oncoprotein_threshold )
 	{ return false; }
@@ -717,8 +602,6 @@ bool immune_cell_attempt_apoptosis( Cell* pAttacker, Cell* pTarget, double dt )
 	if( scale > 1.0 )
 	{ scale = 1.0; } 
 	
-	
-//	if( UniformRandom() < pAttacker->custom_data[kill_rate_index] * pTarget->custom_data[oncoprotein_i] * dt )
 	if( UniformRandom() < pAttacker->custom_data[kill_rate_index] * scale * dt )
 	{ 
 		std::cout << "\t\t kill!" << " " << pTarget->custom_data[oncoprotein_i] << std::endl; 
@@ -741,7 +624,7 @@ bool immune_cell_trigger_apoptosis( Cell* pAttacker, Cell* pTarget )
 
 void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static int attach_lifetime_i = pCell->custom_data.find_variable_index( "attachment lifetime" ); 
+	static int attach_lifetime_i = pCell->custom_data.find_variable_index( "attachment_lifetime" ); 
 	
 	if( phenotype.death.dead == true )
 	{
@@ -754,17 +637,18 @@ void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// if I'm docked
-	if( pCell->state.neighbors.size() > 0 )
+	if( pCell->state.number_of_attached_cells() > 0 )
 	{
+		/*
 		extra_elastic_attachment_mechanics( pCell, phenotype, dt );
 		
 		// attempt to kill my attached cell
 		
 		bool dettach_me = false; 
 		
-		if( immune_cell_attempt_apoptosis( pCell, pCell->state.neighbors[0], dt ) )
+		if( immune_cell_attempt_apoptosis( pCell, pCell->state.attached_cells[0], dt ) )
 		{
-			immune_cell_trigger_apoptosis( pCell, pCell->state.neighbors[0] ); 
+			immune_cell_trigger_apoptosis( pCell, pCell->state.attached_cells[0] ); 
 			dettach_me = true; 
 		}
 		
@@ -777,9 +661,10 @@ void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 		
 		if( dettach_me )
 		{
-			dettach_cells( pCell, pCell->state.neighbors[0] ); 
+			dettach_cells( pCell, pCell->state.attached_cells[0] ); 
 			phenotype.motility.is_motile = true; 
 		}
+		*/
 		return; 
 	}
 	
@@ -793,6 +678,26 @@ void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 		return; 
 	}
 	phenotype.motility.is_motile = true; 
+	
+	return; 
+}
+
+void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt )
+{
+	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
+	
+	static double max_elastic_displacement = pao.geometry.radius * pao.mechanics.relative_detachment_distance; 
+	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
+	
+	// detach cells if too far apart 
+	
+	if( norm_squared( displacement ) > max_displacement_squared )
+	{
+		detach_cells( pActingOn , pAttachedTo );
+		return; 
+	}
+	
+	axpy( &(pActingOn->velocity) , pao.mechanics.attachment_elastic_constant , displacement ); 
 	
 	return; 
 }
