@@ -35,7 +35,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -74,22 +74,20 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-750</x_min>
-		<x_max>750</x_max>
-		<y_min>-750</y_min>
-		<y_max>750</y_max>
-		<z_min>-750</z_min>
-		<z_max>750</z_max>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
+		<z_min>-10</z_min>
+		<z_max>10</z_max>
 		<dx>20</dx>
 		<dy>20</dy>
 		<dz>20</dz>
-		<use_2D>false</use_2D>
+		<use_2D>true</use_2D>
 	</domain>
 	
-	<!-- [-750,750]^3 --> 
-	
 	<overall>
-		<max_time units="min">30240</max_time> <!-- 21 days * 24 h * 60 min -->
+		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -99,7 +97,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>12</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -111,7 +109,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">15</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -125,27 +123,70 @@
 	</options>	
 
 	<microenvironment_setup>
-		<variable name="oxygen" units="mmHg" ID="0">
+		<variable name="food" units="dimensionless" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000</diffusion_coefficient>
-				<decay_rate units="1/min">0.1</decay_rate>  
+				<diffusion_coefficient units="micron^2/min">100.0</diffusion_coefficient>
+				<decay_rate units="1/min">0</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="mmHg">38</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="true">38</Dirichlet_boundary_condition>
-		</variable>
+			<initial_condition units="dimensionless">1</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->			
+ 		</variable>
 		
-		<variable name="immunostimulatory factor" units="dimensionless" ID="1">
+		<variable name="prey signal" units="dimensionless" ID="1">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-				<decay_rate units="1/min">0.016</decay_rate>  
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
-			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
-		</variable>		
-	
+			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>		
+
+		<variable name="predator signal" units="dimensionless" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>		
+
+		
 		<options>
 			<calculate_gradients>true</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
+			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
@@ -155,12 +196,14 @@
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
 		</options>
-	</microenvironment_setup>		
-
+	</microenvironment_setup>	
+	
 	<cell_definitions>
-		<cell_definition name="cancer cell" ID="0">
+		<cell_definition name="farmer" ID="0">
 			<phenotype>
 				<cycle code="5" name="live">  
+					<!-- phases are: G0/G1 , S, G2, M --> 
+
 					<!-- using higher than normal significant digits to match divisions in default code -->
 					<!-- use phase_transition_rates OR phase_durations -->
 					<phase_transition_rates units="1/min"> 
@@ -168,6 +211,14 @@
 					</phase_transition_rates>
 					
 					<!-- use phase_transition_rates OR phase_durations -->
+<!--					
+					<phase_durations units="min"> 
+						<duration index="0" fixed_duration="false">300.0</duration>
+						<duration index="1" fixed_duration="true">480</duration>
+						<duration index="2" fixed_duration="true">240</duration>
+						<duration index="3" fixed_duration="true">60</duration>
+					</phase_durations>
+-->					
 				</cycle>
 				
 				<death>  
@@ -252,25 +303,32 @@
 					<migration_bias units="dimensionless">0.5</migration_bias>
 					
 					<options>
-						<enabled>false</enabled>
-						<use_2D>false</use_2D>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
 						<chemotaxis>
 							<enabled>false</enabled>
-							<substrate>immunostimulatory factor</substrate>
-							<direction>1</direction>
+							<substrate>food</substrate>
+							<direction>-1</direction>
 						</chemotaxis>
 					</options>
 				</motility>
 				
 				<secretion>
-					<substrate name="oxygen">
-						<secretion_rate units="1/min">0</secretion_rate>
-						<secretion_target units="substrate density">38</secretion_target>
-						<uptake_rate units="1/min">10</uptake_rate>
+					<substrate name="food">
+						<secretion_rate units="1/min">100</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 
 
-					<substrate name="immunostimulatory factor">
+					<substrate name="predator signal">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+
+					<substrate name="prey signal">
 						<secretion_rate units="1/min">0</secretion_rate>
 						<secretion_target units="substrate density">1</secretion_target>
 						<uptake_rate units="1/min">0</uptake_rate>
@@ -281,78 +339,111 @@
 				<molecular />
 			</phenotype>
 			<custom_data>  
-				<oncoprotein units="dimensionless">1.0</oncoprotein>
-				<elastic_coefficient units="1/min">0.01</elastic_coefficient>
-				<kill_rate units="1/min">0.06667</kill_rate>
-				<attachment_lifetime units="min">60</attachment_lifetime>
-				<attachment_rate units="1/min">0.2</attachment_rate>
-				<oncoprotein_saturation units="dimensionless">2.0</oncoprotein_saturation>
-				<oncoprotein_threshold units="dimensionless">0.5</oncoprotein_threshold>
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
 				
-				<max_attachment_distance units="micron">18.0</max_attachment_distance>
-				<min_attachment_distance units="micron">14.0</min_attachment_distance>
+				<predator_weight units="dimensionless">-1</predator_weight>
+				<prey_weight units="dimensionless">-1</prey_weight>
+				<food_weight units="dimensionless">-10</food_weight>
 			</custom_data>
 		</cell_definition>
-
-		<cell_definition name="immune cell" ID="1" parent_type="cancer cell">
+		
+		<cell_definition name="prey" ID="1" parent_type="farmer">
 			<phenotype>
 				<cycle code="5" name="live">  
+					<!-- phases are: G0/G1 , S, G2, M --> 
+
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<!-- use phase_transition_rates OR phase_durations -->
 					<phase_transition_rates units="1/min"> 
-						<rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
+						<rate start_index="0" end_index="0" fixed_duration="false">0.003</rate>
 					</phase_transition_rates>
-				</cycle>
-				
-				<motility>  
-					<speed units="micron/min">1</speed>
-					<persistence_time units="min">10</persistence_time>
+				</cycle> 
+				<secretion>
+					<substrate name="food">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<uptake_rate units="1/min">1</uptake_rate>
+					</substrate> 
+
+					<substrate name="prey signal">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
+				<motility>
+					<speed units="micron/min">0.5</speed>
+					<persistence_time units="min">5</persistence_time>
 					<migration_bias units="dimensionless">0.5</migration_bias>
-					
 					<options>
 						<enabled>true</enabled>
-						<use_2D>false</use_2D>
+						<use_2D>true</use_2D>
 						<chemotaxis>
 							<enabled>false</enabled>
-							<substrate>immunostimulatory factor</substrate>
+							<substrate>food</substrate>
 							<direction>1</direction>
 						</chemotaxis>
 					</options>
-				</motility>				
+				</motility>
+			</phenotype>
+			<custom_data>  
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
 				
-			</phenotype> 
-			<custom_data>
-				<oncoprotein units="dimensionless">0</oncoprotein>
+				<predator_weight units="dimensionless">-100</predator_weight>
+				<prey_weight units="dimensionless">10</prey_weight>
+				<food_weight units="dimensionless">1</food_weight>
 			</custom_data>
-		</cell_definition> 
+		</cell_definition>
+		
+		<cell_definition name="predator" ID="2" parent_type="farmer">
+			<phenotype>
+				<secretion>
+					<substrate name="food">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 
+
+					<substrate name="predator signal">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
+				<motility>
+					<speed units="micron/min">0.5</speed>
+					<persistence_time units="min">2.5</persistence_time>
+					<migration_bias units="dimensionless">0.7</migration_bias>
+
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>false</enabled>
+							<substrate>prey signal</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+			</phenotype>
+			<custom_data>  
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
+				
+				<predator_weight units="dimensionless">-2</predator_weight>
+				<prey_weight units="dimensionless">100</prey_weight>
+				<food_weight units="dimensionless">1</food_weight>
+			</custom_data>
+		</cell_definition>
+		
 	</cell_definitions>
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
-
-		<!-- main --> 
-		<immune_activation_time type="double" units="min">20160</immune_activation_time> <!--20160 -->
-			<!-- activate in 7 days --> 
-		<save_interval_after_therapy_start type="double" units="min">15.0</save_interval_after_therapy_start>
-		<SVG_interval_after_therapy_start type="double" units="min">3.0</SVG_interval_after_therapy_start>
+		<!-- example parameters from the template --> 
 		
-		<!-- immune cell properties --> 
-		<immune_o2_relative_uptake type="double" units="dimensionless">0.1</immune_o2_relative_uptake>
-		<immune_relative_adhesion type="double" units="dimensionless">0</immune_relative_adhesion>
-		<immune_relative_repulsion type="double" units="dimensionless">5</immune_relative_repulsion> 	
-
-		<!-- immune seeding parameters --> 
+		<div_initialization type="divider" description="---Initialization settings---"/>
 		
-		<number_of_immune_cells type="int" units="dimensionless">7500</number_of_immune_cells> 
-		<initial_min_immune_distance_from_tumor type="double" units="micron">30</initial_min_immune_distance_from_tumor> <!-- 30 --> 
-		<thickness_of_immune_seeding_region type="double" units="micron">75</thickness_of_immune_seeding_region>
-		
-		<!-- tissue setup -->
-		<tumor_radius type="double" units="micron">250</tumor_radius>
-		<tumor_mean_immunogenicity type="double" units="dimensionless">1.0</tumor_mean_immunogenicity>
-		<tumor_immunogenicity_standard_deviation type="double" units="dimensionless">0.25</tumor_immunogenicity_standard_deviation>
-		
-		
-
-		
+		<number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">15</number_of_cells>
 	</user_parameters>
 	
 </PhysiCell_settings>
