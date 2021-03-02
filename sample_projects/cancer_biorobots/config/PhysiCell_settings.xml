@@ -314,7 +314,7 @@
 			</custom_data>
 		</cell_definition>
 		
-		<cell_definition name="cargo cell" ID="1" parent_type="default">		
+		<cell_definition name="cargo cell" ID="1" parent_type="cancer cell">		
 			<phenotype>
 				<cycle code="5" name="live">  
 					<phase_transition_rates units="1/min"> 
@@ -345,7 +345,7 @@
 			</custom_data>
 		</cell_definition> 
 		
-		<cell_definition name="worker cell" ID="2" parent_type="default">		
+		<cell_definition name="worker cell" ID="2" parent_type="cancer cell">		
 			<phenotype>
 				<cycle code="5" name="live">  
 					<phase_transition_rates units="1/min"> 
