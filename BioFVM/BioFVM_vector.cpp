@@ -292,16 +292,17 @@ std::vector<double> exponentiate( const std::vector<double>& exponent )
 
  return out; 
 }
- 
-void randomize( std::vector<double>* v )
-{
- static double d1 = 2.0 / (double) RAND_MAX; 
 
- for( unsigned int i=0; i < v->size(); i++ )
- { (*v)[i] =  -1 + d1 * rand(); }
+// Comment out to prevent use of "rand()"
+// void randomize( std::vector<double>* v )
+// {
+//  static double d1 = 2.0 / (double) RAND_MAX; 
+
+//  for( unsigned int i=0; i < v->size(); i++ )
+//  { (*v)[i] =  -1 + d1 * rand(); }
  
- return; 
-}
+//  return; 
+// }
 
 /* axpy and related BLAS-type operations */ 
 
