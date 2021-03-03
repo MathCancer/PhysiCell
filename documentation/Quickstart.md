@@ -82,7 +82,7 @@ $ ./biorobots
 ```
 This will begin the simulation, write information to your terminal, and generate output files of types `.svg`, `.xml`, and `.mat`. More about those below. You can `Control-c` to kill the simulation early, if you want.
 
-For the remaining three example projects provided with PhysiCell, you would follow similar steps, but first, you may want to clean out the previous simulation's output and prepare for the new one:
+For the remaining example projects provided with PhysiCell, you would follow similar steps, but first, you may want to clean out the previous simulation's output and prepare for the new one:
 ```
 $ make data-cleanup   # Delete output data. (Optionally, manually move it to another directory to keep it)
 $ make reset          # clear out the sample project / clean slate
@@ -129,8 +129,8 @@ $ ./cancer_immune_3D
 
 PhysiCell does not currently provide a GUI for visualizing output results. Our approach, at least for now,
 is to suggest and offer guidance on using other tools, e.g. your browser, [ImageMagick](https://www.imagemagick.org), 
-[MATLAB](https://www.mathworks.com/products/matlab.html), [Octave](https://octave.sourceforge.io/), 
-[ParaView](https://www.paraview.org/), and more.
+[MATLAB](https://www.mathworks.com/products/matlab.html), [Octave](https://octave.sourceforge.io/), Python, or 
+[ParaView](https://www.paraview.org/).
 
 ### Browser
 
