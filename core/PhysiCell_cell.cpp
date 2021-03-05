@@ -2402,9 +2402,10 @@ std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
 	std::vector<Cell*>::iterator end = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
 	for( neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
 	{
-		if( pCell->phenotype.geometry.radius + (*neighbor)->phenotype.geometry.radius <= 
-			pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius + 
-		(*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
+		std::vector<double> displacement = (*neighbor)->position - pCell->position; 
+		double distance = norm( displacement ); 
+		if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
+			+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
 		{ neighbors.push_back( *neighbor ); }
 	}
 
@@ -2422,9 +2423,10 @@ std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
 		end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
 		for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
 		{
-			if( pCell->phenotype.geometry.radius + (*neighbor)->phenotype.geometry.radius <= 
-				pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius + 
-			(*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
+			std::vector<double> displacement = (*neighbor)->position - pCell->position; 
+			double distance = norm( displacement ); 
+			if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
+				+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
 			{ neighbors.push_back( *neighbor ); }
 		}
 	}
