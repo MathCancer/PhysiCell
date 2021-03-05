@@ -1117,10 +1117,10 @@ std::vector<Cell*>& Cell::cells_in_my_container( void )
 }
 
 std::vector<Cell*> Cell::nearby_cells( void )
-{ return PhysiCell::nearby_cells( this ); }
+{ return find_nearby_cells( this ); }
 
 std::vector<Cell*> Cell::nearby_interacting_cells( void )
-{ return PhysiCell::nearby_interacting_cells( this ); }
+{ return find_nearby_interacting_cells( this ); }
 
 void Cell::ingest_cell( Cell* pCell_to_eat )
 {
@@ -2363,7 +2363,7 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 )
 	return; 
 }
 
-std::vector<Cell*> nearby_cells( Cell* pCell )
+std::vector<Cell*> find_nearby_cells( Cell* pCell )
 {
 	std::vector<Cell*> neighbors = {}; 
 
@@ -2393,7 +2393,7 @@ std::vector<Cell*> nearby_cells( Cell* pCell )
 	return neighbors; 
 }
 
-std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
+std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell )
 {
 	std::vector<Cell*> neighbors = {}; 
 
