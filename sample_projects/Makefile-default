@@ -63,7 +63,7 @@ all:
 # sample projects 	
 list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
-	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm-sample"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -148,7 +148,7 @@ pred-prey-farmer:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/pred_prey_farmer/config/* ./config/	
 	
-worm:
+worm-sample:
 	cp ./sample_projects/worm/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/worm/main.cpp ./main.cpp 

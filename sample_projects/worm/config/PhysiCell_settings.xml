@@ -280,7 +280,7 @@
 		<!-- properties of head cells --> 
 		<head_migration_direction type="double" units="none" description="+1: grad(signal). -1: -grad(signal)">-1</head_migration_direction>
 		<head_migration_speed type="double" units="micron/min" description="migration speed for head cells">0.75</head_migration_speed>
-		<head_migration_bias type="double" units="micron/min" description="migration bias for head cells">0.75</head_migration_bias>
+		<head_migration_bias type="double" units="micron/min" description="migration bias for head cells">0.5</head_migration_bias>
 		<head_migration_persistence type="double" units="micron/min" description="migration persistence time for head cells">60</head_migration_persistence>
 
 		<!-- properties of tail cells --> 
