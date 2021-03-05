@@ -63,7 +63,7 @@ all:
 # sample projects 	
 list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
-	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -148,6 +148,15 @@ pred-prey-farmer:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/pred_prey_farmer/config/* ./config/	
 	
+worm:
+	cp ./sample_projects/worm/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/worm/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/worm/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/worm/config/* ./config/	
+
 # early examples for convergence testing 
 
 physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
