@@ -2405,7 +2405,8 @@ std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
 		std::vector<double> displacement = (*neighbor)->position - pCell->position; 
 		double distance = norm( displacement ); 
 		if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
-			+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
+			+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius 
+			&& (*neighbor) != pCell )
 		{ neighbors.push_back( *neighbor ); }
 	}
 
@@ -2426,7 +2427,8 @@ std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
 			std::vector<double> displacement = (*neighbor)->position - pCell->position; 
 			double distance = norm( displacement ); 
 			if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
-				+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
+				+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius
+				&& (*neighbor) != pCell	)
 			{ neighbors.push_back( *neighbor ); }
 		}
 	}
