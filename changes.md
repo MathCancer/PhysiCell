@@ -28,7 +28,7 @@ The release also add a number of features to improve the ease of code use: a cop
 
 `void contact( Cell* pME, Phenotype& my_phenotype , Cell* pOther, Phenotype& other_phenotype, double dt )`
 
-These are exexcuted once per mechanics time step. Best practice is to either only read `pOther` and `other_phenotype`, or use OMP critical locks. 
+These are exexcuted once per mechanics time step. Best practice is to either only read `pOther` and `other_phenotype`, or use OMP critical locks if writing data to `pOther` and `other_phenotype`. 
 
 For any cell (`this`), the contact function will be executed for any other cell (other) in `this->state.attached_cells`. The modeler will still need to decide which cells to attach. 
 
@@ -47,15 +47,23 @@ All attached cells are automatically removed when a cell dies or divides.
 
 This will add an additional Hookean spring attraction to cells in `state.attached_cells`. The modeler will still need to decide when to attach or detach cells. (Recommended practice: use the `custom` function that is evaluated once per mechanics time step.) 
 
++ Introduced two new member search funtions for cells to facilitate contact functions: 
+++ `std::vector<Cell*> nearby_cells(void)` returns a vector of all cells in the nearby mechanics voxels, excluding the cell (`this`). 
+Users should still test the distance to these cells in their interaction functions. 
+++ `std::vector<Cell*> nearby_interacting_cells(void)` returns a vector of all cells in the nearby mechanics voxels that are within interaction distance, excluding the cell (`this`). This uses the same distance testing as in the default mechanics functions. 
+
++ Introduced two new search funtions outside the `Cell` class to facilitate contact functions: 
+++ `std::vector<Cell*> nearby_cells(Cell* pCell)` returns a vector of all cells in the nearby mechanics voxels, excluding the cell (`pCell`). 
+Users should still test the distance to these cells in their interaction functions. 
+++ `std::vector<Cell*> nearby_interacting_cells(Cell* pCell)` returns a vector of all cells in the nearby mechanics voxels that are within interaction distance, excluding the cell (`pCell`). This uses the same distance testing as in the default mechanics functions. 
+
++ The default mechanics function now automatically updates `state.neighbors` with a list of all cells which had non-zero mechanical interactions in the last mechanics time step. Use this as an inexpensive (``prepaid``) method to find nearby cells for your own contact functions. 
+
++ Introduced a new sample project `worm` which shows advanced interaction testing and contact testing. Individual cells aggregate based on chemotaxis towards a secreted quorum factor and test for contacts. Cells can form a maximum of `n` (default: 2) attachments with the built-in spring functions. Cells on the ends (1 attachment) hold a steady expression of a differentiation function (`head`). This factor is exchanged between interior cells (2 attachments) to model juxtacrine signaling, using a contact function. End cells determine if they are a head or a tail based by comparing their expresoin with their linked neibhbor. This introduces asymmmetry that allows the "worms" to crawl directionally. 
+
 + All sample projects now copy the configuration file to the output directory, to help keep track of settings and parameters used to create a simulation result. 
 
-+ Updated the following sample projects to use the new Cell_Definitions and contact functions: 
-++ template2D
-++ template3D
-++ template
-++ biorobots-sample
-++ cancer-biorobots-sample
-++ heterogeneity-sample
++ Updated the sample projects to use the new Cell_Definitions and contact functions. 
 
 + Users can now pre-specify cell positions by creating a CSV file: 
 ++ Each row corresponds to a cell:     x,y,z,typeID
@@ -66,35 +74,33 @@ This will add an additional Hookean spring attraction to cells in `state.attache
 
 + Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined or modified in the next few releases while still in beta. 
 
-+ All sample projects have a "make jpeg" rule that uses ImageMagick to convert SVG snapshots into JPG files. 
++ All sample projects have a `make jpeg` rule that uses ImageMagick to convert SVG snapshots into JPG files. 
 
-+ All sample projects have a "make movie" that uses ffmepg to convert JPG snapshots to an mp4 animation. 
++ All sample projects have a `make movie` that uses ffmepg to convert JPG snapshots to an mp4 animation. 
 
-+ New "paint by numbers" coloring function 
++ The `make upgrade` rule will check for and download the most recent version of PhysiCell, overwriting these core functions (and sample projects) without overwriting your project code. 
 
-+ Cycle and Death in Cell_Definitions no longer require a "code" as long as the "name" is correct. 
++ A new `paint_by_number_cell_coloring` coloring function colors each cell type with a unique color. (Currently there is a maximum of 13 pre-defined colors for 13 cell types.) Apoptotic cells are black, and necrotic cells are brown. 
+
++ Cycle and Death in the XML `Cell_Definitions` no longer require a `code` as long as the `name` is correct. 
 
 + Revised template project to a barebones minimum. 
 
-+ Removed beta-testing sample project 
++ Removed beta-testing sample project. 
 
-+ Legend  
-
++ Added functionality to auto-generate an SVG legend based on the currently defined XML funtions and coloring function. 
 
 ### Beta features (not fully supported):
  
-+ Signaling 
++ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
 
-
-+ Geometry stuff 
-
++ Started creating new functions to fill geometric shapes with cells of a chosen type. 
   
 ### Bugfixes: 
 
 + In response to SourceForge ticket #43, fixed the bug where Dirichlet conditions weren't properly applied to individual boundaries. 
 
 + Cleaned up code as suggested in SourceForge Ticket #42.
-
 
 ### Notices for intended changes that may affect backwards compatibility:
  
@@ -110,17 +116,13 @@ This will add an additional Hookean spring attraction to cells in `state.attache
 
 ### Planned future improvements: 
 
-+ Methods or scripts to make "upgrading" PhysiCell easier for existing projects (to avoid overwriting the config file, Makefile, or custom files. 
- 
 + Further XML-based simulation setup. 
 
-+ current sample projects will be refactored to use XML cdell definitions. 
++ Read saved simulation states (as MultiCellDS digital snapshots)
  
-+ read saved simulation states (as MultiCellDS digital snapshots)
- 
-+ integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
++ Integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
   
-+ integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
++ Integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
   
 + Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
  
@@ -128,11 +130,11 @@ This will add an additional Hookean spring attraction to cells in `state.attache
  
 + Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
  
-+ create an angiogenesis sample project 
++ Create an angiogenesis sample project 
  
-+ create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
++ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
 
-+ improved plotting options in SVG 
++ Improved plotting options in SVG 
 
 * * * 
 
