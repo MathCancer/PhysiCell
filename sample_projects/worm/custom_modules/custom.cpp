@@ -88,9 +88,8 @@ void create_cell_types( void )
 	cell_defaults.functions.update_migration_bias = NULL; 
 	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
-	cell_defaults.functions.contact_function = NULL; 
 	
-	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL;  
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
 	/*
@@ -105,10 +104,13 @@ void create_cell_types( void )
 	   This is a good place to set custom functions. 
 	*/ 
 	
-	cell_defaults.functions.update_phenotype = phenotype_function; 
+	cell_defaults.functions.update_phenotype = NULL; 
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
 	
+	cell_defaults.phenotype.mechanics.attachment_elastic_constant = 
+		parameters.doubles("attachment_elastic_constant"); 
+		
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -177,17 +179,182 @@ void setup_tissue( void )
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
 	
+	// set the initial value of all the cells 
+	for( int n=0; n < (*all_cells).size(); n++ )
+	{
+		Cell* pC = (*all_cells)[n]; 
+		pC->custom_data["head"] = UniformRandom(); 
+		pC->custom_data["head_initial"] = pC->custom_data["head"];
+	}
+	
 	return; 
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{ return paint_by_number_cell_coloring(pCell); }
+{
+	if( pCell->state.number_of_attached_cells() == 0 )
+	{ return { "grey", "black", "grey", "grey"}; }
+
+	if( pCell->state.number_of_attached_cells() == 1 )
+	{
+		if( pCell->custom_data["head"] > pCell->state.attached_cells[0]->custom_data["head"] )
+		{ return { "red", "black", "red", "red"};  } 
+		
+		return { "orange", "black", "orange", "orange"}; 
+	}
+
+	if( pCell->state.number_of_attached_cells() >= 2 )
+	{
+		// shaed by head protein value 
+		int intensity = (int) floor( 255.0 * pCell->custom_data["head"] ); 
+		std::string strColor = std::to_string(intensity); 
+		std::string color = "rgb(" + strColor + "," + strColor + ",255)"; 
+		
+		if( pCell->state.number_of_attached_cells() > 2 )
+		{ return { "yellow", "black" , color, color }; }
+
+		return { color , "black", color, color}; 	
+	}
+
+	return { "yellow", "black", "yellow", "yellow" }; 
+}
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
 
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
-{ return; } 
+{
+	// bookkeeping 
+	
+	static int nSignal = microenvironment.find_density_index("signal");
+	
+	// look for cells to form attachments, if 0 attachments
+	int number_of_attachments = pCell->state.number_of_attached_cells(); 
+	std::vector<Cell*> nearby = pCell->nearby_interacting_cells(); 
+	
+	if( number_of_attachments == 0 )
+	{
+		int n = 0; 
+		while( number_of_attachments < (int) pCell->custom_data["max_attachments"] && n < nearby.size() )
+		{
+			if( nearby[n]->state.number_of_attached_cells() < nearby[n]->custom_data["max_attachments"] )
+			{
+				attach_cells( nearby[n] , pCell ); 
+				number_of_attachments++;
+			}
+			n++; 
+		}
+	}
 
-void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
-{ return; } 
+	// if no attachments, use chemotaxis 
+	if( number_of_attachments == 0 )
+	{ pCell->functions.update_migration_bias = chemotaxis_function; } 
+	
+	// if 1 attachment, do some logic  
+	if( number_of_attachments == 1 )
+	{
+		// constant expression in end cells 
+		pCell->custom_data["head"] = pCell->custom_data["head_initial"];
+
+		// am I the head? 
+		bool head = false; 
+		if( pCell->custom_data["head"] > pCell->state.attached_cells[0]->custom_data["head"] )
+		{ head = true; } 
+		
+		if( head )
+		{ pCell->functions.update_migration_bias = head_migration_direction; }
+		else
+		{ pCell->functions.update_migration_bias = tail_migration_direction; }
+		phenotype.secretion.secretion_rates[nSignal] = 100; 
+	} 
+	
+	// if 2 or more attachments, use middle 
+	if( number_of_attachments > 1 )
+	{
+		pCell->functions.update_migration_bias = middle_migration_direction;
+		phenotype.secretion.secretion_rates[nSignal] = 1; 
+	} 
+	
+	return; 
+} 
+
+void contact_function( Cell* pMe, Phenotype& phenoMe, 
+	Cell* pOther, Phenotype& phenoOther, double dt )
+{
+	// spring-like adhesion 
+	standard_elastic_contact_function(pMe,phenoMe,pOther,phenoOther,dt);
+
+	// juxtacrine 
+	if( pMe->state.number_of_attached_cells() > 0 )
+	{
+		double head_me = pMe->custom_data["head"];
+		double head_other = pOther->custom_data["head"]; 
+		
+		// avoid double-counting transfer: 
+		// Only do the high -> low transfers
+		// One cell of each pair will satisfy this. 
+			
+		// make the transfer 
+		if( head_me > head_other )
+		{
+			double amount_to_transfer = dt * pMe->custom_data["transfer_rate"] 
+				* (head_me - head_other ); 
+			pMe->custom_data["head"] -= amount_to_transfer; 
+			#pragma omp critical
+			{ pOther->custom_data["head"] += amount_to_transfer; }
+		}	
+	}
+
+}
+
+void head_migration_direction( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	phenotype.motility.chemotaxis_direction = parameters.doubles("head_migration_direction"); 
+	
+	phenotype.motility.migration_speed = parameters.doubles("head_migration_speed"); 
+	phenotype.motility.migration_bias = parameters.doubles("head_migration_bias");
+	phenotype.motility.persistence_time =parameters.doubles("head_migration_persistence"); 
+	
+	// use this for fun rotational paths 
+	/*
+	double r = norm( pCell->position ) + 1e-16; 
+	phenotype.motility.migration_bias_direction[0] = - pCell->position[1] / r; 
+	phenotype.motility.migration_bias_direction[1] = pCell->position[0] / r; 
+
+	normalize( &(phenotype.motility.migration_bias_direction) ); 
+	return; 
+	*/
+	
+	return chemotaxis_function( pCell,phenotype,dt); 
+}
+
+void tail_migration_direction( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	phenotype.motility.chemotaxis_direction = parameters.doubles("tail_migration_direction"); 
+	
+	phenotype.motility.migration_speed = parameters.doubles("tail_migration_speed");  0; 
+	phenotype.motility.migration_bias = parameters.doubles("tail_migration_bias");0.5; 
+	phenotype.motility.persistence_time = parameters.doubles("tail_migration_persistence"); 100; 
+
+	return chemotaxis_function( pCell,phenotype,dt); 
+}
+
+void middle_migration_direction( Cell* pCell, Phenotype& phenotype , double dt )
+{
+	// get velocity from "Upstream" 
+	Cell* pUpstream = pCell->state.attached_cells[0]; 
+
+	if( pCell->state.attached_cells[1]->custom_data["head"] > 
+		pCell->state.attached_cells[0]->custom_data["head"] )
+	{ pUpstream = pCell->state.attached_cells[1]; }
+	
+	phenotype.motility.migration_speed = parameters.doubles("middle_migration_speed"); 
+	phenotype.motility.migration_bias_direction = 
+		pUpstream->phenotype.motility.migration_bias_direction;
+		
+	normalize( &(phenotype.motility.migration_bias_direction) ); 
+		
+	return; 
+}
+
+

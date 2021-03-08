@@ -153,7 +153,7 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-
+	
 	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
 	create_plot_legend( filename , cell_coloring_function ); 
 	
@@ -174,11 +174,6 @@ int main( int argc, char* argv[] )
 	}
 	
 	// main loop 
-	
-	std::cout << std::endl << st::endl; 
-	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
-	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
-	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl << std::endl; 
 	
 	try 
 	{		
@@ -240,11 +235,6 @@ int main( int argc, char* argv[] )
 	{ // reference to the base of a polymorphic object
 		std::cout << e.what(); // information from length_error printed
 	}
-	
-	std::cout << std::endl << st::endl; 
-	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
-	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
-	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl << std::endl; 
 	
 	// save a final simulation snapshot 
 	

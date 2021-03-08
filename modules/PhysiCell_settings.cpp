@@ -207,7 +207,6 @@ void PhysiCell_Settings::read_from_pugixml( void )
 		if( settings )
 		{
 			std::cout << "setting legacy unif" << std::endl; 
-			system("pause"); 
 			extern std::vector<double> (*cell_division_orientation)(void); 
 			cell_division_orientation = LegacyRandomOnUnitSphere; 
 		}

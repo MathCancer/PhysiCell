@@ -914,6 +914,9 @@ void Cell::add_potentials(Cell* other_agent)
 	// }
 	axpy( &velocity , temp_r , displacement ); 
 	
+	
+	state.neighbors.push_back(other_agent); // new 1.8.0
+	
 	return;
 }
 
@@ -1117,10 +1120,10 @@ std::vector<Cell*>& Cell::cells_in_my_container( void )
 }
 
 std::vector<Cell*> Cell::nearby_cells( void )
-{ return PhysiCell::nearby_cells( this ); }
+{ return find_nearby_cells( this ); }
 
 std::vector<Cell*> Cell::nearby_interacting_cells( void )
-{ return PhysiCell::nearby_interacting_cells( this ); }
+{ return find_nearby_interacting_cells( this ); }
 
 void Cell::ingest_cell( Cell* pCell_to_eat )
 {
@@ -2265,6 +2268,20 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
 {
+	pugi::xml_node node_options; 
+	
+	node_options = xml_find_node( root , "options" ); 
+	if( node_options )
+	{
+		bool settings = 
+			xml_get_bool_value( node_options, "virtual_wall_at_domain_edge" ); 
+		if( settings )
+		{
+			std::cout << "virtual_wall_at_domain_edge: enabled" << std::endl; 
+			cell_defaults.functions.add_cell_basement_membrane_interactions = standard_domain_edge_avoidance_interactions;
+		}
+	}
+	
 	pugi::xml_node node = root.child( "cell_definitions" ); 
 	
 	node = node.child( "cell_definition" ); 
@@ -2363,7 +2380,7 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 )
 	return; 
 }
 
-std::vector<Cell*> nearby_cells( Cell* pCell )
+std::vector<Cell*> find_nearby_cells( Cell* pCell )
 {
 	std::vector<Cell*> neighbors = {}; 
 
@@ -2393,7 +2410,7 @@ std::vector<Cell*> nearby_cells( Cell* pCell )
 	return neighbors; 
 }
 
-std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
+std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell )
 {
 	std::vector<Cell*> neighbors = {}; 
 
@@ -2402,9 +2419,11 @@ std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
 	std::vector<Cell*>::iterator end = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
 	for( neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
 	{
-		if( pCell->phenotype.geometry.radius + (*neighbor)->phenotype.geometry.radius <= 
-			pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius + 
-		(*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
+		std::vector<double> displacement = (*neighbor)->position - pCell->position; 
+		double distance = norm( displacement ); 
+		if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
+			+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius 
+			&& (*neighbor) != pCell )
 		{ neighbors.push_back( *neighbor ); }
 	}
 
@@ -2422,9 +2441,11 @@ std::vector<Cell*> nearby_interacting_cells( Cell* pCell )
 		end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
 		for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
 		{
-			if( pCell->phenotype.geometry.radius + (*neighbor)->phenotype.geometry.radius <= 
-				pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius + 
-			(*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius )
+			std::vector<double> displacement = (*neighbor)->position - pCell->position; 
+			double distance = norm( displacement ); 
+			if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
+				+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius
+				&& (*neighbor) != pCell	)
 			{ neighbors.push_back( *neighbor ); }
 		}
 	}
