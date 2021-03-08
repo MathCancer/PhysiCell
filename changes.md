@@ -20,7 +20,7 @@ The release also add a number of features to improve the ease of code use: a cop
 
 + Unified the 2D and 3D template projects into a single "template" project. 
 
-+ New predator-prey-farmer sample project. Prey look for and consume food that's released by farmers. Prey avoid predators, predators hunt and eat prey.  
++ New `predator-prey-farmer` sample project. Prey look for and consume food that's released by farmers. Prey avoid predators, predators hunt and eat prey.  
 
 + Improved thread safety, particularly when cells ingest cells. 
 
@@ -69,6 +69,7 @@ Users should still test the distance to these cells in their interaction functio
 ++ Each row corresponds to a cell:     x,y,z,typeID
 ++ TypeID is the integer index of a `Cell_Definition` (ideally defined in XML!)
 ++ Call the function `load_cells_csv( std::string filename )` to load these possitions and place the cells in corresponding positions. Ideally, cally this function at the end of `setup_tissue()`. The template projects will call this function automatically if a cell CSV file is specified in the `initial_conditions` section of the XML configuration file. 
+++ The `template` project already uses this function in the right place. See `worm-sample` for project that uses it. 
 
 ### Minor new features and changes: 
 
