@@ -172,15 +172,20 @@ void setup_tissue( void )
 			
 			pC = create_cell( *pCD ); 
 			pC->assign_position( position );
-			
-			pC->custom_data["head"] = UniformRandom(); 
-			pC->custom_data["head_initial"] = pC->custom_data["head"];
 		}
 	}
 	std::cout << std::endl; 
 	
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
+	
+	// set the initial value of all the cells 
+	for( int n=0; n < (*all_cells).size(); n++ )
+	{
+		Cell* pC = (*all_cells)[n]; 
+		pC->custom_data["head"] = UniformRandom(); 
+		pC->custom_data["head_initial"] = pC->custom_data["head"];
+	}
 	
 	return; 
 }
