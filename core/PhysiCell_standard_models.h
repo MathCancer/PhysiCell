@@ -110,6 +110,12 @@ void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt );
 void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt); // done 
 void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype phenotype, double dt );
 
+// bounary avoidance functions 
+
+void standard_domain_edge_avoidance_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
+double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dt); 
+
+
 // other standard functions 
 
 void empty_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 

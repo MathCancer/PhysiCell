@@ -89,7 +89,7 @@ void create_cell_types( void )
 	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
 	
-	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL;  
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
 	/*
@@ -198,12 +198,15 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 		return { "orange", "black", "orange", "orange"}; 
 	}
 
-	if( pCell->state.number_of_attached_cells() == 2 )
+	if( pCell->state.number_of_attached_cells() >= 2 )
 	{
 		// shaed by head protein value 
 		int intensity = (int) floor( 255.0 * pCell->custom_data["head"] ); 
 		std::string strColor = std::to_string(intensity); 
 		std::string color = "rgb(" + strColor + "," + strColor + ",255)"; 
+		
+		if( pCell->state.number_of_attached_cells() > 2 )
+		{ return { "yellow", "black" , color, color }; }
 
 		return { color , "black", color, color}; 	
 	}

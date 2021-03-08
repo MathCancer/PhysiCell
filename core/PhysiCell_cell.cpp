@@ -914,6 +914,9 @@ void Cell::add_potentials(Cell* other_agent)
 	// }
 	axpy( &velocity , temp_r , displacement ); 
 	
+	
+	state.neighbors.push_back(other_agent); // new 1.8.0
+	
 	return;
 }
 
@@ -2265,6 +2268,20 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
 {
+	pugi::xml_node node_options; 
+	
+	node_options = xml_find_node( root , "options" ); 
+	if( node_options )
+	{
+		bool settings = 
+			xml_get_bool_value( node_options, "virtual_wall_at_domain_edge" ); 
+		if( settings )
+		{
+			std::cout << "virtual_wall_at_domain_edge: enabled" << std::endl; 
+			cell_defaults.functions.add_cell_basement_membrane_interactions = standard_domain_edge_avoidance_interactions;
+		}
+	}
+	
 	pugi::xml_node node = root.child( "cell_definitions" ); 
 	
 	node = node.child( "cell_definition" ); 
