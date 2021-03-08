@@ -175,6 +175,11 @@ int main( int argc, char* argv[] )
 	
 	// main loop 
 	
+	std::cout << std::endl << st::endl; 
+	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
+	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
+	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl << std::endl; 
+	
 	try 
 	{		
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
@@ -235,6 +240,11 @@ int main( int argc, char* argv[] )
 	{ // reference to the base of a polymorphic object
 		std::cout << e.what(); // information from length_error printed
 	}
+	
+	std::cout << std::endl << st::endl; 
+	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
+	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
+	std::cout << "WARNING!!! Template2D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl << std::endl; 
 	
 	// save a final simulation snapshot 
 	

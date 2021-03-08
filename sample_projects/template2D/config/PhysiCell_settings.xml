@@ -120,7 +120,8 @@
 	
 	<options>
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
-	</options>	
+		<virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
+	</options>
 
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
