@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -207,7 +207,6 @@ void PhysiCell_Settings::read_from_pugixml( void )
 		if( settings )
 		{
 			std::cout << "setting legacy unif" << std::endl; 
-			system("pause"); 
 			extern std::vector<double> (*cell_division_orientation)(void); 
 			cell_division_orientation = LegacyRandomOnUnitSphere; 
 		}
@@ -756,7 +755,7 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 					{ Dirichlet_zmax_values[i] = xml_get_my_double_value( node2 ); }
 				}
 				
-				node2 = node2.next_sibling("boundary"); 
+				node2 = node2.next_sibling("boundary_value"); 
 			}
 		}
 		

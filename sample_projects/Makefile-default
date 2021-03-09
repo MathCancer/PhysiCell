@@ -38,10 +38,10 @@ BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o 
 
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
-PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o
+PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
-PhysiCell_pugixml.o PhysiCell_settings.o
+PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
@@ -63,7 +63,7 @@ all:
 # sample projects 	
 list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
-	@echo "                 cancer-immune-sample virus-macrophage-sample template"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm-sample"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -133,21 +133,30 @@ cancer-immune-sample:
 virus-macrophage-sample:
 	cp ./sample_projects/virus_macrophage/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/virus_macrophage/main-virus_macrophage.cpp ./main.cpp 
+	cp ./sample_projects/virus_macrophage/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/virus_macrophage/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/virus_macrophage/config/* ./config/
 	
-beta-testing:
-	cp ./sample_projects/beta_testing/custom_modules/* ./custom_modules/
+pred-prey-farmer:
+	cp ./sample_projects/pred_prey_farmer/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/beta_testing/main-beta.cpp ./main.cpp 
+	cp ./sample_projects/pred_prey_farmer/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
-	cp ./sample_projects/beta_testing/Makefile .
+	cp ./sample_projects/pred_prey_farmer/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/beta_testing/config/* ./config/
+	cp ./sample_projects/pred_prey_farmer/config/* ./config/	
 	
+worm-sample:
+	cp ./sample_projects/worm/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/worm/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/worm/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/worm/config/* ./config/	
+
 # early examples for convergence testing 
 
 physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
@@ -254,6 +263,12 @@ PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
+PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 
+
+PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
+
 # user-defined PhysiCell modules
 
 # cleanup
@@ -266,19 +281,18 @@ reset:
 	touch ALL_CITATIONS.txt 
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
+	touch ./config/empty.csv
+	rm ./config/*.csv	
 	
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 	
 data-cleanup:
-	rm -f *.mat
-	rm -f *.xml
-	rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
-	
+
 # archival 
 
 checkpoint: 
@@ -303,3 +317,52 @@ unzip:
 untar: 
 	cp ./archives/latest.tar .
 	tar -xzf latest.tar
+
+# easier animation 
+
+FRAMERATE := 24
+OUTPUT := output
+
+jpeg: 
+	@magick identify -format "%h" $(OUTPUT)/initial.svg >> __H.txt 
+	@magick identify -format "%w" $(OUTPUT)/initial.svg >> __W.txt 
+	@expr 2 \* \( $$(grep . __H.txt) / 2 \) >> __H1.txt 
+	@expr 2 \* \( $$(grep . __W.txt) / 2 \) >> __W1.txt 
+	@echo "$$(grep . __W1.txt)!x$$(grep . __H1.txt)!" >> __resize.txt 
+	@magick mogrify -format jpg -resize $$(grep . __resize.txt) $(OUTPUT)/s*.svg
+	rm -f __H*.txt __W*.txt __resize.txt 
+	
+gif: 
+	magick convert $(OUTPUT)/s*.svg $(OUTPUT)/out.gif 
+	 
+movie:
+	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/out.mp4
+	
+# upgrade rules 
+
+SOURCE := PhysiCell_upgrade.zip 
+get-upgrade: 
+	@echo $$(curl https://raw.githubusercontent.com/MathCancer/PhysiCell/master/VERSION.txt) >> VER.txt 
+	@echo https://github.com/MathCancer/PhysiCell/releases/download/$$(grep . VER.txt)/PhysiCell_V.$$(grep . VER.txt).zip >> DL_FILE.txt 
+	rm -f VER.txt
+	$$(curl -L $$(grep . DL_FILE.txt) --output PhysiCell_upgrade.zip)
+	rm -f DL_FILE.txt 
+
+PhysiCell_upgrade.zip: 
+	make get-upgrade 
+
+upgrade: $(SOURCE)
+	unzip $(SOURCE) PhysiCell/VERSION.txt
+	mv -f PhysiCell/VERSION.txt . 
+	unzip $(SOURCE) PhysiCell/core/* 
+	cp -r PhysiCell/core/* core 
+	unzip $(SOURCE) PhysiCell/modules/* 
+	cp -r PhysiCell/modules/* modules 
+	unzip $(SOURCE) PhysiCell/sample_projects/* 
+	cp -r PhysiCell/sample_projects/* sample_projects 
+	unzip $(SOURCE) PhysiCell/BioFVM/* 
+	cp -r PhysiCell/BioFVM/* BioFVM
+	unzip $(SOURCE) PhysiCell/documentation/User_Guide.pdf
+	mv -f PhysiCell/documentation/User_Guide.pdf documentation
+	rm -f -r PhysiCell
+	rm -f $(SOURCE) 

@@ -35,7 +35,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -120,6 +120,7 @@
 	
 	<options>
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+		<virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>		
 	</options>	
 
 	<microenvironment_setup>
@@ -164,43 +165,252 @@
 		</options>
 	</microenvironment_setup>	
 	
+	<cell_definitions>
+		<cell_definition name="cancer cell" ID="0">
+			<phenotype>
+				<cycle code="5" name="live">  
+					<!-- phases are: G0/G1 , S, G2, M --> 
+
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<!-- use phase_transition_rates OR phase_durations -->
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.000072</rate>
+					</phase_transition_rates>
+					
+					<!-- use phase_transition_rates OR phase_durations -->
+					<!--
+					<phase_durations units="min"> 
+						<duration index="0" fixed_duration="false">300.0</duration>
+						<duration index="1" fixed_duration="true">480</duration>
+						<duration index="2" fixed_duration="true">240</duration>
+						<duration index="3" fixed_duration="true">60</duration>
+					</phase_durations>
+					-->
+				</cycle>
+				
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">5.31667e-05</death_rate>
+						<!-- use phase_transition_rates OR phase_durations -->
+						<!--
+						<phase_transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="true">0.00193798</rate>
+						</phase_transition_rates>
+						-->
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">516</duration>
+						</phase_durations>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.0</death_rate>
+						<!-- use phase_transition_rates OR phase_durations -->
+						<!-- necrosis uses phase_duration[0] = 0 so that it always immediately
+							 tries to transition and instead checks volume against the rupture
+							 volume --> 
+<!--						
+						<phase_transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
+						</phase_transition_rates>
+-->						
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">0</duration>
+							<duration index="1" fixed_duration="true">86400</duration>
+						</phase_durations>
+						
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>					
+
+				<volume>  
+					<total units="micron^3">2494</total>
+					<fluid_fraction units="dimensionless">0.75</fluid_fraction>
+					<nuclear units="micron^3">540</nuclear>
+					
+					<fluid_change_rate units="1/min">0.05</fluid_change_rate>
+					<cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+					<nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+					
+					<calcified_fraction units="dimensionless">0</calcified_fraction>
+					<calcification_rate units="1/min">0</calcification_rate>
+					
+					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+				</volume> 				
+				
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+					
+					<options>
+						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
+				<motility>  
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
+					
+					<options>
+						<enabled>false</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>false</enabled>
+							<substrate>oxygen</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				
+				<secretion>
+					<substrate name="oxygen">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">38</secretion_target>
+						<uptake_rate units="1/min">10</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+					
+					<substrate name="chemoattractant">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+
+					<substrate name="therapeutic">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+				</secretion>
+
+				<molecular />
+			</phenotype>
+			<custom_data>  
+				<receptor units="dimensionless">0.0</receptor>
+				<cargo_release_o2_threshold units="mmHg">10</cargo_release_o2_threshold>
+				<damage_rate units="1/min">0.03333</damage_rate>
+				<repair_rate units="1/min">0.004167</repair_rate>
+				<drug_death_rate units="1/min">0.004167</drug_death_rate>
+				<damage units="dimensionless">0.0</damage> 
+			</custom_data>
+		</cell_definition>
+		
+		<cell_definition name="cargo cell" ID="1" parent_type="cancer cell">		
+			<phenotype>
+				<cycle code="5" name="live">  
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
+					</phase_transition_rates>
+				</cycle>	
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">4.065e-5</death_rate>				
+					</model>
+				</death>
+				<secretion>
+					<substrate name="oxygen"> <!-- double-check this --> 
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 				
+					<substrate name="chemoattractant">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
+				<motility>  
+					<options>
+						<enabled>false</enabled>
+					</options>
+				</motility>
+			</phenotype>
+			<custom_data>  
+				<receptor units="dimensionless">1.0</receptor>
+			</custom_data>
+		</cell_definition> 
+		
+		<cell_definition name="worker cell" ID="2" parent_type="cancer cell">		
+			<phenotype>
+				<cycle code="5" name="live">  
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
+					</phase_transition_rates>
+				</cycle>	
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">0</death_rate>				
+					</model>
+				</death>
+				<secretion>
+					<substrate name="oxygen">
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 		
+				</secretion>
+				<motility>  
+					<speed units="micron/min">2</speed>
+					<persistence_time units="min">5</persistence_time>
+					<migration_bias units="dimensionless">0.5</migration_bias>
+					
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+					</options>
+				</motility>
+				
+			</phenotype>
+		</cell_definition> 
+
+	</cell_definitions>	
+	
+	<initial_conditions>
+		<cell_positions type="csv" enabled="false">
+			<folder>./config</folder>
+			<filename>cells.csv</filename>
+		</cell_positions>
+	</initial_conditions>		
+	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		
 		<!-- for main --> 
-		<therapy_activation_time type="double" units="min">10080</therapy_activation_time> 
+		<therapy_activation_time type="double" units="min">10080</therapy_activation_time>
 			<!-- activate in 7 days --> 
 		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
 		
 		<!-- cargo cell setup --> 
 		<cargo_o2_relative_uptake type="double" units="dimensionless">0.1</cargo_o2_relative_uptake>
-		<cargo_apoptosis_rate type="double" units="1/min">4.065e-5</cargo_apoptosis_rate> 
-			<!-- survive 10 days -->
 		<cargo_relative_adhesion type="double" units="dimensionless">0</cargo_relative_adhesion>
 		<cargo_relative_repulsion type="double" units="dimensionless">5</cargo_relative_repulsion> 
 		
-
 		<!-- worker cell setup --> 
 		<worker_o2_relative_uptake type="double" units="1/min">0.1</worker_o2_relative_uptake>
-		<worker_apoptosis_rate type="double" units="1/min">0</worker_apoptosis_rate>
-		<worker_motility_persistence_time type="double" units="min">5.0</worker_motility_persistence_time>
-		<worker_migration_speed type="double" units="micron/min">2.0</worker_migration_speed>
 		<worker_relative_adhesion type="double" units="dimensionless">0</worker_relative_adhesion>
 		<worker_relative_repulsion type="double" units="dimensionless">5</worker_relative_repulsion> 
 
 		<!-- for cell definitions -->
 		<elastic_coefficient type="double" units="1/min">0.05</elastic_coefficient>		
-		<receptor type="double" units="dimensionless">0.0</receptor>
-		<cargo_release_o2_threshold type="double" units="mmHg">10</cargo_release_o2_threshold>
 		
 		<max_relative_cell_adhesion_distance type="double" units="dimensionless">1.25</max_relative_cell_adhesion_distance>
 			<!-- how far out can cancer cells "feel" to close gaps? default is 1.25 -->
 		
 		<!-- for therapy --> 
-		<damage_rate type="double" units="1/min">0.03333</damage_rate> <!-- 1/30 --> 
-		<repair_rate type="double" units="1/min">0.004167</repair_rate> <!-- 1/240 --> 
-		<drug_death_rate type="double" units="1/min">0.004167</drug_death_rate> <!-- 1/240 --> 
-		
 		<worker_fraction type="double" units="dimensionless">0.10</worker_fraction>
 		<number_of_injected_cells type="int" units="dimensionless">500</number_of_injected_cells>
 		

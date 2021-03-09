@@ -32,7 +32,7 @@ number.
    a) Move one directory up. Zip everything in PhysiCell 
       into a new zip file. Use 
       
-zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.gitignore
+zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.gitignore -x .DS_Store
       
       (with appropriate version x.y.z). 
 

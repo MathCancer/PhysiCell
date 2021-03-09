@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -88,13 +88,23 @@ int main( int argc, char* argv[] )
 	// load and parse settings file(s)
 	
 	bool XML_status = false; 
+	char copy_command [1024]; 
 	if( argc > 1 )
-	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
+	{
+		XML_status = load_PhysiCell_config_file( argv[1] ); 
+		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+	}
 	else
-	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	{
+		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
+		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
+	}
 	if( !XML_status )
 	{ exit(-1); }
-
+	
+	// copy config file to output directry 
+	system( copy_command ); 
+	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
@@ -104,17 +114,17 @@ int main( int argc, char* argv[] )
 	/* Microenvironment setup */ 
 	
 	setup_microenvironment(); // modify this in the custom code 
-
+	
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
-
+	
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	create_cell_types();
-
+	
 	setup_tissue();
 
 	/* Users typically stop modifying here. END USERMODS */ 
@@ -125,7 +135,7 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_data_as_matlab( true ); 
 	set_save_biofvm_cell_data( true ); 
 	set_save_biofvm_cell_data_as_custom_matlab( true );
-
+	
 	// save a simulation snapshot 
 	
 	char filename[1024];
@@ -139,13 +149,16 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = viral_coloring_function; 
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-
+	
+	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
+	create_plot_legend( filename , cell_coloring_function ); 
+	
 	display_citations(); 
-
+	
 	// set the performance timers 
 
 	BioFVM::RUNTIME_TIC();
@@ -197,8 +210,6 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
-				
-				std::cout << "Total substrates " << integrate_total_substrates() << std::endl; 
 			}
 
 			// update the microenvironment

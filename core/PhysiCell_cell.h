@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -137,11 +137,16 @@ extern Cell_Definition cell_defaults;
 
 class Cell_State
 {
+ private:
  public:
+	std::vector<Cell*> attached_cells; 
+
 	std::vector<Cell*> neighbors; // not currently tracked! 
 	std::vector<double> orientation;
 	
 	double simple_pressure; 
+	
+	int number_of_attached_cells( void ); 
 	
 	Cell_State(); 
 };
@@ -181,9 +186,11 @@ class Cell : public Basic_Agent
 	void lyse_cell( void ); 
 
 	Cell* divide( void );
-	void die( void );
+	void die( void ); 
 	void step(double dt);
 	Cell();
+	
+	~Cell(); 
 	
 	bool assign_position(std::vector<double> new_position);
 	bool assign_position(double, double, double);
@@ -212,6 +219,10 @@ class Cell : public Basic_Agent
 	
 	void ingest_cell( Cell* pCell_to_eat ); // for use in predation, e.g., immune cells 
 
+	void attach_cell( Cell* pAddMe ); // done 
+	void detach_cell( Cell* pRemoveMe ); // done 
+	void remove_all_attached_cells( void ); // done 
+
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 
 	
@@ -220,6 +231,8 @@ class Cell : public Basic_Agent
 	Cell_Container * get_container();
 	
 	std::vector<Cell*>& cells_in_my_container( void ); 
+	std::vector<Cell*> nearby_cells( void ); // new in 1.8.0 
+	std::vector<Cell*> nearby_interacting_cells( void ); // new in 1.8.0 
 	
 	void convert_to_cell_definition( Cell_Definition& cd ); 
 };
@@ -255,6 +268,11 @@ void initialize_cell_definitions_from_pugixml( void );
 
 extern std::vector<double> (*cell_division_orientation)(void);
 
+void attach_cells( Cell* pCell_1, Cell* pCell_2 );
+void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
+
+std::vector<Cell*> find_nearby_cells( Cell* pCell ); // new in 1.8.0
+std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell ); // new in 1.8.0
 
 };
 

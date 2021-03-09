@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -671,9 +671,15 @@ Mechanics::Mechanics()
 	relative_maximum_adhesion_distance = 1.25; 
 	// maximum_adhesion_distance = 0.0; 
 	
+	
+	relative_maximum_attachment_distance = relative_maximum_adhesion_distance;
+	relative_detachment_distance = relative_maximum_adhesion_distance;
+	maximum_number_of_attachments = 12;
+	attachment_elastic_constant = 0.01; 
+	maximum_attachment_rate = 1.0; 
+	
 	return; 
 }
-
 
 // new on July 29, 2018
 // change the ratio without changing the repulsion strength or equilibrium spacing 
@@ -1094,5 +1100,3 @@ void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
 }
 
 };
-
-

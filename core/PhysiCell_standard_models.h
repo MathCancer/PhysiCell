@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -80,7 +80,6 @@ extern Cycle_Model Ki67_advanced, Ki67_basic, live, flow_cytometry_cycle_model, 
 extern Cycle_Model apoptosis, necrosis; 
 extern Death_Parameters apoptosis_parameters, necrosis_parameters; 
 
-
 extern bool PhysiCell_standard_models_initialized; 
 extern bool PhysiCell_standard_death_models_initialized; 
 extern bool PhysiCell_standard_cycle_models_initialized; 
@@ -111,6 +110,12 @@ void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt );
 void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt); // done 
 void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype phenotype, double dt );
 
+// bounary avoidance functions 
+
+void standard_domain_edge_avoidance_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
+double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dt); 
+
+
 // other standard functions 
 
 void empty_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
@@ -128,9 +133,10 @@ bool create_standard_cycle_and_death_models( void ); // done
 
 void initialize_default_cell_definition( void ); // done 
 
-
 void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
 
+void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt );
+void evaluate_interactions( Cell* pCell, Phenotype& phenotype, double dt );
 	
 };
 

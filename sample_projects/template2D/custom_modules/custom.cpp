@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -67,10 +67,6 @@
 
 #include "./custom.h"
 
-// declare cell definitions here 
-
-Cell_Definition motile_cell; 
-
 void create_cell_types( void )
 {
 	// use the same random seed so that future experiments have the 
@@ -80,89 +76,59 @@ void create_cell_types( void )
 	
 	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
 	
-	// housekeeping 
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
 	
-	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	initialize_default_cell_definition(); 	
 	
-	// Name the default cell type 
-	
-	cell_defaults.type = 0; 
-	cell_defaults.name = "tumor cell"; 
-	
-	// set default cell cycle model 
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	cell_defaults.functions.contact_function = contact_function; 	
+	
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
 	cell_defaults.functions.cycle_model = flow_cytometry_separated_cycle_model; 
 	
-	// set default_cell_functions; 
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
 	
-	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
+	initialize_cell_definitions_from_pugixml(); 
 	
-	// needed for a 2-D simulation: 
-	
-	/* grab code from heterogeneity */ 
-	
-	cell_defaults.functions.set_orientation = up_orientation; 
-	cell_defaults.phenotype.geometry.polarity = 1.0;
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	
-	// make sure the defaults are self-consistent. 
-	
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
-	cell_defaults.phenotype.molecular.sync_to_microenvironment( &microenvironment );	
-	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
 
 	// set the rate terms in the default phenotype 
 
-	// first find index for a few key variables. 
-	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
-	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
-	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 
-	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
-	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
-
-	// initially no necrosis 
-	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
-
-	// set oxygen uptake / secretion parameters for the default cell type 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
-	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
-	
-	// add custom data here, if any 
-	
-
-	// Now, let's define another cell type. 
-	// It's best to just copy the default and modify it. 
-	
-	// make this cell type randomly motile, less adhesive, greater survival, 
-	// and less proliferative 
-	
-	motile_cell = cell_defaults; 
-	motile_cell.type = 1; 
-	motile_cell.name = "motile tumor cell"; 
-	
-	// make sure the new cell type has its own reference phenotype
-	
-	motile_cell.parameters.pReference_live_phenotype = &( motile_cell.phenotype ); 
-	
-	// enable random motility 
-	motile_cell.phenotype.motility.is_motile = true; 
-	motile_cell.phenotype.motility.persistence_time = parameters.doubles( "motile_cell_persistence_time" ); // 15.0; 
-	motile_cell.phenotype.motility.migration_speed = parameters.doubles( "motile_cell_migration_speed" ); // 0.25 micron/minute 
-	motile_cell.phenotype.motility.migration_bias = 0.0;// completely random 
+	Cell_Definition* pCD = find_cell_definition( "motile tumor cell" ); 
 	
 	// Set cell-cell adhesion to 5% of other cells 
-	motile_cell.phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); // 0.05; 
-	
-	// Set apoptosis to zero 
-	motile_cell.phenotype.death.rates[apoptosis_model_index] = parameters.doubles( "motile_cell_apoptosis_rate" ); // 0.0; 
+	pCD->phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "motile_cell_relative_adhesion" ); 
 	
 	// Set proliferation to 10% of other cells. 
 	// Alter the transition rate from G0G1 state to S state
-	motile_cell.phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
-		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); // 0.1; 
+	int G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase );
+	int S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase );
+
+	pCD->phenotype.cycle.data.transition_rate(G0G1_index,S_index) *= 
+		parameters.doubles( "motile_cell_relative_cycle_entry_rate" ); 
+		
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
 		
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
@@ -172,14 +138,6 @@ void create_cell_types( void )
 
 void setup_microenvironment( void )
 {
-	// set domain parameters 
-	
-/* now this is in XML 
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
-	default_microenvironment_options.simulate_2D = true; 
-*/
-	
 	// make sure to override and go back to 2D 
 	if( default_microenvironment_options.simulate_2D == false )
 	{
@@ -187,22 +145,7 @@ void setup_microenvironment( void )
 		default_microenvironment_options.simulate_2D = true; 
 	}
 	
-/* now this is in XML 	
-	// no gradients need for this example 
-
-	default_microenvironment_options.calculate_gradients = false; 
-	
-	// set Dirichlet conditions 
-
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	
-	// if there are more substrates, resize accordingly 
-	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
-	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
-	
-	// set initial conditions 
-	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
-*/
+	// set domain parameters 
 	
 	// put any custom code to set non-homogeneous initial conditions or 
 	// extra Dirichlet nodes here. 
@@ -218,6 +161,8 @@ void setup_tissue( void )
 {
 	// create some cells near the origin
 	
+	/*
+		// these are now in cells.csv 
 	Cell* pC;
 
 	pC = create_cell(); 
@@ -231,8 +176,11 @@ void setup_tissue( void )
 	
 	// now create a motile cell 
 	
-	pC = create_cell( motile_cell ); 
+	pC = create_cell( get_cell_definition("motile tumor cell") ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
+	*/
+	
+	load_cells_from_pugixml(); 
 	
 	return; 
 }
@@ -251,3 +199,6 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	
 	return output; 
 }
+
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
+{ return; } 

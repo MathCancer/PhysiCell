@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -79,12 +79,16 @@ void create_cell_types( void )
 	   This is a good place to set default functions. 
 	*/ 
 	
+	initialize_default_cell_definition(); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
 	cell_defaults.functions.update_migration_bias = NULL; 
 	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
+	cell_defaults.functions.contact_function = NULL; 
 	
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
@@ -101,15 +105,10 @@ void create_cell_types( void )
 	   This is a good place to set custom functions. 
 	*/ 
 	
-	if( parameters.bools("predators_eat_prey") == true )
-	{ get_cell_definition("predator").functions.custom_cell_rule = predator_hunting_function; }
-
-	if( parameters.bools("predators_cycle_if_big") == true )
-	{ get_cell_definition("predator").functions.update_phenotype = predator_cycling_function; }
-
-	if( parameters.bools("prey_quorom_effect") == true )
-	{ get_cell_definition("prey").functions.update_phenotype = prey_cycling_function; }
-		
+	cell_defaults.functions.update_phenotype = phenotype_function; 
+	cell_defaults.functions.custom_cell_rule = custom_function; 
+	cell_defaults.functions.contact_function = contact_function; 
+	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -158,114 +157,37 @@ void setup_tissue( void )
 	
 	Cell* pC;
 	
-	// place prey 
-	
-	for( int n = 0 ; n < parameters.ints("number_of_prey") ; n++ )
+	for( int k=0; k < cell_definitions_by_index.size() ; k++ )
 	{
-		std::vector<double> position = {0,0,0}; 
-		position[0] = Xmin + UniformRandom()*Xrange; 
-		position[1] = Ymin + UniformRandom()*Yrange; 
-		position[2] = Zmin + UniformRandom()*Zrange; 
-		
-		pC = create_cell( get_cell_definition("prey") ); 
-		pC->assign_position( position );
+		Cell_Definition* pCD = cell_definitions_by_index[k]; 
+		std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+		for( int n = 0 ; n < parameters.ints("number_of_cells") ; n++ )
+		{
+			std::vector<double> position = {0,0,0}; 
+			position[0] = Xmin + UniformRandom()*Xrange; 
+			position[1] = Ymin + UniformRandom()*Yrange; 
+			position[2] = Zmin + UniformRandom()*Zrange; 
+			
+			pC = create_cell( *pCD ); 
+			pC->assign_position( position );
+		}
 	}
+	std::cout << std::endl; 
 	
-	// place predators 
-	
-	for( int n = 0 ; n < parameters.ints("number_of_predators") ; n++ )
-	{
-		std::vector<double> position = {0,0,0}; 
-		position[0] = Xmin + UniformRandom()*Xrange; 
-		position[1] = Ymin + UniformRandom()*Yrange; 
-		position[2] = Zmin + UniformRandom()*Zrange; 
-		
-		pC = create_cell( get_cell_definition("predator") ); 
-		pC->assign_position( position );
-	}	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 	
 	
 	return; 
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{
-	static int prey_type = get_cell_definition( "prey" ).type; 
-	static int predator_type = get_cell_definition( "predator" ).type; 
-	
-	// start with flow cytometry coloring 
-	
-	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
-	
-	// color live prey 
-		
-	if( pCell->phenotype.death.dead == false && pCell->type == prey_type )
-	{
-		 output[0] = parameters.strings("prey_color");  
-		 output[2] = parameters.strings("prey_color");  
-	}
-	
-	// color live predators 
+{ return paint_by_number_cell_coloring(pCell); }
 
-	if( pCell->phenotype.death.dead == false && pCell->type == predator_type )
-	{
-		 output[0] = parameters.strings("predator_color");  
-		 output[2] = parameters.strings("predator_color");  
-	}
-	
-	return output; 
-}
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{ return; }
 
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
+{ return; } 
 
-void predator_hunting_function( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	Cell* pTestCell = NULL; 
-	
-	double sated_volume = pCell->parameters.pReference_live_phenotype->volume.total * 
-		parameters.doubles("relative_sated_volume" ); 
-	
-	for( int n=0; n < pCell->cells_in_my_container().size() ; n++ )
-	{
-		pTestCell = pCell->cells_in_my_container()[n]; 
-		// if it's not me, not dead, and not my type, eat it 
-		
-		if( pTestCell != pCell && pTestCell->type != pCell->type && pTestCell->phenotype.death.dead == false )
-		{
-			// only eat if I'm not full 
-			if( phenotype.volume.total < sated_volume )
-			{
-				pCell->ingest_cell(pTestCell); 
-				return; 
-			}
-	
-		}
-	}
-	
-	return; 
-}
-
-void predator_cycling_function( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	double sated_volume = pCell->parameters.pReference_live_phenotype->volume.total * 
-		parameters.doubles("relative_sated_volume" ); 
-	
-	if( phenotype.volume.total > sated_volume )
-	{ phenotype.cycle.data.transition_rate(0,1) = get_cell_definition("prey").phenotype.cycle.data.transition_rate(0,1) * 0.01; }
-	else
-	{ phenotype.cycle.data.transition_rate(0,1) = 0; }
-	return; 
-}
-
-void prey_cycling_function( Cell* pCell , Phenotype& phenotype, double dt )
-{
-	static int signal_index = microenvironment.find_density_index( "prey signal" ); 
-	
-	double threshold = parameters.doubles("prey_quorom_threshold" ) + 1e-16 ; 
-	double factor = (threshold - pCell->nearest_density_vector()[signal_index] )/threshold; 
-	if( factor < 0 )
-	{ factor = 0.0; } 
-	
-	phenotype.cycle.data.transition_rate(0,1) = get_cell_definition("prey").phenotype.cycle.data.transition_rate(0,1); 
-	phenotype.cycle.data.transition_rate(0,1) *= factor; 
-	
-	return; 
-}
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
+{ return; } 

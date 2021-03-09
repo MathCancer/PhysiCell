@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -85,7 +85,8 @@ std::vector<std::string> my_coloring_function( Cell* );
 
 // custom functions can go here 
 
-void predator_hunting_function( Cell* pCell, Phenotype& phenotype, double dt ); 
-void predator_cycling_function( Cell* pCell, Phenotype& phenotype, double dt ); 
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
-void prey_cycling_function( Cell* pCell , Phenotype& phenotype, double dt ); 
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
+

@@ -69,6 +69,7 @@
 #define __PhysiCell_constants_h__
 
 #include <string>
+#include <unordered_map>
 
 namespace PhysiCell
 {
@@ -155,6 +156,10 @@ extern std::string space_units;
 extern double diffusion_dt; 
 extern double mechanics_dt;
 extern double phenotype_dt;
+
+
+extern std::unordered_map<std::string,int> cycle_model_codes;
+int find_cycle_model_code( std::string model_name ); 
 
 };
 

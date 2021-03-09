@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -75,8 +75,6 @@ void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, d
 
 // any additional cell types (beyond cell_defaults)
 
-extern Cell_Definition motile_cell; 
-
 // custom cell phenotype functions could go here 
 
 // setup functions to help us along 
@@ -90,3 +88,5 @@ void setup_microenvironment( void );
 // custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
+
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt );

@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -73,6 +73,9 @@
 #include<limits.h>
 
 #include <signal.h>  // for segfault
+
+#include <algorithm>
+#include <iterator> 
 
 namespace PhysiCell{
 	
@@ -206,6 +209,8 @@ Cell_State::Cell_State()
 	orientation.resize( 3 , 0.0 ); 
 	
 	simple_pressure = 0.0; 
+	
+	attached_cells.clear(); 
 	
 	return; 
 }
@@ -352,6 +357,53 @@ Cell::Cell()
 	return; 
 }
 
+Cell::~Cell()
+{
+//	std::cout << std::endl << "=====-----------------------------=====" << std::endl; 
+//	std::cout << "\tcell destructor " << this << " " << type_name << " at " << position << std::endl;
+//		std::cout << "\t\tattached cells: " << this->state.attached_cells.size() << std::endl << std::endl; 
+	
+	auto result = std::find( std::begin(*all_cells),std::end(*all_cells),this );
+	if( result != std::end(*all_cells) )
+	{
+		std::cout << "Warning: Cell was never removed from data structure " << std::endl ; 
+		std::cout << "I am of type " << this->type << " at " << this->position << std::endl; 
+
+		int temp_index = -1; 
+		bool found = false; 
+		for( int n= 0 ; n < (*all_cells).size() ; n++ )
+		{
+			std::cout << this << " vs " << (*all_cells)[n] << std::endl; 
+			if( (*all_cells)[n] == this )
+			{ found = true; temp_index = n; } 
+		}
+		
+		if( found )
+		{
+			// release any attached cells (as of 1.7.2 release)
+			this->remove_all_attached_cells(); 
+			
+			// released internalized substrates (as of 1.5.x releases)
+			this->release_internalized_substrates(); 
+
+			// performance goal: don't delete in the middle -- very expensive reallocation
+			// alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
+
+			// move last item to index location  
+			(*all_cells)[ (*all_cells).size()-1 ]->index=temp_index;
+			(*all_cells)[temp_index] = (*all_cells)[ (*all_cells).size()-1 ];
+			// shrink the vector
+			(*all_cells).pop_back();	
+			
+			// deregister agent in from the agent container
+			this->get_container()->remove_agent(this);
+		}
+	}
+	
+	
+	return; 
+}
+
 void Cell::flag_for_division( void )
 {
 	get_container()->flag_cell_for_division( this );
@@ -416,6 +468,9 @@ Cell* Cell::divide( )
 {
 	// phenotype.flagged_for_division = false; 
 	// phenotype.flagged_for_removal = false; 
+	
+	// make sure ot remove adhesions 
+	remove_all_attached_cells(); 
 	
 	Cell* child = create_cell();
 	child->copy_data( this );	
@@ -612,8 +667,6 @@ void Cell::set_radius(double new_radius )
 	return; 
 }
 
-
-
 double& Cell::get_total_volume(void)
 {
 	static bool I_warned_you = false; 
@@ -691,8 +744,6 @@ void Cell::update_position( double dt )
 	previous_velocity = velocity; 
 	
 	velocity[0]=0; velocity[1]=0; velocity[2]=0;
-	// #pragma omp critical
-	//{update_voxel_in_container();}
 	if(get_container()->underlying_mesh.is_position_valid(position[0],position[1],position[2]))
 	{
 		updated_current_mechanics_voxel_index=get_container()->underlying_mesh.nearest_voxel_index( position );
@@ -726,10 +777,8 @@ void Cell::update_voxel_in_container()
 		// check if this agent has a valid voxel index, if so, remove it from previous voxel
 		if( get_current_mechanics_voxel_index() >= 0)
 		{
-			// #pragma omp critical
 			{get_container()->remove_agent_from_voxel(this, get_current_mechanics_voxel_index());}
 		}
-		// #pragma omp critical
 		{get_container()->add_agent_to_outer_voxel(this);}
 		// std::cout<<"cell out of boundary..."<< __LINE__<<" "<<ID<<std::endl;
 		current_mechanics_voxel_index=-1;
@@ -744,7 +793,6 @@ void Cell::update_voxel_in_container()
 	// update mesh indices (if needed)
 	if(updated_current_mechanics_voxel_index!= get_current_mechanics_voxel_index())
 	{
-		// #pragma omp critical
 		{
 			container->remove_agent_from_voxel(this, get_current_mechanics_voxel_index());
 			container->add_agent_to_voxel(this, updated_current_mechanics_voxel_index);
@@ -780,7 +828,8 @@ void Cell::copy_function_pointers(Cell* copy_me)
 
 void Cell::add_potentials(Cell* other_agent)
 {
-	if( this->ID == other_agent->ID )
+	// if( this->ID == other_agent->ID )
+	if( this == other_agent )
 	{ return; }
 
 	// 12 uniform neighbors at a close packing distance, after dividing out all constants
@@ -865,6 +914,9 @@ void Cell::add_potentials(Cell* other_agent)
 	// }
 	axpy( &velocity , temp_r , displacement ); 
 	
+	
+	state.neighbors.push_back(other_agent); // new 1.8.0
+	
 	return;
 }
 
@@ -942,6 +994,43 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 
 void delete_cell( int index )
 {
+//	std::cout << __FUNCTION__ << " " << (*all_cells)[index] 
+//	<< " " << (*all_cells)[index]->type_name << std::endl; 
+	
+	Cell* pDeleteMe = (*all_cells)[index]; 
+	
+	// release any attached cells (as of 1.7.2 release)
+	pDeleteMe->remove_all_attached_cells(); 
+	
+	// released internalized substrates (as of 1.5.x releases)
+	pDeleteMe->release_internalized_substrates(); 
+
+	// performance goal: don't delete in the middle -- very expensive reallocation
+	// alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
+
+	// move last item to index location  
+	(*all_cells)[ (*all_cells).size()-1 ]->index=index;
+	(*all_cells)[index] = (*all_cells)[ (*all_cells).size()-1 ];
+	// shrink the vector
+	(*all_cells).pop_back();	
+	
+	// deregister agent in from the agent container
+	pDeleteMe->get_container()->remove_agent(pDeleteMe);
+	// de-allocate (delete) the cell; 
+	delete pDeleteMe; 
+
+
+	return; 
+}
+
+void delete_cell_original( int index ) // before June 11, 2020
+{
+//	std::cout << __FUNCTION__ << " " << (*all_cells)[index] 
+//	<< " " << (*all_cells)[index]->type_name << std::endl; 
+	
+	// release any attached cells (as of 1.7.2 release)
+	(*all_cells)[index]->remove_all_attached_cells(); 
+	
 	// released internalized substrates (as of 1.5.x releases)
 	(*all_cells)[index]->release_internalized_substrates(); 
 	
@@ -1030,91 +1119,127 @@ std::vector<Cell*>& Cell::cells_in_my_container( void )
 	return get_container()->agent_grid[get_current_mechanics_voxel_index()];
 }
 
+std::vector<Cell*> Cell::nearby_cells( void )
+{ return find_nearby_cells( this ); }
+
+std::vector<Cell*> Cell::nearby_interacting_cells( void )
+{ return find_nearby_interacting_cells( this ); }
+
 void Cell::ingest_cell( Cell* pCell_to_eat )
 {
-	// absorb all the volume(s)
-
-	// absorb fluid volume (all into the cytoplasm) 
-	phenotype.volume.cytoplasmic_fluid += pCell_to_eat->phenotype.volume.fluid; 
-	pCell_to_eat->phenotype.volume.cytoplasmic_fluid = 0.0; 
-	
-	// absorb nuclear and cyto solid volume (into the cytoplasm) 
-	phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.cytoplasmic_solid; 
-	pCell_to_eat->phenotype.volume.cytoplasmic_solid = 0.0; 
-	
-	phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.nuclear_solid; 
-	pCell_to_eat->phenotype.volume.nuclear_solid = 0.0; 
-	
-	// consistency calculations 
-	
-	phenotype.volume.fluid = phenotype.volume.nuclear_fluid + 
-		phenotype.volume.cytoplasmic_fluid; 
-	pCell_to_eat->phenotype.volume.fluid = 0.0; 
-	
-	phenotype.volume.solid = phenotype.volume.cytoplasmic_solid + 
-		phenotype.volume.nuclear_solid; 
-	pCell_to_eat->phenotype.volume.solid = 0.0; 
-	
-	// no change to nuclear volume (initially) 
-	pCell_to_eat->phenotype.volume.nuclear = 0.0; 
-	pCell_to_eat->phenotype.volume.nuclear_fluid = 0.0; 
-	
-	phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + 
-		phenotype.volume.cytoplasmic_fluid; 
-	pCell_to_eat->phenotype.volume.cytoplasmic = 0.0; 
-	
-	phenotype.volume.total = phenotype.volume.nuclear + 
-		phenotype.volume.cytoplasmic; 
-	pCell_to_eat->phenotype.volume.total = 0.0; 
-
-	phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
-		(  phenotype.volume.total ); 
-	pCell_to_eat->phenotype.volume.fluid_fraction = 0.0; 
-
-	phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
-		( phenotype.volume.nuclear_solid + 1e-16 );
+	// don't ingest a cell that's already ingested 
+	if( pCell_to_eat->phenotype.volume.total < 1e-15 || this == pCell_to_eat )
+	{ return; } 
 		
-	// update corresponding BioFVM parameters (self-consistency) 
-	set_total_volume( phenotype.volume.total ); 
-	pCell_to_eat->set_total_volume( 0.0 ); 
-	
-	// absorb the internalized substrates 
-	
-	// multiply by the fraction that is supposed to be ingested (for each substrate) 
-	*(pCell_to_eat->internalized_substrates) *= 
-		*(pCell_to_eat->fraction_transferred_when_ingested); // 
-	
-	*internalized_substrates += *(pCell_to_eat->internalized_substrates); 
-	static int n_substrates = internalized_substrates->size(); 
-	pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
-	
-	// trigger removal from the simulation 
-	// pCell_to_eat->die(); // I don't think this is safe if it's in an OpenMP loop 
-	// flag it for removal 
-	pCell_to_eat->flag_for_removal(); 
-	// mark it as dead 
-	pCell_to_eat->phenotype.death.dead = true; 
-	// set secretion and uptake to zero 
-	pCell_to_eat->phenotype.secretion.set_all_secretion_to_zero( );  
-	pCell_to_eat->phenotype.secretion.set_all_uptake_to_zero( ); 
+	// make this thread safe 
+	#pragma omp critical
+	{
+		bool volume_was_zero = false; 
+		if( pCell_to_eat->phenotype.volume.total < 1e-15 )
+		{
+			volume_was_zero = true; 
+			std::cout << this << " " << this->type_name << " ingests " 
+			<< pCell_to_eat << " " << pCell_to_eat->type_name << std::endl; 
+		}
+		// absorb all the volume(s)
 
-	
-	// deactivate all custom function 
-	pCell_to_eat->functions.custom_cell_rule = NULL; 
-	pCell_to_eat->functions.update_phenotype = NULL; 
-	pCell_to_eat->functions.contact_function = NULL; 
-	
-	// set it to zero mechanics 
-	pCell_to_eat->functions.custom_cell_rule = NULL; 
+		// absorb fluid volume (all into the cytoplasm) 
+		phenotype.volume.cytoplasmic_fluid += pCell_to_eat->phenotype.volume.fluid; 
+		pCell_to_eat->phenotype.volume.cytoplasmic_fluid = 0.0; 
+		
+		// absorb nuclear and cyto solid volume (into the cytoplasm) 
+		phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.cytoplasmic_solid; 
+		pCell_to_eat->phenotype.volume.cytoplasmic_solid = 0.0; 
+		
+		phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.nuclear_solid; 
+		pCell_to_eat->phenotype.volume.nuclear_solid = 0.0; 
+		
+		// consistency calculations 
+		
+		phenotype.volume.fluid = phenotype.volume.nuclear_fluid + 
+			phenotype.volume.cytoplasmic_fluid; 
+		pCell_to_eat->phenotype.volume.fluid = 0.0; 
+		
+		phenotype.volume.solid = phenotype.volume.cytoplasmic_solid + 
+			phenotype.volume.nuclear_solid; 
+		pCell_to_eat->phenotype.volume.solid = 0.0; 
+		
+		// no change to nuclear volume (initially) 
+		pCell_to_eat->phenotype.volume.nuclear = 0.0; 
+		pCell_to_eat->phenotype.volume.nuclear_fluid = 0.0; 
+		
+		phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + 
+			phenotype.volume.cytoplasmic_fluid; 
+		pCell_to_eat->phenotype.volume.cytoplasmic = 0.0; 
+		
+		phenotype.volume.total = phenotype.volume.nuclear + 
+			phenotype.volume.cytoplasmic; 
+		pCell_to_eat->phenotype.volume.total = 0.0; 
+
+		phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
+			(  phenotype.volume.total + 1e-16 ); 
+		pCell_to_eat->phenotype.volume.fluid_fraction = 0.0; 
+
+		phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
+			( phenotype.volume.nuclear_solid + 1e-16 );
+			
+		// update corresponding BioFVM parameters (self-consistency) 
+		set_total_volume( phenotype.volume.total ); 
+		pCell_to_eat->set_total_volume( 0.0 ); 
+		
+		// absorb the internalized substrates 
+		
+		// multiply by the fraction that is supposed to be ingested (for each substrate) 
+		*(pCell_to_eat->internalized_substrates) *= 
+			*(pCell_to_eat->fraction_transferred_when_ingested); // 
+		
+		*internalized_substrates += *(pCell_to_eat->internalized_substrates); 
+		static int n_substrates = internalized_substrates->size(); 
+		pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
+		
+		// trigger removal from the simulation 
+		// pCell_to_eat->die(); // I don't think this is safe if it's in an OpenMP loop 
+		
+		// flag it for removal 
+		// pCell_to_eat->flag_for_removal(); 
+		// mark it as dead 
+		pCell_to_eat->phenotype.death.dead = true; 
+		// set secretion and uptake to zero 
+		pCell_to_eat->phenotype.secretion.set_all_secretion_to_zero( );  
+		pCell_to_eat->phenotype.secretion.set_all_uptake_to_zero( ); 
+		
+		// deactivate all custom function 
+		pCell_to_eat->functions.custom_cell_rule = NULL; 
+		pCell_to_eat->functions.update_phenotype = NULL; 
+		pCell_to_eat->functions.contact_function = NULL; 
+
+		// remove all adhesions 
+		// pCell_to_eat->remove_all_attached_cells();
+		
+		// set cell as unmovable and non-secreting 
+		pCell_to_eat->is_movable = false; 
+		pCell_to_eat->is_active = false; 
+	}
+
+	// things that have their own thread safety 
+	pCell_to_eat->flag_for_removal();
+	pCell_to_eat->remove_all_attached_cells();
 	
 	return; 
 }
 
 void Cell::lyse_cell( void )
 {
-	flag_for_removal(); 
+	// don't lyse a cell that's already lysed 
+	if( phenotype.volume.total < 1e-15 )
+	{ return; } 	
+	
+	// flag for removal 
+	flag_for_removal(); // should be safe now 
+	
 	// mark it as dead 
 	phenotype.death.dead = true; 
+	
 	// set secretion and uptake to zero 
 	phenotype.secretion.set_all_secretion_to_zero( );  
 	phenotype.secretion.set_all_uptake_to_zero( ); 
@@ -1124,8 +1249,16 @@ void Cell::lyse_cell( void )
 	functions.update_phenotype = NULL; 
 	functions.contact_function = NULL; 
 	
-	// set it to zero mechanics 
-	functions.custom_cell_rule = NULL; 
+	// remove all adhesions 
+	
+	remove_all_attached_cells(); 
+	
+	// set volume to zero 
+	set_total_volume( 0.0 ); 
+
+	// set cell as unmovable and non-secreting 
+	is_movable = false; 
+	is_active = false; 	
 
 	return; 
 }
@@ -1144,24 +1277,20 @@ void build_cell_definitions_maps( void )
 		cell_definitions_by_type[ pCD->type ] = pCD; 
 	}
 
-/*
-	for( const auto& n : cell_definitions_by_name )
-	{
-		std::cout << "Key:[" << n.first << "] Value:[" << n.second << "]\n";
-	}	
-	std::cout << std::endl << std::endl;
-	for( const auto& n : cell_definitions_by_type )
-	{
-		std::cout << "Key:[" << n.first << "] Value:[" << n.second << "]\n";
-	}	
-	std::cout << std::endl << std::endl;
-*/
 	cell_definitions_by_name_constructed = true; 
 	
 	return;
 }
 
 void display_ptr_as_bool( void (*ptr)(Cell*,Phenotype&,double), std::ostream& os )
+{
+	if( ptr )
+	{ os << "true"; return; }
+	os << "false"; 
+	return;
+}
+
+void display_ptr_as_bool( void (*ptr)(Cell*,Phenotype&,Cell*,Phenotype&,double), std::ostream& os )
 {
 	if( ptr )
 	{ os << "true"; return; }
@@ -1249,6 +1378,8 @@ void display_cell_definitions( std::ostream& os )
 		os << "\t\t volume update function: "; display_ptr_as_bool( pCF->volume_update_function , std::cout ); 
 		os << std::endl; 
 		os << "\t\t mechanics function: "; display_ptr_as_bool( pCF->update_velocity , std::cout ); 
+		os << std::endl;
+		os << "\t\t contact function: "; display_ptr_as_bool( pCF->contact_function , std::cout ); 
 		os << std::endl; 
 		
 		// summarize motility 
@@ -1385,15 +1516,13 @@ Cell_Definition& get_cell_definition( int search_type )
 	return cell_defaults; 	
 }
 
-
-
-
 Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node )
 {
 	Cell_Definition* pCD; 
 	
 	// if this is not "default" then create a new one 
-	if( std::strcmp( cd_node.attribute( "name" ).value() , "default" ) != 0 )
+	if( std::strcmp( cd_node.attribute( "name" ).value() , "default" ) != 0 
+	    && std::strcmp( cd_node.attribute( "ID" ).value() , "0" ) != 0 )
 	{ pCD = new Cell_Definition; }
 	else
 	{ pCD = &cell_defaults; }
@@ -1447,7 +1576,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	pCD->phenotype.secretion.sync_to_microenvironment( (pCD->pMicroenvironment) ); 
 	pCD->phenotype.molecular.sync_to_microenvironment( (pCD->pMicroenvironment) );
 	
-	
 	// set the reference phenotype 
 	pCD->parameters.pReference_live_phenotype = &(pCD->phenotype); 
 	pugi::xml_node node = cd_node.child( "phenotype" ); 
@@ -1459,7 +1587,18 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	node = node.child( "cycle" ); 
 	if( node )
 	{
-		int model = node.attribute("code").as_int() ; 
+		int model; // = node.attribute("code").as_int() ; 
+		if( strlen( node.attribute("code").as_string() ) > 0 )
+		{ model = node.attribute("code").as_int(); }
+		else
+		{ model = find_cycle_model_code( node.attribute("name").as_string() ); } 
+		if( model < 0 )
+		{ 
+			std::cout << "Error. Unable to identify cycle model " 
+				<< node.attribute("name").value() 
+				<< " (" << node.attribute("code").value() << ")" << std::endl;
+			exit(-1);
+		}		
 		
 		// Set the model, but only if it was specified. 
 		if( strlen( node.attribute("code").value() ) > 0 )
@@ -1582,8 +1721,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		
 		
 	}
-
-
 	
 	// here's what it ***should*** do: 
 	// parse the model, get its code 
@@ -1600,7 +1737,19 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		node = node.child( "model" );
 		while( node )
 		{
-			int model = node.attribute("code").as_int() ; 
+			int model; // = node.attribute("code").as_int() ; 
+			if( strlen( node.attribute("code").as_string() ) > 0 )
+			{ model = node.attribute("code").as_int(); }
+			else
+			{ model = find_cycle_model_code( node.attribute("name").as_string() ); } 
+			if( model < 0 )
+			{ 
+				std::cout << "Error. Unable to identify death model " 
+					<< node.attribute("name").value() 
+					<< " (" << node.attribute("code").value() << ")" << std::endl;
+				exit(-1);
+			}		
+
 			
 			// check: is that death model already there? 
 			
@@ -1990,7 +2139,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				pMot->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
 				if( pMot->chemotaxis_index < 0)
 				{
-					std::cout << __FUNCTION__ << ": Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" << std::endl << std::endl; 
+					std::cout << __FUNCTION__ << ": Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" << std::endl; 
+					std::cout << substrate_name << " was not found in the microenvironment. Please check for typos!" << std::endl << std::endl; 
 					exit(-1); 
 				}
 				
@@ -2065,7 +2215,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			node_sec = node_sec.next_sibling( "substrate" ); 
 		}
 	}	
-
 	
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
@@ -2119,6 +2268,20 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
 {
+	pugi::xml_node node_options; 
+	
+	node_options = xml_find_node( root , "options" ); 
+	if( node_options )
+	{
+		bool settings = 
+			xml_get_bool_value( node_options, "virtual_wall_at_domain_edge" ); 
+		if( settings )
+		{
+			std::cout << "virtual_wall_at_domain_edge: enabled" << std::endl; 
+			cell_defaults.functions.add_cell_basement_membrane_interactions = standard_domain_edge_avoidance_interactions;
+		}
+	}
+	
 	pugi::xml_node node = root.child( "cell_definitions" ); 
 	
 	node = node.child( "cell_definition" ); 
@@ -2144,6 +2307,154 @@ void initialize_cell_definitions_from_pugixml( void )
 	initialize_cell_definitions_from_pugixml( physicell_config_root );
 	return; 
 }
+
+int Cell_State::number_of_attached_cells( void )
+{ return attached_cells.size(); } 
+
+void Cell::attach_cell( Cell* pAddMe )
+{
+	#pragma omp critical
+	{
+		bool already_attached = false; 
+		for( int i=0 ; i < state.attached_cells.size() ; i++ )
+		{
+			if( state.attached_cells[i] == pAddMe )
+			{ already_attached = true; }
+		}
+		if( already_attached == false )
+		{ state.attached_cells.push_back( pAddMe ); }
+	}
+	// pAddMe->attach_cell( this ); 
+	return; 
+}
+
+void Cell::detach_cell( Cell* pRemoveMe )
+{
+	#pragma omp critical
+	{
+		bool found = false; 
+		int i = 0; 
+		while( !found && i < state.attached_cells.size() )
+		{
+			// if pRemoveMe is in the cell's list, remove it
+			if( state.attached_cells[i] == pRemoveMe )
+			{
+				int n = state.attached_cells.size(); 
+				// copy last entry to current position 
+				state.attached_cells[i] = state.attached_cells[n-1]; 
+				// shrink by one 
+				state.attached_cells.pop_back(); 
+				found = true; 
+			}
+			i++; 
+		}
+	}
+	return; 
+}
+
+void Cell::remove_all_attached_cells( void )
+{
+	{
+		// remove self from any attached cell's list. 
+		for( int i = 0; i < state.attached_cells.size() ; i++ )
+		{
+			state.attached_cells[i]->detach_cell( this ); 
+		}
+		// clear my list 
+		state.attached_cells.clear(); 
+	}
+	return; 
+}
+
+void attach_cells( Cell* pCell_1, Cell* pCell_2 )
+{
+	pCell_1->attach_cell( pCell_2 );
+	pCell_2->attach_cell( pCell_1 );
+	return; 
+}
+
+void detach_cells( Cell* pCell_1 , Cell* pCell_2 )
+{
+	pCell_1->detach_cell( pCell_2 );
+	pCell_2->detach_cell( pCell_1 );
+	return; 
+}
+
+std::vector<Cell*> find_nearby_cells( Cell* pCell )
+{
+	std::vector<Cell*> neighbors = {}; 
+
+	// First check the neighbors in my current voxel
+	std::vector<Cell*>::iterator neighbor;
+	std::vector<Cell*>::iterator end =
+		pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
+	for( neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
+	{ neighbors.push_back( *neighbor ); }
+
+	std::vector<int>::iterator neighbor_voxel_index;
+	std::vector<int>::iterator neighbor_voxel_index_end = 
+		pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].end();
+	
+	for( neighbor_voxel_index = 
+		pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].begin();
+		neighbor_voxel_index != neighbor_voxel_index_end; 
+		++neighbor_voxel_index )
+	{
+		if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+			continue;
+		end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
+		for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
+		{ neighbors.push_back( *neighbor ); }
+	}
+	
+	return neighbors; 
+}
+
+std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell )
+{
+	std::vector<Cell*> neighbors = {}; 
+
+	// First check the neighbors in my current voxel
+	std::vector<Cell*>::iterator neighbor;
+	std::vector<Cell*>::iterator end = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
+	for( neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
+	{
+		std::vector<double> displacement = (*neighbor)->position - pCell->position; 
+		double distance = norm( displacement ); 
+		if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
+			+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius 
+			&& (*neighbor) != pCell )
+		{ neighbors.push_back( *neighbor ); }
+	}
+
+	std::vector<int>::iterator neighbor_voxel_index;
+	std::vector<int>::iterator neighbor_voxel_index_end = 
+		pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].end();
+	
+	for( neighbor_voxel_index = 
+		pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].begin();
+		neighbor_voxel_index != neighbor_voxel_index_end; 
+		++neighbor_voxel_index )
+	{
+		if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+			continue;
+		end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
+		for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
+		{
+			std::vector<double> displacement = (*neighbor)->position - pCell->position; 
+			double distance = norm( displacement ); 
+			if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
+				+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius
+				&& (*neighbor) != pCell	)
+			{ neighbors.push_back( *neighbor ); }
+		}
+	}
+	
+	return neighbors; 
+}
+
+
+
 
 
 };

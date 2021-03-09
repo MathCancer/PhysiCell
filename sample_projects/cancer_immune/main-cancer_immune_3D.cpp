@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -88,12 +88,22 @@ int main( int argc, char* argv[] )
 	// load and parse settings file(s)
 	
 	bool XML_status = false; 
+	char copy_command [1024]; 
 	if( argc > 1 )
-	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
+	{
+		XML_status = load_PhysiCell_config_file( argv[1] ); 
+		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+	}
 	else
-	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	{
+		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
+		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
+	}
 	if( !XML_status )
 	{ exit(-1); }
+	
+	// copy config file to output directry 
+	system( copy_command ); 
 	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
@@ -178,9 +188,9 @@ int main( int argc, char* argv[] )
 				immune_cells_introduced = true; 
 				
 				PhysiCell_settings.full_save_interval = 
-					parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
+					parameters.doubles("save_interval_after_therapy_start"); 
 				PhysiCell_settings.SVG_save_interval = 
-					parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
+					parameters.doubles("SVG_interval_after_therapy_start"); 
 				
 				PhysiCell_globals.next_full_save_time = PhysiCell_globals.current_time; 
 				PhysiCell_globals.next_SVG_save_time = PhysiCell_globals.current_time; 
