@@ -202,4 +202,6 @@ Users should still test the distance to these cells in their interaction functio
 
 + Further update sample projects to make use of more efficient interaction testing available
 
++ Major refresh of documentation.
+
 * * * 
