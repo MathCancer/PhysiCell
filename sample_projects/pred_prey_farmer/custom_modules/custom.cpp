@@ -508,7 +508,7 @@ void predator_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	// update energy 
 	
-	static double decay_rate = 0.0025; 
+	static double decay_rate = 0.00025; 
 	pCell->custom_data["energy"] /= (1.0 + dt*decay_rate); 
 	
 	// low energy kills
