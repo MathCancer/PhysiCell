@@ -137,6 +137,8 @@ Users should still test the distance to these cells in their interaction functio
 
 + Improved plotting options in SVG 
 
++ Further update sample projects to make use of more efficient interaction testing available
+
 * * * 
 
 **Version:** 1.7.1
