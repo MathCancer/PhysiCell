@@ -175,7 +175,7 @@ int main( int argc, char* argv[] )
 	
 	// main loop 
 	
-	std::cout << std::endl << st::endl; 
+	std::cout << std::endl << std::endl; 
 	std::cout << "WARNING!!! Template3D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
 	std::cout << "WARNING!!! Template3D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
 	std::cout << "WARNING!!! Template3D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl << std::endl; 
@@ -241,7 +241,7 @@ int main( int argc, char* argv[] )
 		std::cout << e.what(); // information from length_error printed
 	}
 	
-	std::cout << std::endl << st::endl; 
+	std::cout << std::endl << std::endl; 
 	std::cout << "WARNING!!! Template3D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
 	std::cout << "WARNING!!! Template3D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl; 
 	std::cout << "WARNING!!! Template3D will be deprecated. Please use \"template\" which generalizes 2D and 3D." <<std::endl << std::endl; 
