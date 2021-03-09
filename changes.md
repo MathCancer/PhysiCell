@@ -2,7 +2,7 @@
 
 **Version:** 1.8.0
 
-**Release date:** 8 March 2021
+**Release date:** 9 March 2021
 
 ## Release summary: 
 
