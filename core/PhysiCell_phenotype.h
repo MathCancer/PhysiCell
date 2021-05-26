@@ -546,6 +546,56 @@ class Molecular
 		
 };
 
+class Intracellular
+{
+ private:
+ public:
+    std::string intracellular_type;  // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
+	// bool enabled; 
+
+    // ==========  specific to SBML ==============
+    // std::string sbml_filename;
+
+	
+    // ================  generic  ================
+	// This function parse the xml cell definition
+	virtual void initialize_intracellular_from_pugixml(pugi::xml_node& node) = 0;
+	
+	// This function initialize the model, needs to be called on each cell once created
+	virtual int start() = 0;
+	
+	// This function checks if it's time to update the model
+	virtual bool need_update() = 0;
+
+	// This function update the model for the time_step defined in the xml definition
+	virtual int update() = 0;
+
+	// Get value for model parameter
+	virtual double get_parameter_value(std::string name) = 0;
+	
+	// Set value for model parameter
+	virtual int set_parameter_value(std::string name, double value) = 0;
+
+	virtual std::string get_state() = 0;  
+	
+	virtual Intracellular* clone() = 0;
+    
+	
+
+    // ================  specific to "maboss" ================
+	virtual bool has_node(std::string name) = 0; 
+	virtual bool get_boolean_node_value(std::string name) = 0;
+	virtual void set_boolean_node_value(std::string name, bool value) = 0;
+	virtual void print_current_nodes() = 0;
+	
+
+    // ================  specific to "roadrunner" ================
+    virtual int update_phenotype_parameters(PhysiCell::Phenotype& phenotype) = 0;
+    virtual int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype) = 0;
+    virtual int validate_SBML_species() = 0;
+    virtual int create_custom_data_for_SBML(PhysiCell::Phenotype& phenotype) = 0;
+};
+
 class Phenotype
 {
  private:
@@ -562,6 +612,10 @@ class Phenotype
 	Secretion secretion; 
 	
 	Molecular molecular; 
+
+    // We need it to be a pointer to allow polymorphism
+	// then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
+	Intracellular* intracellular;
 	
 	Phenotype(); // done 
 	

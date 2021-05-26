@@ -1,0 +1,1368 @@
+Grammar
+
+    0 $accept: translation_unit $end
+
+    1 translation_unit: node_decl
+    2                 | translation_unit node_decl
+
+    3 node_decl: NODE IDENTIFIER '{' node_decl_item_list '}'
+    4          | NODE IDENTIFIER '{' '}'
+    5          | IDENTIFIER colon_comma expression term_opt
+
+    6 colon_comma: ':'
+    7            | ','
+
+    8 node_decl_item_list: node_decl_item
+    9                    | node_decl_item_list node_decl_item
+
+   10 node_decl_item: IDENTIFIER '=' expression ';'
+   11               | IDENTIFIER '=' STRING ';'
+
+   12 primary_expression: IDENTIFIER
+   13                   | '@' IDENTIFIER
+   14                   | VARIABLE
+   15                   | INTEGER
+   16                   | DOUBLE
+   17                   | '(' expression ')'
+
+   18 postfix_expression: primary_expression
+   19                   | IDENTIFIER '(' argument_expression_list ')'
+   20                   | IDENTIFIER '(' ')'
+
+   21 argument_expression_list: conditional_expression
+   22                         | argument_expression_list ',' conditional_expression
+
+   23 unary_expression: postfix_expression
+   24                 | '+' unary_expression
+   25                 | '-' unary_expression
+   26                 | '!' unary_expression
+   27                 | LOGNOT unary_expression
+
+   28 multiplicative_expression: unary_expression
+   29                          | multiplicative_expression '*' unary_expression
+   30                          | multiplicative_expression '/' unary_expression
+
+   31 additive_expression: multiplicative_expression
+   32                    | additive_expression '+' multiplicative_expression
+   33                    | additive_expression '-' multiplicative_expression
+
+   34 relational_expression: additive_expression
+   35                      | relational_expression '<' additive_expression
+   36                      | relational_expression '>' additive_expression
+   37                      | relational_expression LTEQ additive_expression
+   38                      | relational_expression GTEQ additive_expression
+
+   39 equality_expression: relational_expression
+   40                    | equality_expression EQUAL relational_expression
+   41                    | equality_expression NOT_EQUAL relational_expression
+
+   42 logical_and_expression: equality_expression
+   43                       | logical_and_expression LOGAND equality_expression
+
+   44 logical_or_expression: logical_and_expression
+   45                      | logical_or_expression LOGOR logical_and_expression
+
+   46 logical_xor_expression: logical_or_expression
+   47                       | logical_xor_expression LOGXOR logical_or_expression
+   48                       | logical_xor_expression '^' logical_or_expression
+
+   49 conditional_expression: logical_xor_expression
+   50                       | logical_xor_expression '?' expression ':' conditional_expression
+
+   51 expression: conditional_expression
+
+   52 term_opt: /* empty */
+   53         | ';'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 26
+'(' (40) 17 19 20
+')' (41) 17 19 20
+'*' (42) 29
+'+' (43) 24 32
+',' (44) 7 22
+'-' (45) 25 33
+'/' (47) 30
+':' (58) 6 50
+';' (59) 10 11 53
+'<' (60) 35
+'=' (61) 10 11
+'>' (62) 36
+'?' (63) 50
+'@' (64) 13
+'^' (94) 48
+'{' (123) 3 4
+'}' (125) 3 4
+error (256)
+IDENTIFIER (258) 3 4 5 10 11 12 13 19 20
+VARIABLE (259) 14
+STRING (260) 11
+DOUBLE (261) 16
+INTEGER (262) 15
+LOGAND (263) 43
+LOGOR (264) 45
+LOGXOR (265) 47
+LOGNOT (266) 27
+EQUAL (267) 40
+NOT_EQUAL (268) 41
+NODE (269) 3 4
+GTEQ (270) 38
+LTEQ (271) 37
+
+
+Nonterminals, with rules where they appear
+
+$accept (35)
+    on left: 0
+translation_unit (36)
+    on left: 1 2, on right: 0 2
+node_decl (37)
+    on left: 3 4 5, on right: 1 2
+colon_comma (38)
+    on left: 6 7, on right: 5
+node_decl_item_list (39)
+    on left: 8 9, on right: 3 9
+node_decl_item (40)
+    on left: 10 11, on right: 8 9
+primary_expression (41)
+    on left: 12 13 14 15 16 17, on right: 18
+postfix_expression (42)
+    on left: 18 19 20, on right: 23
+argument_expression_list (43)
+    on left: 21 22, on right: 19 22
+unary_expression (44)
+    on left: 23 24 25 26 27, on right: 24 25 26 27 28 29 30
+multiplicative_expression (45)
+    on left: 28 29 30, on right: 29 30 31 32 33
+additive_expression (46)
+    on left: 31 32 33, on right: 32 33 34 35 36 37 38
+relational_expression (47)
+    on left: 34 35 36 37 38, on right: 35 36 37 38 39 40 41
+equality_expression (48)
+    on left: 39 40 41, on right: 40 41 42 43
+logical_and_expression (49)
+    on left: 42 43, on right: 43 44 45
+logical_or_expression (50)
+    on left: 44 45, on right: 45 46 47 48
+logical_xor_expression (51)
+    on left: 46 47 48, on right: 47 48 49 50
+conditional_expression (52)
+    on left: 49 50, on right: 21 22 50 51
+expression (53)
+    on left: 51, on right: 5 10 17 50
+term_opt (54)
+    on left: 52 53, on right: 5
+
+
+state 0
+
+    0 $accept: . translation_unit $end
+
+    IDENTIFIER  shift, and go to state 1
+    NODE        shift, and go to state 2
+
+    translation_unit  go to state 3
+    node_decl         go to state 4
+
+
+state 1
+
+    5 node_decl: IDENTIFIER . colon_comma expression term_opt
+
+    ':'  shift, and go to state 5
+    ','  shift, and go to state 6
+
+    colon_comma  go to state 7
+
+
+state 2
+
+    3 node_decl: NODE . IDENTIFIER '{' node_decl_item_list '}'
+    4          | NODE . IDENTIFIER '{' '}'
+
+    IDENTIFIER  shift, and go to state 8
+
+
+state 3
+
+    0 $accept: translation_unit . $end
+    2 translation_unit: translation_unit . node_decl
+
+    $end        shift, and go to state 9
+    IDENTIFIER  shift, and go to state 1
+    NODE        shift, and go to state 2
+
+    node_decl  go to state 10
+
+
+state 4
+
+    1 translation_unit: node_decl .
+
+    $default  reduce using rule 1 (translation_unit)
+
+
+state 5
+
+    6 colon_comma: ':' .
+
+    $default  reduce using rule 6 (colon_comma)
+
+
+state 6
+
+    7 colon_comma: ',' .
+
+    $default  reduce using rule 7 (colon_comma)
+
+
+state 7
+
+    5 node_decl: IDENTIFIER colon_comma . expression term_opt
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 29
+    logical_xor_expression     go to state 30
+    conditional_expression     go to state 31
+    expression                 go to state 32
+
+
+state 8
+
+    3 node_decl: NODE IDENTIFIER . '{' node_decl_item_list '}'
+    4          | NODE IDENTIFIER . '{' '}'
+
+    '{'  shift, and go to state 33
+
+
+state 9
+
+    0 $accept: translation_unit $end .
+
+    $default  accept
+
+
+state 10
+
+    2 translation_unit: translation_unit node_decl .
+
+    $default  reduce using rule 2 (translation_unit)
+
+
+state 11
+
+   12 primary_expression: IDENTIFIER .
+   19 postfix_expression: IDENTIFIER . '(' argument_expression_list ')'
+   20                   | IDENTIFIER . '(' ')'
+
+    '('  shift, and go to state 34
+
+    $default  reduce using rule 12 (primary_expression)
+
+
+state 12
+
+   14 primary_expression: VARIABLE .
+
+    $default  reduce using rule 14 (primary_expression)
+
+
+state 13
+
+   16 primary_expression: DOUBLE .
+
+    $default  reduce using rule 16 (primary_expression)
+
+
+state 14
+
+   15 primary_expression: INTEGER .
+
+    $default  reduce using rule 15 (primary_expression)
+
+
+state 15
+
+   27 unary_expression: LOGNOT . unary_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression  go to state 21
+    postfix_expression  go to state 22
+    unary_expression    go to state 35
+
+
+state 16
+
+   13 primary_expression: '@' . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 36
+
+
+state 17
+
+   17 primary_expression: '(' . expression ')'
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 29
+    logical_xor_expression     go to state 30
+    conditional_expression     go to state 31
+    expression                 go to state 37
+
+
+state 18
+
+   24 unary_expression: '+' . unary_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression  go to state 21
+    postfix_expression  go to state 22
+    unary_expression    go to state 38
+
+
+state 19
+
+   25 unary_expression: '-' . unary_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression  go to state 21
+    postfix_expression  go to state 22
+    unary_expression    go to state 39
+
+
+state 20
+
+   26 unary_expression: '!' . unary_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression  go to state 21
+    postfix_expression  go to state 22
+    unary_expression    go to state 40
+
+
+state 21
+
+   18 postfix_expression: primary_expression .
+
+    $default  reduce using rule 18 (postfix_expression)
+
+
+state 22
+
+   23 unary_expression: postfix_expression .
+
+    $default  reduce using rule 23 (unary_expression)
+
+
+state 23
+
+   28 multiplicative_expression: unary_expression .
+
+    $default  reduce using rule 28 (multiplicative_expression)
+
+
+state 24
+
+   29 multiplicative_expression: multiplicative_expression . '*' unary_expression
+   30                          | multiplicative_expression . '/' unary_expression
+   31 additive_expression: multiplicative_expression .
+
+    '*'  shift, and go to state 41
+    '/'  shift, and go to state 42
+
+    $default  reduce using rule 31 (additive_expression)
+
+
+state 25
+
+   32 additive_expression: additive_expression . '+' multiplicative_expression
+   33                    | additive_expression . '-' multiplicative_expression
+   34 relational_expression: additive_expression .
+
+    '+'  shift, and go to state 43
+    '-'  shift, and go to state 44
+
+    $default  reduce using rule 34 (relational_expression)
+
+
+state 26
+
+   35 relational_expression: relational_expression . '<' additive_expression
+   36                      | relational_expression . '>' additive_expression
+   37                      | relational_expression . LTEQ additive_expression
+   38                      | relational_expression . GTEQ additive_expression
+   39 equality_expression: relational_expression .
+
+    GTEQ  shift, and go to state 45
+    LTEQ  shift, and go to state 46
+    '<'   shift, and go to state 47
+    '>'   shift, and go to state 48
+
+    $default  reduce using rule 39 (equality_expression)
+
+
+state 27
+
+   40 equality_expression: equality_expression . EQUAL relational_expression
+   41                    | equality_expression . NOT_EQUAL relational_expression
+   42 logical_and_expression: equality_expression .
+
+    EQUAL      shift, and go to state 49
+    NOT_EQUAL  shift, and go to state 50
+
+    $default  reduce using rule 42 (logical_and_expression)
+
+
+state 28
+
+   43 logical_and_expression: logical_and_expression . LOGAND equality_expression
+   44 logical_or_expression: logical_and_expression .
+
+    LOGAND  shift, and go to state 51
+
+    $default  reduce using rule 44 (logical_or_expression)
+
+
+state 29
+
+   45 logical_or_expression: logical_or_expression . LOGOR logical_and_expression
+   46 logical_xor_expression: logical_or_expression .
+
+    LOGOR  shift, and go to state 52
+
+    $default  reduce using rule 46 (logical_xor_expression)
+
+
+state 30
+
+   47 logical_xor_expression: logical_xor_expression . LOGXOR logical_or_expression
+   48                       | logical_xor_expression . '^' logical_or_expression
+   49 conditional_expression: logical_xor_expression .
+   50                       | logical_xor_expression . '?' expression ':' conditional_expression
+
+    LOGXOR  shift, and go to state 53
+    '^'     shift, and go to state 54
+    '?'     shift, and go to state 55
+
+    $default  reduce using rule 49 (conditional_expression)
+
+
+state 31
+
+   51 expression: conditional_expression .
+
+    $default  reduce using rule 51 (expression)
+
+
+state 32
+
+    5 node_decl: IDENTIFIER colon_comma expression . term_opt
+
+    ';'  shift, and go to state 56
+
+    $default  reduce using rule 52 (term_opt)
+
+    term_opt  go to state 57
+
+
+state 33
+
+    3 node_decl: NODE IDENTIFIER '{' . node_decl_item_list '}'
+    4          | NODE IDENTIFIER '{' . '}'
+
+    IDENTIFIER  shift, and go to state 58
+    '}'         shift, and go to state 59
+
+    node_decl_item_list  go to state 60
+    node_decl_item       go to state 61
+
+
+state 34
+
+   19 postfix_expression: IDENTIFIER '(' . argument_expression_list ')'
+   20                   | IDENTIFIER '(' . ')'
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    ')'         shift, and go to state 62
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    argument_expression_list   go to state 63
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 29
+    logical_xor_expression     go to state 30
+    conditional_expression     go to state 64
+
+
+state 35
+
+   27 unary_expression: LOGNOT unary_expression .
+
+    $default  reduce using rule 27 (unary_expression)
+
+
+state 36
+
+   13 primary_expression: '@' IDENTIFIER .
+
+    $default  reduce using rule 13 (primary_expression)
+
+
+state 37
+
+   17 primary_expression: '(' expression . ')'
+
+    ')'  shift, and go to state 65
+
+
+state 38
+
+   24 unary_expression: '+' unary_expression .
+
+    $default  reduce using rule 24 (unary_expression)
+
+
+state 39
+
+   25 unary_expression: '-' unary_expression .
+
+    $default  reduce using rule 25 (unary_expression)
+
+
+state 40
+
+   26 unary_expression: '!' unary_expression .
+
+    $default  reduce using rule 26 (unary_expression)
+
+
+state 41
+
+   29 multiplicative_expression: multiplicative_expression '*' . unary_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression  go to state 21
+    postfix_expression  go to state 22
+    unary_expression    go to state 66
+
+
+state 42
+
+   30 multiplicative_expression: multiplicative_expression '/' . unary_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression  go to state 21
+    postfix_expression  go to state 22
+    unary_expression    go to state 67
+
+
+state 43
+
+   32 additive_expression: additive_expression '+' . multiplicative_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 68
+
+
+state 44
+
+   33 additive_expression: additive_expression '-' . multiplicative_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 69
+
+
+state 45
+
+   38 relational_expression: relational_expression GTEQ . additive_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 70
+
+
+state 46
+
+   37 relational_expression: relational_expression LTEQ . additive_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 71
+
+
+state 47
+
+   35 relational_expression: relational_expression '<' . additive_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 72
+
+
+state 48
+
+   36 relational_expression: relational_expression '>' . additive_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 73
+
+
+state 49
+
+   40 equality_expression: equality_expression EQUAL . relational_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 74
+
+
+state 50
+
+   41 equality_expression: equality_expression NOT_EQUAL . relational_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 75
+
+
+state 51
+
+   43 logical_and_expression: logical_and_expression LOGAND . equality_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 76
+
+
+state 52
+
+   45 logical_or_expression: logical_or_expression LOGOR . logical_and_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 77
+
+
+state 53
+
+   47 logical_xor_expression: logical_xor_expression LOGXOR . logical_or_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 78
+
+
+state 54
+
+   48 logical_xor_expression: logical_xor_expression '^' . logical_or_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 79
+
+
+state 55
+
+   50 conditional_expression: logical_xor_expression '?' . expression ':' conditional_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 29
+    logical_xor_expression     go to state 30
+    conditional_expression     go to state 31
+    expression                 go to state 80
+
+
+state 56
+
+   53 term_opt: ';' .
+
+    $default  reduce using rule 53 (term_opt)
+
+
+state 57
+
+    5 node_decl: IDENTIFIER colon_comma expression term_opt .
+
+    $default  reduce using rule 5 (node_decl)
+
+
+state 58
+
+   10 node_decl_item: IDENTIFIER . '=' expression ';'
+   11               | IDENTIFIER . '=' STRING ';'
+
+    '='  shift, and go to state 81
+
+
+state 59
+
+    4 node_decl: NODE IDENTIFIER '{' '}' .
+
+    $default  reduce using rule 4 (node_decl)
+
+
+state 60
+
+    3 node_decl: NODE IDENTIFIER '{' node_decl_item_list . '}'
+    9 node_decl_item_list: node_decl_item_list . node_decl_item
+
+    IDENTIFIER  shift, and go to state 58
+    '}'         shift, and go to state 82
+
+    node_decl_item  go to state 83
+
+
+state 61
+
+    8 node_decl_item_list: node_decl_item .
+
+    $default  reduce using rule 8 (node_decl_item_list)
+
+
+state 62
+
+   20 postfix_expression: IDENTIFIER '(' ')' .
+
+    $default  reduce using rule 20 (postfix_expression)
+
+
+state 63
+
+   19 postfix_expression: IDENTIFIER '(' argument_expression_list . ')'
+   22 argument_expression_list: argument_expression_list . ',' conditional_expression
+
+    ','  shift, and go to state 84
+    ')'  shift, and go to state 85
+
+
+state 64
+
+   21 argument_expression_list: conditional_expression .
+
+    $default  reduce using rule 21 (argument_expression_list)
+
+
+state 65
+
+   17 primary_expression: '(' expression ')' .
+
+    $default  reduce using rule 17 (primary_expression)
+
+
+state 66
+
+   29 multiplicative_expression: multiplicative_expression '*' unary_expression .
+
+    $default  reduce using rule 29 (multiplicative_expression)
+
+
+state 67
+
+   30 multiplicative_expression: multiplicative_expression '/' unary_expression .
+
+    $default  reduce using rule 30 (multiplicative_expression)
+
+
+state 68
+
+   29 multiplicative_expression: multiplicative_expression . '*' unary_expression
+   30                          | multiplicative_expression . '/' unary_expression
+   32 additive_expression: additive_expression '+' multiplicative_expression .
+
+    '*'  shift, and go to state 41
+    '/'  shift, and go to state 42
+
+    $default  reduce using rule 32 (additive_expression)
+
+
+state 69
+
+   29 multiplicative_expression: multiplicative_expression . '*' unary_expression
+   30                          | multiplicative_expression . '/' unary_expression
+   33 additive_expression: additive_expression '-' multiplicative_expression .
+
+    '*'  shift, and go to state 41
+    '/'  shift, and go to state 42
+
+    $default  reduce using rule 33 (additive_expression)
+
+
+state 70
+
+   32 additive_expression: additive_expression . '+' multiplicative_expression
+   33                    | additive_expression . '-' multiplicative_expression
+   38 relational_expression: relational_expression GTEQ additive_expression .
+
+    '+'  shift, and go to state 43
+    '-'  shift, and go to state 44
+
+    $default  reduce using rule 38 (relational_expression)
+
+
+state 71
+
+   32 additive_expression: additive_expression . '+' multiplicative_expression
+   33                    | additive_expression . '-' multiplicative_expression
+   37 relational_expression: relational_expression LTEQ additive_expression .
+
+    '+'  shift, and go to state 43
+    '-'  shift, and go to state 44
+
+    $default  reduce using rule 37 (relational_expression)
+
+
+state 72
+
+   32 additive_expression: additive_expression . '+' multiplicative_expression
+   33                    | additive_expression . '-' multiplicative_expression
+   35 relational_expression: relational_expression '<' additive_expression .
+
+    '+'  shift, and go to state 43
+    '-'  shift, and go to state 44
+
+    $default  reduce using rule 35 (relational_expression)
+
+
+state 73
+
+   32 additive_expression: additive_expression . '+' multiplicative_expression
+   33                    | additive_expression . '-' multiplicative_expression
+   36 relational_expression: relational_expression '>' additive_expression .
+
+    '+'  shift, and go to state 43
+    '-'  shift, and go to state 44
+
+    $default  reduce using rule 36 (relational_expression)
+
+
+state 74
+
+   35 relational_expression: relational_expression . '<' additive_expression
+   36                      | relational_expression . '>' additive_expression
+   37                      | relational_expression . LTEQ additive_expression
+   38                      | relational_expression . GTEQ additive_expression
+   40 equality_expression: equality_expression EQUAL relational_expression .
+
+    GTEQ  shift, and go to state 45
+    LTEQ  shift, and go to state 46
+    '<'   shift, and go to state 47
+    '>'   shift, and go to state 48
+
+    $default  reduce using rule 40 (equality_expression)
+
+
+state 75
+
+   35 relational_expression: relational_expression . '<' additive_expression
+   36                      | relational_expression . '>' additive_expression
+   37                      | relational_expression . LTEQ additive_expression
+   38                      | relational_expression . GTEQ additive_expression
+   41 equality_expression: equality_expression NOT_EQUAL relational_expression .
+
+    GTEQ  shift, and go to state 45
+    LTEQ  shift, and go to state 46
+    '<'   shift, and go to state 47
+    '>'   shift, and go to state 48
+
+    $default  reduce using rule 41 (equality_expression)
+
+
+state 76
+
+   40 equality_expression: equality_expression . EQUAL relational_expression
+   41                    | equality_expression . NOT_EQUAL relational_expression
+   43 logical_and_expression: logical_and_expression LOGAND equality_expression .
+
+    EQUAL      shift, and go to state 49
+    NOT_EQUAL  shift, and go to state 50
+
+    $default  reduce using rule 43 (logical_and_expression)
+
+
+state 77
+
+   43 logical_and_expression: logical_and_expression . LOGAND equality_expression
+   45 logical_or_expression: logical_or_expression LOGOR logical_and_expression .
+
+    LOGAND  shift, and go to state 51
+
+    $default  reduce using rule 45 (logical_or_expression)
+
+
+state 78
+
+   45 logical_or_expression: logical_or_expression . LOGOR logical_and_expression
+   47 logical_xor_expression: logical_xor_expression LOGXOR logical_or_expression .
+
+    LOGOR  shift, and go to state 52
+
+    $default  reduce using rule 47 (logical_xor_expression)
+
+
+state 79
+
+   45 logical_or_expression: logical_or_expression . LOGOR logical_and_expression
+   48 logical_xor_expression: logical_xor_expression '^' logical_or_expression .
+
+    LOGOR  shift, and go to state 52
+
+    $default  reduce using rule 48 (logical_xor_expression)
+
+
+state 80
+
+   50 conditional_expression: logical_xor_expression '?' expression . ':' conditional_expression
+
+    ':'  shift, and go to state 86
+
+
+state 81
+
+   10 node_decl_item: IDENTIFIER '=' . expression ';'
+   11               | IDENTIFIER '=' . STRING ';'
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    STRING      shift, and go to state 87
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 29
+    logical_xor_expression     go to state 30
+    conditional_expression     go to state 31
+    expression                 go to state 88
+
+
+state 82
+
+    3 node_decl: NODE IDENTIFIER '{' node_decl_item_list '}' .
+
+    $default  reduce using rule 3 (node_decl)
+
+
+state 83
+
+    9 node_decl_item_list: node_decl_item_list node_decl_item .
+
+    $default  reduce using rule 9 (node_decl_item_list)
+
+
+state 84
+
+   22 argument_expression_list: argument_expression_list ',' . conditional_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 29
+    logical_xor_expression     go to state 30
+    conditional_expression     go to state 89
+
+
+state 85
+
+   19 postfix_expression: IDENTIFIER '(' argument_expression_list ')' .
+
+    $default  reduce using rule 19 (postfix_expression)
+
+
+state 86
+
+   50 conditional_expression: logical_xor_expression '?' expression ':' . conditional_expression
+
+    IDENTIFIER  shift, and go to state 11
+    VARIABLE    shift, and go to state 12
+    DOUBLE      shift, and go to state 13
+    INTEGER     shift, and go to state 14
+    LOGNOT      shift, and go to state 15
+    '@'         shift, and go to state 16
+    '('         shift, and go to state 17
+    '+'         shift, and go to state 18
+    '-'         shift, and go to state 19
+    '!'         shift, and go to state 20
+
+    primary_expression         go to state 21
+    postfix_expression         go to state 22
+    unary_expression           go to state 23
+    multiplicative_expression  go to state 24
+    additive_expression        go to state 25
+    relational_expression      go to state 26
+    equality_expression        go to state 27
+    logical_and_expression     go to state 28
+    logical_or_expression      go to state 29
+    logical_xor_expression     go to state 30
+    conditional_expression     go to state 90
+
+
+state 87
+
+   11 node_decl_item: IDENTIFIER '=' STRING . ';'
+
+    ';'  shift, and go to state 91
+
+
+state 88
+
+   10 node_decl_item: IDENTIFIER '=' expression . ';'
+
+    ';'  shift, and go to state 92
+
+
+state 89
+
+   22 argument_expression_list: argument_expression_list ',' conditional_expression .
+
+    $default  reduce using rule 22 (argument_expression_list)
+
+
+state 90
+
+   50 conditional_expression: logical_xor_expression '?' expression ':' conditional_expression .
+
+    $default  reduce using rule 50 (conditional_expression)
+
+
+state 91
+
+   11 node_decl_item: IDENTIFIER '=' STRING ';' .
+
+    $default  reduce using rule 11 (node_decl_item)
+
+
+state 92
+
+   10 node_decl_item: IDENTIFIER '=' expression ';' .
+
+    $default  reduce using rule 10 (node_decl_item)

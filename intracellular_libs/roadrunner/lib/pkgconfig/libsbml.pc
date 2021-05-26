@@ -1,0 +1,13 @@
+Name: libSBML
+Description: A library for reading/writing/manipulating SBML
+URL: http://sbml.org/Software/libSBML
+Version: 5.14.0
+
+prefix=/Users/phantom/devel/install/libroadrunner-deps-osx-10.9
+libdir=/Users/phantom/devel/install/libroadrunner-deps-osx-10.9/lib
+includedir=/Users/phantom/devel/install/libroadrunner-deps-osx-10.9/include
+
+Libs: -L${libdir} -lsbml
+Libs.private:        /usr/lib/libxml2.dylib /usr/lib/libbz2.dylib /usr/lib/libz.dylib -lstdc++ -lm
+Cflags: -I${includedir}
+Requires.private: libxml-2.0 >= 2.6.22
