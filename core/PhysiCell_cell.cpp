@@ -70,6 +70,14 @@
 #include "PhysiCell_utilities.h"
 #include "PhysiCell_constants.h"
 #include "../BioFVM/BioFVM_vector.h" 
+
+#ifdef ADDON_PHYSIBOSS
+#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
+#endif
+#ifdef ADDON_ROADRUNNER
+#include "../addons/libRoadrunner/src/librr_intracellular.h"
+#endif
+
 #include<limits.h>
 
 #include <signal.h>  // for segfault
@@ -2214,6 +2222,48 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			
 			node_sec = node_sec.next_sibling( "substrate" ); 
 		}
+	}	
+
+    	// intracellular
+	
+	node = cd_node.child( "phenotype" );
+	node = node.child( "intracellular" ); 
+	if( node )
+	{
+		std::string model_type = node.attribute( "type" ).value(); 
+		
+#ifdef ADDON_PHYSIBOSS
+		if (model_type == "maboss") {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+				
+			// Otherwise we need to create a new one
+			} else {
+				MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+			}
+		}
+#endif
+
+#ifdef ADDON_ROADRUNNER
+		if (model_type == "roadrunner") 
+        {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellular != NULL) 
+            {
+                std::cout << "------ " << __FUNCTION__ << ": copying another\n";
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+            }	
+			// Otherwise we need to create a new one
+			else 
+            {
+                std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
+				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+			}
+		}
+#endif
 	}	
 	
 	// set up custom data 
