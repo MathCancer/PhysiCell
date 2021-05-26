@@ -62,8 +62,12 @@ all:
 
 # sample projects 	
 list-projects:
+	@echo ""
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
 	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm-sample"
+	@echo ""
+	@echo "Sample intracellular projects: ode1-sample"
+	@echo ""
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
