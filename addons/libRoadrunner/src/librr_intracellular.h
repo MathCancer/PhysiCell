@@ -14,8 +14,10 @@
 // #ifdef ADDON_ROADRUNNER
 // These are for C
 // #define STATIC_RRC
-#include "rrc_api.h"
-#include "rrc_types.h"
+// #include "rrc_api.h"
+// #include "rrc_types.h"
+#include "../roadrunner/include/rr/C/rrc_api.h"
+#include "../roadrunner/include/rr/C/rrc_types.h"
 // #include "rrc_utilities.h"
 extern "C" rrc::RRHandle createRRInstance();
 // #endif

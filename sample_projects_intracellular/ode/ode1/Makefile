@@ -55,7 +55,8 @@ else
 #		CC := clang++
 		OSFLAG += -D OSX
 #	 	LIBRR_DIR := $(HOME)/libroadrunner/roadrunner-osx-10.9-cp36m
-		LIBRR_DIR := $(shell pwd)/intracellular_libs/roadrunner
+#		LIBRR_DIR := $(shell pwd)/intracellular_libs/roadrunner
+		LIBRR_DIR := ./addons/libRoadrunner/roadrunner
 #		LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
 		LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
 		LIBRR_LIBS := ${LIBRR_DIR}/lib
@@ -76,7 +77,6 @@ else
 	endif
 endif
 
-#COMPILE_COMMAND := $(CC) $(CFLAGS) 
 COMPILE_COMMAND := $(CC) $(CFLAGS) $(LIBRR_CFLAGS) 
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
@@ -89,13 +89,10 @@ PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_Mult
 PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
-
-#PhysiCell_custom_module_OBJECTS := custom.o submodel_data_structures.o internal_viral_dynamics.o internal_viral_response.o receptor_dynamics.o immune_submodels.o epithelium_submodel.o
 PhysiCell_custom_module_OBJECTS := custom.o 
 
 pugixml_OBJECTS := pugixml.o
 
-# PhysiBoSSa_OBJECTS := maboss_network.o maboss_intracellular.o
 ROADRUNNER_OBJECTS := librr_intracellular.o 
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
@@ -106,7 +103,7 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(ROADRUN
 #all: main.cpp $(ALL_OBJECTS)
 #	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
 
-all: main.cpp $(ALL_OBJECTS)
+all: libRoadrunner main.cpp $(ALL_OBJECTS)
 	@echo Your OS= $(OSFLAG)
 	@echo LIBRR_CFLAGS= $(LIBRR_CFLAGS)
 	@echo LIBRR_LIBS= $(LIBRR_LIBS)
@@ -199,7 +196,11 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-custom.o: ./custom_modules/custom.cpp ./intracellular/PhysiCell_intracellular.h
+libRoadrunner: 
+	python3 beta/setup_libroadrunner.py
+
+# custom.o: ./custom_modules/custom.cpp ./intracellular/PhysiCell_intracellular.h
+custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 librr_intracellular.o: ./addons/libRoadrunner/src/librr_intracellular.cpp ./addons/libRoadrunner/src/librr_intracellular.h

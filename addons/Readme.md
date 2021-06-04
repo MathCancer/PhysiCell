@@ -1,3 +1,10 @@
+
+on OSX:
+$ DYLD_INSERT_LIBRARIES=./addons/libRoadrunner/roadrunner/lib/libroadrunner_c_api.dylib ode1
+
+
+
+-----------------------
 ~/git/rheiland_development-intracellular$ ty VERSION.txt
 1.9.0-dev
 ~/git/PhysiCell-SBML-trials_Furkan/PhysiCell_intracellular_Phenotype$ ty VERSION.txt
