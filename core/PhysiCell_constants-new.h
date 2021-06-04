@@ -65,50 +65,103 @@
 ###############################################################################
 */
 
-#include "PhysiCell_constants.h" 
+#ifndef __PhysiCell_constants_h__
+#define __PhysiCell_constants_h__
 
-namespace PhysiCell{
+#include <string>
+#include <unordered_map>
 
-std::string time_units = "min";
-std::string space_units = "micron";
-double diffusion_dt = 0.01; 
-double mechanics_dt = 0.1;
-double phenotype_dt = 6.0;
-
-std::unordered_map<std::string,int> cycle_model_codes = 
+namespace PhysiCell
 {
-	{ "Ki67 (advanced)", PhysiCell_constants::advanced_Ki67_cycle_model}, 
-	{ "Ki67 (basic)" ,PhysiCell_constants::basic_Ki67_cycle_model},
-	{ "Flow cytometry model (basic)",PhysiCell_constants::flow_cytometry_cycle_model},
-	// { ,PhysiCell_constants::live_apoptotic_cycle_model}, // not implemented 
-	// { ,PhysiCell_constants::total_cells_cycle_model}, // not implemented 
-	{ "Live",PhysiCell_constants::live_cells_cycle_model}, 
-	{ "Flow cytometry model (separated)",PhysiCell_constants::flow_cytometry_separated_cycle_model}, 
-	{ "Cycling-Quiescent model",PhysiCell_constants::cycling_quiescent_model}, 
+	
+// class PhysiCell_constants
+namespace PhysiCell_constants
+{
+//  public:
+	extern const double pi;
+	
+	extern const double cell_removal_threshold_volume; // 20 cubic microns -- about 1% of typical cell 
+	extern const int keep_pushed_out_cells_in_outer_voxel;
+	extern const int solid_boundary;
+	extern const int default_boundary_condition_for_pushed_out_agents;		
+	
+	extern const int deterministic_necrosis;
+	extern const int stochastic_necrosis;
+	
+	extern const int mesh_min_x_index;
+	extern const int mesh_min_y_index;
+	extern const int mesh_min_z_index;
+	extern const int mesh_max_x_index;
+	extern const int mesh_max_y_index;
+	extern const int mesh_max_z_index;			
+	
+	extern const int mesh_lx_face_index;
+	extern const int mesh_ly_face_index;
+	extern const int mesh_lz_face_index;
+	extern const int mesh_ux_face_index;
+	extern const int mesh_uy_face_index;
+	extern const int mesh_uz_face_index;
+	
+	// currently recognized cell cycle models 
+	extern const int advanced_Ki67_cycle_model;
+	extern const int basic_Ki67_cycle_model;
+	extern const int flow_cytometry_cycle_model;
+	extern const int live_apoptotic_cycle_model;
+	extern const int total_cells_cycle_model;
+	extern const int live_cells_cycle_model; 
+	extern const int flow_cytometry_separated_cycle_model; 
+	extern const int cycling_quiescent_model; 
 	
 	// currently recognized death models 
-	{ "Apoptosis",PhysiCell_constants::apoptosis_death_model}, 
-	{ "Necrosis",PhysiCell_constants::necrosis_death_model} , 
-	// { ,PhysiCell_constants::autophagy_death_model}, // not implemented 
+	extern const int apoptosis_death_model; 
+	extern const int necrosis_death_model; 
+	extern const int autophagy_death_model; 
 	
-	{ "ki67 (advanced)", PhysiCell_constants::advanced_Ki67_cycle_model}, 
-	{ "ki67 (basic)" ,PhysiCell_constants::basic_Ki67_cycle_model},
-	{ "flow cytometry model (basic)",PhysiCell_constants::flow_cytometry_cycle_model},
-	{ "live",PhysiCell_constants::live_cells_cycle_model}, 
-	{ "flow cytometry model (separated)",PhysiCell_constants::flow_cytometry_separated_cycle_model}, 
-	{ "cycling-quiescent model",PhysiCell_constants::cycling_quiescent_model}, 
-	{ "apoptosis",PhysiCell_constants::apoptosis_death_model}, 
-	{ "necrosis",PhysiCell_constants::necrosis_death_model} 
+	extern const int custom_cycle_model; 
 	
-}; 
-
-int find_cycle_model_code( std::string model_name )
-{
-	auto search = cycle_model_codes.find( model_name );
-	if( search == cycle_model_codes.end() )
-	{ return -1; }
-	else
-	{ return search->second; }
+	// currently recognized cell cycle and death phases 
+	// cycle phases
+	extern const int Ki67_positive_premitotic; 
+	extern const int Ki67_positive_postmitotic; 
+	extern const int Ki67_positive; 
+	extern const int Ki67_negative; 
+	extern const int G0G1_phase;
+	extern const int G0_phase;
+	extern const int G1_phase; 
+	extern const int G1a_phase; 
+	extern const int G1b_phase;
+	extern const int G1c_phase;
+	extern const int S_phase;
+	extern const int G2M_phase;
+	extern const int G2_phase;
+	extern const int M_phase;
+	extern const int live;
+	
+	extern const int G1pm_phase;
+	extern const int G1ps_phase; 
+	
+	extern const int cycling; 
+	extern const int quiescent; 
+	
+	
+	extern const int custom_phase;
+	// death phases
+	extern const int apoptotic;
+	extern const int necrotic_swelling;
+	extern const int necrotic_lysed;
+	extern const int necrotic; 
+	extern const int debris; 
 }
+extern std::string time_units;
+extern std::string space_units;
+extern double diffusion_dt; 
+extern double mechanics_dt;
+extern double phenotype_dt;
+
+
+extern std::unordered_map<std::string,int> cycle_model_codes;
+int find_cycle_model_code( std::string model_name ); 
 
 };
+
+#endif
