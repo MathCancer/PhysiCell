@@ -72,10 +72,13 @@
 #include "../BioFVM/BioFVM_vector.h" 
 
 #ifdef ADDON_PHYSIBOSS
-#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
+#include "../addons/PhysiBoSS/src/maboss_intracellular.h"
 #endif
 #ifdef ADDON_ROADRUNNER
 #include "../addons/libRoadrunner/src/librr_intracellular.h"
+#endif
+#ifdef ADDON_PHYSIDFBA
+#include "../addons/dFBA/src/dfba_intracellular.h"
 #endif
 
 #include<limits.h>
@@ -553,6 +556,10 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 	
+// #ifdef ADDON_PHYSIDFBA
+// 	child->fba_model = this->fba_model;
+// #endif
+
 	return child;
 }
 
@@ -580,6 +587,17 @@ bool Cell::assign_position(double x, double y, double z)
 	update_voxel_index();
 	// update current_mechanics_voxel_index
 	current_mechanics_voxel_index= get_container()->underlying_mesh.nearest_voxel_index( position );
+
+    // Since it is most likely our first position, we update the max_cell_interactive_distance_in_voxel
+	// which was not initialized at cell creation
+	if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
+		phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+	{
+		// get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()]= phenotype.geometry.radius*parameters.max_interaction_distance_factor;
+		get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
+			* phenotype.mechanics.relative_maximum_adhesion_distance;
+	}
+
 	get_container()->register_agent(this);
 	
 	if( !get_container()->underlying_mesh.is_position_valid(x,y,z) )
@@ -613,12 +631,18 @@ void Cell::set_total_volume(double volume)
 	// phenotype.update_radius();
 	//if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
 	//	phenotype.geometry.radius * parameters.max_interaction_distance_factor )
-	if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
-		phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
-	{
-		// get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()]= phenotype.geometry.radius*parameters.max_interaction_distance_factor;
-		get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
-			* phenotype.mechanics.relative_maximum_adhesion_distance;
+
+    	
+	// Here the current mechanics voxel index may not be initialized, when position is still unknown. 
+	if (get_current_mechanics_voxel_index() >= 0)
+    {
+        if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
+            phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+        {
+            // get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()]= phenotype.geometry.radius*parameters.max_interaction_distance_factor;
+            get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
+                * phenotype.mechanics.relative_maximum_adhesion_distance;
+        }
 	}
 	
 	return; 
@@ -2252,18 +2276,32 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// If it has already be copied
 			if (pParent != NULL && pParent->phenotype.intracellular != NULL) 
             {
-                std::cout << "------ " << __FUNCTION__ << ": copying another\n";
+                // std::cout << "------ " << __FUNCTION__ << ": copying another\n";
 				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
             }	
 			// Otherwise we need to create a new one
 			else 
             {
-                std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
+                // std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
 				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
 				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
 			}
 		}
 #endif
+
+#ifdef ADDON_PHYSIDFBA
+		if (model_type == "dfba") {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+			// Otherwise we need to create a new one
+			} else {
+				dFBAIntracellular* pIntra = new dFBAIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+			}
+		}
+#endif
+
 	}	
 	
 	// set up custom data 
