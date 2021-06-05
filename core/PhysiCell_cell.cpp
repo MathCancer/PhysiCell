@@ -2285,6 +2285,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
                 std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
 				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
 				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+                pCD->phenotype.intracellular->validate_PhysiCell_tokens(pCD->phenotype);
+                pCD->phenotype.intracellular->validate_SBML_species();
 			}
 		}
 #endif
