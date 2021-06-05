@@ -312,7 +312,7 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 # cleanup
 
 reset:
-	rm -f *.cpp 
+	rm -f *.cpp PhysiCell_cell.o
 	cp ./sample_projects/Makefile-default Makefile 
 	rm -f ./custom_modules/*
 	touch ./custom_modules/empty.txt 
