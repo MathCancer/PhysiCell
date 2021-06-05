@@ -2282,7 +2282,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// Otherwise we need to create a new one
 			else 
             {
-                // std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
+                std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
 				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
 				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
 			}
