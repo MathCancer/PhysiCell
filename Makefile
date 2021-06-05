@@ -62,12 +62,10 @@ all:
 
 # sample projects 	
 list-projects:
-	@echo ""
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
 	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm-sample"
 	@echo ""
-	@echo "Sample intracellular projects: ode1-sample"
-	@echo ""
+	@echo "Sample intracellular projects: ode1-sample ode2-sample"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -169,7 +167,34 @@ ode1-sample:
 	cp ./sample_projects_intracellular/ode/ode1/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects_intracellular/ode/ode1/config/* ./config/	
-    
+
+ode2-sample:
+	cp ./sample_projects_intracellular/ode/ode2/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/ode/ode2/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/ode/ode2/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects_intracellular/ode/ode2/config/* ./config/	
+
+physiboss_cell_lines:
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects_intracellular/boolean/wphysiboss_cell_lines/config/* ./config/	
+
+ecoli-acetic-switch:
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/main_ecoli_acetic_switch.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/config/* ./config/
+
 # early examples for convergence testing 
 
 physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
