@@ -2,7 +2,7 @@
 
 MaBoSSIntracellular::MaBoSSIntracellular() : Intracellular()
 {
-	type = "maboss";
+	intracellular_type = "maboss";
 	initial_values.clear();
 	mutations.clear();
 	parameters.clear();
@@ -10,13 +10,13 @@ MaBoSSIntracellular::MaBoSSIntracellular() : Intracellular()
 
 MaBoSSIntracellular::MaBoSSIntracellular(pugi::xml_node& node)
 {
-	type = "maboss";
+	intracellular_type = "maboss";
 	initialize_intracellular_from_pugixml(node);
 }
 
 MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy) 
 {
-	type = copy->type;
+	intracellular_type = copy->intracellular_type;
 	bnd_filename = copy->bnd_filename;
 	cfg_filename = copy->cfg_filename;
 	time_step = copy->time_step;

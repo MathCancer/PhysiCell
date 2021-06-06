@@ -562,19 +562,19 @@ class Intracellular
 	virtual void initialize_intracellular_from_pugixml(pugi::xml_node& node) = 0;
 	
 	// This function initialize the model, needs to be called on each cell once created
-	virtual int start() = 0;
+	virtual void start() = 0;
 	
 	// This function checks if it's time to update the model
 	virtual bool need_update() = 0;
 
 	// This function update the model for the time_step defined in the xml definition
-	virtual int update() = 0;
+	virtual void update() = 0;
 
 	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
 	
 	// Set value for model parameter
-	virtual int set_parameter_value(std::string name, double value) = 0;
+	virtual void set_parameter_value(std::string name, double value) = 0;
 
 	virtual std::string get_state() = 0;  
 	
@@ -583,9 +583,11 @@ class Intracellular
 	
 
     // ================  specific to "maboss" ================
-	virtual bool has_node(std::string name) = 0; 
-	virtual bool get_boolean_node_value(std::string name) = 0;
-	virtual void set_boolean_node_value(std::string name, bool value) = 0;
+	virtual bool has_variable(std::string name) = 0; 
+	virtual bool get_boolean_variable_value(std::string name) = 0;
+	virtual void set_boolean_variable_value(std::string name, bool value) = 0;
+	// virtual bool get_double_variable_value(std::string name) = 0;
+	// virtual void set_double_variable_value(std::string name, bool value) = 0;
 	virtual void print_current_nodes() = 0;
 	
 

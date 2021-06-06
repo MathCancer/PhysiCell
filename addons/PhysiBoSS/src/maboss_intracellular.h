@@ -69,12 +69,7 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		return this->maboss.get_node_value(name);
 	}
 	
-	void set_double_variable_value(std::string name, double value) {}
-	
-	double get_double_variable_value(std::string name) {
-		return 0.0;
-	}
-	
+
 	void set_boolean_variable_value(std::string name, bool value) {
 		this->maboss.set_node_value(name, value);
 	}
@@ -93,9 +88,15 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	
 	void print_current_nodes(){
 		this->maboss.print_nodes();
-	};
+	}
 	
 	static void save(std::string filename, std::vector<PhysiCell::Cell*>& cells);
+
+    // unneeded for this type
+    int update_phenotype_parameters(PhysiCell::Phenotype& phenotype) {return 0;}
+    int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype) {return 0; }
+    int validate_SBML_species() {return 0; }
+    int create_custom_data_for_SBML(PhysiCell::Phenotype& phenotype) {return 0; }
 
 };
 
