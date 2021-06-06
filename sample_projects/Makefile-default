@@ -65,7 +65,7 @@ list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
 	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm-sample"
 	@echo ""
-	@echo "Sample intracellular projects: ode1-sample ode2-sample physiboss_cell_lines ecoli_acetic_switch"
+	@echo "Sample intracellular projects: ode1-sample ode2-sample physiboss-cell-lines-sample ecoli-acetic-switch-sample"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -177,7 +177,7 @@ ode2-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects_intracellular/ode/ode2/config/* ./config/	
 
-physiboss_cell_lines:
+physiboss-cell-lines-sample:
 	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/main.cpp ./main.cpp 
@@ -186,7 +186,7 @@ physiboss_cell_lines:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects_intracellular/boolean/wphysiboss_cell_lines/config/* ./config/	
 
-ecoli_acetic_switch:
+ecoli-acetic-switch-sample:
 	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/main_ecoli_acetic_switch.cpp ./main.cpp
