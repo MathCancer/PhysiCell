@@ -184,7 +184,7 @@ physiboss-cell-lines-sample:
 	cp Makefile Makefile-backup
 	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/config/* ./config/	
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/config/* ./config/
 
 ecoli-acetic-switch-sample:
 	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/custom_modules/* ./custom_modules/
