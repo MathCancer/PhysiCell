@@ -32,7 +32,6 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	FBA_model model;
 
  public:
-	
 
     dFBAIntracellular();
 
@@ -53,28 +52,16 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 
 	Intracellular* getIntracellularModel() 
     {
-        // std::cout << "------ librr_intracellular: getIntracellularModel called\n";
 		return static_cast<Intracellular*>(this);
 	}
 	
 	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
 	
-    int start();
+    void start();
 
 	bool need_update();
     
-	int update();
-    
-    int update_phenotype_parameters(PhysiCell::Phenotype& phenotype);
-  
-    int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype);
-
-    int validate_SBML_species();
-	
-	double get_parameter_value(std::string name);
-
-	int set_parameter_value(std::string name, double value);
-	
+	void update();
 	
     std::string get_state();
 
@@ -86,6 +73,12 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	
     // static void save_PhysiBoSS(std::string path, std::string index);
 	static void save_dFBA(std::string path, std::string index);
+
+    // unneeded for this type
+    int update_phenotype_parameters(PhysiCell::Phenotype& phenotype) {return 0;}
+    int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype) {return 0; }
+    int validate_SBML_species() {return 0; }
+    int create_custom_data_for_SBML(PhysiCell::Phenotype& phenotype) {return 0; }
 };
 
 

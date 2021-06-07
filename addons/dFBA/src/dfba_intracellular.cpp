@@ -22,13 +22,6 @@ dFBAIntracellular::dFBAIntracellular(dFBAIntracellular* copy)
 	parameters = copy->parameters;
 }
 
-
-int dFBAIntracellular::update_phenotype_parameters(PhysiCell::Phenotype& phenotype) 
-{
-    
-}
-
-
 void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)
 {
     pugi::xml_node node_sbml = node.child( "sbml_filename" );
@@ -51,7 +44,7 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 	}
 }
 
-int dFBAIntracellular::dFBAIntracellular::start()
+void dFBAIntracellular::dFBAIntracellular::start()
 {
 
 }
@@ -77,28 +70,6 @@ int dFBAIntracellular::dFBAIntracellular::update()
         this->model.setReactionLowerBound(fba_reaction, flux_bound)
         pCell->fba_model.runFBA();
     }
-    
-
-}
-
-int dFBAIntracellular:: update_phenotype_parameters(PhysiCell::Phenotype& phenotype)
-{
-
-}
-
-int dFBAIntracellular::validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype)
-{
-
-}
-
-int dFBAIntracellular::validate_SBML_species()
-{
-
-}
-
-double dFBAIntracellular::get_parameter_value(std::string name)
-{
-
 }
 
 int dFBAIntracellular::set_parameter_value(std::string name, double value)
@@ -106,11 +77,10 @@ int dFBAIntracellular::set_parameter_value(std::string name, double value)
 
 }
 
-
-std::string dFBAIntracellular::get_state(){
+std::string dFBAIntracellular::get_state()
+{
 
 }
-
 
 void dFBAIntracellular::save_dFBA(std::string path, std::string index) 
 {

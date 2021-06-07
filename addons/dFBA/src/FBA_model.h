@@ -17,6 +17,7 @@
 #include <sbml/packages/fbc/common/FbcExtensionTypes.h>
 
 #include <coin-or/CoinPackedMatrix.hpp>
+// #include "CoinPackedMatrix.hpp"
 #include <coin-or/CoinPackedVector.hpp>
 #include <coin-or/ClpSimplex.hpp>
 

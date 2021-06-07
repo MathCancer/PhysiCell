@@ -33,7 +33,7 @@ ARCH := native # best auto-tuning
 # For debugging with gdb just add: -g3 -ggdb -O3
 # -DCLP_BUILD is an additional flags to link againt clp
 # CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
-CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
+CFLAGS := -march=$(ARCH) -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
 
 
 # Libraries need: SBML and coin-Clp
@@ -41,10 +41,63 @@ CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 
 CLP_FOLDER := ./addons/coin-clp
 
 
-INC := -I/usr/local/include -DADDON_PCdFBA -I$(CLP_FOLDER)/include -I$(CLP_FOLDER)/include/coin-or/glpk
+INC := -I/usr/local/include -DADDON_PHYSIDFBA -I$(CLP_FOLDER)/include -I$(CLP_FOLDER)/include/coin-or/glpk
 LIBS := -L/usr/local/lib -L$(CLP_FOLDER)/lib -ldl -lm -lClp -lCoinUtils -lcoinasl -lcoinglpk -lcoinmumps -lsbml
 
-COMPILE_COMMAND := $(CC) $(CFLAGS)
+OSFLAG 	:=
+ifeq ($(OS),Windows_NT)
+	OSFLAG += -D WIN32
+	OMP_LIB := 
+#	LIBFBA_DIR := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m
+#	LIBFBA_LIBS := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m/bin
+#	LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
+	CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA
+	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+		OSFLAG += -D AMD64
+	endif
+	ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+		OSFLAG += -D IA32
+	endif
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Linux)
+		OSFLAG += -D LINUX
+		OMP_LIB :=
+#		LIBFBA_DIR := $(HOME)/libroadrunner/libroadrunner
+#		LIBFBA_DIR := $(shell pwd)/intracellular_libs/roadrunner
+#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
+		LIBFBA_LIBS := ${LIBFBA_DIR}/lib
+		# CFLAGS := -march=$(ARCH) -g  -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA 
+		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -m64 -std=c++11 -D ADDON_PHYSIDFBA  
+	endif
+	ifeq ($(UNAME_S),Darwin)
+#		CC := clang++
+		OSFLAG += -D OSX
+#	 	LIBFBA_DIR := $(HOME)/libroadrunner/roadrunner-osx-10.9-cp36m
+#		LIBFBA_DIR := $(shell pwd)/intracellular_libs/roadrunner
+		LIBFBA_DIR := ./addons/dFBA
+#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
+#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
+#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/coin-or/include/coin-or
+		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/coin-or/include
+		LIBFBA_LIBS := ${LIBFBA_DIR}/lib/coin-or/lib
+	endif
+		UNAME_P := $(shell uname -p)
+	ifeq ($(UNAME_P),x86_64)
+		OSFLAG += -D AMD64
+#		LIBFBA_DIR := $(HOME)/libroadrunner/libroadrunner
+#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
+		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA  
+	endif
+		ifneq ($(filter %86,$(UNAME_P)),)
+	OSFLAG += -D IA32
+		endif
+	ifneq ($(filter arm%,$(UNAME_P)),)
+		OSFLAG += -D ARM
+	endif
+endif
+
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(LIBFBA_CFLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o
@@ -67,6 +120,7 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(FBA_add
 
 # compile the project
 
+# all: libFBA main.cpp $(ALL_OBJECTS)
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIBS)
 
@@ -150,17 +204,20 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 
 # user-defined PhysiCell modules
 
-# PCdFBA addon modules
+# dFBA addon modules
 
-FBA_model.o: ./addons/PCdFBA/FBA_model.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/PCdFBA/FBA_model.cpp -o ./FBA_model.o
+libFBA: 
+	python3 beta/setup_coin_clp.py.py
+
+FBA_model.o: ./addons/dFBA/FBA_model.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_model.cpp -o ./FBA_model.o
 	#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:addons/coin-clp/lib
 
-FBA_reaction.o: ./addons/PCdFBA/FBA_reaction.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/PCdFBA/FBA_reaction.cpp -o ./FBA_reaction.o
+FBA_reaction.o: ./addons/dFBA/FBA_reaction.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_reaction.cpp -o ./FBA_reaction.o
 
-FBA_metabolite.o: ./addons/PCdFBA/FBA_metabolite.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/PCdFBA/FBA_metabolite.cpp -o ./FBA_metabolite.o
+FBA_metabolite.o: ./addons/dFBA/FBA_metabolite.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_metabolite.cpp -o ./FBA_metabolite.o
 
 ecoli_acetic_switch.o: ./custom_modules/ecoli_acetic_switch.cpp
 	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./custom_modules/ecoli_acetic_switch.cpp
