@@ -29,8 +29,9 @@ def main():
     parser = param_parser()
     args = parser.parse_args()
 
-    json_packages = os.path.join(os.curdir, 'config')
-    json_packages = os.path.join(json_packages, 'packages.json')
+    # json_packages = os.path.join(os.curdir, 'config')
+    # json_packages = os.path.join(json_packages, 'packages.json')
+    json_packages = os.path.join('beta', 'fba_packages.json')
 
     packages_dict = {}
     with open(json_packages) as fh:
