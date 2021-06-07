@@ -167,7 +167,11 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # user-defined PhysiCell modules
 
 MaBoSS: 
+ifeq ($(OS), Windows_NT)
+	python beta/setup_libmaboss.py
+else
 	python3 beta/setup_libmaboss.py
+endif
 
 maboss_network.o: ./addons/PhysiBoSS/src/maboss_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSS/src/maboss_network.cpp
