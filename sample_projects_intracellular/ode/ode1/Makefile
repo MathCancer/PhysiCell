@@ -197,7 +197,11 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # user-defined PhysiCell modules
 
 libRoadrunner: 
+ifeq ($(OS), Windows_NT)
+	python beta/setup_libroadrunner.py
+else
 	python3 beta/setup_libroadrunner.py
+endif
 
 # custom.o: ./custom_modules/custom.cpp ./intracellular/PhysiCell_intracellular.h
 custom.o: ./custom_modules/custom.cpp 

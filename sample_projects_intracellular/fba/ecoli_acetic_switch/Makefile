@@ -207,7 +207,11 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # dFBA addon modules
 
 libFBA: 
-	python3 beta/setup_coin_clp.py.py
+ifeq ($(OS), Windows_NT)
+	python beta/setup_coin_clp.py
+else
+	python3 beta/setup_coin_clp.py
+endif
 
 FBA_model.o: ./addons/dFBA/FBA_model.cpp
 	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_model.cpp -o ./FBA_model.o
