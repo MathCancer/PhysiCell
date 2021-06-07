@@ -82,6 +82,8 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBo
 
 all: MaBoSS main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) $(INC)  -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB)
+	@echo ""
+	@echo "check for $(PROGRAM_NAME)"
 
 # PhysiCell core components	
 
