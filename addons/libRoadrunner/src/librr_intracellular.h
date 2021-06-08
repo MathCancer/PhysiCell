@@ -101,11 +101,11 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	std::string get_state();
 
     // for now, define dummy methods for these in the abstract parent class
-    bool has_node(std::string name) { return false; }
-	bool get_boolean_node_value(std::string name) { return false; }
-	void set_boolean_node_value(std::string name, bool value)  {}
+    bool has_variable(std::string name) { return false; }
+	bool get_boolean_variable_value(std::string name) { return false; }
+	void set_boolean_variable_value(std::string name, bool value)  {}
     void print_current_nodes() {}
-	// static void save_PhysiBoSS(std::string path, std::string index);
+
 	static void save_libRR(std::string path, std::string index);
 };
 

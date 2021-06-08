@@ -192,7 +192,7 @@ void setup_tissue( void )
     pCell = create_cell(get_cell_definition("default")); 
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
 	// pCell = create_cell(cell_defaults); 
-    retval = pCell->phenotype.intracellular->start();
+    pCell->phenotype.intracellular->start();
 	pCell->assign_position( -50, -30 , 0.0 );
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
 
@@ -222,7 +222,7 @@ void setup_tissue( void )
     // pCell = create_cell(get_cell_definition("default")); 
     pCell = create_cell(); 
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
-    retval = pCell->phenotype.intracellular->start();
+    pCell->phenotype.intracellular->start();
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
 	pCell->assign_position( 50, 50 , 0.0 );
 
