@@ -81,13 +81,13 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	
 	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
 	
-    // Need 'int' return type to avoid bizarre compile errors.
-	int start();
+    // Need 'int' return type to avoid bizarre compile errors? But 'void' to match MaBoSS.
+	void start();
 
 	bool need_update();
 
     // Need 'int' return type to avoid bizarre compile errors.
-	int update();
+	void update();
     
     
     int update_phenotype_parameters(PhysiCell::Phenotype& phenotype);
@@ -96,7 +96,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
     int create_custom_data_for_SBML(PhysiCell::Phenotype& phenotype);
 	
 	double get_parameter_value(std::string name);
-	int set_parameter_value(std::string name, double value);
+	void set_parameter_value(std::string name, double value);
 	
 	std::string get_state();
 
