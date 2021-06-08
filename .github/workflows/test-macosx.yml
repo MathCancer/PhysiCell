@@ -1,0 +1,36 @@
+name: Tests MacOSX
+
+on:
+  push:
+  pull_request:
+    
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run : brew install gcc@10
+
+    - name: Build Virus Macrophage project
+      run: |
+        make virus-macrophage-sample
+        make PHYSICELL_CPP=g++-10
+        
+    - name: Run Virus Macrophage cell lines project
+      run: |
+        ./virus-sample
+        
+    - name: Build PhysiBoSS cell lines project
+      run: |
+        make reset
+        make physiboss-cell-lines
+        make clean
+        make PHYSICELL_CPP=g++-10
+        
+    - name: Run PhysiBoSS cell lines project
+      run: |
+        ./PhysiBoSS_Cell_Lines
