@@ -41,8 +41,8 @@ else:
     print('libMaBoSS will now be installed into the addon PhysiBoSS addon folder:')
     dir_name = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'addons', 'PhysiBoSS')
     print(dir_name + '\n')
-    print('   - Press ENTER to confirm the installation')
-    print('   - Press CTL-C to abort the installation')
+    # print('   - Press ENTER to confirm the installation')
+    # print('   - Press CTL-C to abort the installation')
 
     if not os.path.exists(dir_name):
                 try:
