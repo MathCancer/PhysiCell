@@ -423,7 +423,7 @@ int RoadRunnerIntracellular::update_phenotype_parameters(PhysiCell::Phenotype& p
                 while ((pos = s.find(delimiter)) != std::string::npos) {
                     token = s.substr(0, pos);
                     //std::cout << counter << " : "<< token << std::endl;
-                    if (counter == 1);
+                    if (counter == 1)
                     {
                         start_index = atoi( token.c_str() );
                     }
@@ -580,7 +580,7 @@ int RoadRunnerIntracellular::validate_PhysiCell_tokens(PhysiCell::Phenotype& phe
                 int start_index;
                 while ((pos = s.find(delimiter)) != std::string::npos) {
                     token = s.substr(0, pos);
-                    if (counter == 1);
+                    if (counter == 1)
                     {
                         start_index = atoi( token.c_str() );
                     }
