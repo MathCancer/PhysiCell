@@ -18,13 +18,16 @@ make reset
 make ode1-sample
 make
 make reset
-make ode2-sample
-make
-make reset
 make physiboss-cell-lines-sample 
 make
 make reset
+make ode2-sample
+make
+make reset
 make ecoli-acetic-switch-sample
+make
+make reset
+make ode2-sample
 make
 make reset
 make biorobots-sample 
