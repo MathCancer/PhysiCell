@@ -620,7 +620,10 @@ class Phenotype
 	Intracellular* intracellular;
 	
 	Phenotype(); // done 
-	
+	Phenotype(const Phenotype &p);
+	~Phenotype();
+	Phenotype& operator=(const Phenotype &p );
+
 	void sync_to_functions( Cell_Functions& functions ); // done 
 	
 	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 
