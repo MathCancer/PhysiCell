@@ -16,10 +16,12 @@
 #include <sbml/SBMLTypes.h>
 #include <sbml/packages/fbc/common/FbcExtensionTypes.h>
 
-#include <coin-or/CoinPackedMatrix.hpp>
-// #include "CoinPackedMatrix.hpp"
-#include <coin-or/CoinPackedVector.hpp>
-#include <coin-or/ClpSimplex.hpp>
+// #include <coin-or/CoinPackedMatrix.hpp>
+// #include <coin-or/CoinPackedVector.hpp>
+// #include <coin-or/ClpSimplex.hpp>
+#include "CoinPackedMatrix.hpp"
+#include "CoinPackedVector.hpp"
+#include "ClpSimplex.hpp"
 
 
 #include "FBA_metabolite.h"
