@@ -33,7 +33,7 @@ ARCH := native # best auto-tuning
 # For debugging with gdb just add: -g3 -ggdb -O3
 # -DCLP_BUILD is an additional flags to link againt clp
 # CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
-CFLAGS := -march=$(ARCH) -O3 -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -pipe 
+CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -pipe  -D ADDON_PHYSIDFBA
 
 
 # Libraries need: SBML and coin-Clp
