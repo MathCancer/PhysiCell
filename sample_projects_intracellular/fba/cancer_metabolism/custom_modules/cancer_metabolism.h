@@ -67,12 +67,10 @@
 
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h"
-//#include "../addons/PhysiFBA/PhysiFBA_model.h"
-#include "../addons/dFBA/src/FBA_model.h"
+#include "../addons/dFBA/src/dfba_intracellular.h"
 
 using namespace BioFVM;
 using namespace PhysiCell;
-using namespace PhysiFBA;
 
 
 // any additional cell types (beyond cell_defaults)

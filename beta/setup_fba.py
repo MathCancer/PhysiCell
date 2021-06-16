@@ -4,7 +4,7 @@
 import sys, os
 import json
 import argparse
-
+import platform
 import requests
 import hashlib
 import tarfile
@@ -13,26 +13,24 @@ import zipfile
 def param_parser():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--pkg', dest="pkg", required=True, help='Available packages', choices=PACKAGES)
-    parser.add_argument('--arch', dest="arch", required=True, choices=ARCHS, help='Current arch')
-    parser.add_argument('--checksum', dest="checksum", default=False, help='Check file integrity after downloading')
     parser.add_argument('--path', dest='path', default='addons/dFBA/ext', help='Default folder destination to install third-party libs if changed, Makefiles you be updated according')
     return parser
 
 
 PACKAGES = ("coin-or", "libsbml")
-ARCHS = ("linux-x64", "linux-x86", "win64", "win32", "osx")
-
-SBML_DIR = "libsbml"
     
 
 def main():
     parser = param_parser()
     args = parser.parse_args()
+    os_type = platform.system()
+
+    if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "dFBA", args.pkg)):
+        print('\n%s already installed.\n' % args.pkg)
+        return
 
     print(args)
     print(args.path)
-    # json_packages = os.path.join(os.curdir, 'config')
-    # json_packages = os.path.join(json_packages, 'packages.json')
     json_packages = os.path.join('beta', 'fba_packages.json')
 
     packages_dict = {}
@@ -46,56 +44,36 @@ def main():
 
     print("Moving to %s folder" % args.path)
     os.chdir(args.path)
-        
-    pkg_dict = packages_dict[args.pkg][args.arch]
+      
+    arch = None  
+    if os_type.lower() == 'darwin':
+        arch = "osx"
+    elif os_type.lower().startswith("win"):
+        arch = "win64"
+    elif os_type.lower().startswith("linux"):
+        arch = "linux-x64"
+    else:
+        print("OS not supported !")
+        return
+            
+    pkg_dict = packages_dict[args.pkg][arch]
 
     print("Fetching package:", end="")
-    print("- %s (%s)" % (args.pkg, args.arch))
+    print("- %s (%s)" % (args.pkg, arch))
     print("Downaling from: %s" % pkg_dict['url'])
     r = requests.get(pkg_dict['url'], allow_redirects=True)
-
-    # if args.checksum:
-    #     print("Package cheksum(sha256)", end=" ")
-    #     hash_strn = hashlib.sha256(r.content).hexdigest()
-    #     assert pkg_dict['sha256'] == hash_strn
-    #     print("Ok!")
-
     
     fname = pkg_dict["version"]
     with open(fname, 'wb') as fh:
         fh.write(r.content)
 
-    if args.pkg == 'libsbml':
-        print("Extracting package in %s... " % args.pkg, end=" ")
-        if fname.endswith("zip"):
-            archiver = zipfile.ZipFile(fname, 'r')
-            archiver.extractall(args.pkg)
-        # elif fname.endswith("tar.gz") or fname.endswith("gz"):
-        #     archiver = tarfile.open(fname, "r:gz")
-        #     archiver.extractall()
-        #     old_lib_dir = os.path.commonprefix(archiver.getnames())
-        #     archiver.close()
-        #     os.rename(old_lib_dir, SBML_DIR)
-        #     if os.path.exists(old_lib_dir):
-        #         os.rmdir(old_lib_dir)
-        #     os.remove(fname)
-    
-    elif args.pkg == "coin-or":
-        print("Extracting package in %s... " % args.pkg, end=" ")
-        if fname.endswith("zip"):
-            archiver = zipfile.ZipFile(fname, 'r')
-            archiver.extractall(args.pkg)
-        # elif fname.endswith("tar.gz") or fname.endswith("gz"):
-        #     archiver = tarfile.open(fname, "r:gz")
-        #     archiver.extractall(path=args.pkg)
-        #     archiver.close()
-        #     os.remove(fname)
+    print("Extracting package in %s... " % args.pkg, end=" ")
+    if fname.endswith("zip"):
+        archiver = zipfile.ZipFile(fname, 'r')
+        archiver.extractall(args.pkg)
     
     print("Ok!")
     print("Dependency retrived correctly :-)\n")
 
 if __name__ == "__main__":
-    if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "dFBA", SBML_DIR)):
-        print('\nlibsbml already installed.\n')
-    else:
-        main()
+    main()

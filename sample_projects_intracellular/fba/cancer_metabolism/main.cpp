@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -77,8 +77,6 @@
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
-
-
 // custom user modules 
 #include "custom_modules/cancer_metabolism.h"
 	
@@ -108,7 +106,7 @@ int main( int argc, char* argv[] )
 	system( copy_command ); 
 
 	// OpenMP setup
-	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
+	//omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
 	SeedRandom(); 
@@ -153,6 +151,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
+	/*
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = heterogeneity_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
@@ -160,7 +159,9 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
 	create_plot_legend( filename , cell_coloring_function ); 	
-	
+	*/
+
+
 	display_citations(); 
 	
 	// set the performance timers 
@@ -209,19 +210,21 @@ int main( int argc, char* argv[] )
 				if( PhysiCell_settings.enable_SVG_saves == true )
 				{	
 					sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
-					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-					
+					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, my_coloring_function );
+
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
 			}
-			
-            #pragma omp parallel for
+
+			#pragma omp parallel for
 			for(int n=0; n < all_cells->size(); n++)
 			  {
 			    PhysiCell::Cell* pCell = (*all_cells)[n];
+				std::cout << "Updating " << pCell->ID << " dFBA model bounds" << std::endl;
 			    update_cell(pCell, pCell->phenotype, diffusion_dt);
 			  }
+			
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
@@ -246,10 +249,10 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
-	
+	/*
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-	
+	*/
 	// timer 
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
@@ -257,8 +260,3 @@ int main( int argc, char* argv[] )
 
 	return 0; 
 }
-
-
-
-
-
