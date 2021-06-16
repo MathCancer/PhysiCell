@@ -98,6 +98,7 @@ class Vis(QWidget):
 
         # self.output_dir = "/Users/heiland/dev/PhysiCell_V.1.8.0_release/output"
         self.output_dir_w = QLineEdit()
+        self.output_dir_w.setText("./output")
         # w.setText("/Users/heiland/dev/PhysiCell_V.1.8.0_release/output")
         # w.setText(self.output_dir)
         # w.textChanged[str].connect(self.output_dir_changed)
@@ -117,6 +118,11 @@ class Vis(QWidget):
         self.play_button.clicked.connect(self.animate)
         controls_hbox.addWidget(self.play_button)
 
+        self.reset_button = QPushButton("Reset")
+        # self.play_button.clicked.connect(self.play_plot_cb)
+        self.reset_button.clicked.connect(self.reset_plot_cb)
+        controls_hbox.addWidget(self.reset_button)
+
         # self.prepare_button = QPushButton("Prepare")
         # self.prepare_button.clicked.connect(self.prepare_plot_cb)
         # controls_hbox.addWidget(self.prepare_button)
@@ -134,11 +140,14 @@ class Vis(QWidget):
         self.layout.addLayout(controls_hbox)
         self.layout.addWidget(self.scroll)
 
+        self.reset_plot_cb("")
+
     def open_directory_cb(self):
         dialog = QFileDialog()
         self.output_dir = dialog.getExistingDirectory(self, 'Select an output directory')
         print("open_directory_cb:  output_dir=",self.output_dir)
-        if self.output_dir is "":
+        # if self.output_dir is "":
+        if self.output_dir == "":
             return
 
         self.output_dir_w.setText(self.output_dir)
@@ -188,6 +197,37 @@ class Vis(QWidget):
 
     def forward_plot_cb(self, text):
         self.current_svg_frame += 1
+        print('svg # ',self.current_svg_frame)
+        self.plot_svg(self.current_svg_frame)
+        self.canvas.update()
+        self.canvas.draw()
+
+    def reset_plot_cb(self, text):
+        xml_file = Path(self.output_dir, "initial.xml")
+        if not os.path.isfile(xml_file):
+            print("Expecting initial.xml, but does not exist.")
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText("Did not find 'initial.xml' in this directory.")
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.exec()
+            return
+
+        tree = ET.parse(Path(self.output_dir, "initial.xml"))
+        xml_root = tree.getroot()
+
+        bds_str = xml_root.find(".//microenvironment//domain//mesh//bounding_box").text
+        bds = bds_str.split()
+        print('bds=',bds)
+        self.xmin = float(bds[0])
+        self.xmax = float(bds[3])
+        self.x_range = self.xmax - self.xmin
+
+        self.ymin = float(bds[1])
+        self.ymax = float(bds[4])
+        self.y_range = self.ymax - self.ymin
+
+        self.current_svg_frame = 0
         print('svg # ',self.current_svg_frame)
         self.plot_svg(self.current_svg_frame)
         self.canvas.update()
