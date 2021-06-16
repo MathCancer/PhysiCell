@@ -144,11 +144,13 @@ class Vis(QWidget):
 
     def open_directory_cb(self):
         dialog = QFileDialog()
-        self.output_dir = dialog.getExistingDirectory(self, 'Select an output directory')
-        print("open_directory_cb:  output_dir=",self.output_dir)
+        dir_path = dialog.getExistingDirectory(self, 'Select an output directory')
+        print("open_directory_cb:  output_dir=",dir_path)
         # if self.output_dir is "":
-        if self.output_dir == "":
+        if dir_path == "":
             return
+
+        self.output_dir = dir_path
 
         self.output_dir_w.setText(self.output_dir)
         # Verify initial.xml and at least one .svg file exist. Obtain bounds from initial.xml
