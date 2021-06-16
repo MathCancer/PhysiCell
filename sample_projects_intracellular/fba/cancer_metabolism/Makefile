@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := cancer-metabolism
+PROGRAM_NAME := cancer_metabolism
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -33,60 +33,17 @@ ARCH := native # best auto-tuning
 # For debugging with gdb just add: -g3 -ggdb -O3
 # -DCLP_BUILD is an additional flags to link againt clp
 # CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
-CFLAGS := -march=$(ARCH) -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -D CLP_BUILD -D ADDON_PHYSIDFBA
+CFLAGS := -march=$(ARCH) -O3 -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -pipe 
+
 
 # Libraries need: SBML and coin-Clp
-CLP_FOLDER := ./addons/coin-clp
+DEPS_DIR = ./addons/dFBA/ext/
 
-# INC := -I/usr/local/include -DADDON_PHYSIDFBA -I$(CLP_FOLDER)/include -I$(CLP_FOLDER)/include/coin-or/glpk
-# LIBS := -L/usr/local/lib -L$(CLP_FOLDER)/lib -ldl -lm -lClp -lCoinUtils -lcoinasl -lcoinglpk -lcoinmumps -lsbml
+CPPFLAGS := -I$(DEPS_DIR)/libsbml/include -I$(DEPS_DIR)/coin-or/include
+LDFLAGS  := -L$(DEPS_DIR)/libsbml/lib -L$(DEPS_DIR)/coin-or/lib/
+LIBS     := -lClp-static -lCoinUtils-static -llapack -lsbml-static -lxml2 -lbz2 -lz
 
-OSFLAG 	:=
-ifeq ($(OS),Windows_NT)
-	OSFLAG += -D WIN32
-	OMP_LIB := 
-	LIBFBA_DIR := ./addons/dFBA
-	LIBFBA_LIBS := ${LIBFBA_DIR}/lib
-#	CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA
-	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-		OSFLAG += -D AMD64
-	endif
-	ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-		OSFLAG += -D IA32
-	endif
-else
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		OSFLAG += -D LINUX
-		OMP_LIB :=
-		LIBFBA_DIR := ./addons/dFBA
-		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/libsbml/local/include -I${LIBFBA_DIR}/coin-or/include
-		LIBFBA_LIBS := -L${LIBFBA_DIR}/libsbml/local/lib -L${LIBFBA_DIR}/lib/coin-or/lib
-#		CFLAGS := -march=$(ARCH) -g  -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA 
-#		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -m64 -std=c++11 -D ADDON_PHYSIDFBA  
-#	endif
-	else
-#	ifeq ($(UNAME_S),Darwin)
-		OSFLAG += -D OSX
-		LIBFBA_DIR := ./addons/dFBA
-		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/libsbml/local/include -I${CONDA_PREFIX}/include/coin
-		LIBFBA_LIBS := -L${LIBFBA_DIR}/libsbml/local/lib -L${CONDA_PREFIX}/lib
-	endif
-
-#	UNAME_P := $(shell uname -p)
-#	ifeq ($(UNAME_P),x86_64)
-#		OSFLAG += -D AMD64
-#		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA  
-#	endif
-#	ifneq ($(filter %86,$(UNAME_P)),)
-#		OSFLAG += -D IA32
-#	endif
-#	ifneq ($(filter arm%,$(UNAME_P)),)
-#		OSFLAG += -D ARM
-#	endif
-endif
-
-COMPILE_COMMAND := $(CC) $(CFLAGS) $(LIBFBA_CFLAGS)
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(CPPFLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o
@@ -96,22 +53,24 @@ PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o Physi
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o
 
-FBA_addon_OBJECTS := FBA_metabolite.o FBA_reaction.o FBA_model.o
+PhysiFBA_addon_OBJECTS := PhysiFBA_intracellular.o PhysiFBA_metabolite.o PhysiFBA_reaction.o PhysiFBA_model.o
 
+PCdFBA_OBJECTS := PhysiFBA_intracellular.o FBA_model.o FBA_reaction.o FBA_metabolite.o
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := cancer_flux_balance.o
+PhysiCell_custom_module_OBJECTS := cancer_metabolism.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(FBA_addon_OBJECTS) 
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiFBA_addon_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
+
 
 # compile the project
 
-# all: main.cpp $(ALL_OBJECTS)
 all: libFBA main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIBS)
+	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LDFLAGS) $(LIBS)
+
 
 # PhysiCell core components
 
@@ -135,10 +94,10 @@ PhysiCell_utilities.o: ./core/PhysiCell_utilities.cpp
 
 PhysiCell_custom.o: ./core/PhysiCell_custom.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_custom.cpp
-	
+
 PhysiCell_constants.o: ./core/PhysiCell_constants.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_constants.cpp 
-
+	
 # BioFVM core components (needed by PhysiCell)
 
 BioFVM_vector.o: ./BioFVM/BioFVM_vector.cpp
@@ -191,42 +150,27 @@ PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 
-# user-defined PhysiCell modules
 
-# dFBA addon modules
-
+# PhysiFBA addon modules
 libFBA: 
-	python3 beta/setup_fba.py --pkg libsbml --arch osx --path addons/dFBA
-#	python3 beta/setup_fba.py --pkg libsbml --arch linux-x64 --path addons/dFBA 
-	conda install -c conda-forge coincbc
+	python3 beta/setup_fba.py --pkg libsbml
+	python3 beta/setup_fba.py --pkg coin-or
 
-# ifeq ($(OS), Windows_NT)
-# 	python3 beta/setup_fba.py --pkg libsbml --arch win64 --path addons/dFBA
-# 	python beta/setup_coin_clp.py  
-# else
-# #	UNAME_S := $(shell uname -s)
-# 	UNAME_S := Darwin2
-# 	ifeq ($(UNAME_S),Linux)
-# 		python3 beta/setup_fba.py --pkg libsbml --arch linux-x64 --path addons/dFBA 
-# 	else
-# 		python3 beta/setup_fba.py --pkg libsbml --arch osx --path addons/dFBA
-# 	endif
-# #	python3 beta/setup_coin_clp.py
-# 	conda install -c conda-forge coincbc
-# endif
+PhysiFBA_intracellular.o: ./addons/dFBA/src/dfba_intracellular.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/src/dfba_intracellular.cpp -o ./PhysiFBA_intracellular.o
 
-FBA_model.o: ./addons/dFBA/FBA_model.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_model.cpp -o ./FBA_model.o
-	#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:addons/coin-clp/lib
+PhysiFBA_model.o: ./addons/dFBA/src/FBA_model.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/src/FBA_model.cpp -o ./PhysiFBA_model.o
 
-FBA_reaction.o: ./addons/dFBA/FBA_reaction.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_reaction.cpp -o ./FBA_reaction.o
+PhysiFBA_reaction.o: ./addons/dFBA/src/FBA_reaction.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/src/FBA_reaction.cpp -o ./PhysiFBA_reaction.o
 
-FBA_metabolite.o: ./addons/dFBA/FBA_metabolite.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_metabolite.cpp -o ./FBA_metabolite.o
+PhysiFBA_metabolite.o: ./addons/dFBA/src/FBA_metabolite.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/src/FBA_metabolite.cpp -o ./PhysiFBA_metabolite.o
 
-cancer_flux_balance.o: ./custom_modules/cancer_flux_balance.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./custom_modules/cancer_flux_balance.cpp
+# user-defined PhysiCell modules
+cancer_metabolism.o: ./custom_modules/cancer_metabolism.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/cancer_metabolism.cpp
 
 
 # cleanup
@@ -237,9 +181,8 @@ reset:
 	rm -f ./custom_modules/*
 	touch ./custom_modules/empty.txt
 	touch ALL_CITATIONS.txt
-	touch ./core/PhysiCell_cell.cpp
 	rm ALL_CITATIONS.txt
-	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
+	cp ./config/PhysiCell_settings_default.xml ./config/PhysiCell_settings.xml
 	touch ./config/empty.txt
 
 clean:
@@ -254,9 +197,6 @@ data-cleanup:
 	touch ./config/empty.txt
 
 # archival
-
-checkpoint: 
-	zip -r $$(date +%b_%d_%Y_%H%M).zip Makefile *.cpp *.h config/*.xml custom_modules/* 
 
 zip:
 	zip -r latest.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* sample_projects/*

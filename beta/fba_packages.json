@@ -1,24 +1,21 @@
-{
+{  
     "coin-or":
     {
         "_refurl": "https://www.coin-or.org/download/binary/Clp/",
         "linux-x64": 
         {
-            "version": "Clp-refactor-static-bionic-linux-x86_64-gcc7.tgz",
-            "url": "https://www.coin-or.org/download/binary/Clp/Clp-refactor-static-bionic-linux-x86_64-gcc7.tgz",
-            "sha256": "930cf8c6fce8beff0082ba0c0ded98a9d45413838ce1468c28acfa4797c1600a"
+            "version": "Clp-1.17.6-linux64.zip",
+            "url": "https://maboss.curie.fr/pub/Clp-1.17.6-linux64.zip"
         },
         "win64": 
         {
-            "version": "Clp-refactor-x86_64-w64-mingw32.zip",
-            "url": "https://www.coin-or.org/download/binary/Clp/Clp-refactor-x86_64-w64-mingw32.zip",
-            "sha256": "0aba0075771938c45d3116db0f712e8bbc95ad8a0430a719c9ee96c32ab3ede6"
+            "version": "Clp-1.17.6-win64.zip",
+            "url": "https://maboss.curie.fr/pub/Clp-1.17.6-win64.zip"
         },
         "osx":
         {
-            "version": "Clp-refactor-osx10.15-x86_64-gcc9.tgz",
-            "url": "https://www.coin-or.org/download/binary/Clp/Clp-refactor-osx10.15-x86_64-gcc9.tgz",
-            "sha256": "f67487ab8670e11b46bd8b304d1561b3cb4475e67df0a924673a887ce4c54040"
+            "version": "Clp-1.17.6-osx64.zip",
+            "url": "https://maboss.curie.fr/pub/Clp-1.17.6-osx64.zip"
         }
     },
     "libsbml": 
@@ -26,28 +23,18 @@
         "_refurl": "https://sourceforge.net/projects/sbml/files/libsbml/5.14.0-experimental/binaries/",
         "linux-x64": 
         {
-            "version": "libSBML-5.19.0-Linux-x64-binaries-ubuntu.tar.gz",
-            "url": "https://sourceforge.net/projects/sbml/files/libsbml/5.19.0/stable/Linux/64-bit/libSBML-5.19.0-Linux-x64-binaries-ubuntu.tar.gz/download"
-        },
-        "linux-x86": 
-        {
-            "version": "libSBML-5.19.0-Linux-x86-binaries-ubuntu.tar.gz",
-            "url": "https://sourceforge.net/projects/sbml/files/libsbml/5.19.0/stable/Linux/32-bit/libSBML-5.19.0-Linux-x86-binaries-ubuntu.tar.gz/download"
+            "version": "libSBML-5.19.0-linux64.zip",
+            "url": "https://maboss.curie.fr/pub/libSBML-5.19.0-linux64.zip"
         },
         "win64": 
         {
-            "version": "libSBML-5.19.0-win-matlab-x64.exe",
-            "url": "https://sourceforge.net/projects/sbml/files/libsbml/5.19.0/stable/Windows/64-bit/libSBML-5.19.0-win-matlab-x64.exe/download"
-        },
-        "win32": 
-        {
-            "version": "libSBML-5.19.0-win-x86.exe",
-            "url": "https://sourceforge.net/projects/sbml/files/libsbml/5.19.0/stable/Windows/32-bit/libSBML-5.19.0-win-x86.exe/download"
+            "version": "libSBML-5.19.0-win64.zip",
+            "url": "https://maboss.curie.fr/pub/libSBML-5.19.0-win64.zip"
         },
         "osx":
         {
-            "version": "libSBML-5.19.0-Darwin.tar.gz",
-            "url": "https://sourceforge.net/projects/sbml/files/libsbml/5.19.0/stable/Mac%20OS%20X/libSBML-5.19.0-Darwin.tar.gz/download"
+            "version": "libSBML-5.19.0-osx64.zip",
+            "url": "https://maboss.curie.fr/pub/libSBML-5.19.0-osx64.zip"
         }
     }
 }

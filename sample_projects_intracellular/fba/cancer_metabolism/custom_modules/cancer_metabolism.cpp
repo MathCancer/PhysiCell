@@ -65,12 +65,7 @@
 ###############################################################################
 */
 
-#include "cancer_flux_balance.h"
-
-
-
-// declare cell definitions here
-// Cell_Definition metabolic_cell;
+#include "cancer_metabolism.h"
 
 #include "../modules/PhysiCell_settings.h"
 
@@ -91,15 +86,18 @@ void create_cell_types( void )
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
 	cell_defaults.parameters.o2_reference = 38.0; 
 	
-	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_oncoprotein;  
+	cell_defaults.functions.update_phenotype = update_cell;  
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
-	cell_defaults.functions.update_velocity = standard_update_cell_velocity;	
+	cell_defaults.functions.update_velocity = NULL;
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
 	
  	/*
 	   This parses the cell definitions in the XML config file. 
 	*/
 	
 	initialize_cell_definitions_from_pugixml(); 
+	
 	
 	/* 
 	   Put any modifications to individual cell definitions here. 
@@ -116,7 +114,6 @@ void create_cell_types( void )
 	
 	return; 
 }
-
 
 void setup_microenvironment( void )
 {
@@ -164,6 +161,7 @@ std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius
 
 void setup_tissue( void )
 {
+	double cell_radius = cell_defaults.phenotype.geometry.radius;
 	double tumor_radius = parameters.doubles( "tumor_radius" ); // 250.0; 
 	std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius, tumor_radius);
 	std::cout << "creating " << positions.size() << " closely-packed tumor cells ... " << std::endl;
@@ -171,102 +169,20 @@ void setup_tissue( void )
 	Cell* pCell = NULL;
 	for( int i=0; i < positions.size(); i++ )
 	{
-		pCell = create_cell(); // tumor cell
+		pCell = create_cell(get_cell_definition("metabolic cell")); // tumor cell
 		pCell->assign_position( positions[i] );
+		dFBAIntracellular *model = (dFBAIntracellular*) pCell->phenotype.intracellular;
 	}
 	
 	return; 
 }
 
-/*
-void setup_tissue( void )
-{
-
-	double box_radius = 100.;  // rf. config file
-	double xmin = -box_radius;
-	double ymin = -box_radius;
-	double xmax = box_radius;
-	double ymax = box_radius;
-	double delta = 4.0;
-
-	Cell* pC;
-
-	pC = create_cell( cell_defaults );
-	pC->assign_position( 0., 0.0, 0.0 );
-	pC->physifba_model = PhysiFBA::PhysiFBA_default_model;
-
-}
-
-*/
-
 void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
 
-  phenotype.secretion.set_all_secretion_to_zero();
-  phenotype.secretion.set_all_uptake_to_zero();
-
-  std::string oxygen_name = "oxygen";
-  std::string glucose_name = "glucose";
-  std::string lactate_name = "lactate";
+	dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
+	model->update(pCell, phenotype, dt);
   
-  std::string oxygen_flux_id = PhysiFBA::exchange_flux_density_map[oxygen_name];
-  std::string glucose_flux_id = PhysiFBA::exchange_flux_density_map[glucose_name];
-  std::string lactate_flux_id = PhysiFBA::exchange_flux_density_map[lactate_name];
-
-  static int oxygen_idx = microenvironment.find_density_index( oxygen_name );
-  static int glucose_idx = microenvironment.find_density_index( glucose_name );
-  static int lactate_idx = microenvironment.find_density_index( lactate_name );
-
-  double oxygen_density = pCell->nearest_density_vector()[oxygen_idx];
-  double glucose_density = pCell->nearest_density_vector()[glucose_idx]; // dived by voxel size?
-  double lactate_density = pCell->nearest_density_vector()[lactate_idx]; // dived by voxel size?
-  
-  
-  double O2_Km = parameters.doubles("oxygen_Km");
-  double O2_Vmax = parameters.doubles("oxygen_Vmax");
-  double oxygen_flux_bound = -1 * ( O2_Vmax * oxygen_density) / (oxygen_density + O2_Km);
-  pCell->physifba_model.setReactionLowerBound(oxygen_flux_id, oxygen_flux_bound);
-
-  double glc_Km = parameters.doubles("glucose_Km");
-  double glc_Vmax = parameters.doubles("glucose_Vmax");
-  double glucose_flux_bound = -1 * ( glc_Vmax * glucose_density) / (glucose_density + glc_Km);
-  pCell->physifba_model.setReactionLowerBound(glucose_flux_id, glucose_flux_bound);
-
-  double lac_Km = parameters.doubles("lactate_Km");
-  double lac_Vmax = parameters.doubles("lactate_Vmax");
-  double lactate_flux_bound = -1 * ( lac_Vmax * lactate_density) / (lactate_density + lac_Km);
-  pCell->physifba_model.setReactionLowerBound(lactate_flux_id, lactate_flux_bound);
-
-
-  std::cout << "Running FBA for cell: " << pCell->ID << std::endl;
-  pCell->physifba_model.runFBA();
-    
-  PhysiFBA_reaction* reaction = pCell->physifba_model.getReaction(oxygen_flux_id);
-  double oxygen_flux = reaction->getFluxValue();
-  std::cout << "Oxygen flux: " << oxygen_flux << std::endl;
-
-  reaction = pCell->physifba_model.getReaction(glucose_flux_id);
-  double glucose_flux = reaction->getFluxValue();
-  std::cout << "glucose flux: " << glucose_flux << std::endl;
-
-  reaction = pCell->physifba_model.getReaction(lactate_flux_id);
-  double lactate_flux = reaction->getFluxValue();
-  std::cout << "lactate flux: " << lactate_flux << std::endl;
-
-  
-  if ( oxygen_flux < 0)
-  	phenotype.secretion.uptake_rates[oxygen_idx] = abs(oxygen_flux / oxygen_density);
-
-  if ( glucose_flux < 0)
-  	phenotype.secretion.uptake_rates[glucose_idx] = abs(glucose_flux / glucose_density);
-	  
-
-  if ( lactate_flux < 0 )
-  	phenotype.secretion.uptake_rates[lactate_idx] = abs(lactate_flux / lactate_density);
-	  
-  else if ( lactate_flux > 0 )
-    phenotype.secretion.secretion_rates[lactate_idx] = abs(lactate_flux / lactate_density);
-  
-/*
+  /*
   phenotype.volume.fluid += dt * phenotype.volume.fluid_change_rate *
   	( phenotype.volume.target_fluid_fraction * phenotype.volume.total - phenotype.volume.fluid );
 
@@ -288,28 +204,18 @@ void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double
 
   // Tell physicell to update the cell radius to the new volume
   phenotype.geometry.update(pCell, phenotype, dt);
-*/
 
+
+*/
 }
 
 void setup_default_metabolic_model( void )
 {
-
-  // This codes is to use iSIM model
-  std::string sbml_fileame = parameters.strings("sbml_model");
-  PhysiFBA::PhysiFBA_default_model.readSBMLModel(sbml_fileame.c_str());
-  PhysiFBA::PhysiFBA_default_model.initLpModel();
-
-  PhysiFBA::exchange_flux_density_map["glucose"] = "R_E1";
-  PhysiFBA::exchange_flux_density_map["lactate"] = "R_E2";
-  PhysiFBA::exchange_flux_density_map["oxygen"] = "R_E3";
-  PhysiFBA::exchange_flux_density_map["energy"] = "R_R4";
-
+ 	return;
 }
 
 void anuclear_volume_model (Cell* pCell, Phenotype& phenotype, double dt)
 {
-
     return;
 }
 
@@ -330,8 +236,6 @@ void metabolic_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	//phenotype.cycle.data.transition_rate( cycle_start_index ,cycle_end_index ) *= pCell->custom_data[oncoprotein_i] ;
 	return;
 }
-
-
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
