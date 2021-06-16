@@ -15,7 +15,7 @@ def param_parser():
     parser.add_argument('--pkg', dest="pkg", required=True, help='Available packages', choices=PACKAGES)
     parser.add_argument('--arch', dest="arch", required=True, choices=ARCHS, help='Current arch')
     parser.add_argument('--checksum', dest="checksum", default=False, help='Check file integrity after downloading')
-    parser.add_argument('--path', dest='path', default='ext', help='Default folder destination to install third-party libs if changed, Makefiles you be updated according')
+    parser.add_argument('--path', dest='path', default='addons/dFBA/ext', help='Default folder destination to install third-party libs if changed, Makefiles you be updated according')
     return parser
 
 
@@ -29,6 +29,8 @@ def main():
     parser = param_parser()
     args = parser.parse_args()
 
+    print(args)
+    print(args.path)
     # json_packages = os.path.join(os.curdir, 'config')
     # json_packages = os.path.join(json_packages, 'packages.json')
     json_packages = os.path.join('beta', 'fba_packages.json')
@@ -67,27 +69,27 @@ def main():
         print("Extracting package in %s... " % args.pkg, end=" ")
         if fname.endswith("zip"):
             archiver = zipfile.ZipFile(fname, 'r')
-            archiver.extractall()
-        elif fname.endswith("tar.gz") or fname.endswith("gz"):
-            archiver = tarfile.open(fname, "r:gz")
-            archiver.extractall()
-            old_lib_dir = os.path.commonprefix(archiver.getnames())
-            archiver.close()
-            os.rename(old_lib_dir, SBML_DIR)
-            if os.path.exists(old_lib_dir):
-                os.rmdir(old_lib_dir)
-            os.remove(fname)
+            archiver.extractall(args.pkg)
+        # elif fname.endswith("tar.gz") or fname.endswith("gz"):
+        #     archiver = tarfile.open(fname, "r:gz")
+        #     archiver.extractall()
+        #     old_lib_dir = os.path.commonprefix(archiver.getnames())
+        #     archiver.close()
+        #     os.rename(old_lib_dir, SBML_DIR)
+        #     if os.path.exists(old_lib_dir):
+        #         os.rmdir(old_lib_dir)
+        #     os.remove(fname)
     
     elif args.pkg == "coin-or":
         print("Extracting package in %s... " % args.pkg, end=" ")
         if fname.endswith("zip"):
             archiver = zipfile.ZipFile(fname, 'r')
-            archiver.extractall()
-        elif fname.endswith("tar.gz") or fname.endswith("gz"):
-            archiver = tarfile.open(fname, "r:gz")
-            archiver.extractall(path=args.pkg)
-            archiver.close()
-            os.remove(fname)
+            archiver.extractall(args.pkg)
+        # elif fname.endswith("tar.gz") or fname.endswith("gz"):
+        #     archiver = tarfile.open(fname, "r:gz")
+        #     archiver.extractall(path=args.pkg)
+        #     archiver.close()
+        #     os.remove(fname)
     
     print("Ok!")
     print("Dependency retrived correctly :-)\n")
