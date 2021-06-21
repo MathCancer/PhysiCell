@@ -5,9 +5,7 @@ import sys, os
 import json
 import argparse
 import platform
-import requests
-import hashlib
-import tarfile
+import urllib.request
 import zipfile
 
 def param_parser():
@@ -25,12 +23,10 @@ def main():
     args = parser.parse_args()
     os_type = platform.system()
 
-    if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "dFBA", args.pkg)):
+    if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "dFBA", "ext", args.pkg)):
         print('\n%s already installed.\n' % args.pkg)
         return
 
-    print(args)
-    print(args.path)
     json_packages = os.path.join('beta', 'fba_packages.json')
 
     packages_dict = {}
@@ -61,12 +57,23 @@ def main():
     print("Fetching package:", end="")
     print("- %s (%s)" % (args.pkg, arch))
     print("Downaling from: %s" % pkg_dict['url'])
-    r = requests.get(pkg_dict['url'], allow_redirects=True)
     
-    fname = pkg_dict["version"]
-    with open(fname, 'wb') as fh:
-        fh.write(r.content)
+    def download_cb(blocknum, blocksize, totalsize):
+        readsofar = blocknum * blocksize
+        if totalsize > 0:
+            percent = readsofar * 1e2 / totalsize
+            s = "\r%5.1f%% %*d / %d" % (
+                percent, len(str(totalsize)), readsofar, totalsize)
+            sys.stderr.write(s)
+            if readsofar >= totalsize: # near the end
+                sys.stderr.write("\n")
+        else: # total size is unknown
+            sys.stderr.write("read %d\n" % (readsofar,))
 
+    urllib.request.urlretrieve(pkg_dict['url'], pkg_dict['version'], download_cb)
+
+    fname = pkg_dict["version"]
+    
     print("Extracting package in %s... " % args.pkg, end=" ")
     if fname.endswith("zip"):
         archiver = zipfile.ZipFile(fname, 'r')

@@ -24,7 +24,7 @@ make reset
 make ode2-sample
 make
 make reset
-make ecoli-acetic-switch-sample
+make cancer-metabolism-sample
 make
 make reset
 make ode2-sample
