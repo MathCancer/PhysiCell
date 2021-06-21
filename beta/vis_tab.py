@@ -541,7 +541,7 @@ class Vis(QWidget):
             # days = int(hrs/24)
             # title_str = '%dd, %dh, %dm' % (int(days),(hrs%24), mins - (hrs*60))
         # plt.title(self.title_str)
-        self.ax0.set_title(self.title_str, fontsize=5)
+        self.ax0.set_title(self.title_str, fontsize=9)
         # self.ax0.set_title(self.title_str, prop={'size':'small'})
 
         # plt.xlim(self.xmin, self.xmax)
