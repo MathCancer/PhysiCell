@@ -2,11 +2,8 @@ VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
 PROGRAM_NAME := cancer_metabolism
 
 CC := g++
-# CC := g++-mp-7 # typical macports compiler name
-# CC := g++-7 # typical homebrew compiler name
 
 # Check for environment definitions of compiler
-# e.g., on CC = g++-7 on OSX
 ifdef PHYSICELL_CPP
 	CC := $(PHYSICELL_CPP)
 endif
@@ -14,36 +11,27 @@ endif
 ARCH := native # best auto-tuning
 # ARCH := core2 # a reasonably safe default for most CPUs since 2007
 # ARCH := corei7
-# ARCH := corei7-avx # earlier i7
-# ARCH := core-avx-i # i7 ivy bridge or newer
-# ARCH := core-avx2 # i7 with Haswell or newer
-# ARCH := nehalem
-# ARCH := westmere
-# ARCH := sandybridge # circa 2011
-# ARCH := ivybridge   # circa 2012
-# ARCH := haswell     # circa 2013
-# ARCH := broadwell   # circa 2014
-# ARCH := skylake     # circa 2015
-# ARCH := bonnell
-# ARCH := silvermont
-# ARCH := skylake-avx512
-# ARCH := nocona #64-bit pentium 4 or later
-
 
 # For debugging with gdb just add: -g3 -ggdb -O3
 # -DCLP_BUILD is an additional flags to link againt clp
 # CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
 CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -pipe  -D ADDON_PHYSIDFBA
 
-
 # Libraries need: SBML and coin-Clp
-DEPS_DIR = ./addons/dFBA/ext/
+DEPS_DIR = ./addons/dFBA/ext
 
-CPPFLAGS := -I$(DEPS_DIR)/libsbml/include -I$(DEPS_DIR)/coin-or/include
-LDFLAGS  := -L$(DEPS_DIR)/libsbml/lib -L$(DEPS_DIR)/coin-or/lib/
+DEPS_CFLAGS := -I$(DEPS_DIR)/libsbml/include -I$(DEPS_DIR)/coin-or/include
+LD_PATH  := -L$(DEPS_DIR)/libsbml/lib -L$(DEPS_DIR)/coin-or/lib/
 LIBS     := -lClp-static -lCoinUtils-static -llapack -lsbml-static -lxml2 -lbz2 -lz
 
-COMPILE_COMMAND := $(CC) $(CFLAGS) $(CPPFLAGS)
+# if we're on Windows, we need to provide a (agreed upon) path to some of the dynamic libs
+ifeq ($(OS),Windows_NT)
+	WIN_LD_FLAG := -LC:\msys64\mingw64\bin
+else
+	WIN_LD_FLAG := 
+endif
+
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(DEPS_CFLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o
@@ -69,7 +57,14 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiFBA_addon_OBJECTS) $(PhysiCell_custom
 # compile the project
 
 all: libFBA main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LDFLAGS) $(LIBS)
+#	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LDFLAGS) $(LIBS)
+	@echo DEPS_CFLAGS= $(DEPS_CFLAGS)
+	@echo LIBS= $(LIBS)
+	@echo 
+	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LD_PATH) $(WIN_LD_FLAG) $(LIBS)
+	@echo
+	@echo created $(PROGRAM_NAME)
+	@echo
 
 
 # PhysiCell core components
@@ -153,8 +148,8 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 
 # PhysiFBA addon modules
 libFBA: 
-	python3 beta/setup_fba.py --pkg libsbml
-	python3 beta/setup_fba.py --pkg coin-or
+	python beta/setup_fba.py --pkg libsbml
+	python beta/setup_fba.py --pkg coin-or
 
 PhysiFBA_intracellular.o: ./addons/dFBA/src/dfba_intracellular.cpp
 	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/src/dfba_intracellular.cpp -o ./PhysiFBA_intracellular.o
