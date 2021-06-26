@@ -40,7 +40,9 @@ C:\msys64\usr\bin
 ```
 
 4) Using the same application as above, `Move up` each of the two new paths to be at the very top.
-![PATH env var](images/mingw64_env_var_path.png)
+
+<img src="images/mingw64_env_var_path.png" width="407" height="413">
+
 Then click `OK` on each Edit env variable window to complete the PATH update.
 
 5) Open a *new* Powershell (or Command Prompt) window and type `g++ --version` to verify it can be found:
@@ -83,72 +85,31 @@ building PhysiCell. If not, contact us!
 ## Build: sample projects
 
 We provide several sample projects to help you get started. Most
-of the projects are 2D models (<i>biorobots, anti-cancer biorobots, cancer heterogeneity, virus-macrophage, predator-prey-farmer, and worms</i>); but one project
-is a 3D model (<i>cancer immunology</i>). The procedure to build and execute each of the sample projects follows the same
+of the projects are 2D models, but at least one 
+is 3D (<i>cancer immunology</i>). The procedure to build and execute each of the sample projects follows the same
 pattern. For example, from your Terminal, in the root PhysiCell directory/folder:
 ```
-$ make biorobots-sample     # populate the biorobots sample project
-$ make                      # compile the project
+$ make biorobots-sample     # copy files for biorobots 
+$ make -j2                  # compile (using 2 threads)
 ```
-
-<!-- Note: the first `make` command silently copies over project-specific files, including the Makefile. The 
-second `make` command attempts to compile the (new) code. Since the Makefile is being overwritten, any edits you
-may have done to the previous Makefile (e.g., changing `CC` to point to `g++-7` on OSX) will be lost. You'll need
-to edit it again or find another workaround. -->
 
 Assuming the project builds without errors, you should now have an executable called `biorobots` which you can run, e.g.:
 ```
-$ ./biorobots
+$ ./biorobots    #  .\biorobots.exe on Windows
 ```
 This will begin the simulation, write information to your terminal, and generate output files of types `.svg`, `.xml`, and `.mat`. More about those below. You can `Control-c` to kill the simulation early, if you want.
 
 For the remaining example projects provided with PhysiCell, you would follow similar steps, but first, you may want to clean out the previous simulation's output and prepare for the new one:
 ```
 $ make data-cleanup   # Delete output data. (Optionally, manually move it to another directory to keep it)
-$ make reset          # clear out the sample project / clean slate
+$ make reset          # clear out sample project 
+
+$ make list-projects  # show all possible samples
+
+  # build another one, e.g.:
 $ make cancer-biorobots-sample    # populate the new project
 $ make                            # compile the project
 $ ./cancer_biorobots
-```
-and
-```
-$ make data-cleanup
-$ make reset
-$ make heterogeneity-sample
-$ make 
-$ ./heterogeneity
-```
-and
-```
-$ make data-cleanup
-$ make reset
-$ make virus-macrophage-sample
-$ make 
-$ ./virus-sample
-```
-and
-```
-$ make data-cleanup
-$ make reset
-$ make pred-prey-farmer
-$ make 
-$ ./pred_prey
-```
-and
-```
-$ make data-cleanup
-$ make reset
-$ make worm-sample
-$ make 
-$ ./worm
-```
-and the 3-D model (more computationally intensive):
-```
-$ make data-cleanup
-$ make reset
-$ make cancer-immune-sample
-$ make
-$ ./cancer_immune_3D
 ```
 
 <hr> <!---------------------------------------------->
@@ -166,7 +127,7 @@ At a bare minimum, you should be able to use your browser to `File -> Open` any 
 that your simulation generates. PhysiCell simulates transmitted light microscopy to create virtual pathology images for the .svg files. Even for 3D models, 2D cross-section images (.svg files) are generated, by 
 default, using a slice through the Z=0 plane, as depicted in the following image (from the cancer-immune-sample project).
 
-![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/cancer_immune_snapshot00000574_small.png "SVG slice from 3D cancer-immune-sample project")
+![slice in 3D](images/cancer_immune_snapshot00000574_small.png "SVG slice from 3D cancer-immune-sample project")
 
 ### MATLAB/Octave
 
@@ -188,7 +149,7 @@ $ convert -resize 15% tmp.png out.png
 ```
 will generate a tiled horizontal sequence of images:
 
-![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/cancer_immune_seq4x1_small.png "ImageMagick can tile images")
+![alt text](images/cancer_immune_seq4x1_small.png "ImageMagick can tile images")
 
 ImageMagick will also let you generate an animated gif of your results, e.g.:
 ```
@@ -213,21 +174,19 @@ $ make jpeg OUTPUT=out1
 
 If you install ParaView, you can visualize and interact with output from 3D models (the `.mat` files). Refer to our [blog post](http://www.mathcancer.org/blog/paraview-for-physicell-part-1/) to get started.
 
-![alt text](https://github.com/rheiland/PhysiCell/blob/master/documentation/images/ParaView_clip_planes.png "ParaView w clipping planes and barchart")
+![paraview](images/ParaView_clip_planes.png "ParaView w clipping planes and barchart")
 
 <hr> <!---------------------------------------------->
 
 ## Support
 
-<!-- Please join the [PhysiCell Users](https://groups.google.com/forum/#!forum/physicell-users) forum and follow us on Twitter  (https://twitter.com/MathCancer). -->
 Please submit questions and report problems at https://sourceforge.net/p/physicell/tickets/ and follow us on Twitter (https://twitter.com/PhysiCell and https://twitter.com/MathCancer).
 
 <hr> <!---------------------------------------------->
 
 ## References
 
-* http://physicell.mathcancer.org/
-* http://www.mathcancer.org/blog/setting-up-a-64-bit-gcc-environment-on-windows
+* http://physicell.org/
 * http://www.mathcancer.org/blog/setting-up-gcc-openmp-on-osx-homebrew-edition/
 * http://www.mathcancer.org/blog/physicell-tutorials/
 * http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/
