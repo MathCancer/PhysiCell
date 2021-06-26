@@ -78,7 +78,7 @@ and the Makefile will use it. You should permanently set this in your environmen
 ### Linux
 
 If you're a Linux user, you probably already have or know how to install/use a proper g++ environment for 
-building PhysiCell. If not, contact us!
+building PhysiCell. If not, please reach out to the PhysiCell community.
 
 <hr> <!---------------------------------------------->
 
