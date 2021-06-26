@@ -5,12 +5,12 @@
       * [Windows](#windows)
       * [OSX](#osx)
       * [Linux](#linux)
-   * [Python](#python-1)
+   * [Python](#python)
    * [Build: sample projects](#build-sample-projects)
    * [Visualizing Output](#visualizing-output)
       * [Browser](#browser)
       * [MATLAB/Octave](#matlaboctave)
-      * [Python](#python-2)
+      * [Matplotlib](#matplotlib)
       * [ImageMagick](#imagemagick)
       * [ParaView](#paraview)
    * [Support](#support)
@@ -179,7 +179,7 @@ default, using a slice through the Z=0 plane, as depicted in the following image
 If you have access to MATLAB (or Octave), we have a [detailed tutorial](http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/) on how to visualize the
 MultiCellDS digital snapshots (.xml and .mat files).
 
-### Python
+### Matplotlib
 
 If you want to use Python to visualize results, see this blog post http://www.mathcancer.org/blog/python-loader/ and also see various scripts in 
 the `/beta` directory, e.g., `anim_svg.py`.
