@@ -82,6 +82,36 @@ building PhysiCell. If not, contact us!
 
 <hr> <!---------------------------------------------->
 
+## Python
+
+PhysiCell uses Python in a few different ways:
+1) It is needed to install certain libraries for the intracellular models.
+2) It can be used for visualization and data analysis scripts.
+3) It can be used for parameter explorations of models.
+
+We highly recommend installing the freely available Anaconda Python distribution. 
+However, if you are already actively using Python from another distribution, you may run into possible problems by installing another one. 
+In that case, you may want to reach out to the PhysiCell community for help (see below).
+
+To install the Anaconda Python, you have two options:
+
+1) download/install the entire [Individual Edition](https://www.anaconda.com/products/individual). But be warned, this is ~400-500MB in size because it contains a very large suite of modules. If you have plenty of free disk space, we recommend it.
+2) download/install a much smaller distribution called [Miniconda](https://docs.conda.io/en/latest/miniconda.html) and then install the minimal modules needed by PhysiCell:
+    
+```
+    $ conda install -c conda-forge matplotlib
+    $ conda install -c conda-forge scipy
+    $ conda install -c conda-forge pyqt
+```
+And if you plan to create nanoHUB apps from a PhysiCell project, you may want to preview the Jupyter notebook, in which case you would need:
+    
+```
+    $ conda install -c conda-forge notebook
+    $ conda install -c conda-forge nb_conda_kernels
+```
+
+<hr> <!---------------------------------------------->
+
 ## Build: sample projects
 
 We provide several sample projects to help you get started. Most
@@ -106,10 +136,10 @@ $ make reset          # clear out sample project
 
 $ make list-projects  # show all possible samples
 
-  # build another one, e.g.:
-$ make cancer-biorobots-sample    # populate the new project
-$ make                            # compile the project
-$ ./cancer_biorobots
+   Build another one, e.g.:
+$ make cancer-biorobots-sample    # copy new proj files
+$ make                            # compile 
+$ ./cancer_biorobots              # execute
 ```
 
 <hr> <!---------------------------------------------->
