@@ -23,13 +23,33 @@ that doesn't support OpenMP. You may need to install an OpenMP-supported compile
 
 ### Windows
 
-The currently preferred way to use PhysiCell on Windows is to install [MinGW-w64](https://sourceforge.net/projects/mingw-w64/) which will let you use 
-a version of GCC that supports OpenMP. For more detailed information, 
-[see our blog post](http://www.mathcancer.org/blog/setting-up-a-64-bit-gcc-environment-on-windows).
+The currently preferred way to use PhysiCell on Windows is to install MinGW64,
+a minimal version of GCC that supports OpenMP (on a 64-bit computer). 
 
-(Sometime in the near future, we plan to provide an option to use native Windows and a recent 
-[Microsoft Visual C++](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) compiler,
-using [CMake](https://cmake.org/download/) to build PhysiCell. If you want to be a beta-tester, contact us).
+1) From [msys2.org](https://www.msys2.org), follow steps 1-4 (stopping before step 5). Click through the setup dialog, accepting the default suggestions.
+
+2) In the MSYS2 console terminal, copy/paste/execute the following command (a package manager to install MINGW64 and additional libraries):
+```
+$ pacman -S mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git  mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 git make
+```
+
+3) After the above completes, open the Windows application to let you edit your Environment Variables. You have the option of editing the “User variables” or “System variables”. If it is just for your use and not intended to be shared by other users on this computer, then you can just edit “User variables”. Edit the “Path” variable and add two “New” paths:
+```
+C:\msys64\mingw64\bin
+C:\msys64\usr\bin
+```
+
+4) Using the same application as above, `Move up` each of the two new paths to be at the very top.
+![PATH env var](images/mingw64_env_var_path.png)
+Then click `OK` on each Edit env variable window to complete the PATH update.
+
+5) Open a *new* Powershell (or Command Prompt) window and type `g++ --version` to verify it can be found:
+```
+PS C:\Users\heiland> g++ --version
+g++.exe (Rev10, Built by MSYS2 project) 10.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+```
+
 
 ### OSX
 
@@ -39,19 +59,19 @@ installation instructions](https://docs.brew.sh/Installation.html).
 
 After installing brew, type `brew install gcc` from a Terminal command line. This 
 should install a recent version of gcc/g++ (supporting OpenMP) into `/usr/local/bin`. 
-You can verify this with (note the g++ version # will change over time):
+You can verify this with (note the g++ version # will change over time, but in June 2021, it is version 11):
 ```
 $ ls -l /usr/local/bin/g++*
-   ...             /usr/local/bin/g++-10@ -> ../Cellar/gcc/10.2.0/bin/g++-10
+   ...             /usr/local/bin/g++-11@ -> ../Cellar/gcc/11.1.0_1/bin/g++-11
 ```
 
 Set the following environment variable in your Terminal's shell, e.g., in the bash shell: 
 ```
-$ export PHYSICELL_CPP=/usr/local/bin/g++-10
+$ export PHYSICELL_CPP=/usr/local/bin/g++-11
 ```
 and the Makefile will use it. You should permanently set this in your environment via: 
 
-`$ echo export PHYSICELL_CPP=g++-10 >> ~/.bash_profile`.
+`$ echo export PHYSICELL_CPP=g++-11 >> ~/.bash_profile`.
 
 ### Linux
 
