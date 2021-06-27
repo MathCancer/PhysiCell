@@ -181,8 +181,16 @@ MultiCellDS digital snapshots (.xml and .mat files).
 
 ### Matplotlib
 
-If you want to use Python to visualize results, see this blog post http://www.mathcancer.org/blog/python-loader/ and also see various scripts in 
-the `/beta` directory, e.g., `anim_svg.py`.
+We plan to provide a full-featured GUI that uses matplotlib (Python plotting). For now, we have a simple GUI that plots only the cells (the .svg files):
+```
+$ python beta/plot_cells.py
+```
+You may also see other Python scripts in /beta that can be copied into your /output directory and run, e.g.:
+```
+$ python anim_svg.py
+```
+If you want to experiment with plotting data in the .xml and .mat files in  /output, see this 
+blog post http://www.mathcancer.org/blog/python-loader/.
 
 ### ImageMagick
 
