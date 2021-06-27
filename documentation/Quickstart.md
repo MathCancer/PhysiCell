@@ -110,7 +110,7 @@ In that case, you may want to reach out to the PhysiCell community for help (see
 
 To install the Anaconda Python, you have two options:
 
-1) download/install the entire [Individual Edition](https://www.anaconda.com/products/individual). But be warned, this is ~400-500MB in size because it contains a very large suite of modules. If you have plenty of free disk space, we recommend it.
+1) download/install the entire [Individual Edition](https://www.anaconda.com/products/individual). Be warned: this is ~400-500MB in size because it contains a very large suite of modules. But if you have plenty of free disk space, we recommend it.
 2) download/install a much smaller distribution called [Miniconda](https://docs.conda.io/en/latest/miniconda.html) and then install the minimal modules needed by PhysiCell:
     
 ```
@@ -122,8 +122,12 @@ And if you plan to create nanoHUB apps from a PhysiCell project, you may want to
     
 ```
     $ conda install -c conda-forge notebook
+    $ conda install -c conda-forge ipywidgets
     $ conda install -c conda-forge nb_conda_kernels
+    $ pip install -U hublib   # may not work on Windows
 ```
+
+On macOS, you may need to insert `alias python=pythonw` into your `~/.bashrc` file (or `~/.bash_profile`).
 
 <hr> <!---------------------------------------------->
 
