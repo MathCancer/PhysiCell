@@ -138,7 +138,7 @@ module that will be used by the Jupyter notebook apps:
     $ pip install -U hublib   # may not work on Windows
 ```
 
-On macOS, you may need to insert `alias python=pythonw` into your `~/.bashrc` file (or `~/.bash_profile`).
+<!-- On macOS, you may need to insert `alias python=pythonw` into your `~/.bashrc` file (or `~/.bash_profile`). -->
 
 <hr> <!---------------------------------------------->
 
