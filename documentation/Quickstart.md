@@ -200,8 +200,9 @@ We plan to provide a full-featured GUI that uses matplotlib (Python plotting). F
 ```
 $ python beta/plot_cells.py
 ```
-![](images/plot_cells_gui_biorobots_med.png)
-Output results (.svg) from the biorobots sample project.
+Showing output results (.svg) from the biorobots sample project:
+
+![](images/plot_cells_gui_biorobots_small.png)
 
 You may also see other Python scripts in /beta that can be copied into your /output directory and run, e.g.:
 ```
