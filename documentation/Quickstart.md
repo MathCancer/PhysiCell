@@ -111,6 +111,11 @@ In that case, you may want to reach out to the PhysiCell community for help (see
 To install the Anaconda Python, you have two options:
 
 1) download/install the entire [Individual Edition](https://www.anaconda.com/products/individual). Be warned: this is ~400-500MB in size because it contains a very large suite of modules. But if you have plenty of free disk space, we recommend it.
+
+If you choose this option, during the installation process, select the option to add Anaconda to your PATH, in spite of the "Not recommended" comment:
+
+![anaconda_to_path](images/anaconda_add_to_path_med.png)
+
 2) download/install a much smaller distribution called [Miniconda](https://docs.conda.io/en/latest/miniconda.html) and then install the minimal modules needed by PhysiCell:
     
 ```
@@ -124,6 +129,12 @@ And if you plan to create nanoHUB apps from a PhysiCell project, you may want to
     $ conda install -c conda-forge notebook
     $ conda install -c conda-forge ipywidgets
     $ conda install -c conda-forge nb_conda_kernels
+```
+
+Regardless of which option you choose - full Anaconda or Miniconda, you will also need to install an additional 3rd-party
+module that will be used by the Jupyter notebook apps:
+
+```
     $ pip install -U hublib   # may not work on Windows
 ```
 
