@@ -3,7 +3,7 @@
    * [Download](#download)
    * [Build: the basics](#build-the-basics)
       * [Windows](#windows)
-      * [OSX](#osx)
+      * [macOS](#macos)
       * [Linux](#linux)
    * [Python](#python)
    * [Build: sample projects](#build-sample-projects)
@@ -20,9 +20,9 @@
 
 We currently provide 2 options for downloading the PhysiCell source code:
 
-* https://sourceforge.net/projects/physicell/.
+* https://sourceforge.net/projects/physicell/
 
-* https://github.com/MathCancer/PhysiCell/releases.
+* https://github.com/MathCancer/PhysiCell/releases
 
 For more detailed information, see Section 3 of the User Guide (in `/documentation`)
 and/or also http://www.mathcancer.org/blog/physicell-tutorials/.
@@ -31,7 +31,7 @@ and/or also http://www.mathcancer.org/blog/physicell-tutorials/.
 
 ## Build: the basics
 
-PhysiCell is written in C++ and should build on any of the three major operating systems. 
+PhysiCell is written in C++ and should build on any of the three major operating systems: Windows, macOS, and Linux. 
 The one <b>requirement is that your compiler support OpenMP</b>. If, during your build (make) process, you get
 a message like: `error: unsupported option '-fopenmp'`, you'll know your Makefile is trying to use a compiler
 that doesn't support OpenMP. You may need to install an OpenMP-supported compiler and/or edit the Makefile to use it.
@@ -68,15 +68,15 @@ Copyright (C) 2020 Free Software Foundation, Inc.
 ```
 
 
-### OSX
+### macOS
 
-Unfortunately, the C++ compiler provided by the latest version of XCode on OSX does not support OpenMP.
+Unfortunately, the C++ compiler provided by the latest version of XCode on macOS does not support OpenMP.
 To resolve this, we recommend using the `brew` package manager to install a recent version of `gcc`. Follow the [brew 
 installation instructions](https://docs.brew.sh/Installation.html).
 
 After installing brew, type `brew install gcc` from a Terminal command line. This 
 should install a recent version of gcc/g++ (supporting OpenMP) into `/usr/local/bin`. 
-You can verify this with (note the g++ version # will change over time, but in June 2021, it is version 11):
+You can verify this with (note the g++ version # will change over time, but in June 2021, it was version 11):
 ```
 $ ls -l /usr/local/bin/g++*
    ...             /usr/local/bin/g++-11@ -> ../Cellar/gcc/11.1.0_1/bin/g++-11
@@ -135,7 +135,7 @@ Regardless of which option you choose - full Anaconda or Miniconda, you will als
 module that will be used by the Jupyter notebook apps:
 
 ```
-    $ pip install -U hublib   # may not work on Windows
+    $ pip install -U hublib  # has some Windows issues 
 ```
 
 <!-- On macOS, you may need to insert `alias python=pythonw` into your `~/.bashrc` file (or `~/.bash_profile`). -->
@@ -200,6 +200,9 @@ We plan to provide a full-featured GUI that uses matplotlib (Python plotting). F
 ```
 $ python beta/plot_cells.py
 ```
+![](images/plot_cells_gui_biorobots_med.png)
+Output results (.svg) from the biorobots sample project.
+
 You may also see other Python scripts in /beta that can be copied into your /output directory and run, e.g.:
 ```
 $ python anim_svg.py
