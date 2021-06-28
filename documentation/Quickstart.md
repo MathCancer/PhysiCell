@@ -86,9 +86,15 @@ Set the following environment variable in your Terminal's shell, e.g., in the ba
 ```
 $ export PHYSICELL_CPP=/usr/local/bin/g++-11
 ```
-and the Makefile will use it. You should permanently set this in your environment via: 
+and the Makefile will use it. You should permanently set this in your environment (assuming you're using the bash shell): 
+```
+$ echo export PHYSICELL_CPP=g++-11 >> ~/.bash_profile
+```
+or, if your Mac Terminal is using the zsh shell:
+```
+$ echo export PHYSICELL_CPP=g++-11 >> ~/.zshenv
+```
 
-`$ echo export PHYSICELL_CPP=g++-11 >> ~/.bash_profile`.
 
 ### Linux
 
