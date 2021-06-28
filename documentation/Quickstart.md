@@ -106,7 +106,7 @@ PhysiCell uses Python in a few different ways:
 
 We highly recommend installing the freely available Anaconda Python distribution. 
 However, if you are already actively using Python from another distribution, you may run into possible problems by installing another one. 
-In that case, you may want to reach out to the PhysiCell community for help (see below).
+In that case, you may want to reach out to the PhysiCell community for help (see Support section below).
 
 To install the Anaconda Python, you have two options:
 
