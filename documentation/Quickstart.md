@@ -48,15 +48,21 @@ a minimal version of GCC that supports OpenMP (on a 64-bit computer).
 $ pacman -S mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git  mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 git make
 ```
 
-3) After the above completes, open the Windows application to let you edit your Environment Variables. You have the option of editing the “User variables” or “System variables”. If it is just for your use and not intended to be shared by other users on this computer, then you can just edit “User variables”. Edit the “Path” variable and add two “New” paths:
+3) After the above completes, open the Windows application to let you edit your Environment Variables. You have the option of 
+editing the “User variables” or “System variables”. If it is just for your use and not intended to be shared by other 
+users on this computer, then you can just edit “User variables”. Edit the “Path” variable and add three “New” 
+paths. The first two pertain to the MinGW build environment; the third is for using the libRoadrunner library that's needed
+by the intracellular models (ODEs) (and is a relative path from your PhysiCell main folder).
+
 ```
 C:\msys64\mingw64\bin
 C:\msys64\usr\bin
+.\addons\libRoadrunner\roadrunner\bin
 ```
 
 4) Using the same application as above, `Move up` each of the two new paths to be at the very top.
 
-<img src="images/mingw64_env_var_path.png" width="407" height="413">
+<img src="images/mingw64_env_var_path.png" width="459" height="450">
 
 Then click `OK` on each Edit env variable window to complete the PATH update.
 
@@ -68,7 +74,7 @@ Copyright (C) 2020 Free Software Foundation, Inc.
 ```
 
 
-### macOS
+### MacOS
 
 Unfortunately, the C++ compiler provided by the latest version of XCode on macOS does not support OpenMP.
 To resolve this, we recommend using the `brew` package manager to install a recent version of `gcc`. Follow the [brew 
@@ -82,24 +88,27 @@ $ ls -l /usr/local/bin/g++*
    ...             /usr/local/bin/g++-11@ -> ../Cellar/gcc/11.1.0_1/bin/g++-11
 ```
 
-Set the following environment variable in your Terminal's shell, e.g., in the bash shell: 
+Set the following environment variables in your Terminal's shell, e.g., in the bash or zsh shell: 
 ```
 $ export PHYSICELL_CPP=/usr/local/bin/g++-11
+$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib
 ```
-and the Makefile will use it. You should permanently set this in your environment (assuming you're using the bash shell): 
+You should permanently set these in your environment: for the bash shell: 
 ```
 $ echo export PHYSICELL_CPP=g++-11 >> ~/.bash_profile
+$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.bash_profile
 ```
-or, if your Mac Terminal is using the zsh shell:
+or the zsh shell:
 ```
 $ echo export PHYSICELL_CPP=g++-11 >> ~/.zshenv
+$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.zshenv
 ```
 
 
 ### Linux
 
-If you're a Linux user, you probably already have or know how to install/use a proper g++ environment for 
-building PhysiCell. If not, please reach out to the PhysiCell community.
+If you're a Linux user, you should already have an OpenMP-enabled g++.
+But you will need to append the libRoadrunner relative path to your `LD_LIBRARY_PATH` (similar to the instructions for macOS) if you plan to use that for intracellular ODE models.
 
 <hr> <!---------------------------------------------->
 
