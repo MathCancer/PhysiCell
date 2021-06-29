@@ -38,7 +38,7 @@ that doesn't support OpenMP. You may need to install an OpenMP-supported compile
 
 ### Windows
 
-The currently preferred way to use PhysiCell on Windows is to install MinGW64,
+The preferred way to use PhysiCell on Windows is to install MinGW64,
 a minimal version of GCC that supports OpenMP (on a 64-bit computer). 
 
 1) From [msys2.org](https://www.msys2.org), follow steps 1-4 (stopping before step 5). Click through the setup dialog, accepting the default suggestions.
