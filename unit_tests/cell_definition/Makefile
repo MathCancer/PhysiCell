@@ -35,7 +35,7 @@ all:
 	$(COMPILE_COMMAND) -o test_cell_def2 $(ALL_OBJECTS) test_cell_def2.cpp 
 
 test_cell_def0: 
-	$(COMPILE_COMMAND) -o test_cell_def1 $(ALL_OBJECTS) test_cell_def0.cpp 
+	$(COMPILE_COMMAND) -o test_cell_def0 $(ALL_OBJECTS) test_cell_def0.cpp 
 test_cell_def1: 
 	$(COMPILE_COMMAND) -o test_cell_def1 $(ALL_OBJECTS) test_cell_def1.cpp 
 test_cell_def2: 
