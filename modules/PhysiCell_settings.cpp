@@ -162,6 +162,10 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	search_result = xml_find_node( node , "dt_phenotype" ); 
 	if( search_result )
 	{ phenotype_dt = xml_get_my_double_value( search_result ); }
+
+	search_result = xml_find_node( node , "dt_intracellular" ); 
+	if( search_result )
+	{ intracellular_dt = xml_get_my_double_value( search_result ); }
 	
 	node = node.parent(); 
 	
