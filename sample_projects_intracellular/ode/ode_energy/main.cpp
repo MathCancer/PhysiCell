@@ -84,7 +84,6 @@ using namespace BioFVM;
 using namespace PhysiCell;
 
 
-
 void update_intracellular()
 {
     static int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" );
@@ -93,25 +92,22 @@ void update_intracellular()
 
     int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
     
+    // std::cout << "----- update_intracellular at t= " << PhysiCell_globals.current_time << std::endl;
     
-    // rwh: todo: optimize 
-    // If we know for certain that the intracellular updates happen at every dt_diffusion, then do it here?
     #pragma omp parallel for 
     for( int i=0; i < (*all_cells).size(); i++ )
     {
-   /*      static int i_Oxy_i = pCell->custom_data.find_variable_index( "intra_oxy" );
-        static int i_Glu_i = pCell->custom_data.find_variable_index( "intra_glu" );
-        static int i_Lac_i = pCell->custom_data.find_variable_index( "intra_lac" );
-        static int energy_vi = pCell->custom_data.find_variable_index( "intra_energy" );
-         */
-        
+        // static int i_Oxy_i = pCell->custom_data.find_variable_index( "intra_oxy" );
+        // static int i_Glu_i = pCell->custom_data.find_variable_index( "intra_glu" );
+        // static int i_Lac_i = pCell->custom_data.find_variable_index( "intra_lac" );
+        // static int energy_vi = pCell->custom_data.find_variable_index( "intra_energy" );
         
         // if( ((*all_cells)[i]->phenotype.intracellular != NULL ) && ((*all_cells)[i]->is_out_of_domain == false ) )
         if( (*all_cells)[i]->is_out_of_domain == false  )
         {
-            /* std::cout << "Intracellular Oxygen : " <<(*all_cells)[i]->phenotype.molecular.internalized_total_substrates[oxygen_substrate_index] << std::endl;
-            std::cout << "Intracellular Glucose : " <<(*all_cells)[i]->phenotype.molecular.internalized_total_substrates[glucose_substrate_index] << std::endl;
-            std::cout << "Intracellular Lactate : " <<(*all_cells)[i]->phenotype.molecular.internalized_total_substrates[lactate_substrate_index] << std::endl; */
+            // std::cout << "Intracellular Oxygen : " <<(*all_cells)[i]->phenotype.molecular.internalized_total_substrates[oxygen_substrate_index] << std::endl;
+            // std::cout << "Intracellular Glucose : " <<(*all_cells)[i]->phenotype.molecular.internalized_total_substrates[glucose_substrate_index] << std::endl;
+            // std::cout << "Intracellular Lactate : " <<(*all_cells)[i]->phenotype.molecular.internalized_total_substrates[lactate_substrate_index] << std::endl;
             
             int vi = microenvironment.nearest_voxel_index((*all_cells)[i]->position);
             double oxy_val = microenvironment(vi)[oxygen_substrate_index];
@@ -125,22 +121,21 @@ void update_intracellular()
             //std::cout << "SBML Oxygen : " <<(*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxygen") << std::endl;
             (*all_cells)[i]->phenotype.intracellular->update();
             (*all_cells)[i]->phenotype.intracellular->update_phenotype_parameters((*all_cells)[i]->phenotype);
-/*             std::cout << "SBML Oxygen : " <<(*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxygen") << std::endl;
-            std::cout << "SBML Glucose : " <<(*all_cells)[i]->phenotype.intracellular->get_parameter_value("Glucose") << std::endl;
-            std::cout << "SBML Lactate : " <<(*all_cells)[i]->phenotype.intracellular->get_parameter_value("Lactate") << std::endl; */
+            // std::cout << "SBML Oxygen : " <<(*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxygen") << std::endl;
+            // std::cout << "SBML Glucose : " <<(*all_cells)[i]->phenotype.intracellular->get_parameter_value("Glucose") << std::endl;
+            // std::cout << "SBML Lactate : " <<(*all_cells)[i]->phenotype.intracellular->get_parameter_value("Lactate") << std::endl;
+
             //std::cout << "SBML migration_speed : " <<(*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxygen") << std::endl;
             
-/*             if ( (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Energy") < 50.0 )
-            {
-                (*all_cells)[i]->phenotype.motility.migration_speed = 100.0;
-            }
-            else
-            {
-                (*all_cells)[i]->phenotype.motility.migration_speed = 0.0;
-            }
-            
-            (*all_cells)[i]->phenotype.intracellular->update_phenotype_parameters((*all_cells)[i]->phenotype); */
-            
+            // if ( (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Energy") < 50.0 )
+            // {
+            //     (*all_cells)[i]->phenotype.motility.migration_speed = 100.0;
+            // }
+            // else
+            // {
+            //     (*all_cells)[i]->phenotype.motility.migration_speed = 0.0;
+            // }
+            // (*all_cells)[i]->phenotype.intracellular->update_phenotype_parameters((*all_cells)[i]->phenotype);
             
         }
     }
@@ -229,7 +224,10 @@ int main( int argc, char* argv[] )
 	
     double last_intracellular_time  = 0.0; 
     static double intracellular_dt_tolerance = 0.001 * intracellular_dt; 
+    double next_intracellular_update = intracellular_dt; 
     bool intracellular_initialized = false;
+    PhysiCell_globals.next_intracellular_save_time = PhysiCell_settings.intracellular_save_interval;
+
 	try 
 	{		
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
@@ -282,30 +280,38 @@ int main( int argc, char* argv[] )
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
-			/*
-			  Custom add-ons could potentially go here. 
-			*/
+			//   Custom add-ons could potentially go here. 
             double time_since_last_intracellular = PhysiCell_globals.current_time - last_intracellular_time;
-            if( fabs(time_since_last_intracellular - intracellular_dt) < intracellular_dt_tolerance || !intracellular_initialized)
+            if( PhysiCell_globals.current_time >= next_intracellular_update )
             {
 			    update_intracellular();
 
-                if(!intracellular_initialized)
-                {
-                    time_since_last_intracellular = intracellular_dt;
-                    intracellular_initialized = true;
-                }
+                next_intracellular_update += intracellular_dt; 
 
                 // save intracellular data if enabled and it's time
                 if( PhysiCell_settings.enable_intracellular_saves == true )
                 {
-                    if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_intracellular_save_time  ) < 0.01 * intracellular_dt )
+                    // if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_intracellular_save_time  ) < 0.01 * intracellular_dt )
+                    if( PhysiCell_globals.current_time >= PhysiCell_globals.next_intracellular_save_time ) 
                     {
+                        // std::cout << "-- saving intracellular file at t= " << PhysiCell_globals.current_time << std::endl;
+
                         // Save output for intracellular data
-                        // sprintf( filename , "%s/intra%08u.dat" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.intracellular_output_index ); 
+                        sprintf( filename , "%s/intra%08u.dat" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.intracellular_output_index ); 
+
+                        std::ofstream ofile( filename , std::ios::out );
+                        if( ofile.fail() )
+                        { 
+                            std::cout << std::endl << "Error: Failed to open " << filename << " for SVG writing." << std::endl << std::endl; 
+                            std::cout << std::endl << "Error: We're not writing data like we expect. " << std::endl
+                            << "Check to make sure your save directory exists. " << std::endl << std::endl;
+                            exit(-1); 
+                        } 
+                        ofile << PhysiCell_globals.current_time << ", " << 42.3 << std::endl;   // dummy output
+                        ofile.close();
 
                         PhysiCell_globals.intracellular_output_index++; 
-                        PhysiCell_globals.next_intracellular_save_time  += PhysiCell_settings.intracellular_save_interval;
+                        PhysiCell_globals.next_intracellular_save_time += PhysiCell_settings.intracellular_save_interval;
                     }
                 }
             }
