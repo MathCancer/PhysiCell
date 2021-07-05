@@ -2080,6 +2080,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pV->target_cytoplasmic_to_nuclear_ratio = pV->cytoplasmic_to_nuclear_ratio; 
 		
 		pV->rupture_volume = pV->relative_rupture_volume * pV->total; // in volume units 
+
+        // update the geometry (radius, etc.) for consistency 
+
+        pCD->phenotype.geometry.update( NULL, pCD->phenotype, 0.0 ); 
 	}
 	
 	// mechanics 
