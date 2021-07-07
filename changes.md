@@ -26,11 +26,9 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 + First full support for intracellular models: boolean networks, ordinary differential equations (ODEs), and flux balance analysis (FBA).
 
-+ We adopt existing software for intracellular model solvers: MaBoSS for boolean networks, Clp for FBA, and libRoadrunner for ODEs. However, to make it easier for modelers to use these solvers in PhysiCell, we provide automatic downloads of platform-specific libraries (see next bullet).
++ We adopt existing software for intracellular model solvers: MaBoSS for boolean networks, libRoadrunner for ODEs, and Clp for FBA. However, to make it easier for modelers to use these solvers in PhysiCell, we provide automatic downloads of libraries (see next bullet).
 
-+ If a PhysiCell model uses an intracellular model, the PhysiCell Makefile
-will run a Python script (in the /beta directory) that checks to see if you have already downloaded the software (library) for the intracellular solver and, if not, downloads it and puts it in a directory within your PhysiCell project where it can be found and linked.
-
++ If a PhysiCell model uses an intracellular model, the PhysiCell Makefile will run a Python script (in the /beta directory) that checks to see if you have already downloaded the software (library) for the intracellular solver and, if not, downloads it and puts it in a directory within your PhysiCell project where it can be found and linked. The Python script will download the appropriate library for your operating system.
 
 ### Minor new features and changes: 
 
