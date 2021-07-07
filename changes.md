@@ -2,16 +2,11 @@
 
 **Version:** 1.9.0
 
-**Release date:** ? July 2021
+**Release date:** ?? July 2021
 
 ## Release summary: 
 
-```
-    *Retitle? PhysiCell distribution? Call this 2.0.0 given the shift? Or call 1.9.0 the lead-up and testing, for an official 2.0.0 release in Fall after the workshop planning?
-    We'll want a naming convention for PhysiCell core, and decide if it stays as a separate repo / project, or is tied to the distribution.*
-```
-
-This release introduces intracellular modeling, i.e., models inside individual cells, for PhysiCell. We support three types of intracellular models: boolean networks, ordinary differential equations (ODEs), and flux balance analysis (FBA). An intracellular model is part of a cell type's phenotype specification. Currently, we only support a single intracellular model per cell type; however, different *types* of models can be used for different cell types, e.g., a boolean network for cell type A and ODEs for cell type B.
+This release introduces intracellular modeling, i.e., models inside individual cells, for PhysiCell. We support three types of intracellular models: boolean networks, ordinary differential equations (ODEs), and dynamic flux balance analysis (dFBA). An intracellular model is part of a cell type's phenotype specification. Currently, we only support a single intracellular model per cell type; however, different *types* of models can be used for different cell types, e.g., a boolean network for cell type A and ODEs for cell type B.
 
 This new functionality has been a collaborative effort with the Institut Curie, the Barcelona Supercomputing Center, and the University of Washington. 
 We provide a unified C++ interface between each intracellular model and PhysiCell.
@@ -20,17 +15,19 @@ The Systems Biology Markup Language (SBML) is used to define both the ODEs and F
 configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the full SBML specification; details are provided elsewhere.)
 
 
-**NOTE:** OSX users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the Quickstart of other documentation for more details.
+**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
+
+**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
  
 ### Major new features and changes:
 
-+ First full support for intracellular models: boolean networks, ordinary differential equations (ODEs), and flux balance analysis (FBA).
++ First full support for intracellular models: boolean networks, ordinary differential equations (ODEs), and dynamic flux balance analysis (dFBA).
 
 + Added an abstract `Intracellular` class in core/PhysiCell_phenotype.h. Concrete classes for the supported intracellular models provide the functionality in the abstract class.
 
 + Added an `/addons` directory in the root directory. This is where the intracellular concrete classes and code are located.
 
-+ We adopt existing software for intracellular model solvers: MaBoSS for boolean networks, libRoadrunner for ODEs, and Clp for FBA. However, to make it easier for modelers to use these solvers in PhysiCell, we provide automatic downloads of libraries (see next bullet).
++ We adopt existing software for intracellular model solvers: MaBoSS for boolean networks, libRoadrunner for ODEs, and Clp for dFBA. However, to make it easier for modelers to use these solvers in PhysiCell, we provide automatic downloads of libraries (see next bullet).
 
 + If a PhysiCell model uses an intracellular model, the PhysiCell Makefile will run a Python script (in the /beta directory) that checks to see if you have already downloaded the software (library) for the intracellular solver and, if not, downloads it and puts it in a directory within your PhysiCell project where it can be found and linked. The Python script will download the appropriate library for your operating system.
 
@@ -54,8 +51,6 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 + Removed sample projects: template2D, template3D 
 
-+ bug fix to update phenotype geometry when parsing and processing `volume` XML element
-
 + Deleted deprecated code in core/PhysiCell_cell_container.cpp
 
 + Added a simple Qt GUI for plotting cells (plot_cells.py and vis_tab_cells_only.py in /beta)
@@ -71,13 +66,13 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 + [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
 
++ anim_substrate_cmap.py - plot 2D substrates (contours) with a colormap; manually step via arrow keys
   
 ### Bugfixes: 
 
-+ In response to pull requests: 
-  + core/PhysiCell_cell.cpp: assign_position(double x, double y, double z): make sure the current mechanics voxel is initialized. (https://github.com/PhysiBoSS/PhysiBoSS/commit/84f56656cc23c5d65a05ef1660f65c5b110bdd0f)
++ core/PhysiCell_cell.cpp: assign_position(double x, double y, double z): make sure the current mechanics voxel is initialized.
 
-+ In response to SourceForge ticket ...
++ bug fix to update phenotype geometry when parsing and processing `volume` XML element
 
 ### Notices for intended changes that may affect backwards compatibility:
  

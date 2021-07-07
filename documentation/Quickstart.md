@@ -6,7 +6,8 @@
       * [macOS](#macos)
       * [Linux](#linux)
    * [Python](#python)
-   * [Build: sample projects](#build-sample-projects)
+   * [Test setup: simple projects](#test-setup-simple-projects)
+   * [Test setup: advanced projects](#test-setup-advanced-projects)
    * [Visualizing Output](#visualizing-output)
       * [Browser](#browser)
       * [MATLAB/Octave](#matlaboctave)
@@ -41,9 +42,11 @@ that doesn't support OpenMP. You may need to install an OpenMP-supported compile
 The preferred way to use PhysiCell on Windows is to install MinGW64,
 a minimal version of GCC that supports OpenMP (on a 64-bit computer). 
 
-1) From [msys2.org](https://www.msys2.org), follow steps 1-4 (stopping before step 5). Click through the setup dialog, accepting the default suggestions.
+1) If you have followed the MinGW64 [installation instructions from PhysiCell v1.8.0 or before](http://mathcancer.blogspot.com/2016/01/PrepWindowsForCoding.html), we recommend that you uninstall (delete) everything from it and remove what you added to your system PATH environment variable. However, if you prefer, you can probably leave everything as is and the following steps should override your previous installation.
 
-2) In the MSYS2 console terminal, copy/paste/execute the following command (a package manager to install MINGW64 and additional libraries):
+2) From [msys2.org](https://www.msys2.org), follow steps 1-4 (stopping before step 5). Click through the setup dialog, accepting the default suggestions.
+
+3) In the MSYS2 console terminal, copy/paste/execute the following command (a package manager to install MINGW64 and additional libraries):
 ```
 $ pacman -S mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git  mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 git make
 ```
@@ -66,7 +69,7 @@ C:\msys64\usr\bin
 
 Then click `OK` on each Edit env variable window to complete the PATH update.
 
-5) Open a *new* Powershell (or Command Prompt) window and type `g++ --version` to verify it can be found:
+5) Open a *new* Command Prompt window (or Powershell, if you prefer it) and type `g++ --version` to verify it can be found:
 ```
 PS C:\Users\heiland> g++ --version
 g++.exe (Rev10, Built by MSYS2 project) 10.2.0
@@ -117,47 +120,24 @@ But you will need to append the libRoadrunner relative path to your `LD_LIBRARY_
 PhysiCell uses Python in a few different ways:
 1) It is needed to install certain libraries for the intracellular models.
 2) It can be used for visualization and data analysis scripts.
-3) It can be used for parameter explorations of models.
+3) It is used for Jupyter notebook apps of PhysiCell models.
+4) It can be used for parameter explorations of models.
 
 We highly recommend installing the freely available Anaconda Python distribution. 
 However, if you are already actively using Python from another distribution, you may run into possible problems by installing another one. 
 In that case, you may want to reach out to the PhysiCell community for help (see Support section below).
 
-To install the Anaconda Python, you have two options:
+Download/install the entire [Individual Edition](https://www.anaconda.com/products/individual). This is ~400-500MB in size because it contains a very large suite of modules. If you do not have enough free disk space, contact us for other options.
 
-1) download/install the entire [Individual Edition](https://www.anaconda.com/products/individual). Be warned: this is ~400-500MB in size because it contains a very large suite of modules. But if you have plenty of free disk space, we recommend it.
-
-If you choose this option, during the installation process, select the option to add Anaconda to your PATH, in spite of the "Not recommended" comment:
+During the installation process, select the option to add Anaconda to your PATH, in spite of the "Not recommended" comment:
 
 ![anaconda_to_path](images/anaconda_add_to_path_med.png)
-
-2) download/install a much smaller distribution called [Miniconda](https://docs.conda.io/en/latest/miniconda.html) and then install the minimal modules needed by PhysiCell:
-    
-```
-    $ conda install -c conda-forge matplotlib
-    $ conda install -c conda-forge scipy
-    $ conda install -c conda-forge pyqt
-```
-And if you plan to create nanoHUB apps from a PhysiCell project, you may want to preview the Jupyter notebook, in which case you would need:
-    
-```
-    $ conda install -c conda-forge notebook
-    $ conda install -c conda-forge ipywidgets
-    $ conda install -c conda-forge nb_conda_kernels
-```
-
-Regardless of which option you choose - full Anaconda or Miniconda, you will also need to install an additional 3rd-party
-module that will be used by the Jupyter notebook apps:
-
-```
-    $ pip install -U hublib  # has some Windows issues 
-```
 
 <!-- On macOS, you may need to insert `alias python=pythonw` into your `~/.bashrc` file (or `~/.bash_profile`). -->
 
 <hr> <!---------------------------------------------->
 
-## Build: sample projects
+## Test setup: simple projects
 
 We provide several sample projects to help you get started. Most
 of the projects are 2D models, but at least one 
@@ -165,12 +145,14 @@ is 3D (<i>cancer immunology</i>). The procedure to build and execute each of the
 pattern. For example, from your Terminal, in the root PhysiCell directory/folder:
 ```
 $ make biorobots-sample     # copy files for biorobots 
-$ make -j2                  # compile (using 2 threads)
+$ make                      # compile
 ```
 
 Assuming the project builds without errors, you should now have an executable called `biorobots` which you can run, e.g.:
 ```
 $ ./biorobots    #  .\biorobots.exe on Windows
+...
+(visualize output)
 ```
 This will begin the simulation, write information to your terminal, and generate output files of types `.svg`, `.xml`, and `.mat`. More about those below. You can `Control-c` to kill the simulation early, if you want.
 
@@ -185,7 +167,40 @@ $ make list-projects  # show all possible samples
 $ make cancer-biorobots-sample    # copy new proj files
 $ make                            # compile 
 $ ./cancer_biorobots              # execute
+...
+(visualize output)
 ```
+
+## Test setup: advanced projects
+To build and run some of the advanced, e.g., intracellular, models:
+```
+$ make data-cleanup   # Delete previous output data.
+$ make reset          # clear out previous sample project 
+$ make list-projects  # show all possible samples
+
+$ make ode-energy-sample
+$ make
+$ ./ode_energy               # execute
+...
+(visualize output)
+
+$ make data-cleanup
+$ make reset
+$ make physiboss-cell-lines-sample
+$ make
+$ ./PhysiBoSS_Cell_Lines     # execute
+...
+(visualize output)
+
+$ make data-cleanup
+$ make reset
+$ make cancer-metabolism-sample
+$ make
+$ ./cancer_metabolism        # execute
+...
+(visualize output)
+```
+
 
 <hr> <!---------------------------------------------->
 
@@ -203,28 +218,6 @@ that your simulation generates. PhysiCell simulates transmitted light microscopy
 default, using a slice through the Z=0 plane, as depicted in the following image (from the cancer-immune-sample project).
 
 ![slice in 3D](images/cancer_immune_snapshot00000574_small.png "SVG slice from 3D cancer-immune-sample project")
-
-### MATLAB/Octave
-
-If you have access to MATLAB (or Octave), we have a [detailed tutorial](http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/) on how to visualize the
-MultiCellDS digital snapshots (.xml and .mat files).
-
-### Matplotlib
-
-We plan to provide a full-featured GUI that uses matplotlib (Python plotting). For now, we have a simple GUI that plots only the cells (the .svg files):
-```
-$ python beta/plot_cells.py
-```
-Showing output results (.svg) from the biorobots sample project:
-
-![](images/plot_cells_gui_biorobots_small.png)
-
-You may also see other Python scripts in /beta that can be copied into your /output directory and run, e.g.:
-```
-$ python anim_svg.py
-```
-If you want to experiment with plotting data in the .xml and .mat files in  /output, see this 
-blog post http://www.mathcancer.org/blog/python-loader/.
 
 ### ImageMagick
 
@@ -248,7 +241,7 @@ $ convert -size 1500x1605 tmp.gif -resize 20% small.gif
 $ magick animate small.gif
 ```
 
-Since PhysiCell 1.8.0, there are helper targets in the Makefile that will perform various functions, e.g.:
+PhysiCell 1.8.0 and later provides helper targets in the Makefile that will perform various functions (assuming you have installed ImageMagick), e.g.:
 ```
 $ make jpeg   # convert all output/snapshot*.svg to .jpg
 $ make gif    # create out.gif from output/snapshot*.svg 
@@ -256,6 +249,28 @@ $ make movie  # assuming you have ffmpeg, create out.mp4 from output/snapshot*.j
   You can also specify the name of the output directory, e.g.:
 $ make jpeg OUTPUT=out1
 ```
+
+### MATLAB/Octave
+
+If you have access to MATLAB (or Octave), we have a [detailed tutorial](http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/) on how to visualize the
+MultiCellDS digital snapshots (.xml and .mat files).
+
+### Matplotlib
+
+We plan to provide a full-featured GUI that uses matplotlib (Python plotting). For now, we have a simple GUI that plots only the cells (the .svg files):
+```
+$ python beta/plot_cells.py
+```
+Showing output results (.svg) from the biorobots sample project:
+
+![](images/plot_cells_gui_biorobots_small.png)
+
+You may also see other Python scripts in /beta that can be copied into your /output directory and run, e.g.:
+```
+$ python anim_svg.py
+```
+If you want to experiment with plotting data in the .xml and .mat files in  /output, see this 
+blog post http://www.mathcancer.org/blog/python-loader/.
 
 ### ParaView
 
@@ -267,14 +282,18 @@ If you install ParaView, you can visualize and interact with output from 3D mode
 
 ## Support
 
-Please submit questions and report problems at https://sourceforge.net/p/physicell/tickets/ and follow us on Twitter (https://twitter.com/PhysiCell and https://twitter.com/MathCancer).
+We encourage you to join and actively use the [PhysiCell community Slack channel](https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA). There, you can post questions [(#troubleshooting)](https://physicellcomm-sf93727.slack.com/archives/C026Y12AN7R), answer questions, and (hopefully) share successful modeling stories.
+
+Alternatively, you can submit problem tickets at https://sourceforge.net/p/physicell/tickets/ 
+
+Finally, please follow us on Twitter [@PhysiCell](https://twitter.com/PhysiCell) and [@MathCancer](https://twitter.com/MathCancer).
 
 <hr> <!---------------------------------------------->
 
 ## References
 
 * http://physicell.org/
-* http://www.mathcancer.org/blog/setting-up-gcc-openmp-on-osx-homebrew-edition/
+* http://www.mathcancer.org/blog/setting-up-gcc-openmp-on-osx-homebrew-edition/ (beware the version of gcc discussed there is possibly out of date)
 * http://www.mathcancer.org/blog/physicell-tutorials/
 * http://www.mathcancer.org/blog/working-with-physicell-snapshots-in-matlab/
 * http://www.mathcancer.org/blog/python-loader/
