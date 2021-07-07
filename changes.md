@@ -34,19 +34,23 @@ will run a Python script (in the /beta directory) that checks to see if you have
 
 ### Minor new features and changes: 
 
-+ Added dt_intracellular. 
++ Added `dt_intracellular` XML element and global variable. 
+
++ Added `intracellular_data` XML element to specify frequency of saving output. 
+
++ Added `intracellular` XML element (inside `phenotype`) that specifies the type of intracellular model, its model definition file, and relevant mappings between it and PhysiCell data.
 
 + Added Python scripts in /beta to download intracellular solver libraries: setup_libroadrunner.py, setup_libmaboss.py, setup_fba.py
+
++ Added new sample intracellular projects: physiboss_cell_lines, ode_energy, and cancer_metabolism
+
++ The Makefile `reset` target now includes a `touch ./core/PhysiCell_cell.cpp` since its `.o` file can have intracellular dependencies.
 
 + Added new sample project: celltypes3 
 
 + Removed sample projects: template2D, template3D 
 
-+ Added new sample intracellular projects: physiboss_cell_lines, ode_energy, and cancer_metabolism
-
-+ Added an `intracellular_data` XML element 
-
-+ The Makefile `reset` target now includes a `touch ./core/PhysiCell_cell.cpp` since its `.o` file can have intracellular dependencies.
++ bug fix to update phenotype geometry when parsing and processing `volume` XML element
 
 + Deleted deprecated code in core/PhysiCell_cell_container.cpp
 
