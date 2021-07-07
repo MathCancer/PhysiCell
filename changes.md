@@ -44,6 +44,8 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 + The Makefile `reset` target now includes a `touch ./core/PhysiCell_cell.cpp` since its `.o` file can have intracellular dependencies.
 
++ Update the [Quickstart](documentation/Quickstart.md) guide, primarily to reflect necessary changes for intracellular solver libraries.
+
 + Added new sample project: celltypes3 
 
 + Removed sample projects: template2D, template3D 
