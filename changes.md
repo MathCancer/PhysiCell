@@ -31,7 +31,6 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 + If a PhysiCell model uses an intracellular model, the PhysiCell Makefile
 will run a Python script (in the /beta directory) that checks to see if you have already downloaded the software (library) for the intracellular solver and, if not, downloads it and puts it in a directory within your PhysiCell project where it can be found and linked.
 
-+ ... 
 
 ### Minor new features and changes: 
 
@@ -55,7 +54,6 @@ will run a Python script (in the /beta directory) that checks to see if you have
 
 + Bug fix and improvements to /beta/params_run.py to perform parameter explorations of models.
 
-+ ... 
 
 ### Beta features (not fully supported):
  
