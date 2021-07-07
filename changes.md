@@ -1,28 +1,59 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:** 1.9.0-dev
+**Version:** 1.9.0
 
-**Release date:** TBD
+**Release date:** ? July 2021
 
 ## Release summary: 
 
-WRITE THIS! 
+```
+    *Retitle? PhysiCell distribution? Call this 2.0.0 given the shift? Or call 1.9.0 the lead-up and testing, for an official 2.0.0 release in Fall after the workshop planning?
+    We'll want a naming convention for PhysiCell core, and decide if it stays as a separate repo / project, or is tied to the distribution.*
+```
 
-Retitle? PhysiCell distribution? Call this 2.0.0 given the shift? Or call 1.9.0 the lead-up and testing, for an official 2.0.0 release in Fall after the workshop planning? 
+This release introduces intracellular modeling, i.e., models inside individual cells, for PhysiCell. We support three types of intracellular models: boolean networks, ordinary differential equations (ODEs), and flux balance analysis (FBA). An intracellular model is part of a cell type's phenotype specification. Currently, we only support a single intracellular model per cell type; however, different *types* of models can be used for different cell types, e.g., a boolean network for cell type A and ODEs for cell type B.
 
-We'll want a naming convension for PhysiCell core, and decide if it stays as a separate repo / project, or is tied to the distribution. 
+This new functionality has been a collaborative effort with the Institut Curie, the Barcelona Supercomputing Center, and the University of Washington. 
+We provide a unified C++ interface between each intracellular model and PhysiCell.
 
-This release ...
+The Systems Biology Markup Language (SBML) is used to define both the ODEs and FBA models; boolean networks are defined using MaBoSS's custom 
+configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the full SBML specification; details are provided elsewhere.)
+
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
 ### Major new features and changes:
 
-+ First full support for intracellular models via PhysiBoSSa (rename?), libRoadrunner, and PhysiFBA
++ First full support for intracellular models: boolean networks, ordinary differential equations (ODEs), and flux balance analysis (FBA).
+
++ We adopt existing software for intracellular model solvers: MaBoSS for boolean networks, Clp for FBA, and libRoadrunner for ODEs. However, to make it easier for modelers to use these solvers in PhysiCell, we provide automatic downloads of platform-specific libraries (see next bullet).
+
++ If a PhysiCell model uses an intracellular model, the PhysiCell Makefile
+will run a Python script (in the /beta directory) that checks to see if you have already downloaded the software (library) for the intracellular solver and, if not, downloads it and puts it in a directory within your PhysiCell project where it can be found and linked.
 
 + ... 
 
 ### Minor new features and changes: 
+
++ Added dt_intracellular. 
+
++ Added Python scripts in /beta to download intracellular solver libraries: setup_libroadrunner.py, setup_libmaboss.py, setup_fba.py
+
++ Added new sample project: celltypes3 
+
++ Removed sample projects: template2D, template3D 
+
++ Added new sample intracellular projects: physiboss_cell_lines, ode_energy, and cancer_metabolism
+
++ Added an `intracellular_data` XML element 
+
++ The Makefile `reset` target now includes a `touch ./core/PhysiCell_cell.cpp` since its `.o` file can have intracellular dependencies.
+
++ Deleted deprecated code in core/PhysiCell_cell_container.cpp
+
++ Added a simple Qt GUI for plotting cells (plot_cells.py and vis_tab_cells_only.py in /beta)
+
++ Bug fix and improvements to /beta/params_run.py to perform parameter explorations of models.
 
 + ... 
 
@@ -31,8 +62,14 @@ This release ...
 + Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
 
 + Started creating new functions to fill geometric shapes with cells of a chosen type. 
+
++ [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
+
   
 ### Bugfixes: 
+
++ In response to pull requests: 
+  + core/PhysiCell_cell.cpp: assign_position(double x, double y, double z): make sure the current mechanics voxel is initialized. (https://github.com/PhysiBoSS/PhysiBoSS/commit/84f56656cc23c5d65a05ef1660f65c5b110bdd0f)
 
 + In response to SourceForge ticket ...
 
