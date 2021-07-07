@@ -20,11 +20,15 @@ The Systems Biology Markup Language (SBML) is used to define both the ODEs and F
 configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the full SBML specification; details are provided elsewhere.)
 
 
-**NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
+**NOTE:** OSX users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the Quickstart of other documentation for more details.
  
 ### Major new features and changes:
 
 + First full support for intracellular models: boolean networks, ordinary differential equations (ODEs), and flux balance analysis (FBA).
+
++ Added an abstract `Intracellular` class in core/PhysiCell_phenotype.h. Concrete classes for the supported intracellular models provide the functionality in the abstract class.
+
++ Added an `/addons` directory in the root directory. This is where the intracellular concrete classes and code are located.
 
 + We adopt existing software for intracellular model solvers: MaBoSS for boolean networks, libRoadrunner for ODEs, and Clp for FBA. However, to make it easier for modelers to use these solvers in PhysiCell, we provide automatic downloads of libraries (see next bullet).
 
@@ -44,7 +48,7 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 + The Makefile `reset` target now includes a `touch ./core/PhysiCell_cell.cpp` since its `.o` file can have intracellular dependencies.
 
-+ Update the [Quickstart](documentation/Quickstart.md) guide, primarily to reflect necessary changes for intracellular solver libraries.
++ Updated the [Quickstart](documentation/Quickstart.md) guide, primarily to reflect necessary changes for intracellular solver libraries.
 
 + Added new sample project: celltypes3 
 
