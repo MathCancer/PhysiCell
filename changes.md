@@ -1,5 +1,115 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
+**Version:** 1.9.0
+
+**Release date:** ?? July 2021
+
+## Release summary: 
+
+This release introduces intracellular modeling, i.e., models inside individual cells, for PhysiCell. We support three types of intracellular models: boolean networks, ordinary differential equations (ODEs), and dynamic flux balance analysis (dFBA). An intracellular model is part of a cell type's phenotype specification. Currently, we only support a single intracellular model per cell type; however, different *types* of models can be used for different cell types, e.g., a boolean network for cell type A and ODEs for cell type B.
+
+This new functionality has been a collaborative effort with the Institut Curie, the Barcelona Supercomputing Center, and the University of Washington. 
+We provide a unified C++ interface between each intracellular model and PhysiCell.
+
+The Systems Biology Markup Language (SBML) is used to define both the ODEs and FBA models; boolean networks are defined using MaBoSS's custom 
+configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the full SBML specification; details are provided elsewhere.)
+
+
+**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
+
+**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
+ 
+### Major new features and changes:
+
++ First full support for intracellular models: boolean networks, ordinary differential equations (ODEs), and dynamic flux balance analysis (dFBA).
+
++ Added an abstract `Intracellular` class in core/PhysiCell_phenotype.h. Concrete classes for the supported intracellular models provide the functionality in the abstract class.
+
++ Added an `/addons` directory in the root directory. This is where the intracellular concrete classes and code are located.
+
++ We adopt existing software for intracellular model solvers: MaBoSS for boolean networks, libRoadrunner for ODEs, and Clp for dFBA. However, to make it easier for modelers to use these solvers in PhysiCell, we provide automatic downloads of libraries (see next bullet).
+
++ If a PhysiCell model uses an intracellular model, the PhysiCell Makefile will run a Python script (in the /beta directory) that checks to see if you have already downloaded the software (library) for the intracellular solver and, if not, downloads it and puts it in a directory within your PhysiCell project where it can be found and linked. The Python script will download the appropriate library for your operating system.
+
+### Minor new features and changes: 
+
++ Added `dt_intracellular` XML element and global variable. 
+
++ Added `intracellular_data` XML element to specify frequency of saving output. 
+
++ Added `intracellular` XML element (inside `phenotype`) that specifies the type of intracellular model, its model definition file, and relevant mappings between it and PhysiCell data.
+
++ Added Python scripts in /beta to download intracellular solver libraries: setup_libroadrunner.py, setup_libmaboss.py, setup_fba.py
+
++ Added new sample intracellular projects: physiboss_cell_lines, ode_energy, and cancer_metabolism
+
++ The Makefile `reset` target now includes a `touch ./core/PhysiCell_cell.cpp` since its `.o` file can have intracellular dependencies.
+
++ Updated the [Quickstart](documentation/Quickstart.md) guide, primarily to reflect necessary changes for intracellular solver libraries.
+
++ Added new sample project: celltypes3 
+
++ Removed sample projects: template2D, template3D 
+
++ Deleted deprecated code in core/PhysiCell_cell_container.cpp
+
++ Added a simple Qt GUI for plotting cells (plot_cells.py and vis_tab_cells_only.py in /beta)
+
++ Bug fix and improvements to /beta/params_run.py to perform parameter explorations of models.
+
+
+### Beta features (not fully supported):
+ 
++ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
+
++ Started creating new functions to fill geometric shapes with cells of a chosen type. 
+
++ [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
+
++ anim_substrate_cmap.py - plot 2D substrates (contours) with a colormap; manually step via arrow keys
+  
+### Bugfixes: 
+
++ core/PhysiCell_cell.cpp: assign_position(double x, double y, double z): make sure the current mechanics voxel is initialized.
+
++ bug fix to update phenotype geometry when parsing and processing `volume` XML element
+
+### Notices for intended changes that may affect backwards compatibility:
+ 
++ We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
+
++ We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
+
++ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+ 
++ We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
+
++ We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
+
+### Planned future improvements: 
+
++ Further XML-based simulation setup. 
+
++ Read saved simulation states (as MultiCellDS digital snapshots)
+  
++ Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
+ 
++ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
+ 
++ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
+ 
++ Create an angiogenesis sample project 
+ 
++ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
+
++ Improved plotting options in SVG 
+
++ Further update sample projects to make use of more efficient interaction testing available
+
++ Major refresh of documentation.
+
+* * * 
+
 **Version:** 1.8.0
 
 **Release date:** 9 March 2021
