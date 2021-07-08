@@ -33,19 +33,17 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 ### Minor new features and changes: 
 
-+ Added `dt_intracellular` XML element and global variable. 
-
 + Added `intracellular_data` XML element to specify frequency of saving output. 
 
-+ Added `intracellular` XML element (inside `phenotype`) that specifies the type of intracellular model, its model definition file, and relevant mappings between it and PhysiCell data.
++ Added `intracellular` XML element (inside `phenotype`) that specifies the type of intracellular model, its model definition file, its PhysiCell dt value to be evaluated, and relevant mappings between it and PhysiCell data.
 
 + Added Python scripts in /beta to download intracellular solver libraries: setup_libroadrunner.py, setup_libmaboss.py, setup_fba.py
 
 + Added new sample intracellular projects: physiboss_cell_lines, ode_energy, and cancer_metabolism
 
-+ The Makefile `reset` target now includes a `touch ./core/PhysiCell_cell.cpp` since its `.o` file can have intracellular dependencies.
-
 + Updated the [Quickstart](documentation/Quickstart.md) guide, primarily to reflect necessary changes for intracellular solver libraries.
+
++ Added `UniformInt()` to core/PhysiCell_utilities.cpp (used by intracellular boolean models)
 
 + Added new sample project: celltypes3 
 
@@ -70,9 +68,13 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
   
 ### Bugfixes: 
 
++ In core/PhysiCell_cell.cpp, replace `switch` statement with `if`/`else if` to prevent compiler errors related to `static const int` from PhysiCell_constants.
+
 + core/PhysiCell_cell.cpp: assign_position(double x, double y, double z): make sure the current mechanics voxel is initialized.
 
 + bug fix to update phenotype geometry when parsing and processing `volume` XML element
+
++ The Makefile `reset` target now includes a `touch ./core/PhysiCell_cell.cpp` since its `.o` file can have intracellular dependencies.
 
 ### Notices for intended changes that may affect backwards compatibility:
  
