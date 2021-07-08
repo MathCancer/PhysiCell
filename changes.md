@@ -45,6 +45,8 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 + Added `UniformInt()` to core/PhysiCell_utilities.cpp (used by intracellular boolean models)
 
++ Added new functions to ./modules/PhysiCell_geometry to draw (unfilled) circles of cells
+
 + Added new sample project: celltypes3 
 
 + Removed sample projects: template2D, template3D 
@@ -59,8 +61,6 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 ### Beta features (not fully supported):
  
 + Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
-
-+ Started creating new functions to fill geometric shapes with cells of a chosen type. 
 
 + [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
 
