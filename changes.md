@@ -58,7 +58,6 @@ use them in the intracellular sample projects yet. More thought is needed on how
 
 + Bug fix and improvements to /beta/params_run.py to perform parameter explorations of models.
 
-
 ### Beta features (not fully supported):
  
 + Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 

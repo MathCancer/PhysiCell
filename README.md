@@ -98,17 +98,20 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 ### Minor new features and changes: 
 
-+ Added `intracellular_data` XML element to specify frequency of saving output. 
-
 + Added `intracellular` XML element (inside `phenotype`) that specifies the type of intracellular model, its model definition file, its PhysiCell dt value to be evaluated, and relevant mappings between it and PhysiCell data.
 
 + Added Python scripts in /beta to download intracellular solver libraries: setup_libroadrunner.py, setup_libmaboss.py, setup_fba.py
 
 + Added new sample intracellular projects: physiboss_cell_lines, ode_energy, and cancer_metabolism
 
++ Added parsing of `dt_intracellular` and `intracellular_data` XML elements in PhysiCell_settings.cpp (and `intracellular_dt` global parameter in PhysiCell_constants.{h,cpp}). However, we do not actively
+use them in the intracellular sample projects yet. More thought is needed on how to properly use them.
+
 + Updated the [Quickstart](documentation/Quickstart.md) guide, primarily to reflect necessary changes for intracellular solver libraries.
 
 + Added `UniformInt()` to core/PhysiCell_utilities.cpp (used by intracellular boolean models)
+
++ Added new functions to ./modules/PhysiCell_geometry to draw (unfilled) circles of cells
 
 + Added new sample project: celltypes3 
 
@@ -123,8 +126,6 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 ### Beta features (not fully supported):
  
 + Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
-
-+ Started creating new functions to fill geometric shapes with cells of a chosen type. 
 
 + [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
 
