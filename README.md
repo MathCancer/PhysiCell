@@ -121,8 +121,6 @@ However, it is up to each intracellular model as to how, or if, it will be used.
 
 + Deleted deprecated code in core/PhysiCell_cell_container.cpp
 
-+ Added a simple Qt GUI for plotting cells (plot_cells.py and vis_tab_cells_only.py in /beta)
-
 + Bug fix and improvements to /beta/params_run.py to perform parameter explorations of models.
 
 ### Beta features (not fully supported):
@@ -131,7 +129,9 @@ However, it is up to each intracellular model as to how, or if, it will be used.
 
 + [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
 
-+ anim_substrate_cmap.py - plot 2D substrates (contours) with a colormap; manually step via arrow keys
++ Added a simple Qt GUI for plotting cells (plot_cells.py and vis_tab_cells_only.py in /beta)
+
++ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
 
