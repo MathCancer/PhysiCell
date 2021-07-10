@@ -39,8 +39,10 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 + Added new sample intracellular projects: physiboss_cell_lines, ode_energy, and cancer_metabolism
 
-+ Added parsing of `dt_intracellular` and `intracellular_data` XML elements in PhysiCell_settings.cpp (and `intracellular_dt` global parameter in PhysiCell_constants.{h,cpp}). However, we do not actively
-use them in the intracellular sample projects yet. More thought is needed on how to properly use them.
++ Added parsing of `dt_intracellular` XML element in modules/PhysiCell_settings.cpp (associated with the `intracellular_dt` global parameter in PhysiCell_constants.{h,cpp}). 
+However, it is up to each intracellular model as to how, or if, it will be used.
+
++ Added parsing of `intracellular_data` XML element in modules/PhysiCell_settings.cpp to determine. However, it is not currently used by the intracellular sample models. It may be used for debugging in the future.
 
 + Updated the [Quickstart](documentation/Quickstart.md) guide, primarily to reflect necessary changes for intracellular solver libraries.
 
@@ -54,8 +56,6 @@ use them in the intracellular sample projects yet. More thought is needed on how
 
 + Deleted deprecated code in core/PhysiCell_cell_container.cpp
 
-+ Added a simple Qt GUI for plotting cells (plot_cells.py and vis_tab_cells_only.py in /beta)
-
 + Bug fix and improvements to /beta/params_run.py to perform parameter explorations of models.
 
 ### Beta features (not fully supported):
@@ -64,7 +64,9 @@ use them in the intracellular sample projects yet. More thought is needed on how
 
 + [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
 
-+ anim_substrate_cmap.py - plot 2D substrates (contours) with a colormap; manually step via arrow keys
++ Added a simple Qt GUI for plotting cells (plot_cells.py and vis_tab_cells_only.py in /beta)
+
++ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
 

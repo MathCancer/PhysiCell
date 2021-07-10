@@ -104,8 +104,10 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 
 + Added new sample intracellular projects: physiboss_cell_lines, ode_energy, and cancer_metabolism
 
-+ Added parsing of `dt_intracellular` and `intracellular_data` XML elements in PhysiCell_settings.cpp (and `intracellular_dt` global parameter in PhysiCell_constants.{h,cpp}). However, we do not actively
-use them in the intracellular sample projects yet. More thought is needed on how to properly use them.
++ Added parsing of `dt_intracellular` XML element in modules/PhysiCell_settings.cpp (associated with the `intracellular_dt` global parameter in PhysiCell_constants.{h,cpp}). 
+However, it is up to each intracellular model as to how, or if, it will be used.
+
++ Added parsing of `intracellular_data` XML element in modules/PhysiCell_settings.cpp to determine. However, it is not currently used by the intracellular sample models. It may be used for debugging in the future.
 
 + Updated the [Quickstart](documentation/Quickstart.md) guide, primarily to reflect necessary changes for intracellular solver libraries.
 
