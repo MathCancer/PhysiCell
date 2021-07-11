@@ -131,6 +131,8 @@ However, it is up to each intracellular model as to how, or if, it will be used.
 
 + Added a simple Qt GUI for plotting cells (plot_cells.py and vis_tab_cells_only.py in /beta)
 
++ Added a simple Qt GUI for plotting substrates and cells (plot_data.py and vis_tab.py in /beta)
+
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
