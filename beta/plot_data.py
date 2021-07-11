@@ -1,4 +1,6 @@
 """
+Provide simple plotting functionality for PhysiCell output results.
+
 Authors:
 Randy Heiland (heiland@iu.edu)
 Dr. Paul Macklin (macklinp@iu.edu)
@@ -40,8 +42,9 @@ class PhysiCellXMLCreator(QWidget):
         # Menus
         vlayout = QVBoxLayout(self)
         # vlayout.setContentsMargins(5, 35, 5, 5)
-        menuWidget = QWidget(self.menu())
-        vlayout.addWidget(menuWidget)
+        # menuWidget = QWidget(self.menu())
+        # vlayout.addWidget(menuWidget)
+
         # self.setWindowIcon(self.style().standardIcon(getattr(QStyle, 'SP_DialogNoButton')))
         # self.setWindowIcon(QtGui.QIcon('physicell_logo_25pct.png'))
         # self.grid = QGridLayout()
@@ -52,7 +55,8 @@ class PhysiCellXMLCreator(QWidget):
         # self.setMinimumSize(800, 620)  # width, height (height >= Cell Types|Death params)
         # self.setMinimumSize(800, 660)  # width, height (height >= Cell Types|Death params)
         # self.setMinimumSize(800, 800)  # width, height (height >= Cell Types|Death params)
-        self.setMinimumSize(700, 770)  # width, height (height >= Cell Types|Death params)
+        # self.setMinimumSize(700, 770)  # width, height (height >= Cell Types|Death params)
+        self.setMinimumSize(800, 770)  # width, height (height >= Cell Types|Death params)
         # self.setMinimumSize(600, 600)  # width, height (height >= Cell Types|Death params)
         # self.resize(400, 790)  # width, height (height >= Cell Types|Death params)
 
@@ -92,7 +96,7 @@ class PhysiCellXMLCreator(QWidget):
         tabWidget = QTabWidget()
         self.vis_tab = Vis()
         # self.vis_tab.xml_root = self.xml_root
-        tabWidget.addTab(self.vis_tab,"Plot")
+        tabWidget.addTab(self.vis_tab,"")
 
         vlayout.addWidget(tabWidget)
         # self.addTab(self.sbml_tab,"SBML")

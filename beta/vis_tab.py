@@ -6,6 +6,7 @@ from pathlib import Path
 # from ipywidgets import Layout, Label, Text, Checkbox, Button, BoundedIntText, HBox, VBox, Box, \
     # FloatText, Dropdown, SelectMultiple, RadioButtons, interactive
 # import matplotlib.pyplot as plt
+import matplotlib as mpl
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 from matplotlib.collections import LineCollection
@@ -16,9 +17,12 @@ from matplotlib import gridspec
 from collections import deque
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QFrame,QApplication,QWidget,QTabWidget,QFormLayout,QLineEdit, QHBoxLayout,QVBoxLayout,QRadioButton,QLabel,QCheckBox,QComboBox,QScrollArea,  QMainWindow,QGridLayout, QPushButton, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFrame,QApplication,QWidget,QTabWidget,QFormLayout,QLineEdit, QHBoxLayout,QVBoxLayout, \
+    QRadioButton,QLabel,QCheckBox,QComboBox,QScrollArea,  QMainWindow,QGridLayout, QPushButton, QFileDialog, QMessageBox
 
+import math
 import numpy as np
+import scipy.io  # .io.loadmat(full_fname, info_dict)
 import matplotlib
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
@@ -55,13 +59,30 @@ class Vis(QWidget):
         self.show_nucleus = False
         self.show_edge = False
         self.alpha = 0.7
+        # self.cells_toggle = None
+        # self.substrates_toggle = None
 
         basic_length = 12.0
-        self.figsize_width_substrate = 15.0  # allow extra for colormap
+        basic_length = 10.0
+        self.figsize_width_substrate = 18.0  # allow extra for colormap
+        self.figsize_width_substrate = 12.0  # allow extra for colormap
         self.figsize_height_substrate = basic_length
 
         self.figsize_width_2Dplot = basic_length
         self.figsize_height_2Dplot = basic_length
+
+        # rwh: TODO these params
+        self.modulo = 1
+        self.field_index = 4
+        # define dummy size of mesh (set in the tool's primary module)
+        self.numx = 0
+        self.numy = 0
+        self.colormap_min = 0.5
+        self.colormap_max = 1.0
+        self.colormap_fixed_toggle = False
+        # self.fontsize = 10
+        self.fontsize = 5
+
 
         # self.width_substrate = basic_length  # allow extra for colormap
         # self.height_substrate = basic_length
@@ -72,6 +93,8 @@ class Vis(QWidget):
         # self.output_dir = "/Users/heiland/dev/PhysiCell_V.1.8.0_release/output"
         self.output_dir = "./output"
 
+        self.customized_output_freq = False
+
         #-------------------------------------------
         label_width = 110
         domain_value_width = 100
@@ -79,7 +102,7 @@ class Vis(QWidget):
         label_height = 20
         units_width = 70
 
-        self.create_figure()
+        # self.create_figure()
 
         self.scroll = QScrollArea()  # might contain centralWidget
 
@@ -90,7 +113,11 @@ class Vis(QWidget):
         self.vbox = QVBoxLayout()
         self.vbox.addStretch(0)
 
+        # self.substrates_toggle = None
+
         #------------------
+        controls_vbox = QVBoxLayout()
+        
         controls_hbox = QHBoxLayout()
         w = QPushButton("Directory")
         w.clicked.connect(self.open_directory_cb)
@@ -119,9 +146,34 @@ class Vis(QWidget):
         controls_hbox.addWidget(self.play_button)
 
         self.reset_button = QPushButton("Reset")
+        self.reset_button.setEnabled(False)
         # self.play_button.clicked.connect(self.play_plot_cb)
         self.reset_button.clicked.connect(self.reset_plot_cb)
         controls_hbox.addWidget(self.reset_button)
+        controls_vbox.addLayout(controls_hbox)
+
+        #-------------
+        hbox = QHBoxLayout()
+
+        self.cells_toggle = QCheckBox("cells")
+        self.cells_toggle.setChecked(True)
+        self.cells_toggle.stateChanged.connect(self.cells_toggle_cb)
+        hbox.addWidget(self.cells_toggle)
+
+        self.substrates_toggle = QCheckBox("substrates")
+        self.substrates_toggle.setChecked(True)
+        self.substrates_toggle.stateChanged.connect(self.substrates_toggle_cb)
+        hbox.addWidget(self.substrates_toggle)
+
+        self.substrate_dropdown = QComboBox()
+        self.substrate_dropdown.setFixedWidth(250)
+        # self.cycle_dropdown.currentIndex.connect(self.cycle_changed_cb)
+        self.substrate_dropdown.currentIndexChanged.connect(self.substrate_changed_cb)
+        self.substrate_dropdown.addItem("substrate0")
+        self.substrate_dropdown.addItem("substrate1")
+        hbox.addWidget(self.substrate_dropdown)
+
+        controls_vbox.addLayout(hbox)
 
         # self.prepare_button = QPushButton("Prepare")
         # self.prepare_button.clicked.connect(self.prepare_plot_cb)
@@ -134,13 +186,19 @@ class Vis(QWidget):
         self.scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.scroll.setWidgetResizable(True)
 
+        self.create_figure()
+
         # self.scroll.setWidget(self.config_params) # self.config_params = QWidget()
         self.scroll.setWidget(self.canvas) # self.config_params = QWidget()
         self.layout = QVBoxLayout(self)
-        self.layout.addLayout(controls_hbox)
+        # self.layout.addLayout(controls_hbox)
+        self.layout.addLayout(controls_vbox)
+
         self.layout.addWidget(self.scroll)
 
+
         self.reset_plot_cb("")
+
 
     def open_directory_cb(self):
         dialog = QFileDialog()
@@ -184,6 +242,19 @@ class Vis(QWidget):
         self.forward_plot_cb("")  
 
 
+    def cells_toggle_cb(self):
+        self.plot_substrate(self.current_svg_frame)
+        self.canvas.update()
+        self.canvas.draw()
+
+    def substrates_toggle_cb(self):
+        self.plot_substrate(self.current_svg_frame)
+        self.canvas.update()
+        self.canvas.draw()
+
+    def substrate_changed_cb(self):
+        print("--- new substrate")
+
     # def output_dir_changed(self, text):
     #     self.output_dir = text
     #     print(self.output_dir)
@@ -193,18 +264,24 @@ class Vis(QWidget):
         if self.current_svg_frame < 0:
             self.current_svg_frame = 0
         print('svg # ',self.current_svg_frame)
-        self.plot_svg(self.current_svg_frame)
-        self.canvas.update()
+        self.plot_substrate(self.current_svg_frame)
+        # self.plot_svg(self.current_svg_frame)
+
+        # self.canvas.update()
         self.canvas.draw()
 
     def forward_plot_cb(self, text):
         self.current_svg_frame += 1
         print('svg # ',self.current_svg_frame)
-        self.plot_svg(self.current_svg_frame)
-        self.canvas.update()
+        self.plot_substrate(self.current_svg_frame)
+        # self.plot_svg(self.current_svg_frame)
+        # self.canvas.update()
         self.canvas.draw()
 
     def reset_plot_cb(self, text):
+        print("-------------- reset_plot_cb() ----------------")
+        # self.create_figure()
+
         xml_file = Path(self.output_dir, "initial.xml")
         if not os.path.isfile(xml_file):
             print("Expecting initial.xml, but does not exist.")
@@ -214,6 +291,30 @@ class Vis(QWidget):
             msgBox.setStandardButtons(QMessageBox.Ok)
             msgBox.exec()
             return
+
+        # if self.first_time:
+        #     self.first_time = False
+        #     full_xml_filename = Path(os.path.join(self.output_dir, 'config.xml'))
+        #     if full_xml_filename.is_file():
+        #         tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
+        #         xml_root = tree.getroot()
+        #         self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
+        #         self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
+        #         # print("---- svg,substrate delta_t values=",self.svg_delta_t,self.substrate_delta_t)        
+        #         self.modulo = int(self.substrate_delta_t / self.svg_delta_t)
+        #         # print("---- modulo=",self.modulo)        
+
+        # all_files = sorted(glob.glob(os.path.join(self.output_dir, 'snap*.svg')))   # if .svg
+        # if len(all_files) > 0:
+        #     last_file = all_files[-1]
+        #     # print("substrates.py/update(): len(snap*.svg) = ",len(all_files)," , last_file=",last_file)
+        #     self.max_frames.value = int(last_file[-12:-4])  # assumes naming scheme: "snapshot%08d.svg"
+        # else:
+        #     substrate_files = sorted(glob.glob(os.path.join(self.output_dir, 'output*.xml')))
+        #     if len(substrate_files) > 0:
+        #         last_file = substrate_files[-1]
+        #         self.max_frames.value = int(last_file[-12:-4])
+
 
         tree = ET.parse(Path(self.output_dir, "initial.xml"))
         xml_root = tree.getroot()
@@ -229,11 +330,22 @@ class Vis(QWidget):
         self.ymax = float(bds[4])
         self.y_range = self.ymax - self.ymin
 
+        # self.numx =  math.ceil( (self.xmax - self.xmin) / config_tab.xdelta.value)
+        # self.numy =  math.ceil( (self.ymax - self.ymin) / config_tab.ydelta.value)
+        self.numx =  math.ceil( (self.xmax - self.xmin) / 20.)
+        self.numy =  math.ceil( (self.ymax - self.ymin) / 20.)
+        print(" calc: numx,numy = ",self.numx, self.numy)
+
+        self.cbar = None
+
         self.current_svg_frame = 0
         print('svg # ',self.current_svg_frame)
-        self.plot_svg(self.current_svg_frame)
+        self.plot_substrate(self.current_svg_frame)
+        # self.plot_svg(self.current_svg_frame)
+        # self.canvas.clear()
         self.canvas.update()
         self.canvas.draw()
+
 
     # def task(self):
             # self.dc.update_figure()
@@ -254,7 +366,8 @@ class Vis(QWidget):
                 self.timer.stop()
                 return
 
-            self.plot_svg(self.current_svg_frame)
+            self.plot_substrate(self.current_svg_frame)
+            # self.plot_svg(self.current_svg_frame)
             self.canvas.update()
             self.canvas.draw()
 
@@ -276,23 +389,36 @@ class Vis(QWidget):
     #         # self.ax0.clear()
     #         # self.canvas.pause(0.05)
 
-    def prepare_plot_cb(self, text):
-        self.current_svg_frame += 1
-        print('svg # ',self.current_svg_frame)
-        self.plot_svg(self.current_svg_frame)
-        self.canvas.update()
-        self.canvas.draw()
+    # def prepare_plot_cb(self, text):
+    #     self.current_svg_frame += 1
+    #     print('svg # ',self.current_svg_frame)
+    #     # self.plot_substrate(self.current_svg_frame)
+    #     self.plot_svg(self.current_svg_frame)
+    #     self.canvas.update()
+    #     self.canvas.draw()
 
     def create_figure(self):
-        self.figure = plt.figure()
+        # self.figure = plt.figure()
+        self.figure = plt.figure(figsize=(self.figsize_width_substrate, self.figsize_height_substrate))
         self.canvas = FigureCanvasQTAgg(self.figure)
-        self.canvas.setStyleSheet("background-color:transparent;")
+        # self.canvas.setStyleSheet("background-color:transparent;")
 
         # Adding one subplot for image
-        self.ax0 = self.figure.add_subplot(111)
-        # self.ax0.get_xaxis().set_visible(False)
-        # self.ax0.get_yaxis().set_visible(False)
+        # self.ax0 = self.figure.add_subplot(111, frameon=True)
+        # self.ax0 = self.figure.add_axes([0.1,0.1,0.8,0.8])
+
+        # self.fig = plt.figure(figsize=(self.figsize_width_substrate, self.figsize_height_substrate))
+        # self.ax0 = plt.figure(figsize=(self.figsize_width_substrate, self.figsize_height_substrate))
+
+        # self.ax0.get_xaxis().set_visible(True)
+        # self.ax0.get_yaxis().set_visible(True)
+
+        # self.ax0.set_frame_on(True)
+
+        print(mpl.rcParams['axes.edgecolor'])
+        # self.ax0.grid(True, linestyle='-.')
         # plt.tight_layout()
+        # self.ax0.tight_layout()
 
         # np.random.seed(19680801)  # for reproducibility
         # N = 50
@@ -302,7 +428,12 @@ class Vis(QWidget):
         # area = (30 * np.random.rand(N))**2  # 0 to 15 point radii
         # self.ax0.scatter(x, y, s=area, c=colors, alpha=0.5)
 
-        self.plot_svg(self.current_svg_frame)
+        self.plot_substrate(self.current_svg_frame)
+
+        # self.ax0.get_xaxis().set_visible(True)
+        # self.ax0.get_yaxis().set_visible(True)
+
+        # self.plot_svg(self.current_svg_frame)
 
         # self.imageInit = [[255] * 320 for i in range(240)]
         # self.imageInit[0][0] = 0
@@ -384,15 +515,15 @@ class Vis(QWidget):
             collection.set_array(c)
             collection.set_clim(vmin, vmax)
 
-        # ax = plt.gca()
-        # ax.add_collection(collection)
-        # ax.autoscale_view()
-        self.ax0.add_collection(collection)
-        self.ax0.autoscale_view()
+        ax = plt.gca()
+        ax.add_collection(collection)
+        ax.autoscale_view()
+        # self.ax0.add_collection(collection)
+        # self.ax0.autoscale_view()
         # plt.draw_if_interactive()
         if c is not None:
-            # plt.sci(collection)
-            self.ax0.sci(collection)
+            plt.sci(collection)
+        #     self.ax0.sci(collection)
         # return collection
 
     #------------------------------------------------------------
@@ -406,13 +537,13 @@ class Vis(QWidget):
         print("full_fname = ",full_fname)
         # with debug_view:
             # print("plot_svg:", full_fname) 
-        # print("-- plot_svg:", full_fname) 
+        print("-- plot_svg:", full_fname) 
         if not os.path.isfile(full_fname):
             # print("Once output files are generated, click the slider.")   
             print("ERROR:  filename not found.")   
             return
 
-        self.ax0.cla()
+        # self.ax0.cla()
         self.title_str = ""
 
         xlist = deque()
@@ -540,15 +671,17 @@ class Vis(QWidget):
             # hrs = int(mins/60)
             # days = int(hrs/24)
             # title_str = '%dd, %dh, %dm' % (int(days),(hrs%24), mins - (hrs*60))
-        # plt.title(self.title_str)
-        self.ax0.set_title(self.title_str, fontsize=9)
+        plt.title(self.title_str, fontsize=self.fontsize)
+        # self.ax0.set_title(self.title_str, fontsize=5)
         # self.ax0.set_title(self.title_str, prop={'size':'small'})
 
-        # plt.xlim(self.xmin, self.xmax)
-        # plt.ylim(self.ymin, self.ymax)
-        self.ax0.set_xlim(self.xmin, self.xmax)
-        self.ax0.set_ylim(self.ymin, self.ymax)
-        self.ax0.tick_params(labelsize=4)
+        plt.xlim(self.xmin, self.xmax)
+        plt.ylim(self.ymin, self.ymax)
+        # print("l. 649: xmin,xmax = ",self.xmin, self.xmax)
+        # print("l. 649: ymin,ymax = ",self.ymin, self.ymax)
+        # self.ax0.set_xlim(self.xmin, self.xmax)
+        # self.ax0.set_ylim(self.ymin, self.ymax)
+        # self.ax0.tick_params(labelsize=4)
 
         # self.ax0.colorbar(collection)
 
@@ -586,7 +719,148 @@ class Vis(QWidget):
                 # cell_circles = self.circles(xvals,yvals, s=rvals, color=rgbs, edgecolor='black', linewidth=0.5)
                 # plt.sci(cell_circles)
             except (ValueError):
+                print("----- got error trying to plot circles with edges")
                 pass
         else:
             # plt.scatter(xvals,yvals, s=markers_size, c=rgbs)
+            # print("----- plot circles with no edges")
             self.circles(xvals,yvals, s=rvals, color=rgbs, alpha=self.alpha)
+
+    #---------------------------------------------------------------------------
+    # assume "frame" is cell frame #, unless Cells is togggled off, then it's the substrate frame #
+    # def plot_substrate(self, frame, grid):
+    def plot_substrate(self, frame):
+        # global cbar
+
+        # print("plot_substrate(): frame*self.substrate_delta_t  = ",frame*self.substrate_delta_t)
+        # print("plot_substrate(): frame*self.svg_delta_t  = ",frame*self.svg_delta_t)
+        # print("plot_substrate(): fig width: SVG+2D = ",self.figsize_width_svg + self.figsize_width_2Dplot)  # 24
+        # print("plot_substrate(): fig width: substrate+2D = ",self.figsize_width_substrate + self.figsize_width_2Dplot)  # 27
+
+        # self.ax0.cla()
+        # self.ax0.axis('on')
+
+        self.title_str = ''
+
+        # Recall:
+        # self.svg_delta_t = config_tab.svg_interval.value
+        # self.substrate_delta_t = config_tab.mcds_interval.value
+        # self.modulo = int(self.substrate_delta_t / self.svg_delta_t)
+        # self.therapy_activation_time = user_params_tab.therapy_activation_time.value
+
+        # print("plot_substrate(): pre_therapy: max svg, substrate frames = ",max_svg_frame_pre_therapy, max_substrate_frame_pre_therapy)
+
+        # Assume: # .svg files >= # substrate files
+#        if (self.cells_toggle.value):
+
+        if self.substrates_toggle.isChecked():
+            # self.fig, (self.ax0) = plt.subplots(1, 1, figsize=(self.figsize_width_substrate, self.figsize_height_substrate))
+
+            self.substrate_frame = int(frame / self.modulo)
+
+            fname = "output%08d_microenvironment0.mat" % self.substrate_frame
+            xml_fname = "output%08d.xml" % self.substrate_frame
+            # fullname = output_dir_str + fname
+
+    #        fullname = fname
+            full_fname = os.path.join(self.output_dir, fname)
+            print("--- plot_substrate(): full_fname=",full_fname)
+            full_xml_fname = os.path.join(self.output_dir, xml_fname)
+    #        self.output_dir = '.'
+
+    #        if not os.path.isfile(fullname):
+            if not os.path.isfile(full_fname):
+                print("Once output files are generated, click the slider.")  # No:  output00000000_microenvironment0.mat
+                return
+
+    #        tree = ET.parse(xml_fname)
+            tree = ET.parse(full_xml_fname)
+            xml_root = tree.getroot()
+            mins = round(int(float(xml_root.find(".//current_time").text)))  # TODO: check units = mins
+            self.substrate_mins= round(int(float(xml_root.find(".//current_time").text)))  # TODO: check units = mins
+
+            hrs = int(mins/60)
+            days = int(hrs/24)
+            self.title_str = 'substrate: %dd, %dh, %dm' % (int(days),(hrs%24), mins - (hrs*60))
+            # self.title_str = 'substrate: %dm' % (mins )   # rwh
+
+            info_dict = {}
+            scipy.io.loadmat(full_fname, info_dict)
+            M = info_dict['multiscale_microenvironment']
+            f = M[self.field_index, :]   # 4=tumor cells field, 5=blood vessel density, 6=growth substrate
+
+            try:
+                print("numx, numy = ",self.numx, self.numy)
+                xgrid = M[0, :].reshape(self.numy, self.numx)
+                ygrid = M[1, :].reshape(self.numy, self.numx)
+            except:
+                print("substrates.py: mismatched mesh size for reshape: numx,numy=",self.numx, self.numy)
+                pass
+#                xgrid = M[0, :].reshape(self.numy, self.numx)
+#                ygrid = M[1, :].reshape(self.numy, self.numx)
+
+            num_contours = 15
+            # levels = MaxNLocator(nbins=num_contours).tick_values(self.colormap_min.value, self.colormap_max.value)
+            levels = MaxNLocator(nbins=num_contours).tick_values(self.colormap_min, self.colormap_max)
+            contour_ok = True
+            # if (self.colormap_fixed_toggle.isChecked()):
+            if (self.colormap_fixed_toggle):
+                try:
+                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), 
+                            levels=levels, extend='both', cmap="viridis", fontsize=self.fontsize)
+                except:
+                    contour_ok = False
+                    print('got error on contourf 1.')
+            else:    
+                try:
+                    print("field min,max= ", M[self.field_index, :].min(), M[self.field_index, :].max())
+                    print("self.field_index = ", self.field_index)
+                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), 
+                            num_contours, cmap = "viridis" ) #  cmap=self.colormap_dd.value)
+                except:
+                    contour_ok = False
+                    print('\n -->> got error on contourf 2  \n')  # rwh: argh, getting here
+
+            if (contour_ok):
+                # self.ax0.set_title(self.title_str, fontsize=self.fontsize)
+                plt.title(self.title_str, fontsize=5)
+
+                # self.image = self.ax0.imshow(self.imageInit, interpolation='none')
+                # divider = make_axes_locatable(self.ax0)
+                # cax = divider.new_vertical(size="5%", pad=0.05, pack_start=True)
+                # self.colorbar = self.figure.add_axes(cax)
+                # self.figure.colorbar(self.image, cax=cax, orientation='horizontal')
+                # plt.subplots_adjust(left=0, bottom=0.05, right=1, top=1, wspace=0, hspace=0)
+
+                # cbar = self.figure.colorbar(substrate_plot, ax=self.ax0)
+                # cbar = self.figure.colorbar(substrate_plot, cax=self.ax0)
+                # cbar = self.figure.colorbar(substrate_plot, cax=self.ax0, orientation='horizontal')
+                if self.cbar == None:  # if we always do this, it creates an additional colorbar!
+                    # cbar = plt.colorbar(my_plot)
+                    # self.cbar = self.ax0.colorbar(substrate_plot)
+                    self.cbar = self.figure.colorbar(substrate_plot)
+                    self.cbar.ax.tick_params(labelsize=self.fontsize)
+                else:
+                    # self.cbar.ax0.clear()
+                    self.cbar.ax.clear()
+                    # self.figure.cbar = self.figure.colorbar(substrate_plot, cax=self.ax0)
+                    self.cbar = self.figure.colorbar(substrate_plot , cax=self.cbar.ax)
+
+                # cbar.ax.tick_params(labelsize=self.fontsize)
+
+            # print("l. 805: xmin,xmax = ",self.xmin, self.xmax)
+            # print("l. 805: ymin,ymax = ",self.ymin, self.ymax)
+            # self.ax0.set_xlim(self.xmin, self.xmax)
+            # self.ax0.set_ylim(self.ymin, self.ymax)
+            # self.ax0.tick_params(labelsize=4)
+            plt.xticks(fontsize= self.fontsize)
+            plt.yticks(fontsize= self.fontsize)
+
+        # Now plot the cells (possibly on top of the substrate)
+        if self.cells_toggle.isChecked():
+            # if not self.substrates_toggle.isChecked():
+            #     self.fig, (self.ax0) = plt.subplots(1, 1, figsize=(self.figsize_width_svg, self.figsize_height_svg))
+
+            self.svg_frame = frame
+            # print('plot_svg with frame=',self.svg_frame)
+            self.plot_svg(self.svg_frame)
