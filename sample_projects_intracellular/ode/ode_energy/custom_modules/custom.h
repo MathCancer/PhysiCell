@@ -82,6 +82,7 @@ void setup_microenvironment( void );
 // custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
+void update_intracellular();
 
 // custom functions can go here 
 

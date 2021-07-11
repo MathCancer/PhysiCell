@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created by COPASI version 4.24 (Build 197) on 2021-06-17 13:57 with libSBML version 5.17.0. -->
+<!-- Created by COPASI version 4.24 (Build 197) on 2021-07-09 15:52 with libSBML version 5.17.0. -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" version="4">
-  <model metaid="COPASI0" id="New_Model_1" name="New Model_1">
+  <model metaid="COPASI0" id="New_Model_1_1" name="New Model_1_1">
     <annotation>
       <COPASI xmlns="http://www.copasi.org/static/sbml">
         <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#">
@@ -109,7 +109,7 @@
       </compartment>
     </listOfCompartments>
     <listOfSpecies>
-      <species metaid="COPASI2" id="Glucose" name="Glucose" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
+      <species metaid="COPASI2" id="Glucose" name="Glucose" compartment="Intracellular" initialConcentration="100" boundaryCondition="false" constant="false">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -124,7 +124,7 @@
           </COPASI>
         </annotation>
       </species>
-      <species metaid="COPASI3" id="Oxygen" name="Oxygen" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
+      <species metaid="COPASI3" id="Oxygen" name="Oxygen" compartment="Intracellular" initialConcentration="100" boundaryCondition="false" constant="false">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -139,7 +139,7 @@
           </COPASI>
         </annotation>
       </species>
-      <species metaid="COPASI4" id="Energy" name="Energy" compartment="Intracellular" initialConcentration="100" boundaryCondition="false" constant="false">
+      <species metaid="COPASI4" id="Energy" name="Energy" compartment="Intracellular" initialConcentration="450" boundaryCondition="false" constant="false">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -169,26 +169,11 @@
           </COPASI>
         </annotation>
       </species>
-      <species metaid="COPASI6" id="cycle_rate" name="lactatesr" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
+      <species metaid="COPASI6" id="apoptosis_rate" name="apoptosis_rate" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
               <rdf:Description rdf:about="#COPASI6">
-                <dcterms:created>
-                  <rdf:Description>
-                    <dcterms:W3CDTF>2021-06-14T16:19:30Z</dcterms:W3CDTF>
-                  </rdf:Description>
-                </dcterms:created>
-              </rdf:Description>
-            </rdf:RDF>
-          </COPASI>
-        </annotation>
-      </species>
-      <species metaid="COPASI7" id="apoptosis_rate" name="apoptosis_rate" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
-        <annotation>
-          <COPASI xmlns="http://www.copasi.org/static/sbml">
-            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI7">
                 <dcterms:created>
                   <rdf:Description>
                     <dcterms:W3CDTF>2021-06-14T16:49:25Z</dcterms:W3CDTF>
@@ -199,11 +184,11 @@
           </COPASI>
         </annotation>
       </species>
-      <species metaid="COPASI8" id="migration_speed" name="migration_speed" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
+      <species metaid="COPASI7" id="migration_speed" name="migration_speed" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI8">
+              <rdf:Description rdf:about="#COPASI7">
                 <dcterms:created>
                   <rdf:Description>
                     <dcterms:W3CDTF>2021-06-15T16:22:51Z</dcterms:W3CDTF>
@@ -214,9 +199,39 @@
           </COPASI>
         </annotation>
       </species>
+      <species metaid="COPASI8" id="Lac_Secretion_Rate" name="Lac_Secretion_Rate" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI8">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-07-07T10:38:47Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </species>
+      <species metaid="COPASI20" id="Transition_Rate" name="Transition_Rate" compartment="Intracellular" initialConcentration="0" boundaryCondition="false" constant="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI20">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-07-09T15:25:02Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </species>
     </listOfSpecies>
     <listOfParameters>
-      <parameter metaid="COPASI9" id="k_aer" name="k_aer" value="0.5" constant="true">
+      <parameter metaid="COPASI9" id="k_aer" name="k_aer" value="0.01" constant="true">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -231,7 +246,7 @@
           </COPASI>
         </annotation>
       </parameter>
-      <parameter metaid="COPASI10" id="k_ane" name="k_ane" value="0.1" constant="true">
+      <parameter metaid="COPASI10" id="k_ane" name="k_ane" value="0.00018" constant="true">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -246,7 +261,7 @@
           </COPASI>
         </annotation>
       </parameter>
-      <parameter metaid="COPASI11" id="k_usage" name="k_usage" value="5" constant="true">
+      <parameter metaid="COPASI11" id="k_usage" name="k_usage" value="0.0023" constant="true">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -261,11 +276,11 @@
           </COPASI>
         </annotation>
       </parameter>
-      <parameter metaid="COPASI19" id="oxygen_thresh" name="oxygen_thresh" value="0.1" constant="true">
+      <parameter metaid="COPASI12" id="oxygen_thresh" name="energy_move_thresh" value="440" constant="true">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI19">
+              <rdf:Description rdf:about="#COPASI12">
                 <dcterms:created>
                   <rdf:Description>
                     <dcterms:W3CDTF>2021-06-17T13:56:08Z</dcterms:W3CDTF>
@@ -276,13 +291,43 @@
           </COPASI>
         </annotation>
       </parameter>
-    </listOfParameters>
-    <listOfReactions>
-      <reaction metaid="COPASI16" id="Aerobic" name="Aerobic" reversible="false">
+      <parameter metaid="COPASI23" id="energy_death_thresh" name="energy_death_thresh" value="430" constant="true">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI16">
+              <rdf:Description rdf:about="#COPASI23">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-07-09T15:31:16Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </parameter>
+      <parameter metaid="COPASI24" id="energy_prolif_thresh" name="energy_prolif_thresh" value="445" constant="true">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI24">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-07-09T15:31:17Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </parameter>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction metaid="COPASI17" id="Aerobic" name="Aerobic" reversible="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI17">
                 <dcterms:created>
                   <rdf:Description>
                     <dcterms:W3CDTF>2020-02-26T17:29:30Z</dcterms:W3CDTF>
@@ -294,7 +339,7 @@
         </annotation>
         <listOfReactants>
           <speciesReference species="Glucose" stoichiometry="1"/>
-          <speciesReference species="Oxygen" stoichiometry="1"/>
+          <speciesReference species="Oxygen" stoichiometry="6"/>
         </listOfReactants>
         <listOfProducts>
           <speciesReference species="Energy" stoichiometry="38"/>
@@ -306,16 +351,20 @@
               <ci> Intracellular </ci>
               <ci> k_aer </ci>
               <ci> Glucose </ci>
-              <ci> Oxygen </ci>
+              <apply>
+                <power/>
+                <ci> Oxygen </ci>
+                <cn> 6 </cn>
+              </apply>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
-      <reaction metaid="COPASI17" id="Anaerobic" name="Anaerobic" reversible="false">
+      <reaction metaid="COPASI18" id="Anaerobic" name="Anaerobic" reversible="false">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI17">
+              <rdf:Description rdf:about="#COPASI18">
                 <dcterms:created>
                   <rdf:Description>
                     <dcterms:W3CDTF>2020-02-26T17:35:05Z</dcterms:W3CDTF>
@@ -329,7 +378,7 @@
           <speciesReference species="Glucose" stoichiometry="1"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="Energy" stoichiometry="4"/>
+          <speciesReference species="Energy" stoichiometry="2"/>
           <speciesReference species="Lactate" stoichiometry="1"/>
         </listOfProducts>
         <kineticLaw>
@@ -343,11 +392,11 @@
           </math>
         </kineticLaw>
       </reaction>
-      <reaction metaid="COPASI18" id="Energy_Usage" name="Energy_Usage" reversible="false">
+      <reaction metaid="COPASI19" id="Energy_Usage" name="Energy_Usage" reversible="false">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI18">
+              <rdf:Description rdf:about="#COPASI19">
                 <dcterms:created>
                   <rdf:Description>
                     <dcterms:W3CDTF>2020-02-26T17:35:09Z</dcterms:W3CDTF>
@@ -373,14 +422,122 @@
       </reaction>
     </listOfReactions>
     <listOfEvents>
-      <event metaid="COPASI12" id="secrete_lactate" name="secrete_lactate" useValuesFromTriggerTime="true">
+      <event metaid="COPASI13" id="die" name="die" useValuesFromTriggerTime="true">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI12">
+              <rdf:Description rdf:about="#COPASI13">
                 <dcterms:created>
                   <rdf:Description>
-                    <dcterms:W3CDTF>2021-06-14T16:33:02Z</dcterms:W3CDTF>
+                    <dcterms:W3CDTF>2021-07-07T10:08:54Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <trigger>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <lt/>
+              <ci> Energy </ci>
+              <ci> energy_death_thresh </ci>
+            </apply>
+          </math>
+        </trigger>
+        <delay>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <cn> 0 </cn>
+          </math>
+        </delay>
+        <listOfEventAssignments>
+          <eventAssignment variable="apoptosis_rate">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <cn type="e-notation"> 9 <sep/> 99 </cn>
+            </math>
+          </eventAssignment>
+        </listOfEventAssignments>
+      </event>
+      <event metaid="COPASI14" id="do_not_move" name="do_not_move" useValuesFromTriggerTime="true">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI14">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-07-07T10:34:14Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <trigger>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <gt/>
+              <ci> Energy </ci>
+              <ci> oxygen_thresh </ci>
+            </apply>
+          </math>
+        </trigger>
+        <delay>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <cn> 0 </cn>
+          </math>
+        </delay>
+        <listOfEventAssignments>
+          <eventAssignment variable="migration_speed">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <cn> 0 </cn>
+            </math>
+          </eventAssignment>
+        </listOfEventAssignments>
+      </event>
+      <event metaid="COPASI15" id="move" name="move" useValuesFromTriggerTime="true">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI15">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-07-07T10:08:54Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <trigger>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <lt/>
+              <ci> Energy </ci>
+              <ci> oxygen_thresh </ci>
+            </apply>
+          </math>
+        </trigger>
+        <delay>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <cn> 0 </cn>
+          </math>
+        </delay>
+        <listOfEventAssignments>
+          <eventAssignment variable="migration_speed">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <cn> 10 </cn>
+            </math>
+          </eventAssignment>
+        </listOfEventAssignments>
+      </event>
+      <event metaid="COPASI16" id="Lac_Sec" name="Lac_Sec">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI16">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-07-07T10:37:37Z</dcterms:W3CDTF>
                   </rdf:Description>
                 </dcterms:created>
               </rdf:Description>
@@ -396,27 +553,53 @@
             </apply>
           </math>
         </trigger>
-        <delay>
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <ci> cycle_rate </ci>
-          </math>
-        </delay>
         <listOfEventAssignments>
-          <eventAssignment variable="cycle_rate">
+          <eventAssignment variable="Lac_Secretion_Rate">
             <math xmlns="http://www.w3.org/1998/Math/MathML">
-              <cn> 0.01 </cn>
+              <cn> 0.0001 </cn>
             </math>
           </eventAssignment>
         </listOfEventAssignments>
       </event>
-      <event metaid="COPASI13" id="die" name="die">
+      <event metaid="COPASI21" id="divide" name="divide">
         <annotation>
           <COPASI xmlns="http://www.copasi.org/static/sbml">
             <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI13">
+              <rdf:Description rdf:about="#COPASI21">
                 <dcterms:created>
                   <rdf:Description>
-                    <dcterms:W3CDTF>2021-06-14T16:33:29Z</dcterms:W3CDTF>
+                    <dcterms:W3CDTF>2021-07-09T15:22:22Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <trigger>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <gt/>
+              <ci> Energy </ci>
+              <ci> energy_prolif_thresh </ci>
+            </apply>
+          </math>
+        </trigger>
+        <listOfEventAssignments>
+          <eventAssignment variable="Transition_Rate">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <cn> 0.0001666666 </cn>
+            </math>
+          </eventAssignment>
+        </listOfEventAssignments>
+      </event>
+      <event metaid="COPASI22" id="do_not_divide" name="do_not_divide">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI22">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-07-09T15:27:04Z</dcterms:W3CDTF>
                   </rdf:Description>
                 </dcterms:created>
               </rdf:Description>
@@ -428,76 +611,14 @@
             <apply>
               <lt/>
               <ci> Energy </ci>
-              <cn> 45 </cn>
+              <ci> energy_prolif_thresh </ci>
             </apply>
           </math>
         </trigger>
         <listOfEventAssignments>
-          <eventAssignment variable="apoptosis_rate">
-            <math xmlns="http://www.w3.org/1998/Math/MathML">
-              <cn type="e-notation"> 9 <sep/> 99 </cn>
-            </math>
-          </eventAssignment>
-        </listOfEventAssignments>
-      </event>
-      <event metaid="COPASI14" id="do_not_move" name="do_not_move">
-        <annotation>
-          <COPASI xmlns="http://www.copasi.org/static/sbml">
-            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI14">
-                <dcterms:created>
-                  <rdf:Description>
-                    <dcterms:W3CDTF>2021-06-15T16:23:07Z</dcterms:W3CDTF>
-                  </rdf:Description>
-                </dcterms:created>
-              </rdf:Description>
-            </rdf:RDF>
-          </COPASI>
-        </annotation>
-        <trigger>
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <apply>
-              <gt/>
-              <ci> Oxygen </ci>
-              <ci> oxygen_thresh </ci>
-            </apply>
-          </math>
-        </trigger>
-        <listOfEventAssignments>
-          <eventAssignment variable="migration_speed">
+          <eventAssignment variable="Transition_Rate">
             <math xmlns="http://www.w3.org/1998/Math/MathML">
               <cn> 0 </cn>
-            </math>
-          </eventAssignment>
-        </listOfEventAssignments>
-      </event>
-      <event metaid="COPASI15" id="move" name="move">
-        <annotation>
-          <COPASI xmlns="http://www.copasi.org/static/sbml">
-            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-              <rdf:Description rdf:about="#COPASI15">
-                <dcterms:created>
-                  <rdf:Description>
-                    <dcterms:W3CDTF>2021-06-15T16:25:45Z</dcterms:W3CDTF>
-                  </rdf:Description>
-                </dcterms:created>
-              </rdf:Description>
-            </rdf:RDF>
-          </COPASI>
-        </annotation>
-        <trigger>
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <apply>
-              <lt/>
-              <ci> Oxygen </ci>
-              <ci> oxygen_thresh </ci>
-            </apply>
-          </math>
-        </trigger>
-        <listOfEventAssignments>
-          <eventAssignment variable="migration_speed">
-            <math xmlns="http://www.w3.org/1998/Math/MathML">
-              <cn> 100 </cn>
             </math>
           </eventAssignment>
         </listOfEventAssignments>
