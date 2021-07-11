@@ -39,7 +39,8 @@ class Vis(QWidget):
         # global self.config_params
 
         self.xml_root = None
-        self.current_svg_frame = 0
+        self.frame_count = 0
+        # self.current_svg_frame = 0
         self.timer = QtCore.QTimer()
         # self.t.timeout.connect(self.task)
         self.timer.timeout.connect(self.play_plot_cb)
@@ -59,6 +60,10 @@ class Vis(QWidget):
         self.show_nucleus = False
         self.show_edge = False
         self.alpha = 0.7
+
+        self.cell_mod = 1
+        self.substrate_mod = 1
+
         # self.cells_toggle = None
         # self.substrates_toggle = None
 
@@ -162,15 +167,49 @@ class Vis(QWidget):
         #-------------
         hbox = QHBoxLayout()
 
+        widget_width = 60
         self.cells_toggle = QCheckBox("cells")
+        self.cells_toggle.setFixedWidth(widget_width)
         self.cells_toggle.setChecked(True)
         self.cells_toggle.stateChanged.connect(self.cells_toggle_cb)
         hbox.addWidget(self.cells_toggle)
 
+        label = QLabel("mod")
+        label.setFixedWidth(30)
+        label.setAlignment(QtCore.Qt.AlignRight)
+        hbox.addWidget(label)
+
+        self.cell_mod_val = QLineEdit()
+        self.cell_mod_val.setFixedWidth(50)
+        self.cell_mod_val.setText(str(self.cell_mod))
+        self.cell_mod_val.textChanged.connect(self.cell_modulo_cb)
+        self.cell_mod_val.setValidator(QtGui.QIntValidator())
+        hbox.addWidget(self.cell_mod_val)
+
+        self.cells_edges_toggle = QCheckBox("edges")
+        self.cells_edges_toggle.setFixedWidth(widget_width)
+        self.cells_edges_toggle.setChecked(False)
+        self.cells_edges_toggle.stateChanged.connect(self.cells_edges_toggle_cb)
+        hbox.addWidget(self.cells_edges_toggle)
+
         self.substrates_toggle = QCheckBox("substrates")
+        self.substrates_toggle.setFixedWidth(100)
+        self.substrates_toggle.setEnabled(False)
         self.substrates_toggle.setChecked(True)
         self.substrates_toggle.stateChanged.connect(self.substrates_toggle_cb)
         hbox.addWidget(self.substrates_toggle)
+
+        label = QLabel("mod")
+        label.setFixedWidth(30)
+        label.setAlignment(QtCore.Qt.AlignRight)
+        hbox.addWidget(label)
+
+        self.substrate_mod_val = QLineEdit()
+        self.substrate_mod_val.setFixedWidth(50)
+        self.substrate_mod_val.setText(str(self.substrate_mod))
+        self.substrate_mod_val.textChanged.connect(self.substrate_modulo_cb)
+        self.substrate_mod_val.setValidator(QtGui.QIntValidator())
+        hbox.addWidget(self.substrate_mod_val)
 
         self.substrate_dropdown = QComboBox()
         self.substrate_dropdown.setFixedWidth(250)
@@ -249,20 +288,36 @@ class Vis(QWidget):
 
 
     def cells_toggle_cb(self):
-        self.plot_substrate(self.current_svg_frame)
+        self.plot_substrate()
+        self.canvas.update()
+        self.canvas.draw()
+
+    def cell_modulo_cb(self, text):
+        print("cell_modulo_cb(): text = ",text)
+        if len(text) > 0:
+            self.cell_mod = int(text)
+
+    def cells_edges_toggle_cb(self,bval):
+        self.show_edge = bval
+        self.plot_substrate()
         self.canvas.update()
         self.canvas.draw()
 
     def substrates_toggle_cb(self):
-        self.plot_substrate(self.current_svg_frame)
+        self.plot_substrate()
         self.canvas.update()
         self.canvas.draw()
+
+    def substrate_modulo_cb(self, text):
+        print("substrate_modulo_cb(): text = ",text)
+        if len(text) > 0:
+            self.substrate_mod = int(text)
 
     def substrate_changed_cb(self):
         print("\n== substrate_changed_cb(): ", self.substrate_dropdown.currentText(),self.substrate_dropdown.currentIndex() )
         if not self.first_time:
             self.field_index = int(self.substrate_dropdown.currentIndex()) + 4
-            self.plot_substrate(self.current_svg_frame)
+            self.plot_substrate()
             print("== substrate_changed_cb():  self.field_index =  ",self.field_index )
             self.canvas.update()
             self.canvas.draw()
@@ -275,28 +330,28 @@ class Vis(QWidget):
     #     print(self.output_dir)
 
     def back0_plot_cb(self, text):
-        self.current_svg_frame = 0
-        print('svg # ',self.current_svg_frame)
-        self.plot_substrate(self.current_svg_frame)
+        self.frame_count = 0
+        print('frame # ',self.frame_count)
+        self.plot_substrate()
         # self.canvas.update()
         self.canvas.draw()
         self.timer.stop()
 
     def back_plot_cb(self, text):
-        self.current_svg_frame -= 1
-        if self.current_svg_frame < 0:
-            self.current_svg_frame = 0
-        print('svg # ',self.current_svg_frame)
-        self.plot_substrate(self.current_svg_frame)
+        self.frame_count -= 1
+        if self.frame_count < 0:
+            self.frame_count = 0
+        print('frame # ',self.frame_count)
+        self.plot_substrate()
         # self.plot_svg(self.current_svg_frame)
 
         # self.canvas.update()
         self.canvas.draw()
 
     def forward_plot_cb(self, text):
-        self.current_svg_frame += 1
-        print('svg # ',self.current_svg_frame)
-        self.plot_substrate(self.current_svg_frame)
+        self.frame_count += 1
+        print('frame # ',self.frame_count)
+        self.plot_substrate()
         # self.plot_svg(self.current_svg_frame)
         # self.canvas.update()
         self.canvas.draw()
@@ -370,9 +425,8 @@ class Vis(QWidget):
 
         self.cbar = None
 
-        self.current_svg_frame = 0
-        print('svg # ',self.current_svg_frame)
-        self.plot_substrate(self.current_svg_frame)
+        self.frame_count = 0
+        self.plot_substrate()
         # self.plot_svg(self.current_svg_frame)
         # self.canvas.clear()
         self.canvas.update()
@@ -383,29 +437,31 @@ class Vis(QWidget):
             # self.dc.update_figure()
     def play_plot_cb(self):
         for idx in range(1):
-            self.current_svg_frame += 1
-            print('svg # ',self.current_svg_frame)
+            self.frame_count += 1
+            print('frame # ',self.frame_count)
+
+            self.current_svg_frame = int(self.frame_count / self.cell_mod)
 
             fname = "snapshot%08d.svg" % self.current_svg_frame
             full_fname = os.path.join(self.output_dir, fname)
-            print("full_fname = ",full_fname)
+            # print("full_fname = ",full_fname)
             # with debug_view:
                 # print("plot_svg:", full_fname) 
             # print("-- plot_svg:", full_fname) 
             if not os.path.isfile(full_fname):
                 # print("Once output files are generated, click the slider.")   
                 print("ERROR:  filename not found.")
-                self.current_svg_frame -= 1
+                self.frame_count -= 1
                 self.timer.stop()
                 return
 
-            self.plot_substrate(self.current_svg_frame)
+            self.plot_substrate()
             # self.plot_svg(self.current_svg_frame)
             self.canvas.update()
             self.canvas.draw()
 
     def animate(self, text):
-        self.current_svg_frame = 0
+        self.frame_count = 0
         # self.timer = QtCore.QTimer()
         # self.timer.timeout.connect(self.play_plot_cb)
         # self.timer.start(2000)  # every 2 sec
@@ -462,7 +518,7 @@ class Vis(QWidget):
         # area = (30 * np.random.rand(N))**2  # 0 to 15 point radii
         # self.ax0.scatter(x, y, s=area, c=colors, alpha=0.5)
 
-        self.plot_substrate(self.current_svg_frame)
+        self.plot_substrate()
 
         # self.ax0.get_xaxis().set_visible(True)
         # self.ax0.get_yaxis().set_visible(True)
@@ -562,13 +618,17 @@ class Vis(QWidget):
 
     #------------------------------------------------------------
     # def plot_svg(self, frame, rdel=''):
-    def plot_svg(self, frame):
+    def plot_svg(self):
         # global current_idx, axes_max
-        global current_frame
-        current_frame = frame
-        fname = "snapshot%08d.svg" % frame
+        # global current_frame
+
+        # current_frame = frame
+
+        svg_frame = int(self.frame_count / self.cell_mod)
+
+        fname = "snapshot%08d.svg" % svg_frame
         full_fname = os.path.join(self.output_dir, fname)
-        print("full_fname = ",full_fname)
+        # print("full_fname = ",full_fname)
         # with debug_view:
             # print("plot_svg:", full_fname) 
         print("-- plot_svg:", full_fname) 
@@ -578,7 +638,7 @@ class Vis(QWidget):
             return
 
         # self.ax0.cla()
-        self.title_str = ""
+        # self.title_str = ""
 
         xlist = deque()
         ylist = deque()
@@ -698,7 +758,7 @@ class Vis(QWidget):
         #   plt.figure(figsize=(6, 6))
         #   plt.cla()
         # if (self.substrates_toggle.value):
-        self.title_str += " (" + str(num_cells) + " agents)"
+        self.title_str += " (" + str(num_cells) + ")"
             # title_str = " (" + str(num_cells) + " agents)"
         # else:
             # mins= round(int(float(root.find(".//current_time").text)))  # TODO: check units = mins
@@ -768,7 +828,7 @@ class Vis(QWidget):
     #---------------------------------------------------------------------------
     # assume "frame" is cell frame #, unless Cells is togggled off, then it's the substrate frame #
     # def plot_substrate(self, frame, grid):
-    def plot_substrate(self, frame):
+    def plot_substrate(self):
         # global cbar
 
         # print("plot_substrate(): frame*self.substrate_delta_t  = ",frame*self.substrate_delta_t)
@@ -795,7 +855,7 @@ class Vis(QWidget):
         if self.substrates_toggle.isChecked():
             # self.fig, (self.ax0) = plt.subplots(1, 1, figsize=(self.figsize_width_substrate, self.figsize_height_substrate))
 
-            self.substrate_frame = int(frame / self.modulo)
+            self.substrate_frame = int(self.frame_count / self.substrate_mod)
 
             fname = "output%08d_microenvironment0.mat" % self.substrate_frame
             xml_fname = "output%08d.xml" % self.substrate_frame
@@ -909,6 +969,6 @@ class Vis(QWidget):
             # if not self.substrates_toggle.isChecked():
             #     self.fig, (self.ax0) = plt.subplots(1, 1, figsize=(self.figsize_width_svg, self.figsize_height_svg))
 
-            self.svg_frame = frame
+            # self.svg_frame = frame
             # print('plot_svg with frame=',self.svg_frame)
-            self.plot_svg(self.svg_frame)
+            self.plot_svg()
