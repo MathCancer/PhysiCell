@@ -73,7 +73,7 @@ class Vis(QWidget):
 
         # rwh: TODO these params
         self.modulo = 1
-        self.field_index = 4
+        self.field_index = 4   # "4" is the 0th substrate
         # define dummy size of mesh (set in the tool's primary module)
         self.numx = 0
         self.numy = 0
@@ -82,6 +82,9 @@ class Vis(QWidget):
         self.colormap_fixed_toggle = False
         # self.fontsize = 10
         self.fontsize = 5
+
+        # self.canvas = None
+        self.first_time = True
 
 
         # self.width_substrate = basic_length  # allow extra for colormap
@@ -132,6 +135,10 @@ class Vis(QWidget):
         # w.textChanged.connect(self.output_dir_changed)
         controls_hbox.addWidget(self.output_dir_w)
 
+        self.back0_button = QPushButton("<<")
+        self.back0_button.clicked.connect(self.back0_plot_cb)
+        controls_hbox.addWidget(self.back0_button)
+
         self.back_button = QPushButton("<")
         self.back_button.clicked.connect(self.back_plot_cb)
         controls_hbox.addWidget(self.back_button)
@@ -169,8 +176,7 @@ class Vis(QWidget):
         self.substrate_dropdown.setFixedWidth(250)
         # self.cycle_dropdown.currentIndex.connect(self.cycle_changed_cb)
         self.substrate_dropdown.currentIndexChanged.connect(self.substrate_changed_cb)
-        self.substrate_dropdown.addItem("substrate0")
-        self.substrate_dropdown.addItem("substrate1")
+        # self.substrate_dropdown.addItem("foo")
         hbox.addWidget(self.substrate_dropdown)
 
         controls_vbox.addLayout(hbox)
@@ -253,11 +259,28 @@ class Vis(QWidget):
         self.canvas.draw()
 
     def substrate_changed_cb(self):
-        print("--- new substrate")
+        print("\n== substrate_changed_cb(): ", self.substrate_dropdown.currentText(),self.substrate_dropdown.currentIndex() )
+        if not self.first_time:
+            self.field_index = int(self.substrate_dropdown.currentIndex()) + 4
+            self.plot_substrate(self.current_svg_frame)
+            print("== substrate_changed_cb():  self.field_index =  ",self.field_index )
+            self.canvas.update()
+            self.canvas.draw()
+        else:
+            self.first_time = False
+        
 
     # def output_dir_changed(self, text):
     #     self.output_dir = text
     #     print(self.output_dir)
+
+    def back0_plot_cb(self, text):
+        self.current_svg_frame = 0
+        print('svg # ',self.current_svg_frame)
+        self.plot_substrate(self.current_svg_frame)
+        # self.canvas.update()
+        self.canvas.draw()
+        self.timer.stop()
 
     def back_plot_cb(self, text):
         self.current_svg_frame -= 1
@@ -336,6 +359,15 @@ class Vis(QWidget):
         self.numy =  math.ceil( (self.ymax - self.ymin) / 20.)
         print(" calc: numx,numy = ",self.numx, self.numy)
 
+        vars_uep = xml_root.find(".//microenvironment//domain//variables")
+        self.substrates = []
+        self.substrate_dropdown.clear()
+        for var in vars_uep.findall("variable"):
+            print(" substrate name = ",var.attrib["name"])
+            self.substrates.append(var.attrib["name"])
+            self.substrate_dropdown.addItem(var.attrib["name"])
+
+
         self.cbar = None
 
         self.current_svg_frame = 0
@@ -363,6 +395,7 @@ class Vis(QWidget):
             if not os.path.isfile(full_fname):
                 # print("Once output files are generated, click the slider.")   
                 print("ERROR:  filename not found.")
+                self.current_svg_frame -= 1
                 self.timer.stop()
                 return
 
@@ -376,7 +409,8 @@ class Vis(QWidget):
         # self.timer = QtCore.QTimer()
         # self.timer.timeout.connect(self.play_plot_cb)
         # self.timer.start(2000)  # every 2 sec
-        self.timer.start(100)
+        # self.timer.start(100)
+        self.timer.start(50)
 
     # def play_plot_cb0(self, text):
     #     for idx in range(10):
@@ -726,6 +760,11 @@ class Vis(QWidget):
             # print("----- plot circles with no edges")
             self.circles(xvals,yvals, s=rvals, color=rgbs, alpha=self.alpha)
 
+        del xvals
+        del yvals
+        del rvals
+        del rgbs
+
     #---------------------------------------------------------------------------
     # assume "frame" is cell frame #, unless Cells is togggled off, then it's the substrate frame #
     # def plot_substrate(self, frame, grid):
@@ -770,91 +809,100 @@ class Vis(QWidget):
 
     #        if not os.path.isfile(fullname):
             if not os.path.isfile(full_fname):
-                print("Once output files are generated, click the slider.")  # No:  output00000000_microenvironment0.mat
-                return
+                # print("Once output files are generated, click the slider.")  # No:  output00000000_microenvironment0.mat
+                print("-- Error: no file ",full_fname)  # No:  output00000000_microenvironment0.mat
 
-    #        tree = ET.parse(xml_fname)
-            tree = ET.parse(full_xml_fname)
-            xml_root = tree.getroot()
-            mins = round(int(float(xml_root.find(".//current_time").text)))  # TODO: check units = mins
-            self.substrate_mins= round(int(float(xml_root.find(".//current_time").text)))  # TODO: check units = mins
+                # if self.cells_toggle.isChecked():
+                #     self.svg_frame = frame
+                #     # print('plot_svg with frame=',self.svg_frame)
+                #     self.plot_svg(self.svg_frame)
 
-            hrs = int(mins/60)
-            days = int(hrs/24)
-            self.title_str = 'substrate: %dd, %dh, %dm' % (int(days),(hrs%24), mins - (hrs*60))
-            # self.title_str = 'substrate: %dm' % (mins )   # rwh
+                # return
 
-            info_dict = {}
-            scipy.io.loadmat(full_fname, info_dict)
-            M = info_dict['multiscale_microenvironment']
-            f = M[self.field_index, :]   # 4=tumor cells field, 5=blood vessel density, 6=growth substrate
+            else:
 
-            try:
-                print("numx, numy = ",self.numx, self.numy)
-                xgrid = M[0, :].reshape(self.numy, self.numx)
-                ygrid = M[1, :].reshape(self.numy, self.numx)
-            except:
-                print("substrates.py: mismatched mesh size for reshape: numx,numy=",self.numx, self.numy)
-                pass
-#                xgrid = M[0, :].reshape(self.numy, self.numx)
-#                ygrid = M[1, :].reshape(self.numy, self.numx)
+        #        tree = ET.parse(xml_fname)
+                tree = ET.parse(full_xml_fname)
+                xml_root = tree.getroot()
+                mins = round(int(float(xml_root.find(".//current_time").text)))  # TODO: check units = mins
+                self.substrate_mins= round(int(float(xml_root.find(".//current_time").text)))  # TODO: check units = mins
 
-            num_contours = 15
-            # levels = MaxNLocator(nbins=num_contours).tick_values(self.colormap_min.value, self.colormap_max.value)
-            levels = MaxNLocator(nbins=num_contours).tick_values(self.colormap_min, self.colormap_max)
-            contour_ok = True
-            # if (self.colormap_fixed_toggle.isChecked()):
-            if (self.colormap_fixed_toggle):
+                hrs = int(mins/60)
+                days = int(hrs/24)
+                self.title_str = 'substrate: %dd, %dh, %dm' % (int(days),(hrs%24), mins - (hrs*60))
+                # self.title_str = 'substrate: %dm' % (mins )   # rwh
+
+                info_dict = {}
+                scipy.io.loadmat(full_fname, info_dict)
+                M = info_dict['multiscale_microenvironment']
+                f = M[self.field_index, :]   # 4=tumor cells field, 5=blood vessel density, 6=growth substrate
+
                 try:
-                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), 
-                            levels=levels, extend='both', cmap="viridis", fontsize=self.fontsize)
+                    print("numx, numy = ",self.numx, self.numy)
+                    xgrid = M[0, :].reshape(self.numy, self.numx)
+                    ygrid = M[1, :].reshape(self.numy, self.numx)
                 except:
-                    contour_ok = False
-                    print('got error on contourf 1.')
-            else:    
-                try:
-                    print("field min,max= ", M[self.field_index, :].min(), M[self.field_index, :].max())
-                    print("self.field_index = ", self.field_index)
-                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), 
-                            num_contours, cmap = "viridis" ) #  cmap=self.colormap_dd.value)
-                except:
-                    contour_ok = False
-                    print('\n -->> got error on contourf 2  \n')  # rwh: argh, getting here
+                    print("substrates.py: mismatched mesh size for reshape: numx,numy=",self.numx, self.numy)
+                    pass
+    #                xgrid = M[0, :].reshape(self.numy, self.numx)
+    #                ygrid = M[1, :].reshape(self.numy, self.numx)
 
-            if (contour_ok):
-                # self.ax0.set_title(self.title_str, fontsize=self.fontsize)
-                plt.title(self.title_str, fontsize=5)
+                num_contours = 15
+                # levels = MaxNLocator(nbins=num_contours).tick_values(self.colormap_min.value, self.colormap_max.value)
+                levels = MaxNLocator(nbins=num_contours).tick_values(self.colormap_min, self.colormap_max)
+                contour_ok = True
+                # if (self.colormap_fixed_toggle.isChecked()):
+                if (self.colormap_fixed_toggle):
+                    try:
+                        substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), 
+                                levels=levels, extend='both', cmap="viridis", fontsize=self.fontsize)
+                    except:
+                        contour_ok = False
+                        print('got error on contourf 1.')
+                else:    
+                    try:
+                        print("field min,max= ", M[self.field_index, :].min(), M[self.field_index, :].max())
+                        print("self.field_index = ", self.field_index)
+                        substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), 
+                                num_contours, cmap = "viridis" ) #  cmap=self.colormap_dd.value)
+                    except:
+                        contour_ok = False
+                        print('\n -->> got error on contourf 2  \n')  # rwh: argh, getting here
 
-                # self.image = self.ax0.imshow(self.imageInit, interpolation='none')
-                # divider = make_axes_locatable(self.ax0)
-                # cax = divider.new_vertical(size="5%", pad=0.05, pack_start=True)
-                # self.colorbar = self.figure.add_axes(cax)
-                # self.figure.colorbar(self.image, cax=cax, orientation='horizontal')
-                # plt.subplots_adjust(left=0, bottom=0.05, right=1, top=1, wspace=0, hspace=0)
+                if (contour_ok):
+                    # self.ax0.set_title(self.title_str, fontsize=self.fontsize)
+                    plt.title(self.title_str, fontsize=5)
 
-                # cbar = self.figure.colorbar(substrate_plot, ax=self.ax0)
-                # cbar = self.figure.colorbar(substrate_plot, cax=self.ax0)
-                # cbar = self.figure.colorbar(substrate_plot, cax=self.ax0, orientation='horizontal')
-                if self.cbar == None:  # if we always do this, it creates an additional colorbar!
-                    # cbar = plt.colorbar(my_plot)
-                    # self.cbar = self.ax0.colorbar(substrate_plot)
-                    self.cbar = self.figure.colorbar(substrate_plot)
-                    self.cbar.ax.tick_params(labelsize=self.fontsize)
-                else:
-                    # self.cbar.ax0.clear()
-                    self.cbar.ax.clear()
-                    # self.figure.cbar = self.figure.colorbar(substrate_plot, cax=self.ax0)
-                    self.cbar = self.figure.colorbar(substrate_plot , cax=self.cbar.ax)
+                    # self.image = self.ax0.imshow(self.imageInit, interpolation='none')
+                    # divider = make_axes_locatable(self.ax0)
+                    # cax = divider.new_vertical(size="5%", pad=0.05, pack_start=True)
+                    # self.colorbar = self.figure.add_axes(cax)
+                    # self.figure.colorbar(self.image, cax=cax, orientation='horizontal')
+                    # plt.subplots_adjust(left=0, bottom=0.05, right=1, top=1, wspace=0, hspace=0)
 
-                # cbar.ax.tick_params(labelsize=self.fontsize)
+                    # cbar = self.figure.colorbar(substrate_plot, ax=self.ax0)
+                    # cbar = self.figure.colorbar(substrate_plot, cax=self.ax0)
+                    # cbar = self.figure.colorbar(substrate_plot, cax=self.ax0, orientation='horizontal')
+                    if self.cbar == None:  # if we always do this, it creates an additional colorbar!
+                        # cbar = plt.colorbar(my_plot)
+                        # self.cbar = self.ax0.colorbar(substrate_plot)
+                        self.cbar = self.figure.colorbar(substrate_plot)
+                        self.cbar.ax.tick_params(labelsize=self.fontsize)
+                    else:
+                        # self.cbar.ax0.clear()
+                        self.cbar.ax.clear()
+                        # self.figure.cbar = self.figure.colorbar(substrate_plot, cax=self.ax0)
+                        self.cbar = self.figure.colorbar(substrate_plot , cax=self.cbar.ax)
 
-            # print("l. 805: xmin,xmax = ",self.xmin, self.xmax)
-            # print("l. 805: ymin,ymax = ",self.ymin, self.ymax)
-            # self.ax0.set_xlim(self.xmin, self.xmax)
-            # self.ax0.set_ylim(self.ymin, self.ymax)
-            # self.ax0.tick_params(labelsize=4)
-            plt.xticks(fontsize= self.fontsize)
-            plt.yticks(fontsize= self.fontsize)
+                    # cbar.ax.tick_params(labelsize=self.fontsize)
+
+                # print("l. 805: xmin,xmax = ",self.xmin, self.xmax)
+                # print("l. 805: ymin,ymax = ",self.ymin, self.ymax)
+                # self.ax0.set_xlim(self.xmin, self.xmax)
+                # self.ax0.set_ylim(self.ymin, self.ymax)
+                # self.ax0.tick_params(labelsize=4)
+                plt.xticks(fontsize= self.fontsize)
+                plt.yticks(fontsize= self.fontsize)
 
         # Now plot the cells (possibly on top of the substrate)
         if self.cells_toggle.isChecked():
