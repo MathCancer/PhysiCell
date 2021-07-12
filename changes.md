@@ -2,7 +2,7 @@
 
 **Version:** 1.9.0
 
-**Release date:** ?? July 2021
+**Release date:** 12 July 2021
 
 ## Release summary: 
 
