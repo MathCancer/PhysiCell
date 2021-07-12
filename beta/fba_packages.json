@@ -1,0 +1,41 @@
+{  
+    "coin-or":
+    {
+        "_refurl": "https://www.coin-or.org/download/binary/Clp/",
+        "linux-x64": 
+        {
+            "version": "Clp-1.17.6-linux64.zip",
+            "url": "https://maboss.curie.fr/pub/Clp-1.17.6-linux64.zip"
+        },
+        "win64": 
+        {
+            "version": "Clp-1.17.6-win64.zip",
+            "url": "https://maboss.curie.fr/pub/Clp-1.17.6-win64.zip"
+        },
+        "osx":
+        {
+            "version": "Clp-1.17.6-osx64.zip",
+            "url": "https://maboss.curie.fr/pub/Clp-1.17.6-osx64.zip"
+        }
+    },
+    "libsbml": 
+    {
+        "_refurl": "https://sourceforge.net/projects/sbml/files/libsbml/5.14.0-experimental/binaries/",
+        "linux-x64": 
+        {
+            "version": "libSBML-5.19.0-linux64.zip",
+            "url": "https://maboss.curie.fr/pub/libSBML-5.19.0-linux64.zip"
+        },
+        "win64": 
+        {
+            "version": "libSBML-5.19.0-win64.zip",
+            "url": "https://maboss.curie.fr/pub/libSBML-5.19.0-win64.zip"
+        },
+        "osx":
+        {
+            "version": "libSBML-5.19.0-osx64.zip",
+            "url": "https://maboss.curie.fr/pub/libSBML-5.19.0-osx64.zip"
+        }
+    }
+}
+

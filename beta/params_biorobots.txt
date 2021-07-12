@@ -1,0 +1,14 @@
+# File to be used with params_run.py
+# Allows for changing parameters in .xml, running sim, and writing results to different folders.
+# <key> <value> pairs, where <key> is the first unique node name found in the xml.
+folder  out_bots1 
+max_time 60
+full_data.enable false
+# the "user_parameters." prefix path is not req'd in the next entry since "cargo_signal_D" is unique 
+user_parameters.cargo_signal_D 1.e2   
+run_it dummy
+#
+folder  out_bots2 
+max_time 80
+user_parameters.cargo_signal_D 1.e4
+run_it dummy

@@ -153,6 +153,7 @@ reset:
 	rm -f ./custom_modules/*
 	touch ./custom_modules/empty.txt 
 	touch ALL_CITATIONS.txt 
+	touch ./core/PhysiCell_cell.cpp
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	touch ./config/empty.csv

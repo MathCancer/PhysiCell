@@ -15,9 +15,15 @@ script:
   - make reset
   - make cancer-immune-sample
   - make reset
-  - make virus-macrophage-sample
+  - make celltypes3-sample
+  - make reset
+  - make heterogeneity-sample
   - make reset
   - make pred-prey-farmer
+  - make reset
+  - make virus-macrophage-sample
+  - make reset
+  - make worm-sample
 
 notifications:
   email:

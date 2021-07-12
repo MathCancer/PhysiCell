@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created by COPASI version 4.24 (Build 197) on 2021-05-05 14:42 with libSBML version 5.17.0. -->
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" version="4">
+  <model metaid="COPASI0" id="New_Model_1" name="New Model_1">
+    <annotation>
+      <COPASI xmlns="http://www.copasi.org/static/sbml">
+        <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#">
+          <rdf:Description rdf:about="#COPASI0">
+            <dcterms:created>
+              <rdf:Description>
+                <dcterms:W3CDTF>2019-05-24T13:44:22Z</dcterms:W3CDTF>
+              </rdf:Description>
+            </dcterms:created>
+            <dcterms:creator>
+              <rdf:Bag>
+                <rdf:li>
+                  <rdf:Description>
+                    <vCard:EMAIL>heiland@iu.edu</vCard:EMAIL>
+                    <vCard:N>
+                      <rdf:Description>
+                        <vCard:Family>Heiland</vCard:Family>
+                        <vCard:Given>Randy</vCard:Given>
+                      </rdf:Description>
+                    </vCard:N>
+                    <vCard:ORG>
+                      <rdf:Description>
+                        <vCard:Orgname>Indiana University</vCard:Orgname>
+                      </rdf:Description>
+                    </vCard:ORG>
+                  </rdf:Description>
+                </rdf:li>
+              </rdf:Bag>
+            </dcterms:creator>
+            <dcterms:modified>
+              <rdf:Description>
+                <dcterms:W3CDTF>2019-05-24T13:44:22Z</dcterms:W3CDTF>
+              </rdf:Description>
+            </dcterms:modified>
+          </rdf:Description>
+        </rdf:RDF>
+      </COPASI>
+      <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
+        <rdf:Description rdf:about="#COPASI0">
+          <dc:creator>
+            <rdf:Bag>
+              <rdf:li rdf:parseType="Resource">
+                <vCard:N rdf:parseType="Resource">
+                  <vCard:Family>Heiland</vCard:Family>
+                  <vCard:Given>Randy</vCard:Given>
+                </vCard:N>
+                <vCard:EMAIL>heiland@iu.edu</vCard:EMAIL>
+                <vCard:ORG rdf:parseType="Resource">
+                  <vCard:Orgname>Indiana University</vCard:Orgname>
+                </vCard:ORG>
+              </rdf:li>
+            </rdf:Bag>
+          </dc:creator>
+          <dcterms:created rdf:parseType="Resource">
+            <dcterms:W3CDTF>2019-05-24T13:44:22Z</dcterms:W3CDTF>
+          </dcterms:created>
+          <dcterms:modified rdf:parseType="Resource">
+            <dcterms:W3CDTF>2019-05-24T13:44:22Z</dcterms:W3CDTF>
+          </dcterms:modified>
+        </rdf:Description>
+      </rdf:RDF>
+    </annotation>
+    <listOfFunctionDefinitions>
+      <functionDefinition id="Constant_flux__irreversible_0" name="Constant flux (irreversible)">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <lambda>
+            <bvar>
+              <ci> v </ci>
+            </bvar>
+            <ci> v </ci>
+          </lambda>
+        </math>
+      </functionDefinition>
+    </listOfFunctionDefinitions>
+    <listOfUnitDefinitions>
+      <unitDefinition id="volume" name="volume">
+        <listOfUnits>
+          <unit kind="litre" exponent="1" scale="-3" multiplier="1"/>
+        </listOfUnits>
+      </unitDefinition>
+      <unitDefinition id="time" name="time">
+        <listOfUnits>
+          <unit kind="second" exponent="1" scale="0" multiplier="60"/>
+        </listOfUnits>
+      </unitDefinition>
+      <unitDefinition id="substance" name="substance">
+        <listOfUnits>
+          <unit kind="mole" exponent="1" scale="-3" multiplier="1"/>
+        </listOfUnits>
+      </unitDefinition>
+    </listOfUnitDefinitions>
+    <listOfCompartments>
+      <compartment metaid="COPASI1" id="Cell" name="Cell" spatialDimensions="3" size="1" constant="true">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI1">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2019-05-24T17:25:38Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </compartment>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species metaid="COPASI2" id="Oxy" name="Oxy" compartment="Cell" initialConcentration="100" boundaryCondition="false" constant="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI2">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2019-05-24T16:49:30Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </species>
+      <species metaid="COPASI3" id="migration_speed" name="migration_speed" compartment="Cell" initialConcentration="0" boundaryCondition="false" constant="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI3">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-02-12T12:54:30Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </species>
+      <species metaid="COPASI4" id="transition_rate_0_1" name="transition_rate_0_1" compartment="Cell" initialConcentration="0" boundaryCondition="false" constant="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI4">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-02-12T12:56:00Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </species>
+      <species metaid="COPASI5" id="death_rate" name="death_rate" compartment="Cell" initialConcentration="0" boundaryCondition="false" constant="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI5">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-02-12T14:53:48Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </species>
+      <species metaid="COPASI6" id="secretion_rate_Lactate" name="secretion_rate_Lactate" compartment="Cell" initialConcentration="1" boundaryCondition="false" constant="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI6">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-02-12T14:59:54Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </species>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter metaid="COPASI7" id="Alpha" name="Alpha" value="2" constant="true">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI7">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2019-05-24T15:35:14Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+      </parameter>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction metaid="COPASI9" id="Aerobic_Reaction" name="Aerobic Reaction" reversible="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI9">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2019-05-24T15:30:11Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <listOfReactants>
+          <speciesReference species="Oxy" stoichiometry="1"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> Cell </ci>
+              <ci> Alpha </ci>
+              <ci> Oxy </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="COPASI10" id="reaction" name="reaction1" reversible="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI10">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-02-12T13:27:00Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <listOfProducts>
+          <speciesReference species="transition_rate_0_1" stoichiometry="1"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> Cell </ci>
+              <apply>
+                <ci> Constant_flux__irreversible_0 </ci>
+                <ci> v </ci>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="v" name="v" value="0.01"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="COPASI11" id="reaction2" name="reaction2" reversible="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI11">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-02-12T14:43:58Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <listOfProducts>
+          <speciesReference species="migration_speed" stoichiometry="1"/>
+        </listOfProducts>
+        <listOfModifiers>
+          <modifierSpeciesReference species="Oxy"/>
+        </listOfModifiers>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> Cell </ci>
+              <apply>
+                <ci> Constant_flux__irreversible_0 </ci>
+                <ci> v </ci>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="v" name="v" value="100"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="COPASI12" id="reaction_0" name="reaction" reversible="false">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI12">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-02-12T14:59:22Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <listOfProducts>
+          <speciesReference species="secretion_rate_Lactate" stoichiometry="1"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> Cell </ci>
+              <apply>
+                <ci> Constant_flux__irreversible_0 </ci>
+                <ci> v </ci>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="v" name="v" value="15"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+    </listOfReactions>
+    <listOfEvents>
+      <event metaid="COPASI8" id="event" name="event" useValuesFromTriggerTime="true">
+        <annotation>
+          <COPASI xmlns="http://www.copasi.org/static/sbml">
+            <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+              <rdf:Description rdf:about="#COPASI8">
+                <dcterms:created>
+                  <rdf:Description>
+                    <dcterms:W3CDTF>2021-05-05T14:36:39Z</dcterms:W3CDTF>
+                  </rdf:Description>
+                </dcterms:created>
+              </rdf:Description>
+            </rdf:RDF>
+          </COPASI>
+        </annotation>
+        <trigger>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <lt/>
+              <ci> Oxy </ci>
+              <cn> 50 </cn>
+            </apply>
+          </math>
+        </trigger>
+        <delay>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <cn> 0 </cn>
+          </math>
+        </delay>
+        <listOfEventAssignments>
+          <eventAssignment variable="death_rate">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <cn> 100 </cn>
+            </math>
+          </eventAssignment>
+        </listOfEventAssignments>
+      </event>
+    </listOfEvents>
+  </model>
+</sbml>

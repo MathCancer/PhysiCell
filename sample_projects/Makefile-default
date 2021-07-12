@@ -14,17 +14,8 @@ endif
 ARCH := native # best auto-tuning
 # ARCH := core2 # a reasonably safe default for most CPUs since 2007
 # ARCH := corei7
-# ARCH := corei7-avx # earlier i7 
 # ARCH := core-avx-i # i7 ivy bridge or newer 
 # ARCH := core-avx2 # i7 with Haswell or newer
-# ARCH := nehalem
-# ARCH := westmere
-# ARCH := sandybridge # circa 2011
-# ARCH := ivybridge   # circa 2012
-# ARCH := haswell     # circa 2013
-# ARCH := broadwell   # circa 2014
-# ARCH := skylake     # circa 2015
-# ARCH := bonnell
 # ARCH := silvermont
 # ARCH := skylake-avx512
 # ARCH := nocona #64-bit pentium 4 or later 
@@ -62,26 +53,11 @@ all:
 
 # sample projects 	
 list-projects:
-	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
-	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm-sample"
-	
-template2D: 
-	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/template2D/main-2D.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/template2D/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/template2D/config/* ./config/
-	
-template3D: 	
-	cp ./sample_projects/template3D/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/template3D/main-3D.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/template3D/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/template3D/config/* ./config/
+	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
+	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample worm-sample"
+	@echo ""
+	@echo "Sample intracellular projects: ode-energy-sample physiboss-cell-lines-sample cancer-metabolism-sample"
+	@echo ""
 	
 template:
 	cp ./sample_projects/template/custom_modules/* ./custom_modules/
@@ -94,6 +70,7 @@ template:
 	
 # sample projects 
 
+# ---- non-intracellular projects 
 biorobots-sample:
 	cp ./sample_projects/biorobots/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
@@ -112,15 +89,6 @@ cancer-biorobots-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/cancer_biorobots/config/* ./config/
 	
-heterogeneity-sample:
-	cp ./sample_projects/heterogeneity/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/heterogeneity/main-heterogeneity.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/heterogeneity/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/heterogeneity/config/* ./config/
-	
 cancer-immune-sample:
 	cp ./sample_projects/cancer_immune/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
@@ -129,15 +97,24 @@ cancer-immune-sample:
 	cp ./sample_projects/cancer_immune/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/cancer_immune/config/* ./config/
-	
-virus-macrophage-sample:
-	cp ./sample_projects/virus_macrophage/custom_modules/* ./custom_modules/
+
+celltypes3-sample:
+	cp ./sample_projects/celltypes3/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/virus_macrophage/main.cpp ./main.cpp 
+	cp ./sample_projects/celltypes3/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
-	cp ./sample_projects/virus_macrophage/Makefile .
+	cp ./sample_projects/celltypes3/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/virus_macrophage/config/* ./config/
+	cp ./sample_projects/celltypes3/config/* ./config/	
+	
+heterogeneity-sample:
+	cp ./sample_projects/heterogeneity/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/heterogeneity/main-heterogeneity.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/heterogeneity/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/heterogeneity/config/* ./config/
 	
 pred-prey-farmer:
 	cp ./sample_projects/pred_prey_farmer/custom_modules/* ./custom_modules/
@@ -148,6 +125,15 @@ pred-prey-farmer:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/pred_prey_farmer/config/* ./config/	
 	
+virus-macrophage-sample:
+	cp ./sample_projects/virus_macrophage/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/virus_macrophage/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/virus_macrophage/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/virus_macrophage/config/* ./config/
+	
 worm-sample:
 	cp ./sample_projects/worm/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
@@ -156,6 +142,43 @@ worm-sample:
 	cp ./sample_projects/worm/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/worm/config/* ./config/	
+
+# ---- intracellular projects 
+ode-energy-sample:
+	cp ./sample_projects_intracellular/ode/ode_energy/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/ode/ode_energy/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/ode/ode_energy/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects_intracellular/ode/ode_energy/config/* ./config/	
+
+physiboss-cell-lines-sample:
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/config/* ./config/
+
+ecoli-acetic-switch-sample:
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/main_ecoli_acetic_switch.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/config/* ./config/
+
+cancer-metabolism-sample:
+	cp ./sample_projects_intracellular/fba/cancer_metabolism/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/fba/cancer_metabolism/main.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/fba/cancer_metabolism/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects_intracellular/fba/cancer_metabolism/config/* ./config/
 
 # early examples for convergence testing 
 
@@ -274,11 +297,12 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 # cleanup
 
 reset:
-	rm -f *.cpp 
+	rm -f *.cpp PhysiCell_cell.o
 	cp ./sample_projects/Makefile-default Makefile 
 	rm -f ./custom_modules/*
 	touch ./custom_modules/empty.txt 
 	touch ALL_CITATIONS.txt 
+	touch ./core/PhysiCell_cell.cpp
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	touch ./config/empty.csv

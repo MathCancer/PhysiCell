@@ -74,6 +74,7 @@ std::string space_units = "micron";
 double diffusion_dt = 0.01; 
 double mechanics_dt = 0.1;
 double phenotype_dt = 6.0;
+double intracellular_dt = 0.01;
 
 std::unordered_map<std::string,int> cycle_model_codes = 
 {
