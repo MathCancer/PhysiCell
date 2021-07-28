@@ -33,8 +33,7 @@ This release introduces ...
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
-
-
++ Fixed bug in legend function where on some rare occasions, the temporary cell could adversely interact with other cells prior to deletion. 
 
 ### Notices for intended changes that may affect backwards compatibility:
  
