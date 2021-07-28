@@ -682,10 +682,6 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 	
 	std::ofstream os( filename , std::ios::out );
 	Write_SVG_start( os , total_width ,total_height ); 
-
-	// create a temporary cell 
-	Cell* pCell; 
-	pCell = create_cell(); 
 	
 	double cursor_x = padding + temp_cell_radius; 
 	double cursor_y = padding + temp_cell_radius; 
@@ -693,10 +689,11 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 	for( int k=0 ; k < number_of_cell_types ; k++ )
 	{
 		// switch to the cell type 
-		pCell->convert_to_cell_definition( *(cell_definitions_by_index[k]) );
+		Cell C; 
+		C.convert_to_cell_definition( *(cell_definitions_by_index[k]) );
 		
 		// get the colors using the current coloring function 
-		std::vector<std::string> colors = cell_coloring_function(pCell); 
+		std::vector<std::string> colors = cell_coloring_function(&C); 
 		
 		// place a big circle with cytoplasm colors 
 		Write_SVG_circle(os,cursor_x, cursor_y , temp_cell_radius , 1.0 , colors[1] , colors[0] ); 
@@ -716,16 +713,7 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 		cursor_y -= 0.3*font_size; 
 		cursor_y += ( 2.0 * padding + 2.0*temp_cell_radius ); 
 		cursor_x = padding + temp_cell_radius;
-		
 	}
-	
-	// get rid of this temp cell at the earliest opportunity. 
-	// make it harmless for now 
-	pCell->assign_position( 0,0,0 ); 
-	pCell->turn_off_reactions(0.0); 
-	pCell->set_total_volume( 0.0 ); 
-	pCell->start_death(0); 
- 	pCell->phenotype.cycle.data.exit_rate(0) = 9e99; 
 	
 	Write_SVG_end( os ); 
 	os.close(); 
