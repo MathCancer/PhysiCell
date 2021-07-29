@@ -98,12 +98,12 @@ $ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/
 You should permanently set these in your environment: for the bash shell: 
 ```
 $ echo export PHYSICELL_CPP=g++-11 >> ~/.bash_profile
-$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.bash_profile
+$ echo export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.bash_profile
 ```
 or the zsh shell:
 ```
 $ echo export PHYSICELL_CPP=g++-11 >> ~/.zshenv
-$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.zshenv
+$ echo export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.zshenv
 ```
 
 
