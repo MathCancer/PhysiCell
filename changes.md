@@ -37,6 +37,8 @@ This release introduces ...
 
 + Remove an old error printout from standard_elastic_contact_function that causes problem with the ANCIENT version of gcc (4.8.x) that nanoHUB refuses to upgrade. 
 
++ Fixed Libroadrunner memory leak issue.
+
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
