@@ -14,11 +14,11 @@ This release introduces ...
  
 ### Major new features and changes:
 
-+ 
++ None in this release. 
 
 ### Minor new features and changes: 
 
-
++ None in this release.
 
 ### Beta features (not fully supported):
  
@@ -34,6 +34,8 @@ This release introduces ...
   
 ### Bugfixes: 
 + Fixed bug in legend function where on some rare occasions, the temporary cell could adversely interact with other cells prior to deletion. 
+
++ Remove an old error printout from standard_elastic_contact_function that causes problem with the ANCIENT version of gcc (4.8.x) that nanoHUB refuses to upgrade. 
 
 ### Notices for intended changes that may affect backwards compatibility:
  
