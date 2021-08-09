@@ -871,12 +871,14 @@ void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phe
 {
 	if( pC1->position.size() != 3 || pC2->position.size() != 3 )
 	{
+		/*
 		#pragma omp critical
 		{
 			std::cout << "what?! " << std::endl
 			<< pC1 << " : " << pC1->type << " " << pC1->type_name << " " << pC1->position << std::endl 
 			<< pC2 << " : " << pC2->type << " " << pC2->type_name << " " << pC2->position << std::endl ;
 		}
+		*/
 		return; 
 	}
 	
