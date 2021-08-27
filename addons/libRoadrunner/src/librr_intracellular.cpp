@@ -182,7 +182,7 @@ void RoadRunnerIntracellular::start()
         std::cerr << kdx << ") " << vptr->Data[kdx] << std::endl;
     }
     //std::cerr << "----------  end start() -------------\n";
-
+    rrc::freeVector(vptr);
     // return 0;
 }
 
