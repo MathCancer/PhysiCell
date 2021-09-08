@@ -1777,7 +1777,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	node = node.child( "death" ); 
 	if( node )
 	{
-        pugi::xml_node model_node = node.child( "model" );
+		pugi::xml_node model_node = node.child( "model" );
 		while( model_node )
 		{
 			node = model_node;
