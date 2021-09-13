@@ -1,12 +1,12 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:** 1.9.x
+**Version:** 1.9.1
 
-**Release date:** ????
+**Release date:** 13 September 2021
 
 ## Release summary: 
 
-This release introduces ...
+This release focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracellular modeling, as well as several small bugs in parsing cell definitions in the XML configuration file. It also implements a basic_volume_model that only models total volume. (For internal consistency, it treats the entire cell as cytoplasm.) 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
@@ -18,7 +18,7 @@ This release introduces ...
 
 ### Minor new features and changes: 
 
-+ None in this release.
++ Implemented basic_volume_model (see standard models), where nuclear volumes are set to zero, and cytoplasmic volumes are updated as normal. 
 
 ### Beta features (not fully supported):
  
@@ -39,6 +39,10 @@ This release introduces ...
 
 + Fixed Libroadrunner memory leak issue.
 
++ Made minor bugfixes to parsing cell definitions in the XML configuration files: 
+  + verify motility enabled flag is present before parsing its value
+  + fix bug when parsing multiple death models
+
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
@@ -50,6 +54,8 @@ This release introduces ...
 + We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
 
 + We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
+	
++ We will most probably merge all of "core" and "modules" into "core." 
 
 ### Planned future improvements: 
 
