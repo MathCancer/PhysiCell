@@ -51,7 +51,7 @@ a minimal version of GCC that supports OpenMP (on a 64-bit computer).
 $ pacman -S mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git  mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 git make
 ```
 
-3) After the above completes, open the Windows application (go to Start and search for "view advanced system settings") to let you edit your Environment Variables. You have the option of editing the “User variables” or “System variables”. If it is just for your use and not intended to be shared by other 
+3) After the above completes, open the Windows application (Go to start and search for "view advanced system settings") to let you edit your Environment Variables. You have the option of editing the “User variables” or “System variables”. If it is just for your use and not intended to be shared by other 
 users on this computer, then you can just edit “User variables”. Edit the “Path” variable and add three “New” 
 paths. The first two pertain to the MinGW build environment; the third is for using the libRoadrunner library that's needed
 by the intracellular models (ODEs) (and is a relative path from your PhysiCell main folder).
@@ -98,12 +98,12 @@ $ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/
 You should permanently set these in your environment: for the bash shell: 
 ```
 $ echo export PHYSICELL_CPP=g++-11 >> ~/.bash_profile
-$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.bash_profile
+$ echo export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.bash_profile
 ```
 or the zsh shell:
 ```
 $ echo export PHYSICELL_CPP=g++-11 >> ~/.zshenv
-$ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.zshenv
+$ echo export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib >> ~/.zshenv
 ```
 
 
