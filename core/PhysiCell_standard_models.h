@@ -103,7 +103,7 @@ bool standard_necrosis_arrest_function( Cell* pCell, Phenotype& phenotype, doubl
 // standard volume functions 
 
 void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt ); 
+void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt ); // done 
 
 // standard mechanics functions 
 
