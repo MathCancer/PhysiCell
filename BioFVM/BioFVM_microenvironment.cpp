@@ -237,6 +237,13 @@ void Microenvironment::set_substrate_dirichlet_activation( int substrate_index ,
 	
 	return; 
 }
+	
+void Microenvironment::set_substrate_dirichlet_activation_vector( int substrate_index , bool new_value )
+{
+	dirichlet_activation_vector[substrate_index] = new_value; 
+	
+	return; 
+}
 
 void Microenvironment::set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value )
 {
@@ -1526,7 +1533,7 @@ void initialize_microenvironment( void )
 	// set the Dirichlet condition activation vector to match the microenvironment options 
 	for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
 	{
-		microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
+		microenvironment.set_substrate_dirichlet_activation_vector( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
 	}
 	
 	microenvironment.display_information( std::cout );
