@@ -318,6 +318,21 @@
 			<custom_data>  
 				<sample units="dimensionless" conserved="false">1.0</sample>
 			</custom_data>
+
+			<initial_parameter_distributions enabled="false">
+				<distribution enabled="false" type="Log10Normal" check_base="true">
+					<behavior>Volume</behavior> 
+					<mu>4</mu>
+					<sigma>2</sigma>
+					<upper_bound>100000</upper_bound>
+				</distribution>
+				<distribution enabled="false" type="LogUniform" check_base="true">
+					<behavior>apoptosis</behavior>
+					<min>1e-6</min>
+					<max>1e-2</max>
+				</distribution>
+			</initial_parameter_distributions>
+			
 		</cell_definition>
 	</cell_definitions>
 	
