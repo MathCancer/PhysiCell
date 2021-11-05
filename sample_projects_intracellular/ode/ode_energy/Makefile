@@ -219,7 +219,11 @@ reset:
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	touch ./config/empty.csv
-	rm ./config/*.csv	
+	rm ./config/*.csv
+	rm ./config/*.m
+	rm ./config/*.cps
+	rm ./config/Toy_Metabolic_Model.xml
+	
 	
 FOLDER := output
 FRAMERATE := 24
