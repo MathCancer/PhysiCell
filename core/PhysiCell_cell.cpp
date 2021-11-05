@@ -1777,9 +1777,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	node = node.child( "death" ); 
 	if( node )
 	{
-		node = node.child( "model" );
-		while( node )
+		pugi::xml_node model_node = node.child( "model" );
+		while( model_node )
 		{
+			node = model_node;
+
 			int model; // = node.attribute("code").as_int() ; 
 			if( strlen( node.attribute("code").as_string() ) > 0 )
 			{ model = node.attribute("code").as_int(); }
@@ -2013,7 +2015,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			
 			// node = node.parent(); 
 			
-			node = node.next_sibling( "model" ); 
+			model_node = model_node.next_sibling( "model" ); 
 //			death_model_index++; 
 		}
 		
@@ -2157,11 +2159,17 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		{
 			// enable motility? 
 			pugi::xml_node node_mot1 = node_mot.child( "enabled" ); 
-			pMot->is_motile = xml_get_my_bool_value( node_mot1 ); 
+			if( node_mot1 )
+			{
+				pMot->is_motile = xml_get_my_bool_value( node_mot1 ); 
+			}
 			
 			// restrict to 2D? 
 			node_mot1 = node_mot.child( "use_2D" ); 
-			pMot->restrict_to_2D = xml_get_my_bool_value( node_mot1 ); 
+			if( node_mot1 )
+			{
+				pMot->restrict_to_2D = xml_get_my_bool_value( node_mot1 ); 
+			}
 			
 			if( default_microenvironment_options.simulate_2D )
 			{

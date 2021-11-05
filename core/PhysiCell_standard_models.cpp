@@ -561,8 +561,52 @@ void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double 
 
 void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	// This model does not simulate a nucleus, and sets all nuclear volumes to zero. 
+	// The total volume is most relevant. Use the cytoplasmic volume if you must. 
+	
+	// update fluid volume 
+	phenotype.volume.fluid += dt * phenotype.volume.fluid_change_rate * 
+	( phenotype.volume.target_fluid_fraction * phenotype.volume.total - phenotype.volume.fluid );
+		
+	// if the fluid volume is negative, set to zero
+	if( phenotype.volume.fluid < 0.0 )
+	{ phenotype.volume.fluid = 0.0; }
+
+	// now distribute fluid to cytoplasm and nucleus 
+		
+	phenotype.volume.nuclear_fluid = 0.0; 
+		// (phenotype.volume.nuclear / phenotype.volume.total) * ( phenotype.volume.fluid );
+	phenotype.volume.cytoplasmic_fluid = phenotype.volume.fluid;
+		// - phenotype.volume.nuclear_fluid; 
+
+	// biomass creation 
+
+	phenotype.volume.nuclear_solid = 0; 
+	
+	// don't overwrite target_solid_cytoplasmic. 
+	phenotype.volume.cytoplasmic_solid += dt * phenotype.volume.cytoplasmic_biomass_change_rate * 
+		( phenotype.volume.target_solid_cytoplasmic - phenotype.volume.cytoplasmic_solid );	
+	if( phenotype.volume.cytoplasmic_solid < 0.0 )
+	{ phenotype.volume.cytoplasmic_solid = 0.0; }
+
+	// bookkeeping 
+	
+	// phenotype.volume.solid = phenotype.volume.nuclear_solid + phenotype.volume.cytoplasmic_solid;
+	phenotype.volume.solid = phenotype.volume.cytoplasmic_solid;
+	
+	phenotype.volume.nuclear = 0.0; // phenotype.volume.nuclear_solid + phenotype.volume.nuclear_fluid; 
+	phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + phenotype.volume.cytoplasmic_fluid; 
+	
+	phenotype.volume.calcified_fraction = dt * phenotype.volume.calcification_rate 
+		* (1- phenotype.volume.calcified_fraction);
+   
+	phenotype.volume.total = phenotype.volume.cytoplasmic; //  + phenotype.volume.nuclear; 
 	
 	
+	phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
+		( 1e-16 + phenotype.volume.total ); 
+   
+	phenotype.geometry.update( pCell,phenotype,dt );
 	
 	return; 
 }
