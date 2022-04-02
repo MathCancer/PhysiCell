@@ -31,8 +31,6 @@ focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracel
 
 ### Minor new features and changes: 
 
-+ Merged all modules into core, since there is no longer a meaningful difference. 
-
 + All sample projects output the executable name to screen for easier reference. 
 
 
