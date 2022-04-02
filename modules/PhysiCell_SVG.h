@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,20 +65,25 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_standard_modules_h__
-#define __PhysiCell_standard_modules_h__
-
 #include <iostream>
 #include <fstream>
+#include <cstdio>
+#include <cstdlib>
+#include <string>
 
-#include "./PhysiCell_SVG.h"
-#include "./PhysiCell_pathology.h"
-#include "./PhysiCell_MultiCellDS.h"
-#include "./PhysiCell_various_outputs.h"
+#ifndef _PhysiCell_SVG_h_
+#define _PhysiCell_SVG_h_
 
-#include "./PhysiCell_pugixml.h"
-#include "./PhysiCell_settings.h" 
+bool Write_SVG_start( std::ostream& os, double width, double height );
+bool Write_SVG_end( std::ostream& os );
 
-#include "./PhysiCell_geometry.h" 
+bool Write_SVG_text( std::ostream& os, const char* str , double position_x, double position_y, double font_size , const char* color , const char* font);
+bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, std::string stroke_color , std::string fill_color );
+
+bool Write_SVG_rect( std::ostream& os , double UL_corner_x, double UL_corner_y, double width, double height,
+                     double stroke_size, std::string stroke_color , std::string fill_color );
+
+bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
+                    std::string stroke_color );  
 
 #endif

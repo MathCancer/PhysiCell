@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,60 +65,20 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_pugixml_h__
-#define __PhysiCell_pugixml_h__
+#ifndef __PhysiCell_standard_modules_h__
+#define __PhysiCell_standard_modules_h__
 
 #include <iostream>
-#include <ctime>
-#include <cmath>
-#include <string>
-#include <vector>
-#include <random>
-#include <chrono>
+#include <fstream>
 
-#include "../BioFVM/pugixml.hpp"
+#include "./PhysiCell_SVG.h"
+#include "./PhysiCell_pathology.h"
+#include "./PhysiCell_MultiCellDS.h"
+#include "./PhysiCell_various_outputs.h"
 
-namespace PhysiCell{
-	
-// find the first <find_me> child in <parent_node> 
-pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me ); // done 
+#include "./PhysiCell_pugixml.h"
+#include "./PhysiCell_settings.h" 
 
-// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me ); // done 
+#include "./PhysiCell_geometry.h" 
 
-// get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
-double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me ); // done 
-
-// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me ); // done 
-
-// get the Boolean value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me );// done 
-
-
-// get the name of the element in <my_node> (the name would be my_node) 
-std::string xml_get_my_name( pugi::xml_node node ); 
-
-
-bool xml_get_my_bool_value( pugi::xml_node node ); 
-int xml_get_my_int_value( pugi::xml_node node ); 
-double xml_get_my_double_value( pugi::xml_node node ); 
-std::string xml_get_my_string_value( pugi::xml_node node ); 
-
-
-
-
-
-// get the string attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-std::string get_string_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
-
-// get the int attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-int get_int_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
-
-// get the double attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-double get_double_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
-
-};
-
-#endif 
-
+#endif

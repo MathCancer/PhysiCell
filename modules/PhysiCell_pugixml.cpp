@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,77 +65,68 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_geometry_h__
-#define __PhysiCell_geometry_h__
+#include "./PhysiCell_pugixml.h"
 
-#include <string>
-#include <vector>
-
-#include "./PhysiCell.h"
-#include "./PhysiCell_settings.h"
-
-
-namespace PhysiCell
-{
-// loaders 
+namespace PhysiCell{
 	
-void load_cells_csv( std::string filename ); // done 
-void load_cells_mat( std::string filename ); 
-void load_cells_physicell( std::string filename ); 
 
-bool load_cells_from_pugixml( pugi::xml_node root ); 
-bool load_cells_from_pugixml( void ); // load cells based on default config XML root 
+// find the first <find_me> child in <parent_node> 
+pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me )
+{
+	return parent_node.child( find_me.c_str() ); 
+}
 
-
-//	
-// 2D functions 
-//
-void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
-void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD ); 
-
-void fill_circle( std::vector<double> center , double radius , int cell_type , double compression );
-void fill_circle( std::vector<double> center , double radius , int cell_type ); 
-
-
-void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD , double compression ); 
-void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD ); 
-
-void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type , double compression );
-void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type ); 
+// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me )
+{
+	return parent_node.child( find_me.c_str() ).text().get(); 
+}
+	
+	
+// get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
+double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me )
+{
+	// return strtod( parent_node.child( find_me.c_str() ).text().get() , NULL ); // classic 
+	
+	return parent_node.child( find_me.c_str() ).text().as_double(); // using pugixml conversion 
+}
 
 
-// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
-void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
-void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD ); 
+// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
+int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me )
+{
+	//	return atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic 
+	
+	return parent_node.child( find_me.c_str() ).text().as_int(); // using pugixml conversion 
+}
 
-void fill_rectangle( std::vector<double> bounds , int cell_type , double compression );  
-void fill_rectangle( std::vector<double> bounds , int cell_type ); 
+// get the Boolean value in <parent_node> <find_me>int_value</find_me> </parent_node> 
+bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me )
+{
+	//	return (bool) atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic (untested)
+	
+	return parent_node.child( find_me.c_str() ).text().as_bool(); // using pugixml conversion 
+}
+ 
+// get the name of the element in <my_node> (the name would be my_node) 
+std::string xml_get_my_name( pugi::xml_node node )
+{
+	return node.name(); 
+}
+
+bool xml_get_my_bool_value( pugi::xml_node node )
+{ return node.text().as_bool(); }
+
+int xml_get_my_int_value( pugi::xml_node node )
+{ return node.text().as_int(); }
+
+double xml_get_my_double_value( pugi::xml_node node )
+{ return node.text().as_double(); }
+
+std::string xml_get_my_string_value( pugi::xml_node node )
+{ return node.text().get(); }
 
 
-//
-// 3D functions
-//
-void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
-void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD ); 
 
-void fill_sphere( std::vector<double> center , double radius , int cell_type , double compression ); 
-void fill_sphere( std::vector<double> center , double radius , int cell_type ); 
-
-// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
-void fill_box( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
-void fill_box( std::vector<double> bounds , Cell_Definition* pCD ); 
-
-void fill_box( std::vector<double> bounds , int cell_type , double compression ); 
-void fill_box( std::vector<double> bounds , int cell_type ); 
-
-void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD , double compression ); 
-void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD ); 
-
-void draw_line( std::vector<double> start , std::vector<double> end , int cell_type , double compression ); 
-void draw_line( std::vector<double> start , std::vector<double> end , int cell_type ); 
-
-
-
+	
 };
-
-#endif

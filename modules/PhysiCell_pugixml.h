@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,65 +65,60 @@
 ###############################################################################
 */
 
-#include <vector>
+#ifndef __PhysiCell_pugixml_h__
+#define __PhysiCell_pugixml_h__
+
+#include <iostream>
+#include <ctime>
+#include <cmath>
 #include <string>
+#include <vector>
+#include <random>
+#include <chrono>
 
-#ifndef __PhysiCell_pathology__
-#define __PhysiCell_pathology__
-
-#include "../core/PhysiCell.h"
-
-#include "./PhysiCell_SVG.h"
-#include "../BioFVM/BioFVM_utilities.h"
+#include "../BioFVM/pugixml.hpp"
 
 namespace PhysiCell{
 	
-struct PhysiCell_SVG_options_struct {
-	bool plot_nuclei = true; 
+// find the first <find_me> child in <parent_node> 
+pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me ); // done 
 
-	std::string simulation_time_units = "min";
-	std::string mu = "&#956;";
-	std::string simulation_space_units = "&#956;m";
-	
-	std::string label_time_units = "days"; 
-	
-	double font_size = 200; 
-	std::string font_color = "black";
-	std::string font = "Arial";
+// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me ); // done 
 
-	double length_bar = 100; 
-}; 
+// get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
+double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me ); // done 
 
-extern PhysiCell_SVG_options_struct PhysiCell_SVG_options;
+// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
+int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me ); // done 
 
-// done 
-std::vector<double> transmission( std::vector<double>& incoming_light, std::vector<double>& absorb_color, double thickness , double stain );
+// get the Boolean value in <parent_node> <find_me>int_value</find_me> </parent_node> 
+bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me );// done 
 
-// these give (in order) the cytoplasm color, cytoplasm outline color, nuclear color, nuclear outline color, 
-// each string is either rgb(R,G,B) or none 
 
-std::vector<std::string> simple_cell_coloring( Cell* pCell ); // done 
-std::vector<std::string> false_cell_coloring_Ki67( Cell* pCell ); // done 
-std::vector<std::string> false_cell_coloring_live_dead( Cell* pCell ); // done 
+// get the name of the element in <my_node> (the name would be my_node) 
+std::string xml_get_my_name( pugi::xml_node node ); 
 
-std::vector<std::string> false_cell_coloring_cycling_quiescent( Cell* pCell ); // done 
 
-std::vector<std::string> false_cell_coloring_cytometry( Cell* pCell ); 
+bool xml_get_my_bool_value( pugi::xml_node node ); 
+int xml_get_my_int_value( pugi::xml_node node ); 
+double xml_get_my_double_value( pugi::xml_node node ); 
+std::string xml_get_my_string_value( pugi::xml_node node ); 
 
-std::vector<std::string> hematoxylin_and_eosin_cell_coloring( Cell* pCell ); // done 
-std::vector<std::string> hematoxylin_and_eosin_stroma_coloring( double& ECM_fraction , double& blood_vessel_fraction); // planned 
 
-std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell ); // done 
 
-std::string formatted_minutes_to_DDHHMM( double minutes ); 
 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) ); // done
 
-void SVG_plot_with_stroma( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) , 
-	int ECM_index, std::vector<std::string> (*ECM_coloring_function)(double) ); // planned
-	
-void create_plot_legend( std::string filename , std::vector<std::string> (*cell_coloring_function)(Cell*) ); 
+// get the string attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+std::string get_string_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
+
+// get the int attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+int get_int_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
+
+// get the double attribute named "attribute" in the first std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
+double get_double_attribute_value( pugi::xml_node& parent_node , std::string find_me , std::string attribute ); 
 
 };
 
-#endif
+#endif 
+

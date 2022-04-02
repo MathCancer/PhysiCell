@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,25 +65,77 @@
 ###############################################################################
 */
 
-#include <iostream>
-#include <fstream>
-#include <cstdio>
-#include <cstdlib>
+#ifndef __PhysiCell_geometry_h__
+#define __PhysiCell_geometry_h__
+
 #include <string>
+#include <vector>
 
-#ifndef _PhysiCell_SVG_h_
-#define _PhysiCell_SVG_h_
+#include "../core/PhysiCell.h"
+#include "./PhysiCell_settings.h"
 
-bool Write_SVG_start( std::ostream& os, double width, double height );
-bool Write_SVG_end( std::ostream& os );
 
-bool Write_SVG_text( std::ostream& os, const char* str , double position_x, double position_y, double font_size , const char* color , const char* font);
-bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, std::string stroke_color , std::string fill_color );
+namespace PhysiCell
+{
+// loaders 
+	
+void load_cells_csv( std::string filename ); // done 
+void load_cells_mat( std::string filename ); 
+void load_cells_physicell( std::string filename ); 
 
-bool Write_SVG_rect( std::ostream& os , double UL_corner_x, double UL_corner_y, double width, double height,
-                     double stroke_size, std::string stroke_color , std::string fill_color );
+bool load_cells_from_pugixml( pugi::xml_node root ); 
+bool load_cells_from_pugixml( void ); // load cells based on default config XML root 
 
-bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
-                    std::string stroke_color );  
+
+//	
+// 2D functions 
+//
+void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
+void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD ); 
+
+void fill_circle( std::vector<double> center , double radius , int cell_type , double compression );
+void fill_circle( std::vector<double> center , double radius , int cell_type ); 
+
+
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD , double compression ); 
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD ); 
+
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type , double compression );
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type ); 
+
+
+// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
+void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
+void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD ); 
+
+void fill_rectangle( std::vector<double> bounds , int cell_type , double compression );  
+void fill_rectangle( std::vector<double> bounds , int cell_type ); 
+
+
+//
+// 3D functions
+//
+void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
+void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD ); 
+
+void fill_sphere( std::vector<double> center , double radius , int cell_type , double compression ); 
+void fill_sphere( std::vector<double> center , double radius , int cell_type ); 
+
+// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
+void fill_box( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
+void fill_box( std::vector<double> bounds , Cell_Definition* pCD ); 
+
+void fill_box( std::vector<double> bounds , int cell_type , double compression ); 
+void fill_box( std::vector<double> bounds , int cell_type ); 
+
+void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD , double compression ); 
+void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD ); 
+
+void draw_line( std::vector<double> start , std::vector<double> end , int cell_type , double compression ); 
+void draw_line( std::vector<double> start , std::vector<double> end , int cell_type ); 
+
+
+
+};
 
 #endif

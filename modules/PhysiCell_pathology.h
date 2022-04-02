@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,68 +65,65 @@
 ###############################################################################
 */
 
-#include "./PhysiCell_pugixml.h"
+#include <vector>
+#include <string>
+
+#ifndef __PhysiCell_pathology__
+#define __PhysiCell_pathology__
+
+#include "../core/PhysiCell.h"
+
+#include "./PhysiCell_SVG.h"
+#include "../BioFVM/BioFVM_utilities.h"
 
 namespace PhysiCell{
 	
+struct PhysiCell_SVG_options_struct {
+	bool plot_nuclei = true; 
 
-// find the first <find_me> child in <parent_node> 
-pugi::xml_node xml_find_node( pugi::xml_node& parent_node , std::string find_me )
-{
-	return parent_node.child( find_me.c_str() ); 
-}
-
-// get the std:string in <parent_node> <find_me>string_value</find_me> </parent_node> 
-std::string xml_get_string_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	return parent_node.child( find_me.c_str() ).text().get(); 
-}
+	std::string simulation_time_units = "min";
+	std::string mu = "&#956;";
+	std::string simulation_space_units = "&#956;m";
 	
+	std::string label_time_units = "days"; 
 	
-// get the double value stored in <parent_node> <find_me>double_value</find_me> </parent_node> 
-double xml_get_double_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	// return strtod( parent_node.child( find_me.c_str() ).text().get() , NULL ); // classic 
+	double font_size = 200; 
+	std::string font_color = "black";
+	std::string font = "Arial";
+
+	double length_bar = 100; 
+}; 
+
+extern PhysiCell_SVG_options_struct PhysiCell_SVG_options;
+
+// done 
+std::vector<double> transmission( std::vector<double>& incoming_light, std::vector<double>& absorb_color, double thickness , double stain );
+
+// these give (in order) the cytoplasm color, cytoplasm outline color, nuclear color, nuclear outline color, 
+// each string is either rgb(R,G,B) or none 
+
+std::vector<std::string> simple_cell_coloring( Cell* pCell ); // done 
+std::vector<std::string> false_cell_coloring_Ki67( Cell* pCell ); // done 
+std::vector<std::string> false_cell_coloring_live_dead( Cell* pCell ); // done 
+
+std::vector<std::string> false_cell_coloring_cycling_quiescent( Cell* pCell ); // done 
+
+std::vector<std::string> false_cell_coloring_cytometry( Cell* pCell ); 
+
+std::vector<std::string> hematoxylin_and_eosin_cell_coloring( Cell* pCell ); // done 
+std::vector<std::string> hematoxylin_and_eosin_stroma_coloring( double& ECM_fraction , double& blood_vessel_fraction); // planned 
+
+std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell ); // done 
+
+std::string formatted_minutes_to_DDHHMM( double minutes ); 
+
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) ); // done
+
+void SVG_plot_with_stroma( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) , 
+	int ECM_index, std::vector<std::string> (*ECM_coloring_function)(double) ); // planned
 	
-	return parent_node.child( find_me.c_str() ).text().as_double(); // using pugixml conversion 
-}
+void create_plot_legend( std::string filename , std::vector<std::string> (*cell_coloring_function)(Cell*) ); 
 
-
-// get the integer value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	//	return atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic 
-	
-	return parent_node.child( find_me.c_str() ).text().as_int(); // using pugixml conversion 
-}
-
-// get the Boolean value in <parent_node> <find_me>int_value</find_me> </parent_node> 
-bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me )
-{
-	//	return (bool) atoi( parent_node.child( find_me.c_str() ).text().get() ); // classic (untested)
-	
-	return parent_node.child( find_me.c_str() ).text().as_bool(); // using pugixml conversion 
-}
- 
-// get the name of the element in <my_node> (the name would be my_node) 
-std::string xml_get_my_name( pugi::xml_node node )
-{
-	return node.name(); 
-}
-
-bool xml_get_my_bool_value( pugi::xml_node node )
-{ return node.text().as_bool(); }
-
-int xml_get_my_int_value( pugi::xml_node node )
-{ return node.text().as_int(); }
-
-double xml_get_my_double_value( pugi::xml_node node )
-{ return node.text().as_double(); }
-
-std::string xml_get_my_string_value( pugi::xml_node node )
-{ return node.text().get(); }
-
-
-
-	
 };
+
+#endif
