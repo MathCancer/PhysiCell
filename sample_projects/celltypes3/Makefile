@@ -63,8 +63,12 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
 # compile the project  
 
+name:
+	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
+
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
+	make name 
 
 # PhysiCell core components	
 

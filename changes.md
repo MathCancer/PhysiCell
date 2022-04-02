@@ -33,6 +33,8 @@ focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracel
 
 + All sample projects output the executable name to screen for easier reference. 
 
++ All sample projects have a new rule "make name" to tell you the name of the executable. 
+
 
 	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
 

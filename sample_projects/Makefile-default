@@ -59,6 +59,9 @@ EXAMPLES := ./examples/PhysiCell_test_mechanics_1.cpp ./examples/PhysiCell_test_
  ./examples/PhysiCell_test_DCIS.cpp ./examples/PhysiCell_test_HDS.cpp \
  ./examples/PhysiCell_test_cell_cycle.cpp ./examples/PhysiCell_test_volume.cpp 
 
+name:
+	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
+
 all: 
 	make heterogeneity-sample
 	make 
