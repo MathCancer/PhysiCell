@@ -26,7 +26,7 @@ focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracel
 
 + PhysiCell_basic_signaling now includes standard Hill and linear response functions. 
 
-
++ Updated heterogeneity-sample, template, 
 
 
 ### Minor new features and changes: 
