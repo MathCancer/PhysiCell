@@ -247,8 +247,6 @@ upgrade: $(SOURCE)
 	mv -f PhysiCell/VERSION.txt . 
 	unzip $(SOURCE) PhysiCell/core/* 
 	cp -r PhysiCell/core/* core 
-	unzip $(SOURCE) PhysiCell/modules/* 
-	cp -r PhysiCell/modules/* modules 
 	unzip $(SOURCE) PhysiCell/sample_projects/* 
 	cp -r PhysiCell/sample_projects/* sample_projects 
 	unzip $(SOURCE) PhysiCell/BioFVM/* 

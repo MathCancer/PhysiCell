@@ -28,11 +28,16 @@ focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracel
 
 
 
+
 ### Minor new features and changes: 
 
 + Merged all modules into core, since there is no longer a meaningful difference. 
 
 + All sample projects output the executable name to screen for easier reference. 
+
+
+	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
+
 
 ### Beta features (not fully supported):
  
