@@ -55,6 +55,8 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiFBA_addon_OBJECTS) $(PhysiCell_custom
 
 
 # compile the project
+name:
+	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
 
 all: libFBA main.cpp $(ALL_OBJECTS)
 #	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LDFLAGS) $(LIBS)

@@ -87,6 +87,10 @@ PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJE
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(ROADRUNNER_OBJECTS)
 
 # compile the project 
+
+name:
+	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
+
 all: libRoadrunner main.cpp $(ALL_OBJECTS)
 	@echo Your OS= $(OSFLAG)
 	@echo LIBRR_CFLAGS= $(LIBRR_CFLAGS)

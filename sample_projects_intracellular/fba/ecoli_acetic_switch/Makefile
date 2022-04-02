@@ -121,8 +121,13 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(FBA_add
 # compile the project
 
 # all: libFBA main.cpp $(ALL_OBJECTS)
+
+name:
+	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
+
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIBS)
+	make name 
 
 # PhysiCell core components
 

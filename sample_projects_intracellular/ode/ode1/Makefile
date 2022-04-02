@@ -90,6 +90,9 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(ROADRUN
 #all: main.cpp $(ALL_OBJECTS)
 #	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
 
+name:
+	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
+
 all: libRoadrunner main.cpp $(ALL_OBJECTS)
 	@echo Your OS= $(OSFLAG)
 	@echo LIBRR_CFLAGS= $(LIBRR_CFLAGS)
