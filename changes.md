@@ -32,6 +32,8 @@ focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracel
 
 + Merged all modules into core, since there is no longer a meaningful difference. 
 
++ All sample projects output the executable name to screen for easier reference. 
+
 ### Beta features (not fully supported):
  
 + Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 

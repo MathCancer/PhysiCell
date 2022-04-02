@@ -64,95 +64,23 @@
 #                                                                             #
 ###############################################################################
 */
- 
-#include "./PhysiCell_basic_signaling.h"
+
+#include "../core/PhysiCell.h"
+#include "../core/PhysiCell_standard_modules.h" 
 
 using namespace BioFVM; 
+using namespace PhysiCell;
 
-namespace PhysiCell{
-	
-Integrated_Signal::Integrated_Signal()
-{
-	base_activity = 0.0; 
-	max_activity = 1.0; 
-	
-	promoters.clear(); 
-	promoter_weights.clear(); 
-	
-	promoters_half_max = 0.1;
-	promoters_Hill = 4; 
-	
-	inhibitors.clear(); 
-	inhibitor_weights.clear(); 
-	
-	inhibitors_half_max = 0.1; 
-	inhibitors_Hill = 4; 
-	
-	return; 
-}
+// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-void Integrated_Signal::reset( void )
-{
-	promoters.clear(); 
-	promoter_weights.clear(); 
+// set the tumor cell properties, then call the function 
+// to set up the tumor cells 
+void create_cell_types( void );
 
-	inhibitors.clear(); 
-	inhibitor_weights.clear(); 
-	return; 
-}
+void setup_tissue(); 
 
-double Integrated_Signal::compute_signal( void )
-{
-	double pr = 0.0; 
-	double w = 0.0; 
-	for( int k=0 ; k < promoters.size() ; k++ )
-	{ pr += promoters[k]; w += promoter_weights[k]; } 
-	w += 1e-16; 
-	pr /= w; 
-	
-	double inhib = 0.0; 
-	w = 0.0; 
-	for( int k=0 ; k < inhibitors.size() ; k++ )
-	{ inhib += inhibitors[k]; w += inhibitor_weights[k]; } 
-	w += 1e-16; 
-	inhib /= w; 
-	
-	double Pn = pow( pr , promoters_Hill ); 
-	double Phalf = pow( promoters_half_max , promoters_Hill ); 
+// set up the microenvironment to include the immunostimulatory factor 
+void setup_microenvironment( void );  // done 
 
-	double In = pow( inhib , inhibitors_Hill ); 
-	double Ihalf = pow( inhibitors_half_max , inhibitors_Hill ); 
-	
-	double P = Pn / ( Pn + Phalf ); 
-	double I = 1.0 / ( In + Ihalf ); 
-	
-	double output = max_activity; 
-	output -= base_activity; //(max-base)
-	output *= P; // (max-base)*P 
-	output += base_activity; // base + (max-base)*P 
-	output *= I; // (base + (max-base)*P)*I; 
-
-	return output; 
-};
-
-void Integrated_Signal::add_signal( char signal_type , double signal , double weight )
-{
-	if( signal_type == 'P' || signal_type == 'p' )
-	{
-		promoters.push_back( signal ); 
-		promoter_weights.push_back( weight ); 
-		return; 
-	}
-	if( signal_type == 'I' || signal_type == 'i' )
-	{
-		inhibitors.push_back( signal ); 
-		inhibitor_weights.push_back( weight ); 
-		return; 
-	}
-	return; 
-}
-
-void Integrated_Signal::add_signal( char signal_type , double signal )
-{ return add_signal( signal_type , signal , 1.0 ); }
-
-}; 
+std::vector<std::string> heterogeneity_coloring_function( Cell* );
