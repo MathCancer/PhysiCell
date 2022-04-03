@@ -181,7 +181,10 @@ void setup_tissue( void )
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{ return paint_by_number_cell_coloring(pCell); }
+{
+	 return paint_by_number_cell_coloring(pCell); 
+	 
+}
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
@@ -191,3 +194,21 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
 { return; } 
+
+void tumor_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	static Cell_Definition* pCD = find_cell_definition( pCell->name ); 
+
+	// sample oxygen 
+
+	static int nO2 
+
+	// oxygen increases cycle entry 
+
+	// oxygen decreses necrosis 
+
+	// damage increases death 
+
+
+
+}

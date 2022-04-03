@@ -214,12 +214,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
 			Cell* pC = (*all_cells)[i]; 
-			
-			// new March 2022: 
-			// run standard interactions (phagocytosis, attack, fusion) here 
-			
-			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics); 
-			
+						
 			if( pC->functions.custom_cell_rule && pC->is_out_of_domain == false )
 			{ pC->functions.custom_cell_rule( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
@@ -235,9 +230,17 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{ pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
 
+		// new March 2022: 
+		// run standard interactions (phagocytosis, attack, fusion) here 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics); 
+		}
+
 		// update positions 
 		
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "position" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -245,43 +248,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			if( pC->is_out_of_domain == false && pC->is_movable)
 			{ pC->update_position(time_since_last_mechanics); }
 		}
-		
-/*		
-		// Compute custom functions, interations, and velocities
-		#pragma omp parallel for 
-		for( int i=0; i < (*all_cells).size(); i++ )
-		{
-
-			if(!(*all_cells)[i]->is_out_of_domain && (*all_cells)[i]->is_movable && (*all_cells)[i]->functions.update_velocity )
-			{
-				// update_velocity already includes the motility update 
-				//(*all_cells)[i]->phenotype.motility.update_motility_vector( (*all_cells)[i] ,(*all_cells)[i]->phenotype , time_since_last_mechanics ); 
-				(*all_cells)[i]->functions.update_velocity( (*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
-			}
-
-			if( (*all_cells)[i]->functions.custom_cell_rule )
-			{
-				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
-			}
-			
-			// contact interactions 
-			
-			if( (*all_cells)[i]->functions.contact_function )
-			{
-				evaluate_interactions( (*all_cells)[i] , (*all_cells)[i]->phenotype, time_since_last_mechanics );
-			}
-			
-		}
-		// Calculate new positions
-		#pragma omp parallel for 
-		for( int i=0; i < (*all_cells).size(); i++ )
-		{
-			if(!(*all_cells)[i]->is_out_of_domain && (*all_cells)[i]->is_movable)
-			{
-				(*all_cells)[i]->update_position(time_since_last_mechanics);
-			}
-		}
-*/		
 		
 		// When somebody reviews this code, let's add proper braces for clarity!!! 
 		
