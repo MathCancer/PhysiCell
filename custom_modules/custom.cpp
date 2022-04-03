@@ -179,6 +179,11 @@ void setup_tissue( void )
 		}
 	}
 	std::cout << std::endl; 
+
+	// place a tumor spheroid 
+
+	Cell_Definition* pCD = find_cell_definition( "cancer"); 
+	fill_circle( {0,0,0} , 200 , pCD , 0.9 ); 
 	
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	

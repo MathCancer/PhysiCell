@@ -31,10 +31,15 @@ focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracel
 
 ### Minor new features and changes: 
 
-+ All sample projects output the executable name to screen for easier reference. 
-
 + All sample projects have a new rule "make name" to tell you the name of the executable. 
 
++ All sample projects output the executable name to screen for easier reference. 
+
++ Cell_Definition has a new Boolean is_movable, so that all cells of a type can be set to non-movable. (Default: is_movable = true;)
+
++ create_cell( Cell_Definition ) now uses "is_movable" from the cell def 
+
++ 
 
 	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
 

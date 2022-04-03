@@ -137,6 +137,8 @@ Cell_Definition::Cell_Definition()
 	type = 0; 
 	name = "unnamed"; 
 
+	is_movable = true;
+
 	parameters.pReference_live_phenotype = &phenotype; 
 		
 	// set up the default custom data 
@@ -1009,7 +1011,7 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->functions = cd.functions; 
 	
 	pNew->phenotype = cd.phenotype; 
-	pNew->is_movable = true;
+	pNew->is_movable = cd.is_movable; //  true;
 	pNew->is_out_of_domain = false;
 	pNew->displacement.resize(3,0.0); // state? 
 	
