@@ -117,6 +117,7 @@ void create_cell_types( void )
 	
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.1; 
+	pCD->functions.update_phenotype = macrophage_phenotype; 
 
 	// pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria" ) = 0.001; 
 
@@ -261,11 +262,49 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	// find my cell definition 
+	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
+
+	// sample environment 
+
+	static int nROS = microenvironment.find_density_index( "ROS");
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
+	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
+	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double PIF = samples[nPIF];
+	double AIF = samples[nAIF]; 
+	double ROS = samples[nROS];
+
+	// sample contacts 
+
+	static int Treg_type = find_cell_definition( "Treg")->type; 
+	static int bacteria_type = find_cell_definition( "bacteria")->type; 
+
+	int num_Treg = 0; 
+	int num_bacteria = 0; 
+	int num_dead = 0; 
+	for( int n=0; n < pCell->state.neighbors.size(); n++ )
+	{
+		Cell* pC = pCell->state.neighbors[n]; 
+		if( pC->phenotype.death.dead == true )
+		{ num_dead++; }
+		else
+		{ 
+			if( pC->type == Treg_type )
+			{ num_Treg++; }
+			if( pC->type == bacteria_type )
+			{ num_bacteria++; }
+		}
+	}
 
 	// contact with bacteria increases secretion of pro-inflamatory 
-
 	// contact with dead cells increases secretion of pro-inflammatory 
 
+	double base_val = pCD->phenotype.secretion.net_export_rates[nPIF]; 
+	double max_response = 1; 
+	double signal = 0.1*num_dead + num_bacteria; 
+	double hill = Hill_response_function( signal , 1.0 , 1.5 ); 
+	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
 
 	// contact with Treg decreases secretion of pro-inflamatory
 
