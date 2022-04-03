@@ -214,6 +214,12 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
 			Cell* pC = (*all_cells)[i]; 
+			
+			// new March 2022: 
+			// run standard interactions (phagocytosis, attack, fusion) here 
+			
+			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics); 
+			
 			if( pC->functions.custom_cell_rule && pC->is_out_of_domain == false )
 			{ pC->functions.custom_cell_rule( pC,pC->phenotype,time_since_last_mechanics ); }
 		}

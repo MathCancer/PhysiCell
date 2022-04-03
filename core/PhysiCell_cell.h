@@ -141,12 +141,18 @@ class Cell_State
  public:
 	std::vector<Cell*> attached_cells; 
 
-	std::vector<Cell*> neighbors; // not currently tracked! 
+	std::vector<Cell*> neighbors; 
 	std::vector<double> orientation;
 	
 	double simple_pressure; 
 	
 	int number_of_attached_cells( void ); 
+
+	int number_of_nuclei; 
+	
+	double damage; 
+	double total_attack_time; 
+	bool contact_with_basement_membrane; // not implemented yet 
 	
 	Cell_State(); 
 };
@@ -202,8 +208,6 @@ class Cell : public Basic_Agent
 	void set_target_radius(double); 
 	void set_radius(double); 
 	
-	
-	
 	// mechanics 
 	void update_position( double dt ); //
 	std::vector<double> displacement; // this should be moved to state, or made private  
@@ -218,6 +222,8 @@ class Cell : public Basic_Agent
 	void copy_data(Cell *);
 	
 	void ingest_cell( Cell* pCell_to_eat ); // for use in predation, e.g., immune cells 
+	void attack_cell( Cell* pCell_to_attack , double dt ); 
+	void fuse_cell( Cell* pCell_to_fuse ); // done 
 
 	void attach_cell( Cell* pAddMe ); // done 
 	void detach_cell( Cell* pRemoveMe ); // done 
@@ -253,11 +259,18 @@ extern std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name
 extern std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
 extern std::vector<Cell_Definition*> cell_definitions_by_index; // works 
 
+extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+extern std::unordered_map<int,int> cell_definition_indices_by_type; 
+
 void display_cell_definitions( std::ostream& os ); // done 
 void build_cell_definitions_maps( void ); // done 
+void prebuild_cell_definition_index_maps( void ); // done 
 
 Cell_Definition* find_cell_definition( std::string search_string ); // done 
 Cell_Definition* find_cell_definition( int search_type );  
+
+int find_cell_definition_index( std::string search_string );
+int find_cell_definition_index( int search_type );  
 
 Cell_Definition& get_cell_definition( std::string search_string ); // done 
 Cell_Definition& get_cell_definition( int search_type );  

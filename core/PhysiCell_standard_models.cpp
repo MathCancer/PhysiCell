@@ -725,6 +725,8 @@ void initialize_default_cell_definition( void )
 {
 	// If the standard models have not yet been created, do so now. 
 	create_standard_cycle_and_death_models();
+	
+	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 		
 	// set the microenvironment pointer 
 	cell_defaults.pMicroenvironment = NULL;
@@ -735,12 +737,16 @@ void initialize_default_cell_definition( void )
 	
 	cell_defaults.phenotype.secretion.sync_to_current_microenvironment();
 	
+	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
+	
 	// set up the default parameters 
 		
 	cell_defaults.type = 0; 
 	cell_defaults.name = "breast epithelium"; 
 
 	cell_defaults.parameters.pReference_live_phenotype = &(cell_defaults.phenotype); 
+	
+	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 	
 	// set up the default custom data 
 		// the default Custom_Cell_Data constructor should take care of this
@@ -759,6 +765,8 @@ void initialize_default_cell_definition( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
 	cell_defaults.functions.set_orientation = NULL;
+	
+	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 
 	// add the standard death models to the default phenotype. 
 	cell_defaults.phenotype.death.add_death_model( 0.00319/60.0 , &apoptosis , apoptosis_parameters );
@@ -767,6 +775,8 @@ void initialize_default_cell_definition( void )
 	
 	// set up the default phenotype (to be consistent with the default functions)
 	cell_defaults.phenotype.cycle.sync_to_cycle_model( cell_defaults.functions.cycle_model ); 
+	
+	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 	
 	// set molecular defaults 
 	
@@ -1087,5 +1097,59 @@ double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dummy)
 	pCell->displacement = {0,0,0};
 	return 9e99; 
 }	
+
+void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	if( phenotype.death.dead == true )
+	{ return; }
+	
+	Cell* pC = NULL; 
+	int type = -1; 
+	double probability = 0.0; 
+	
+	// std::cout << "testing against " << pCell->state.neighbors.size() << " cells " << std::endl; 
+	
+	bool attacked = false; 
+	for( int n=0; n < pCell->state.neighbors.size(); n++ )
+	{
+		pC = pCell->state.neighbors[n]; 
+		type = pC->type; 
+		if( pC->phenotype.death.dead == true )
+		{
+			// dead phagocytosis 
+			probability = phenotype.cell_interactions.dead_phagocytosis_rate * dt; 
+			if( UniformRandom() <= probability ) 
+			{ pCell->ingest_cell(pC); } 
+		}
+		else
+		{
+			// live phagocytosis
+			probability = phenotype.cell_interactions.live_phagocytosis_rates[type] * dt;  
+			if( UniformRandom() <= probability ) 
+			{ pCell->ingest_cell(pC); } 
+			
+			// attack 
+
+			// assume you can only attack one cell at a time 
+			probability = phenotype.cell_interactions.attack_rates[type] * dt;  
+			if( UniformRandom() <= probability && attacked == false ) 
+			{
+				pCell->attack_cell(pC,dt); 
+				attacked = true;
+			} 
+			
+			// fusion 
+			probability = phenotype.cell_interactions.fusion_rates[type] * dt;  
+			if( UniformRandom() <= probability ) 
+			{ pCell->fuse_cell(pC); } 
+		}
+		
+		
+		
+	}
+//	std::cout << std::endl; 
+	
+}
+
 	
 };

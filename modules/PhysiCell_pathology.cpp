@@ -289,6 +289,57 @@ std::vector<double> transmission( std::vector<double>& incoming_light, std::vect
 	return output;
 }
 
+std::vector<std::string> hematoxylin_eosin_DAB_cell_coloring( Cell* pCell )
+{
+	static std::vector<std::string> out( 4, "rgb(255,255,255)" );
+	// cyto_color, cyto_outline , nuclear_color, nuclear_outline
+
+	// cytoplasm colors 
+  
+	double fluid_fraction = pCell->phenotype.volume.cytoplasmic_fluid / (pCell->phenotype.volume.cytoplasmic + 1e-10);
+	double solid_fraction = pCell->phenotype.volume.cytoplasmic_solid / (pCell->phenotype.volume.cytoplasmic + 1e-10);
+	double calc_fraction  = pCell->phenotype.volume.calcified_fraction; 
+ 
+	static double thickness = 20;
+ 
+	static std::vector<double> light( 3, 255.0 ); 
+ 
+	static std::vector<double> eosin_absorb = {2.55,33.15,2.55}; // ( 3 , 3.0 ); // (3,33,3)
+	static std::vector<double> hematoxylin_absorb = {45.90,51.00,20.40}; // ( 3, 45.0 ); // (45,51,20)
+	static std::vector<double> DAB_absorb = {65.93,109.14,129.82}; 
+
+	static std::vector<double> temp( 3, 0.0 );
+ 
+	// eosin staining of cytoplasmic basics 
+	temp = transmission( light, eosin_absorb , thickness , solid_fraction );
+	// hematoxylin staining of cytoplasmic calcifications 
+	temp = transmission( temp , hematoxylin_absorb ,thickness, calc_fraction );
+	// DAB staining of cytoplasm (if any) 
+	temp = transmission( temp , DAB_absorb ,thickness, pCell->custom_data["DAB_cytoplasm"]*solid_fraction );
+ 
+	static char szTempString [128]; 
+	sprintf( szTempString , "rgb(%u,%u,%u)", (int) round( temp[0] ) , (int) round( temp[1] ) , (int) round( temp[2]) ); 
+	out[0].assign( szTempString ); 
+	out[1] = out[0]; 
+ 
+	// nuclear colors 
+ 
+	// fluid_fraction = pCell->phenotype.volume.nuclear_fluid / (pCell->phenotype.volume.nuclear + 1e-10); // pCell->phenotype.volume.nuclear_fluid_volume / ( pCell->State.nuclear_volume + 1e-10 ); 
+	solid_fraction = pCell->phenotype.volume.nuclear_solid / (pCell->phenotype.volume.nuclear + 1e-10); // pCell->State.nuclear_solid_volume / ( pCell->State.nuclear_volume + 1e-10 ); 
+
+	// hematoxylin staining 
+	temp = transmission( light , hematoxylin_absorb , thickness , solid_fraction );
+	// DAB staining of nucleus (if any) 
+	temp = transmission( temp , DAB_absorb ,thickness, pCell->custom_data["DAB_nucleus"]*solid_fraction );
+
+	sprintf( szTempString , "rgb(%u,%u,%u)", (int) round( temp[0] ) , (int) round( temp[1] ) , (int) round( temp[2]) ); 
+	out[2].assign( szTempString ); 
+	out[3] = out[2]; 
+
+	return out;
+
+}
+
 std::vector<std::string> hematoxylin_and_eosin_cell_coloring( Cell* pCell )
 {
 	static std::vector<std::string> out( 4, "rgb(255,255,255)" );
@@ -306,16 +357,6 @@ std::vector<std::string> hematoxylin_and_eosin_cell_coloring( Cell* pCell )
  
 	static std::vector<double> eosin_absorb = {2.55,33.15,2.55}; // ( 3 , 3.0 ); // (3,33,3)
 	static std::vector<double> hematoxylin_absorb = {45.90,51.00,20.40}; // ( 3, 45.0 ); // (45,51,20)
-/*	
-	static bool setup_done = false; 
-	if( !setup_done )
-	{
-		eosin_absorb[1] = 33.0;
-		hematoxylin_absorb[1] = 51.0; 
-		hematoxylin_absorb[2] = 20.0; 
-		setup_done = true; 
-	}
-*/	
 
 	static std::vector<double> temp( 3, 0.0 );
  

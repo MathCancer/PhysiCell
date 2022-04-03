@@ -65,85 +65,129 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_standard_models_h__
-#define __PhysiCell_standard_models_h__
+#include "./custom.h"
 
-#include "./PhysiCell_constants.h" 
-#include "./PhysiCell_phenotype.h" 
-
-namespace PhysiCell
+void create_cell_types( void )
 {
-
-// standard cycle models: 
-
-extern Cycle_Model Ki67_advanced, Ki67_basic, live, flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model, cycling_quiescent; 
-extern Cycle_Model apoptosis, necrosis; 
-extern Death_Parameters apoptosis_parameters, necrosis_parameters; 
-
-extern bool PhysiCell_standard_models_initialized; 
-extern bool PhysiCell_standard_death_models_initialized; 
-extern bool PhysiCell_standard_cycle_models_initialized; 
-
-// standard entry function for the cycle models 
-
-void standard_Ki67_positive_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-void standard_Ki67_negative_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-void standard_live_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-
-void G1_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); 
-void G0_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); 
-void S_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-
-void standard_apoptosis_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-void standard_necrosis_entry_function( Cell* pCell, Phenotype& phenotype, double dt );  // done 
-void standard_lysis_entry_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-
-bool standard_necrosis_arrest_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-
-// standard volume functions 
-
-void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-
-// standard mechanics functions 
-
-void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt); // done 
-void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype phenotype, double dt );
-
-// bounary avoidance functions 
-
-void standard_domain_edge_avoidance_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
-double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dt); 
-
-// other standard functions 
-
-void empty_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-void up_orientation( Cell* pCell, Phenotype& phenotype, double dt ); // done
-
-// standard o2-based phenotype changes 
-
-void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotype, double dt ); 
-
-// create standard models 
-
-bool create_standard_cell_cycle_models( void ); // done 
-bool create_standard_cell_death_models( void ); // done 
-bool create_standard_cycle_and_death_models( void ); // done 
-
-void initialize_default_cell_definition( void ); // done 
-
-void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
-
-void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt );
-void evaluate_interactions( Cell* pCell, Phenotype& phenotype, double dt );
-
-// new in 1.10.0 
+	// set the random seed 
+	SeedRandom( parameters.ints("random_seed") );  
 	
-// automated cell phagocytosis, attack, and fusion 
-void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
-
-
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
 	
-};
+	initialize_default_cell_definition(); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
-#endif 
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	cell_defaults.functions.contact_function = NULL; 
+	
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
+	
+	initialize_cell_definitions_from_pugixml(); 
+	
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
+	
+	cell_defaults.functions.update_phenotype = phenotype_function; 
+	cell_defaults.functions.custom_cell_rule = custom_function; 
+	cell_defaults.functions.contact_function = contact_function; 
+	
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
+	
+	return; 
+}
+
+void setup_microenvironment( void )
+{
+	// set domain parameters 
+	
+	// put any custom code to set non-homogeneous initial conditions or 
+	// extra Dirichlet nodes here. 
+	
+	// initialize BioFVM 
+	
+	initialize_microenvironment(); 	
+	
+	return; 
+}
+
+void setup_tissue( void )
+{
+	double Xmin = microenvironment.mesh.bounding_box[0]; 
+	double Ymin = microenvironment.mesh.bounding_box[1]; 
+	double Zmin = microenvironment.mesh.bounding_box[2]; 
+
+	double Xmax = microenvironment.mesh.bounding_box[3]; 
+	double Ymax = microenvironment.mesh.bounding_box[4]; 
+	double Zmax = microenvironment.mesh.bounding_box[5]; 
+	
+	if( default_microenvironment_options.simulate_2D == true )
+	{
+		Zmin = 0.0; 
+		Zmax = 0.0; 
+	}
+	
+	double Xrange = Xmax - Xmin; 
+	double Yrange = Ymax - Ymin; 
+	double Zrange = Zmax - Zmin; 
+	
+	// create some of each type of cell 
+	
+	Cell* pC;
+	
+	for( int k=0; k < cell_definitions_by_index.size() ; k++ )
+	{
+		Cell_Definition* pCD = cell_definitions_by_index[k]; 
+		std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+		for( int n = 0 ; n < parameters.ints("number_of_cells") ; n++ )
+		{
+			std::vector<double> position = {0,0,0}; 
+			position[0] = Xmin + UniformRandom()*Xrange; 
+			position[1] = Ymin + UniformRandom()*Yrange; 
+			position[2] = Zmin + UniformRandom()*Zrange; 
+			
+			pC = create_cell( *pCD ); 
+			pC->assign_position( position );
+		}
+	}
+	std::cout << std::endl; 
+	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 	
+	
+	return; 
+}
+
+std::vector<std::string> my_coloring_function( Cell* pCell )
+{ return paint_by_number_cell_coloring(pCell); }
+
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{ return; }
+
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
+{ return; } 
+
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
+{ return; } 
