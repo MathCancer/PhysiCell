@@ -109,12 +109,17 @@ void create_cell_types( void )
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
 
-	Cell_Definition* pCD = find_cell_definition( "cancer");
-	pCD->functions.update_phenotype = tumor_phenotype; 
+	Cell_Definition* pBacteria = find_cell_definition( "bacteria");
+	pBacteria->functions.update_phenotype = bacteria_phenotype; 
 
-	pCD = find_cell_definition( "blood vessel");
+	Cell_Definition* pCD = find_cell_definition( "blood vessel");
 	pCD->is_movable = false; 
 	
+	pCD = find_cell_definition( "macrophage");
+	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.1; 
+
+	pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria" ) = 0.001; 
+
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -178,12 +183,6 @@ void setup_tissue( void )
 			pC->assign_position( position );
 		}
 	}
-	std::cout << std::endl; 
-
-	// place a tumor spheroid 
-
-	Cell_Definition* pCD = find_cell_definition( "cancer"); 
-	fill_circle( {0,0,0} , 200 , pCD , 0.9 ); 
 	
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
@@ -206,42 +205,44 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
 { return; } 
 
-void tumor_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
+void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	// find my cell definition 
 	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
 
-	// sample oxygen 
+	// sample resource 
 
-	static int nO2 = microenvironment.find_density_index( "oxygen" ); 
-	double O2 = pCell->nearest_density_vector()[O2]; 
+	static int nR = microenvironment.find_density_index( "resource" ); 
+	double R = pCell->nearest_density_vector()[nR]; 
 
-	// oxygen increases cycle entry 
-
+	// resource increases cycle entry 
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
 	double max_val = base_val * 10.0; 
-	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( O2, 5, 38 );
+	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( R, 0.15, 1 );
 
-	// oxygen decreses necrosis
+	// resource decreses necrosis
 
 	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( O2, 2.5, 5.0 );
+	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
 
-	// oxygen decreases motile speed  
+	// resource decreases motile speed  
 
 	base_val = pCD->phenotype.motility.migration_speed; 
-	max_val = 0.0; 
-	double hill = 1.0-Hill_response_function( O2, 7.5 , 1.5);  
-	phenotype.motility.migration_speed = base_val + (max_val-base_val)*hill;
+	double max_response = 0.0; 
+	double hill = Hill_response_function( R, 7.5 , 1.5);  
+	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill;
 
 	// oxygen increases motility bias 
 	base_val = pCD->phenotype.motility.migration_speed; 
-	max_val = 1.0; 
-	hill = Hill_response_function( O2, 15 , 1.5);  
-	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
+	max_response = 1.0; 
+	hill = Hill_response_function( R, 0.5 , 1.5);  
+	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 
 
 	// damage increases death 
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
+
+
 
 
 }

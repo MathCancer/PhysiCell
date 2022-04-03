@@ -90,7 +90,7 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
-void tumor_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
 void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
 void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
 void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
