@@ -210,10 +210,13 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// find my cell definition 
 	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
 
-	// sample resource 
+	// sample resource and ROS
 
 	static int nR = microenvironment.find_density_index( "resource" ); 
-	double R = pCell->nearest_density_vector()[nR]; 
+	static int nROS = microenvironment.find_density_index( "ROS" ); 
+	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double R = samples[nR];
+	double ROS = samples[nROS]; 
 
 	// resource increases cycle entry 
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
@@ -240,9 +243,125 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 
 
 	// damage increases death 
+	// so does ROS 
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
+	double signal = ROS + pCell->state.damage / 180.0; 
+	base_val = pCD->phenotype.death.rates[nApoptosis]; 
+	max_response = 100*base_val;
+	hill = Hill_response_function( signal , 0.25 , 1.5 ); 
+	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
+
+	return; 
+}
+
+void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
+{
+
+	// contact with bacteria increases secretion of pro-inflamatory 
+
+	// contact with dead cells increases secretion of pro-inflammatory 
+
+
+	// contact with Treg decreases secretion of pro-inflamatory
+
+	// high pro-inflammatory decreases motility 
+
+	// high anti-inflamatory decreases secretion of pro-inflammatory 
 
 
 
 }
+
+void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// not sure what I want to do with these 
+
+	// contact with bacteria increases secretion of pro-inflamatory 
+
+	// contact with Treg decreases secretion of pro-inflamatory
+
+	// high pro-inflammatory decreases motility 
+
+
+
+}
+
+void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// high pro-inflammatory increases damage rate 
+
+	// contact with dendritic cells increases rate of attacking bacteria 
+
+
+	// contact with Treg decreases damage rate
+
+	// high pro-inflammatory decreases motility 
+
+	// high anti-inflammatory decreases motility 
+
+
+
+}
+
+void Treg_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// high pro-inflammatory increases secretion of anti-inflammatory 
+
+	// high pro-inflammatory decreases motility 
+
+
+
+}
+
+void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// find my cell definition 
+	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
+
+	// sample environment 
+
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
+	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
+	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double PIF = samples[nPIF];
+	double AIF = samples[nAIF]; 
+
+	// sample contacts 
+
+	static int Treg_type = find_cell_definition( "Treg")->type; 
+	static int bacteria_type = find_cell_definition( "bacteria")->type; 
+
+	int num_Treg = 0; 
+	int num_bacteria = 0; 
+	int num_dead = 0; 
+	for( int n=0; n < pCell->state.neighbors.size(); n++ )
+	{
+		Cell* pC = pCell->state.neighbors[n]; 
+		if( pC->phenotype.death.dead == true )
+		{ num_dead++; }
+		else
+		{ 
+			if( pC->type == Treg_type )
+			{ num_Treg++; }
+			if( pC->type == bacteria_type )
+			{ num_bacteria++; }
+		}
+
+	}
+
+
+	// contacdt with bacteria increases ROS secretion 
+
+	// high pro-inflammatory increases phagocytosis rate of bacteria  
+
+	// contact with Treg decreases ROS secretion 
+
+	// high pro-inflammatory decreases motility 
+
+	// high anti-inflammatory decreases motility 
+
+	
+
+}
+
