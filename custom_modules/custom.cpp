@@ -118,7 +118,11 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.1; 
 
-	pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria" ) = 0.001; 
+	// pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria" ) = 0.001; 
+
+	pCD = find_cell_definition( "neutrophil"); 
+	pCD->functions.update_phenotype = neutrophil_phenotype; 	
+
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -321,11 +325,13 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
+	static int nROS = microenvironment.find_density_index( "ROS");
 	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
 	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];
 	double AIF = samples[nAIF]; 
+	double ROS = samples[nROS];
 
 	// sample contacts 
 
@@ -347,21 +353,38 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 			if( pC->type == bacteria_type )
 			{ num_bacteria++; }
 		}
-
 	}
 
+	// contact with bacteria increases ROS export 
+	double base_val = pCD->phenotype.secretion.net_export_rates[nROS];
+	double max_response = 1; 
+	double hill = Hill_response_function( num_bacteria , 1.0 , 1.5 ); 
 
-	// contacdt with bacteria increases ROS secretion 
+	phenotype.secretion.net_export_rates[nROS] = base_val + (max_response-base_val)*hill; 
+
+	// contact with Treg decreases ROS secretion 
+	hill = Hill_response_function( num_Treg , 1.0 , 1.5 ); 
+	phenotype.secretion.net_export_rates[nROS] *= (1.0-hill); 
 
 	// high pro-inflammatory increases phagocytosis rate of bacteria  
 
-	// contact with Treg decreases ROS secretion 
+	base_val = pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria");
+	max_response = 0.05; 
+	hill = Hill_response_function( PIF , 0.15 , 1.5 ); 
+	phenotype.cell_interactions.live_phagocytosis_rate( "bacteria") = 
+		base_val + (max_response-base_val)*hill; 
 
 	// high pro-inflammatory decreases motility 
 
+	base_val = pCD->phenotype.motility.migration_speed; 
+	max_response = 0; 
+	// reuse Hill calculation 
+	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill; 
+
 	// high anti-inflammatory decreases motility 
-
+	hill = Hill_response_function( AIF , 0.15 , 1.5 ); 
+	phenotype.motility.migration_speed *= (1.0-hill); 
 	
-
+	return; 
 }
 
