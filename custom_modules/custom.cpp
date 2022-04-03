@@ -188,7 +188,37 @@ void setup_tissue( void )
 			pC->assign_position( position );
 		}
 	}
-	
+
+	// parameter-based placement 
+	// bacteria 
+	Cell_Definition* pCD = find_cell_definition("bacteria"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_bacteria") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
+	// blood vessels 
+	pCD = find_cell_definition("blood vessel"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_blood_vessels") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
+
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
 	
@@ -307,6 +337,8 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
 
 	// contact with Treg decreases secretion of pro-inflamatory
+
+	// pro-inflammatory increases migration bias 
 
 	// high pro-inflammatory decreases motility 
 

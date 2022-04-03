@@ -929,7 +929,11 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless" description="">0</random_seed>
-        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">20</number_of_cells>
+        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
+        <number_of_blood_vessels type="int">20</number_of_blood_vessels>
+        <number_of_bacteria type="int">100</number_of_bacteria>
+        <number_of_macrophages type="int">10</number_of_macrophages>
+        <number_of_neutrophils type="int">10</number_of_neutrophils>
     </user_parameters>
 	
 </PhysiCell_settings>
