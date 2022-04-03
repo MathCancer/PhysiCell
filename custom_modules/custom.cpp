@@ -176,7 +176,9 @@ void setup_tissue( void )
 	for( int k=0; k < cell_definitions_by_index.size() ; k++ )
 	{
 		Cell_Definition* pCD = cell_definitions_by_index[k]; 
-		std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+		int num_cells = parameters.ints("number_of_cells"); 
+		if( num_cells > 0 )
+		{ std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; }
 		for( int n = 0 ; n < parameters.ints("number_of_cells") ; n++ )
 		{
 			std::vector<double> position = {0,0,0}; 
@@ -218,6 +220,34 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 
+	// macrophages 
+	pCD = find_cell_definition("macrophage"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_macrophages") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
+	// macrophages 
+	pCD = find_cell_definition("neutrophil"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_neutrophils") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
 
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
@@ -245,10 +275,22 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// find my cell definition 
 	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
 
+
 	// sample resource and ROS
 
 	static int nR = microenvironment.find_density_index( "resource" ); 
 	static int nROS = microenvironment.find_density_index( "ROS" ); 
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
+	static int nQuorum = microenvironment.find_density_index( "quorum" );
+
+	// if dead: stop exporting quorum factor, start exporting debris 
+	if( phenotype.death.dead == true )
+	{
+		phenotype.secretion.net_export_rates[nQuorum] = 0; 
+		phenotype.secretion.net_export_rates[nDebris] = 1; 
+		return; 
+	}
+
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double R = samples[nR];
 	double ROS = samples[nROS]; 

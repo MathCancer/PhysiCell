@@ -130,6 +130,21 @@
         </Dirichlet_options>
         </variable>
 
+      <variable name="debris" units="dimensionless" ID="5">
+        <physical_parameter_set>
+          <diffusion_coefficient units="micron^2/min">100.0</diffusion_coefficient>
+          <decay_rate units="1/min">0.01</decay_rate>
+        </physical_parameter_set>
+        <initial_condition units="mmHg">0</initial_condition>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
+        <Dirichlet_options><boundary_value ID="xmin" enabled="False">0</boundary_value>
+          <boundary_value ID="xmax" enabled="False">0</boundary_value>
+          <boundary_value ID="ymin" enabled="False">0</boundary_value>
+          <boundary_value ID="ymax" enabled="False">0</boundary_value>
+          <boundary_value ID="zmin" enabled="False">0</boundary_value>
+          <boundary_value ID="zmax" enabled="False">0</boundary_value>
+        </Dirichlet_options>
+        </variable>
 
 
       <options>
@@ -438,7 +453,7 @@
               <use_2D>true</use_2D>
               <chemotaxis>
                 <enabled>true</enabled>
-                <substrate>quorum</substrate>
+                <substrate>debris</substrate>
                 <direction>1</direction>
               </chemotaxis>
             </options>
@@ -468,6 +483,12 @@
               <secretion_target units="substrate density">0.0</secretion_target>
               <uptake_rate units="1/min">0.0</uptake_rate>
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
+            </substrate>
+            <substrate name="debris">
+              <secretion_rate units="1/min">0.0</secretion_rate>
+              <secretion_target units="substrate density">0.0</secretion_target>
+              <uptake_rate units="1/min">1</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
             </substrate>
             </secretion>
 
