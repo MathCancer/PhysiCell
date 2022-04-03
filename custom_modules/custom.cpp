@@ -108,6 +108,9 @@ void create_cell_types( void )
 	cell_defaults.functions.update_phenotype = phenotype_function; 
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
+
+	Cell_Definition* pCD = find_cell_definition( "cancer");
+	pCD->functions.update_phenotype = tumor_phenotype; 
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -197,18 +200,25 @@ void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& 
 
 void tumor_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static Cell_Definition* pCD = find_cell_definition( pCell->name ); 
+	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
 
 	// sample oxygen 
 
-	static int nO2 
+	static int nO2 = microenvironment.find_density_index( "oxygen" ); 
+	double O2 = pCell->nearest_density_vector()[O2]; 
 
 	// oxygen increases cycle entry 
 
-	// oxygen decreses necrosis 
+	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
+	double max_val = base_val * 10.0; 
+	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( O2, 5, 38 );
+
+	
+
+	// oxygen decreses necrosis
+
 
 	// damage increases death 
-
 
 
 }

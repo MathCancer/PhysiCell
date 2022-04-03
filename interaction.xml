@@ -239,7 +239,7 @@
         </custom_data>
           </cell_definition>
 
-      <cell_definition name="blood vessel" ID="2">
+      <cell_definition name="blood vessel" ID="1">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
@@ -349,7 +349,7 @@
         </custom_data>
           </cell_definition>
 
-      <cell_definition name="macrophage" ID="3">
+      <cell_definition name="macrophage" ID="2">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
@@ -459,7 +459,7 @@
         </custom_data>
           </cell_definition>
 
-      <cell_definition name="dendritic cell" ID="4">
+      <cell_definition name="dendritic cell" ID="3">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
@@ -569,7 +569,7 @@
         </custom_data>
           </cell_definition>
 
-      <cell_definition name="CD8+ T cell" ID="5">
+      <cell_definition name="CD8+ T cell" ID="4">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
@@ -679,7 +679,7 @@
         </custom_data>
           </cell_definition>
 
-      <cell_definition name="Treg" ID="6">
+      <cell_definition name="Treg" ID="5">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
