@@ -1021,12 +1021,26 @@ double linear_response_function( double s, double s_min , double s_max )
 	{ return 0.0; } 
 	if( s >= s_max )
 	{ return 1.0; } 
-	double output = s; // s
-	s -= s_min; // s - s_min 
-	double temp1 = s_max; // s_max 
-	s_max -= s_min; // s_max - s_min 
-	output /= temp1; // (s-s_min)/(s_max-s_min); 
-	return output; 
+	s -= s_min; // overwrite s with s - s_min 
+	s_max -= s_min; // overwrite s_max with s_max - s_min 
+	s /= s_max; // now we have (s-s_min)/(s_max-s_min
+	return s; 
 }
+
+double decreasing_linear_response_function( double s, double s_min , double s_max )
+{
+	if( s <= s_min )
+	{ return 1.0; } 
+	if( s >= s_max )
+	{ return 0.0; } 
+	// (smax-s)/(smax-smin); 
+	// = -(s-smax)/(smax-smin)
+	s -= s_max; // replace s by s-s_max 
+	s_max -= s_min; // replace s_max = s_max - s_min 
+	s /= s_max; // this is (s-s_max)/(s_max-s_min)
+	s *= -1; // this is (s_max-s)/(s_max-s_min)
+	return s; 
+}
+
 
 };

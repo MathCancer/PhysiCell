@@ -111,6 +111,9 @@ void create_cell_types( void )
 
 	Cell_Definition* pCD = find_cell_definition( "cancer");
 	pCD->functions.update_phenotype = tumor_phenotype; 
+
+	pCD = find_cell_definition( "blood vessel");
+	pCD->is_movable = false; 
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -213,12 +216,27 @@ void tumor_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double max_val = base_val * 10.0; 
 	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( O2, 5, 38 );
 
-	
-
 	// oxygen decreses necrosis
 
+	max_val = 0.0028;  
+	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
+	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( O2, 2.5, 5.0 );
+
+	// oxygen decreases motile speed  
+
+	base_val = pCD->phenotype.motility.migration_speed; 
+	max_val = 0.0; 
+	double hill = 1.0-Hill_response_function( O2, 7.5 , 1.5);  
+	phenotype.motility.migration_speed = base_val + (max_val-base_val)*hill;
+
+	// oxygen increases motility bias 
+	base_val = pCD->phenotype.motility.migration_speed; 
+	max_val = 1.0; 
+	hill = Hill_response_function( O2, 15 , 1.5);  
+	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
 
 	// damage increases death 
+	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
 
 }

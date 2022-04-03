@@ -80,7 +80,11 @@ namespace PhysiCell{
 // std::vector<std::string> 
 
 double Hill_response_function( double s, double half_max , double hill_power ); // done
+// increases from 0 (at s_min) to 1 (at s_max)
 double linear_response_function( double s, double s_min , double s_max ); // done 
+// decreases from 1 (at s_min) to 0 (at s_max)
+double decreasing_linear_response_function( double s, double s_min , double s_max ); // done 
+
 
 /*
 void setup_signal_response( void ); 

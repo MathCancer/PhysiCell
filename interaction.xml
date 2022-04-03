@@ -193,14 +193,14 @@
 
           <motility>
             <speed>1</speed>
-            <persistence_time>1</persistence_time>
+            <persistence_time>0.5</persistence_time>
             <migration_bias>.5</migration_bias>
             <options>
-              <enabled>false</enabled>
+              <enabled>true</enabled>
               <use_2D>true</use_2D>
               <chemotaxis>
-                <enabled>false</enabled>
-                <substrate>anti-inflammatory</substrate>
+                <enabled>true</enabled>
+                <substrate>oxygen</substrate>
                 <direction>1</direction>
               </chemotaxis>
             </options>
@@ -318,7 +318,7 @@
 
           <secretion>
             <substrate name="oxygen">
-              <secretion_rate units="1/min">10</secretion_rate>
+              <secretion_rate units="1/min">100</secretion_rate>
               <secretion_target units="substrate density">38</secretion_target>
               <uptake_rate units="1/min">0</uptake_rate>
               <net_export_rate units="total substrate/min">0</net_export_rate>
