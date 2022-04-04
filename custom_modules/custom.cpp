@@ -111,6 +111,10 @@ void create_cell_types( void )
 
 	Cell_Definition* pBacteria = find_cell_definition( "bacteria");
 	pBacteria->functions.update_phenotype = bacteria_phenotype; 
+	pBacteria->functions.update_migration_bias = advanced_chemotaxis_function; 
+	
+	pBacteria->phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
+	pBacteria->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
 
 	Cell_Definition* pCD = find_cell_definition( "blood vessel");
 	pCD->is_movable = false; 
@@ -248,23 +252,6 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 	
-	
-
-	// neutrophils  
-	pCD = find_cell_definition("neutrophil"); 
-	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
-	for( int n = 0 ; n < parameters.ints("number_of_neutrophils") ; n++ )
-	{
-		std::vector<double> position = {0,0,0}; 
-		position[0] = Xmin + UniformRandom()*Xrange; 
-		position[1] = Ymin + UniformRandom()*Yrange; 
-		position[2] = Zmin + UniformRandom()*Zrange; 
-		
-		pC = create_cell( *pCD ); 
-		pC->assign_position( position );
-	}
-
-
 	// number_of_dendritic_cells  
 	pCD = find_cell_definition("dendritic cell"); 
 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
@@ -279,7 +266,6 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 	
-
 	// number_of_CD8_T_cells  
 	pCD = find_cell_definition("CD8+ T cell"); 
 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
@@ -293,7 +279,6 @@ void setup_tissue( void )
 		pC = create_cell( *pCD ); 
 		pC->assign_position( position );
 	}
-
 
 	// number_of_Tregs  
 	pCD = find_cell_definition("Treg"); 
@@ -311,7 +296,6 @@ void setup_tissue( void )
 
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
-	
 	
 	return; 
 }
@@ -355,6 +339,7 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double R = samples[nR];
 	double ROS = samples[nROS]; 
+	double Q = samples[nQuorum]; 
 
 	// resource increases cycle entry 
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
@@ -371,13 +356,13 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	double max_response = 0.0; 
-	double hill = Hill_response_function( R, 7.5 , 1.5);  
+	double hill = Hill_response_function( R, 0.25 , 1.5);  
 	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill;
 
-	// oxygen increases motility bias 
+	// quorum increases motility bias 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	max_response = 1.0; 
-	hill = Hill_response_function( R, 0.5 , 1.5);  
+	hill = Hill_response_function( Q, 0.5 , 1.5);  
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 
 
 	// damage increases death 
@@ -387,7 +372,7 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double signal = ROS + pCell->state.damage / 180.0; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
 	max_response = 100*base_val;
-	hill = Hill_response_function( signal , 0.25 , 1.5 ); 
+	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
 
 	return; 
