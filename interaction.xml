@@ -172,7 +172,7 @@
 
           <death>
             <model code="100" name="apoptosis">
-              <death_rate units="1/min">5.3e-05</death_rate>
+              <death_rate units="1/min">0.00028</death_rate>
               <phase_durations units="min">
                 <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
@@ -203,9 +203,9 @@
           </death>
 
           <volume>
-            <total>100</total>
+            <total>500</total>
             <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>100</nuclear>
+            <nuclear>500</nuclear>
             <fluid_change_rate>0.05</fluid_change_rate>
             <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
             <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
@@ -435,7 +435,7 @@
           </volume>
 
           <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
+            <cell_cell_adhesion_strength units="micron/min">0.01</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
             <options>
@@ -447,7 +447,7 @@
           <motility>
             <speed>1</speed>
             <persistence_time>1</persistence_time>
-            <migration_bias>.5</migration_bias>
+            <migration_bias>.25</migration_bias>
             <options>
               <enabled>true</enabled>
               <use_2D>true</use_2D>
@@ -869,9 +869,9 @@
           </death>
 
           <volume>
-            <total>2494</total>
+            <total>500</total>
             <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>540</nuclear>
+            <nuclear>100</nuclear>
             <fluid_change_rate>0.05</fluid_change_rate>
             <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
             <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
@@ -893,7 +893,7 @@
           <motility>
             <speed>1</speed>
             <persistence_time>1</persistence_time>
-            <migration_bias>.5</migration_bias>
+            <migration_bias>.25</migration_bias>
             <options>
               <enabled>true</enabled>
               <use_2D>true</use_2D>
@@ -953,8 +953,8 @@
         <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
         <number_of_blood_vessels type="int">20</number_of_blood_vessels>
         <number_of_bacteria type="int">100</number_of_bacteria>
-        <number_of_macrophages type="int">0</number_of_macrophages>
-        <number_of_neutrophils type="int">0</number_of_neutrophils>
+        <number_of_macrophages type="int">10</number_of_macrophages>
+        <number_of_neutrophils type="int">1</number_of_neutrophils>
         <number_of_dendritic_cells type="int">0</number_of_dendritic_cells> 
         <number_of_CD8_T_cells type="int">0</number_of_CD8_T_cells> 
         <number_of_Tregs type="int">0</number_of_Tregs> 

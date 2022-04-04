@@ -419,7 +419,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// contact with dead cells increases secretion of pro-inflammatory 
 
 	double base_val = pCD->phenotype.secretion.net_export_rates[nPIF]; 
-	double max_response = 1; 
+	double max_response = 10; 
 	double signal = 0.1*num_dead + num_bacteria; 
 	double hill = Hill_response_function( signal , 1.0 , 1.5 ); 
 	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
@@ -516,7 +516,7 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// contact with bacteria increases ROS export 
 	double base_val = pCD->phenotype.secretion.net_export_rates[nROS];
-	double max_response = 1; 
+	double max_response = 10; 
 	double hill = Hill_response_function( num_bacteria , 1.0 , 1.5 ); 
 
 	phenotype.secretion.net_export_rates[nROS] = base_val + (max_response-base_val)*hill; 
