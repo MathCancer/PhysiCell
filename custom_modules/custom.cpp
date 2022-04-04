@@ -122,6 +122,10 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.1; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
+	
+	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
+	pCD->phenotype.motility.chemotactic_sensitivity( "pro-inflammatory" ) = 1; 
+	pCD->phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
 
 	// pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria" ) = 0.001; 
 
@@ -378,6 +382,8 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	return; 
 }
 
+/* https://www.karger.com/Article/Fulltext/494069 */ 
+
 void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// find my cell definition 
@@ -388,10 +394,12 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static int nROS = microenvironment.find_density_index( "ROS");
 	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
 	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];
 	double AIF = samples[nAIF]; 
 	double ROS = samples[nROS];
+	double debris = samples[nDebris]; 
 
 	// sample contacts 
 
@@ -426,7 +434,10 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// contact with Treg decreases secretion of pro-inflamatory
 
-	// pro-inflammatory increases migration bias 
+	// weight chemotactic_sensitivity
+	double total = debris + PIF; 
+	phenotype.motility.chemotactic_sensitivity("debris") = debris / (total+1e-16); 
+	phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = PIF / (total+1e-16); 
 
 	// high pro-inflammatory decreases motility 
 
@@ -528,7 +539,7 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// high pro-inflammatory increases phagocytosis rate of bacteria  
 
 	base_val = pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria");
-	max_response = 0.05; 
+	max_response = 2*base_val; 
 	hill = Hill_response_function( PIF , 0.15 , 1.5 ); 
 	phenotype.cell_interactions.live_phagocytosis_rate( "bacteria") = 
 		base_val + (max_response-base_val)*hill; 
