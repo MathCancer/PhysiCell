@@ -955,6 +955,9 @@
         <number_of_bacteria type="int">100</number_of_bacteria>
         <number_of_macrophages type="int">10</number_of_macrophages>
         <number_of_neutrophils type="int">10</number_of_neutrophils>
+        <number_of_dendritic_cells type="int">0</number_of_dendritic_cells> 
+        <number_of_CD8_T_cells type="int">0</number_of_CD8_T_cells> 
+        <number_of_Tregs type="int">0</number_of_Tregs> 
     </user_parameters>
 	
 </PhysiCell_settings>

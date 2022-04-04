@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -234,7 +234,23 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 
-	// macrophages 
+	// neutrophils  
+	pCD = find_cell_definition("neutrophil"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_neutrophils") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+	
+	
+
+	// neutrophils  
 	pCD = find_cell_definition("neutrophil"); 
 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
 	for( int n = 0 ; n < parameters.ints("number_of_neutrophils") ; n++ )
@@ -249,8 +265,53 @@ void setup_tissue( void )
 	}
 
 
+	// number_of_dendritic_cells  
+	pCD = find_cell_definition("dendritic cell"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_dendritic_cells") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+	
+
+	// number_of_CD8_T_cells  
+	pCD = find_cell_definition("CD8+ T cell"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_CD8_T_cells") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
+
+	// number_of_Tregs  
+	pCD = find_cell_definition("Treg"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_Tregs") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
+	
 	
 	return; 
 }
