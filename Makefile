@@ -71,7 +71,9 @@ all: main.cpp $(ALL_OBJECTS)
 	make name
 
 name:
-	@echo "\n\nExecutable name is" $(PROGRAM_NAME) " \n"
+	@echo ""
+	@echo "Executable name is" $(PROGRAM_NAME)
+	@echo ""
 
 # PhysiCell core components	
 
