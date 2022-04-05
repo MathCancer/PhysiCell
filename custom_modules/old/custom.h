@@ -91,15 +91,8 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
 void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // done 
-
 void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
-void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
-void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
-
-void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
-void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
-
-
 void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
 void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
 void Treg_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt );

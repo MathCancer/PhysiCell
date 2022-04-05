@@ -780,6 +780,14 @@ void initialize_default_cell_definition( void )
 	
 	// set molecular defaults 
 	
+	// new March 2022 : make sure Cell_Interactions and Cell_Transformations 
+	// 					are appropriately sized. Same on motiltiy. 
+	//                  The Cell_Definitions constructor doesn't catch 
+	//					these for the cell_defaults 
+	cell_defaults.phenotype.cell_interactions.sync_to_cell_definitions(); 
+	cell_defaults.phenotype.cell_transformations.sync_to_cell_definitions(); 
+	cell_defaults.phenotype.motility.sync_to_current_microenvironment(); 
+
 	return; 	
 }
 

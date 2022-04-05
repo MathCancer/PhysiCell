@@ -111,7 +111,6 @@ void create_cell_types( void )
 
 	Cell_Definition* pBacteria = find_cell_definition( "bacteria");
 	pBacteria->functions.update_phenotype = bacteria_phenotype; 
-
 	pBacteria->functions.update_migration_bias = advanced_chemotaxis_function; 
 	
 	pBacteria->phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
@@ -119,7 +118,7 @@ void create_cell_types( void )
 
 	Cell_Definition* pCD = find_cell_definition( "blood vessel");
 	pCD->is_movable = false; 
-	/*
+	
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.1; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
@@ -132,7 +131,7 @@ void create_cell_types( void )
 
 	pCD = find_cell_definition( "neutrophil"); 
 	pCD->functions.update_phenotype = neutrophil_phenotype; 	
-*/
+
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -229,7 +228,6 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 
-/*
 	// macrophages 
 	pCD = find_cell_definition("macrophage"); 
 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
@@ -299,7 +297,6 @@ void setup_tissue( void )
 		pC = create_cell( *pCD ); 
 		pC->assign_position( position );
 	}
-*/	
 
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
@@ -324,30 +321,29 @@ void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& 
 
 void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	return; 
 	// find my cell definition 
 	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
+
 
 	// sample resource and ROS
 
 	static int nR = microenvironment.find_density_index( "resource" ); 
-//	static int nDebris = microenvironment.find_density_index( "debris" ); 
+	static int nROS = microenvironment.find_density_index( "ROS" ); 
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
 	static int nQuorum = microenvironment.find_density_index( "quorum" );
-	static int nToxin = microenvironment.find_density_index( "toxin" ); 
 
 	// if dead: stop exporting quorum factor, start exporting debris 
 	if( phenotype.death.dead == true )
 	{
 		phenotype.secretion.net_export_rates[nQuorum] = 0; 
-		phenotype.secretion.net_export_rates[nToxin] = 0; 
-		// phenotype.secretion.net_export_rates[nDebris] = 1; 
+		phenotype.secretion.net_export_rates[nDebris] = 1; 
 		return; 
 	}
 
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double R = samples[nR];
+	double ROS = samples[nROS]; 
 	double Q = samples[nQuorum]; 
-	double Tox = samples[nToxin]; 
 
 	// resource increases cycle entry 
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
@@ -374,9 +370,10 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 
 
 	// damage increases death 
+	// so does ROS 
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
-	double signal = pCell->state.damage / 180.0; 
+	double signal = ROS + pCell->state.damage / 180.0; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
 	max_response = 100*base_val;
 	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
@@ -561,8 +558,3 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	return; 
 }
 
-void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
-{ return; }
-
-void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
-{ return; }
