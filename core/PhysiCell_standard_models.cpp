@@ -945,7 +945,27 @@ void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt
 	return;
 }
 
+void advanced_chemotaxis_function_unnormalized( Cell* pCell, Phenotype& phenotype , double dt )
+{
+	// We'll work directly on the migration bias direction 
+	std::vector<double>* pVec = &(phenotype.motility.migration_bias_direction);  
+	// reset to zero. use memset to be faster??
+	pVec->assign( 3, 0.0 ); 
+	
+	// a place to put each gradient prior to normalizing it 
+	std::vector<double> temp(3,0.0); 
 
+	// weighted combination of the gradients 
+	for( int i=0; i < phenotype.motility.chemotactic_sensitivities.size(); i++ )
+	{
+		// get and normalize ith gradient 
+		axpy( pVec , phenotype.motility.chemotactic_sensitivities[i] , pCell->nearest_gradient(i) ); 
+	}
+	// normalize that 
+	normalize( pVec ); 
+	
+	return;
+}
 
 void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt )
 {
@@ -1177,5 +1197,20 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 	
 }
 
+void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	double probability = 0.0; 
+	for( int i=0 ; i < phenotype.cell_transformations.transformation_rates.size() ; i++ )
+	{
+		probability = phenotype.cell_transformations.transformation_rates[i] * dt;  
+		if( UniformRandom() <= probability ) 
+		{
+			std::cout << "Transforming from " << pCell->type_name << " to " << cell_definitions_by_index[i]->name << std::endl; 
+			pCell->convert_to_cell_definition( *cell_definitions_by_index[i] ); 
+			return; 
+		} 
+	}
+	
+}
 	
 };

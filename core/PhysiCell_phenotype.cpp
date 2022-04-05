@@ -1238,34 +1238,4 @@ double& Cell_Transformations::transformation_rate( std::string type_name )
 }
 
 
-
-/*
-class Cell_Interactions
-{
- private:
- public: 
-	// phagocytosis parameters (e.g., macrophages)
-	double dead_phagocytosis_rate; 
-	std::vector<double> live_phagocytosis_rates; 
-	// attack parameters (e.g., T cells)
-	std::vector<double> live_attack_rates; 
-	// cell fusion parameters 
-	std::vector<double> fusion_rates;
-	
-	// initialization 
-
-	void sync_to_cell_definitions(); 
-	
-	// ease of access 
-	double& live_phagocytosis_rate( std::string type_name  ); 
-	double& live_attack_rate( std::string type_name ); 
-	double& fusion_rate( std::string type_name ); 
-	
-	// automated cell phagocytosis, attack, and fusion 
-	void perform_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
-};
-*/
-
-
-
 };

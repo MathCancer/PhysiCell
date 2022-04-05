@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -290,9 +290,13 @@ void Cell::update_motility_vector( double dt_ )
 
 void Cell::advance_bundled_phenotype_functions( double dt_ )
 {
+	// New March 2022
+	// perform transformations 
+	standard_cell_transformations( this,this->phenotype,dt_ ); 
+	
 	// call the custom code to update the phenotype 
 	if( functions.update_phenotype )
-	{	functions.update_phenotype( this , phenotype , dt_ ); }
+	{ functions.update_phenotype( this , phenotype , dt_ ); }
 	
 	// update volume 
 	if( functions.volume_update_function )
