@@ -324,23 +324,23 @@ void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& 
 
 void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	return; 
 	// find my cell definition 
 	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
 
-	// sample resource and ROS
+	// sample resource, quorum, and toxin 
 
 	static int nR = microenvironment.find_density_index( "resource" ); 
 //	static int nDebris = microenvironment.find_density_index( "debris" ); 
 	static int nQuorum = microenvironment.find_density_index( "quorum" );
 	static int nToxin = microenvironment.find_density_index( "toxin" ); 
 
-	// if dead: stop exporting quorum factor, start exporting debris 
+	// if dead: stop exporting quorum factor. 
+	// also, replace phenotype function 
 	if( phenotype.death.dead == true )
 	{
 		phenotype.secretion.net_export_rates[nQuorum] = 0; 
 		phenotype.secretion.net_export_rates[nToxin] = 0; 
-		// phenotype.secretion.net_export_rates[nDebris] = 1; 
+		pCell->functions.update_phenotype = NULL; 
 		return; 
 	}
 
@@ -367,10 +367,10 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double hill = Hill_response_function( R, 0.25 , 1.5);  
 	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill;
 
-	// quorum increases motility bias 
+	// quorum and resource increases motility bias 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	max_response = 1.0; 
-	hill = Hill_response_function( Q, 0.5 , 1.5);  
+	hill = Hill_response_function( Q+R, 0.5 , 1.5);  
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 
 
 	// damage increases death 
@@ -562,7 +562,51 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 }
 
 void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
-{ return; }
+{
+	// find my cell definition 
+	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
+
+	// sample environment 
+
+	static int nR = microenvironment.find_density_index( "resource");
+	static int nTox = microenvironment.find_density_index( "toxin");
+	/*
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
+	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
+	*/
+	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double PIF = samples[nPIF];
+	double AIF = samples[nAIF]; 
+	double ROS = samples[nROS];
+	double debris = samples[nDebris]; 
+
+	// sample contacts 
+
+	static int Treg_type = find_cell_definition( "Treg")->type; 
+	static int bacteria_type = find_cell_definition( "bacteria")->type; 
+
+	int num_Treg = 0; 
+	int num_bacteria = 0; 
+	int num_dead = 0; 
+	for( int n=0; n < pCell->state.neighbors.size(); n++ )
+	{
+		Cell* pC = pCell->state.neighbors[n]; 
+		if( pC->phenotype.death.dead == true )
+		{ num_dead++; }
+		else
+		{ 
+			if( pC->type == Treg_type )
+			{ num_Treg++; }
+			if( pC->type == bacteria_type )
+			{ num_bacteria++; }
+		}
+	}
+	
+	
+	
+	return; 
+}
 
 void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }

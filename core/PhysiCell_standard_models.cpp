@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -726,8 +726,6 @@ void initialize_default_cell_definition( void )
 	// If the standard models have not yet been created, do so now. 
 	create_standard_cycle_and_death_models();
 	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
-		
 	// set the microenvironment pointer 
 	cell_defaults.pMicroenvironment = NULL;
 	if( BioFVM::get_default_microenvironment() != NULL )
@@ -737,16 +735,12 @@ void initialize_default_cell_definition( void )
 	
 	cell_defaults.phenotype.secretion.sync_to_current_microenvironment();
 	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
-	
 	// set up the default parameters 
 		
 	cell_defaults.type = 0; 
 	cell_defaults.name = "breast epithelium"; 
 
 	cell_defaults.parameters.pReference_live_phenotype = &(cell_defaults.phenotype); 
-	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 	
 	// set up the default custom data 
 		// the default Custom_Cell_Data constructor should take care of this
@@ -766,8 +760,6 @@ void initialize_default_cell_definition( void )
 	
 	cell_defaults.functions.set_orientation = NULL;
 	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
-
 	// add the standard death models to the default phenotype. 
 	cell_defaults.phenotype.death.add_death_model( 0.00319/60.0 , &apoptosis , apoptosis_parameters );
 		// MCF10A, to get a 2% apoptotic index 
@@ -775,8 +767,6 @@ void initialize_default_cell_definition( void )
 	
 	// set up the default phenotype (to be consistent with the default functions)
 	cell_defaults.phenotype.cycle.sync_to_cycle_model( cell_defaults.functions.cycle_model ); 
-	
-	std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << std::endl; 
 	
 	// set molecular defaults 
 	
@@ -979,22 +969,12 @@ void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phe
 {
 	if( pC1->position.size() != 3 || pC2->position.size() != 3 )
 	{
-		/*
-		#pragma omp critical
-		{
-			std::cout << "what?! " << std::endl
-			<< pC1 << " : " << pC1->type << " " << pC1->type_name << " " << pC1->position << std::endl 
-			<< pC2 << " : " << pC2->type << " " << pC2->type_name << " " << pC2->position << std::endl ;
-		}
-		*/
 		return; 
 	}
 	
 	std::vector<double> displacement = pC2->position;
 	displacement -= pC1->position; 
-	// std::cout << "vel: " << pC1->velocity << " disp: " << displacement << " e: " << p1.mechanics.attachment_elastic_constant << " vel new: "; 
 	axpy( &(pC1->velocity) , p1.mechanics.attachment_elastic_constant , displacement ); 
-	// std::cout << pC1->velocity << std::endl << std::endl; 
 	return; 
 }
 
@@ -1161,8 +1141,6 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 	int type = -1; 
 	double probability = 0.0; 
 	
-	// std::cout << "testing against " << pCell->state.neighbors.size() << " cells " << std::endl; 
-	
 	bool attacked = false; 
 	for( int n=0; n < pCell->state.neighbors.size(); n++ )
 	{
@@ -1201,7 +1179,6 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 		
 		
 	}
-//	std::cout << std::endl; 
 	
 }
 

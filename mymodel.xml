@@ -56,13 +56,13 @@
           <decay_rate units="1/min">0.1</decay_rate>
         </physical_parameter_set>
         <initial_condition units="mmHg">1</initial_condition>
-        <Dirichlet_boundary_condition units="mmHg" enabled="True">1</Dirichlet_boundary_condition>
-        <Dirichlet_options><boundary_value ID="xmin" enabled="True">1</boundary_value>
-          <boundary_value ID="xmax" enabled="True">1</boundary_value>
-          <boundary_value ID="ymin" enabled="True">1</boundary_value>
-          <boundary_value ID="ymax" enabled="True">1</boundary_value>
-          <boundary_value ID="zmin" enabled="True">1</boundary_value>
-          <boundary_value ID="zmax" enabled="True">1</boundary_value>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">1</Dirichlet_boundary_condition>
+        <Dirichlet_options><boundary_value ID="xmin" enabled="False">1</boundary_value>
+          <boundary_value ID="xmax" enabled="False">1</boundary_value>
+          <boundary_value ID="ymin" enabled="False">1</boundary_value>
+          <boundary_value ID="ymax" enabled="False">1</boundary_value>
+          <boundary_value ID="zmin" enabled="False">1</boundary_value>
+          <boundary_value ID="zmax" enabled="False">1</boundary_value>
         </Dirichlet_options>
         </variable>
 
@@ -180,7 +180,7 @@
           <motility>
             <speed>1</speed>
             <persistence_time>5</persistence_time>
-            <migration_bias>.25</migration_bias>
+            <migration_bias>0.2</migration_bias>
             <options>
               <enabled>true</enabled>
               <use_2D>true</use_2D>

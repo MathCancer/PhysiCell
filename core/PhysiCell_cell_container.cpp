@@ -124,7 +124,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 {
 	// secretions and uptakes. Syncing with BioFVM is automated. 
 
-	// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "secretion" << std::endl; 
 	#pragma omp parallel for 
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
@@ -153,7 +152,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
 		// checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "bundled phenotype" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -163,7 +161,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			}
 		}
 		
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "divide / die " << std::endl; 
 		// process divides / removes 
 		for( int i=0; i < cells_ready_to_divide.size(); i++ )
 		{
@@ -197,7 +194,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{ microenvironment.compute_all_gradient_vectors();  }
 		// end of new in Feb 2018 
 		
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "interactions" << std::endl; 
 		// perform interactions -- new in June 2020 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
@@ -209,7 +205,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// perform custom computations 
 
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "custom" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -221,7 +216,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// update velocities 
 		
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "velocity" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{

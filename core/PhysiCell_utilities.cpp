@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -155,7 +155,7 @@ std::vector<double> LegacyRandomOnUnitSphere( void )
 	if( warned == false )
 	{
 		std::cout << "Warning! LegacyRandomOnUnitSphere() has bad random properties. " << std::endl 
-				  << "         It generates points that aren't uniform on the random sphere," << std::endl 
+				  << "         It generates points that aren't uniform on the unit sphere," << std::endl 
 				  << "         but instead are concentrated towards the poles." << std::endl 
 				  << "         Use UniformOnUnitSphere() instead!" << std::endl << std::endl; 
 		warned = true; 

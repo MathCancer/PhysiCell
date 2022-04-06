@@ -131,13 +131,8 @@ Cell_Definition::Cell_Definition()
 	if( BioFVM::get_default_microenvironment() != NULL )
 	{ pMicroenvironment = BioFVM::get_default_microenvironment(); }
 
-	std::cout << __LINE__ << " " << __FUNCTION__ << " num substrates " << pMicroenvironment->number_of_densities() << std::endl; 
-	std::cout << __LINE__ << " " << __FUNCTION__ << " num cell defs  " << cell_definition_indices_by_name.size() << std::endl; 
-	system("sleep 1"); 
-
 //	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 //	int number_of_cell_defs = cell_definition_indices_by_name.size(); 
-
 
 	// set up the default parameters 
 		// the default Cell_Parameters constructor should take care of this

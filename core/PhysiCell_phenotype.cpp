@@ -821,7 +821,6 @@ void Motility::sync_to_microenvironment( Microenvironment* pNew_Microenvironment
 double& Motility::chemotactic_sensitivity( std::string name )
 {
 	int n = microenvironment.find_density_index(name); 
-	std::cout << name << " at " << n << " :: " << chemotactic_sensitivities << std::endl; 
 	return chemotactic_sensitivities[n]; 
 }
 
