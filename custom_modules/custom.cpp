@@ -259,6 +259,20 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 
+	// differentiated cells 
+	pCD = find_cell_definition("differentiated"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_differentiated_cells") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
 /*
 	// macrophages 
 	pCD = find_cell_definition("macrophage"); 
@@ -741,7 +755,8 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
 	double max_response = 100*base_val;
-	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
+	hill = Hill_response_function( signal , 0.02 , 1.5 ); 
+	std::cout << "tox: " << signal << " " << hill << std::endl; 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
 
 
