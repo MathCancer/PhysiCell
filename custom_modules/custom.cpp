@@ -654,10 +654,17 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 
 	// contact with a stem cell increases differentiation 
+	double base_val = phenotype.cell_transformations.transformation_rates[diff_type]; 
+	double max_rate = base_val * 100.0; 
+	double signal = num_stem; 
+	double hill = Hill_response_function( signal, 0.5 , 1.5 ); 
+	phenotype.cell_transformations.transformation_rates[diff_type] = base_val + (max_rate-base_val)*hill; 
+
 	// contact with a differentiated cell reduces differentiation 
 
-	double signal = 0.0; 
-	double hill = 0.0; 
+	signal = num_differentiated; 
+	hill = Hill_response_function( signal, 0.5 , 1.5 ); 
+	phenotype.cell_transformations.transformation_rates[diff_type] *= (1-hill); 
 
 	// pressure reduces proliferation 
 	signal = pCell->state.simple_pressure;  
@@ -678,7 +685,7 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
 	double max_response = 100*base_val;
-	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
+	hill = Hill_response_function( signal , 0.4 , 1.5 ); 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
 	
 	return; 
@@ -755,8 +762,8 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
 	double max_response = 100*base_val;
-	hill = Hill_response_function( signal , 0.02 , 1.5 ); 
-	std::cout << "tox: " << signal << " " << hill << std::endl; 
+	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
+	// std::cout << "tox: " << signal << " " << hill << std::endl; 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
 
 
