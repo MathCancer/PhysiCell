@@ -655,10 +655,10 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// contact with a stem cell increases differentiation 
 	double base_val = phenotype.cell_transformations.transformation_rates[diff_type]; 
-	double max_rate = base_val * 100.0; 
+	double max_val = base_val * 100.0; 
 	double signal = num_stem; 
 	double hill = Hill_response_function( signal, 0.5 , 1.5 ); 
-	phenotype.cell_transformations.transformation_rates[diff_type] = base_val + (max_rate-base_val)*hill; 
+	phenotype.cell_transformations.transformation_rates[diff_type] = base_val + (max_val-base_val)*hill; 
 
 	// contact with a differentiated cell reduces differentiation 
 
@@ -669,12 +669,12 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// pressure reduces proliferation 
 	signal = pCell->state.simple_pressure;  
 	hill = Hill_response_function( signal, 0.5 , 1.5 );  
-	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
+	base_val = pCD->phenotype.cycle.data.exit_rate(0); 
 	phenotype.cycle.data.exit_rate(0) = (1-hill)*base_val; 
 
 	// resource reduces necrotic death 
 
-	double max_val = 0.0028;  
+	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
 	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
 
@@ -684,9 +684,9 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
-	double max_response = 100*base_val;
+	max_val = 100*base_val;
 	hill = Hill_response_function( signal , 0.4 , 1.5 ); 
-	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
+	phenotype.death.rates[nApoptosis] = base_val + (max_val-base_val)*hill; 
 	
 	return; 
 }
