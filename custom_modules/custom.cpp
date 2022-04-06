@@ -109,6 +109,8 @@ void create_cell_types( void )
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
 
+	// set up bacteria 
+
 	Cell_Definition* pBacteria = find_cell_definition( "bacteria");
 	pBacteria->functions.update_phenotype = bacteria_phenotype; 
 
@@ -117,8 +119,22 @@ void create_cell_types( void )
 	pBacteria->phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
 	pBacteria->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
 
+	// set up blood vessels 
+
 	Cell_Definition* pCD = find_cell_definition( "blood vessel");
 	pCD->is_movable = false; 
+
+	// set up stem cells 
+
+	pCD = find_cell_definition( "stem");
+	pCD->functions.update_phenotype = stem_cell_phenotype; 
+	pCD->phenotype.cell_transformations.transformation_rate("differentiated") = 0.001; 
+	
+	// set up differentiated cells 
+
+	pCD = find_cell_definition( "differentiated");
+	pCD->functions.update_phenotype = differentiated_cell_phenotype; 
+
 	/*
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.1; 
@@ -219,6 +235,20 @@ void setup_tissue( void )
 	pCD = find_cell_definition("blood vessel"); 
 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
 	for( int n = 0 ; n < parameters.ints("number_of_blood_vessels") ; n++ )
+	{
+		std::vector<double> position = {0,0,0}; 
+		position[0] = Xmin + UniformRandom()*Xrange; 
+		position[1] = Ymin + UniformRandom()*Yrange; 
+		position[2] = Zmin + UniformRandom()*Zrange; 
+		
+		pC = create_cell( *pCD ); 
+		pC->assign_position( position );
+	}
+
+	// stem cells 
+	pCD = find_cell_definition("stem"); 
+	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	for( int n = 0 ; n < parameters.ints("number_of_stem_cells") ; n++ )
 	{
 		std::vector<double> position = {0,0,0}; 
 		position[0] = Xmin + UniformRandom()*Xrange; 
@@ -576,17 +606,21 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static int nDebris = microenvironment.find_density_index( "debris" ); 
 	*/
 	std::vector<double> samples = pCell->nearest_density_vector(); 
-	double PIF = samples[nPIF];
-	double AIF = samples[nAIF]; 
-	double ROS = samples[nROS];
-	double debris = samples[nDebris]; 
+	// double PIF = samples[nPIF];
+	// double AIF = samples[nAIF]; 
+	// double ROS = samples[nROS];
+	// double debris = samples[nDebris]; 
+	double R = samples[nR];
+	double toxin = samples[nTox];
 
 	// sample contacts 
 
-	static int Treg_type = find_cell_definition( "Treg")->type; 
+	static int stem_type = find_cell_definition( "stem")->type; 
+	static int diff_type = find_cell_definition( "differentiated")->type; 
 	static int bacteria_type = find_cell_definition( "bacteria")->type; 
 
-	int num_Treg = 0; 
+	int num_stem = 0; 
+	int num_differentiated = 0; 
 	int num_bacteria = 0; 
 	int num_dead = 0; 
 	for( int n=0; n < pCell->state.neighbors.size(); n++ )
@@ -596,17 +630,120 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		{ num_dead++; }
 		else
 		{ 
-			if( pC->type == Treg_type )
-			{ num_Treg++; }
+			if( pC->type == stem_type )
+			{ num_stem++; }
+			if( pC->type == num_differentiated )
+			{ num_differentiated++; }
 			if( pC->type == bacteria_type )
 			{ num_bacteria++; }
 		}
 	}
+
+	// contact with a stem cell increases differentiation 
+	// contact with a differentiated cell reduces differentiation 
+
+	double signal = 0.0; 
+	double hill = 0.0; 
+
+	// pressure reduces proliferation 
+	signal = pCell->state.simple_pressure;  
+	hill = Hill_response_function( signal, 0.5 , 1.5 );  
+	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
+	phenotype.cycle.data.exit_rate(0) = (1-hill)*base_val; 
+
+	// resource reduces necrotic death 
+
+	double max_val = 0.0028;  
+	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
+	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
+
+	// toxin increases apoptotic death 
 	
-	
+	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
+
+	signal = toxin; 
+	base_val = pCD->phenotype.death.rates[nApoptosis]; 
+	double max_response = 100*base_val;
+	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
+	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
 	
 	return; 
 }
 
 void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
-{ return; }
+{
+	// find my cell definition 
+	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
+
+	// sample environment 
+
+	static int nR = microenvironment.find_density_index( "resource");
+	static int nTox = microenvironment.find_density_index( "toxin");
+	/*
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
+	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
+	*/
+	std::vector<double> samples = pCell->nearest_density_vector(); 
+	// double PIF = samples[nPIF];
+	// double AIF = samples[nAIF]; 
+	// double ROS = samples[nROS];
+	// double debris = samples[nDebris]; 
+	double R = samples[nR];
+	double toxin = samples[nTox];
+
+	// sample contacts 
+/*
+	static int stem_type = find_cell_definition( "stem")->type; 
+	static int diff_type = find_cell_definition( "differentiated")->type; 
+	static int bacteria_type = find_cell_definition( "bacteria")->type; 
+
+	int num_stem = 0; 
+	int num_differentiated = 0; 
+	int num_bacteria = 0; 
+	int num_dead = 0; 
+	for( int n=0; n < pCell->state.neighbors.size(); n++ )
+	{
+		Cell* pC = pCell->state.neighbors[n]; 
+		if( pC->phenotype.death.dead == true )
+		{ num_dead++; }
+		else
+		{ 
+			if( pC->type == stem_type )
+			{ num_stem++; }
+			if( pC->type == num_differentiated )
+			{ num_differentiated++; }
+			if( pC->type == bacteria_type )
+			{ num_bacteria++; }
+		}
+	}
+*/
+
+	double signal = 0.0; 
+	double hill = 0.0; 
+
+	// pressure reduces proliferation 
+	signal = pCell->state.simple_pressure;  
+	hill = Hill_response_function( signal, 0.5 , 1.5 );  
+	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
+	phenotype.cycle.data.exit_rate(0) = (1-hill)*base_val; 
+
+	// resource reduces necrotic death 
+
+	double max_val = 0.0028;  
+	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
+	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
+
+	// toxin increases apoptotic death 
+	
+	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
+
+	signal = toxin; 
+	base_val = pCD->phenotype.death.rates[nApoptosis]; 
+	double max_response = 100*base_val;
+	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
+	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
+
+
+	return; 
+}
