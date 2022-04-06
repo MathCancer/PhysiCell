@@ -128,17 +128,22 @@ void create_cell_types( void )
 
 	pCD = find_cell_definition( "stem");
 	pCD->functions.update_phenotype = stem_cell_phenotype; 
-	pCD->phenotype.cell_transformations.transformation_rate("differentiated") = 0.001; 
+	pCD->phenotype.cell_transformations.transformation_rate("differentiated") = 0.0001; 
 	
 	// set up differentiated cells 
 
 	pCD = find_cell_definition( "differentiated");
 	pCD->functions.update_phenotype = differentiated_cell_phenotype; 
 
-	/*
+	// set up macrophages 
+
 	pCD = find_cell_definition( "macrophage");
-	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.1; 
+	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
+	pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
+
 	pCD->functions.update_phenotype = macrophage_phenotype; 
+
+	/*
 	
 	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
 	pCD->phenotype.motility.chemotactic_sensitivity( "pro-inflammatory" ) = 1; 
@@ -273,7 +278,6 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 
-/*
 	// macrophages 
 	pCD = find_cell_definition("macrophage"); 
 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
@@ -287,6 +291,8 @@ void setup_tissue( void )
 		pC = create_cell( *pCD ); 
 		pC->assign_position( position );
 	}
+
+/*	
 
 	// neutrophils  
 	pCD = find_cell_definition("neutrophil"); 
@@ -438,22 +444,15 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nROS = microenvironment.find_density_index( "ROS");
 	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
-	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-	static int nDebris = microenvironment.find_density_index( "debris" ); 
+
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];
-	double AIF = samples[nAIF]; 
-	double ROS = samples[nROS];
-	double debris = samples[nDebris]; 
 
 	// sample contacts 
 
-	static int Treg_type = find_cell_definition( "Treg")->type; 
 	static int bacteria_type = find_cell_definition( "bacteria")->type; 
 
-	int num_Treg = 0; 
 	int num_bacteria = 0; 
 	int num_dead = 0; 
 	for( int n=0; n < pCell->state.neighbors.size(); n++ )
@@ -463,8 +462,6 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		{ num_dead++; }
 		else
 		{ 
-			if( pC->type == Treg_type )
-			{ num_Treg++; }
 			if( pC->type == bacteria_type )
 			{ num_bacteria++; }
 		}
@@ -474,10 +471,35 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// contact with dead cells increases secretion of pro-inflammatory 
 
 	double base_val = pCD->phenotype.secretion.net_export_rates[nPIF]; 
-	double max_response = 10; 
-	double signal = 0.1*num_dead + num_bacteria; 
-	double hill = Hill_response_function( signal , 1.0 , 1.5 ); 
+	double max_response = 100; 
+	double signal = num_dead + 10*num_bacteria; 
+	double hill = Hill_response_function( signal , 0.5 , 1.5 ); 
 	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
+
+	// chemotaxis bias increases with pro-inflammatory signal 
+
+	base_val = pCD->phenotype.motility.migration_bias; 
+	max_response = 1; 
+	signal = PIF; 
+	hill = Hill_response_function( signal , 0.25 , 1.5 ); 
+	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
+
+	return; 
+
+
+	// sample environment 
+
+	static int nROS = microenvironment.find_density_index( "ROS");
+	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
+
+
+	double AIF = samples[nAIF]; 
+	double ROS = samples[nROS];
+	double debris = samples[nDebris]; 
+
+	// sample contacts 
+
 
 	// contact with Treg decreases secretion of pro-inflamatory
 

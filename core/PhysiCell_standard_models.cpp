@@ -1137,43 +1137,44 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 	if( phenotype.death.dead == true )
 	{ return; }
 	
-	Cell* pC = NULL; 
+	Cell* pTarget = NULL; 
 	int type = -1; 
+	std::string type_name = "none";
 	double probability = 0.0; 
 	
 	bool attacked = false; 
 	for( int n=0; n < pCell->state.neighbors.size(); n++ )
 	{
-		pC = pCell->state.neighbors[n]; 
-		type = pC->type; 
-		if( pC->phenotype.death.dead == true )
+		pTarget = pCell->state.neighbors[n]; 
+		type = pTarget->type; 
+		if( pTarget->phenotype.death.dead == true )
 		{
 			// dead phagocytosis 
 			probability = phenotype.cell_interactions.dead_phagocytosis_rate * dt; 
 			if( UniformRandom() <= probability ) 
-			{ pCell->ingest_cell(pC); } 
+			{ pCell->ingest_cell(pTarget); } 
 		}
 		else
 		{
 			// live phagocytosis
-			probability = phenotype.cell_interactions.live_phagocytosis_rates[type] * dt;  
+			probability = phenotype.cell_interactions.live_phagocytosis_rate(type_name) * dt; // s[type] * dt;  
 			if( UniformRandom() <= probability ) 
-			{ pCell->ingest_cell(pC); } 
+			{ pCell->ingest_cell(pTarget); } 
 			
 			// attack 
 
 			// assume you can only attack one cell at a time 
-			probability = phenotype.cell_interactions.attack_rates[type] * dt;  
+			probability = phenotype.cell_interactions.attack_rate(type_name)*dt; // s[type] * dt;  
 			if( UniformRandom() <= probability && attacked == false ) 
 			{
-				pCell->attack_cell(pC,dt); 
+				pCell->attack_cell(pTarget,dt); 
 				attacked = true;
 			} 
 			
 			// fusion 
-			probability = phenotype.cell_interactions.fusion_rates[type] * dt;  
+			probability = phenotype.cell_interactions.fusion_rate(type_name)*dt; // s[type] * dt;  
 			if( UniformRandom() <= probability ) 
-			{ pCell->fuse_cell(pC); } 
+			{ pCell->fuse_cell(pTarget); } 
 		}
 		
 		
@@ -1190,7 +1191,7 @@ void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt
 		probability = phenotype.cell_transformations.transformation_rates[i] * dt;  
 		if( UniformRandom() <= probability ) 
 		{
-			std::cout << "Transforming from " << pCell->type_name << " to " << cell_definitions_by_index[i]->name << std::endl; 
+			// std::cout << "Transforming from " << pCell->type_name << " to " << cell_definitions_by_index[i]->name << std::endl; 
 			pCell->convert_to_cell_definition( *cell_definitions_by_index[i] ); 
 			return; 
 		} 

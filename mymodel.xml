@@ -85,7 +85,7 @@
       <variable name="quorum" units="dimensionless" ID="2">
         <physical_parameter_set>
           <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-          <decay_rate units="1/min">0.2</decay_rate>
+          <decay_rate units="1/min">0.1</decay_rate>
         </physical_parameter_set>
         <initial_condition units="mmHg">0.0</initial_condition>
         <Dirichlet_boundary_condition units="mmHg" enabled="False">0.0</Dirichlet_boundary_condition>
@@ -95,6 +95,22 @@
           <boundary_value ID="ymax" enabled="False" />
           <boundary_value ID="zmin" enabled="False" />
           <boundary_value ID="zmax" enabled="False" />
+        </Dirichlet_options>
+        </variable>
+
+      <variable name="pro-inflammatory" units="dimensionless" ID="3">
+        <physical_parameter_set>
+          <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+          <decay_rate units="1/min">0.1</decay_rate>
+        </physical_parameter_set>
+        <initial_condition units="mmHg">0</initial_condition>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
+        <Dirichlet_options><boundary_value ID="xmin" enabled="False">0</boundary_value>
+          <boundary_value ID="xmax" enabled="False">0</boundary_value>
+          <boundary_value ID="ymin" enabled="False">0</boundary_value>
+          <boundary_value ID="ymax" enabled="False">0</boundary_value>
+          <boundary_value ID="zmin" enabled="False">0</boundary_value>
+          <boundary_value ID="zmax" enabled="False">0</boundary_value>
         </Dirichlet_options>
         </variable>
 
@@ -211,6 +227,12 @@
               <uptake_rate units="1/min">0.0</uptake_rate>
               <net_export_rate units="total substrate/min">1</net_export_rate>
             </substrate>
+            <substrate name="pro-inflammatory">
+              <secretion_rate units="1/min">0.0</secretion_rate>
+              <secretion_target units="substrate density">0.0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
+              <net_export_rate units="total substrate/min">0.0</net_export_rate>
+            </substrate>
             </secretion>
 
           </phenotype>
@@ -290,7 +312,7 @@
               <use_2D>true</use_2D>
               <chemotaxis>
                 <enabled>false</enabled>
-                <substrate>quorum</substrate>
+                <substrate>pro-inflammatory</substrate>
                 <direction>1</direction>
               </chemotaxis>
             </options>
@@ -313,6 +335,12 @@
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
               <uptake_rate units="1/min">0</uptake_rate>
+              <net_export_rate units="total substrate/min">0.0</net_export_rate>
+            </substrate>
+            <substrate name="pro-inflammatory">
+              <secretion_rate units="1/min">0.0</secretion_rate>
+              <secretion_target units="substrate density">0.0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             </secretion>
@@ -394,7 +422,7 @@
               <use_2D>true</use_2D>
               <chemotaxis>
                 <enabled>false</enabled>
-                <substrate>quorum</substrate>
+                <substrate>pro-inflammatory</substrate>
                 <direction>1</direction>
               </chemotaxis>
             </options>
@@ -414,6 +442,12 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             <substrate name="quorum">
+              <secretion_rate units="1/min">0.0</secretion_rate>
+              <secretion_target units="substrate density">0.0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
+              <net_export_rate units="total substrate/min">0.0</net_export_rate>
+            </substrate>
+            <substrate name="pro-inflammatory">
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
               <uptake_rate units="1/min">0.0</uptake_rate>
@@ -498,7 +532,7 @@
               <use_2D>true</use_2D>
               <chemotaxis>
                 <enabled>false</enabled>
-                <substrate>quorum</substrate>
+                <substrate>pro-inflammatory</substrate>
                 <direction>1</direction>
               </chemotaxis>
             </options>
@@ -518,6 +552,122 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             <substrate name="quorum">
+              <secretion_rate units="1/min">0.0</secretion_rate>
+              <secretion_target units="substrate density">0.0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
+              <net_export_rate units="total substrate/min">0.0</net_export_rate>
+            </substrate>
+            <substrate name="pro-inflammatory">
+              <secretion_rate units="1/min">0.0</secretion_rate>
+              <secretion_target units="substrate density">0.0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
+              <net_export_rate units="total substrate/min">0.0</net_export_rate>
+            </substrate>
+            </secretion>
+
+          </phenotype>
+        <custom_data>
+          <sample units="" description="">1.0</sample>
+        </custom_data>
+          </cell_definition>
+
+      <cell_definition name="macrophage" ID="4">
+        <phenotype>
+          <cycle code="5" name="live">
+            <phase_transition_rates units="1/min">
+              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
+            </phase_transition_rates>
+            </cycle>
+
+          <death>
+            <model code="100" name="apoptosis">
+              <death_rate units="1/min">0</death_rate>
+              <phase_durations units="min">
+                <duration index="0" fixed_duration="true">516</duration>
+              </phase_durations>
+              <parameters>
+                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                <calcification_rate units="1/min">0</calcification_rate>
+                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+              </parameters>
+            </model>
+            <model code="101" name="necrosis">
+              <death_rate units="1/min">0.0</death_rate>
+              <phase_durations units="min">
+                <duration index="0" fixed_duration="true">0</duration>
+              <duration index="1" fixed_duration="true">86400</duration>
+              </phase_durations>
+              <parameters>
+                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                <calcification_rate units="1/min">0</calcification_rate>
+                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+              </parameters>
+            </model>
+          </death>
+
+          <volume>
+            <total>3000</total>
+            <fluid_fraction>0.75</fluid_fraction>
+            <nuclear>600</nuclear>
+            <fluid_change_rate>0.05</fluid_change_rate>
+            <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
+            <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
+            <calcified_fraction>0</calcified_fraction>
+            <calcification_rate>0</calcification_rate>
+            <relative_rupture_volume>2.0</relative_rupture_volume>
+          </volume>
+
+          <mechanics>
+            <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
+            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+            <options>
+              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+            </options>
+          </mechanics>
+
+          <motility>
+            <speed>1</speed>
+            <persistence_time>5</persistence_time>
+            <migration_bias>0.1</migration_bias>
+            <options>
+              <enabled>true</enabled>
+              <use_2D>true</use_2D>
+              <chemotaxis>
+                <enabled>true</enabled>
+                <substrate>pro-inflammatory</substrate>
+                <direction>1</direction>
+              </chemotaxis>
+            </options>
+          </motility>
+
+          <secretion>
+            <substrate name="resource">
+              <secretion_rate units="1/min">0</secretion_rate>
+              <secretion_target units="substrate density">1</secretion_target>
+              <uptake_rate units="1/min">5</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            <substrate name="toxin">
+              <secretion_rate units="1/min">0.0</secretion_rate>
+              <secretion_target units="substrate density">0.0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            <substrate name="quorum">
+              <secretion_rate units="1/min">0.0</secretion_rate>
+              <secretion_target units="substrate density">0.0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            <substrate name="pro-inflammatory">
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
               <uptake_rate units="1/min">0.0</uptake_rate>
@@ -546,6 +696,7 @@
         <number_of_differentiated_cells type="int" units="" description="">400</number_of_differentiated_cells>
         <number_of_blood_vessels type="int" units="" description="">40</number_of_blood_vessels>
         <number_of_bacteria type="int" units="" description="">0</number_of_bacteria>
+        <number_of_macrophages type="int" units="" description="">10</number_of_macrophages>
     </user_parameters>
 	
 </PhysiCell_settings>
