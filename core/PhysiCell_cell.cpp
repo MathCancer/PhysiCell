@@ -892,11 +892,12 @@ void Cell::add_potentials(Cell* other_agent)
 	// if( this->ID == other_agent->ID )
 	if( this == other_agent )
 	{ return; }
-
+/*
 	// new April 2022: don't interact with cells with 0 volume 
+	// does not seem to really help 
 	if( other_agent->phenotype.volume.total < 1e-15 )
 	{ std::cout << "zero size cell in mechanics!" << std::endl; return; }
-
+*/
 	// 12 uniform neighbors at a close packing distance, after dividing out all constants
 	static double simple_pressure_scale = 0.027288820670331; // 12 * (1 - sqrt(pi/(2*sqrt(3))))^2 
 	// 9.820170012151277; // 12 * ( 1 - sqrt(2*pi/sqrt(3)))^2
