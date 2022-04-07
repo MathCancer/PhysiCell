@@ -652,7 +652,7 @@ void Cell::set_total_volume(double volume)
 	// if( fabs( phenotype.volume.total - volume ) < 1e-16 )
 	if( fabs( phenotype.volume.total - volume ) > 1e-16 )
 	{
-		double ratio= volume/ phenotype.volume.total;
+		double ratio= volume/ (phenotype.volume.total + 1e-16);  
 		phenotype.volume.multiply_by_ratio(ratio);
 	}
 	
@@ -1193,26 +1193,23 @@ std::vector<Cell*> Cell::nearby_interacting_cells( void )
 
 void Cell::ingest_cell( Cell* pCell_to_eat )
 {
+	// don't ingest self 
+	if( pCell_to_eat == this )
+	{ return; } 
+	
 	// don't ingest a cell that's already ingested 
-	if( pCell_to_eat->phenotype.volume.total < 1e-15 || this == pCell_to_eat )
+	if( pCell_to_eat->phenotype.volume.total < 1e-15 )
 	{ return; } 
 		
 	// make this thread safe 
 	#pragma omp critical
 	{
-		bool volume_was_zero = false; 
-		if( pCell_to_eat->phenotype.volume.total < 1e-15 )
-		{
-			volume_was_zero = true; 
-			std::cout << this << " " << this->type_name << " ingests " 
-			<< pCell_to_eat << " " << pCell_to_eat->type_name << std::endl; 
-		}
-
-
 		if( pCell_to_eat->phenotype.death.dead == true )
-		{ std::cout << this->type_name << " eats dead " << pCell_to_eat->type_name << std::endl; }
+		{ std::cout << this->type_name << " (" << this << ")" << " eats dead " << pCell_to_eat->type_name << " (" << pCell_to_eat 
+			<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
 		else
-		{ std::cout << this->type_name << " eats live " << pCell_to_eat->type_name << std::endl; }
+		{ std::cout << this->type_name << " (" << this << ")" << " eats live " << pCell_to_eat->type_name << " (" << pCell_to_eat 
+			<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
 
 		// absorb all the volume(s)
 
@@ -1285,6 +1282,9 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		pCell_to_eat->functions.custom_cell_rule = NULL; 
 		pCell_to_eat->functions.update_phenotype = NULL; 
 		pCell_to_eat->functions.contact_function = NULL; 
+		
+		// should set volume fuction to NULL too! 
+		pCell_to_eat->functions.volume_update_function = NULL; 
 
 		// remove all adhesions 
 		// pCell_to_eat->remove_all_attached_cells();
@@ -1303,12 +1303,19 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 
 void Cell::attack_cell( Cell* pCell_to_attack , double dt )
 {
-	if( pCell_to_attack->phenotype.death.dead == true )
+	// don't attack self 
+	if( pCell_to_attack == this )
+	{ return; } 
+	
+	// don't attack a dead or tiny cell 
+	if( pCell_to_attack->phenotype.death.dead == true || pCell_to_attack->phenotype.volume.total < 1e-15 )
 	{ return; } 
 	
 	// make this thread safe 
 	#pragma omp critical
 	{ 
+		std::cout << this->type_name << " attacks " << pCell_to_attack->type_name << std::endl;
+	
 		pCell_to_attack->state.damage += phenotype.cell_interactions.damage_rate * dt; 
 		pCell_to_attack->state.total_attack_time += dt; 
 	}
@@ -1319,20 +1326,13 @@ void Cell::attack_cell( Cell* pCell_to_attack , double dt )
 
 void Cell::fuse_cell( Cell* pCell_to_fuse )
 {
-	// don't ingest a cell that's already fused 
+	// don't ingest a cell that's already fused or fuse self 
 	if( pCell_to_fuse->phenotype.volume.total < 1e-15 || this == pCell_to_fuse )
 	{ return; } 
 		
 	// make this thread safe 
 	#pragma omp critical
 	{
-		bool volume_was_zero = false; 
-		if( pCell_to_fuse->phenotype.volume.total < 1e-15 )
-		{
-			volume_was_zero = true; 
-			std::cout << this << " " << this->type_name << " fuses " 
-			<< pCell_to_fuse << " " << pCell_to_fuse->type_name << std::endl; 
-		}
 
 		// set new position at center of volume 
 			// x_new = (vol_B * x_B + vol_S * x_S ) / (vol_B + vol_S )

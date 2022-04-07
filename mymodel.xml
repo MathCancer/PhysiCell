@@ -188,7 +188,7 @@
           <volume>
             <total>500</total>
             <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>500</nuclear>
+            <nuclear>499</nuclear>
             <fluid_change_rate>0.05</fluid_change_rate>
             <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
             <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
@@ -971,10 +971,10 @@
         <number_of_stem_cells description=" type)" type="int" units="none">50</number_of_stem_cells>
         <number_of_differentiated_cells description="" type="int" units="">500</number_of_differentiated_cells>
         <number_of_blood_vessels description="" type="int" units="">40</number_of_blood_vessels>
-        <number_of_bacteria description="" type="int" units="">5</number_of_bacteria>
-        <number_of_macrophages description="" type="int" units="">10</number_of_macrophages>
-        <number_of_CD8T_cells description="" type="int" units="">10</number_of_CD8T_cells>
-        <number_of_neutrophils description="" type="int" units="">10</number_of_neutrophils>
+        <number_of_bacteria description="" type="int" units="">50</number_of_bacteria>
+        <number_of_macrophages description="" type="int" units="">100</number_of_macrophages>
+        <number_of_CD8T_cells description="" type="int" units="">100</number_of_CD8T_cells>
+        <number_of_neutrophils description="" type="int" units="">100</number_of_neutrophils>
     </user_parameters>
 	
 </PhysiCell_settings>

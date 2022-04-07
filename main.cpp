@@ -83,6 +83,55 @@
 using namespace BioFVM;
 using namespace PhysiCell;
 
+bool sanity_check( Cell* pC )
+{
+	if( std::isnan( pC->phenotype.volume.total ) || 
+		std::isnan( pC->position[0] ) ||
+		std::isnan( pC->position[1] ) ||  
+		std::isnan( pC->position[2] )
+	)
+	{
+		#pragma omp critical 
+		{
+			std::cout << "cell " << pC << " of type " << pC->type_name << " at " << 
+			pC->position << " is weird " << std::endl; 
+			
+			std::cout 
+			<< "ns: " << pC->phenotype.volume.nuclear_solid << " " 
+			<< "cs: " << pC->phenotype.volume.cytoplasmic_solid << " " 
+			<< "sol: " << pC->phenotype.volume.solid << " " 
+
+			<< "nf: " << pC->phenotype.volume.nuclear_fluid << " " 
+			<< "cf: " << pC->phenotype.volume.cytoplasmic_fluid << " " 
+			<< "fluid: " << pC->phenotype.volume.fluid << " " 
+			
+			<< "cyto: " << pC->phenotype.volume.cytoplasmic << " " 
+			<< "nuc: " << pC->phenotype.volume.nuclear << " " 
+			<< "tot:  " << pC->phenotype.volume.total << " " 
+			
+			<< "radius: " << pC->phenotype.geometry.radius << std::endl; 
+			
+			std::cout << "dead: " << (int) pC->phenotype.death.dead << std::endl; 
+		}
+		return true; 
+	}	
+	return false; 
+}
+
+bool check_all( void )
+{
+	bool out = false; 
+	for( int n= 0 ; n < (*all_cells).size() ; n++ )
+	{
+		Cell* pC = (*all_cells)[n]; 
+		if( sanity_check(pC) )
+		{ out = true; } 
+	}
+	return out; 
+	
+}
+
+
 int main( int argc, char* argv[] )
 {
 	// load and parse settings file(s)
@@ -221,6 +270,9 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
+			
+			if( check_all() )
+			{ SVG_plot( "weird.svg" , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function ); system("pause"); }
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}

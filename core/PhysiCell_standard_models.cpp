@@ -523,7 +523,7 @@ void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double 
 	if( phenotype.volume.fluid < 0.0 )
 	{ phenotype.volume.fluid = 0.0; }
 		
-	phenotype.volume.nuclear_fluid = (phenotype.volume.nuclear / phenotype.volume.total) * 
+	phenotype.volume.nuclear_fluid = (phenotype.volume.nuclear / (phenotype.volume.total+1e-16) ) * 
 		( phenotype.volume.fluid );
 	phenotype.volume.cytoplasmic_fluid = phenotype.volume.fluid - phenotype.volume.nuclear_fluid; 
 
@@ -1150,6 +1150,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 		pTarget = pCell->state.neighbors[n]; 
 		type = pTarget->type; 
 		type_name = pTarget->type_name; 
+		
 		if( pTarget->phenotype.death.dead == true )
 		{
 			// dead phagocytosis 

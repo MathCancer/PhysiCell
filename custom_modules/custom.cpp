@@ -139,31 +139,16 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
-	// pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
-	// pCD->phenotype.motility.chemotactic_sensitivity("debris") = 1; 
-	// pCD->phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = 10; 
 	
 	// set up CD8+ T cells 
 	pCD = find_cell_definition( "CD8+ T cell");
 	pCD->functions.update_phenotype = CD8Tcell_phenotype; 
-	pCD->phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
+	// pCD->phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
 
 	// set up neutrophil  
 	pCD = find_cell_definition( "neutrophil");
 	pCD->functions.update_phenotype = neutrophil_phenotype; 
 	pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
-
-	/*
-	
-	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
-	pCD->phenotype.motility.chemotactic_sensitivity( "pro-inflammatory" ) = 1; 
-	pCD->phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
-
-	// pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria" ) = 0.001; 
-
-	pCD = find_cell_definition( "neutrophil"); 
-	pCD->functions.update_phenotype = neutrophil_phenotype; 	
-*/
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
