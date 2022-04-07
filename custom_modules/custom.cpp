@@ -139,7 +139,7 @@ void create_cell_types( void )
 
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
-	pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
+	// pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
 
 	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
@@ -489,7 +489,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	double base_val = pCD->phenotype.secretion.net_export_rates[nPIF]; 
 	double max_response = phenotype.volume.total; 
-	double signal = num_dead + 5*debris + 10*num_bacteria; 
+	double signal = num_dead + 5*debris; //  + 10*num_bacteria; 
 	double hill = Hill_response_function( signal , 0.5 , 1.5 ); 
 	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
 
@@ -501,8 +501,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	hill = Hill_response_function( signal , 0.05 , 1.5 ); 
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
 
-
-	std::cout << "mac: debris " << debris << " PIF: " << PIF << " num_dead: " << num_dead << " num_bac: " << num_bacteria << std::endl; 
+	// std::cout << "mac: debris " << debris << " PIF: " << PIF << " num_dead: " << num_dead << " num_bac: " << num_bacteria << std::endl; 
 
 	return; 
 

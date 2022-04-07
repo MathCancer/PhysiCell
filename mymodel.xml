@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">7200</max_time> 
+		<max_time units="min">15000</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -235,7 +235,7 @@
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
               <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">10</net_export_rate>
+              <net_export_rate units="total substrate/min">100</net_export_rate>
             </substrate>
             <substrate name="quorum">
               <secretion_rate units="1/min">0.0</secretion_rate>
@@ -466,7 +466,7 @@
             <substrate name="toxin">
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
+              <uptake_rate units="1/min">0</uptake_rate>
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             <substrate name="quorum">
@@ -582,7 +582,7 @@
             <substrate name="toxin">
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
+              <uptake_rate units="1/min">0</uptake_rate>
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             <substrate name="quorum">
