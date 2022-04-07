@@ -111,17 +111,17 @@ void create_cell_types( void )
 
 	// set up bacteria 
 
-	Cell_Definition* pBacteria = find_cell_definition( "bacteria");
-	pBacteria->functions.update_phenotype = bacteria_phenotype; 
+	Cell_Definition* pCD = find_cell_definition( "bacteria");
+	pCD->functions.update_phenotype = bacteria_phenotype; 
 
-	pBacteria->functions.update_migration_bias = advanced_chemotaxis_function; 
+	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
 	
-	pBacteria->phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
-	pBacteria->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
+	pCD->phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
+	pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
 
 	// set up blood vessels 
 
-	Cell_Definition* pCD = find_cell_definition( "blood vessel");
+	pCD = find_cell_definition( "blood vessel");
 	pCD->is_movable = false; 
 
 	// set up stem cells 
@@ -139,12 +139,21 @@ void create_cell_types( void )
 
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
-	// pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
 
 	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
 	pCD->phenotype.motility.chemotactic_sensitivity("debris") = 1; 
-	pCD->phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = 10; 	
+	pCD->phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = 10; 
+	
+	// set up CD8+ T cells 
+	pCD = find_cell_definition( "CD8+ T cell");
+	pCD->functions.update_phenotype = CD8Tcell_phenotype; 
+	pCD->phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
+
+	// set up neutrophil  
+	pCD = find_cell_definition( "neutrophil");
+	pCD->functions.update_phenotype = neutrophil_phenotype; 
+	pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
 
 	/*
 	
@@ -295,8 +304,6 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 
-/*	
-
 	// neutrophils  
 	pCD = find_cell_definition("neutrophil"); 
 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
@@ -311,10 +318,10 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 	
-	// number_of_dendritic_cells  
-	pCD = find_cell_definition("dendritic cell"); 
+	// CD8+ T cells   
+	pCD = find_cell_definition("CD8+ T cell"); 
 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
-	for( int n = 0 ; n < parameters.ints("number_of_dendritic_cells") ; n++ )
+	for( int n = 0 ; n < parameters.ints("number_of_CD8T_cells") ; n++ )
 	{
 		std::vector<double> position = {0,0,0}; 
 		position[0] = Xmin + UniformRandom()*Xrange; 
@@ -325,35 +332,6 @@ void setup_tissue( void )
 		pC->assign_position( position );
 	}
 	
-	// number_of_CD8_T_cells  
-	pCD = find_cell_definition("CD8+ T cell"); 
-	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
-	for( int n = 0 ; n < parameters.ints("number_of_CD8_T_cells") ; n++ )
-	{
-		std::vector<double> position = {0,0,0}; 
-		position[0] = Xmin + UniformRandom()*Xrange; 
-		position[1] = Ymin + UniformRandom()*Yrange; 
-		position[2] = Zmin + UniformRandom()*Zrange; 
-		
-		pC = create_cell( *pCD ); 
-		pC->assign_position( position );
-	}
-
-	// number_of_Tregs  
-	pCD = find_cell_definition("Treg"); 
-	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
-	for( int n = 0 ; n < parameters.ints("number_of_Tregs") ; n++ )
-	{
-		std::vector<double> position = {0,0,0}; 
-		position[0] = Xmin + UniformRandom()*Xrange; 
-		position[1] = Ymin + UniformRandom()*Yrange; 
-		position[2] = Zmin + UniformRandom()*Zrange; 
-		
-		pC = create_cell( *pCD ); 
-		pC->assign_position( position );
-	}
-*/	
-
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
 	
@@ -483,7 +461,6 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		}
 	}
 
-	// contact with bacteria increases secretion of pro-inflamatory 
 	// contact with dead cells increases secretion of pro-inflammatory 
 	// or presence of debris 
 
@@ -504,9 +481,6 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// std::cout << "mac: debris " << debris << " PIF: " << PIF << " num_dead: " << num_dead << " num_bac: " << num_bacteria << std::endl; 
 
 	return; 
-
-
-
 
 
 	// sample environment 
@@ -538,45 +512,39 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 }
 
-void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	// not sure what I want to do with these 
-
-	// contact with bacteria increases secretion of pro-inflamatory 
-
-	// contact with Treg decreases secretion of pro-inflamatory
-
-	// high pro-inflammatory decreases motility 
-
-
-
-}
-
 void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	// high pro-inflammatory increases damage rate 
+	// find my cell definition 
+	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
 
-	// contact with dendritic cells increases rate of attacking bacteria 
+	// sample environment 
 
+	static int nR = microenvironment.find_density_index( "resource");
+	static int nTox = microenvironment.find_density_index( "toxin");
+	static int nDebris = microenvironment.find_density_index( "debris" );
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory"); 
+	
+	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double PIF = samples[nPIF];	
+	
+	// if dead, release debris
+	if( phenotype.death.dead == true )
+	{
+		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		pCell->functions.update_phenotype = NULL; 
+		return;
+	}
+	
+	// migration bias increases with pro-inflammatory 
 
-	// contact with Treg decreases damage rate
+	double signal = PIF; 
+	double base_val = pCD->phenotype.motility.migration_bias; 
+	double max_val = 0.75; 
+	double hill = Hill_response_function( PIF , 0.25 , 1.5 ); 
 
-	// high pro-inflammatory decreases motility 
+	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
 
-	// high anti-inflammatory decreases motility 
-
-
-
-}
-
-void Treg_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	// high pro-inflammatory increases secretion of anti-inflammatory 
-
-	// high pro-inflammatory decreases motility 
-
-
-
+	return; 
 }
 
 void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
@@ -586,14 +554,23 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nROS = microenvironment.find_density_index( "ROS");
-	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
-	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
+	static int nR = microenvironment.find_density_index( "resource");
+	static int nTox = microenvironment.find_density_index( "toxin");
+	static int nDebris = microenvironment.find_density_index( "debris" );
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory"); 
+	
 	std::vector<double> samples = pCell->nearest_density_vector(); 
-	double PIF = samples[nPIF];
-	double AIF = samples[nAIF]; 
-	double ROS = samples[nROS];
+	double PIF = samples[nPIF];	
+	
+	// if dead, release debris
+	if( phenotype.death.dead == true )
+	{
+		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		pCell->functions.update_phenotype = NULL; 
+		return;
+	}
 
+/*
 	// sample contacts 
 
 	static int Treg_type = find_cell_definition( "Treg")->type; 
@@ -615,37 +592,16 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 			{ num_bacteria++; }
 		}
 	}
+*/	
+	// migration bias increases with pro-inflammatory 
 
-	// contact with bacteria increases ROS export 
-	double base_val = pCD->phenotype.secretion.net_export_rates[nROS];
-	double max_response = 10; 
-	double hill = Hill_response_function( num_bacteria , 1.0 , 1.5 ); 
+	double signal = PIF; 
+	double base_val = pCD->phenotype.motility.migration_bias; 
+	double max_val = 0.75; 
+	double hill = Hill_response_function( PIF , 0.25 , 1.5 ); 
 
-	phenotype.secretion.net_export_rates[nROS] = base_val + (max_response-base_val)*hill; 
+	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
 
-	// contact with Treg decreases ROS secretion 
-	hill = Hill_response_function( num_Treg , 1.0 , 1.5 ); 
-	phenotype.secretion.net_export_rates[nROS] *= (1.0-hill); 
-
-	// high pro-inflammatory increases phagocytosis rate of bacteria  
-
-	base_val = pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria");
-	max_response = 2*base_val; 
-	hill = Hill_response_function( PIF , 0.15 , 1.5 ); 
-	phenotype.cell_interactions.live_phagocytosis_rate( "bacteria") = 
-		base_val + (max_response-base_val)*hill; 
-
-	// high pro-inflammatory decreases motility 
-
-	base_val = pCD->phenotype.motility.migration_speed; 
-	max_response = 0; 
-	// reuse Hill calculation 
-	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill; 
-
-	// high anti-inflammatory decreases motility 
-	hill = Hill_response_function( AIF , 0.15 , 1.5 ); 
-	phenotype.motility.migration_speed *= (1.0-hill); 
-	
 	return; 
 }
 
