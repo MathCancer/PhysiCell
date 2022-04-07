@@ -115,7 +115,6 @@ void create_cell_types( void )
 	pCD->functions.update_phenotype = bacteria_phenotype; 
 
 	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
-	
 	pCD->phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
 	pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
 
@@ -140,10 +139,9 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
-
-	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
-	pCD->phenotype.motility.chemotactic_sensitivity("debris") = 1; 
-	pCD->phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = 10; 
+	// pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
+	// pCD->phenotype.motility.chemotactic_sensitivity("debris") = 1; 
+	// pCD->phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = 10; 
 	
 	// set up CD8+ T cells 
 	pCD = find_cell_definition( "CD8+ T cell");
@@ -474,7 +472,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	base_val = pCD->phenotype.motility.migration_bias; 
 	max_response = 0.75; 
-	signal = debris + 10 * PIF; 
+	signal = debris; // + 10 * PIF; 
 	hill = Hill_response_function( signal , 0.05 , 1.5 ); 
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
 
