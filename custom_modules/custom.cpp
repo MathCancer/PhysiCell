@@ -140,8 +140,11 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
 	pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
-
 	pCD->functions.update_phenotype = macrophage_phenotype; 
+
+	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
+	pCD->phenotype.motility.chemotactic_sensitivity("debris") = 1; 
+	pCD->phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = 10; 	
 
 	/*
 	
@@ -380,7 +383,7 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// sample resource, quorum, and toxin 
 
 	static int nR = microenvironment.find_density_index( "resource" ); 
-//	static int nDebris = microenvironment.find_density_index( "debris" ); 
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
 	static int nQuorum = microenvironment.find_density_index( "quorum" );
 	static int nToxin = microenvironment.find_density_index( "toxin" ); 
 
@@ -390,6 +393,9 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	{
 		phenotype.secretion.net_export_rates[nQuorum] = 0; 
 		phenotype.secretion.net_export_rates[nToxin] = 0; 
+
+		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		
 		pCell->functions.update_phenotype = NULL; 
 		return; 
 	}
@@ -445,9 +451,19 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// sample environment 
 
 	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
+	static int nDebris = microenvironment.find_density_index( "debris"); 
+
+	// if dead, release debris
+	if( phenotype.death.dead == true )
+	{
+		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		pCell->functions.update_phenotype = NULL; 
+		return;
+	}	
 
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];
+	double debris = samples[nDebris]; 
 
 	// sample contacts 
 
@@ -469,34 +485,41 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// contact with bacteria increases secretion of pro-inflamatory 
 	// contact with dead cells increases secretion of pro-inflammatory 
+	// or presence of debris 
 
 	double base_val = pCD->phenotype.secretion.net_export_rates[nPIF]; 
-	double max_response = 100; 
-	double signal = num_dead + 10*num_bacteria; 
+	double max_response = phenotype.volume.total; 
+	double signal = num_dead + 5*debris + 10*num_bacteria; 
 	double hill = Hill_response_function( signal , 0.5 , 1.5 ); 
 	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
 
-	// chemotaxis bias increases with pro-inflammatory signal 
+	// chemotaxis bias increases with pro-inflammatory signal or debris 
 
 	base_val = pCD->phenotype.motility.migration_bias; 
-	max_response = 1; 
-	signal = PIF; 
-	hill = Hill_response_function( signal , 0.25 , 1.5 ); 
+	max_response = 0.75; 
+	signal = debris + 10 * PIF; 
+	hill = Hill_response_function( signal , 0.05 , 1.5 ); 
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
 
+
+	std::cout << "mac: debris " << debris << " PIF: " << PIF << " num_dead: " << num_dead << " num_bac: " << num_bacteria << std::endl; 
+
 	return; 
+
+
+
 
 
 	// sample environment 
 
 	static int nROS = microenvironment.find_density_index( "ROS");
 	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-	static int nDebris = microenvironment.find_density_index( "debris" ); 
+	// static int nDebris = microenvironment.find_density_index( "debris" ); 
 
 
 	double AIF = samples[nAIF]; 
 	double ROS = samples[nROS];
-	double debris = samples[nDebris]; 
+	
 
 	// sample contacts 
 
@@ -632,14 +655,24 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// find my cell definition 
 	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
 
+
 	// sample environment 
 
 	static int nR = microenvironment.find_density_index( "resource");
 	static int nTox = microenvironment.find_density_index( "toxin");
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
+
+	// if dead, release debris
+	if( phenotype.death.dead == true )
+	{
+		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		pCell->functions.update_phenotype = NULL; 
+		return;
+	}
+
 	/*
 	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
 	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-	static int nDebris = microenvironment.find_density_index( "debris" ); 
 	*/
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	// double PIF = samples[nPIF];
@@ -722,10 +755,20 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 
 	static int nR = microenvironment.find_density_index( "resource");
 	static int nTox = microenvironment.find_density_index( "toxin");
-	/*
+	static int nDebris = microenvironment.find_density_index( "debris" );
+	
+	// if dead, release debris
+	if( phenotype.death.dead == true )
+	{
+		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		pCell->functions.update_phenotype = NULL; 
+		return;
+	}
+	
+	 	/*
 	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
 	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-	static int nDebris = microenvironment.find_density_index( "debris" ); 
+
 	*/
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	// double PIF = samples[nPIF];

@@ -1203,11 +1203,11 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 			<< pCell_to_eat << " " << pCell_to_eat->type_name << std::endl; 
 		}
 
-		std::cout << this->type_name << " eats " << pCell_to_eat->type_name << std::endl; 
-		std::cout << this->type_name << " : " << this->phenotype.cell_interactions.live_phagocytosis_rates << " :: " 
-		<< this->phenotype.cell_interactions.dead_phagocytosis_rate << std::endl; 
-		std::cout << pCell_to_eat->type_name << " : " << pCell_to_eat->phenotype.cell_interactions.live_phagocytosis_rates << " :: " 
-		<< pCell_to_eat->phenotype.cell_interactions.dead_phagocytosis_rate << std::endl << std::endl << std::endl; 
+
+		if( pCell_to_eat->phenotype.death.dead == true )
+		{ std::cout << this->type_name << " eats dead " << pCell_to_eat->type_name << std::endl; }
+		else
+		{ std::cout << this->type_name << " eats live " << pCell_to_eat->type_name << std::endl; }
 
 		// absorb all the volume(s)
 

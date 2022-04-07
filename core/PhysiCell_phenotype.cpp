@@ -1194,6 +1194,7 @@ double& Cell_Interactions::live_phagocytosis_rate( std::string type_name )
 {
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 	int n = cell_definition_indices_by_name[type_name]; 
+	// std::cout << type_name << " " << n << std::endl; 
 	return live_phagocytosis_rates[n]; 
 }
 

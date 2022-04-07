@@ -919,7 +919,7 @@ void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt )
 	return;
 }
 
-void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt )
+void advanced_chemotaxis_function_normalized( Cell* pCell, Phenotype& phenotype , double dt )
 {
 	// We'll work directly on the migration bias direction 
 	std::vector<double>* pVec = &(phenotype.motility.migration_bias_direction);  
@@ -943,7 +943,7 @@ void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt
 	return;
 }
 
-void advanced_chemotaxis_function_unnormalized( Cell* pCell, Phenotype& phenotype , double dt )
+void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt )
 {
 	// We'll work directly on the migration bias direction 
 	std::vector<double>* pVec = &(phenotype.motility.migration_bias_direction);  
@@ -1147,6 +1147,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 	{
 		pTarget = pCell->state.neighbors[n]; 
 		type = pTarget->type; 
+		type_name = pTarget->type_name; 
 		if( pTarget->phenotype.death.dead == true )
 		{
 			// dead phagocytosis 
