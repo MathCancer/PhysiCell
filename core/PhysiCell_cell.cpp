@@ -892,6 +892,7 @@ void Cell::add_potentials(Cell* other_agent)
 	// if( this->ID == other_agent->ID )
 	if( this == other_agent )
 	{ return; }
+
 	// new April 2022: don't interact with cells with 0 volume 
 	if( other_agent->phenotype.volume.total < 1e-15 )
 	{ std::cout << "zero size cell in mechanics!" << std::endl; return; }
