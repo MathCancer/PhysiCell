@@ -1187,15 +1187,14 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 				fused = true; 
 			} 
 		}
-		
-		
-		
-	}
-	
+	}	
 }
 
 void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	if( phenotype.death.dead == true )
+	{ return; }
+
 	double probability = 0.0; 
 	for( int i=0 ; i < phenotype.cell_transformations.transformation_rates.size() ; i++ )
 	{

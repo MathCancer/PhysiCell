@@ -121,6 +121,7 @@ bool sanity_check( Cell* pC )
 bool check_all( void )
 {
 	bool out = false; 
+	#pragma omp parallel for 
 	for( int n= 0 ; n < (*all_cells).size() ; n++ )
 	{
 		Cell* pC = (*all_cells)[n]; 
@@ -128,7 +129,6 @@ bool check_all( void )
 		{ out = true; } 
 	}
 	return out; 
-	
 }
 
 
@@ -271,9 +271,11 @@ int main( int argc, char* argv[] )
 			  Custom add-ons could potentially go here. 
 			*/
 			
+			/*
 			if( check_all() )
 			{ SVG_plot( "weird.svg" , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function ); system("pause"); }
-			
+			*/
+
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 		

@@ -23,7 +23,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>6</omp_num_threads>
+		<omp_num_threads>10</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -50,13 +50,13 @@
 	</options>	
 
 	<microenvironment_setup>
-		<variable ID="0" name="resource" units="dimensionless">
+		<variable name="resource" units="dimensionless" ID="0">
         <physical_parameter_set>
           <diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
           <decay_rate units="1/min">0.1</decay_rate>
         </physical_parameter_set>
         <initial_condition units="mmHg">1</initial_condition>
-        <Dirichlet_boundary_condition enabled="False" units="mmHg">1</Dirichlet_boundary_condition>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">1</Dirichlet_boundary_condition>
         <Dirichlet_options><boundary_value ID="xmin" enabled="False">1</boundary_value>
           <boundary_value ID="xmax" enabled="False">1</boundary_value>
           <boundary_value ID="ymin" enabled="False">1</boundary_value>
@@ -66,13 +66,13 @@
         </Dirichlet_options>
         </variable>
 
-      <variable ID="1" name="toxin" units="dimensionless">
+      <variable name="toxin" units="dimensionless" ID="1">
         <physical_parameter_set>
           <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
           <decay_rate units="1/min">0.1</decay_rate>
         </physical_parameter_set>
         <initial_condition units="mmHg">0</initial_condition>
-        <Dirichlet_boundary_condition enabled="False" units="mmHg">0</Dirichlet_boundary_condition>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
         <Dirichlet_options><boundary_value ID="xmin" enabled="False">0</boundary_value>
           <boundary_value ID="xmax" enabled="False">0</boundary_value>
           <boundary_value ID="ymin" enabled="False">0</boundary_value>
@@ -82,13 +82,13 @@
         </Dirichlet_options>
         </variable>
 
-      <variable ID="2" name="quorum" units="dimensionless">
+      <variable name="quorum" units="dimensionless" ID="2">
         <physical_parameter_set>
           <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
           <decay_rate units="1/min">0.1</decay_rate>
         </physical_parameter_set>
         <initial_condition units="mmHg">0.0</initial_condition>
-        <Dirichlet_boundary_condition enabled="False" units="mmHg">0.0</Dirichlet_boundary_condition>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">0.0</Dirichlet_boundary_condition>
         <Dirichlet_options><boundary_value ID="xmin" enabled="False" />
           <boundary_value ID="xmax" enabled="False" />
           <boundary_value ID="ymin" enabled="False" />
@@ -98,13 +98,13 @@
         </Dirichlet_options>
         </variable>
 
-      <variable ID="3" name="pro-inflammatory" units="dimensionless">
+      <variable name="pro-inflammatory" units="dimensionless" ID="3">
         <physical_parameter_set>
           <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
           <decay_rate units="1/min">0.01</decay_rate>
         </physical_parameter_set>
         <initial_condition units="mmHg">0</initial_condition>
-        <Dirichlet_boundary_condition enabled="False" units="mmHg">0</Dirichlet_boundary_condition>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
         <Dirichlet_options><boundary_value ID="xmin" enabled="False">0</boundary_value>
           <boundary_value ID="xmax" enabled="False">0</boundary_value>
           <boundary_value ID="ymin" enabled="False">0</boundary_value>
@@ -114,13 +114,13 @@
         </Dirichlet_options>
         </variable>
 
-      <variable ID="4" name="debris" units="dimensionless">
+      <variable name="debris" units="dimensionless" ID="4">
         <physical_parameter_set>
           <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
           <decay_rate units="1/min">0.1</decay_rate>
         </physical_parameter_set>
         <initial_condition units="mmHg">0.0</initial_condition>
-        <Dirichlet_boundary_condition enabled="False" units="mmHg">0.0</Dirichlet_boundary_condition>
+        <Dirichlet_boundary_condition units="mmHg" enabled="False">0.0</Dirichlet_boundary_condition>
         <Dirichlet_options><boundary_value ID="xmin" enabled="False" />
           <boundary_value ID="xmax" enabled="False" />
           <boundary_value ID="ymin" enabled="False" />
@@ -145,11 +145,11 @@
 	</microenvironment_setup>	
 	
 	<cell_definitions>
-      <cell_definition ID="0" name="bacteria">
+      <cell_definition name="bacteria" ID="0">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
-              <rate end_index="0" fixed_duration="false" start_index="0">0.00028</rate>
+              <rate start_index="0" end_index="0" fixed_duration="false">0.00028</rate>
             </phase_transition_rates>
             </cycle>
 
@@ -157,7 +157,7 @@
             <model code="100" name="apoptosis">
               <death_rate units="1/min">0.00028</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">516</duration>
+                <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -171,8 +171,8 @@
             <model code="101" name="necrosis">
               <death_rate units="1/min">0.0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">0</duration>
-              <duration fixed_duration="true" index="1">86400</duration>
+                <duration index="0" fixed_duration="true">0</duration>
+              <duration index="1" fixed_duration="true">86400</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -199,7 +199,7 @@
 
           <mechanics>
             <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
-            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+            <cell_cell_repulsion_strength units="micron/min">20.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
@@ -257,15 +257,15 @@
 
           </phenotype>
         <custom_data>
-          <sample description="" units="">1.0</sample>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
-      <cell_definition ID="1" name="blood vessel">
+      <cell_definition name="blood vessel" ID="1">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
-              <rate end_index="0" fixed_duration="false" start_index="0">0</rate>
+              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
             </phase_transition_rates>
             </cycle>
 
@@ -273,7 +273,7 @@
             <model code="100" name="apoptosis">
               <death_rate units="1/min">0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">516</duration>
+                <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -287,8 +287,8 @@
             <model code="101" name="necrosis">
               <death_rate units="1/min">0.0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">0</duration>
-              <duration fixed_duration="true" index="1">86400</duration>
+                <duration index="0" fixed_duration="true">0</duration>
+              <duration index="1" fixed_duration="true">86400</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -373,15 +373,15 @@
 
           </phenotype>
         <custom_data>
-          <sample description="" units="">1.0</sample>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
-      <cell_definition ID="2" name="stem">
+      <cell_definition name="stem" ID="2">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
-              <rate end_index="0" fixed_duration="false" start_index="0">5.3e-7</rate>
+              <rate start_index="0" end_index="0" fixed_duration="false">5.3e-7</rate>
             </phase_transition_rates>
             </cycle>
 
@@ -389,7 +389,7 @@
             <model code="100" name="apoptosis">
               <death_rate units="1/min">5.3e-08</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">516</duration>
+                <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -403,8 +403,8 @@
             <model code="101" name="necrosis">
               <death_rate units="1/min">0.0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">0</duration>
-              <duration fixed_duration="true" index="1">86400</duration>
+                <duration index="0" fixed_duration="true">0</duration>
+              <duration index="1" fixed_duration="true">86400</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -489,15 +489,15 @@
 
           </phenotype>
         <custom_data>
-          <sample description="" units="">1.0</sample>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
-      <cell_definition ID="3" name="differentiated">
+      <cell_definition name="differentiated" ID="3">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
-              <rate end_index="0" fixed_duration="false" start_index="0">5.3e-4</rate>
+              <rate start_index="0" end_index="0" fixed_duration="false">5.3e-4</rate>
             </phase_transition_rates>
             </cycle>
 
@@ -505,7 +505,7 @@
             <model code="100" name="apoptosis">
               <death_rate units="1/min">5.3e-05</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">516</duration>
+                <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -519,8 +519,8 @@
             <model code="101" name="necrosis">
               <death_rate units="1/min">0.0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">0</duration>
-              <duration fixed_duration="true" index="1">86400</duration>
+                <duration index="0" fixed_duration="true">0</duration>
+              <duration index="1" fixed_duration="true">86400</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -605,15 +605,15 @@
 
           </phenotype>
         <custom_data>
-          <sample description="" units="">1.0</sample>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
-      <cell_definition ID="4" name="macrophage">
+      <cell_definition name="macrophage" ID="4">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
-              <rate end_index="0" fixed_duration="false" start_index="0">0</rate>
+              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
             </phase_transition_rates>
             </cycle>
 
@@ -621,7 +621,7 @@
             <model code="100" name="apoptosis">
               <death_rate units="1/min">0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">516</duration>
+                <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -635,8 +635,8 @@
             <model code="101" name="necrosis">
               <death_rate units="1/min">0.0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">0</duration>
-              <duration fixed_duration="true" index="1">86400</duration>
+                <duration index="0" fixed_duration="true">0</duration>
+              <duration index="1" fixed_duration="true">86400</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -721,15 +721,15 @@
 
           </phenotype>
         <custom_data>
-          <sample description="" units="">1.0</sample>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
-      <cell_definition ID="5" name="CD8+ T cell">
+      <cell_definition name="CD8+ T cell" ID="5">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
-              <rate end_index="0" fixed_duration="false" start_index="0">0</rate>
+              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
             </phase_transition_rates>
             </cycle>
 
@@ -737,7 +737,7 @@
             <model code="100" name="apoptosis">
               <death_rate units="1/min">0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">516</duration>
+                <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -751,8 +751,8 @@
             <model code="101" name="necrosis">
               <death_rate units="1/min">0.0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">0</duration>
-              <duration fixed_duration="true" index="1">86400</duration>
+                <duration index="0" fixed_duration="true">0</duration>
+              <duration index="1" fixed_duration="true">86400</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -837,15 +837,15 @@
 
           </phenotype>
         <custom_data>
-          <sample description="" units="">1.0</sample>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
-      <cell_definition ID="6" name="neutrophil">
+      <cell_definition name="neutrophil" ID="6">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
-              <rate end_index="0" fixed_duration="false" start_index="0">0</rate>
+              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
             </phase_transition_rates>
             </cycle>
 
@@ -853,7 +853,7 @@
             <model code="100" name="apoptosis">
               <death_rate units="1/min">0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">516</duration>
+                <duration index="0" fixed_duration="true">516</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -867,8 +867,8 @@
             <model code="101" name="necrosis">
               <death_rate units="1/min">0.0</death_rate>
               <phase_durations units="min">
-                <duration fixed_duration="true" index="0">0</duration>
-              <duration fixed_duration="true" index="1">86400</duration>
+                <duration index="0" fixed_duration="true">0</duration>
+              <duration index="1" fixed_duration="true">86400</duration>
               </phase_durations>
               <parameters>
                 <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
@@ -953,7 +953,7 @@
 
           </phenotype>
         <custom_data>
-          <sample description="" units="">1.0</sample>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
@@ -967,14 +967,14 @@
 	</initial_conditions>	
 	
 	<user_parameters>
-		<random_seed description="" type="int" units="dimensionless">0</random_seed>
-        <number_of_stem_cells description=" type)" type="int" units="none">50</number_of_stem_cells>
-        <number_of_differentiated_cells description="" type="int" units="">500</number_of_differentiated_cells>
-        <number_of_blood_vessels description="" type="int" units="">40</number_of_blood_vessels>
-        <number_of_bacteria description="" type="int" units="">50</number_of_bacteria>
-        <number_of_macrophages description="" type="int" units="">100</number_of_macrophages>
-        <number_of_CD8T_cells description="" type="int" units="">100</number_of_CD8T_cells>
-        <number_of_neutrophils description="" type="int" units="">100</number_of_neutrophils>
+		<random_seed type="int" units="dimensionless" description="">0</random_seed>
+        <number_of_stem_cells type="int" units="none" description=" type)">50</number_of_stem_cells>
+        <number_of_differentiated_cells type="int" units="" description="">500</number_of_differentiated_cells>
+        <number_of_blood_vessels type="int" units="" description="">40</number_of_blood_vessels>
+        <number_of_bacteria type="int" units="" description="">50</number_of_bacteria>
+        <number_of_macrophages type="int" units="" description="">100</number_of_macrophages>
+        <number_of_CD8T_cells type="int" units="" description="">100</number_of_CD8T_cells>
+        <number_of_neutrophils type="int" units="" description="">100</number_of_neutrophils>
     </user_parameters>
 	
 </PhysiCell_settings>

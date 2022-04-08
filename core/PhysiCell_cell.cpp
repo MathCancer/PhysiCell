@@ -1204,12 +1204,14 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	// make this thread safe 
 	#pragma omp critical
 	{
+		/*
 		if( pCell_to_eat->phenotype.death.dead == true )
 		{ std::cout << this->type_name << " (" << this << ")" << " eats dead " << pCell_to_eat->type_name << " (" << pCell_to_eat 
 			<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
 		else
 		{ std::cout << this->type_name << " (" << this << ")" << " eats live " << pCell_to_eat->type_name << " (" << pCell_to_eat 
 			<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
+		*/
 
 		// absorb all the volume(s)
 
@@ -1314,8 +1316,8 @@ void Cell::attack_cell( Cell* pCell_to_attack , double dt )
 	// make this thread safe 
 	#pragma omp critical
 	{ 
-		std::cout << this->type_name << " attacks " << pCell_to_attack->type_name << std::endl;
-	
+		// std::cout << this->type_name << " attacks " << pCell_to_attack->type_name << std::endl;
+		// 
 		pCell_to_attack->state.damage += phenotype.cell_interactions.damage_rate * dt; 
 		pCell_to_attack->state.total_attack_time += dt; 
 	}
