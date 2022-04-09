@@ -23,7 +23,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>6</omp_num_threads>
+		<omp_num_threads>10</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -973,8 +973,17 @@
         <number_of_blood_vessels type="int" units="" description="">40</number_of_blood_vessels>
         <number_of_bacteria type="int" units="" description="">50</number_of_bacteria>
         <number_of_macrophages type="int" units="" description="">100</number_of_macrophages>
-        <number_of_CD8T_cells type="int" units="" description="">100</number_of_CD8T_cells>
-        <number_of_neutrophils type="int" units="" description="">100</number_of_neutrophils>
+        <number_of_CD8T_cells type="int" units="" description="">0</number_of_CD8T_cells> 
+        <number_of_neutrophils type="int" units="" description="">0</number_of_neutrophils>
+
+        <bacteria_cycle_entry_min_resource type="double" 
+          description="bacteria do not cycle if R is below this value">0.15</bacteria_cycle_entry_min_resource>
+        <bacteria_saturation_necrosis_resource type="double" 
+          description="bacteria reach max necrosis for R below this value">0.075</bacteria_saturation_necrosis_resource>
+        <bacteria_threshold_necrosis_resource type="double" 
+          description="no bacteria necrosis for R above this value">0.15</bacteria_threshold_necrosis_resource>
+        <bacteria_motility_resource_halfmax type="double" 
+          description="resource half-max for bacteria reduction of motility with high resource">0.25</bacteria_motility_resource_halfmax>
     </user_parameters>
 	
 </PhysiCell_settings>

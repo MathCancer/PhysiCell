@@ -237,9 +237,11 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		// dummy cells of size zero are left ot interact mechanically, etc. 
 		if( cells_ready_to_die.size() > 0 )
 		{
+			/*
 			std::cout << "\tClearing dummy cells from phagocytosis and fusion events ... " << std::endl; 
 			std::cout << "\t\tClearing " << cells_ready_to_die.size() << " cells ... " << std::endl; 
 			// there might be a lot of "dummy" cells ready for removal. Let's do it. 		
+			*/
 			for( int i=0; i < cells_ready_to_die.size(); i++ )
 			{ cells_ready_to_die[i]->die(); }
 			cells_ready_to_die.clear();

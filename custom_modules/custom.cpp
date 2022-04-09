@@ -143,7 +143,7 @@ void create_cell_types( void )
 	// set up CD8+ T cells 
 	pCD = find_cell_definition( "CD8+ T cell");
 	pCD->functions.update_phenotype = CD8Tcell_phenotype; 
-	// pCD->phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
+	pCD->phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
 
 	// set up neutrophil  
 	pCD = find_cell_definition( "neutrophil");
@@ -369,19 +369,24 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// resource increases cycle entry 
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
 	double max_val = base_val * 10.0; 
-	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( R, 0.15, 1 );
+	static double min_cycle_resource = parameters.doubles("bacteria_cycle_entry_min_resource");
+	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( R, min_cycle_resource, 1 );
 
 	// resource decreses necrosis
 
 	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
+	static double saturation_necrosis_resource = parameters.doubles("bacteria_saturation_necrosis_resource");
+	static double threshold_necrosis_resource = parameters.doubles("bacteria_threshold_necrosis_resource");
+	phenotype.death.rates[nNecrosis] = max_val * 
+		decreasing_linear_response_function( R, saturation_necrosis_resource, threshold_necrosis_resource );
 
 	// resource decreases motile speed  
 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	double max_response = 0.0; 
-	double hill = Hill_response_function( R, 0.25 , 1.5);  
+	static double motility_resource_halfmax = parameters.doubles("bacteria_motility_resource_halfmax");
+	double hill = Hill_response_function( R, motility_resource_halfmax , 1.5);  
 	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill;
 
 	// quorum and resource increases motility bias 
@@ -444,55 +449,32 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		}
 	}
 
-	// contact with dead cells increases secretion of pro-inflammatory 
-	// or presence of debris 
+	// contact with dead cells or bacteria, or debris 
+	// increases secretion of pro-inflammatory 
 
 	double base_val = pCD->phenotype.secretion.net_export_rates[nPIF]; 
 	double max_response = phenotype.volume.total; 
-	double signal = num_dead + 5*debris; //  + 10*num_bacteria; 
+	double signal = num_dead + 5*debris + 10*num_bacteria; 
 	double hill = Hill_response_function( signal , 0.5 , 1.5 ); 
 	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
 
-	// chemotaxis bias increases with pro-inflammatory signal or debris 
+	// chemotaxis bias increases with debris 
 
 	base_val = pCD->phenotype.motility.migration_bias; 
 	max_response = 0.75; 
-	signal = debris; // + 10 * PIF; 
+	signal = debris  ; // + 10 * PIF; 
 	hill = Hill_response_function( signal , 0.05 , 1.5 ); 
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
 
-	// std::cout << "mac: debris " << debris << " PIF: " << PIF << " num_dead: " << num_dead << " num_bac: " << num_bacteria << std::endl; 
+	// migration speed slows down in the presence of bacteria or debris 
+
+	base_val = pCD->phenotype.motility.migration_speed; 
+	max_response = 0.1 * base_val; 
+	signal = debris  ; // + 10 * PIF; 
+	hill = Hill_response_function( signal , 0.05 , 1.5 ); 
+	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
 
 	return; 
-
-
-	// sample environment 
-
-	static int nROS = microenvironment.find_density_index( "ROS");
-	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-	// static int nDebris = microenvironment.find_density_index( "debris" ); 
-
-
-	double AIF = samples[nAIF]; 
-	double ROS = samples[nROS];
-	
-
-	// sample contacts 
-
-
-	// contact with Treg decreases secretion of pro-inflamatory
-
-	// weight chemotactic_sensitivity
-	double total = debris + PIF; 
-	phenotype.motility.chemotactic_sensitivity("debris") = debris / (total+1e-16); 
-	phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = PIF / (total+1e-16); 
-
-	// high pro-inflammatory decreases motility 
-
-	// high anti-inflamatory decreases secretion of pro-inflammatory 
-
-
-
 }
 
 void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
@@ -768,7 +750,6 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
 	// std::cout << "tox: " << signal << " " << hill << std::endl; 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
-
 
 	return; 
 }
