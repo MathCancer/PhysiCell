@@ -1145,11 +1145,29 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 	bool attacked = false; 
 	bool phagocytosed = false; 
 	bool fused = false; 
+
+/*	
+	if( pCell->state.neighbors.size() > 10 )
+	{
+		std::cout << pCell->type_name << " cell (" << pCell << ") has " << pCell->state.neighbors.size() << "neighbors" << std::endl; 
+		for( int n=0; n < pCell->state.neighbors.size(); n++ )
+		{
+			Cell* pC = pCell->state.neighbors[n]; 
+			std::cout << (int) pC->phenotype.death.dead << " " << pC->type_name << " size: " << pC->phenotype.volume.total << std::endl; 
+		}
+		std::cout << std::endl;
+		system("sleep 1") ; 
+	}
+*/
+	
 	for( int n=0; n < pCell->state.neighbors.size(); n++ )
 	{
 		pTarget = pCell->state.neighbors[n]; 
 		type = pTarget->type; 
 		type_name = pTarget->type_name; 
+		
+		if( pTarget->phenotype.volume.total < 1e-15 )
+		{ break; } 
 		
 		if( pTarget->phenotype.death.dead == true )
 		{
