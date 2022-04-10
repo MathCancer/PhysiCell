@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">10080</max_time> 
+		<max_time units="min">10080</max_time> <!-- 3600 -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -257,18 +257,7 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="signal for changes in migration speed reach half max at this value">0.25</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="signal for changes in migration bias reach half max at this value">0.5</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">36</damage_halfmax>
-          <relative_max_damage_death units="none" description="relatigve increase in apoptotic death from damage">100</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
@@ -384,18 +373,7 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relatigve increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
@@ -511,18 +489,7 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.4</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">100</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.1</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.1</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relatigve increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
@@ -638,18 +605,7 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.2</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">100</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relatigve increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.5</cycling_pressure_halfmax>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
@@ -765,18 +721,7 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relatigve increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
@@ -892,18 +837,7 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relatigve increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
@@ -1019,18 +953,7 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relatigve increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
+          <sample units="" description="">1.0</sample>
         </custom_data>
           </cell_definition>
 
@@ -1045,14 +968,39 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless" description="">0</random_seed>
-        <number_of_stem_cells type="int" units="none" description="">50</number_of_stem_cells>
+        <number_of_stem_cells type="int" units="none" description=" type)">50</number_of_stem_cells>
         <number_of_differentiated_cells type="int" units="" description="">200</number_of_differentiated_cells>
         <number_of_blood_vessels type="int" units="" description="">40</number_of_blood_vessels>
         <number_of_bacteria type="int" units="" description="">0</number_of_bacteria>
         <number_of_macrophages type="int" units="" description="">50</number_of_macrophages>
-        <number_of_CD8T_cells type="int" units="" description="">0</number_of_CD8T_cells>
+        <number_of_CD8T_cells type="int" units="" description="">0</number_of_CD8T_cells> 
         <number_of_neutrophils type="int" units="" description="">0</number_of_neutrophils>
-        <max_stem_differentiation type="double" units="" description="maximum stem cell differentiation rate">0.0075</max_stem_differentiation>
+
+        <bacteria_cycle_entry_min_resource type="double" 
+          description="bacteria do not cycle if R is below this value">0.15</bacteria_cycle_entry_min_resource>
+        <bacteria_saturation_necrosis_resource type="double" 
+          description="bacteria reach max necrosis for R below this value">0.075</bacteria_saturation_necrosis_resource>
+        <bacteria_threshold_necrosis_resource type="double" 
+          description="no bacteria necrosis for R above this value">0.15</bacteria_threshold_necrosis_resource>
+        <bacteria_motility_resource_halfmax type="double" 
+          description="resource half-max for bacteria reduction of motility with high resource">0.25</bacteria_motility_resource_halfmax>
+        <bacteria_migration_bias_halfmax type="double" 
+          description="half-max for increased migration bias in bacteria">0.5</bacteria_migration_bias_halfmax>
+        <bacteria_damage_halfmax type="double" 
+          description="(scaled) damage half-max for bacteria death">36</bacteria_damage_halfmax>
+
+        <max_stem_differentiation type="double" 
+          description="maximum stem cell differentiation rate">0.0075</max_stem_differentiation>
+        <max_stem_diff_contact_halfmax type="double" 
+          description="half-maximum for promoting stem cell differentiation after contact with stem cells">0.1</max_stem_diff_contact_halfmax>
+        <stem_cycling_halfmax type="double" 
+          description="half-maximum for inhibiting stem cell cycling after contact with differentiated cells">0.1</stem_cycling_halfmax>
+        <stem_saturation_necrosis_resource type="double" 
+          description="bacteria reach max necrosis for R below this value">0.075</stem_saturation_necrosis_resource>
+        <stem_threshold_necrosis_resource type="double" 
+          description="no bacteria necrosis for R above this value">0.15</stem_threshold_necrosis_resource>
+
+
     </user_parameters>
 	
 </PhysiCell_settings>

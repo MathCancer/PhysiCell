@@ -369,15 +369,15 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// resource increases cycle entry 
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
 	double max_val = base_val * 10.0; 
-	static double min_cycle_resource = parameters.doubles("bacteria_cycle_entry_min_resource");
+	static double min_cycle_resource = pCell->custom_data["cycling_entry_threshold_resource"]; // 0.15 
 	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( R, min_cycle_resource, 1 );
 
 	// resource decreses necrosis
 
 	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	static double saturation_necrosis_resource = parameters.doubles("bacteria_saturation_necrosis_resource");
-	static double threshold_necrosis_resource = parameters.doubles("bacteria_threshold_necrosis_resource");
+	static double saturation_necrosis_resource = pCell->custom_data["necrosis_saturation_resource"]; //0.075
+	static double threshold_necrosis_resource = pCell->custom_data["necrosis_threshold_resource"]; // 0.15
 	phenotype.death.rates[nNecrosis] = max_val * 
 		decreasing_linear_response_function( R, saturation_necrosis_resource, threshold_necrosis_resource );
 
@@ -386,7 +386,8 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double signal = R; 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	double max_response = 0.0; 
-	static double motility_resource_halfmax = parameters.doubles("bacteria_motility_resource_halfmax");
+	static double motility_resource_halfmax = 
+		pCell->custom_data["migration_speed_halfmax"]; // 0.25 // parameters.doubles("bacteria_motility_resource_halfmax");
 	double hill = Hill_response_function( signal, motility_resource_halfmax , 1.5);  
 	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill;
 
@@ -394,7 +395,8 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	signal = Q+R; 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	max_response = 1.0; 
-	static double bias_halfmax = parameters.doubles("bacteria_migration_bias_halfmax");
+	static double bias_halfmax = pCell->custom_data["migration_bias_halfmax"]; 
+		// 0.5 //  parameters.doubles("bacteria_migration_bias_halfmax");
 	hill = Hill_response_function( signal, bias_halfmax , 1.5);  
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 
 
@@ -403,8 +405,12 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	signal = pCell->state.damage; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
-	max_response = 100*base_val;
-	static double damage_halfmax = parameters.doubles("bacteria_damage_halfmax");
+
+	static double damage_halfmax = pCell->custom_data["damage_halfmax"]; 
+	static double relative_max_damage_death = pCell->custom_data["relative_max_damage_death"]; 
+	max_response = base_val * relative_max_damage_death; 
+
+		// 36 // parameters.doubles("bacteria_damage_halfmax");
 	hill = Hill_response_function( signal , damage_halfmax , 1.5 ); 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
 
@@ -632,11 +638,11 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 
 	// contact with a stem cell increases differentiation 
-	static double max_stem_diff = parameters.doubles("max_stem_differentiation"); 
-	static double stem_diff_halfmax = parameters.doubles("max_stem_diff_contact_halfmax");
+	static double max_stem_diff = parameters.doubles("max_stem_differentiation"); // 0.0075 
+	static double stem_diff_halfmax = pCell->custom_data["differentiation_contact_halfmax"]; // 0.1 
 
 	double base_val = 0; // phenotype.cell_transformations.transformation_rates[diff_type]; 
-	double max_val = max_stem_diff; // 0.0075; // base_val * 100.0; 
+	double max_val = max_stem_diff; // 0.0075;
 	double signal = num_stem; 
 	double half_max = stem_diff_halfmax; // 0.1; 
 	double hill = Hill_response_function( signal, half_max , 1.5 ); 
@@ -645,32 +651,37 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// contact with a differentiated cell reduces proliferation 
 	// high rate of proliferation unless in contact with a differentiated cell 
 
-	static double max_stem_cycling = pCD->phenotype.cycle.data.exit_rate(0);
-	static double stem_cycling_halfmax = parameters.doubles("max_stem_cycling_contact_halfmax");
+	static double stem_cycling_halfmax = pCell->custom_data["cycling_contact_halfmax"]; // 0.1; 
 
-	base_val = max_stem_cycling; // 0.002; 
-	double max_response = 0.0; 
+	base_val = pCD->phenotype.cycle.data.exit_rate(0); // 0.002; 
+	max_val = 0.0; 
 	signal = num_differentiated; 
 	half_max = stem_cycling_halfmax; //  0.1; 
 	hill = Hill_response_function( signal, half_max , 1.5 ); 
-	phenotype.cycle.data.exit_rate(0) = base_val + (max_response-base_val)*hill; 
+	phenotype.cycle.data.exit_rate(0) = base_val + (max_val-base_val)*hill; 
 
 	// resource reduces necrotic death 
 
 	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	static double stem_saturation_necrosis = pCell->custom_data["shit"]; 
+	static double stem_saturation_necrosis = pCell->custom_data["necrosis_saturation_resource"];
+	static double stem_threshold_necrosis = pCell->custom_data["necrosis_threshold_resource"];
 
-	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
+	phenotype.death.rates[nNecrosis] = max_val * 
+		decreasing_linear_response_function( R, stem_saturation_necrosis, stem_threshold_necrosis );
 
 	// toxin increases apoptotic death 
 	
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
+	static double toxicity_halfmax = pCell->custom_data["toxicity_halfmax"]; // 0.4 
+	static double relative_max_toxicity = pCell->custom_data["relative_max_toxicity"]; 
+
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
-	max_val = 100*base_val;
-	hill = Hill_response_function( signal , 0.4 , 1.5 ); 
+	max_val = base_val * relative_max_toxicity; // 100*base_val;
+
+	hill = Hill_response_function( signal , toxicity_halfmax , 1.5 ); 
 	phenotype.death.rates[nApoptosis] = base_val + (max_val-base_val)*hill; 
 	
 	return; 
@@ -695,69 +706,45 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 		return;
 	}
 	
-	 	/*
-	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
-	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-
-	*/
 	std::vector<double> samples = pCell->nearest_density_vector(); 
-	// double PIF = samples[nPIF];
-	// double AIF = samples[nAIF]; 
-	// double ROS = samples[nROS];
-	// double debris = samples[nDebris]; 
 	double R = samples[nR];
 	double toxin = samples[nTox];
 
-	// sample contacts 
-/*
-	static int stem_type = find_cell_definition( "stem")->type; 
-	static int diff_type = find_cell_definition( "differentiated")->type; 
-	static int bacteria_type = find_cell_definition( "bacteria")->type; 
-
-	int num_stem = 0; 
-	int num_differentiated = 0; 
-	int num_bacteria = 0; 
-	int num_dead = 0; 
-	for( int n=0; n < pCell->state.neighbors.size(); n++ )
-	{
-		Cell* pC = pCell->state.neighbors[n]; 
-		if( pC->phenotype.death.dead == true )
-		{ num_dead++; }
-		else
-		{ 
-			if( pC->type == stem_type )
-			{ num_stem++; }
-			if( pC->type == num_differentiated )
-			{ num_differentiated++; }
-			if( pC->type == bacteria_type )
-			{ num_bacteria++; }
-		}
-	}
-*/
 
 	double signal = 0.0; 
 	double hill = 0.0; 
 
 	// pressure reduces proliferation 
 	signal = pCell->state.simple_pressure;  
-	hill = Hill_response_function( signal, 0.5 , 1.5 );  
+	static double pressure_halfmax = pCell->custom_data["cycling_pressure_halfmax"]; // 0.5 
+	hill = Hill_response_function( signal, pressure_halfmax , 1.5 );  
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
+
 	phenotype.cycle.data.exit_rate(0) = (1-hill)*base_val; 
 
 	// resource reduces necrotic death 
 
 	double max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
+
+	// get same from bacteria
+	static double necrosis_saturation = pCD->custom_data["necrosis_saturation_resource"]; // 0.075 
+	static double necrosis_threshold = pCD->custom_data["necrosis_threshold_resource"]; // 0.15 
+
+	phenotype.death.rates[nNecrosis] = max_val * 
+		decreasing_linear_response_function( R, necrosis_saturation, necrosis_threshold ); 
 
 	// toxin increases apoptotic death 
 	
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
+	static double toxicity_halfmax = pCD->custom_data["toxicity_halfmax"]; // 0.2 
+	static double relative_max_tox_death = pCD->custom_data["relative_max_toxicity"]; // 100 
+
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
-	double max_response = 100*base_val;
-	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
+	double max_response = base_val * relative_max_tox_death; 
+	hill = Hill_response_function( signal , toxicity_halfmax , 1.5 ); 
 	// std::cout << "tox: " << signal << " " << hill << std::endl; 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
 
