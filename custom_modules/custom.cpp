@@ -599,15 +599,7 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		return;
 	}
 
-	/*
-	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
-	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-	*/
 	std::vector<double> samples = pCell->nearest_density_vector(); 
-	// double PIF = samples[nPIF];
-	// double AIF = samples[nAIF]; 
-	// double ROS = samples[nROS];
-	// double debris = samples[nDebris]; 
 	double R = samples[nR];
 	double toxin = samples[nTox];
 
@@ -639,7 +631,7 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// contact with a stem cell increases differentiation 
 	static double max_stem_diff = parameters.doubles("max_stem_differentiation"); // 0.0075 
-	static double stem_diff_halfmax = pCell->custom_data["differentiation_contact_halfmax"]; // 0.1 
+	static double stem_diff_halfmax = pCD->custom_data["differentiation_contact_halfmax"]; // 0.1 
 
 	double base_val = 0; // phenotype.cell_transformations.transformation_rates[diff_type]; 
 	double max_val = max_stem_diff; // 0.0075;
@@ -651,7 +643,7 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// contact with a differentiated cell reduces proliferation 
 	// high rate of proliferation unless in contact with a differentiated cell 
 
-	static double stem_cycling_halfmax = pCell->custom_data["cycling_contact_halfmax"]; // 0.1; 
+	static double stem_cycling_halfmax = pCD->custom_data["cycling_contact_halfmax"]; // 0.1; 
 
 	base_val = pCD->phenotype.cycle.data.exit_rate(0); // 0.002; 
 	max_val = 0.0; 
@@ -664,8 +656,8 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	static double stem_saturation_necrosis = pCell->custom_data["necrosis_saturation_resource"];
-	static double stem_threshold_necrosis = pCell->custom_data["necrosis_threshold_resource"];
+	static double stem_saturation_necrosis = pCD->custom_data["necrosis_saturation_resource"];
+	static double stem_threshold_necrosis = pCD->custom_data["necrosis_threshold_resource"];
 
 	phenotype.death.rates[nNecrosis] = max_val * 
 		decreasing_linear_response_function( R, stem_saturation_necrosis, stem_threshold_necrosis );
@@ -674,8 +666,8 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
-	static double toxicity_halfmax = pCell->custom_data["toxicity_halfmax"]; // 0.4 
-	static double relative_max_toxicity = pCell->custom_data["relative_max_toxicity"]; 
+	static double toxicity_halfmax = pCD->custom_data["toxicity_halfmax"]; // 0.4 
+	static double relative_max_toxicity = pCD->custom_data["relative_max_toxicity"]; 
 
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
@@ -716,7 +708,7 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 
 	// pressure reduces proliferation 
 	signal = pCell->state.simple_pressure;  
-	static double pressure_halfmax = pCell->custom_data["cycling_pressure_halfmax"]; // 0.5 
+	static double pressure_halfmax = pCD->custom_data["cycling_pressure_halfmax"]; // 0.5 
 	hill = Hill_response_function( signal, pressure_halfmax , 1.5 );  
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
 
