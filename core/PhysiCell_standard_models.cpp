@@ -949,9 +949,6 @@ void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt
 	std::vector<double>* pVec = &(phenotype.motility.migration_bias_direction);  
 	// reset to zero. use memset to be faster??
 	pVec->assign( 3, 0.0 ); 
-	
-	// a place to put each gradient prior to normalizing it 
-	std::vector<double> temp(3,0.0); 
 
 	// weighted combination of the gradients 
 	for( int i=0; i < phenotype.motility.chemotactic_sensitivities.size(); i++ )
@@ -961,7 +958,17 @@ void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt
 	}
 	// normalize that 
 	normalize( pVec ); 
-	
+
+/*
+ #pragma omp critical
+ {
+	std::cout << "\t\ttype: " << pCell->type_name 
+	<< " bias: " << phenotype.motility.migration_bias 
+	<< " speed: " << phenotype.motility.migration_speed 
+	<< " direction: " << phenotype.motility.migration_bias_direction << std::endl; 
+ }
+ */
+
 	return;
 }
 

@@ -139,11 +139,9 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
-/*
 	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
 	pCD->phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
 	pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 1; 
-*/
 
 	
 	// set up CD8+ T cells 
@@ -475,7 +473,6 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static double secretion_debris_sensitivity = 2; 
 	static double secretion_quorum_sensitivity = 5; 
 
-
 	double base_val = pCD->phenotype.secretion.secretion_rates[nPIF]; 
 	double max_response = 10; // phenotype.volume.total; 
 	double signal = 
@@ -483,27 +480,44 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		secretion_bacteria_sensitivity*num_bacteria + 
 		secretion_debris_sensitivity*debris + 
 		secretion_quorum_sensitivity*Q; 
-	double half_max = 0.5; // 0.5; 
+	double half_max = pCD->custom_data["secretion_halfmax"]; // 0.5; // 0.5; 
 	double hill = Hill_response_function( signal , half_max , 1.5 ); 
 	phenotype.secretion.secretion_rates[nPIF] = base_val + (max_response-base_val)*hill; 
 
 	// chemotaxis bias increases with debris or quorum factor 
 
+	static double bias_debris_sensitivity = 0.1; 
+	static double bias_quorum_sensitivity = 1; 
 
 	base_val = pCD->phenotype.motility.migration_bias; 
 	max_response = 0.75; 
-	signal = debris  ; // + 10 * PIF; 
-	half_max = 0.05; 
+	signal = bias_debris_sensitivity*debris + 
+		bias_quorum_sensitivity*Q ; // + 10 * PIF; 
+	half_max = pCD->custom_data["migration_bias_halfmax"]; // 0.01 // 0.005 //0.1 // 0.05
 	hill = Hill_response_function( signal , half_max , 1.5 ); 
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
+
+/*
+	#pragma omp critical 
+	{
+	std::cout << "signal: " << signal << " halfmax: " << half_max 
+	<< " hill: " << hill << std::endl; 
+	
+	std::cout << "\tbase: " << base_val 
+	<< " max: " << max_response 
+	<< " actual: " << phenotype.motility.migration_bias << std::endl; 
+	}
+*/
 
 	// migration speed slows down in the presence of debris or quorum factor 
 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	max_response = 0.1 * base_val; 
-	signal = debris  ; // + 10 * PIF; 
-	hill = Hill_response_function( signal , 0.05 , 1.5 ); 
-	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
+	signal = bias_debris_sensitivity*debris + 
+		bias_quorum_sensitivity*Q ; // + 10 * PIF; 
+	half_max = pCD->custom_data["migration_speed_halfmax"]; // 0.1 // 0.05 
+	hill = Hill_response_function( signal , half_max , 1.5 ); 
+	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill; 	
 
 	return; 
 }
