@@ -139,6 +139,12 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
+/*
+	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
+	pCD->phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
+	pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 1; 
+*/
+
 	
 	// set up CD8+ T cells 
 	pCD = find_cell_definition( "CD8+ T cell");
@@ -369,15 +375,15 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// resource increases cycle entry 
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
 	double max_val = base_val * 10.0; 
-	static double min_cycle_resource = pCell->custom_data["cycling_entry_threshold_resource"]; // 0.15 
+	static double min_cycle_resource = pCD->custom_data["cycling_entry_threshold_resource"]; // 0.15 
 	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( R, min_cycle_resource, 1 );
 
 	// resource decreses necrosis
 
 	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	static double saturation_necrosis_resource = pCell->custom_data["necrosis_saturation_resource"]; //0.075
-	static double threshold_necrosis_resource = pCell->custom_data["necrosis_threshold_resource"]; // 0.15
+	static double saturation_necrosis_resource = pCD->custom_data["necrosis_saturation_resource"]; //0.075
+	static double threshold_necrosis_resource = pCD->custom_data["necrosis_threshold_resource"]; // 0.15
 	phenotype.death.rates[nNecrosis] = max_val * 
 		decreasing_linear_response_function( R, saturation_necrosis_resource, threshold_necrosis_resource );
 
@@ -387,7 +393,7 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	base_val = pCD->phenotype.motility.migration_speed; 
 	double max_response = 0.0; 
 	static double motility_resource_halfmax = 
-		pCell->custom_data["migration_speed_halfmax"]; // 0.25 // parameters.doubles("bacteria_motility_resource_halfmax");
+		pCD->custom_data["migration_speed_halfmax"]; // 0.25 // parameters.doubles("bacteria_motility_resource_halfmax");
 	double hill = Hill_response_function( signal, motility_resource_halfmax , 1.5);  
 	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill;
 
@@ -395,7 +401,7 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	signal = Q+R; 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	max_response = 1.0; 
-	static double bias_halfmax = pCell->custom_data["migration_bias_halfmax"]; 
+	static double bias_halfmax = pCD->custom_data["migration_bias_halfmax"]; 
 		// 0.5 //  parameters.doubles("bacteria_migration_bias_halfmax");
 	hill = Hill_response_function( signal, bias_halfmax , 1.5);  
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 
@@ -406,8 +412,8 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	signal = pCell->state.damage; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
 
-	static double damage_halfmax = pCell->custom_data["damage_halfmax"]; 
-	static double relative_max_damage_death = pCell->custom_data["relative_max_damage_death"]; 
+	static double damage_halfmax = pCD->custom_data["damage_halfmax"]; 
+	static double relative_max_damage_death = pCD->custom_data["relative_max_damage_death"]; 
 	max_response = base_val * relative_max_damage_death; 
 
 		// 36 // parameters.doubles("bacteria_damage_halfmax");
@@ -428,6 +434,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
 	static int nDebris = microenvironment.find_density_index( "debris"); 
+	static int nQ = microenvironment.find_density_index("quorum");
 
 	// if dead, release debris
 	if( phenotype.death.dead == true )
@@ -440,6 +447,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];
 	double debris = samples[nDebris]; 
+	double Q = samples[nQ];
 
 	// sample contacts 
 
@@ -462,21 +470,34 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// contact with dead cells or bacteria, or debris 
 	// increases secretion of pro-inflammatory 
 
-	double base_val = pCD->phenotype.secretion.net_export_rates[nPIF]; 
-	double max_response = phenotype.volume.total; 
-	double signal = num_dead + 5*debris + 10*num_bacteria; 
-	double hill = Hill_response_function( signal , 0.5 , 1.5 ); 
-	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
+	static double secretion_dead_sensitivity = 1; 
+	static double secretion_bacteria_sensitivity = 1; 
+	static double secretion_debris_sensitivity = 2; 
+	static double secretion_quorum_sensitivity = 5; 
 
-	// chemotaxis bias increases with debris 
+
+	double base_val = pCD->phenotype.secretion.secretion_rates[nPIF]; 
+	double max_response = 10; // phenotype.volume.total; 
+	double signal = 
+		secretion_dead_sensitivity*num_dead + 
+		secretion_bacteria_sensitivity*num_bacteria + 
+		secretion_debris_sensitivity*debris + 
+		secretion_quorum_sensitivity*Q; 
+	double half_max = 0.5; // 0.5; 
+	double hill = Hill_response_function( signal , half_max , 1.5 ); 
+	phenotype.secretion.secretion_rates[nPIF] = base_val + (max_response-base_val)*hill; 
+
+	// chemotaxis bias increases with debris or quorum factor 
+
 
 	base_val = pCD->phenotype.motility.migration_bias; 
 	max_response = 0.75; 
 	signal = debris  ; // + 10 * PIF; 
-	hill = Hill_response_function( signal , 0.05 , 1.5 ); 
+	half_max = 0.05; 
+	hill = Hill_response_function( signal , half_max , 1.5 ); 
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
 
-	// migration speed slows down in the presence of bacteria or debris 
+	// migration speed slows down in the presence of debris or quorum factor 
 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	max_response = 0.1 * base_val; 
