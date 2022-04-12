@@ -714,7 +714,7 @@
             <fluid_fraction>0.75</fluid_fraction>
             <nuclear>600</nuclear>
             <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
+            <cytoplasmic_biomass_change_rate>0.045</cytoplasmic_biomass_change_rate>
             <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
             <calcified_fraction>0</calcified_fraction>
             <calcification_rate>0</calcification_rate>
@@ -767,7 +767,7 @@
             </substrate>
             <substrate name="pro-inflammatory">
               <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
+              <secretion_target units="substrate density">1.0</secretion_target>
               <uptake_rate units="1/min">0</uptake_rate>
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
@@ -793,7 +793,7 @@
           <damage_halfmax units="" description="">0.0</damage_halfmax>
           <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
           <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="" description="">0.5</secretion_halfmax>
+          <secretion_halfmax units="" description="">0.005</secretion_halfmax>
           <debris_sensitivity units="" description="">0.1</debris_sensitivity>
           <quorum_sensitivity units="" description="">1</quorum_sensitivity>
           <inflammation_sensitivity units="" description="">0</inflammation_sensitivity>
@@ -916,7 +916,7 @@
           <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
           <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
           <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.001</migration_bias_halfmax>
+          <migration_bias_halfmax units="" description="">0.01</migration_bias_halfmax>
           <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
           <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
           <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
@@ -976,7 +976,7 @@
             <fluid_fraction>0.75</fluid_fraction>
             <nuclear>600</nuclear>
             <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
+            <cytoplasmic_biomass_change_rate>0.045</cytoplasmic_biomass_change_rate>
             <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
             <calcified_fraction>0</calcified_fraction>
             <calcification_rate>0</calcification_rate>
@@ -1047,7 +1047,7 @@
           <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
           <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
           <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.001</migration_bias_halfmax>
+          <migration_bias_halfmax units="" description="">0.01</migration_bias_halfmax>
           <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
           <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
           <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>

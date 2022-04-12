@@ -482,7 +482,19 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		secretion_quorum_sensitivity*Q; 
 	double half_max = pCD->custom_data["secretion_halfmax"]; // 0.5; // 0.5; 
 	double hill = Hill_response_function( signal , half_max , 1.5 ); 
+	
+	
 	phenotype.secretion.secretion_rates[nPIF] = base_val + (max_response-base_val)*hill; 
+	
+/*	
+	#pragma omp critical
+	{
+	std::cout << "secretion index: " << nPIF << " base: " << base_val << " max: " << max_response << " actual: " << phenotype.secretion.secretion_rates[nPIF] << std::endl; 
+	std::cout << "\tsignal: " << signal << " vs halfmax: " << half_max << std::endl; 
+	std::cout << "\t\tdead: " << num_dead << " bac: " << num_bacteria << " debris: " << debris << " Q: " << Q << std::endl; 
+	std::cout << "\t\t\tsaturation: " << phenotype.secretion.saturation_densities[nPIF]<< std::endl; 
+	}
+*/	
 
 	// chemotaxis bias increases with debris or quorum factor 
 
@@ -554,6 +566,18 @@ void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double hill = Hill_response_function( PIF , half_max , 1.5 ); 
 
 	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
+	
+/*	
+	#pragma omp critical 
+	{
+		std::cout << "signal: " << signal << " halfmax: " << half_max 
+		<< " hill: " << hill << std::endl; 
+		
+		std::cout << "\tbase: " << base_val 
+		<< " max: " << max_val 
+		<< " actual: " << phenotype.motility.migration_bias << std::endl; 
+	}	
+*/	
 
 	return; 
 }
