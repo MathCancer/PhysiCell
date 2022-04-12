@@ -550,7 +550,8 @@ void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double signal = PIF; 
 	double base_val = pCD->phenotype.motility.migration_bias; 
 	double max_val = 0.75; 
-	double hill = Hill_response_function( PIF , 0.25 , 1.5 ); 
+	double half_max = pCD->custom_data["migration_bias_halfmax"]; // 0.05 // 0.25 
+	double hill = Hill_response_function( PIF , half_max , 1.5 ); 
 
 	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
 
@@ -580,35 +581,13 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		return;
 	}
 
-/*
-	// sample contacts 
-
-	static int Treg_type = find_cell_definition( "Treg")->type; 
-	static int bacteria_type = find_cell_definition( "bacteria")->type; 
-
-	int num_Treg = 0; 
-	int num_bacteria = 0; 
-	int num_dead = 0; 
-	for( int n=0; n < pCell->state.neighbors.size(); n++ )
-	{
-		Cell* pC = pCell->state.neighbors[n]; 
-		if( pC->phenotype.death.dead == true )
-		{ num_dead++; }
-		else
-		{ 
-			if( pC->type == Treg_type )
-			{ num_Treg++; }
-			if( pC->type == bacteria_type )
-			{ num_bacteria++; }
-		}
-	}
-*/	
 	// migration bias increases with pro-inflammatory 
 
 	double signal = PIF; 
 	double base_val = pCD->phenotype.motility.migration_bias; 
 	double max_val = 0.75; 
-	double hill = Hill_response_function( PIF , 0.25 , 1.5 ); 
+	double half_max = pCD->custom_data["migration_bias_halfmax"]; // 0.25 
+	double hill = Hill_response_function( PIF , half_max , 1.5 ); 
 
 	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
 

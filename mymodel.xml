@@ -257,22 +257,22 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="none" description="signal for changes in migration speed reach half max at this value">0.25</migration_speed_halfmax>
-          <migration_bias_halfmax units="none" description="signal for changes in migration bias reach half max at this value">0.5</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">36</damage_halfmax>
-          <relative_max_damage_death units="none" description="relative increase in apoptotic death from damage">100</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="none" description="secretion reaches half of maximum change at this value">0.0</secretion_halfmax>
-          <debris_sensitivity units="none" description="sensitivity to debris in key migration and secretion behaviors">0.0</debris_sensitivity>
-          <quorum_sensitivity units="none" description="sensitivity to quorum factor in key migration and secretion behaviors">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="none" description="sensitivity to pro-inflammatory factor in key migration and secretion behaviors">0.0</inflammation_sensitivity>
+          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
+          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
+          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
+          <migration_speed_halfmax units="" description="">0.25</migration_speed_halfmax>
+          <migration_bias_halfmax units="" description="">0.5</migration_bias_halfmax>
+          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
+          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
+          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
+          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
+          <damage_halfmax units="" description="">36</damage_halfmax>
+          <relative_max_damage_death units="" description="">100</relative_max_damage_death>
+          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
+          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
+          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
+          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
+          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
         </custom_data>
           </cell_definition>
 
@@ -388,22 +388,22 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="none" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="none" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relative increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="none" description="secretion reaches half of maximum change at this value">0.0</secretion_halfmax>
-          <debris_sensitivity units="none" description="sensitivity to debris in key migration and secretion behaviors">0.0</debris_sensitivity>
-          <quorum_sensitivity units="none" description="sensitivity to quorum factor in key migration and secretion behaviors">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="none" description="sensitivity to pro-inflammatory factor in key migration and secretion behaviors">0.0</inflammation_sensitivity>
+          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
+          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
+          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
+          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
+          <migration_bias_halfmax units="" description="">0.0</migration_bias_halfmax>
+          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
+          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
+          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
+          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
+          <damage_halfmax units="" description="">0.0</damage_halfmax>
+          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
+          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
+          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
+          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
+          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
+          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
         </custom_data>
           </cell_definition>
 
@@ -519,22 +519,22 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="none" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="none" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.4</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">100</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.1</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.1</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relative increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="none" description="secretion reaches half of maximum change at this value">0.0</secretion_halfmax>
-          <debris_sensitivity units="none" description="sensitivity to debris in key migration and secretion behaviors">0.0</debris_sensitivity>
-          <quorum_sensitivity units="none" description="sensitivity to quorum factor in key migration and secretion behaviors">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="none" description="sensitivity to pro-inflammatory factor in key migration and secretion behaviors">0.0</inflammation_sensitivity>
+          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
+          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
+          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
+          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
+          <migration_bias_halfmax units="" description="">0.0</migration_bias_halfmax>
+          <toxicity_halfmax units="" description="">0.4</toxicity_halfmax>
+          <relative_max_toxicity units="" description="">100</relative_max_toxicity>
+          <cycling_contact_halfmax units="" description="">0.1</cycling_contact_halfmax>
+          <differentiation_contact_halfmax units="" description="">0.1</differentiation_contact_halfmax>
+          <damage_halfmax units="" description="">0.0</damage_halfmax>
+          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
+          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
+          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
+          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
+          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
+          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
         </custom_data>
           </cell_definition>
 
@@ -650,22 +650,22 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="none" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="none" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.2</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">100</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relative increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.5</cycling_pressure_halfmax>
-          <secretion_halfmax units="none" description="secretion reaches half of maximum change at this value">0.0</secretion_halfmax>
-          <debris_sensitivity units="none" description="sensitivity to debris in key migration and secretion behaviors">0.0</debris_sensitivity>
-          <quorum_sensitivity units="none" description="sensitivity to quorum factor in key migration and secretion behaviors">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="none" description="sensitivity to pro-inflammatory factor in key migration and secretion behaviors">0.0</inflammation_sensitivity>
+          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
+          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
+          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
+          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
+          <migration_bias_halfmax units="" description="">0.0</migration_bias_halfmax>
+          <toxicity_halfmax units="" description="">0.2</toxicity_halfmax>
+          <relative_max_toxicity units="" description="">100</relative_max_toxicity>
+          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
+          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
+          <damage_halfmax units="" description="">0.0</damage_halfmax>
+          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
+          <cycling_pressure_halfmax units="" description="">0.5</cycling_pressure_halfmax>
+          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
+          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
+          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
+          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
         </custom_data>
           </cell_definition>
 
@@ -781,22 +781,22 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="none" description="signal for changes in migration speed reach half max at this value">0.05</migration_speed_halfmax>
-          <migration_bias_halfmax units="none" description="signal for changes in migration bias reach half max at this value">0.01</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relative increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="none" description="secretion reaches half of maximum change at this value">0.5</secretion_halfmax>
-          <debris_sensitivity units="none" description="sensitivity to debris in key migration and secretion behaviors">0.1</debris_sensitivity>
-          <quorum_sensitivity units="none" description="sensitivity to quorum factor in key migration and secretion behaviors">1</quorum_sensitivity>
-          <inflammation_sensitivity units="none" description="sensitivity to pro-inflammatory factor in key migration and secretion behaviors">0</inflammation_sensitivity>
+          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
+          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
+          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
+          <migration_speed_halfmax units="" description="">0.05</migration_speed_halfmax>
+          <migration_bias_halfmax units="" description="">0.01</migration_bias_halfmax>
+          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
+          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
+          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
+          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
+          <damage_halfmax units="" description="">0.0</damage_halfmax>
+          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
+          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
+          <secretion_halfmax units="" description="">0.5</secretion_halfmax>
+          <debris_sensitivity units="" description="">0.1</debris_sensitivity>
+          <quorum_sensitivity units="" description="">1</quorum_sensitivity>
+          <inflammation_sensitivity units="" description="">0</inflammation_sensitivity>
         </custom_data>
           </cell_definition>
 
@@ -899,7 +899,7 @@
             <substrate name="pro-inflammatory">
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">5</uptake_rate>
+              <uptake_rate units="1/min">1</uptake_rate>
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             <substrate name="debris">
@@ -912,22 +912,22 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="none" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="none" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relative increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="none" description="secretion reaches half of maximum change at this value">0.0</secretion_halfmax>
-          <debris_sensitivity units="none" description="sensitivity to debris in key migration and secretion behaviors">0.0</debris_sensitivity>
-          <quorum_sensitivity units="none" description="sensitivity to quorum factor in key migration and secretion behaviors">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="none" description="sensitivity to pro-inflammatory factor in key migration and secretion behaviors">0.0</inflammation_sensitivity>
+          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
+          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
+          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
+          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
+          <migration_bias_halfmax units="" description="">0.005</migration_bias_halfmax>
+          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
+          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
+          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
+          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
+          <damage_halfmax units="" description="">0.0</damage_halfmax>
+          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
+          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
+          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
+          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
+          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
+          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
         </custom_data>
           </cell_definition>
 
@@ -1030,7 +1030,7 @@
             <substrate name="pro-inflammatory">
               <secretion_rate units="1/min">0.0</secretion_rate>
               <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">5</uptake_rate>
+              <uptake_rate units="1/min">1</uptake_rate>
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             <substrate name="debris">
@@ -1043,22 +1043,22 @@
 
           </phenotype>
         <custom_data>
-          <cycling_entry_threshold_resource units="none" description="minimal resource for cycling">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="none" description="max necrosis below this value">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="none" description="no necrosis above this value">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="none" description="signal for changes in migration speed reach half max at this value">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="none" description="signal for changes in migration bias reach half max at this value">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="none" description="bacteria-secreted toxin reaches half max toxicity at this level">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="none" description="relative increase in apoptotic death from toxin">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="none" description="number of contacts to reach half max change in cycling">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="none" description="number of contacts to reach half max change in differentiation">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="min" description="damage level for half of max damage-induced death">0.0</damage_halfmax>
-          <relative_max_damage_death units="none" description="relative increase in apoptotic death from damage">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="none" description="pressure to reach half max change in cycling">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="none" description="secretion reaches half of maximum change at this value">0.0</secretion_halfmax>
-          <debris_sensitivity units="none" description="sensitivity to debris in key migration and secretion behaviors">0.0</debris_sensitivity>
-          <quorum_sensitivity units="none" description="sensitivity to quorum factor in key migration and secretion behaviors">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="none" description="sensitivity to pro-inflammatory factor in key migration and secretion behaviors">0.0</inflammation_sensitivity>
+          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
+          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
+          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
+          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
+          <migration_bias_halfmax units="" description="">0.0025</migration_bias_halfmax>
+          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
+          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
+          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
+          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
+          <damage_halfmax units="" description="">0.0</damage_halfmax>
+          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
+          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
+          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
+          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
+          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
+          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
         </custom_data>
           </cell_definition>
 
@@ -1078,8 +1078,8 @@
         <number_of_blood_vessels type="int" units="" description="">40</number_of_blood_vessels>
         <number_of_bacteria type="int" units="" description="">20</number_of_bacteria>
         <number_of_macrophages type="int" units="" description="">50</number_of_macrophages>
-        <number_of_CD8T_cells type="int" units="" description="">0</number_of_CD8T_cells>
-        <number_of_neutrophils type="int" units="" description="">0</number_of_neutrophils>
+        <number_of_CD8T_cells type="int" units="" description="">50</number_of_CD8T_cells>
+        <number_of_neutrophils type="int" units="" description="">50</number_of_neutrophils>
         <max_stem_differentiation type="double" units="" description="maximum stem cell differentiation rate">0.0075</max_stem_differentiation>
     </user_parameters>
 	
