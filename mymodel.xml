@@ -23,11 +23,11 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>10</omp_num_threads>
+		<omp_num_threads>12</omp_num_threads>
 	</parallel> 
 	
 	<save>
-		<folder>output2</folder>  
+		<folder>output</folder>  
 
 		<full_data>
 			<interval units="min">360</interval>
