@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -169,7 +169,7 @@ int main( int argc, char* argv[] )
 	{	
 		sprintf( filename , "%s/simulation_report.txt" , PhysiCell_settings.folder.c_str() ); 
 		
-		report_file.open(filename); 	// create the data log file 
+		report_file.open(filename); // create the data log file 
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
 	
@@ -221,7 +221,7 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
-			
+
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 		

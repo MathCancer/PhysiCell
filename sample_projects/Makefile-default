@@ -161,7 +161,7 @@ worm-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/worm/config/* ./config/
 	
-interactions-sample:
+interaction-sample:
 	cp ./sample_projects/interactions/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/interactions/main.cpp ./main.cpp 

@@ -139,9 +139,10 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "macrophage");
 	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
-	// pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
-	// pCD->phenotype.motility.chemotactic_sensitivity("debris") = 1; 
-	// pCD->phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = 10; 
+	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
+	pCD->phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
+	pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 1; 
+
 	
 	// set up CD8+ T cells 
 	pCD = find_cell_definition( "CD8+ T cell");
@@ -152,18 +153,6 @@ void create_cell_types( void )
 	pCD = find_cell_definition( "neutrophil");
 	pCD->functions.update_phenotype = neutrophil_phenotype; 
 	pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
-
-	/*
-	
-	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
-	pCD->phenotype.motility.chemotactic_sensitivity( "pro-inflammatory" ) = 1; 
-	pCD->phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
-
-	// pCD->phenotype.cell_interactions.live_phagocytosis_rate( "bacteria" ) = 0.001; 
-
-	pCD = find_cell_definition( "neutrophil"); 
-	pCD->functions.update_phenotype = neutrophil_phenotype; 	
-*/
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -384,34 +373,49 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// resource increases cycle entry 
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
 	double max_val = base_val * 10.0; 
-	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( R, 0.15, 1 );
+	static double min_cycle_resource = pCD->custom_data["cycling_entry_threshold_resource"]; // 0.15 
+	phenotype.cycle.data.exit_rate(0) = max_val * linear_response_function( R, min_cycle_resource, 1 );
 
 	// resource decreses necrosis
 
 	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
+	static double saturation_necrosis_resource = pCD->custom_data["necrosis_saturation_resource"]; //0.075
+	static double threshold_necrosis_resource = pCD->custom_data["necrosis_threshold_resource"]; // 0.15
+	phenotype.death.rates[nNecrosis] = max_val * 
+		decreasing_linear_response_function( R, saturation_necrosis_resource, threshold_necrosis_resource );
 
 	// resource decreases motile speed  
 
+	double signal = R; 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	double max_response = 0.0; 
-	double hill = Hill_response_function( R, 0.25 , 1.5);  
+	static double motility_resource_halfmax = 
+		pCD->custom_data["migration_speed_halfmax"]; // 0.25 // parameters.doubles("bacteria_motility_resource_halfmax");
+	double hill = Hill_response_function( signal, motility_resource_halfmax , 1.5);  
 	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill;
 
 	// quorum and resource increases motility bias 
+	signal = Q+R; 
 	base_val = pCD->phenotype.motility.migration_speed; 
 	max_response = 1.0; 
-	hill = Hill_response_function( Q+R, 0.5 , 1.5);  
+	static double bias_halfmax = pCD->custom_data["migration_bias_halfmax"]; 
+		// 0.5 //  parameters.doubles("bacteria_migration_bias_halfmax");
+	hill = Hill_response_function( signal, bias_halfmax , 1.5);  
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 
 
 	// damage increases death 
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
-	double signal = pCell->state.damage / 180.0; 
+	signal = pCell->state.damage; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
-	max_response = 100*base_val;
-	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
+
+	static double damage_halfmax = pCD->custom_data["damage_halfmax"]; 
+	static double relative_max_damage_death = pCD->custom_data["relative_max_damage_death"]; 
+	max_response = base_val * relative_max_damage_death; 
+
+		// 36 // parameters.doubles("bacteria_damage_halfmax");
+	hill = Hill_response_function( signal , damage_halfmax , 1.5 ); 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
 
 	return; 
@@ -428,6 +432,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
 	static int nDebris = microenvironment.find_density_index( "debris"); 
+	static int nQ = microenvironment.find_density_index("quorum");
 
 	// if dead, release debris
 	if( phenotype.death.dead == true )
@@ -440,6 +445,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	std::vector<double> samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];
 	double debris = samples[nDebris]; 
+	double Q = samples[nQ];
 
 	// sample contacts 
 
@@ -459,55 +465,73 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		}
 	}
 
-	// contact with dead cells increases secretion of pro-inflammatory 
-	// or presence of debris 
+	// contact with dead cells or bacteria, or debris 
+	// increases secretion of pro-inflammatory 
 
-	double base_val = pCD->phenotype.secretion.net_export_rates[nPIF]; 
-	double max_response = phenotype.volume.total; 
-	double signal = num_dead + 5*debris; //  + 10*num_bacteria; 
-	double hill = Hill_response_function( signal , 0.5 , 1.5 ); 
-	phenotype.secretion.net_export_rates[nPIF] = base_val + (max_response-base_val)*hill; 
+	static double secretion_dead_sensitivity = 1; 
+	static double secretion_bacteria_sensitivity = 1; 
+	static double secretion_debris_sensitivity = 2; 
+	static double secretion_quorum_sensitivity = 5; 
 
-	// chemotaxis bias increases with pro-inflammatory signal or debris 
+	double base_val = pCD->phenotype.secretion.secretion_rates[nPIF]; 
+	double max_response = 10; // phenotype.volume.total; 
+	double signal = 
+		secretion_dead_sensitivity*num_dead + 
+		secretion_bacteria_sensitivity*num_bacteria + 
+		secretion_debris_sensitivity*debris + 
+		secretion_quorum_sensitivity*Q; 
+	double half_max = pCD->custom_data["secretion_halfmax"]; // 0.5; // 0.5; 
+	double hill = Hill_response_function( signal , half_max , 1.5 ); 
+	
+	
+	phenotype.secretion.secretion_rates[nPIF] = base_val + (max_response-base_val)*hill; 
+	
+/*	
+	#pragma omp critical
+	{
+	std::cout << "secretion index: " << nPIF << " base: " << base_val << " max: " << max_response << " actual: " << phenotype.secretion.secretion_rates[nPIF] << std::endl; 
+	std::cout << "\tsignal: " << signal << " vs halfmax: " << half_max << std::endl; 
+	std::cout << "\t\tdead: " << num_dead << " bac: " << num_bacteria << " debris: " << debris << " Q: " << Q << std::endl; 
+	std::cout << "\t\t\tsaturation: " << phenotype.secretion.saturation_densities[nPIF]<< std::endl; 
+	}
+*/	
+
+	// chemotaxis bias increases with debris or quorum factor 
+
+	static double bias_debris_sensitivity = 0.1; 
+	static double bias_quorum_sensitivity = 1; 
 
 	base_val = pCD->phenotype.motility.migration_bias; 
 	max_response = 0.75; 
-	signal = debris; // + 10 * PIF; 
-	hill = Hill_response_function( signal , 0.05 , 1.5 ); 
+	signal = bias_debris_sensitivity*debris + 
+		bias_quorum_sensitivity*Q ; // + 10 * PIF; 
+	half_max = pCD->custom_data["migration_bias_halfmax"]; // 0.01 // 0.005 //0.1 // 0.05
+	hill = Hill_response_function( signal , half_max , 1.5 ); 
 	phenotype.motility.migration_bias = base_val + (max_response-base_val)*hill; 	
 
-	// std::cout << "mac: debris " << debris << " PIF: " << PIF << " num_dead: " << num_dead << " num_bac: " << num_bacteria << std::endl; 
+/*
+	#pragma omp critical 
+	{
+	std::cout << "signal: " << signal << " halfmax: " << half_max 
+	<< " hill: " << hill << std::endl; 
+	
+	std::cout << "\tbase: " << base_val 
+	<< " max: " << max_response 
+	<< " actual: " << phenotype.motility.migration_bias << std::endl; 
+	}
+*/
+
+	// migration speed slows down in the presence of debris or quorum factor 
+
+	base_val = pCD->phenotype.motility.migration_speed; 
+	max_response = 0.1 * base_val; 
+	signal = bias_debris_sensitivity*debris + 
+		bias_quorum_sensitivity*Q ; // + 10 * PIF; 
+	half_max = pCD->custom_data["migration_speed_halfmax"]; // 0.1 // 0.05 
+	hill = Hill_response_function( signal , half_max , 1.5 ); 
+	phenotype.motility.migration_speed = base_val + (max_response-base_val)*hill; 	
 
 	return; 
-
-
-	// sample environment 
-
-	static int nROS = microenvironment.find_density_index( "ROS");
-	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-	// static int nDebris = microenvironment.find_density_index( "debris" ); 
-
-
-	double AIF = samples[nAIF]; 
-	double ROS = samples[nROS];
-	
-
-	// sample contacts 
-
-
-	// contact with Treg decreases secretion of pro-inflamatory
-
-	// weight chemotactic_sensitivity
-	double total = debris + PIF; 
-	phenotype.motility.chemotactic_sensitivity("debris") = debris / (total+1e-16); 
-	phenotype.motility.chemotactic_sensitivity("pro-inflammatory") = PIF / (total+1e-16); 
-
-	// high pro-inflammatory decreases motility 
-
-	// high anti-inflamatory decreases secretion of pro-inflammatory 
-
-
-
 }
 
 void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
@@ -538,9 +562,22 @@ void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double signal = PIF; 
 	double base_val = pCD->phenotype.motility.migration_bias; 
 	double max_val = 0.75; 
-	double hill = Hill_response_function( PIF , 0.25 , 1.5 ); 
+	double half_max = pCD->custom_data["migration_bias_halfmax"]; // 0.05 // 0.25 
+	double hill = Hill_response_function( PIF , half_max , 1.5 ); 
 
 	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
+	
+/*	
+	#pragma omp critical 
+	{
+		std::cout << "signal: " << signal << " halfmax: " << half_max 
+		<< " hill: " << hill << std::endl; 
+		
+		std::cout << "\tbase: " << base_val 
+		<< " max: " << max_val 
+		<< " actual: " << phenotype.motility.migration_bias << std::endl; 
+	}	
+*/	
 
 	return; 
 }
@@ -568,35 +605,13 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		return;
 	}
 
-/*
-	// sample contacts 
-
-	static int Treg_type = find_cell_definition( "Treg")->type; 
-	static int bacteria_type = find_cell_definition( "bacteria")->type; 
-
-	int num_Treg = 0; 
-	int num_bacteria = 0; 
-	int num_dead = 0; 
-	for( int n=0; n < pCell->state.neighbors.size(); n++ )
-	{
-		Cell* pC = pCell->state.neighbors[n]; 
-		if( pC->phenotype.death.dead == true )
-		{ num_dead++; }
-		else
-		{ 
-			if( pC->type == Treg_type )
-			{ num_Treg++; }
-			if( pC->type == bacteria_type )
-			{ num_bacteria++; }
-		}
-	}
-*/	
 	// migration bias increases with pro-inflammatory 
 
 	double signal = PIF; 
 	double base_val = pCD->phenotype.motility.migration_bias; 
 	double max_val = 0.75; 
-	double hill = Hill_response_function( PIF , 0.25 , 1.5 ); 
+	double half_max = pCD->custom_data["migration_bias_halfmax"]; // 0.25 
+	double hill = Hill_response_function( PIF , half_max , 1.5 ); 
 
 	phenotype.motility.migration_bias = base_val + (max_val-base_val)*hill; 
 
@@ -607,7 +622,6 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// find my cell definition 
 	static Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
-
 
 	// sample environment 
 
@@ -623,15 +637,7 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		return;
 	}
 
-	/*
-	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
-	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-	*/
 	std::vector<double> samples = pCell->nearest_density_vector(); 
-	// double PIF = samples[nPIF];
-	// double AIF = samples[nAIF]; 
-	// double ROS = samples[nROS];
-	// double debris = samples[nDebris]; 
 	double R = samples[nR];
 	double toxin = samples[nTox];
 
@@ -662,38 +668,50 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 
 	// contact with a stem cell increases differentiation 
-	double base_val = phenotype.cell_transformations.transformation_rates[diff_type]; 
-	double max_val = base_val * 100.0; 
+	static double max_stem_diff = parameters.doubles("max_stem_differentiation"); // 0.0075 
+	static double stem_diff_halfmax = pCD->custom_data["differentiation_contact_halfmax"]; // 0.1 
+
+	double base_val = 0; // phenotype.cell_transformations.transformation_rates[diff_type]; 
+	double max_val = max_stem_diff; // 0.0075;
 	double signal = num_stem; 
-	double hill = Hill_response_function( signal, 0.5 , 1.5 ); 
+	double half_max = stem_diff_halfmax; // 0.1; 
+	double hill = Hill_response_function( signal, half_max , 1.5 ); 
 	phenotype.cell_transformations.transformation_rates[diff_type] = base_val + (max_val-base_val)*hill; 
 
-	// contact with a differentiated cell reduces differentiation 
+	// contact with a differentiated cell reduces proliferation 
+	// high rate of proliferation unless in contact with a differentiated cell 
 
+	static double stem_cycling_halfmax = pCD->custom_data["cycling_contact_halfmax"]; // 0.1; 
+
+	base_val = pCD->phenotype.cycle.data.exit_rate(0); // 0.002; 
+	max_val = 0.0; 
 	signal = num_differentiated; 
-	hill = Hill_response_function( signal, 0.5 , 1.5 ); 
-	phenotype.cell_transformations.transformation_rates[diff_type] *= (1-hill); 
-
-	// pressure reduces proliferation 
-	signal = pCell->state.simple_pressure;  
-	hill = Hill_response_function( signal, 0.5 , 1.5 );  
-	base_val = pCD->phenotype.cycle.data.exit_rate(0); 
-	phenotype.cycle.data.exit_rate(0) = (1-hill)*base_val; 
+	half_max = stem_cycling_halfmax; //  0.1; 
+	hill = Hill_response_function( signal, half_max , 1.5 ); 
+	phenotype.cycle.data.exit_rate(0) = base_val + (max_val-base_val)*hill; 
 
 	// resource reduces necrotic death 
 
 	max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
+	static double stem_saturation_necrosis = pCD->custom_data["necrosis_saturation_resource"];
+	static double stem_threshold_necrosis = pCD->custom_data["necrosis_threshold_resource"];
+
+	phenotype.death.rates[nNecrosis] = max_val * 
+		decreasing_linear_response_function( R, stem_saturation_necrosis, stem_threshold_necrosis );
 
 	// toxin increases apoptotic death 
 	
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
+	static double toxicity_halfmax = pCD->custom_data["toxicity_halfmax"]; // 0.4 
+	static double relative_max_toxicity = pCD->custom_data["relative_max_toxicity"]; 
+
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
-	max_val = 100*base_val;
-	hill = Hill_response_function( signal , 0.4 , 1.5 ); 
+	max_val = base_val * relative_max_toxicity; // 100*base_val;
+
+	hill = Hill_response_function( signal , toxicity_halfmax , 1.5 ); 
 	phenotype.death.rates[nApoptosis] = base_val + (max_val-base_val)*hill; 
 	
 	return; 
@@ -718,72 +736,47 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 		return;
 	}
 	
-	 	/*
-	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
-	static int nAIF = microenvironment.find_density_index( "anti-inflammatory" ); 
-
-	*/
 	std::vector<double> samples = pCell->nearest_density_vector(); 
-	// double PIF = samples[nPIF];
-	// double AIF = samples[nAIF]; 
-	// double ROS = samples[nROS];
-	// double debris = samples[nDebris]; 
 	double R = samples[nR];
 	double toxin = samples[nTox];
 
-	// sample contacts 
-/*
-	static int stem_type = find_cell_definition( "stem")->type; 
-	static int diff_type = find_cell_definition( "differentiated")->type; 
-	static int bacteria_type = find_cell_definition( "bacteria")->type; 
-
-	int num_stem = 0; 
-	int num_differentiated = 0; 
-	int num_bacteria = 0; 
-	int num_dead = 0; 
-	for( int n=0; n < pCell->state.neighbors.size(); n++ )
-	{
-		Cell* pC = pCell->state.neighbors[n]; 
-		if( pC->phenotype.death.dead == true )
-		{ num_dead++; }
-		else
-		{ 
-			if( pC->type == stem_type )
-			{ num_stem++; }
-			if( pC->type == num_differentiated )
-			{ num_differentiated++; }
-			if( pC->type == bacteria_type )
-			{ num_bacteria++; }
-		}
-	}
-*/
 
 	double signal = 0.0; 
 	double hill = 0.0; 
 
 	// pressure reduces proliferation 
 	signal = pCell->state.simple_pressure;  
-	hill = Hill_response_function( signal, 0.5 , 1.5 );  
+	static double pressure_halfmax = pCD->custom_data["cycling_pressure_halfmax"]; // 0.5 
+	hill = Hill_response_function( signal, pressure_halfmax , 1.5 );  
 	double base_val = pCD->phenotype.cycle.data.exit_rate(0); 
+
 	phenotype.cycle.data.exit_rate(0) = (1-hill)*base_val; 
 
 	// resource reduces necrotic death 
 
 	double max_val = 0.0028;  
 	static int nNecrosis = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model );
-	phenotype.death.rates[nNecrosis] = max_val * decreasing_linear_response_function( R, 0.075, 0.15 );
+
+	// get same from bacteria
+	static double necrosis_saturation = pCD->custom_data["necrosis_saturation_resource"]; // 0.075 
+	static double necrosis_threshold = pCD->custom_data["necrosis_threshold_resource"]; // 0.15 
+
+	phenotype.death.rates[nNecrosis] = max_val * 
+		decreasing_linear_response_function( R, necrosis_saturation, necrosis_threshold ); 
 
 	// toxin increases apoptotic death 
 	
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
+	static double toxicity_halfmax = pCD->custom_data["toxicity_halfmax"]; // 0.2 
+	static double relative_max_tox_death = pCD->custom_data["relative_max_toxicity"]; // 100 
+
 	signal = toxin; 
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
-	double max_response = 100*base_val;
-	hill = Hill_response_function( signal , 0.2 , 1.5 ); 
+	double max_response = base_val * relative_max_tox_death; 
+	hill = Hill_response_function( signal , toxicity_halfmax , 1.5 ); 
 	// std::cout << "tox: " << signal << " " << hill << std::endl; 
 	phenotype.death.rates[nApoptosis] = base_val + (max_response-base_val)*hill; 
-
 
 	return; 
 }
