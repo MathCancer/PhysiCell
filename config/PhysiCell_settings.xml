@@ -224,11 +224,11 @@
                 <enabled>false></enabled>
                 <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivites>
-                  <chemotactic_sensitivity name="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="debris">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
                 </chemotactic_sensitivites>
               </advanced_chemotaxis>
 
@@ -409,11 +409,11 @@
                 <enabled>false></enabled>
                 <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivites>
-                  <chemotactic_sensitivity name="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="debris">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
                 </chemotactic_sensitivites>
               </advanced_chemotaxis>
 
@@ -595,11 +595,11 @@
                 <enabled>false></enabled>
                 <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivites>
-                  <chemotactic_sensitivity name="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="debris">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
                 </chemotactic_sensitivites>
               </advanced_chemotaxis>
                
@@ -781,11 +781,11 @@
                 <enabled>false></enabled>
                 <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivites>
-                  <chemotactic_sensitivity name="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="debris">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
                 </chemotactic_sensitivites>
               </advanced_chemotaxis>
 
@@ -967,11 +967,11 @@
                 <enabled>false></enabled>
                 <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivites>
-                  <chemotactic_sensitivity name="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="debris">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
                 </chemotactic_sensitivites>
               </advanced_chemotaxis>
 
@@ -1148,16 +1148,16 @@
                 <substrate>pro-inflammatory</substrate>
                 <direction>1</direction>
               </chemotaxis>
-              
+
               <advanced_chemotaxis>
                 <enabled>false></enabled>
                 <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivites>
-                  <chemotactic_sensitivity name="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="debris">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
                 </chemotactic_sensitivites>
               </advanced_chemotaxis>
 
@@ -1336,14 +1336,14 @@
               </chemotaxis>
 
               <advanced_chemotaxis>
-                <enabled>true></enabled>
+                <enabled>true</enabled>
                 <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivites>
-                  <chemotactic_sensitivity name="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity name="debris">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
                 </chemotactic_sensitivites>
               </advanced_chemotaxis>
 

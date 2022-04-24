@@ -2463,6 +2463,58 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				std::cout << pMot->chemotaxis_direction << " * grad( " << actual_name << " )" << std::endl; 
 
 			}
+
+			// automated advanced chemotaxis setup 
+			node_mot1 = node_mot.child( "advanced_chemotaxis" ); 
+			if( node_mot1 )
+			{
+				// enabled? if so, set the standard chemotaxis function
+				if( xml_get_bool_value( node_mot1, "enabled" ) )
+				{
+					if( pCD->functions.update_migration_bias == chemotaxis_function )
+					{
+						std::cout << "Warning: when processing motility for " << pCD->name << " cells: " << std::endl 
+								 << "\tBoth chemotaxis and advanced_chemotaxis are enabled." << std::endl
+						          << "\tThe settings for advanced_chemotaxis override those of chemotaxis." << std::endl; 
+					}
+					pCD->functions.update_migration_bias = advanced_chemotaxis_function;
+					if( xml_get_bool_value( node_mot1, "normalize_each_gradient" ) )
+					{ pCD->functions.update_migration_bias = advanced_chemotaxis_function_normalized; }
+				}	
+
+				// START HERE !!!!! 
+				
+				// search for the right chemo index 
+				
+				std::string substrate_name = xml_get_string_value( node_mot1 , "substrate" ); 
+				pMot->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
+				if( pMot->chemotaxis_index < 0)
+				{
+					std::cout << __FUNCTION__ << ": Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" << std::endl; 
+					std::cout << substrate_name << " was not found in the microenvironment. Please check for typos!" << std::endl << std::endl; 
+					exit(-1); 
+				}
+				
+				std::string actual_name = microenvironment.density_names[ pMot->chemotaxis_index ]; 
+				
+				// error check 
+				if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )
+				{
+					std::cout << "Error: attempted to set chemotaxis to \"" 
+						<< substrate_name << "\", which was not found in the microenvironment." << std::endl 
+					<< "       Please double-check your substrate name in the config file." << std::endl << std::endl; 
+					exit(-1); 
+				}
+				
+				// set the direction 
+				
+				pMot->chemotaxis_direction = xml_get_int_value( node_mot1 , "direction" ); 
+				
+				std::cout << pMot->chemotaxis_direction << " * grad( " << actual_name << " )" << std::endl; 
+
+			}
+
+
 		}
 	}	
 
