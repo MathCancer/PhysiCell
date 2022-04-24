@@ -46,7 +46,8 @@
 	
 	<options>
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
-        <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
+    <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
+    <legacy_cell_defaults_copy>false</legacy_cell_defaults_copy> 
 	</options>	
 
 	<microenvironment_setup>
@@ -224,11 +225,11 @@
                 <enabled>false></enabled>
                 <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivities>
-                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="resource">10</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">20</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">30</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">-1</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">120</chemotactic_sensitivity> 
                 </chemotactic_sensitivities>
               </advanced_chemotaxis>
 

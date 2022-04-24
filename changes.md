@@ -57,7 +57,7 @@ focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracel
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
-+ ? 
++ When the cell_defaults definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying cell_defaults, the XML parsing will reset motility to off (with NULL function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set legacy_cell_defaults_copy = true in the config file to override this bugfix. 
 
 ### Notices for intended changes that may affect backwards compatibility:
  

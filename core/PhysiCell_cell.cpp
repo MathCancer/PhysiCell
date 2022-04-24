@@ -1801,6 +1801,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	{ pCD = new Cell_Definition; }
 	else
 	{ pCD = &cell_defaults; }
+
+	std::cout << __LINE__ << std::endl; 
 	
 	// set the name 
 	pCD->name = cd_node.attribute("name").value();
@@ -1816,8 +1818,12 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	if( cd_node.attribute( "parent_type" ) )
 	{ pParent = find_cell_definition( cd_node.attribute( "parent_type" ).value() ); }
 	// if it's not the default and no parent stated, inherit from default 
+	bool use_default_as_parent_without_specifying = false; 
 	if( pParent == NULL && pCD != &cell_defaults )
-	{ pParent = &cell_defaults; } 
+	{
+		pParent = &cell_defaults; 
+		use_default_as_parent_without_specifying = true; 
+	} 
 
 	// if we found something to inherit from, then do it! 
 	if( pParent != NULL )
@@ -1829,6 +1835,38 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pCD->name = cd_node.attribute("name").value();
 		pCD->type = cd_node.attribute("ID").as_int(); 
 	} 
+
+	/* bugfix on April 24, 2022 */ 
+	// If we copied from cell_defaults and also wrote 
+	// more properties to cell defaults, we have messed up 
+	// some of the rates that are assumed to start at zero. 
+	// So, let's overwrite with zeros. 
+	if( use_default_as_parent_without_specifying )
+	{
+		int number_of_substrates = microenvironment.density_names.size(); 
+		int number_of_cell_defs = cell_definition_indices_by_name.size(); 
+
+		// motility 
+		pCD->phenotype.motility.is_motile = false; 
+		pCD->phenotype.motility.chemotactic_sensitivities.assign(number_of_substrates,0.0); 
+
+		// secretion  
+		pCD->phenotype.secretion.secretion_rates.assign(number_of_substrates,0.0); 
+		pCD->phenotype.secretion.uptake_rates.assign(number_of_substrates,0.0); 
+		pCD->phenotype.secretion.net_export_rates.assign(number_of_substrates,0.0); 
+		pCD->phenotype.secretion.saturation_densities.assign(number_of_substrates,0.0); 
+
+		// interaction 
+		pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.0; 
+		pCD->phenotype.cell_interactions.live_phagocytosis_rates.assign(number_of_cell_defs,0.0); 
+		pCD->phenotype.cell_interactions.attack_rates.assign(number_of_cell_defs,0.0); 
+		pCD->phenotype.cell_interactions.damage_rate = 1.0; 
+		pCD->phenotype.cell_interactions.fusion_rates.assign(number_of_cell_defs,0.0); 
+
+		// transformation 
+		pCD->phenotype.cell_transformations.transformation_rates.assign(number_of_cell_defs,0.0); 
+	}
+
 	
 	// sync to microenvironment
 	pCD->pMicroenvironment = NULL;
@@ -2464,10 +2502,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 			}
 
-/*
 			// automated advanced chemotaxis setup 
 			node_mot1 = node_mot.child( "advanced_chemotaxis" ); 
-			if( node_mot1  )
+			if( node_mot1 )
 			{
 				// enabled? if so, set the standard chemotaxis function
 				if( xml_get_bool_value( node_mot1, "enabled" ) )
@@ -2485,24 +2522,29 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 				// now process the chemotactic sensitivities 
 
-				std::cout << "adv chemotaxis for " << pCD->name << " : "; 
-				pugi::xml_node node_cs = node_cs.child( "chemotactic_sensitivities"); 
-				if( node_cs )
+				std::cout << "adv chemotaxis for " << pCD->name << " : " << std::endl; 
+				pugi::xml_node node_cs = node_mot1.child( "chemotactic_sensitivities"); 
+				if( node_cs  )
 				{
 					node_cs = node_cs.child("chemotactic_sensitivity"); 
 
 					while( node_cs )
 					{
-						std::string substrate_name = node_cs.attribute( "name").value(); 
+						std::string substrate_name = node_cs.attribute( "substrate").value(); 
 						int index = microenvironment.find_density_index( substrate_name ); 
 						std::string actual_name = microenvironment.density_names[ index ]; 
 			
 						// error check 
 						if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )						
-						{ std::cout << "fuck!" << std::endl; }
+						{
+							std::cout << "Warning: when processing advanced chemotaxis for " << pCD->name << " cells: " << std::endl 
+									  << "\tInvalid substrate " << substrate_name << " specified." << std::endl
+						          	  << "\tIgnoring this invalid substrate in the chemotaxis function .. " << std::endl; 
+						}
+						else
+						{ pCD->phenotype.motility.chemotactic_sensitivities[index] = xml_get_my_double_value(node_cs); }
 
-						std::cout << " " << substrate_name << " " ; 
-
+						std::cout<< " *** *** " << pCD->phenotype.motility.chemotactic_sensitivities << std::endl; 
 						node_cs = node_cs.next_sibling( "chemotactic_sensitivity" ); 
 					}
 
@@ -2517,7 +2559,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				std::cout << std::endl; 
 
 				// START HERE !!!!! 
- 		
+/* 		
 				// search for the right chemo index 
 				
 				std::string substrate_name = xml_get_string_value( node_mot1 , "substrate" ); 
@@ -2546,9 +2588,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				
 				
 				std::cout << pMot->chemotaxis_direction << " * grad( " << actual_name << " )" << std::endl; 
-
+*/
 			}
-*/			
 
 
 		}
