@@ -23,7 +23,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>6</omp_num_threads>
+		<omp_num_threads>24</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -46,7 +46,8 @@
 	
 	<options>
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
-        <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
+    <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
+    <legacy_cell_defaults_copy>false</legacy_cell_defaults_copy> 
 	</options>	
 
 	<microenvironment_setup>
@@ -219,6 +220,19 @@
                 <substrate>resource</substrate>
                 <direction>1</direction>
               </chemotaxis>
+
+              <advanced_chemotaxis>
+                <enabled>false</enabled>
+                <normalize_each_gradient>false</normalize_each_gradient>
+                <chemotactic_sensitivities>
+                  <chemotactic_sensitivity substrate="resource">10</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">20</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">30</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">-1</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">120</chemotactic_sensitivity> 
+                </chemotactic_sensitivities>
+              </advanced_chemotaxis>
+
             </options>
           </motility>
 
@@ -254,7 +268,48 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             </secretion>
-
+            <cell_interactions>
+              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+              <live_phagocytosis_rates>
+                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
+              </live_phagocytosis_rates>
+              <attack_rates>
+                <attack_rate name="bacteria" units="1/min">0</attack_rate>
+                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
+                <attack_rate name="stem" units="1/min">0</attack_rate>
+                <attack_rate name="differentiated" units="1/min">0</attack_rate>
+                <attack_rate name="macrophage" units="1/min">0</attack_rate>
+                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
+                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
+              </attack_rates>
+              <damage_rate units="1/min">0</damage_rate>
+              <fusion_rates>
+                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
+                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
+                <fusion_rate name="stem" units="1/min">0</fusion_rate>
+                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
+                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
+                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
+                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
+              </fusion_rates>
+            </cell_interactions>
+            <cell_transformations>
+              <transformation_rates>
+                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
+                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
+                <transformation_rate name="stem" units="1/min">0</transformation_rate>
+                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
+                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
+                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
+                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
+            </cell_transformations>
           </phenotype>
         <custom_data>
           <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
@@ -350,6 +405,19 @@
                 <substrate>debris</substrate>
                 <direction>1</direction>
               </chemotaxis>
+
+              <advanced_chemotaxis>
+                <enabled>true</enabled>
+                <normalize_each_gradient>false</normalize_each_gradient>
+                <chemotactic_sensitivities>
+                  <chemotactic_sensitivity substrate="resource">1</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0.1</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
+                </chemotactic_sensitivities>
+              </advanced_chemotaxis>
+
             </options>
           </motility>
 
@@ -385,6 +453,48 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             </secretion>
+            <cell_interactions>
+              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+              <live_phagocytosis_rates>
+                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
+              </live_phagocytosis_rates>
+              <attack_rates>
+                <attack_rate name="bacteria" units="1/min">0</attack_rate>
+                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
+                <attack_rate name="stem" units="1/min">0</attack_rate>
+                <attack_rate name="differentiated" units="1/min">0</attack_rate>
+                <attack_rate name="macrophage" units="1/min">0</attack_rate>
+                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
+                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
+              </attack_rates>
+              <damage_rate units="1/min">0</damage_rate>
+              <fusion_rates>
+                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
+                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
+                <fusion_rate name="stem" units="1/min">0</fusion_rate>
+                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
+                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
+                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
+                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
+              </fusion_rates>
+            </cell_interactions>
+            <cell_transformations>
+              <transformation_rates>
+                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
+                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
+                <transformation_rate name="stem" units="1/min">0</transformation_rate>
+                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
+                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
+                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
+                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
+            </cell_transformations>
 
           </phenotype>
         <custom_data>
@@ -481,6 +591,19 @@
                 <substrate>debris</substrate>
                 <direction>1</direction>
               </chemotaxis>
+
+              <advanced_chemotaxis>
+                <enabled>false</enabled>
+                <normalize_each_gradient>false</normalize_each_gradient>
+                <chemotactic_sensitivities>
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
+                </chemotactic_sensitivities>
+              </advanced_chemotaxis>
+               
             </options>
           </motility>
 
@@ -516,6 +639,48 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             </secretion>
+            <cell_interactions>
+              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+              <live_phagocytosis_rates>
+                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
+              </live_phagocytosis_rates>
+              <attack_rates>
+                <attack_rate name="bacteria" units="1/min">0</attack_rate>
+                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
+                <attack_rate name="stem" units="1/min">0</attack_rate>
+                <attack_rate name="differentiated" units="1/min">0</attack_rate>
+                <attack_rate name="macrophage" units="1/min">0</attack_rate>
+                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
+                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
+              </attack_rates>
+              <damage_rate units="1/min">0</damage_rate>
+              <fusion_rates>
+                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
+                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
+                <fusion_rate name="stem" units="1/min">0</fusion_rate>
+                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
+                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
+                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
+                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
+              </fusion_rates>
+            </cell_interactions>
+            <cell_transformations>
+              <transformation_rates>              
+                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
+                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
+                <transformation_rate name="stem" units="1/min">0</transformation_rate>
+                <transformation_rate name="differentiated" units="1/min">0.0001</transformation_rate>
+                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
+                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
+                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
+            </cell_transformations>
 
           </phenotype>
         <custom_data>
@@ -612,6 +777,19 @@
                 <substrate>debris</substrate>
                 <direction>1</direction>
               </chemotaxis>
+
+              <advanced_chemotaxis>
+                <enabled>false</enabled>
+                <normalize_each_gradient>false</normalize_each_gradient>
+                <chemotactic_sensitivities>
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
+                </chemotactic_sensitivities>
+              </advanced_chemotaxis>
+
             </options>
           </motility>
 
@@ -647,6 +825,48 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             </secretion>
+            <cell_interactions>
+              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+              <live_phagocytosis_rates>
+                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
+              </live_phagocytosis_rates>
+              <attack_rates>
+                <attack_rate name="bacteria" units="1/min">0</attack_rate>
+                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
+                <attack_rate name="stem" units="1/min">0</attack_rate>
+                <attack_rate name="differentiated" units="1/min">0</attack_rate>
+                <attack_rate name="macrophage" units="1/min">0</attack_rate>
+                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
+                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
+              </attack_rates>
+              <damage_rate units="1/min">0</damage_rate>
+              <fusion_rates>
+                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
+                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
+                <fusion_rate name="stem" units="1/min">0</fusion_rate>
+                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
+                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
+                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
+                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
+              </fusion_rates>
+            </cell_interactions>
+            <cell_transformations>
+              <transformation_rates>
+                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
+                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
+                <transformation_rate name="stem" units="1/min">0</transformation_rate>
+                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
+                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
+                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
+                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
+            </cell_transformations>
 
           </phenotype>
         <custom_data>
@@ -743,6 +963,19 @@
                 <substrate>debris</substrate>
                 <direction>1</direction>
               </chemotaxis>
+
+              <advanced_chemotaxis>
+                <enabled>true</enabled>
+                <normalize_each_gradient>false</normalize_each_gradient>
+                <chemotactic_sensitivities>
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">1</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0.1</chemotactic_sensitivity> 
+                </chemotactic_sensitivities>
+              </advanced_chemotaxis>
+
             </options>
           </motility>
 
@@ -778,6 +1011,48 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             </secretion>
+            <cell_interactions>
+              <dead_phagocytosis_rate units="1/min">0.05</dead_phagocytosis_rate>
+              <live_phagocytosis_rates>
+                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
+              </live_phagocytosis_rates>
+              <attack_rates>
+                <attack_rate name="bacteria" units="1/min">0</attack_rate>
+                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
+                <attack_rate name="stem" units="1/min">0</attack_rate>
+                <attack_rate name="differentiated" units="1/min">0</attack_rate>
+                <attack_rate name="macrophage" units="1/min">0</attack_rate>
+                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
+                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
+              </attack_rates>
+              <damage_rate units="1/min">0</damage_rate>
+              <fusion_rates>
+                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
+                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
+                <fusion_rate name="stem" units="1/min">0</fusion_rate>
+                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
+                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
+                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
+                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
+              </fusion_rates>
+            </cell_interactions>
+            <cell_transformations>
+              <transformation_rates>
+                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
+                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
+                <transformation_rate name="stem" units="1/min">0</transformation_rate>
+                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
+                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
+                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
+                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
+            </cell_transformations>
 
           </phenotype>
         <custom_data>
@@ -874,6 +1149,19 @@
                 <substrate>pro-inflammatory</substrate>
                 <direction>1</direction>
               </chemotaxis>
+
+              <advanced_chemotaxis>
+                <enabled>false</enabled>
+                <normalize_each_gradient>false</normalize_each_gradient>
+                <chemotactic_sensitivities>
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
+                </chemotactic_sensitivities>
+              </advanced_chemotaxis>
+
             </options>
           </motility>
 
@@ -909,6 +1197,48 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             </secretion>
+            <cell_interactions>
+              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+              <live_phagocytosis_rates>
+                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
+              </live_phagocytosis_rates>
+              <attack_rates>
+                <attack_rate name="bacteria" units="1/min">0.05</attack_rate>
+                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
+                <attack_rate name="stem" units="1/min">0</attack_rate>
+                <attack_rate name="differentiated" units="1/min">0</attack_rate>
+                <attack_rate name="macrophage" units="1/min">0</attack_rate>
+                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
+                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
+              </attack_rates>
+              <damage_rate units="1/min">0</damage_rate>
+              <fusion_rates>
+                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
+                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
+                <fusion_rate name="stem" units="1/min">0</fusion_rate>
+                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
+                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
+                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
+                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
+              </fusion_rates>
+            </cell_interactions>
+            <cell_transformations>
+              <transformation_rates>
+                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
+                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
+                <transformation_rate name="stem" units="1/min">0</transformation_rate>
+                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
+                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
+                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
+                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
+            </cell_transformations>
 
           </phenotype>
         <custom_data>
@@ -1005,6 +1335,19 @@
                 <substrate>pro-inflammatory</substrate>
                 <direction>1</direction>
               </chemotaxis>
+
+              <advanced_chemotaxis>
+                <enabled>true</enabled>
+                <normalize_each_gradient>false</normalize_each_gradient>
+                <chemotactic_sensitivities>
+                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
+                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
+                </chemotactic_sensitivities>
+              </advanced_chemotaxis>
+
             </options>
           </motility>
 
@@ -1040,6 +1383,48 @@
               <net_export_rate units="total substrate/min">0.0</net_export_rate>
             </substrate>
             </secretion>
+            <cell_interactions>
+              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+              <live_phagocytosis_rates>
+                <phagocytosis_rate name="bacteria" units="1/min">0.05</phagocytosis_rate>
+                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
+              </live_phagocytosis_rates>
+              <attack_rates>
+                <attack_rate name="bacteria" units="1/min">0</attack_rate>
+                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
+                <attack_rate name="stem" units="1/min">0</attack_rate>
+                <attack_rate name="differentiated" units="1/min">0</attack_rate>
+                <attack_rate name="macrophage" units="1/min">0</attack_rate>
+                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
+                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
+              </attack_rates>
+              <damage_rate units="1/min">0</damage_rate>
+              <fusion_rates>
+                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
+                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
+                <fusion_rate name="stem" units="1/min">0</fusion_rate>
+                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
+                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
+                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
+                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
+              </fusion_rates>
+            </cell_interactions>
+            <cell_transformations>
+              <transformation_rates>
+                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
+                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
+                <transformation_rate name="stem" units="1/min">0</transformation_rate>
+                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
+                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
+                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
+                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
+            </cell_transformations>
 
           </phenotype>
         <custom_data>

@@ -113,10 +113,9 @@ void create_cell_types( void )
 
 	Cell_Definition* pCD = find_cell_definition( "bacteria");
 	pCD->functions.update_phenotype = bacteria_phenotype; 
-
-	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
-	pCD->phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
-	pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
+	// pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
+	// pCD->phenotype.motility.chemotactic_sensitivity( "resource" ) = 1; 
+	// pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 0.1; 
 
 	// set up blood vessels 
 
@@ -127,7 +126,7 @@ void create_cell_types( void )
 
 	pCD = find_cell_definition( "stem");
 	pCD->functions.update_phenotype = stem_cell_phenotype; 
-	pCD->phenotype.cell_transformations.transformation_rate("differentiated") = 0.0001; 
+	// pCD->phenotype.cell_transformations.transformation_rate("differentiated") = 0.0001; 
 	
 	// set up differentiated cells 
 
@@ -137,22 +136,22 @@ void create_cell_types( void )
 	// set up macrophages 
 
 	pCD = find_cell_definition( "macrophage");
-	pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
+	// pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.05; 
 	pCD->functions.update_phenotype = macrophage_phenotype; 
-	pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
-	pCD->phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
-	pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 1; 
+	// pCD->functions.update_migration_bias = advanced_chemotaxis_function; 
+	// pCD->phenotype.motility.chemotactic_sensitivity( "debris" ) = 0.1; 
+	// pCD->phenotype.motility.chemotactic_sensitivity( "quorum" ) = 1; 
 
 	
 	// set up CD8+ T cells 
 	pCD = find_cell_definition( "CD8+ T cell");
 	pCD->functions.update_phenotype = CD8Tcell_phenotype; 
-	pCD->phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
+	// pCD->phenotype.cell_interactions.attack_rate("bacteria") = 0.05; 
 
 	// set up neutrophil  
 	pCD = find_cell_definition( "neutrophil");
 	pCD->functions.update_phenotype = neutrophil_phenotype; 
-	pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
+	// pCD->phenotype.cell_interactions.live_phagocytosis_rate("bacteria") = 0.05; 
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
