@@ -1801,8 +1801,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	{ pCD = new Cell_Definition; }
 	else
 	{ pCD = &cell_defaults; }
-
-	std::cout << __LINE__ << std::endl; 
 	
 	// set the name 
 	pCD->name = cd_node.attribute("name").value();
@@ -1843,29 +1841,47 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// So, let's overwrite with zeros. 
 	if( use_default_as_parent_without_specifying )
 	{
-		int number_of_substrates = microenvironment.density_names.size(); 
-		int number_of_cell_defs = cell_definition_indices_by_name.size(); 
 
-		// motility 
-		pCD->phenotype.motility.is_motile = false; 
-		pCD->phenotype.motility.chemotactic_sensitivities.assign(number_of_substrates,0.0); 
-		pCD->functions.update_migration_bias = NULL; 
+		pugi::xml_node node_options = xml_find_node( physicell_config_root , "options" ); 
+		bool disable_bugfix = false; 
+		if( node_options )
+		{ xml_get_bool_value( node_options, "legacy_cell_defaults_copy" ); }
 
-		// secretion  
-		pCD->phenotype.secretion.secretion_rates.assign(number_of_substrates,0.0); 
-		pCD->phenotype.secretion.uptake_rates.assign(number_of_substrates,0.0); 
-		pCD->phenotype.secretion.net_export_rates.assign(number_of_substrates,0.0); 
-		pCD->phenotype.secretion.saturation_densities.assign(number_of_substrates,0.0); 
+		if( disable_bugfix == false )
+		{
+			int number_of_substrates = microenvironment.density_names.size(); 
+			int number_of_cell_defs = cell_definition_indices_by_name.size(); 
 
-		// interaction 
-		pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.0; 
-		pCD->phenotype.cell_interactions.live_phagocytosis_rates.assign(number_of_cell_defs,0.0); 
-		pCD->phenotype.cell_interactions.attack_rates.assign(number_of_cell_defs,0.0); 
-		pCD->phenotype.cell_interactions.damage_rate = 1.0; 
-		pCD->phenotype.cell_interactions.fusion_rates.assign(number_of_cell_defs,0.0); 
+			// motility 
+			pCD->phenotype.motility.is_motile = false; 
+			pCD->phenotype.motility.chemotactic_sensitivities.assign(number_of_substrates,0.0); 
+			pCD->functions.update_migration_bias = NULL; 
 
-		// transformation 
-		pCD->phenotype.cell_transformations.transformation_rates.assign(number_of_cell_defs,0.0); 
+			// secretion  
+			pCD->phenotype.secretion.secretion_rates.assign(number_of_substrates,0.0); 
+			pCD->phenotype.secretion.uptake_rates.assign(number_of_substrates,0.0); 
+			pCD->phenotype.secretion.net_export_rates.assign(number_of_substrates,0.0); 
+			pCD->phenotype.secretion.saturation_densities.assign(number_of_substrates,0.0); 
+
+			// interaction 
+			pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.0; 
+			pCD->phenotype.cell_interactions.live_phagocytosis_rates.assign(number_of_cell_defs,0.0); 
+			pCD->phenotype.cell_interactions.attack_rates.assign(number_of_cell_defs,0.0); 
+			pCD->phenotype.cell_interactions.damage_rate = 1.0; 
+			pCD->phenotype.cell_interactions.fusion_rates.assign(number_of_cell_defs,0.0); 
+
+			// transformation 
+			pCD->phenotype.cell_transformations.transformation_rates.assign(number_of_cell_defs,0.0); 
+		}
+		else 
+		{
+			std::cout << "Warning! You have disabled a bugfix on cell definition inheritance" << std::endl 
+			<< "\tBe VERY careful that you have manually specified every parameter value" << std::endl
+			<< "\tfor every cell cell definition. Set legacy_cell_defaults_copy to false" << std::endl 
+			<< "\tin the options section of your parameter file to re-enable the bug fix. " << std::endl << std::endl
+			<< "\tSome good news: if you used the model builder, this has never affected your results." << std::endl; 
+		}
+
 	}
 
 	
@@ -1965,7 +1981,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
                 std::cout << "Warning: Unknown cycle model " << std::endl;
                 exit(-1); 
             }
-//			}
 			pCD->phenotype.cycle.sync_to_cycle_model( pCD->functions.cycle_model ); 
 		}
 		
@@ -2499,7 +2514,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				
 				pMot->chemotaxis_direction = xml_get_int_value( node_mot1 , "direction" ); 
 				
-				std::cout << pMot->chemotaxis_direction << " * grad( " << actual_name << " )" << std::endl; 
+				// std::cout << pMot->chemotaxis_direction << " * grad( " << actual_name << " )" << std::endl; 
 
 			}
 
@@ -2523,7 +2538,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 				// now process the chemotactic sensitivities 
 
-				std::cout << "adv chemotaxis for " << pCD->name << " : " << std::endl; 
 				pugi::xml_node node_cs = node_mot1.child( "chemotactic_sensitivities"); 
 				if( node_cs  )
 				{
@@ -2544,8 +2558,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 						}
 						else
 						{ pCD->phenotype.motility.chemotactic_sensitivities[index] = xml_get_my_double_value(node_cs); }
-
-						std::cout<< " *** *** " << pCD->phenotype.motility.chemotactic_sensitivities << std::endl; 
 						node_cs = node_cs.next_sibling( "chemotactic_sensitivity" ); 
 					}
 
@@ -2557,43 +2569,50 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 								<< "\tAdvanced chemotaxis requries chemotactic_sensitivities." << std::endl
 								<< "\tBut you have none. Your migration bias will be the zero vector." << std::endl; 
 				}
-				std::cout << std::endl; 
 
-				// START HERE !!!!! 
-/* 		
-				// search for the right chemo index 
-				
-				std::string substrate_name = xml_get_string_value( node_mot1 , "substrate" ); 
-				pMot->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
-				if( pMot->chemotaxis_index < 0)
-				{
-					std::cout << __FUNCTION__ << ": Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" << std::endl; 
-					std::cout << substrate_name << " was not found in the microenvironment. Please check for typos!" << std::endl << std::endl; 
-					exit(-1); 
-				}
-				
-				std::string actual_name = microenvironment.density_names[ pMot->chemotaxis_index ]; 
-				
-				// error check 
-				if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )
-				{
-					std::cout << "Error: attempted to set chemotaxis to \"" 
-						<< substrate_name << "\", which was not found in the microenvironment." << std::endl 
-					<< "       Please double-check your substrate name in the config file." << std::endl << std::endl; 
-					exit(-1); 
-				}
-				
-				// set the direction 
-				
-				pMot->chemotaxis_direction = xml_get_int_value( node_mot1 , "direction" ); 
-				
-				
-				std::cout << pMot->chemotaxis_direction << " * grad( " << actual_name << " )" << std::endl; 
-*/
 			}
 
 
+
 		}
+
+		// display summary for diagnostic help 
+		if( pCD->functions.update_migration_bias == chemotaxis_function && pMot->is_motile == true )
+		{
+			std::cout << "Cells of type " << pCD->name << " use standard chemotaxis: " << std::endl 
+			<< "\t d_bias (before normalization) = " << pMot->chemotaxis_direction << " * grad(" 
+			<< microenvironment.density_names[pMot->chemotaxis_index] << ")" << std::endl; 
+		}
+
+		if( pCD->functions.update_migration_bias == advanced_chemotaxis_function && pMot->is_motile == true )
+		{
+			int number_of_substrates = microenvironment.density_names.size(); 
+
+			std::cout << "Cells of type " << pCD->name << " use advanced chemotaxis: " << std::endl 
+			<< "\t d_bias (before normalization) = " 
+			<< pMot->chemotactic_sensitivities[0] << " * grad(" << microenvironment.density_names[0] << ")"; 
+
+			for( int n=1; n < number_of_substrates; n++ )
+			{ std::cout << " + " << pMot->chemotactic_sensitivities[n] << " * grad(" << microenvironment.density_names[n] << ")"; }
+			std::cout << std::endl; 
+		}		
+
+		if( pCD->functions.update_migration_bias == advanced_chemotaxis_function_normalized && pMot->is_motile == true )
+		{
+			int number_of_substrates = microenvironment.density_names.size(); 
+
+			std::cout << "Cells of type " << pCD->name << " use normalized advanced chemotaxis: " << std::endl 
+			<< "\t d_bias (before normalization) = " 
+			<< pMot->chemotactic_sensitivities[0] << " * grad(" << microenvironment.density_names[0] << ")" 
+			<< " / ||grad(" << microenvironment.density_names[0] << ")||"; 
+
+			for( int n=1; n < number_of_substrates; n++ )
+			{
+				std::cout << " + " << pMot->chemotactic_sensitivities[n] << " * grad(" << microenvironment.density_names[n] << ")"
+				<< " / ||grad(" << microenvironment.density_names[n] << ")||"; 
+			}
+			std::cout << std::endl; 
+		}		
 	}	
 
 	// secretion
