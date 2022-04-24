@@ -2640,7 +2640,16 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				// if the target is found, set the appropriate rate 
 				int target_index = search->second; 
 				std::string target_name_check = search->first; 
-				pCT->transformation_rates[target_index] = xml_get_my_double_value(node_tr); 
+
+				double transformation_rate = xml_get_my_double_value(node_tr);
+				if( target_name == pCD->name && transformation_rate > 1e-16 )
+				{
+					std::cout << "Warning: When processing the " << pCD->name << " cell definition: " << std::endl 
+					<< "\tTransformation from " << pCD->name << " to " << target_name << " is not allowed." << std::endl
+					<< "\tIgnoring this cell transformation rate!" << std::endl << std::endl; 
+				}
+				else
+				{ pCT->transformation_rates[target_index] = transformation_rate; }
 			}
 			else
 			{
