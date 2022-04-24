@@ -286,6 +286,7 @@
               </fusion_rates>
             </cell_interactions>
             <cell_transformations>
+              <transformation_rates>
                 <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
                 <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
                 <transformation_rate name="stem" units="1/min">0</transformation_rate>
@@ -293,6 +294,7 @@
                 <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
                 <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
                 <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
             </cell_transformations>
           </phenotype>
         <custom_data>
@@ -456,6 +458,7 @@
               </fusion_rates>
             </cell_interactions>
             <cell_transformations>
+              <transformation_rates>
                 <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
                 <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
                 <transformation_rate name="stem" units="1/min">0</transformation_rate>
@@ -463,6 +466,7 @@
                 <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
                 <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
                 <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
             </cell_transformations>
 
           </phenotype>
@@ -627,6 +631,7 @@
               </fusion_rates>
             </cell_interactions>
             <cell_transformations>
+              <transformation_rates>              
                 <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
                 <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
                 <transformation_rate name="stem" units="1/min">0</transformation_rate>
@@ -634,6 +639,7 @@
                 <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
                 <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
                 <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
             </cell_transformations>
 
           </phenotype>
@@ -798,6 +804,7 @@
               </fusion_rates>
             </cell_interactions>
             <cell_transformations>
+              <transformation_rates>
                 <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
                 <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
                 <transformation_rate name="stem" units="1/min">0</transformation_rate>
@@ -805,6 +812,7 @@
                 <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
                 <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
                 <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
             </cell_transformations>
 
           </phenotype>
@@ -969,6 +977,7 @@
               </fusion_rates>
             </cell_interactions>
             <cell_transformations>
+              <transformation_rates>
                 <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
                 <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
                 <transformation_rate name="stem" units="1/min">0</transformation_rate>
@@ -976,6 +985,7 @@
                 <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
                 <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
                 <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
             </cell_transformations>
 
           </phenotype>
@@ -1140,6 +1150,7 @@
               </fusion_rates>
             </cell_interactions>
             <cell_transformations>
+              <transformation_rates>
                 <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
                 <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
                 <transformation_rate name="stem" units="1/min">0</transformation_rate>
@@ -1147,6 +1158,7 @@
                 <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
                 <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
                 <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
             </cell_transformations>
 
           </phenotype>
@@ -1311,6 +1323,7 @@
               </fusion_rates>
             </cell_interactions>
             <cell_transformations>
+              <transformation_rates>
                 <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
                 <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
                 <transformation_rate name="stem" units="1/min">0</transformation_rate>
@@ -1318,6 +1331,7 @@
                 <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
                 <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
                 <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
+              </transformation_rates>
             </cell_transformations>
 
           </phenotype>

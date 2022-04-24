@@ -299,7 +299,9 @@
 				</fusion_rates>
 				</cell_interactions>
 				<cell_transformations>
-					<transformation_rate name="default" units="1/min">0</transformation_rate>
+					<transformation_rates>
+						<transformation_rate name="default" units="1/min">0</transformation_rate>
+					</transformation_rates>
 				</cell_transformations>
 
 

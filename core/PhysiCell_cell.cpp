@@ -2517,6 +2517,142 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 	}	
 
+	// cell interactions 
+
+	node = cd_node.child( "phenotype" );
+	node = node.child( "cell_interactions" ); 
+	if( node )
+	{
+		Cell_Interactions* pCI = &(pCD->phenotype.cell_interactions);
+
+		// dead_phagocytosis_rate
+		pugi::xml_node node_dpr = node.child("dead_phagocytosis_rate");
+		pCI->dead_phagocytosis_rate = xml_get_my_double_value(node_dpr); 
+
+		// live phagocytosis rates 
+		pugi::xml_node node_lpcr = node.child( "live_phagocytosis_rates");
+		if( node_lpcr )
+		{ node_lpcr = node_lpcr.child( "phagocytosis_rate"); }
+		while( node_lpcr )
+		{
+			// get the name of the target cell type
+			std::string target_name = node_lpcr.attribute( "name").value(); 
+			// now find its index 
+			auto search = cell_definition_indices_by_name.find( target_name );
+			// safety first! 
+			if( search != cell_definition_indices_by_name.end() )
+			{
+				// if the target is found, set the appropriate rate 
+				int target_index = search->second; 
+				std::string target_name_check = search->first; 
+				pCI->live_phagocytosis_rates[target_index] = xml_get_my_double_value(node_lpcr); 
+			}
+			else
+			{
+				std::cout << "Warning: When processing the " << pCD->name << " cell definition: " << std::endl 
+				<< "\tCould not find cell type " << target_name << " for phagocytosis." << std::endl
+				<< "\tIgnoring this live phagocytosis rate!" << std::endl << std::endl; 
+			}
+			node_lpcr = node_lpcr.next_sibling( "phagocytosis_rate" ); 
+		}
+
+		// effector attack rates 
+		pugi::xml_node node_ar = node.child( "attack_rates");
+		if( node_ar )
+		{ node_ar = node_ar.child( "attack_rate"); }
+		while( node_ar )
+		{
+			// get the name of the target cell type
+			std::string target_name = node_ar.attribute( "name").value(); 
+			// now find its index 
+			auto search = cell_definition_indices_by_name.find( target_name );
+			// safety first! 
+			if( search != cell_definition_indices_by_name.end() )
+			{
+				// if the target is found, set the appropriate rate 
+				int target_index = search->second; 
+				std::string target_name_check = search->first; 
+				pCI->attack_rates[target_index] = xml_get_my_double_value(node_ar); 
+			}
+			else
+			{
+				std::cout << "Warning: When processing the " << pCD->name << " cell definition: " << std::endl 
+				<< "\tCould not find cell type " << target_name << " for cell attack." << std::endl
+				<< "\tIgnoring this cell attack rate!" << std::endl << std::endl; 
+			}
+			node_ar = node_ar.next_sibling( "attack_rate" ); 
+		}
+
+		// damage_rate
+		pugi::xml_node node_dr = node.child("damage_rate");
+		pCI->damage_rate = xml_get_my_double_value(node_dr); 
+
+		// fusion_rates 
+		pugi::xml_node node_fr = node.child( "fusion_rates");
+		if( node_fr )
+		{ node_fr = node_fr.child( "fusion_rate"); }
+		while( node_fr )
+		{
+			// get the name of the target cell type
+			std::string target_name = node_fr.attribute( "name").value(); 
+			// now find its index 
+			auto search = cell_definition_indices_by_name.find( target_name );
+			// safety first! 
+			if( search != cell_definition_indices_by_name.end() )
+			{
+				// if the target is found, set the appropriate rate 
+				int target_index = search->second; 
+				std::string target_name_check = search->first; 
+				pCI->fusion_rates[target_index] = xml_get_my_double_value(node_fr); 
+			}
+			else
+			{
+				std::cout << "Warning: When processing the " << pCD->name << " cell definition: " << std::endl 
+				<< "\tCould not find cell type " << target_name << " for cell fusion." << std::endl
+				<< "\tIgnoring this cell fusion rate!" << std::endl << std::endl; 
+			}
+			node_fr = node_fr.next_sibling( "fusion_rate" ); 
+		}
+	}	
+
+	// cell_transformations>
+    //            <transformation_rate
+
+	node = cd_node.child( "phenotype" );
+	node = node.child( "cell_transformations" ); 
+	if( node )
+	{
+		Cell_Transformations * pCT = &(pCD->phenotype.cell_transformations);
+
+		// transformation rates 
+		pugi::xml_node node_tr = node.child( "transformation_rates");
+		if( node_tr )
+		{ node_tr = node_tr.child( "transformation_rate"); }
+		while( node_tr )
+		{
+			// get the name of the target cell type
+			std::string target_name = node_tr.attribute( "name").value(); 
+			// now find its index 
+			auto search = cell_definition_indices_by_name.find( target_name );
+			// safety first! 
+			if( search != cell_definition_indices_by_name.end() )
+			{
+				// if the target is found, set the appropriate rate 
+				int target_index = search->second; 
+				std::string target_name_check = search->first; 
+				pCT->transformation_rates[target_index] = xml_get_my_double_value(node_tr); 
+			}
+			else
+			{
+				std::cout << "Warning: When processing the " << pCD->name << " cell definition: " << std::endl 
+				<< "\tCould not find cell type " << target_name << " for cell transformation." << std::endl
+				<< "\tIgnoring this cell transformation rate!" << std::endl << std::endl; 
+			}
+			node_tr = node_tr.next_sibling( "transformation_rate" ); 
+		}
+
+	}	
+
     	// intracellular
 	
 	node = cd_node.child( "phenotype" );
