@@ -2470,11 +2470,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				pMot->restrict_to_2D = xml_get_my_bool_value( node_mot1 ); 
 			}
 			
-			if( default_microenvironment_options.simulate_2D )
+			if( default_microenvironment_options.simulate_2D && pMot->restrict_to_2D == false )
 			{
-				std::cout << "Note: Overriding to set cell motility to 2D based on " 
-							<< "microenvironment domain settings ... "
-				<< std::endl; 				
+				std::cout << "Note: Overriding to set cell motility for " << pCD->name << " to 2D based on " 
+						  << "microenvironment domain settings ... " << std::endl; 				
 				pMot->restrict_to_2D = true; 
 			}
 			

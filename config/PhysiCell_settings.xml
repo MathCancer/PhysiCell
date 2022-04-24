@@ -223,7 +223,7 @@
 
               <advanced_chemotaxis>
                 <enabled>true</enabled>
-                <normalize_each_gradient>true</normalize_each_gradient>
+                <normalize_each_gradient>false</normalize_each_gradient>
                 <chemotactic_sensitivities>
                   <chemotactic_sensitivity substrate="resource">1</chemotactic_sensitivity> 
                   <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
