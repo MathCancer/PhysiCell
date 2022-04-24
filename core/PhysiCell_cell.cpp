@@ -2464,9 +2464,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 			}
 
+/*
 			// automated advanced chemotaxis setup 
 			node_mot1 = node_mot.child( "advanced_chemotaxis" ); 
-			if( node_mot1 )
+			if( node_mot1  )
 			{
 				// enabled? if so, set the standard chemotaxis function
 				if( xml_get_bool_value( node_mot1, "enabled" ) )
@@ -2482,8 +2483,41 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					{ pCD->functions.update_migration_bias = advanced_chemotaxis_function_normalized; }
 				}	
 
+				// now process the chemotactic sensitivities 
+
+				std::cout << "adv chemotaxis for " << pCD->name << " : "; 
+				pugi::xml_node node_cs = node_cs.child( "chemotactic_sensitivities"); 
+				if( node_cs )
+				{
+					node_cs = node_cs.child("chemotactic_sensitivity"); 
+
+					while( node_cs )
+					{
+						std::string substrate_name = node_cs.attribute( "name").value(); 
+						int index = microenvironment.find_density_index( substrate_name ); 
+						std::string actual_name = microenvironment.density_names[ index ]; 
+			
+						// error check 
+						if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )						
+						{ std::cout << "fuck!" << std::endl; }
+
+						std::cout << " " << substrate_name << " " ; 
+
+						node_cs = node_cs.next_sibling( "chemotactic_sensitivity" ); 
+					}
+
+
+				}
+				else
+				{
+					std::cout << "Warning: when processing motility for " << pCD->name << " cells: " << std::endl 
+								<< "\tAdvanced chemotaxis requries chemotactic_sensitivities." << std::endl
+								<< "\tBut you have none. Your migration bias will be the zero vector." << std::endl; 
+				}
+				std::cout << std::endl; 
+
 				// START HERE !!!!! 
-				
+ 		
 				// search for the right chemo index 
 				
 				std::string substrate_name = xml_get_string_value( node_mot1 , "substrate" ); 
@@ -2510,9 +2544,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				
 				pMot->chemotaxis_direction = xml_get_int_value( node_mot1 , "direction" ); 
 				
+				
 				std::cout << pMot->chemotaxis_direction << " * grad( " << actual_name << " )" << std::endl; 
 
 			}
+*/			
 
 
 		}
