@@ -1849,6 +1849,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		// motility 
 		pCD->phenotype.motility.is_motile = false; 
 		pCD->phenotype.motility.chemotactic_sensitivities.assign(number_of_substrates,0.0); 
+		pCD->functions.update_migration_bias = NULL; 
 
 		// secretion  
 		pCD->phenotype.secretion.secretion_rates.assign(number_of_substrates,0.0); 
