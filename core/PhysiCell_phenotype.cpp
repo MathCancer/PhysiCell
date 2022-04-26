@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -796,7 +796,32 @@ Motility::Motility()
 	chemotaxis_index = 0; 
 	chemotaxis_direction = 1; 
 	
+	sync_to_current_microenvironment(); 
+	
 	return; 
+}
+
+void Motility::sync_to_current_microenvironment( void )
+{
+	Microenvironment* pMicroenvironment = get_default_microenvironment(); 
+	if( pMicroenvironment )
+	{ sync_to_microenvironment( pMicroenvironment ); } 
+	else
+	{ chemotactic_sensitivities.resize( 1 , 0.0 ); }
+
+	return; 
+}
+
+void Motility::sync_to_microenvironment( Microenvironment* pNew_Microenvironment )
+{
+	chemotactic_sensitivities.resize( pNew_Microenvironment->number_of_densities() , 0.0 ); 
+	return; 
+}
+
+double& Motility::chemotactic_sensitivity( std::string name )
+{
+	int n = microenvironment.find_density_index(name); 
+	return chemotactic_sensitivities[n]; 
 }
 
 Secretion::Secretion()
@@ -1092,9 +1117,12 @@ Phenotype& Phenotype::operator=(const Phenotype &p ) {
 	delete intracellular;
 	
 	if (p.intracellular != NULL)
-		intracellular = p.intracellular->clone();
+	{ intracellular = p.intracellular->clone(); }
 	else
-		intracellular = NULL;
+	{ intracellular = NULL; }
+	
+	cell_interactions = p.cell_interactions; 
+	cell_transformations = p.cell_transformations; 
 	
 	return *this;
 }
@@ -1134,5 +1162,81 @@ void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
 
 	return; 
 }
+
+Cell_Interactions::Cell_Interactions()
+{
+	dead_phagocytosis_rate = 0.0; 
+	live_phagocytosis_rates = {0.0}; 
+	damage_rate = 1.0; 
+	attack_rates = {0.0}; 
+	fusion_rates = {0.0}; 
+	
+	return; 
+}
+
+void Cell_Interactions::sync_to_cell_definitions()
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int number_of_cell_defs = cell_definition_indices_by_name.size(); 
+	
+	if( live_phagocytosis_rates.size() != number_of_cell_defs )
+	{
+		live_phagocytosis_rates.resize( number_of_cell_defs, 0.0); 
+		attack_rates.resize( number_of_cell_defs, 0.0); 
+		fusion_rates.resize( number_of_cell_defs, 0.0); 
+	}
+	
+	return; 
+}
+
+// ease of access 
+double& Cell_Interactions::live_phagocytosis_rate( std::string type_name )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name]; 
+	// std::cout << type_name << " " << n << std::endl; 
+	return live_phagocytosis_rates[n]; 
+}
+
+double& Cell_Interactions::attack_rate( std::string type_name ) 
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name]; 
+	return attack_rates[n]; 
+}
+
+double& Cell_Interactions::fusion_rate( std::string type_name )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name]; 
+	return fusion_rates[n]; 
+}
+
+Cell_Transformations::Cell_Transformations()
+{
+	transformation_rates = {0.0}; 
+	
+	return; 
+}
+
+void Cell_Transformations::sync_to_cell_definitions()
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 	
+	int number_of_cell_defs = cell_definition_indices_by_name.size();  
+	
+	if( transformation_rates.size() != number_of_cell_defs )
+	{ transformation_rates.resize( number_of_cell_defs, 0.0); }
+	
+	return; 
+}
+
+// ease of access 
+double& Cell_Transformations::transformation_rate( std::string type_name )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name]; 
+	return transformation_rates[n]; 
+}
+
 
 };

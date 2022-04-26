@@ -84,6 +84,12 @@ all: MaBoSS main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) $(INC)  -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB)
 	@echo ""
 	@echo "check for $(PROGRAM_NAME)"
+	make name
+
+name:
+	@echo ""
+	@echo "Executable name is" $(PROGRAM_NAME)
+	@echo ""
 
 # PhysiCell core components	
 

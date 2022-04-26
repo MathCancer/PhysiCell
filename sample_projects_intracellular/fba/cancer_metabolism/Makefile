@@ -66,6 +66,10 @@ all: libFBA main.cpp $(ALL_OBJECTS)
 	@echo created $(PROGRAM_NAME)
 	@echo
 
+name:
+	@echo ""
+	@echo "Executable name is" $(PROGRAM_NAME)
+	@echo ""
 
 # PhysiCell core components
 

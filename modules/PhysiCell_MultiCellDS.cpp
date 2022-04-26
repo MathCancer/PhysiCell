@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -362,6 +362,79 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 			attrib.set_value( size ); 
 			node_temp1 = node_temp1.parent(); 
 			index += size; 			
+
+			// new in 2022: interactions : 
+			// 	// phagocytosis parameters (e.g., macrophages)
+
+			// dead_phagocytosis_rate 
+			size = 1; 
+			node_temp1 = node_temp1.append_child( "label" );
+			node_temp1.append_child( pugi::node_pcdata ).set_value( "dead_phagocytosis_rate" ); 
+			attrib = node_temp1.append_attribute( "index" ); 
+			attrib.set_value( index ); 
+			attrib = node_temp1.append_attribute( "size" ); 
+			attrib.set_value( size ); 
+			node_temp1 = node_temp1.parent(); 
+			index += size; 			
+
+			extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+			int number_of_cell_defs = cell_definition_indices_by_name.size(); 
+
+			// live_phagocytosis_rates
+			size = number_of_cell_defs; 
+			node_temp1 = node_temp1.append_child( "label" );
+			node_temp1.append_child( pugi::node_pcdata ).set_value( "live_phagocytosis_rates" ); 
+			attrib = node_temp1.append_attribute( "index" ); 
+			attrib.set_value( index ); 
+			attrib = node_temp1.append_attribute( "size" ); 
+			attrib.set_value( size ); 
+			node_temp1 = node_temp1.parent(); 
+			index += size; 			
+
+			// attack_rates
+			size = number_of_cell_defs; 
+			node_temp1 = node_temp1.append_child( "label" );
+			node_temp1.append_child( pugi::node_pcdata ).set_value( "attack_rates" ); 
+			attrib = node_temp1.append_attribute( "index" ); 
+			attrib.set_value( index ); 
+			attrib = node_temp1.append_attribute( "size" ); 
+			attrib.set_value( size ); 
+			node_temp1 = node_temp1.parent(); 
+			index += size; 			
+			
+			// damage_rate
+			size = 1; 
+			node_temp1 = node_temp1.append_child( "label" );
+			node_temp1.append_child( pugi::node_pcdata ).set_value( "damage_rate" ); 
+			attrib = node_temp1.append_attribute( "index" ); 
+			attrib.set_value( index ); 
+			attrib = node_temp1.append_attribute( "size" ); 
+			attrib.set_value( size ); 
+			node_temp1 = node_temp1.parent(); 
+			index += size; 			
+			
+			// fusion_rates
+			size = number_of_cell_defs; 
+			node_temp1 = node_temp1.append_child( "label" );
+			node_temp1.append_child( pugi::node_pcdata ).set_value( "fusion_rates" ); 
+			attrib = node_temp1.append_attribute( "index" ); 
+			attrib.set_value( index ); 
+			attrib = node_temp1.append_attribute( "size" ); 
+			attrib.set_value( size ); 
+			node_temp1 = node_temp1.parent(); 
+			index += size; 			
+
+			// new in 2022: transformations : 
+			size = number_of_cell_defs; 
+			node_temp1 = node_temp1.append_child( "label" );
+			node_temp1.append_child( pugi::node_pcdata ).set_value( "transformation_rates" ); 
+			attrib = node_temp1.append_attribute( "index" ); 
+			attrib.set_value( index ); 
+			attrib = node_temp1.append_attribute( "size" ); 
+			attrib.set_value( size ); 
+			node_temp1 = node_temp1.parent(); 
+			index += size; 			
+
 			// custom variables 
 			for( int i=0; i < (*all_cells)[0]->custom_data.variables.size(); i++ )
 			{
@@ -437,6 +510,18 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 			+1+1+1+1 // volume information 
 			+3+1 // orientation, polarity; 
 			+1+3+1+3+1+1; // motility 
+
+		// figure out size of 2022 phenotype items 
+		extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+		int number_of_cell_defs = cell_definition_indices_by_name.size(); 
+
+		// cell interactions: 
+		size_of_each_datum += 
+			1+number_of_cell_defs+number_of_cell_defs+1+number_of_cell_defs;
+
+		// cell transformations;  
+		size_of_each_datum += number_of_cell_defs;
+
 		// figure out size of custom data. for now, 
 		// assume all the cells have teh same custom data as 
 		// cell #0
@@ -518,6 +603,15 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 			fwrite( (char*) &( pCell->phenotype.motility.migration_bias_direction[2] ) , sizeof(double) , 1 , fp ); 
 			fwrite( (char*) &( pCell->phenotype.motility.persistence_time ) , sizeof(double) , 1 , fp ); // persistence 
 			fwrite( (char*) &( temp_zero ) , sizeof(double) , 1 , fp ); // reserved for "time in this direction" 
+
+
+			// new in 2022: interactions : 
+			fwrite( (char*) &( pCell->phenotype.cell_interactions.dead_phagocytosis_rate ) , sizeof(double) , 1 , fp ); // dead_phagocytosis_rate 
+			fwrite( (char*) &( pCell->phenotype.cell_interactions.live_phagocytosis_rates ) , sizeof(double) , number_of_cell_defs , fp ); // live_phagocytosis_rates 
+			fwrite( (char*) &( pCell->phenotype.cell_interactions.attack_rates ) , sizeof(double) , number_of_cell_defs , fp ); // attack_rates 
+			fwrite( (char*) &( pCell->phenotype.cell_interactions.damage_rate ) , sizeof(double) , 1 , fp ); // damage_rate 
+			fwrite( (char*) &( pCell->phenotype.cell_interactions.fusion_rates ) , sizeof(double) , number_of_cell_defs , fp ); // fusion_rates 
+			fwrite( (char*) &( pCell->phenotype.cell_transformations.transformation_rates ) , sizeof(double) , number_of_cell_defs , fp ); // transformation_rates 
 			
 			// custom variables 
 			for( int j=0 ; j < pCell->custom_data.variables.size(); j++ )

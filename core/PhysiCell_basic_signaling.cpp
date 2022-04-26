@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,7 +70,7 @@
 using namespace BioFVM; 
 
 namespace PhysiCell{
-	
+
 Integrated_Signal::Integrated_Signal()
 {
 	base_activity = 0.0; 
@@ -155,4 +155,43 @@ void Integrated_Signal::add_signal( char signal_type , double signal , double we
 void Integrated_Signal::add_signal( char signal_type , double signal )
 { return add_signal( signal_type , signal , 1.0 ); }
 
-}; 
+double Hill_response_function( double s, double half_max , double hill_power )
+{ 
+	if( s <= 0.0 )
+	{ return 0.0; } 
+	double output = pow( s , hill_power ); // s^h 
+	double temp1 = pow( half_max , hill_power ); // s_half^h 
+	temp1 += output; // s^h + s_half^h 
+	output /= temp1; // s^h / (s^h + s_half^h ); 
+	return output;
+}
+
+double linear_response_function( double s, double s_min , double s_max )
+{
+	if( s <= s_min )
+	{ return 0.0; } 
+	if( s >= s_max )
+	{ return 1.0; } 
+	s -= s_min; // overwrite s with s - s_min 
+	s_max -= s_min; // overwrite s_max with s_max - s_min 
+	s /= s_max; // now we have (s-s_min)/(s_max-s_min
+	return s; 
+}
+
+double decreasing_linear_response_function( double s, double s_min , double s_max )
+{
+	if( s <= s_min )
+	{ return 1.0; } 
+	if( s >= s_max )
+	{ return 0.0; } 
+	// (smax-s)/(smax-smin); 
+	// = -(s-smax)/(smax-smin)
+	s -= s_max; // replace s by s-s_max 
+	s_max -= s_min; // replace s_max = s_max - s_min 
+	s /= s_max; // this is (s-s_max)/(s_max-s_min)
+	s *= -1; // this is (s_max-s)/(s_max-s_min)
+	return s; 
+}
+
+
+};

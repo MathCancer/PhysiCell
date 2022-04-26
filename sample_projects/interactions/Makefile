@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := worm
+PROGRAM_NAME := interaction_demo
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -68,7 +68,7 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
-	make name 
+	make name
 
 name:
 	@echo ""

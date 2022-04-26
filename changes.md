@@ -1,5 +1,102 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
+
+**Version:** 1.10.0
+
+**Release date:** ?? April 2022
+
+## Release summary: 
+
+This release introduces major new phenotype functionality. 
+
+focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracellular modeling, as well as several small bugs in parsing cell definitions in the XML configuration file. It also implements a basic_volume_model that only models total volume. (For internal consistency, it treats the entire cell as cytoplasm.) 
+
+**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
+
+**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
+ 
+### Major new features and changes:
+
++ Created Cell_Interactions in Phenotype as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
+
++ Created Cell_Transformations in Phenotype as a standard representation of cell transformations such as differentation or transdifferentiation. 
+
++ PhysiCell now runs a s
+
++ PhysiCell_basic_signaling now includes standard Hill and linear response functions. 
+
++ Updated heterogeneity-sample, template, 
+
+
+### Minor new features and changes: 
+
++ All sample projects have a new rule "make name" to tell you the name of the executable. 
+
++ All sample projects output the executable name to screen for easier reference. 
+
++ Cell_Definition has a new Boolean is_movable, so that all cells of a type can be set to non-movable. (Default: is_movable = true;)
+
++ create_cell( Cell_Definition ) now uses "is_movable" from the cell def 
+
++ 
+
+	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
+
+
+### Beta features (not fully supported):
+ 
++ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
+
++ [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
+
++ Added a simple Qt GUI for plotting cells only (plot_cells.py and vis_tab_cells_only.py in /beta)
+
++ Added a simple Qt GUI for plotting substrates and cells (plot_data.py and vis_tab.py in /beta)
+
++ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
+  
+### Bugfixes: 
++ When the cell_defaults definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying cell_defaults, the XML parsing will reset motility to off (with NULL function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set legacy_cell_defaults_copy = true in the config file to override this bugfix. 
+
+### Notices for intended changes that may affect backwards compatibility:
+ 
++ We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
+
++ We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
+
++ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+ 
++ We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
+
++ We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
+	
++ We will most probably merge all of "core" and "modules" into "core." 
+
+### Planned future improvements: 
+
++ Further XML-based simulation setup. 
+
++ Read saved simulation states (as MultiCellDS digital snapshots)
+  
++ Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
+ 
++ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
+ 
++ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
+ 
++ Create an angiogenesis sample project 
+ 
++ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
+
++ Improved plotting options in SVG 
+
++ Further update sample projects to make use of more efficient interaction testing available
+
++ Major refresh of documentation.
+
+* * * 
+
 **Version:** 1.9.1
 
 **Release date:** 13 September 2021

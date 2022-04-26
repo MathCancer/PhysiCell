@@ -63,10 +63,16 @@ all:
 	make heterogeneity-sample
 	make 
 
+name:
+	@echo ""
+	@echo "Executable name is" $(PROGRAM_NAME)
+	@echo ""
+
 # sample projects 	
 list-projects:
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
-	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample worm-sample"
+	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
+	@echo "                 worm-sample interaction-sample"
 	@echo ""
 	@echo "Sample intracellular projects: ode-energy-sample physiboss-cell-lines-sample cancer-metabolism-sample"
 	@echo ""
@@ -153,7 +159,16 @@ worm-sample:
 	cp Makefile Makefile-backup
 	cp ./sample_projects/worm/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/worm/config/* ./config/	
+	cp ./sample_projects/worm/config/* ./config/
+	
+interaction-sample:
+	cp ./sample_projects/interactions/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/interactions/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/interactions/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/interactions/config/* ./config/
 
 # ---- intracellular projects 
 ode-energy-sample:
@@ -191,6 +206,7 @@ cancer-metabolism-sample:
 	cp ./sample_projects_intracellular/fba/cancer_metabolism/Makefile ./
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
 	cp ./sample_projects_intracellular/fba/cancer_metabolism/config/* ./config/
+
 
 # early examples for convergence testing 
 
