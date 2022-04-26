@@ -227,7 +227,12 @@ gif:
 movie:
 	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/out.mp4
 
-# upgrade rules 
+ciPATH := ./sample_projects/cancer_immune/scripts
+pov:
+	cp $(ciPATH)/CI_POV_writer.cpp .
+	$(COMPILE_COMMAND) -o CI_vis CI_POV_writer.cpp ./modules/PhysiCell_POV.cpp $(BioFVM_OBJECTS) $(pugixml_OBJECTS)
+	$(COMPILE_COMMAND) -o CI_script $(ciPATH)/CI_script.cpp  
+	rm CI_POV_writer.cpp
 
 SOURCE := PhysiCell_upgrade.zip 
 get-upgrade: 
