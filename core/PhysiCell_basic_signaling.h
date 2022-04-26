@@ -73,7 +73,7 @@
 
 #include "./PhysiCell_constants.h" 
 #include "./PhysiCell_phenotype.h" 
-#include "./PhysiCell_Cell.h" 
+#include "./PhysiCell_cell.h" 
 
 namespace PhysiCell{
 	
