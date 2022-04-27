@@ -33,7 +33,7 @@ else:
         print("Your operating system seems to be unsupported. Please submit a ticket at https://sourceforge.net/p/physicell/tickets/ ")
         sys.exit(1)
 
-    url = "http://maboss.curie.fr/pub/" + mb_file
+    url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/v2.4.1/" + mb_file
 
     fname = mb_file
 
