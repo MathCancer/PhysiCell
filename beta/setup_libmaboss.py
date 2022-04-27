@@ -83,6 +83,7 @@ else:
         tar = tarfile.open(mb_file)
         tar.extractall()
         tar.close()
+        os.remove(mb_file)
     except:
         print('error untarring the file')
         exit(1)
