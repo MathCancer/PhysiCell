@@ -9,7 +9,7 @@
 #include "../../../modules/PhysiCell_pugixml.h"
 #include "maboss_network.h"
 
-static std::string PhysiBoSS_Version = "2.0.0"; 
+static std::string PhysiBoSS_Version = "2.1.0"; 
 
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
