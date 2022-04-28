@@ -157,13 +157,21 @@ void Integrated_Signal::add_signal( char signal_type , double signal )
 
 double Hill_response_function( double s, double half_max , double hill_power )
 { 
-	if( s <= 0.0 )
+    // newer. only one expensive a^b operation. 45% less computationl expense. 
+
+	// give an early exit possibility to cut cost on "empty" rules
+	if(s < 1e-16 ) // maybe also try a dynamic threshold: 0.0001 * half_max 
 	{ return 0.0; } 
-	double output = pow( s , hill_power ); // s^h 
-	double temp1 = pow( half_max , hill_power ); // s_half^h 
-	temp1 += output; // s^h + s_half^h 
-	output /= temp1; // s^h / (s^h + s_half^h ); 
-	return output;
+
+	// operations to reduce a^b operations and minimize hidden memory allocation / deallocation / copy operations. 
+	// Hill = (s/half_max)^hill_power / ( 1 + (s/half_max)^hill_power  )
+	double temp = s; // s 
+	temp /= half_max; // s/half_max 
+	double temp1 = pow(temp,hill_power); // (s/half_max)^h 
+	temp = temp1;  // (s/half_max)^h 
+	temp +=1 ;  // (1+(s/half_max)^h ); 
+	temp1 /= temp; // (s/half_max)^h / ( 1 + s/half_max)^h) 
+	return temp1; 
 }
 
 double linear_response_function( double s, double s_min , double s_max )
