@@ -64,28 +64,11 @@
 #                                                                             #
 ###############################################################################
 */
+ 
+#include "./PhysiCell_signal_response.h"
 
-#ifndef __PhysiCell_h__
-#define __PhysiCell_h__
+using namespace BioFVM; 
 
-#include <iostream>
-#include <fstream>
-#include <string>
+namespace PhysiCell{
 
-static std::string PhysiCell_Version = "1.10.0-beta"; 
-static std::string PhysiCell_URL = "http://PhysiCell.MathCancer.org"; 
-static std::string PhysiCell_DOI = "10.1371/journal.pcbi.1005991"; 
-
-#include "PhysiCell_basic_signaling.h"
-#include "PhysiCell_signal_response.h"
-#include "PhysiCell_phenotype.h"
-#include "PhysiCell_standard_models.h"
-#include "PhysiCell_cell.h"
-#include "PhysiCell_cell_container.h"
-// #include "PhysiCell_digital_cell_line.h" // to be deprecated! 
-#include "PhysiCell_utilities.h"
-#include "PhysiCell_constants.h"
-
-
-
-#endif
+};
