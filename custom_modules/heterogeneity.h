@@ -1,4 +1,4 @@
-	/*
+/*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -64,51 +64,23 @@
 #                                                                             #
 ###############################################################################
 */
- 
-#include <vector>
-#include <string>
 
-#ifndef __PhysiCell_signal_response__
-#define __PhysiCell_signal_response__
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-#include "./PhysiCell_constants.h" 
-#include "./PhysiCell_phenotype.h" 
-#include "./PhysiCell_cell.h" 
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-namespace PhysiCell{
+// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-// scales for the signals 
-extern std::vector<double> signal_scales; 
-// easy access to get or set scales 
-double& signal_scale( std::string signal_name ); // done 
-double& signal_scale( int signal_index ); // done 
+// set the tumor cell properties, then call the function 
+// to set up the tumor cells 
+void create_cell_types( void );
 
-// create the signal and response dictionaries 
-void setup_signal_response_dictionaries( void ); // done 
+void setup_tissue(); 
 
-// display dictionaries 
-void display_signal_dictionary( void ); // done 
-void display_response_dictionary( void ); // done 
+// set up the microenvironment to include the immunostimulatory factor 
+void setup_microenvironment( void );  // done 
 
-void display_signal_dictionary_with_synonyms( void ); // done 
-void display_response_dictionary_with_synonyms( void ); // done 
-
-// find index for named signal (returns -1 if not found)
-int find_signal_index( std::string signal_name ); // done 
-
-// find index for named behavior / response / parameter (returns -1 if not found)
-int find_parameter_index( std::string response_name ); // done
-int find_response_index( std::string response_name ); // done 
-
-// create a full signal vector 
-std::vector<double> construct_signals( Cell* pCell ); 
-
-std::vector<double> construct_selected_signals( Cell* pCell, std::vector<int>& indices ); 
-std::vector<double> construct_selected_signals( Cell* pCell, std::vector<std::string>& names ); 
-
-void transfer_updated_parameters( Cell* pCell , std::vector<double>& parameters ); 
-
-
-}; 
-
-#endif 
+std::vector<std::string> heterogeneity_coloring_function( Cell* );

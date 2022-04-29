@@ -666,6 +666,8 @@ Mechanics::Mechanics()
 	
 	cell_cell_repulsion_strength = 10.0; 
 	cell_BM_repulsion_strength = 10.0; 
+
+	cell_adhesion_affinities = {1}; 
 	
 	// this is a multiple of the cell (equivalent) radius
 	relative_maximum_adhesion_distance = 1.25; 
@@ -679,6 +681,23 @@ Mechanics::Mechanics()
 	maximum_attachment_rate = 1.0; 
 	
 	return; 
+}
+
+void Mechanics::sync_to_cell_definitions()
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int number_of_cell_defs = cell_definition_indices_by_name.size(); 
+	
+	if( cell_adhesion_affinities.size() != number_of_cell_defs )
+	{ cell_adhesion_affinities.resize( number_of_cell_defs, 1.0); }
+	return; 
+}
+
+double& Mechanics::cell_adhesion_affinity( std::string type_name )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name]; 
+	return cell_adhesion_affinities[n]; 
 }
 
 // new on July 29, 2018
