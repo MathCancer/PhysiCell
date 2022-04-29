@@ -1,15 +1,16 @@
-add cell_adhesion_affinities to Mechanics
-make sure it's properly sized
+add cell_adhesion_affinities to Mechanics [x]
+make sure it's properly sized [x]
 data save it 
 XML parsing reads it 
 
+potential functions use the adhesion affinities 
 
 
 signal dictionaries are generated  [x]
 response dictionaries are generated [x]
 
 can query signal dictionary [x]
-can query beahvior dictionary 
+can query beahvior dictionary [x]
 
 can add a missing signal
 can add a missing response 

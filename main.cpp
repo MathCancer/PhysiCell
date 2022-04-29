@@ -230,6 +230,14 @@ std::cout << std::endl;
 	std::cout << "sigs: " << sigs << std::endl; 
 
 
+std::cout << __LINE__ << std::endl; 
+
+for( int n=0; n < 10 ; n++ )
+{
+	Cell* pCC = (*all_cells)[n]; 
+	std::cout << pCC->type_name << " " << pCC->phenotype.mechanics.cell_adhesion_affinities << std::endl; 
+}
+std::cout << __LINE__ << std::endl; 
 	exit(0); 
 	
 	// main loop 

@@ -165,6 +165,7 @@ Cell_Definition::Cell_Definition()
 	phenotype.cell_interactions.sync_to_cell_definitions(); 
 	phenotype.cell_transformations.sync_to_cell_definitions(); 
 	phenotype.motility.sync_to_current_microenvironment(); 
+	phenotype.mechanics.sync_to_cell_definitions(); 
 	
 	cell_definitions_by_index.push_back( this ); 
 
@@ -1910,6 +1911,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// this requires that prebuild_cell_definition_index_maps was already run 
 	pCD->phenotype.cell_interactions.sync_to_cell_definitions(); 
 	pCD->phenotype.cell_transformations.sync_to_cell_definitions(); 
+	pCD->phenotype.mechanics.sync_to_cell_definitions(); 
 	
 	// set the reference phenotype 
 	pCD->parameters.pReference_live_phenotype = &(pCD->phenotype); 

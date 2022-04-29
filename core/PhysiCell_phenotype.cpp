@@ -700,6 +700,29 @@ double& Mechanics::cell_adhesion_affinity( std::string type_name )
 	return cell_adhesion_affinities[n]; 
 }
 
+void Mechanics::set_fully_heterotypic( void )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int number_of_cell_defs = cell_definition_indices_by_name.size(); 	
+
+	cell_adhesion_affinities.assign( number_of_cell_defs, 1.0);
+	return; 
+}
+
+void Mechanics::set_fully_homotypic( Cell* pC )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int number_of_cell_defs = cell_definition_indices_by_name.size(); 	
+
+	cell_adhesion_affinities.assign( number_of_cell_defs, 0.0);
+
+	// now find my type and set to 1 
+//	cell_adhesion_affinity( pC->type_name ) = 1.0; 
+
+	return; 
+}
+
+
 // new on July 29, 2018
 // change the ratio without changing the repulsion strength or equilibrium spacing 
 void Mechanics::set_relative_maximum_adhesion_distance( double new_value )

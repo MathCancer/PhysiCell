@@ -777,7 +777,8 @@ void initialize_default_cell_definition( void )
 	cell_defaults.phenotype.cell_interactions.sync_to_cell_definitions(); 
 	cell_defaults.phenotype.cell_transformations.sync_to_cell_definitions(); 
 	cell_defaults.phenotype.motility.sync_to_current_microenvironment(); 
-
+	cell_defaults.phenotype.mechanics.sync_to_cell_definitions(); 
+	
 	return; 	
 }
 
