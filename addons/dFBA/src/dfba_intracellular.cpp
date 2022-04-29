@@ -18,7 +18,10 @@ dFBAIntracellular::dFBAIntracellular(dFBAIntracellular* copy)
     intracellular_type = copy->intracellular_type;
 	sbml_filename = copy->sbml_filename;
 	parameters = copy->parameters;
-    model = copy->model;
+    // model = copy->model;
+    model.readSBMLModel(copy->sbml_filename.c_str());
+    model.initLpModel();
+    model.runFBA();
 }
 
 
