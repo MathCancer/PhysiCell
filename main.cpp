@@ -196,6 +196,8 @@ int main( int argc, char* argv[] )
 
 //	std::cout << signal_scales << std::endl; 
 
+display_signal_dictionary_with_synonyms(); 
+
 display_signal_dictionary(); 
 
 // make some conversions and connections 
@@ -254,6 +256,15 @@ for( int n=0; n < 10 ; n++ )
 	Cell* pCC = (*all_cells)[n]; 
 	std::cout << pCC->type_name << " " << pCC->phenotype.mechanics.cell_adhesion_affinities << std::endl; 
 }
+
+for( int i=0 ; i < sigs.size() ; i++ )
+{
+	std::cout << i << " : " << signal_name(i) << " " << signal( pC , i ) << " vs " << signal( pC, signal_name(i))
+	 << " vs " << sigs[i] << std::endl; 
+}
+
+
+
 std::cout << __LINE__ << std::endl; 
 std::cout << "done" << std::endl; 
 	exit(0); 

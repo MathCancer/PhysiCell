@@ -96,12 +96,25 @@ void display_response_dictionary_with_synonyms( void ); // done
 // find index for named signal (returns -1 if not found)
 int find_signal_index( std::string signal_name ); // done 
 
+// get the name of a signal index 
+std::string signal_name( int i );
+
+
+/* now need corresponding searches for responses */ 
+
 // find index for named behavior / response / parameter (returns -1 if not found)
 int find_parameter_index( std::string response_name ); // done
 int find_response_index( std::string response_name ); // done 
 
+
+
+
+
 // create a full signal vector 
-std::vector<double> construct_signals( Cell* pCell ); 
+std::vector<double> construct_signals( Cell* pCell ); // done 
+
+double signal( Cell* pCell, int index );
+double signal( Cell* pCell, std::string name );
 
 std::vector<double> construct_selected_signals( Cell* pCell, std::vector<int>& indices ); 
 std::vector<double> construct_selected_signals( Cell* pCell, std::vector<std::string>& names ); 
