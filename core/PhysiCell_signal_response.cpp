@@ -146,7 +146,13 @@ void setup_signal_response_dictionaries( void )
 	// int map_index = m; 
 	signal_to_int[ "pressure"] = map_index; 
 	int_to_signal[map_index] = "pressure"; 
-	
+
+	// total volume 
+
+	map_index++; 
+	signal_to_int[ "volume"] = map_index; 
+	int_to_signal[map_index] = "volume"; 
+
 	// contact with each cell type 
 	for( int i=0; i < n ; i++ )
 	{
@@ -162,12 +168,12 @@ void setup_signal_response_dictionaries( void )
 	
 	// contact with (any) live cell 
 	map_index++; 
-	signal_to_int["contact with live cells"] = map_index; 
+	signal_to_int["contact with live cell"] = map_index; 
 	int_to_signal[map_index] = "contact with live cell"; 
 	
 	// contact with dead cell 
 	map_index++; 
-	signal_to_int["contact with dead cells"] = map_index; 
+	signal_to_int["contact with dead cell"] = map_index; 
 	int_to_signal[map_index] = "contact with dead cell"; 
 	
 	// contact with basement membrane 
@@ -494,6 +500,12 @@ std::vector<double> construct_signals( Cell* pCell )
     // signals[ind] / signal_scales[ind]; 
     ind++; 
 
+	// cell volume 
+	signals[ind] = pCell->phenotype.volume.total; 
+    // signals[ind] / signal_scales[ind]; 
+    ind++; 
+
+
 	// physical contact with cells (of each type) 
 		// increment signals 
 	int dead_cells = 0; 
@@ -546,6 +558,8 @@ double signal( Cell* pCell, int index )
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
 
+	double out = 0.0; 
+
 	if( index < 0 )
 	{ 
 		std::cout<< "Why would you ask for array[-1]? Why? WHY???? That's it, I quit." << std::endl; 
@@ -557,7 +571,7 @@ double signal( Cell* pCell, int index )
 	// first m entries: extracellular concentration 
 	if( 0 <= ind && ind < m )
 	{
-		double out = pCell->nearest_density_vector()[ind];
+		out = pCell->nearest_density_vector()[ind];
 		out /= signal_scales[index]; 
 		return out; 
 	}
@@ -566,7 +580,7 @@ double signal( Cell* pCell, int index )
 	ind -= m; 
 	if( ind < m )
 	{
-		double out = pCell->phenotype.molecular.internalized_total_substrates[ind]; 
+		out = pCell->phenotype.molecular.internalized_total_substrates[ind]; 
 		out /= pCell->phenotype.volume.total;
 		out /= signal_scales[index]; 
 		return out; 
@@ -576,7 +590,25 @@ double signal( Cell* pCell, int index )
 	ind -= m; 
 	if( ind < m )
 	{
-		double out =  norm( pCell->nearest_gradient(ind) ); 
+		out =  norm( pCell->nearest_gradient(ind) ); 
+		out /= signal_scales[index]; 
+		return out; 
+	}
+
+	ind -= m; 
+	// mechanical pressure 
+	if( ind == 0 )
+	{
+		out = pCell->state.simple_pressure;
+		out /= signal_scales[index]; 
+		return out; 
+	}
+
+	ind -= 1; 
+	// cell volume 	
+	if( ind == 0 )
+	{
+		out = pCell->phenotype.volume.total; 
 		out /= signal_scales[index]; 
 		return out; 
 	}
@@ -584,21 +616,15 @@ double signal( Cell* pCell, int index )
 
 
 /*
-tal; }
 
-    // substrate gradients 
-    ind = 2*m; // int ind = m; 
-	for( int i=0; i < m ; i++ )
-	{
-        signals[ind] = norm( pCell->nearest_gradient(i) ); 
-        // signals[ind] /= signal_scales[ind]; 
-        ind++; 
-	}    
 
 	// mechanical pressure 
 	signals[ind] = pCell->state.simple_pressure;
-    // signals[ind] / signal_scales[ind]; 
     ind++; 
+
+	// cell volume 	
+	signals[ind] = pCell->phenotype.volume.total; 
+    ind++; 	
 
 	// physical contact with cells (of each type) 
 		// increment signals 

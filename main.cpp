@@ -251,6 +251,14 @@ std::cout << std::endl;
 
 std::cout << __LINE__ << std::endl; 
 
+int tmp_ind = 25; 
+std::string tmp1 = signal_name(tmp_ind); 
+std::cout << tmp_ind << " : " << tmp1 << " vs : "; 
+int temp_ind1 = find_signal_index( tmp1 ); 
+std::cout<< temp_ind1 << std::endl; 
+std::cout << __LINE__ << std::endl; 
+
+
 for( int n=0; n < 10 ; n++ )
 {
 	Cell* pCC = (*all_cells)[n]; 
@@ -259,10 +267,9 @@ for( int n=0; n < 10 ; n++ )
 
 for( int i=0 ; i < sigs.size() ; i++ )
 {
-	std::cout << i << " : " << signal_name(i) << " " << signal( pC , i ) << " vs " << signal( pC, signal_name(i))
-	 << " vs " << sigs[i] << std::endl; 
+	std::cout << i << " : " << signal_name(i) << " " << signal( pC , i )  << " vs " << signal( pC, signal_name(i)); 
+	std::cout << " vs " << sigs[i] << std::endl; 
 }
-
 
 
 std::cout << __LINE__ << std::endl; 
