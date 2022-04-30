@@ -110,8 +110,17 @@ void setup_signal_response_dictionaries( void )
 		int_to_signal[i] = name; 
 	}
 
-    // substrate gradients 
+    // internalized substrates 
     int map_index = m; 
+    for( int i=0; i < m ; i++ )
+	{
+		std::string name = "internalized " + microenvironment.density_names[i]; 
+		signal_to_int[ name ] = m+i;
+		int_to_signal[m+i] = name; 
+	}
+
+    // substrate gradients 
+    map_index = 2*m; 
 	for( int i=0; i < m ; i++ )
 	{
 		std::string name = microenvironment.density_names[i] + " gradient"; 
@@ -452,8 +461,13 @@ std::vector<double> construct_signals( Cell* pCell )
 	// for( int i=0; i < m ; i++ )
 	// { signals[i] /= signal_scales[i]; }
 
-    // substrate gradients 
+
+    // internalized substrates 
     int ind = m; 
+    std::copy( pCell->phenotype.molecular.internalized_total_substrates.begin() , pCell->phenotype.molecular.internalized_total_substrates.end(), signals.begin()+m ); 
+
+    // substrate gradients 
+    ind = 2*m; // int ind = m; 
 	for( int i=0; i < m ; i++ )
 	{
         signals[ind] = norm( pCell->nearest_gradient(i) ); 

@@ -191,7 +191,7 @@ int main( int argc, char* argv[] )
 
 	std::cout << signal_scales << std::endl; 
 */
-	signal_scale( "oxygen") = 38;
+	signal_scale( "resource") = 38;
 	signal_scale( "pressure" ) = 0.5; 
 
 //	std::cout << signal_scales << std::endl; 
@@ -205,14 +205,14 @@ Cell* pC = (*all_cells)[0];
 
 int iii = 1; 
 
-for( int iii=1 ; iii <= 6 ; iii++ )
+for( int iii=0 ; iii <= 6 ; iii++ )
 {
 	Cell* pC1 = (*all_cells)[iii];
 	pC1->convert_to_cell_definition( *cell_definitions_by_index[iii] ); 
 	pC->state.neighbors.push_back( pC1 ); 
 }
 
-for( int iii=1 ; iii <= 6 ; iii++ )
+for( int iii=0 ; iii <= 6 ; iii++ )
 {
 	Cell* pC1 = (*all_cells)[iii+10];
 	pC1->convert_to_cell_definition( *cell_definitions_by_index[iii] ); 
@@ -220,6 +220,23 @@ for( int iii=1 ; iii <= 6 ; iii++ )
 	{ pC1->phenotype.death.dead = true; }
 	pC->state.neighbors.push_back( pC1 ); 
 }
+
+int m = microenvironment.number_of_densities(); 
+int n = cell_definition_indices_by_name.size(); 
+
+int k = pC->get_current_voxel_index();
+
+// let's do some testing 
+for( int i=0; i < m ; i++ )
+{
+	microenvironment(k)[i] = i + 0.1; 
+	pC->phenotype.molecular.internalized_total_substrates[i] = 10 + i ; 
+}
+std::cout << pC->phenotype.molecular.internalized_total_substrates << std::endl; 
+
+pC->state.simple_pressure = 4.01; 
+pC->state.damage = 3.14; 
+pC->state.total_attack_time = 2.718; 
 
 
 std::vector<double> sigs = construct_signals( pC ); 
@@ -238,6 +255,7 @@ for( int n=0; n < 10 ; n++ )
 	std::cout << pCC->type_name << " " << pCC->phenotype.mechanics.cell_adhesion_affinities << std::endl; 
 }
 std::cout << __LINE__ << std::endl; 
+std::cout << "done" << std::endl; 
 	exit(0); 
 	
 	// main loop 
