@@ -142,7 +142,7 @@ void set_single_behavior( Cell* pCell, std::string name , double parameter );
 
 // get selected current behavior
 
-// get single selected behavior 
+// get single current behavior 
 
 
 

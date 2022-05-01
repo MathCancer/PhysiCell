@@ -1008,65 +1008,114 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	if( index == necrosis_parameter_index )
 	{ pCell->phenotype.death.rates[necrosis_model_index] = parameter; return; }
 
+	// migration speed
+	static int migration_speed_index = find_behavior_index( "migration speed"); 
+	if( index == migration_speed_index )
+	{ pCell->phenotype.motility.migration_speed = parameter; return; } 
+
+	// migration bias 
+	static int migration_bias_index = find_behavior_index( "migration bias"); 
+	if( index == migration_bias_index )
+	{ pCell->phenotype.motility.migration_bias = parameter; return; } 
+
+	// migration persistence time
+	static int persistence_time_index = find_behavior_index( "migration persistence time"); 
+	if( index == persistence_time_index )
+	{ pCell->phenotype.motility.persistence_time = parameter; return; } 
+
+	// chemotactic sensitivities 
+	static int first_chemotaxis_index = find_behavior_index( "chemotactic response to " + microenvironment.density_names[0] ); 
+	if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
+	{ pCell->phenotype.motility.chemotactic_sensitivities[index-first_chemotaxis_index]; return; } 
+
+
+	// cell-cell adhesion 
+	static int cca_index = find_behavior_index( "cell-cell adhesion"); 
+	if( index == cca_index )
+	{ pCell->phenotype.mechanics.cell_cell_adhesion_strength = parameter; return; } 
+
+	// cell-cell "springs"
+	static int elastic_index = find_behavior_index( "cell-cell adhesion elastic constant"); 
+	if( index == elastic_index )
+	{ pCell->phenotype.mechanics.attachment_elastic_constant = parameter; return; } 
+
+    // cell adhesion affinities 
+	static int first_affinity_index = find_behavior_index( "adhesive affinity to " + cell_definitions_by_type[0]->name ); 
+	if( index >= first_affinity_index && index < first_affinity_index + n )
+	{ pCell->phenotype.mechanics.cell_adhesion_affinities[index-first_affinity_index] = parameter; return; } 
+ 
+	// max relative maximum adhesion distance 
+	static int max_adh_distance_index = find_behavior_index( "relative maximum adhesion distance" ); 
+	if( index == max_adh_distance_index )
+	{ pCell->phenotype.mechanics.relative_maximum_adhesion_distance = parameter; return; } 
+
+	// cell-cell repulsion 
+	static int ccr_index = find_behavior_index( "cell-cell repulsion" ); 
+	if( index == ccr_index )
+	{ pCell->phenotype.mechanics.cell_cell_repulsion_strength = parameter; return; } 
+
+	// cell-BM adhesion 
+	static int cba_index = find_behavior_index( "cell-BM adhesion" ); 
+	if( index == cba_index )
+	{ pCell->phenotype.mechanics.cell_BM_adhesion_strength = parameter; return; } 
+	
+	// cell-BM repulsion 
+	static int cbr_index = find_behavior_index( "cell-BM repulsion" ); 
+	if( index == cbr_index )
+	{ pCell->phenotype.mechanics.cell_BM_repulsion_strength = parameter; return; } 
+
+	// dead cell phagocytosis
+	static int dead_phago_index = find_behavior_index( "phagocytosis of dead cell" ); 
+	if( index == dead_phago_index )
+	{ pCell->phenotype.cell_interactions.dead_phagocytosis_rate = parameter; return; } 
+ 
+
+
+/*
+ 
+  
+
+
+50 : phagocytose bacteria
+51 : phagocytose blood vessel
+52 : phagocytose stem
+53 : phagocytose differentiated
+54 : phagocytose macrophage
+55 : phagocytose CD8+ T cell
+56 : phagocytose neutrophil
+
+57 : attack bacteria
+58 : attack blood vessel
+59 : attack stem
+60 : attack differentiated
+61 : attack macrophage
+62 : attack CD8+ T cell
+63 : attack neutrophil
+
+64 : fuse to bacteria
+65 : fuse to blood vessel
+66 : fuse to stem
+67 : fuse to differentiated
+68 : fuse to macrophage
+69 : fuse to CD8+ T cell
+70 : fuse to neutrophil
+
+71 : transform to bacteria
+72 : transform to blood vessel
+73 : transform to stem
+74 : transform to differentiated
+75 : transform to macrophage
+76 : transform to CD8+ T cell
+77 : transform to neutrophil
+
+*/
+
 
 /*
 
-	// migration speed
-	map_index++; 
-	pCell->phenotype.motility.migration_speed = parameters[map_index]; 
-
-	// migration bias 
-	map_index++; 
-	pCell->phenotype.motility.migration_bias = parameters[map_index]; 
-
-	// migration persistence time
-	map_index++; 
-	pCell->phenotype.motility.persistence_time = parameters[map_index]; 
-
-	// chemotactic sensitivities 
-	static std::string search_for0 = "chemotactic response to " + microenvironment.density_names[0]; 
-	static int first_chemotaxis_index = find_behavior_index( search_for0 ); 
-	std::copy(  parameters.begin()+first_chemotaxis_index , 
-				parameters.begin()+first_chemotaxis_index+m , 
-				pCell->phenotype.motility.chemotactic_sensitivities.begin() ); 	
-
-	// cell-cell adhesion 
-	map_index++; 
-	pCell->phenotype.mechanics.cell_cell_adhesion_strength= parameters[map_index]; 
-
-	// cell-cell "springs"
-	map_index++; 
-	pCell->phenotype.mechanics.attachment_elastic_constant = parameters[map_index]; 
 
 
-    // cell adhesion affinities 
-	static std::string search_for1 = "adhesive affinity to " + cell_definitions_by_type[0]->name ; 
-	static int first_affinity_index = find_behavior_index( search_for1 ); 
 
-	std::copy(  parameters.begin()+first_affinity_index , 
-				parameters.begin()+first_affinity_index+n , 
-				pCell->phenotype.mechanics.cell_adhesion_affinities.begin() ); 	
-
-	// max relative maximum adhesion distance 
-
-	map_index += n; 
-	pCell->phenotype.mechanics.relative_maximum_adhesion_distance = parameters[map_index]; 
-
-	// cell-cell repulsion 
-	map_index++; 
-	pCell->phenotype.mechanics.cell_cell_repulsion_strength = parameters[map_index]; 
-
-	// cell-BM adhesion 
-	map_index++; 
-	pCell->phenotype.mechanics.cell_BM_adhesion_strength = parameters[map_index]; 
-	
-	// cell-BM repulsion 
-	map_index++; 
-	pCell->phenotype.mechanics.cell_BM_repulsion_strength = parameters[map_index]; 
-
-	// dead cell phagocytosis
-	map_index++; 
-	pCell->phenotype.cell_interactions.dead_phagocytosis_rate = parameters[map_index]; 
 
     // phagocytosis of each live cell type 
 	static int first_phagocytosis_index = find_behavior_index( "phagocytose " + cell_definitions_by_type[0]->name ); 
