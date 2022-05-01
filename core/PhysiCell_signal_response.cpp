@@ -459,7 +459,7 @@ int find_parameter_index( std::string response_name )
     return -1; 
 }
 
-int find_response_index( std::string response_name )
+int find_behavior_index( std::string response_name )
 { return find_parameter_index(response_name); }
 
 // create a full signal vector 
@@ -521,8 +521,8 @@ std::vector<double> construct_signals( Cell* pCell )
 		signals[ind+nCT] += 1; 
 	}
     // rescale 
-    for( int nCT=0; nCT < n ; nCT++ )
-    { signals[ind+nCT] /= signal_scales[ind+nCT]; }
+    // for( int nCT=0; nCT < n ; nCT++ )
+    // { signals[ind+nCT] /= signal_scales[ind+nCT]; }
 
     ind += n; 
 	// physical contact with live cells 
@@ -553,7 +553,75 @@ std::vector<double> construct_signals( Cell* pCell )
     return signals; 
 }
 
-double signal( Cell* pCell, int index )
+// create a signal vector of only the cell contacts 
+std::vector<double> construct_cell_contact_signals( Cell* pCell )
+{
+	static int m = microenvironment.number_of_densities(); 
+	static int n = cell_definition_indices_by_name.size(); 
+
+	std::vector<double> output( n+2 , 0.0 ); 
+	// process all neighbors 
+	int dead_cells = 0; 
+	int live_cells = 0; 
+	for( int i=0; i < pCell->state.neighbors.size(); i++ )
+	{
+		Cell* pC = pCell->state.neighbors[i]; 
+		if( pC->phenotype.death.dead == true )
+		{ dead_cells++; } 
+		else
+		{ live_cells++; } 
+		int nCT = cell_definition_indices_by_type[pC->type]; 
+		output[nCT] += 1; 
+	}
+	output[n] = live_cells; 
+	output[n+1] = dead_cells; 
+
+	// rescale 
+	std::string search_for = "contact with " + cell_definitions_by_type[0]->name; 
+	static int scaling_start_index = find_signal_index( search_for ); 
+	for( int i=0; i < n+2 ; i++ )
+	{ output[i] /= signal_scales[scaling_start_index+i]; }
+
+	return output; 
+}
+
+std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> signal_indices )
+{
+	static int m = microenvironment.number_of_densities(); 
+	static int n = cell_definition_indices_by_name.size(); 	
+
+	// contact signals start here 
+	static int contact_start_index = find_signal_index( "contact with " + cell_definitions_by_type[0]->name ); 
+
+	// typically more efficient to get these first 
+	std::vector<double> contact_signals = construct_cell_contact_signals( pCell ); 
+	bool created_contact_signals = false; 
+
+	std::vector<double> signals( signal_indices.size() , 0.0 ); 
+	for( int i=0; i < signal_indices.size() ; i++ )
+	{
+		int ind = signal_indices[i]; 
+		if( ind >= contact_start_index && ind < contact_start_index+n+2)
+		{ signals[i] = contact_signals[ind-contact_start_index]; }
+		else
+		{ signals[i] = single_signal( pCell , ind ); }
+	}
+
+	return signals; 
+}
+
+std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::string> signal_names )
+{
+	std::vector<int> signal_indices( signal_names.size() , 0 ); 
+	for( int i=0; i < signal_names.size(); i++ )
+	{ signal_indices[i] = find_signal_index( signal_names[i]); }
+
+	return construct_selected_signals(pCell,signal_indices); 
+}
+
+
+
+double single_signal( Cell* pCell, int index )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
@@ -613,71 +681,82 @@ double signal( Cell* pCell, int index )
 		return out; 
 	}
 
-
-
-/*
-
-
-	// mechanical pressure 
-	signals[ind] = pCell->state.simple_pressure;
-    ind++; 
-
-	// cell volume 	
-	signals[ind] = pCell->phenotype.volume.total; 
-    ind++; 	
-
+	ind -=1; 
 	// physical contact with cells (of each type) 
-		// increment signals 
-	int dead_cells = 0; 
-	int live_cells = 0; 
-	for( int i=0; i < pCell->state.neighbors.size(); i++ )
+	// individual contact signals are a bit costly 
+	if( ind < n+2 )
 	{
-		Cell* pC = pCell->state.neighbors[i]; 
-		if( pC->phenotype.death.dead == true )
-		{ dead_cells++; } 
-		else
-		{ live_cells++; } 
-		int nCT = cell_definition_indices_by_type[pC->type]; 
-		signals[ind+nCT] += 1; 
+		std::vector<int> counts( n , 0 ); 
+		// process all neighbors 
+		int dead_cells = 0; 
+		int live_cells = 0; 
+		for( int i=0; i < pCell->state.neighbors.size(); i++ )
+		{
+			Cell* pC = pCell->state.neighbors[i]; 
+			if( pC->phenotype.death.dead == true )
+			{ dead_cells++; } 
+			else
+			{ live_cells++; } 
+			int nCT = cell_definition_indices_by_type[pC->type]; 
+			counts[nCT] += 1; 
+		}
+
+		if( ind < n )
+		{
+			out = counts[ind]; 
+			out /= signal_scales[index]; 
+			return out; 
+		}
+		if( ind == n )
+		{
+			out = live_cells; 
+			out /= signal_scales[index]; 
+			return out; 
+		}
+
+		// ind == n+1 
+		out = dead_cells; 
+		out /= signal_scales[index]; 
+		return out; 
 	}
-    // rescale 
-    for( int nCT=0; nCT < n ; nCT++ )
-    { signals[ind+nCT] /= signal_scales[ind+nCT]; }
 
-    ind += n; 
-	// physical contact with live cells 
-	signals[ind] = live_cells; 
-    // signals[ind] /= signal_scales[ind]; 
-    ind++; 
-	
-	// physical contact with dead cells 
-	signals[ind] = dead_cells; 
-    // signals[ind] /= signal_scales[ind]; 
-    ind++; 
-
-	// physical contact with basement membrane (not implemented) 
-	signals[ind] = (int) pCell->state.contact_with_basement_membrane; 
-    ind++; 
+	// contact with BM 
+	ind -= (n+2); 
+	if( ind == 0 )
+	{ 
+		out = (double) pCell->state.contact_with_basement_membrane; 
+		out /= signal_scales[index]; 
+		return out; 
+	} 
 
 	// damage
-	signals[ind] = pCell->state.damage; 
-    ind++; 
-	
+	ind -= 1; 
+	if( ind == 0 )
+	{
+		out = pCell->state.damage; 
+		out /= signal_scales[index]; 
+		return out; 
+	} 
+
 	// integrated total attack time 
-	signals[ind] = pCell->state.total_attack_time;     
-    ind++; 
+	ind -= 1; 
+	if( ind == 0 )
+	{
+		out = pCell->state.total_attack_time;     
+		out /= signal_scales[index]; 
+		return out; 
+	} 
 
-    // rescale 
-    signals /= signal_scales; 
-	
+	// unknown after here !
 
-*/
+	std::cout << "Warning: Requested unknown signal number " << index << "!" << std::endl
+		      << "         Returning 0.0, but you should fix this!" << std::endl << std::endl; 
 
-	return 9e99;
+	return 0.0; 
 }
 
-double signal( Cell* pCell, std::string name )
-{ return signal( pCell, find_signal_index(name) ); }
+double single_signal( Cell* pCell, std::string name )
+{ return single_signal( pCell, find_signal_index(name) ); }
 
 
 

@@ -93,31 +93,40 @@ void display_response_dictionary( void ); // done
 void display_signal_dictionary_with_synonyms( void ); // done 
 void display_response_dictionary_with_synonyms( void ); // done 
 
+/* signal functions */ 
+
 // find index for named signal (returns -1 if not found)
 int find_signal_index( std::string signal_name ); // done 
 
 // get the name of a signal index 
-std::string signal_name( int i );
-
-
-/* now need corresponding searches for responses */ 
-
-// find index for named behavior / response / parameter (returns -1 if not found)
-int find_parameter_index( std::string response_name ); // done
-int find_response_index( std::string response_name ); // done 
-
-
-
-
+std::string signal_name( int i ); // done 
 
 // create a full signal vector 
 std::vector<double> construct_signals( Cell* pCell ); // done 
 
-double signal( Cell* pCell, int index );
-double signal( Cell* pCell, std::string name );
+// create a signal vector of only the cell contacts 
+std::vector<double> construct_cell_contact_signals( Cell* pCell ); // done 
 
-std::vector<double> construct_selected_signals( Cell* pCell, std::vector<int>& indices ); 
-std::vector<double> construct_selected_signals( Cell* pCell, std::vector<std::string>& names ); 
+// create a subset of the signal vector with the supplied indicies 
+std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> signal_indices ); // done 
+std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::string> names );  // done 
+
+// grab a single signal by its index or name 
+double single_signal( Cell* pCell, int index ); // done 
+double single_signal( Cell* pCell, std::string name ); // done 
+
+/* response functions */ 
+
+// find index for named behavior / response / parameter (returns -1 if not found)
+int find_parameter_index( std::string response_name ); // done
+int find_behavior_index( std::string response_name ); // done 
+
+/* now need corresponding searches for responses */ 
+
+
+
+
+
 
 void transfer_updated_parameters( Cell* pCell , std::vector<double>& parameters ); 
 

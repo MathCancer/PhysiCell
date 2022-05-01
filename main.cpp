@@ -204,27 +204,23 @@ display_signal_dictionary();
 
 Cell* pC = (*all_cells)[0]; 
 
+int m = microenvironment.number_of_densities(); 
+int n = cell_definition_indices_by_name.size(); 
 
 int iii = 1; 
 
-for( int iii=0 ; iii <= 6 ; iii++ )
+for( int iii=0 ; iii <= 1000 ; iii++ )
 {
 	Cell* pC1 = (*all_cells)[iii];
-	pC1->convert_to_cell_definition( *cell_definitions_by_index[iii] ); 
-	pC->state.neighbors.push_back( pC1 ); 
-}
+	// pick a random type 
+	std::vector<double> probs( n , 1.0 / (0.0+n) ); 
 
-for( int iii=0 ; iii <= 6 ; iii++ )
-{
-	Cell* pC1 = (*all_cells)[iii+10];
-	pC1->convert_to_cell_definition( *cell_definitions_by_index[iii] ); 
+	int temp_type = choose_event( probs ); 
+	pC1->convert_to_cell_definition( *cell_definitions_by_index[temp_type] ); 
 	if( UniformRandom() <= 0.5 )
 	{ pC1->phenotype.death.dead = true; }
 	pC->state.neighbors.push_back( pC1 ); 
 }
-
-int m = microenvironment.number_of_densities(); 
-int n = cell_definition_indices_by_name.size(); 
 
 int k = pC->get_current_voxel_index();
 
@@ -239,6 +235,9 @@ std::cout << pC->phenotype.molecular.internalized_total_substrates << std::endl;
 pC->state.simple_pressure = 4.01; 
 pC->state.damage = 3.14; 
 pC->state.total_attack_time = 2.718; 
+
+signal_scale( "contact with bacteria") = 1000.0; 
+signal_scale( "contact with CD8+ T cell") = 0.01; 
 
 
 std::vector<double> sigs = construct_signals( pC ); 
@@ -267,9 +266,51 @@ for( int n=0; n < 10 ; n++ )
 
 for( int i=0 ; i < sigs.size() ; i++ )
 {
-	std::cout << i << " : " << signal_name(i) << " " << signal( pC , i )  << " vs " << signal( pC, signal_name(i)); 
+	std::cout << i << " : " << signal_name(i) << " " << single_signal( pC , i )  << " vs " << single_signal( pC, signal_name(i)); 
 	std::cout << " vs " << sigs[i] << std::endl; 
 }
+
+
+std::cout << __LINE__ << std::endl; 
+std::cout << construct_cell_contact_signals( pC ) << std::endl; 
+
+
+// now try it! 
+
+
+std::vector<int> indices =  { 0 , 12, 13, 15 , 25}; 
+std::vector<double> selected_sigs = construct_selected_signals( pC , indices ); 
+
+std::cout << "selected signal test: " << std::endl 
+          << "======================" << std::endl; 
+for( int i=0 ; i < indices.size(); i++ )
+{
+	std::cout << indices[i] << " : " 
+	   << signal_name( indices[i]) << " : " 
+	   << selected_sigs[i] << std::endl; 
+}
+
+// std::cout << construct_selected_signals( pC , {"resource" , "contact with macrophage" , "pressure", "contact with dead cell"}) << std::endl; 
+
+construct_selected_signals( pC , {0,1,4,19,2} ); 
+
+std::vector<std::string> sig_names( indices.size() , "hi" ); 
+for( int i=0; i < sig_names.size() ; i++ )
+{ sig_names[i] = signal_name( indices[i] ); }
+
+std::vector<double> selected_sigs1 = construct_selected_signals( pC , sig_names ); 
+
+std::cout << "selected signal test: " << std::endl 
+          << "======================" << std::endl; 
+for( int i=0 ; i < sig_names.size(); i++ )
+{
+	std::cout << indices[i] << " : " 
+	   << signal_name( indices[i]) << " vs " << sig_names[i] << " : "
+	   << selected_sigs1[i] << std::endl; 
+}
+
+
+std::cout << construct_selected_signals(pC, {"resource", "debris", "pressure", "contact with blood vessel"}) << std::endl; 
 
 
 std::cout << __LINE__ << std::endl; 
