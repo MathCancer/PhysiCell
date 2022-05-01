@@ -124,13 +124,16 @@ int find_behavior_index( std::string response_name ); // done
 // get the name of a behavior index 
 std::string behavior_name( int i ); // done 
 
-// write a full parameter vector to the cell 
+// make a properly sized behavior vector 
+std::vector<double> create_empty_behavior_vector(); // done 
+
+// write a full behavior vector (phenotype parameters) to the cell 
 void write_behaviors( Cell* pCell , std::vector<double>& parameters ); 
 
 // write a selected set of behavior parameters to the cell 
-void write_selected_behaviors( Cell* pCell , std::vector<int> signal_indices ); 
+void write_selected_behaviors( Cell* pCell , std::vector<int> signal_indices , std::vector<double>& parameters ); 
 
-// write a single behavior 
+// write a single behavior parameter 
 double write_single_behavior( Cell* pCell, int index , double parameter ); 
 double write_single_behavior( Cell* pCell, std::string name , double parameter ); 
 

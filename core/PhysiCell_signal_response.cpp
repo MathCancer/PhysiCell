@@ -214,9 +214,12 @@ void setup_signal_behavior_dictionaries( void )
 
 		// secretion target 
 		map_index = m+i; 
-		map_name = name + " " + "secretion_target"; 
+		map_name = name + " " + "secretion target"; 
 		behavior_to_int[ map_name ] = map_index;
 		int_to_behavior[map_index] = map_name; 
+			// synonym 
+			map_name = name + " " + "secretion saturation density"; 
+			behavior_to_int[ map_name ] = map_index;
 
 		// uptake rate 
 		map_index = 2*m+i; 
@@ -235,6 +238,19 @@ void setup_signal_behavior_dictionaries( void )
 	map_name = "cycle entry";
 	behavior_to_int[ map_name ] = map_index;
 	int_to_behavior[map_index] = map_name; 
+
+		// synonym 
+		map_name = "exit from cycle phase 0"; 
+		behavior_to_int[ map_name ] = map_index;
+
+	// other cyle phases 
+	for( int i=1; i < 6; i++ )
+	{
+		map_index++; 
+		map_name = "exit from cycle phase " + std::to_string(i);
+		behavior_to_int[ map_name ] = map_index;
+		int_to_behavior[map_index] = map_name; 
+	}
 
 	map_index++; 
 	map_name = "apoptosis";
@@ -326,13 +342,13 @@ void setup_signal_behavior_dictionaries( void )
 	{
 		map_index++; 
 		Cell_Definition* pCD = cell_definitions_by_type[i]; 
-		std::string temp =  "phagocytosis of " + pCD->name; 
+		std::string temp =  "phagocytose " + pCD->name; 
 		behavior_to_int[temp] = map_index; 
 		int_to_behavior[map_index] = temp; 
 
 		// synonym 
 		temp = "phagocytose cell type " + std::to_string(pCD->type); 
-		int_to_behavior[map_index] = temp;         
+		behavior_to_int[temp] = map_index; 
 	}
 
 	// attack of each live cell type 
@@ -772,10 +788,227 @@ std::string behavior_name( int i )
 	return "not found"; 
 }
 
+std::vector<double> create_empty_behavior_vector()
+{ 
+	std::vector<double> parameters( int_to_behavior.size() , 0.0 ); 
+	return parameters; 
+}
+
 void write_behaviors( Cell* pCell , std::vector<double>& parameters )
 {
+	static int m = microenvironment.number_of_densities(); 
+	static int n = cell_definition_indices_by_name.size(); 
+
+	// substrate-related behaviors 
+	
+	// first m entries are secretion 
+	static int first_secretion_index = 0; 
+	std::copy(  parameters.begin()+first_secretion_index , 
+				parameters.begin()+first_secretion_index+m , 
+				pCell->phenotype.secretion.secretion_rates.begin() ); 
+
+	// next m entries are secretion targets
+	static int first_secretion_target_index = m; 
+	std::copy(  parameters.begin()+first_secretion_target_index , 
+				parameters.begin()+first_secretion_target_index+m , 
+				pCell->phenotype.secretion.saturation_densities.begin() ); 
+
+	// next m entries are uptake rates
+	static int first_uptake_index = 2*m; 
+	std::copy(  parameters.begin()+first_uptake_index , 
+				parameters.begin()+first_uptake_index+m , 
+				pCell->phenotype.secretion.uptake_rates.begin() ); 
+
+	// next m entries are net export rates 
+	static int first_export_index = 3*m; 
+	std::copy(  parameters.begin()+first_export_index , 
+				parameters.begin()+first_export_index+m , 
+				pCell->phenotype.secretion.net_export_rates.begin() ); 
+
+	// cycle entry (exit from phase 0) and exit from up to 5 more phases 
+	int map_index = 4*m; 
+	int max_cycle_index = pCell->phenotype.cycle.model().phases.size(); 
+	if( max_cycle_index > 6 )
+	{
+		max_cycle_index = 6; 
+		std::cout << "Warning: Standardized behaviors only support exit rate from the first 6 phases of a cell cycle!" << std::endl 
+		          << "         Ignoring any later phase exit rates." << std::endl; 
+	}
+	for( int i=0; i < max_cycle_index ; i++ )
+	{ pCell->phenotype.cycle.data.exit_rate( i ) = parameters[map_index+i]; }
+
+/*
+	// apoptosis 
+	map_index++; 
+	map_name = "apoptosis";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	// necrosis 
+	map_index++; 
+	map_name = "necrosis";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	// migration speed 
+	map_index++; 
+	map_name = "migration speed";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	// migration bias 
+	map_index++; 
+	map_name = "migration bias";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+*/					
+
+	return; 
+/*
+	
+	map_index = 4*m; 
+	map_name = "cycle entry";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "apoptosis";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "necrosis";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "migration speed";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "migration bias";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+	
+	// chemotactic sensitivities 
+	for( int i=0; i < m ; i++ )
+	{
+		map_index++; 
+		std::string name = "chemotactic response to " + microenvironment.density_names[i]; 
+		behavior_to_int[ name ] = map_index;
+		int_to_behavior[map_index] = name; 
+		// synonym 
+		name = "chemotactic sensitivity to " + microenvironment.density_names[i]; 
+		behavior_to_int[ name ] = map_index;
+	}
+	
+	// cell-cell adhesion 
+	map_index++; 
+	map_name = "cell-cell adhesion";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "cell-cell adhesion elastic constant";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 
 
+    // cell adhesion affinities 
+	// cell-type specific adhesion 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string temp =  "adhesive affinity to " + pCD->name; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
+
+		// synonym 
+		temp = "adhesive affinity to cell type " + std::to_string(pCD->type); 
+		behavior_to_int[temp] = map_index; 
+	}
+
+	// cell-cell repulsion 
+	map_index++; 
+	map_name = "cell-cell repulsion";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	// cell-BM adhesion 
+	map_index++; 
+	map_name = "cell-BM adhesion";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+	behavior_to_int["cell-membrane adhesion"] = map_index; 
+	
+	// cell-BM repulsion 
+	map_index++; 
+	map_name = "cell-BM repulsion";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+	behavior_to_int["cell-membrane repulsion"] = map_index; 
+
+
+	map_index++; 
+	map_name = "phagocytosis of dead cell";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+	
+	// phagocytosis of each live cell type 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string temp =  "phagocytose " + pCD->name; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
+
+		// synonym 
+		temp = "phagocytose cell type " + std::to_string(pCD->type); 
+		behavior_to_int[temp] = map_index; 
+	}
+
+	// attack of each live cell type 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string temp =  "attack " + pCD->name; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
+		// synonym 
+		temp = "attack cell type " + std::to_string(pCD->type); 
+		behavior_to_int[temp] = map_index; 
+	}
+
+	// fusion 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string temp =  "fuse to " + pCD->name; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
+		// synonym 
+		temp = "fuse to cell type " + std::to_string(pCD->type); 
+		behavior_to_int[temp] = map_index; 
+	}	
+	
+	// transformation 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string temp =  "transform to " + pCD->name; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
+		// synonym 
+		temp = "transform to cell type " + std::to_string(pCD->type); 
+		behavior_to_int[temp] = map_index; 
+	}	
+*/
 
 
 

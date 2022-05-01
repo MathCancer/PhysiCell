@@ -316,7 +316,42 @@ std::cout << construct_selected_signals(pC, {"resource", "debris", "pressure", "
 display_behavior_dictionary(); 
 
 
-std::cout << behavior_name( 12) << std::endl; 
+std::vector<double> params = create_empty_behavior_vector(); 
+
+for( int i=0 ; i < m ; i++ )
+{
+	params[i] = i+ 0.1; 
+	params[m+i] = i+ 0.01; 
+	params[2*m+i] = i+ 0.001; 
+	params[3*m+i] = i+ 0.0001; 
+}
+
+std::cout << pC->phenotype.secretion.secretion_rates << std::endl; 
+std::cout << pC->phenotype.secretion.saturation_densities << std::endl; 
+std::cout << pC->phenotype.secretion.uptake_rates << std::endl; 
+std::cout << pC->phenotype.secretion.net_export_rates << std::endl; 
+
+
+pC->phenotype.cycle.sync_to_cycle_model( flow_cytometry_separated_cycle_model ); 
+// pC->phenotype.cycle.model().display( std::cout ); 
+for( int i=0 ; i < pC->phenotype.cycle.model().phases.size(); i++ )
+{ std::cout << "phase exit rate " << i << " : " << pC->phenotype.cycle.data.exit_rate(i) << std::endl; }
+
+std::cout << std::endl; 
+
+for( int i=0; i < 4 ; i++ )
+{ params[ 4*m + i] = 0.0001 + i / 100000.0; }
+
+write_behaviors( pC, params ); 
+
+std::cout << pC->phenotype.secretion.secretion_rates << std::endl; 
+std::cout << pC->phenotype.secretion.saturation_densities << std::endl; 
+std::cout << pC->phenotype.secretion.uptake_rates << std::endl; 
+std::cout << pC->phenotype.secretion.net_export_rates << std::endl; 
+
+for( int i=0 ; i < pC->phenotype.cycle.model().phases.size(); i++ )
+{ std::cout << "phase exit rate " << i << " : " << pC->phenotype.cycle.data.exit_rate(i) << std::endl; }
+
 
 std::cout << __LINE__ << std::endl; 
 std::cout << "done" << std::endl; 
