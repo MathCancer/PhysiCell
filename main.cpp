@@ -313,6 +313,9 @@ for( int i=0 ; i < sig_names.size(); i++ )
 std::cout << construct_selected_signals(pC, {"resource", "debris", "pressure", "contact with blood vessel"}) << std::endl; 
 
 
+display_response_dictionary(); 
+
+
 std::cout << __LINE__ << std::endl; 
 std::cout << "done" << std::endl; 
 	exit(0); 

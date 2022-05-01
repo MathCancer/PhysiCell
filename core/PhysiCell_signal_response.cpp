@@ -273,7 +273,13 @@ void setup_signal_response_dictionaries( void )
 	map_name = "cell-cell adhesion";
 	response_to_int[ map_name ] = map_index;
 	int_to_response[map_index] = map_name; 
-	
+
+	map_index++; 
+	map_name = "cell-cell elastic constant";
+	response_to_int[ map_name ] = map_index;
+	int_to_response[map_index] = map_name; 
+
+
     // cell adhesion affinities 
 	// cell-type specific adhesion 
 	for( int i=0; i < n ; i++ )

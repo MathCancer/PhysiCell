@@ -121,14 +121,18 @@ double single_signal( Cell* pCell, std::string name ); // done
 int find_parameter_index( std::string response_name ); // done
 int find_behavior_index( std::string response_name ); // done 
 
-/* now need corresponding searches for responses */ 
+// get the name of a behavior index 
+std::string behavior_name( int i ); 
 
+// write a full parameter vector to the cell 
+void write_behaviors( Cell* pCell , std::vector<double>& parameters ); 
 
+// write a selected set of behavior parameters to the cell 
+void write_selected_behaviors( Cell* pCell , std::vector<int> signal_indices ); 
 
-
-
-
-void transfer_updated_parameters( Cell* pCell , std::vector<double>& parameters ); 
+// write a single behavior 
+double write_single_behavior( Cell* pCell, int index , double parameter ); 
+double write_single_behavior( Cell* pCell, std::string name , double parameter ); 
 
 
 }; 
