@@ -128,14 +128,22 @@ std::string behavior_name( int i ); // done
 std::vector<double> create_empty_behavior_vector(); // done 
 
 // write a full behavior vector (phenotype parameters) to the cell 
-void write_behaviors( Cell* pCell , std::vector<double>& parameters ); 
+void set_behaviors( Cell* pCell , std::vector<double>& parameters ); // done 
 
 // write a selected set of behavior parameters to the cell 
-void write_selected_behaviors( Cell* pCell , std::vector<int> signal_indices , std::vector<double>& parameters ); 
+void set_selected_behaviors( Cell* pCell , std::vector<int> signal_indices , std::vector<double>& parameters ); 
 
 // write a single behavior parameter 
-double write_single_behavior( Cell* pCell, int index , double parameter ); 
-double write_single_behavior( Cell* pCell, std::string name , double parameter ); 
+void set_single_behavior( Cell* pCell, int index , double parameter ); 
+void set_single_behavior( Cell* pCell, std::string name , double parameter ); 
+
+
+// get all current behavior
+
+// get selected current behavior
+
+// get single selected behavior 
+
 
 
 }; 

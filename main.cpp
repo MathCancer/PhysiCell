@@ -342,7 +342,19 @@ std::cout << std::endl;
 for( int i=0; i < 4 ; i++ )
 { params[ 4*m + i] = 0.0001 + i / 100000.0; }
 
-write_behaviors( pC, params ); 
+
+// cell adhesion affinities 
+std::string search_for1 = "adhesive affinity to " + cell_definitions_by_type[0]->name ; 
+int first_affinity_index = find_behavior_index( search_for1 ); 
+
+std::cout << first_affinity_index << " : " << behavior_name(first_affinity_index) << std::endl; 
+
+for( int j=0; j < n ; j++ )
+{ params[first_affinity_index+j] = (j+1) / (n + 0.0); }
+
+std::cout << "af: " << pC->phenotype.mechanics.cell_adhesion_affinities << std::endl; 
+set_behaviors( pC, params ); 
+std::cout << "af: " << pC->phenotype.mechanics.cell_adhesion_affinities << std::endl; 
 
 std::cout << pC->phenotype.secretion.secretion_rates << std::endl; 
 std::cout << pC->phenotype.secretion.saturation_densities << std::endl; 
