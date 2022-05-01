@@ -98,6 +98,9 @@ void display_behavior_dictionary_with_synonyms( void ); // done
 // find index for named signal (returns -1 if not found)
 int find_signal_index( std::string signal_name ); // done 
 
+// coming soon: 
+std::vector<int> find_signal_indices( std::vector<std::string> signal_names ); 
+
 // get the name of a signal index 
 std::string signal_name( int i ); // done 
 
@@ -120,6 +123,8 @@ double single_signal( Cell* pCell, std::string name ); // done
 // find index for named behavior / response / parameter (returns -1 if not found)
 int find_parameter_index( std::string response_name ); // done
 int find_behavior_index( std::string response_name ); // done 
+
+std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names ); 
 
 // get the name of a behavior index 
 std::string behavior_name( int i ); // done 
