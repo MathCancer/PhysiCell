@@ -74,12 +74,12 @@ namespace PhysiCell{
 std::vector<double> signal_scales; 
 
 std::map<std::string,int> signal_to_int; 
-std::map<std::string,int> response_to_int; 
+std::map<std::string,int> behavior_to_int; 
 
 std::map<int,std::string> int_to_signal; 
-std::map<int,std::string> int_to_response; 
+std::map<int,std::string> int_to_behavior; 
 
-void setup_signal_response_dictionaries( void )
+void setup_signal_behavior_dictionaries( void )
 {
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 	extern std::unordered_map<int,int> cell_definition_indices_by_type; 
@@ -195,10 +195,10 @@ void setup_signal_response_dictionaries( void )
 	int_to_signal[map_index] = "total attack time"; 
 
 
-	response_to_int.clear(); 	
-	int_to_response.clear(); 
+	behavior_to_int.clear(); 	
+	int_to_behavior.clear(); 
 
-	// construct responses 
+	// construct behaviors 
 	std::string name;
 	std::string map_name;
 
@@ -209,75 +209,75 @@ void setup_signal_response_dictionaries( void )
 		map_name = name + " " + "secretion";
 
 		// secretion rate 
-		response_to_int[ map_name ] = map_index;
-		int_to_response[map_index] = map_name; 
+		behavior_to_int[ map_name ] = map_index;
+		int_to_behavior[map_index] = map_name; 
 
 		// secretion target 
 		map_index = m+i; 
 		map_name = name + " " + "secretion_target"; 
-		response_to_int[ map_name ] = map_index;
-		int_to_response[map_index] = map_name; 
+		behavior_to_int[ map_name ] = map_index;
+		int_to_behavior[map_index] = map_name; 
 
 		// uptake rate 
 		map_index = 2*m+i; 
 		map_name = name + " " + "uptake"; 
-		response_to_int[ map_name ] = map_index;
-		int_to_response[map_index] = map_name; 
+		behavior_to_int[ map_name ] = map_index;
+		int_to_behavior[map_index] = map_name; 
 
 		// net export rate 
 		map_index = 3*m+i; 
 		map_name = name + " " + "export"; 
-		response_to_int[ map_name ] = map_index;
-		int_to_response[map_index] = map_name; 
+		behavior_to_int[ map_name ] = map_index;
+		int_to_behavior[map_index] = map_name; 
 	}
 	
 	map_index = 4*m; 
 	map_name = "cycle entry";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 
 	map_index++; 
 	map_name = "apoptosis";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 
 	map_index++; 
 	map_name = "necrosis";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 
 	map_index++; 
 	map_name = "migration speed";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 
 	map_index++; 
 	map_name = "migration bias";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 	
 	// chemotactic sensitivities 
 	for( int i=0; i < m ; i++ )
 	{
 		map_index++; 
 		std::string name = "chemotactic response to " + microenvironment.density_names[i]; 
-		response_to_int[ name ] = map_index;
-		int_to_response[map_index] = name; 
+		behavior_to_int[ name ] = map_index;
+		int_to_behavior[map_index] = name; 
 		// synonym 
 		name = "chemotactic sensitivity to " + microenvironment.density_names[i]; 
-		response_to_int[ name ] = map_index;
+		behavior_to_int[ name ] = map_index;
 	}
 	
 	// cell-cell adhesion 
 	map_index++; 
 	map_name = "cell-cell adhesion";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 
 	map_index++; 
-	map_name = "cell-cell elastic constant";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	map_name = "cell-cell adhesion elastic constant";
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 
 
     // cell adhesion affinities 
@@ -287,39 +287,39 @@ void setup_signal_response_dictionaries( void )
 		map_index++; 
 		Cell_Definition* pCD = cell_definitions_by_type[i]; 
 		std::string temp =  "adhesive affinity to " + pCD->name; 
-		response_to_int[temp] = map_index; 
-		int_to_response[map_index] = temp; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
 
 		// synonym 
 		temp = "adhesive affinity to cell type " + std::to_string(pCD->type); 
-		response_to_int[temp] = map_index; 
+		behavior_to_int[temp] = map_index; 
 	}
 
 	// cell-cell repulsion 
 	map_index++; 
 	map_name = "cell-cell repulsion";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 
 	// cell-BM adhesion 
 	map_index++; 
 	map_name = "cell-BM adhesion";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
-	response_to_int["cell-membrane adhesion"] = map_index; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+	behavior_to_int["cell-membrane adhesion"] = map_index; 
 	
 	// cell-BM repulsion 
 	map_index++; 
 	map_name = "cell-BM repulsion";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
-	response_to_int["cell-membrane repulsion"] = map_index; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+	behavior_to_int["cell-membrane repulsion"] = map_index; 
 
 
 	map_index++; 
 	map_name = "phagocytosis of dead cell";
-	response_to_int[ map_name ] = map_index;
-	int_to_response[map_index] = map_name; 
+	behavior_to_int[ map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
 	
 	// phagocytosis of each live cell type 
 	for( int i=0; i < n ; i++ )
@@ -327,12 +327,12 @@ void setup_signal_response_dictionaries( void )
 		map_index++; 
 		Cell_Definition* pCD = cell_definitions_by_type[i]; 
 		std::string temp =  "phagocytosis of " + pCD->name; 
-		response_to_int[temp] = map_index; 
-		int_to_response[map_index] = temp; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
 
 		// synonym 
 		temp = "phagocytose cell type " + std::to_string(pCD->type); 
-		int_to_response[map_index] = temp;         
+		int_to_behavior[map_index] = temp;         
 	}
 
 	// attack of each live cell type 
@@ -341,11 +341,11 @@ void setup_signal_response_dictionaries( void )
 		map_index++; 
 		Cell_Definition* pCD = cell_definitions_by_type[i]; 
 		std::string temp =  "attack " + pCD->name; 
-		response_to_int[temp] = map_index; 
-		int_to_response[map_index] = temp; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
 		// synonym 
 		temp = "attack cell type " + std::to_string(pCD->type); 
-		response_to_int[temp] = map_index; 
+		behavior_to_int[temp] = map_index; 
 	}
 
 	// fusion 
@@ -354,11 +354,11 @@ void setup_signal_response_dictionaries( void )
 		map_index++; 
 		Cell_Definition* pCD = cell_definitions_by_type[i]; 
 		std::string temp =  "fuse to " + pCD->name; 
-		response_to_int[temp] = map_index; 
-		int_to_response[map_index] = temp; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
 		// synonym 
 		temp = "fuse to cell type " + std::to_string(pCD->type); 
-		response_to_int[temp] = map_index; 
+		behavior_to_int[temp] = map_index; 
 	}	
 	
 	// transformation 
@@ -367,18 +367,18 @@ void setup_signal_response_dictionaries( void )
 		map_index++; 
 		Cell_Definition* pCD = cell_definitions_by_type[i]; 
 		std::string temp =  "transform to " + pCD->name; 
-		response_to_int[temp] = map_index; 
-		int_to_response[map_index] = temp; 
+		behavior_to_int[temp] = map_index; 
+		int_to_behavior[map_index] = temp; 
 		// synonym 
 		temp = "transform to cell type " + std::to_string(pCD->type); 
-		response_to_int[temp] = map_index; 
+		behavior_to_int[temp] = map_index; 
 	}	
 
     // resize scales; 
     signal_scales.resize( int_to_signal.size() , 1.0 ); 
 
     display_signal_dictionary(); 
-    display_response_dictionary(); 
+    display_behavior_dictionary(); 
 /*
 	// now create empty SR models for each cell definition 
 
@@ -417,12 +417,12 @@ void display_signal_dictionary_with_synonyms( void )
     return; 
 }
 
-void display_response_dictionary( void )
+void display_behavior_dictionary( void )
 {
-	std::cout << "Responses: " << std::endl 
+	std::cout << "Behaviors: " << std::endl 
 			  << "=========" << std::endl; 
-	for( int i=0; i < int_to_response.size() ; i++ )
-	{ std::cout << i << " : " << int_to_response[i] << std::endl; }
+	for( int i=0; i < int_to_behavior.size() ; i++ )
+	{ std::cout << i << " : " << int_to_behavior[i] << std::endl; }
 	std::cout << std::endl; 
 
     return; 
@@ -430,9 +430,9 @@ void display_response_dictionary( void )
 
 void display_response_dictionary_with_synonyms( void )
 {
-	std::cout << "Responses (with synonyms): " << std::endl 
+	std::cout << "Behaviors (with synonyms): " << std::endl 
 			  << "=========================" << std::endl; 
-	for( auto it = response_to_int.begin() ; it != response_to_int.end() ; it++ )
+	for( auto it = behavior_to_int.begin() ; it != behavior_to_int.end() ; it++ )
 	{ std::cout << it->second << " : " << it->first << std::endl; }
 	std::cout << std::endl << std::endl;  	
     return; 
@@ -458,9 +458,9 @@ std::string signal_name( int i )
 
 int find_parameter_index( std::string response_name )
 {
-	auto search = response_to_int.find( response_name );
+	auto search = behavior_to_int.find( response_name );
 	// safety first! 
-	if( search != response_to_int.end() )
+	if( search != behavior_to_int.end() )
     { return search->second; }   
     return -1; 
 }
@@ -625,8 +625,6 @@ std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::s
 	return construct_selected_signals(pCell,signal_indices); 
 }
 
-
-
 double single_signal( Cell* pCell, int index )
 {
 	static int m = microenvironment.number_of_densities(); 
@@ -764,6 +762,30 @@ double single_signal( Cell* pCell, int index )
 double single_signal( Cell* pCell, std::string name )
 { return single_signal( pCell, find_signal_index(name) ); }
 
+// behaviors 
+
+std::string behavior_name( int i )
+{
+	if( i >= 0 && i < int_to_behavior.size() )
+	{ return int_to_behavior[i]; }
+	
+	return "not found"; 
+}
+
+void write_behaviors( Cell* pCell , std::vector<double>& parameters )
+{
+
+
+
+
+
+
+
+
+
+
+
+}
 
 
 

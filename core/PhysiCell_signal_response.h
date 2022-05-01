@@ -83,15 +83,15 @@ extern std::vector<double> signal_scales;
 double& signal_scale( std::string signal_name ); // done 
 double& signal_scale( int signal_index ); // done 
 
-// create the signal and response dictionaries 
-void setup_signal_response_dictionaries( void ); // done 
+// create the signal and behavior dictionaries 
+void setup_signal_behavior_dictionaries( void ); // done 
 
 // display dictionaries 
 void display_signal_dictionary( void ); // done 
-void display_response_dictionary( void ); // done 
+void display_behavior_dictionary( void ); // done 
 
 void display_signal_dictionary_with_synonyms( void ); // done 
-void display_response_dictionary_with_synonyms( void ); // done 
+void display_behavior_dictionary_with_synonyms( void ); // done 
 
 /* signal functions */ 
 
@@ -115,14 +115,14 @@ std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::s
 double single_signal( Cell* pCell, int index ); // done 
 double single_signal( Cell* pCell, std::string name ); // done 
 
-/* response functions */ 
+/* behavior functions */ 
 
 // find index for named behavior / response / parameter (returns -1 if not found)
 int find_parameter_index( std::string response_name ); // done
 int find_behavior_index( std::string response_name ); // done 
 
 // get the name of a behavior index 
-std::string behavior_name( int i ); 
+std::string behavior_name( int i ); // done 
 
 // write a full parameter vector to the cell 
 void write_behaviors( Cell* pCell , std::vector<double>& parameters ); 
