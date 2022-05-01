@@ -132,17 +132,22 @@ void set_behaviors( Cell* pCell , std::vector<double>& parameters ); // done
 
 // write a selected set of behavior parameters to the cell 
 void set_selected_behaviors( Cell* pCell , std::vector<int> signal_indices , std::vector<double>& parameters ); 
+void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double>& parameters ); 
 
 // write a single behavior parameter 
-void set_single_behavior( Cell* pCell, int index , double parameter ); 
-void set_single_behavior( Cell* pCell, std::string name , double parameter ); 
-
+void set_single_behavior( Cell* pCell, int index , double parameter ); // done but error-check it 
+void set_single_behavior( Cell* pCell, std::string name , double parameter ); // done 
 
 // get all current behavior
+std::vector<double> get_behaviors( Cell* pCell ); // done 
 
 // get selected current behavior
+std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices );
+std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names );
 
 // get single current behavior 
+double get_behaviors( Cell* pCell , int index );
+double get_behaviors( Cell* pCell , std::string name );
 
 
 
