@@ -99,7 +99,7 @@ void display_behavior_dictionary_with_synonyms( void ); // done
 int find_signal_index( std::string signal_name ); // done 
 
 // coming soon: 
-std::vector<int> find_signal_indices( std::vector<std::string> signal_names ); 
+std::vector<int> find_signal_indices( std::vector<std::string> signal_names ); // done 
 
 // get the name of a signal index 
 std::string signal_name( int i ); // done 
@@ -124,7 +124,7 @@ double single_signal( Cell* pCell, std::string name ); // done
 int find_parameter_index( std::string response_name ); // done
 int find_behavior_index( std::string response_name ); // done 
 
-std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names ); 
+std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names ); // done 
 
 // get the name of a behavior index 
 std::string behavior_name( int i ); // done 
@@ -149,12 +149,12 @@ void set_single_behavior( Cell* pCell, std::string name , double parameter ); //
 std::vector<double> get_behaviors( Cell* pCell ); // done 
 
 // get selected current behavior
-std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices );
-std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names );
+std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices ); // doen 
+std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names ); // done 
 
 // get single current behavior 
-double get_single_behavior( Cell* pCell , int index );
-double get_single_behavior( Cell* pCell , std::string name );
+double get_single_behavior( Cell* pCell , int index ); // done 
+double get_single_behavior( Cell* pCell , std::string name ); // done 
 
 /* get base behaviors (from cell definition) */ 
 
