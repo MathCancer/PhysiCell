@@ -25,7 +25,7 @@ else:
 
     if os_type.lower() == 'darwin':
         mb_file = "libMaBoSS-osx64.tar.gz"
-    elif os_type.lower().startswith("win"):
+    elif os_type.lower().startswith("win") or os_type.lower().startswith("msys_nt") or os_type.lower().startswith("mingw64_nt"):
         mb_file = "libMaBoSS-win64.tar.gz"
     elif os_type.lower().startswith("linux"):
         mb_file = "libMaBoSS-linux64.tar.gz"
