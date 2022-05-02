@@ -1,0 +1,20 @@
+add cell_adhesion_affinities to Mechanics [x]
+make sure it's properly sized [x]
+data save it 
+XML parsing reads it 
+
+potential functions use the adhesion affinities 
+
+
+signal dictionaries are generated  [x]
+response dictionaries are generated [x]
+
+can query signal dictionary [x]
+can query beahvior dictionary [x]
+
+can add a missing signal
+can add a missing response 
+
+can generate a proper signal vector [x]
+can generate a properly sized parameter vector 
+can map parameters back to phenotype 
