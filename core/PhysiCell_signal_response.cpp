@@ -1447,9 +1447,6 @@ std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names 
 	return parameters; 
 }
 
-
-
-
 void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double>& parameters )
 {
 	for( int i=0 ; i < indices.size() ; i++ )
@@ -1463,6 +1460,321 @@ void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std:
 	{ set_single_behavior(pCell,find_behavior_index(names[i]),parameters[i]); }
 	return; 
 }
+
+std::vector<double> get_base_behaviors( Cell* pCell )
+{
+	Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 
+
+	static int m = microenvironment.number_of_densities(); 
+	static int n = cell_definition_indices_by_name.size(); 
+
+	std::vector<double> parameters( int_to_behavior.size() , 0.0 ); 
+
+	// substrate-related behaviors 
+	
+	// first m entries are secretion 
+	static int first_secretion_index = find_behavior_index( microenvironment.density_names[0] + " secretion" ); // 0; 
+	std::copy(  pCD->phenotype.secretion.secretion_rates.begin(), 
+				pCD->phenotype.secretion.secretion_rates.end(), 
+				parameters.begin()+first_secretion_index ); 
+
+
+	// next m entries are secretion targets
+	static int first_secretion_target_index = find_behavior_index( microenvironment.density_names[0] + " secretion target" ); // m; 
+	std::copy(  pCD->phenotype.secretion.saturation_densities.begin(), 
+				pCD->phenotype.secretion.saturation_densities.end(), 
+				parameters.begin()+first_secretion_target_index ); 
+
+	// next m entries are uptake rates
+	static int first_uptake_index = find_behavior_index( microenvironment.density_names[0] + " uptake" );  // 2*m; 
+	std::copy(  pCD->phenotype.secretion.uptake_rates.begin(), 
+				pCD->phenotype.secretion.uptake_rates.end(), 
+				parameters.begin()+first_uptake_index ); 
+
+	// next m entries are net export rates 
+	static int first_export_index = find_behavior_index( microenvironment.density_names[0] + " export" ); //  3*m; 
+	std::copy(  pCD->phenotype.secretion.net_export_rates.begin(), 
+				pCD->phenotype.secretion.net_export_rates.end(), 
+				parameters.begin()+first_export_index ); 
+
+	// cycle entry (exit from phase 0) and exit from up to 5 more phases 
+	static int first_cycle_index = find_behavior_index("exit from cycle phase 0" ); //  4*m; 
+	int map_index = first_cycle_index; 
+	int max_cycle_index = pCD->phenotype.cycle.model().phases.size(); 
+	if( max_cycle_index > 6 )
+	{
+		max_cycle_index = 6; 
+		std::cout << "Warning: Standardized behaviors only support exit rate from the first 6 phases of a cell cycle!" << std::endl 
+		          << "         Ignoring any later phase exit rates." << std::endl; 
+	}
+	for( int i=0; i < max_cycle_index ; i++ )
+	{  parameters[map_index+i] = pCD->phenotype.cycle.data.exit_rate( i ); }
+
+	static int apoptosis_index = pCD->phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+	static int necrosis_index = pCD->phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+
+	map_index = first_cycle_index+6; // 4*m + 6; 
+	// apoptosis 
+	parameters[map_index] = pCD->phenotype.death.rates[apoptosis_index];
+
+	// necrosis 
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.death.rates[necrosis_index]; 
+
+	// migration speed
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.motility.migration_speed; 
+
+	// migration bias 
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.motility.migration_bias; 
+
+	// migration persistence time
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.motility.persistence_time; 
+
+	// chemotactic sensitivities 
+	static int first_chemotaxis_index = find_behavior_index( "chemotactic response to " + microenvironment.density_names[0] ); 
+	std::copy(  pCD->phenotype.motility.chemotactic_sensitivities.begin() ,
+				pCD->phenotype.motility.chemotactic_sensitivities.end() ,
+			 	parameters.begin()+first_chemotaxis_index ); 
+
+	// cell-cell adhesion 
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.mechanics.cell_cell_adhesion_strength; 
+
+	// cell-cell "springs"
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.mechanics.attachment_elastic_constant; 
+
+    // cell adhesion affinities 
+	static std::string search_for1 = "adhesive affinity to " + cell_definitions_by_type[0]->name ; 
+	static int first_affinity_index = find_behavior_index( search_for1 ); 
+	std::copy(  pCD->phenotype.mechanics.cell_adhesion_affinities.begin(), 
+				pCD->phenotype.mechanics.cell_adhesion_affinities.end() ,
+				parameters.begin()+first_affinity_index ); 
+
+	// max relative maximum adhesion distance 
+	map_index += n; 
+	parameters[map_index] = pCD->phenotype.mechanics.relative_maximum_adhesion_distance; 
+
+	// cell-cell repulsion 
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.mechanics.cell_cell_repulsion_strength; 
+
+	// cell-BM adhesion 
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.mechanics.cell_BM_adhesion_strength; 
+	
+	// cell-BM repulsion 
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.mechanics.cell_BM_repulsion_strength; 
+
+	// dead cell phagocytosis
+	map_index++; 
+	parameters[map_index] = pCD->phenotype.cell_interactions.dead_phagocytosis_rate; 
+
+    // phagocytosis of each live cell type 
+	static int first_phagocytosis_index = find_behavior_index( "phagocytose " + cell_definitions_by_type[0]->name ); 
+	std::copy(  pCD->phenotype.cell_interactions.live_phagocytosis_rates.begin(), 
+				pCD->phenotype.cell_interactions.live_phagocytosis_rates.end(), 
+				parameters.begin()+first_phagocytosis_index ); 	
+
+	// attack of each live cell type 
+	static int first_attack_index = find_behavior_index( "attack " + cell_definitions_by_type[0]->name ); 
+	std::copy(  pCD->phenotype.cell_interactions.attack_rates.begin(), 
+				pCD->phenotype.cell_interactions.attack_rates.end(), 
+				parameters.begin()+first_attack_index ); 	
+ 
+	// fusion 
+	static int first_fusion_index = find_behavior_index( "fuse to " + cell_definitions_by_type[0]->name ); 
+	std::copy(  pCD->phenotype.cell_interactions.fusion_rates.begin(), 
+				pCD->phenotype.cell_interactions.fusion_rates.end(), 
+				parameters.begin()+first_fusion_index ); 	
+
+ 	// transformation 
+	static int first_transformation_index = find_behavior_index( "transform to " + cell_definitions_by_type[0]->name ); 
+	std::copy(  pCD->phenotype.cell_transformations.transformation_rates.begin(), 
+				pCD->phenotype.cell_transformations.transformation_rates.end(), 
+				parameters.begin()+first_transformation_index ); 	
+
+	return parameters; 
+}
+
+double get_single_base_behavior( Cell* pCell , int index )
+{
+	static int m = microenvironment.number_of_densities(); 
+	static int n = cell_definition_indices_by_name.size(); 
+
+	Cell_Definition* pCD = find_cell_definition( pCell->type_name ); 	
+
+	if( index < 0 )
+	{
+		std::cout << "Warning: attempted to get behavior with unknown index " << index << std::endl	
+				  << "         I'm ignoring it, but you should fix it!" << std::endl; 
+		return 0.0; 
+	}
+
+	// substrate-related behaviors 
+
+	// first m entries are secretion 
+	static int first_secretion_index = find_behavior_index( microenvironment.density_names[0] + " secretion" ); // 0; 
+	if( index >= first_secretion_index && index < first_secretion_index+m )
+	{ return pCD->phenotype.secretion.secretion_rates[index-first_secretion_index]; }
+
+	// next m entries are secretion targets
+	static int first_secretion_target_index = find_behavior_index( microenvironment.density_names[0] + " secretion target" ); // m; 
+	if( index >= first_secretion_target_index && index < first_secretion_target_index+m )
+	{ return pCD->phenotype.secretion.saturation_densities[index-first_secretion_target_index]; }
+
+	// next m entries are uptake rates
+	static int first_uptake_index = find_behavior_index( microenvironment.density_names[0] + " uptake" );  // 2*m; 
+	if( index >= first_uptake_index && index < first_uptake_index+m )
+	{ return pCD->phenotype.secretion.uptake_rates[index-first_uptake_index]; }
+
+	// next m entries are net export rates 
+	static int first_export_index = find_behavior_index( microenvironment.density_names[0] + " export" ); //  3*m; 
+	if( index >= first_export_index && index < first_export_index+m )
+	{ return pCD->phenotype.secretion.net_export_rates[index-first_export_index]; }
+
+	// cycle entry (exit from phase 0) and exit from up to 5 more phases 
+	static int first_cycle_index = find_behavior_index("exit from cycle phase 0" ); //  4*m; 
+	int map_index = first_cycle_index; 
+	int max_cycle_index = pCD->phenotype.cycle.model().phases.size(); 
+	if( max_cycle_index > 6 )
+	{
+		max_cycle_index = 6; 
+		std::cout << "Warning: Standardized behaviors only support exit rate from the first 6 phases of a cell cycle!" << std::endl 
+		          << "         Ignoring any later phase exit rates." << std::endl; 
+	}
+	if( index >= first_cycle_index && index < first_export_index + 6 )
+	{
+		int ind = index - first_cycle_index; 
+		if( ind < max_cycle_index )
+		{ return pCD->phenotype.cycle.data.exit_rate( ind ); }
+		return 0.0; 
+	}
+
+	static int apoptosis_index = pCD->phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+	static int necrosis_index = pCD->phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+
+	static int apop_param_index = find_behavior_index( "apoptosis"); 
+	static int necr_param_index = find_behavior_index( "necrosis"); 
+
+	map_index = first_cycle_index+6; // 4*m + 6; 
+	// apoptosis 
+	if( index == apop_param_index )
+	{ return pCD->phenotype.death.rates[apoptosis_index]; }
+
+	// necrosis 
+	map_index++; 
+	if( index == necr_param_index )
+	{ return pCD->phenotype.death.rates[necrosis_index]; }
+
+	// migration speed
+	map_index++; 
+	static int migr_spd_index = find_behavior_index( "migration speed"); 
+	if( index == migr_spd_index )
+	{ return pCD->phenotype.motility.migration_speed; }
+
+	// migration bias 
+	map_index++; 
+	static int migr_bias_index = find_behavior_index( "migration bias"); 
+	if( index == migr_bias_index )
+	{ return pCD->phenotype.motility.migration_bias; }
+
+	// migration persistence time
+	map_index++; 
+	static int migr_pt_index = find_behavior_index( "migration persistence time"); 
+	if( index == migr_pt_index )
+	{ return pCD->phenotype.motility.persistence_time; }
+
+	// chemotactic sensitivities 
+	static int first_chemotaxis_index = find_behavior_index( "chemotactic response to " + microenvironment.density_names[0] ); 
+	if( index >= first_chemotaxis_index && index < first_chemotaxis_index+m )
+	{ return pCD->phenotype.motility.chemotactic_sensitivities[index-first_chemotaxis_index]; }
+
+	// cell-cell adhesion 
+	map_index++; 
+	static int cca_index = find_behavior_index( "cell-cell adhesion" ); 
+	if( index == cca_index )
+	{ return pCD->phenotype.mechanics.cell_cell_adhesion_strength; }
+
+	// cell-cell "springs"
+	map_index++; 
+	static int cca_spring_index = find_behavior_index( "cell-cell adhesion" ); // HERE 
+	if( index == cca_spring_index )
+	{ return pCD->phenotype.mechanics.attachment_elastic_constant; }
+
+    // cell adhesion affinities 
+	static int first_affinity_index = find_behavior_index("adhesive affinity to " + cell_definitions_by_type[0]->name ); 
+	if( index >= first_affinity_index && index < first_affinity_index+n )
+	{ return pCD->phenotype.mechanics.cell_adhesion_affinities[index-first_affinity_index]; }
+
+	// max relative maximum adhesion distance 
+	map_index += n; 
+	static int max_adh_index = find_behavior_index("relative maximum adhesion distance" ); 
+	if( index = max_adh_index )
+	{ return pCD->phenotype.mechanics.relative_maximum_adhesion_distance; }
+
+	// cell-cell repulsion 
+	map_index++; 
+	static int ccr_index = find_behavior_index("cell-cell repulsion" ); 
+	if( index = ccr_index )
+	{ return pCD->phenotype.mechanics.cell_cell_repulsion_strength; }
+
+	// cell-BM adhesion 
+	map_index++; 
+	static int cba_index = find_behavior_index("cell-BM adhesion" ); 
+	if( index = cba_index )
+	{ return pCD->phenotype.mechanics.cell_BM_adhesion_strength; }
+	
+	// cell-BM repulsion 
+	map_index++; 
+	static int cbr_index = find_behavior_index("cell-BM repulsion" ); 
+	if( index = cbr_index )
+	{ return pCD->phenotype.mechanics.cell_BM_repulsion_strength; }
+
+	// dead cell phagocytosis
+	map_index++; 
+	static int dead_phag_index = find_behavior_index("phagocytose dead dell" ); 
+	if( index = dead_phag_index )
+	{ return pCD->phenotype.cell_interactions.dead_phagocytosis_rate; }
+
+    // phagocytosis of each live cell type 
+	static int first_phagocytosis_index = find_behavior_index( "phagocytose " + cell_definitions_by_type[0]->name ); 
+	if( index >= first_phagocytosis_index && index < first_phagocytosis_index+n )
+	{ return pCD->phenotype.cell_interactions.live_phagocytosis_rates[index-first_phagocytosis_index]; } 
+
+	// attack of each live cell type 
+	static int first_attack_index = find_behavior_index( "attack " + cell_definitions_by_type[0]->name ); 
+	if( index >= first_attack_index && index < first_attack_index+n )
+	{ return pCD->phenotype.cell_interactions.attack_rates[index-first_attack_index]; } 
+
+	// fusion 
+	static int first_fusion_index = find_behavior_index( "fuse to " + cell_definitions_by_type[0]->name ); 
+	if( index >= first_fusion_index && index < first_fusion_index+n )
+	{ return pCD->phenotype.cell_interactions.fusion_rates[index-first_fusion_index]; } 
+
+ 	// transformation 
+	static int first_transformation_index = find_behavior_index( "transform to " + cell_definitions_by_type[0]->name ); 
+	if( index >= first_transformation_index && index < first_transformation_index+n )
+	{ return pCD->phenotype.cell_transformations.transformation_rates[index-first_transformation_index]; } 
+
+	return -1; 
+}
+
+double get_single_base_behavior( Cell* pCell , std::string name )
+{ return get_single_base_behavior(pCell,find_behavior_index(name)); }
+
+std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices )
+{
+	std::vector<double> parameters( indices.size() , 0.0 ); 
+	for( int n=0 ; n < indices.size(); n++ )
+	{ parameters[n] = get_single_base_behavior(pCell,indices[n]); }
+	return parameters; 
+}
+
 
 
 };

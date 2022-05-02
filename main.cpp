@@ -365,6 +365,8 @@ for( int i=0 ; i < pC->phenotype.cycle.model().phases.size(); i++ )
 { std::cout << "phase exit rate " << i << " : " << pC->phenotype.cycle.data.exit_rate(i) << std::endl; }
 
 
+get_base_behaviors( pC ); 
+
 std::cout << __LINE__ << std::endl; 
 std::cout << "done" << std::endl; 
 	exit(0); 

@@ -159,15 +159,15 @@ double get_single_behavior( Cell* pCell , std::string name ); // done
 /* get base behaviors (from cell definition) */ 
 
 // get all base behaviors (from cell's definition) 
-std::vector<double> get_base_behaviors( Cell* pCell );  
+std::vector<double> get_base_behaviors( Cell* pCell );  // done 
 
 // get selected base behaviors (from cell's definition)
 std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices );
 std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names );
 
 // get single base behavior (from cell's definition)
-double get_base_behaviors( Cell* pCell , int index );
-double get_base_behaviors( Cell* pCell , std::string name );
+double get_single_base_behavior( Cell* pCell , int index ); // done 
+double get_single_base_behavior( Cell* pCell , std::string name ); // done 
 
 }; 
 
