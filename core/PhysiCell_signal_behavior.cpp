@@ -65,7 +65,7 @@
 ###############################################################################
 */
  
-#include "./PhysiCell_signal_response.h"
+#include "./PhysiCell_signal_behavior.h"
 
 using namespace BioFVM; 
 
@@ -642,7 +642,7 @@ std::vector<double> construct_cell_contact_signals( Cell* pCell )
 	return output; 
 }
 
-std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> signal_indices )
+std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> indices )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 	
@@ -654,10 +654,10 @@ std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> s
 	std::vector<double> contact_signals = construct_cell_contact_signals( pCell ); 
 	bool created_contact_signals = false; 
 
-	std::vector<double> signals( signal_indices.size() , 0.0 ); 
-	for( int i=0; i < signal_indices.size() ; i++ )
+	std::vector<double> signals( indices.size() , 0.0 ); 
+	for( int i=0; i < indices.size() ; i++ )
 	{
-		int ind = signal_indices[i]; 
+		int ind = indices[i]; 
 		if( ind >= contact_start_index && ind < contact_start_index+n+2)
 		{ signals[i] = contact_signals[ind-contact_start_index]; }
 		else
@@ -667,11 +667,11 @@ std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> s
 	return signals; 
 }
 
-std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::string> signal_names )
+std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::string> names )
 {
-	std::vector<int> signal_indices( signal_names.size() , 0 ); 
-	for( int i=0; i < signal_names.size(); i++ )
-	{ signal_indices[i] = find_signal_index( signal_names[i]); }
+	std::vector<int> signal_indices( names.size() , 0 ); 
+	for( int i=0; i < names.size(); i++ )
+	{ signal_indices[i] = find_signal_index( names[i]); }
 
 	return construct_selected_signals(pCell,signal_indices); 
 }
@@ -829,7 +829,7 @@ std::vector<double> create_empty_behavior_vector()
 	return parameters; 
 }
 
-void set_behaviors( Cell* pCell , std::vector<double>& parameters )
+void set_behaviors( Cell* pCell , std::vector<double> parameters )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
@@ -956,14 +956,11 @@ void set_behaviors( Cell* pCell , std::vector<double>& parameters )
 				parameters.begin()+first_phagocytosis_index+n , 
 				pCell->phenotype.cell_interactions.live_phagocytosis_rates.begin() ); 	
 
-
-
 	// attack of each live cell type 
 	static int first_attack_index = find_behavior_index( "attack " + cell_definitions_by_type[0]->name ); 
 	std::copy(  parameters.begin()+first_attack_index , 
 				parameters.begin()+first_attack_index+n , 
 				pCell->phenotype.cell_interactions.attack_rates.begin() ); 	
-
  
 	// fusion 
 	static int first_fusion_index = find_behavior_index( "fuse to " + cell_definitions_by_type[0]->name ); 
@@ -1447,14 +1444,14 @@ std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names 
 	return parameters; 
 }
 
-void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double>& parameters )
+void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters )
 {
 	for( int i=0 ; i < indices.size() ; i++ )
 	{ set_single_behavior(pCell,indices[i],parameters[i]); }
 	return; 
 }
 
-void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double>& parameters )
+void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters )
 {
 	for( int i=0 ; i < names.size() ; i++ )
 	{ set_single_behavior(pCell,find_behavior_index(names[i]),parameters[i]); }
@@ -1772,6 +1769,14 @@ std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices )
 	std::vector<double> parameters( indices.size() , 0.0 ); 
 	for( int n=0 ; n < indices.size(); n++ )
 	{ parameters[n] = get_single_base_behavior(pCell,indices[n]); }
+	return parameters; 
+}
+
+std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names )
+{
+	std::vector<double> parameters( names.size() , 0.0 ); 
+	for( int n=0 ; n < names.size(); n++ )
+	{ parameters[n] = get_single_base_behavior(pCell,names[n]); }
 	return parameters; 
 }
 

@@ -111,8 +111,14 @@ std::vector<double> construct_signals( Cell* pCell ); // done
 std::vector<double> construct_cell_contact_signals( Cell* pCell ); // done 
 
 // create a subset of the signal vector with the supplied indicies 
-std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> signal_indices ); // done 
+std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> indices ); // done 
 std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::string> names );  // done 
+
+
+/*
+void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters ); // done 
+void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters ); // done 
+*/
 
 // grab a single signal by its index or name 
 double single_signal( Cell* pCell, int index ); // done 
@@ -133,11 +139,11 @@ std::string behavior_name( int i ); // done
 std::vector<double> create_empty_behavior_vector(); // done 
 
 // write a full behavior vector (phenotype parameters) to the cell 
-void set_behaviors( Cell* pCell , std::vector<double>& parameters ); // done 
+void set_behaviors( Cell* pCell , std::vector<double> parameters ); // done 
 
 // write a selected set of behavior parameters to the cell 
-void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double>& parameters ); // done 
-void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double>& parameters ); // done 
+void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters ); // done 
+void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters ); // done 
 
 // write a single behavior parameter 
 void set_single_behavior( Cell* pCell, int index , double parameter ); // done  
@@ -162,8 +168,8 @@ double get_single_behavior( Cell* pCell , std::string name ); // done
 std::vector<double> get_base_behaviors( Cell* pCell );  // done 
 
 // get selected base behaviors (from cell's definition)
-std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices );
-std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names );
+std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices ); // done 
+std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names ); // done 
 
 // get single base behavior (from cell's definition)
 double get_single_base_behavior( Cell* pCell , int index ); // done 
