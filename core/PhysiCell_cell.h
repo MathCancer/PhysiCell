@@ -271,8 +271,8 @@ void prebuild_cell_definition_index_maps( void ); // done
 Cell_Definition* find_cell_definition( std::string search_string ); // done 
 Cell_Definition* find_cell_definition( int search_type );  
 
-int find_cell_definition_index( std::string search_string );
-int find_cell_definition_index( int search_type );  
+int find_cell_definition_index( std::string search_string ); // done 
+int find_cell_definition_index( int search_type );  // done 
 
 Cell_Definition& get_cell_definition( std::string search_string ); // done 
 Cell_Definition& get_cell_definition( int search_type );  

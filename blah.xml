@@ -202,6 +202,15 @@
             <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">20.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+  					<cell_adhesion_affinities>
+	  					<cell_adhesion_affinity name="bacteria">.1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="blood vessel">.2</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="stem">.3</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="differentiated">.4</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="macrophage">.5</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="CD8+ T cell">.6</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="neutrophil">.7</cell_adhesion_affinity> 
+		  			</cell_adhesion_affinities>            
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
               <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
@@ -387,6 +396,15 @@
             <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+  					<cell_adhesion_affinities>
+	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
+		  			</cell_adhesion_affinities>            
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
               <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
@@ -573,6 +591,15 @@
             <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+  					<cell_adhesion_affinities>
+	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
+		  			</cell_adhesion_affinities>            
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
               <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
@@ -759,6 +786,15 @@
             <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+  					<cell_adhesion_affinities>
+	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
+		  			</cell_adhesion_affinities>            
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
               <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
@@ -945,6 +981,15 @@
             <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+  					<cell_adhesion_affinities>
+	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
+		  			</cell_adhesion_affinities>            
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
               <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
@@ -1131,6 +1176,15 @@
             <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+  					<cell_adhesion_affinities>
+	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
+		  			</cell_adhesion_affinities>            
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
               <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
@@ -1317,6 +1371,15 @@
             <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+  					<cell_adhesion_affinities>
+	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
+	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
+		  			</cell_adhesion_affinities>            
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
               <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
