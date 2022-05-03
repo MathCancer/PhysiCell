@@ -2411,6 +2411,28 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if( node_mech )
 		{ pM->relative_maximum_adhesion_distance = xml_get_my_double_value( node_mech ); }	
 
+		// cell adhesion affinities 
+		node_mech = node.child( "cell_adhesion_affinities" );
+		if( node_mech )
+		{
+			node_mech = node_mech.child("cell_adhesion_affinity"); 
+			while( node_mech )
+			{
+				std::string target = node_mech.attribute("name").value(); 
+				double value = xml_get_my_double_value( node_mech ) ; 
+
+				// find the target
+				// if found, assign taht affinity 
+				int ind = find_cell_definition_index( target ); 
+				if( ind > -1 )
+				{ pM->cell_adhesion_affinities[ind] = value; }
+				else
+				{ std::cout << "what?!?" << std::endl; }
+
+				node_mech = node_mech.next_sibling( "cell_adhesion_affinity"); 
+			}
+		}	
+
 		node_mech = node.child( "options" );
 		if( node_mech )
 		{
@@ -3118,9 +3140,30 @@ std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell )
 }
 
 
-int find_cell_definition_index( std::string search_string );
-int find_cell_definition_index( int search_type );  
+int find_cell_definition_index( std::string search_string )
+{
+	auto search = cell_definition_indices_by_name.find( search_string );
+	// safety first! 
+	if( search != cell_definition_indices_by_name.end() )
+	{
+		// if the target is found, set the appropriate rate 
+		return search->second; 
+	}
+	return -1; 
+}
 
+
+int find_cell_definition_index( int search_type )
+{	
+	auto search = cell_definition_indices_by_type.find( search_type );
+	// safety first! 
+	if( search != cell_definition_indices_by_type.end() )
+	{
+		// if the target is found, set the appropriate rate 
+		return search->second; 
+	}
+	return -1; 
+}  
 
 
 

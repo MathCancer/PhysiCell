@@ -1,6 +1,6 @@
 add cell_adhesion_affinities to Mechanics [x]
 make sure it's properly sized [x]
-data save it 
+data save it [x]
 XML parsing reads it 
 
 potential functions use the adhesion affinities 
@@ -12,9 +12,40 @@ response dictionaries are generated [x]
 can query signal dictionary [x]
 can query beahvior dictionary [x]
 
-can add a missing signal
+can add a missing signal 
 can add a missing response 
 
 can generate a proper signal vector [x]
-can generate a properly sized parameter vector 
-can map parameters back to phenotype 
+can generate a properly sized parameter vector [x]
+can map parameters back to phenotype [x]
+
+
+prototypical phenotyep funciton 
+
+
+	Cell* pC = (*all_cells)[0]; 
+
+/*
+	pC->add_rule( signal, behavior, response ); 
+	pC->edit_rule_parameters( signal, behavior, rsponse , parameters ); 
+*/
+
+	// get signals 
+	std::vector< std::string > sig_names = {"substrate","pressure"} ;
+	static std::vector<int> sig_indices = find_signal_indices( sig_names ); 
+	construct_selected_signals( pC , sig_indices); 
+
+	// set up beahviors 
+	std::vector<std::string> beh_names = {"cycle entry", "apoptosis" , "migration speed"}; 	
+	static std::vector<int> beh_indices = find_behavior_indices( beh_names); 
+
+	// mjake a place to wirte your beahviors / model here 
+	std::vector<double> params( beh_names.size() , 0.0 ); 
+
+	// model goes here. some math that acts on parameters based on signals 
+
+	// write updated bheaviors back to cell 
+	set_selected_behaviors( pC, beh_indices, params ); 
+	
+	 // done 
+	std::cout << __LINE__ << " done " << std::endl; 
