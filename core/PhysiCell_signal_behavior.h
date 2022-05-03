@@ -90,6 +90,9 @@ void setup_signal_behavior_dictionaries( void ); // done
 void display_signal_dictionary( void ); // done 
 void display_behavior_dictionary( void ); // done 
 
+void display_signal_dictionary( std::ostream& os ); // done 
+void display_behavior_dictionary( std::ostream& os ); // done 
+
 void display_signal_dictionary_with_synonyms( void ); // done 
 void display_behavior_dictionary_with_synonyms( void ); // done 
 

@@ -277,7 +277,6 @@ void setup_signal_behavior_dictionaries( void )
 	behavior_to_int[ map_name ] = map_index;
 	int_to_behavior[map_index] = map_name; 
 
-
 	// chemotactic sensitivities 
 	for( int i=0; i < m ; i++ )
 	{
@@ -300,7 +299,6 @@ void setup_signal_behavior_dictionaries( void )
 	map_name = "cell-cell adhesion elastic constant";
 	behavior_to_int[ map_name ] = map_index;
 	int_to_behavior[map_index] = map_name; 
-
 
     // cell adhesion affinities 
 	// cell-type specific adhesion 
@@ -429,17 +427,19 @@ double& signal_scale( std::string signal_name )
 double& signal_scale( int signal_index  )
 { return signal_scales[signal_index]; }
 
-
-void display_signal_dictionary( void )
+void display_signal_dictionary( std::ostream& os )
 {
-	std::cout << "Signals: " << std::endl 
+	os << "Signals: " << std::endl 
 			  << "=======" << std::endl; 
 	for( int i=0; i < int_to_signal.size() ; i++ )
-	{ std::cout << i << " : " << int_to_signal[i] << std::endl; }
-	std::cout << std::endl << std::endl;  
-	
+	{ os << i << " : " << int_to_signal[i] << std::endl; }
+	os << std::endl;  
     return; 
 }
+
+void display_signal_dictionary( void )
+{ display_signal_dictionary( std::cout); std::cout << std::endl; }
+
 
 void display_signal_dictionary_with_synonyms( void )
 {
@@ -451,15 +451,21 @@ void display_signal_dictionary_with_synonyms( void )
     return; 
 }
 
+void display_behavior_dictionary( std::ostream& os )
+{
+	os << "Behaviors: " << std::endl 
+	   << "=========" << std::endl; 
+	for( int i=0; i < int_to_behavior.size() ; i++ )
+	{ os << i << " : " << int_to_behavior[i] << std::endl; }
+	os << std::endl; 
+    return; 
+}
+
 void display_behavior_dictionary( void )
 {
-	std::cout << "Behaviors: " << std::endl 
-			  << "=========" << std::endl; 
-	for( int i=0; i < int_to_behavior.size() ; i++ )
-	{ std::cout << i << " : " << int_to_behavior[i] << std::endl; }
+	display_behavior_dictionary( std::cout );
 	std::cout << std::endl; 
-
-    return; 
+	return; 
 }
 
 void display_response_dictionary_with_synonyms( void )
@@ -493,8 +499,7 @@ std::vector<int> find_signal_indices( std::vector<std::string> signal_names )
 std::string signal_name( int i )
 {
 	if( i >= 0 && i < int_to_signal.size() )
-	{ return int_to_signal[i]; }
-	
+	{ return int_to_signal[i]; }	
 	return "not found"; 
 }
 
@@ -518,6 +523,7 @@ std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names 
 	return output; 
 }
 
+// start here 
 
 // create a full signal vector 
 std::vector<double> construct_signals( Cell* pCell )
@@ -1780,7 +1786,4 @@ std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> n
 	return parameters; 
 }
 
-
-
 };
-
