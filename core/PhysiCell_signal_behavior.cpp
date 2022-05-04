@@ -1268,8 +1268,6 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	return; 
 }
 
-/* start here */
-
 void set_single_behavior( Cell* pCell, std::string name , double parameter )
 {
 	int index = find_behavior_index( name ); 
@@ -1291,7 +1289,6 @@ std::vector<double> get_behaviors( Cell* pCell )
 				pCell->phenotype.secretion.secretion_rates.end(), 
 				parameters.begin()+first_secretion_index ); 
 
-
 	// next m entries are secretion targets
 	static int first_secretion_target_index = find_behavior_index( microenvironment.density_names[0] + " secretion target" ); // m; 
 	std::copy(  pCell->phenotype.secretion.saturation_densities.begin(), 
@@ -1312,7 +1309,6 @@ std::vector<double> get_behaviors( Cell* pCell )
 
 	// cycle entry (exit from phase 0) and exit from up to 5 more phases 
 	static int first_cycle_index = find_behavior_index("exit from cycle phase 0" ); //  4*m; 
-	int map_index = first_cycle_index; 
 	int max_cycle_index = pCell->phenotype.cycle.model().phases.size(); 
 	if( max_cycle_index > 6 )
 	{
@@ -1321,30 +1317,30 @@ std::vector<double> get_behaviors( Cell* pCell )
 		          << "         Ignoring any later phase exit rates." << std::endl; 
 	}
 	for( int i=0; i < max_cycle_index ; i++ )
-	{  parameters[map_index+i] = pCell->phenotype.cycle.data.exit_rate( i ); }
+	{ parameters[first_cycle_index+i] = pCell->phenotype.cycle.data.exit_rate( i ); }
 
 	static int apoptosis_index = pCell->phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	static int necrosis_index = pCell->phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
 
-	map_index = first_cycle_index+6; // 4*m + 6; 
 	// apoptosis 
-	parameters[map_index] = pCell->phenotype.death.rates[apoptosis_index];
+	static int apoptosis_param_index = find_behavior_index( "apoptosis"); 
+	parameters[apoptosis_param_index] = pCell->phenotype.death.rates[apoptosis_index];
 
 	// necrosis 
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.death.rates[necrosis_index]; 
+	static int necrosis_param_index = find_behavior_index( "necrosis"); 
+	parameters[necrosis_param_index] = pCell->phenotype.death.rates[necrosis_index]; 
 
 	// migration speed
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.motility.migration_speed; 
+	static int migration_speed_index = find_behavior_index("migration speed"); 
+	parameters[migration_speed_index] = pCell->phenotype.motility.migration_speed; 
 
 	// migration bias 
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.motility.migration_bias; 
+	static int migration_bias_index = find_behavior_index("migration bias"); 
+	parameters[migration_bias_index] = pCell->phenotype.motility.migration_bias; 
 
 	// migration persistence time
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.motility.persistence_time; 
+	static int migration_pt_index = find_behavior_index("migration persistence time"); 
+	parameters[migration_pt_index] = pCell->phenotype.motility.persistence_time; 
 
 	// chemotactic sensitivities 
 	static int first_chemotaxis_index = find_behavior_index( "chemotactic response to " + microenvironment.density_names[0] ); 
@@ -1353,12 +1349,12 @@ std::vector<double> get_behaviors( Cell* pCell )
 			 	parameters.begin()+first_chemotaxis_index ); 
 
 	// cell-cell adhesion 
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.mechanics.cell_cell_adhesion_strength; 
+	static int cca_index = find_behavior_index("cell-cell adhesion"); 
+	parameters[cca_index] = pCell->phenotype.mechanics.cell_cell_adhesion_strength; 
 
 	// cell-cell "springs"
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.mechanics.attachment_elastic_constant; 
+	static int cca_spring_index = find_behavior_index("cell-cell adhesion elastic constant"); 
+	parameters[cca_spring_index] = pCell->phenotype.mechanics.attachment_elastic_constant; 
 
     // cell adhesion affinities 
 	static std::string search_for1 = "adhesive affinity to " + cell_definitions_by_type[0]->name ; 
@@ -1368,24 +1364,24 @@ std::vector<double> get_behaviors( Cell* pCell )
 				parameters.begin()+first_affinity_index ); 
 
 	// max relative maximum adhesion distance 
-	map_index += n; 
-	parameters[map_index] = pCell->phenotype.mechanics.relative_maximum_adhesion_distance; 
+	static int max_adhesion_distance_index = find_behavior_index("relative maximum adhesion distance"); 
+	parameters[max_adhesion_distance_index] = pCell->phenotype.mechanics.relative_maximum_adhesion_distance; 
 
 	// cell-cell repulsion 
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.mechanics.cell_cell_repulsion_strength; 
+	static int ccr_index = find_behavior_index("cell-cell repulsion"); 
+	parameters[ccr_index] = pCell->phenotype.mechanics.cell_cell_repulsion_strength; 
 
 	// cell-BM adhesion 
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.mechanics.cell_BM_adhesion_strength; 
+	static int cba_index = find_behavior_index("cell-BM adhesion"); 
+	parameters[cba_index] = pCell->phenotype.mechanics.cell_BM_adhesion_strength; 
 	
 	// cell-BM repulsion 
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.mechanics.cell_BM_repulsion_strength; 
+	static int cbr_index = find_behavior_index("cell-BM repulsion"); 
+	parameters[cbr_index] = pCell->phenotype.mechanics.cell_BM_repulsion_strength; 
 
 	// dead cell phagocytosis
-	map_index++; 
-	parameters[map_index] = pCell->phenotype.cell_interactions.dead_phagocytosis_rate; 
+	static int dead_phag_index = find_behavior_index("phagocytose dead cell"); 
+	parameters[dead_phag_index] = pCell->phenotype.cell_interactions.dead_phagocytosis_rate; 
 
     // phagocytosis of each live cell type 
 	static int first_phagocytosis_index = find_behavior_index( "phagocytose " + cell_definitions_by_type[0]->name ); 
@@ -1413,6 +1409,8 @@ std::vector<double> get_behaviors( Cell* pCell )
 
 	return parameters; 
 }
+
+/* start here */
 
 double get_single_behavior( Cell* pCell , int index )
 {
