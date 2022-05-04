@@ -170,11 +170,15 @@ void setup_signal_behavior_dictionaries( void )
 	map_index++; 
 	signal_to_int["contact with live cell"] = map_index; 
 	int_to_signal[map_index] = "contact with live cell"; 
+		// synonym 
+	signal_to_int["contact with live cells"] = map_index; 
 	
 	// contact with dead cell 
 	map_index++; 
 	signal_to_int["contact with dead cell"] = map_index; 
 	int_to_signal[map_index] = "contact with dead cell"; 
+		// synonym 
+	signal_to_int["contact with dead cells"] = map_index; 	
 	
 	// contact with basement membrane 
 	map_index++; 
@@ -193,7 +197,6 @@ void setup_signal_behavior_dictionaries( void )
 	map_index++; 
 	signal_to_int["total attack time"] = map_index; 
 	int_to_signal[map_index] = "total attack time"; 
-
 
 	behavior_to_int.clear(); 	
 	int_to_behavior.clear(); 
@@ -348,6 +351,7 @@ void setup_signal_behavior_dictionaries( void )
 
 		// synonym "phagocytosis of dead cell";
 		behavior_to_int[ "phagocytosis of dead cell" ] = map_index; 
+		behavior_to_int[ "phagocytosis of dead cells" ] = map_index; 
 	
 	// phagocytosis of each live cell type 
 	for( int i=0; i < n ; i++ )
@@ -430,7 +434,7 @@ double& signal_scale( int signal_index  )
 void display_signal_dictionary( std::ostream& os )
 {
 	os << "Signals: " << std::endl 
-			  << "=======" << std::endl; 
+	   << "=======" << std::endl; 
 	for( int i=0; i < int_to_signal.size() ; i++ )
 	{ os << i << " : " << int_to_signal[i] << std::endl; }
 	os << std::endl;  
@@ -478,7 +482,6 @@ void display_response_dictionary_with_synonyms( void )
     return; 
 }
 
-
 int find_signal_index( std::string signal_name )
 {
 	auto search = signal_to_int.find( signal_name );
@@ -523,13 +526,9 @@ std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names 
 	return output; 
 }
 
-// start here 
-
 // create a full signal vector 
 std::vector<double> construct_signals( Cell* pCell )
 {
-     // hard-coded 
-
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
 
@@ -538,41 +537,47 @@ std::vector<double> construct_signals( Cell* pCell )
 
 	// substrate densities 
     // copy efficiently; 
-    std::copy( pCell->nearest_density_vector().begin() , pCell->nearest_density_vector().end(), signals.begin() ); 
-	// for( int i=0; i < m ; i++ )
-	// { signals[i] /= signal_scales[i]; }
-
+	static int start_substrate_ind = find_signal_index( microenvironment.density_names[0] ); 
+    std::copy( pCell->nearest_density_vector().begin() , 
+			   pCell->nearest_density_vector().end(), 
+			   signals.begin()+start_substrate_ind ); 
 
     // internalized substrates 
-    int ind = m; 
-    std::copy( pCell->phenotype.molecular.internalized_total_substrates.begin() , pCell->phenotype.molecular.internalized_total_substrates.end(), signals.begin()+m ); 
+    int ind = m; 	
+	static int start_int_substrate_ind = find_signal_index( "intracellular " + microenvironment.density_names[0] ); 
+    std::copy( pCell->phenotype.molecular.internalized_total_substrates.begin() , 
+	           pCell->phenotype.molecular.internalized_total_substrates.end(), 
+			   signals.begin()+start_int_substrate_ind); // m ); 
 	for( int i=0; i < m ; i++ )
-	{ signals[i+m] /= pCell->phenotype.volume.total; }
+	{ signals[i+start_int_substrate_ind] /= pCell->phenotype.volume.total; }
 
     // substrate gradients 
     ind = 2*m; // int ind = m; 
+	static int start_substrate_grad_ind = find_signal_index( microenvironment.density_names[0] + " gradient"); 
 	for( int i=0; i < m ; i++ )
 	{
-        signals[ind] = norm( pCell->nearest_gradient(i) ); 
+        signals[start_substrate_grad_ind+i] = norm( pCell->nearest_gradient(i) ); 
         // signals[ind] /= signal_scales[ind]; 
         ind++; 
 	}    
 
 	// mechanical pressure 
-	signals[ind] = pCell->state.simple_pressure;
+	static int pressure_ind = find_signal_index( "pressure"); 
+	signals[pressure_ind] = pCell->state.simple_pressure;
     // signals[ind] / signal_scales[ind]; 
     ind++; 
 
 	// cell volume 
-	signals[ind] = pCell->phenotype.volume.total; 
+	static int volume_ind = find_signal_index( "volume"); 
+	signals[volume_ind] = pCell->phenotype.volume.total; 
     // signals[ind] / signal_scales[ind]; 
     ind++; 
-
 
 	// physical contact with cells (of each type) 
 		// increment signals 
 	int dead_cells = 0; 
 	int live_cells = 0; 
+	static int contact_ind = find_signal_index( "contact with " + cell_definitions_by_type[0]->name ); 
 	for( int i=0; i < pCell->state.neighbors.size(); i++ )
 	{
 		Cell* pC = pCell->state.neighbors[i]; 
@@ -581,33 +586,35 @@ std::vector<double> construct_signals( Cell* pCell )
 		else
 		{ live_cells++; } 
 		int nCT = cell_definition_indices_by_type[pC->type]; 
-		signals[ind+nCT] += 1; 
+		signals[contact_ind+nCT] += 1; 
 	}
-    // rescale 
-    // for( int nCT=0; nCT < n ; nCT++ )
-    // { signals[ind+nCT] /= signal_scales[ind+nCT]; }
 
     ind += n; 
 	// physical contact with live cells 
-	signals[ind] = live_cells; 
+	static int live_contact_ind = find_signal_index( "contact with live cell"); 
+	signals[live_contact_ind] = live_cells; 
     // signals[ind] /= signal_scales[ind]; 
     ind++; 
 	
 	// physical contact with dead cells 
-	signals[ind] = dead_cells; 
+	static int dead_contact_ind = find_signal_index( "contact with dead cell"); 
+	signals[dead_contact_ind] = dead_cells; 
     // signals[ind] /= signal_scales[ind]; 
     ind++; 
 
 	// physical contact with basement membrane (not implemented) 
-	signals[ind] = (int) pCell->state.contact_with_basement_membrane; 
+	static int BM_contact_ind = find_signal_index( "contact with basement membrane"); 
+	signals[BM_contact_ind] = (int) pCell->state.contact_with_basement_membrane; 
     ind++; 
 
 	// damage
-	signals[ind] = pCell->state.damage; 
+	static int damage_ind = find_signal_index( "damage"); 
+	signals[damage_ind] = pCell->state.damage; 
     ind++; 
 	
 	// integrated total attack time 
-	signals[ind] = pCell->state.total_attack_time;     
+	static int tot_attack_ind = find_signal_index( "total attack time"); 
+	signals[tot_attack_ind] = pCell->state.total_attack_time;     
     ind++; 
 
     // rescale 
@@ -615,6 +622,8 @@ std::vector<double> construct_signals( Cell* pCell )
 	
     return signals; 
 }
+
+/* start here */ 
 
 // create a signal vector of only the cell contacts 
 std::vector<double> construct_cell_contact_signals( Cell* pCell )

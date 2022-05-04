@@ -1530,6 +1530,9 @@
         <number_of_neutrophils type="int" units="" description="">50</number_of_neutrophils>
         <max_stem_differentiation type="double" units="" description="maximum stem cell differentiation rate">0.0075</max_stem_differentiation>
         <tumor_radius type="double">200</tumor_radius>
-    </user_parameters>
+
+		    <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">5</number_of_cells>
+    
+      </user_parameters>
 	
 </PhysiCell_settings>
