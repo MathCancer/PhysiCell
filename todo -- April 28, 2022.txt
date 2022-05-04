@@ -20,6 +20,10 @@ can generate a properly sized parameter vector [x]
 can map parameters back to phenotype [x]
 
 
+start at 692 
+
+
+
 prototypical phenotyep funciton 
 
 
@@ -29,6 +33,9 @@ prototypical phenotyep funciton
 	pC->add_rule( signal, behavior, response ); 
 	pC->edit_rule_parameters( signal, behavior, rsponse , parameters ); 
 */
+
+
+
 
 	// get signals 
 	std::vector< std::string > sig_names = {"substrate","pressure"} ;

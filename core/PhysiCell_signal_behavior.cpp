@@ -623,8 +623,6 @@ std::vector<double> construct_signals( Cell* pCell )
     return signals; 
 }
 
-/* start here */ 
-
 // create a signal vector of only the cell contacts 
 std::vector<double> construct_cell_contact_signals( Cell* pCell )
 {
@@ -692,6 +690,142 @@ std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::s
 }
 
 double single_signal( Cell* pCell, int index )
+{
+	static int m = microenvironment.number_of_densities(); 
+	static int n = cell_definition_indices_by_name.size(); 
+
+	double out = 0.0; 
+	if( index < 0 )
+	{ 
+		std::cout<< "Why would you ask for array[-1]? Why? WHY???? That's it, I quit." << std::endl; 
+		exit(-1832443); 
+		return -9e9; 
+	}
+
+	// first m entries: extracellular concentration 
+	static int start_substrate_ind = find_signal_index( microenvironment.density_names[0] ); 
+	if( start_substrate_ind <= index && index < m )
+	{
+		out = pCell->nearest_density_vector()[index-start_substrate_ind];
+		out /= signal_scales[index]; 
+		return out; 
+	}
+
+	// second m entries: intracellular concentration 
+	static int start_int_substrate_ind = find_signal_index( "intracellular " + microenvironment.density_names[0] ); 
+	if( start_int_substrate_ind <= index && start_int_substrate_ind < m )
+	{
+		out = pCell->phenotype.molecular.internalized_total_substrates[index-start_int_substrate_ind]; 
+		out /= pCell->phenotype.volume.total;
+		out /= signal_scales[index]; 
+		return out; 
+	}
+
+	// next m entries: gradients 
+	static int start_substrate_grad_ind = find_signal_index( microenvironment.density_names[0] + " gradient"); 
+	if( start_substrate_grad_ind <= index && start_substrate_grad_ind < m )
+	{
+		out =  norm( pCell->nearest_gradient(index-start_substrate_grad_ind) ); 
+		out /= signal_scales[index]; 
+		return out; 
+	}
+
+	// mechanical pressure 
+	static int pressure_ind = find_signal_index( "pressure"); 
+	if( index == pressure_ind )
+	{
+		out = pCell->state.simple_pressure;
+		out /= signal_scales[index]; 
+		return out; 
+	}
+
+	// cell volume 	
+	static int volume_ind = find_signal_index( "volume"); 
+	if( index == volume_ind )
+	{
+		out = pCell->phenotype.volume.total; 
+		out /= signal_scales[index]; 
+		return out; 
+	}
+
+	// physical contact with cells (of each type) 
+	// individual contact signals are a bit costly 
+	static int contact_ind = find_signal_index( "contact with " + cell_definitions_by_type[0]->name ); 
+	if( contact_ind <= index && index < contact_ind+n+2 )
+	{
+		std::vector<int> counts( n , 0 ); 
+		// process all neighbors 
+		int dead_cells = 0; 
+		int live_cells = 0; 
+		for( int i=0; i < pCell->state.neighbors.size(); i++ )
+		{
+			Cell* pC = pCell->state.neighbors[i]; 
+			if( pC->phenotype.death.dead == true )
+			{ dead_cells++; } 
+			else
+			{ live_cells++; } 
+			int nCT = cell_definition_indices_by_type[pC->type]; 
+			counts[nCT] += 1; 
+		}
+
+		if( index < contact_ind+n )
+		{
+			out = counts[index-contact_ind]; 
+			out /= signal_scales[index]; 
+			return out; 
+		}
+
+		static int live_contact_ind = find_signal_index( "contact with live cell"); 
+		if( index == live_contact_ind )
+		{
+			out = live_cells; 
+			out /= signal_scales[index]; 
+			return out; 
+		}
+
+		static int dead_contact_ind = find_signal_index( "contact with dead cell"); 
+		// index == dead_contact_ind
+		out = dead_cells; 
+		out /= signal_scales[index]; 
+		return out; 
+	}
+
+	// contact with BM 
+	static int BM_contact_ind = find_signal_index( "contact with basement membrane"); 
+	if( index == BM_contact_ind )
+	{ 
+		out = (double) pCell->state.contact_with_basement_membrane; 
+		out /= signal_scales[index]; 
+		return out; 
+	} 
+
+	// damage
+	static int damage_ind = find_signal_index( "damage"); 
+	if( index == damage_ind )
+	{
+		out = pCell->state.damage; 
+		out /= signal_scales[index]; 
+		return out; 
+	} 
+
+	// integrated total attack time 
+	static int tot_attack_ind = find_signal_index( "total attack time"); 
+	if( index == tot_attack_ind )
+	{
+		out = pCell->state.total_attack_time;     
+		out /= signal_scales[index]; 
+		return out; 
+	} 
+
+	// unknown after here !
+
+	std::cout << "Warning: Requested unknown signal number " << index << "!" << std::endl
+		      << "         Returning 0.0, but you should fix this!" << std::endl << std::endl; 
+
+	return 0.0; 
+}
+
+double single_signal_old( Cell* pCell, int index )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
@@ -834,9 +968,10 @@ std::string behavior_name( int i )
 {
 	if( i >= 0 && i < int_to_behavior.size() )
 	{ return int_to_behavior[i]; }
-	
 	return "not found"; 
 }
+
+/* start here */ 
 
 std::vector<double> create_empty_behavior_vector()
 { 
@@ -890,7 +1025,6 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 
 	static int apoptosis_index = pCell->phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	static int necrosis_index = pCell->phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
-
 
 	map_index = first_cycle_index+6; // 4*m + 6; 
 	static int apoptosis_param_index = find_behavior_index( "apoptosis"); 
@@ -1126,7 +1260,6 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	if( index >= first_fusion_index && index < first_fusion_index + n )
 	{ pCell->phenotype.cell_interactions.fusion_rates[index-first_fusion_index]; return; } 
 
-
  	// transformation 
 	static int first_transformation_index = find_behavior_index( "transform to " + cell_definitions_by_type[0]->name ); 
 	if( index >= first_transformation_index && index < first_transformation_index + n )
@@ -1134,6 +1267,8 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 
 	return; 
 }
+
+/* start here */
 
 void set_single_behavior( Cell* pCell, std::string name , double parameter )
 {
