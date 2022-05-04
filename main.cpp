@@ -178,6 +178,16 @@ int main( int argc, char* argv[] )
 	Cell* pC = (*all_cells)[0]; 
 	std::vector<double> sigs = construct_signals( pC ); 
 	std::cout << sigs << std::endl;
+
+	std::vector<double> b0 = get_base_behaviors( pC ); 
+	std::cout << b0 << std::endl;
+
+	for( int i=0; i < b0.size(); i++ )
+	{
+		std::cout << i << " : " << behavior_name(i) << " : " << b0[i] << std::endl; 
+	}
+
+
 	return 1; 
 
 	
