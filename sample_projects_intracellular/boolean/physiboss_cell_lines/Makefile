@@ -176,6 +176,9 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
+Compile_MaBoSS: MaBoSS
+	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make install_alib;make clean; cd ../../../../..
+
 MaBoSS: 
 ifeq ($(OS), Windows_NT)
 	python beta/setup_libmaboss.py
@@ -209,7 +212,7 @@ reset:
 MaBoSS-clean:
 	rm -fr addons/PhysiBoSS/MaBoSS-env-2.0
 	
-clean: MaBoSS-clean
+clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 	

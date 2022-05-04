@@ -147,9 +147,9 @@
 			<phenotype>
 				<cycle code="2" name="live">  
 					<!-- using higher than normal significant digits to match divisions in default code -->
-					<transition_rates units="1/min"> 
+					<phase_transition_rates units="1/min"> 
 						<rate start_index="0" end_index="0" fixed_duration="true">0.0</rate>
-					</transition_rates>
+					</phase_transition_rates>
 				</cycle>
 				
 				<death>  

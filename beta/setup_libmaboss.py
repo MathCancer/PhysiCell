@@ -25,7 +25,7 @@ else:
 
     if os_type.lower() == 'darwin':
         mb_file = "libMaBoSS-osx64.tar.gz"
-    elif os_type.lower().startswith("win"):
+    elif os_type.lower().startswith("win") or os_type.lower().startswith("msys_nt") or os_type.lower().startswith("mingw64_nt"):
         mb_file = "libMaBoSS-win64.tar.gz"
     elif os_type.lower().startswith("linux"):
         mb_file = "libMaBoSS-linux64.tar.gz"
@@ -33,7 +33,7 @@ else:
         print("Your operating system seems to be unsupported. Please submit a ticket at https://sourceforge.net/p/physicell/tickets/ ")
         sys.exit(1)
 
-    url = "http://maboss.curie.fr/pub/" + mb_file
+    url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/v2.4.1/" + mb_file
 
     fname = mb_file
 
@@ -83,6 +83,7 @@ else:
         tar = tarfile.open(mb_file)
         tar.extractall()
         tar.close()
+        os.remove(mb_file)
     except:
         print('error untarring the file')
         exit(1)
