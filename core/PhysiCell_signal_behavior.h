@@ -90,6 +90,9 @@ void setup_signal_behavior_dictionaries( void ); // done
 void display_signal_dictionary( void ); // done 
 void display_behavior_dictionary( void ); // done 
 
+void display_signal_dictionary( std::ostream& os ); // done 
+void display_behavior_dictionary( std::ostream& os ); // done 
+
 void display_signal_dictionary_with_synonyms( void ); // done 
 void display_behavior_dictionary_with_synonyms( void ); // done 
 
@@ -105,24 +108,18 @@ std::vector<int> find_signal_indices( std::vector<std::string> signal_names ); /
 std::string signal_name( int i ); // done 
 
 // create a full signal vector 
-std::vector<double> construct_signals( Cell* pCell ); // done 
+std::vector<double> get_signals( Cell* pCell ); // done 
 
 // create a signal vector of only the cell contacts 
-std::vector<double> construct_cell_contact_signals( Cell* pCell ); // done 
+std::vector<double> get_cell_contact_signals( Cell* pCell ); // done 
 
 // create a subset of the signal vector with the supplied indicies 
-std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> indices ); // done 
-std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::string> names );  // done 
-
-
-/*
-void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters ); // done 
-void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters ); // done 
-*/
+std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices ); // done 
+std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names );  // done 
 
 // grab a single signal by its index or name 
-double single_signal( Cell* pCell, int index ); // done 
-double single_signal( Cell* pCell, std::string name ); // done 
+double get_single_signal( Cell* pCell, int index ); // done 
+double get_single_signal( Cell* pCell, std::string name ); // done 
 
 /* behavior functions */ 
 
