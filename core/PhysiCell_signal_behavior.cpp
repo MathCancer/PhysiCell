@@ -509,7 +509,6 @@ std::string signal_name( int i )
 int find_parameter_index( std::string response_name )
 {
 	auto search = behavior_to_int.find( response_name );
-	// safety first! 
 	if( search != behavior_to_int.end() )
     { return search->second; }   
     return -1; 
@@ -543,35 +542,25 @@ std::vector<double> get_signals( Cell* pCell )
 			   signals.begin()+start_substrate_ind ); 
 
     // internalized substrates 
-    int ind = m; 	
 	static int start_int_substrate_ind = find_signal_index( "intracellular " + microenvironment.density_names[0] ); 
     std::copy( pCell->phenotype.molecular.internalized_total_substrates.begin() , 
 	           pCell->phenotype.molecular.internalized_total_substrates.end(), 
-			   signals.begin()+start_int_substrate_ind); // m ); 
+			   signals.begin()+start_int_substrate_ind);  
 	for( int i=0; i < m ; i++ )
 	{ signals[i+start_int_substrate_ind] /= pCell->phenotype.volume.total; }
 
     // substrate gradients 
-    ind = 2*m; // int ind = m; 
 	static int start_substrate_grad_ind = find_signal_index( microenvironment.density_names[0] + " gradient"); 
 	for( int i=0; i < m ; i++ )
-	{
-        signals[start_substrate_grad_ind+i] = norm( pCell->nearest_gradient(i) ); 
-        // signals[ind] /= signal_scales[ind]; 
-        ind++; 
-	}    
+	{ signals[start_substrate_grad_ind+i] = norm( pCell->nearest_gradient(i) ); }    
 
 	// mechanical pressure 
 	static int pressure_ind = find_signal_index( "pressure"); 
 	signals[pressure_ind] = pCell->state.simple_pressure;
-    // signals[ind] / signal_scales[ind]; 
-    ind++; 
 
 	// cell volume 
 	static int volume_ind = find_signal_index( "volume"); 
 	signals[volume_ind] = pCell->phenotype.volume.total; 
-    // signals[ind] / signal_scales[ind]; 
-    ind++; 
 
 	// physical contact with cells (of each type) 
 		// increment signals 
@@ -589,33 +578,25 @@ std::vector<double> get_signals( Cell* pCell )
 		signals[contact_ind+nCT] += 1; 
 	}
 
-    ind += n; 
 	// physical contact with live cells 
 	static int live_contact_ind = find_signal_index( "contact with live cell"); 
 	signals[live_contact_ind] = live_cells; 
-    // signals[ind] /= signal_scales[ind]; 
-    ind++; 
 	
 	// physical contact with dead cells 
 	static int dead_contact_ind = find_signal_index( "contact with dead cell"); 
 	signals[dead_contact_ind] = dead_cells; 
-    // signals[ind] /= signal_scales[ind]; 
-    ind++; 
 
 	// physical contact with basement membrane (not implemented) 
 	static int BM_contact_ind = find_signal_index( "contact with basement membrane"); 
 	signals[BM_contact_ind] = (int) pCell->state.contact_with_basement_membrane; 
-    ind++; 
 
 	// damage
 	static int damage_ind = find_signal_index( "damage"); 
 	signals[damage_ind] = pCell->state.damage; 
-    ind++; 
 	
 	// integrated total attack time 
 	static int tot_attack_ind = find_signal_index( "total attack time"); 
 	signals[tot_attack_ind] = pCell->state.total_attack_time;     
-    ind++; 
 
     // rescale 
     signals /= signal_scales; 
@@ -698,13 +679,12 @@ double get_single_signal( Cell* pCell, int index )
 	if( index < 0 )
 	{ 
 		std::cout<< "Why would you ask for array[-1]? Why? WHY???? That's it, I quit." << std::endl; 
-		exit(-1832443); 
 		return -9e9; 
 	}
 
 	// first m entries: extracellular concentration 
 	static int start_substrate_ind = find_signal_index( microenvironment.density_names[0] ); 
-	if( start_substrate_ind <= index && index < m )
+	if( start_substrate_ind <= index && index < start_substrate_ind + m )
 	{
 		out = pCell->nearest_density_vector()[index-start_substrate_ind];
 		out /= signal_scales[index]; 
@@ -731,7 +711,7 @@ double get_single_signal( Cell* pCell, int index )
 	}
 
 	// mechanical pressure 
-	static int pressure_ind = find_signal_index( "pressure"); 
+	static int pressure_ind = find_signal_index( "pressure" ); 
 	if( index == pressure_ind )
 	{
 		out = pCell->state.simple_pressure;
@@ -751,7 +731,7 @@ double get_single_signal( Cell* pCell, int index )
 	// physical contact with cells (of each type) 
 	// individual contact signals are a bit costly 
 	static int contact_ind = find_signal_index( "contact with " + cell_definitions_by_type[0]->name ); 
-	if( contact_ind <= index && index < contact_ind+n+2 )
+	if( contact_ind <= index && index < contact_ind + n+2 )
 	{
 		std::vector<int> counts( n , 0 ); 
 		// process all neighbors 
@@ -768,7 +748,7 @@ double get_single_signal( Cell* pCell, int index )
 			counts[nCT] += 1; 
 		}
 
-		if( index < contact_ind+n )
+		if( index < contact_ind + n )
 		{
 			out = counts[index-contact_ind]; 
 			out /= signal_scales[index]; 
@@ -825,140 +805,6 @@ double get_single_signal( Cell* pCell, int index )
 	return 0.0; 
 }
 
-double get_single_signal_old( Cell* pCell, int index )
-{
-	static int m = microenvironment.number_of_densities(); 
-	static int n = cell_definition_indices_by_name.size(); 
-
-	double out = 0.0; 
-
-	if( index < 0 )
-	{ 
-		std::cout<< "Why would you ask for array[-1]? Why? WHY???? That's it, I quit." << std::endl; 
-		exit(-1832443); 
-		return -9e9; 
-	}
-
-	int ind = index; 
-	// first m entries: extracellular concentration 
-	if( 0 <= ind && ind < m )
-	{
-		out = pCell->nearest_density_vector()[ind];
-		out /= signal_scales[index]; 
-		return out; 
-	}
-
-	// second m entries: intracellular concentration 
-	ind -= m; 
-	if( ind < m )
-	{
-		out = pCell->phenotype.molecular.internalized_total_substrates[ind]; 
-		out /= pCell->phenotype.volume.total;
-		out /= signal_scales[index]; 
-		return out; 
-	}
-
-	// next m entries: gradients 
-	ind -= m; 
-	if( ind < m )
-	{
-		out =  norm( pCell->nearest_gradient(ind) ); 
-		out /= signal_scales[index]; 
-		return out; 
-	}
-
-	ind -= m; 
-	// mechanical pressure 
-	if( ind == 0 )
-	{
-		out = pCell->state.simple_pressure;
-		out /= signal_scales[index]; 
-		return out; 
-	}
-
-	ind -= 1; 
-	// cell volume 	
-	if( ind == 0 )
-	{
-		out = pCell->phenotype.volume.total; 
-		out /= signal_scales[index]; 
-		return out; 
-	}
-
-	ind -=1; 
-	// physical contact with cells (of each type) 
-	// individual contact signals are a bit costly 
-	if( ind < n+2 )
-	{
-		std::vector<int> counts( n , 0 ); 
-		// process all neighbors 
-		int dead_cells = 0; 
-		int live_cells = 0; 
-		for( int i=0; i < pCell->state.neighbors.size(); i++ )
-		{
-			Cell* pC = pCell->state.neighbors[i]; 
-			if( pC->phenotype.death.dead == true )
-			{ dead_cells++; } 
-			else
-			{ live_cells++; } 
-			int nCT = cell_definition_indices_by_type[pC->type]; 
-			counts[nCT] += 1; 
-		}
-
-		if( ind < n )
-		{
-			out = counts[ind]; 
-			out /= signal_scales[index]; 
-			return out; 
-		}
-		if( ind == n )
-		{
-			out = live_cells; 
-			out /= signal_scales[index]; 
-			return out; 
-		}
-
-		// ind == n+1 
-		out = dead_cells; 
-		out /= signal_scales[index]; 
-		return out; 
-	}
-
-	// contact with BM 
-	ind -= (n+2); 
-	if( ind == 0 )
-	{ 
-		out = (double) pCell->state.contact_with_basement_membrane; 
-		out /= signal_scales[index]; 
-		return out; 
-	} 
-
-	// damage
-	ind -= 1; 
-	if( ind == 0 )
-	{
-		out = pCell->state.damage; 
-		out /= signal_scales[index]; 
-		return out; 
-	} 
-
-	// integrated total attack time 
-	ind -= 1; 
-	if( ind == 0 )
-	{
-		out = pCell->state.total_attack_time;     
-		out /= signal_scales[index]; 
-		return out; 
-	} 
-
-	// unknown after here !
-
-	std::cout << "Warning: Requested unknown signal number " << index << "!" << std::endl
-		      << "         Returning 0.0, but you should fix this!" << std::endl << std::endl; 
-
-	return 0.0; 
-}
-
 double get_single_signal( Cell* pCell, std::string name )
 { return get_single_signal( pCell, find_signal_index(name) ); }
 
@@ -970,8 +816,6 @@ std::string behavior_name( int i )
 	{ return int_to_behavior[i]; }
 	return "not found"; 
 }
-
-/* start here */ 
 
 std::vector<double> create_empty_behavior_vector()
 { 
