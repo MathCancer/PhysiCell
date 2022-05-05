@@ -995,7 +995,7 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	if( index >= first_cycle_index && index < first_cycle_index+6 )
 	{
 		int max_cycle_index = pCell->phenotype.cycle.model().phases.size(); 
-		if( index < first_cycle_index+max_cycle_index )
+		if( index < first_cycle_index + max_cycle_index )
 		{ pCell->phenotype.cycle.data.exit_rate(index-first_cycle_index) = parameter; return; }
 		std::cout << "Warning: Attempted to set a cycle exit rate outside the bounds of the cell's cycle model" << std::endl
        		      <<        "         Ignoring it, but you should fix this." << std::endl; 
