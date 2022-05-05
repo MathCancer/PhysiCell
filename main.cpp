@@ -176,16 +176,74 @@ int main( int argc, char* argv[] )
 	// main loop 
 
 	Cell* pC = (*all_cells)[0]; 
-	std::vector<double> sigs = construct_signals( pC ); 
+	std::vector<double> sigs = get_signals( pC ); 
 	std::cout << sigs << std::endl;
 
 	std::vector<double> b0 = get_base_behaviors( pC ); 
-	std::cout << b0 << std::endl;
+
+	for( int i=0; i < b0.size(); i++ )
+	{
+		std::vector<int> indices = {i}; 
+		std::vector<double> params = {i + 0.0 }; 
+		b0[i] = i + 0.00001; 
+		// set_selected_behaviors(pC, indices, params ); 
+		// set_single_behavior( pC, i , i+0.0 ); 
+	}
+
+	set_behaviors( pC, b0 ); 
+
+	b0 = get_behaviors( pC ); 
+
+
+	std::cout.precision(10);
 
 	for( int i=0; i < b0.size(); i++ )
 	{
 		std::cout << i << " : " << behavior_name(i) << " : " << b0[i] << std::endl; 
 	}
+
+	// now let's test signals 
+	int nV = pC->get_current_voxel_index(); 
+	for( int i=0 ; i < microenvironment.number_of_densities() ; i++ )
+	{
+		microenvironment(nV)[i] = i + 0.1;
+		pC->phenotype.molecular.internalized_total_substrates[i] = (-i - 0.1)*pC->phenotype.volume.total; 
+/*
+		pC->phenotype.secretion.secretion_rates[i] = 10*i+0.01; 
+		pC->phenotype.secretion.saturation_densities[i] = 20*i+0.01; 
+		pC->phenotype.secretion.uptake_rates[i] = 30*i+0.01; 
+		pC->phenotype.secretion.net_export_rates[i] = 40*i+0.01; 
+
+		pC->phenotype.motility.chemotactic_sensitivities[i] = 50*i + 0.001; 
+*/		
+	} 
+
+	int n = cell_definitions_by_index.size(); 
+	std::vector<double> cell_probs( n , 1.0 / ( n + 0.0 ) ); 
+
+	for( int i=1; i < 100 ; i++ )
+	{
+		Cell* pC1 = (*all_cells)[i]; 
+
+		// choose type 
+		int nNT = choose_event( cell_probs ); 
+		// transform cell 
+		pC1->convert_to_cell_definition( *cell_definitions_by_index[nNT] ); 
+		// dead or alive? 
+		if( UniformRandom() <= 0.5 )
+		{ pC1->phenotype.death.dead = true; }
+		// add it to neighbors of pC
+		pC->state.neighbors.push_back( pC1 ); 
+	}
+
+	std::cout << std::endl; 
+	sigs = get_signals( pC ); 
+	for( int i=0; i < sigs.size(); i++ )
+	{
+		std::cout << i << " : " << signal_name(i) << " : " << sigs[i] << " vs: " << get_single_signal(pC,i) <<  std::endl; 
+	}
+
+
 
 
 	return 1; 

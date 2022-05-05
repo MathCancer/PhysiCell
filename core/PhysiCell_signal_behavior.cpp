@@ -527,7 +527,7 @@ std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names 
 }
 
 // create a full signal vector 
-std::vector<double> construct_signals( Cell* pCell )
+std::vector<double> get_signals( Cell* pCell )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
@@ -624,7 +624,7 @@ std::vector<double> construct_signals( Cell* pCell )
 }
 
 // create a signal vector of only the cell contacts 
-std::vector<double> construct_cell_contact_signals( Cell* pCell )
+std::vector<double> get_cell_contact_signals( Cell* pCell )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
@@ -655,7 +655,7 @@ std::vector<double> construct_cell_contact_signals( Cell* pCell )
 	return output; 
 }
 
-std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> indices )
+std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 	
@@ -664,7 +664,7 @@ std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> i
 	static int contact_start_index = find_signal_index( "contact with " + cell_definitions_by_type[0]->name ); 
 
 	// typically more efficient to get these first 
-	std::vector<double> contact_signals = construct_cell_contact_signals( pCell ); 
+	std::vector<double> contact_signals = get_cell_contact_signals( pCell ); 
 	bool created_contact_signals = false; 
 
 	std::vector<double> signals( indices.size() , 0.0 ); 
@@ -674,22 +674,22 @@ std::vector<double> construct_selected_signals( Cell* pCell , std::vector<int> i
 		if( ind >= contact_start_index && ind < contact_start_index+n+2)
 		{ signals[i] = contact_signals[ind-contact_start_index]; }
 		else
-		{ signals[i] = single_signal( pCell , ind ); }
+		{ signals[i] = get_single_signal( pCell , ind ); }
 	}
 
 	return signals; 
 }
 
-std::vector<double> construct_selected_signals( Cell* pCell , std::vector<std::string> names )
+std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names )
 {
 	std::vector<int> signal_indices( names.size() , 0 ); 
 	for( int i=0; i < names.size(); i++ )
 	{ signal_indices[i] = find_signal_index( names[i]); }
 
-	return construct_selected_signals(pCell,signal_indices); 
+	return get_selected_signals(pCell,signal_indices); 
 }
 
-double single_signal( Cell* pCell, int index )
+double get_single_signal( Cell* pCell, int index )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
@@ -713,7 +713,7 @@ double single_signal( Cell* pCell, int index )
 
 	// second m entries: intracellular concentration 
 	static int start_int_substrate_ind = find_signal_index( "intracellular " + microenvironment.density_names[0] ); 
-	if( start_int_substrate_ind <= index && start_int_substrate_ind < m )
+	if( start_int_substrate_ind <= index && index < start_int_substrate_ind + m )
 	{
 		out = pCell->phenotype.molecular.internalized_total_substrates[index-start_int_substrate_ind]; 
 		out /= pCell->phenotype.volume.total;
@@ -723,7 +723,7 @@ double single_signal( Cell* pCell, int index )
 
 	// next m entries: gradients 
 	static int start_substrate_grad_ind = find_signal_index( microenvironment.density_names[0] + " gradient"); 
-	if( start_substrate_grad_ind <= index && start_substrate_grad_ind < m )
+	if( start_substrate_grad_ind <= index && index < start_substrate_grad_ind + m )
 	{
 		out =  norm( pCell->nearest_gradient(index-start_substrate_grad_ind) ); 
 		out /= signal_scales[index]; 
@@ -825,7 +825,7 @@ double single_signal( Cell* pCell, int index )
 	return 0.0; 
 }
 
-double single_signal_old( Cell* pCell, int index )
+double get_single_signal_old( Cell* pCell, int index )
 {
 	static int m = microenvironment.number_of_densities(); 
 	static int n = cell_definition_indices_by_name.size(); 
@@ -959,8 +959,8 @@ double single_signal_old( Cell* pCell, int index )
 	return 0.0; 
 }
 
-double single_signal( Cell* pCell, std::string name )
-{ return single_signal( pCell, find_signal_index(name) ); }
+double get_single_signal( Cell* pCell, std::string name )
+{ return get_single_signal( pCell, find_signal_index(name) ); }
 
 // behaviors 
 
@@ -1168,7 +1168,7 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 		if( index < first_cycle_index+max_cycle_index )
 		{ pCell->phenotype.cycle.data.exit_rate(index-first_cycle_index) = parameter; return; }
 		std::cout << "Warning: Attempted to set a cycle exit rate outside the bounds of the cell's cycle model" << std::endl
-		   <<        "         Ignoring it, but you should fix this." << std::endl; 
+       		      <<        "         Ignoring it, but you should fix this." << std::endl; 
 		return; 
 	}
 
@@ -1179,7 +1179,7 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	if( index == apoptosis_parameter_index )
 	{ pCell->phenotype.death.rates[apoptosis_model_index] = parameter; return; }
 
-	static int necrosis_model_index = pCell->phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+	static int necrosis_model_index = pCell->phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
 	static int necrosis_parameter_index = find_behavior_index( "necrosis"); 
 	if( index == necrosis_parameter_index )
 	{ pCell->phenotype.death.rates[necrosis_model_index] = parameter; return; }
@@ -1202,8 +1202,7 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	// chemotactic sensitivities 
 	static int first_chemotaxis_index = find_behavior_index( "chemotactic response to " + microenvironment.density_names[0] ); 
 	if( index >= first_chemotaxis_index && index < first_chemotaxis_index + m )
-	{ pCell->phenotype.motility.chemotactic_sensitivities[index-first_chemotaxis_index]; return; } 
-
+	{ pCell->phenotype.motility.chemotactic_sensitivities[index-first_chemotaxis_index] = parameter; return; } 
 
 	// cell-cell adhesion 
 	static int cca_index = find_behavior_index( "cell-cell adhesion"); 
@@ -1248,22 +1247,22 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
     // phagocytosis of each live cell type 
 	static int first_phagocytosis_index = find_behavior_index( "phagocytose " + cell_definitions_by_type[0]->name ); 
 	if( index >= first_phagocytosis_index && index < first_phagocytosis_index + n )
-	{ pCell->phenotype.cell_interactions.live_phagocytosis_rates[index-first_phagocytosis_index]; return; } 
+	{ pCell->phenotype.cell_interactions.live_phagocytosis_rates[index-first_phagocytosis_index] = parameter ; return; } 
 
 	// attack of each live cell type 
 	static int first_attack_index = find_behavior_index( "attack " + cell_definitions_by_type[0]->name ); 
 	if( index >= first_attack_index && index < first_attack_index + n )
-	{ pCell->phenotype.cell_interactions.attack_rates[index-first_attack_index]; return; } 
+	{ pCell->phenotype.cell_interactions.attack_rates[index-first_attack_index] = parameter; return; } 
  
 	// fusion 
 	static int first_fusion_index = find_behavior_index( "fuse to " + cell_definitions_by_type[0]->name ); 
 	if( index >= first_fusion_index && index < first_fusion_index + n )
-	{ pCell->phenotype.cell_interactions.fusion_rates[index-first_fusion_index]; return; } 
+	{ pCell->phenotype.cell_interactions.fusion_rates[index-first_fusion_index] = parameter; return; } 
 
  	// transformation 
 	static int first_transformation_index = find_behavior_index( "transform to " + cell_definitions_by_type[0]->name ); 
 	if( index >= first_transformation_index && index < first_transformation_index + n )
-	{ pCell->phenotype.cell_transformations.transformation_rates[index-first_transformation_index]; return; } 
+	{ pCell->phenotype.cell_transformations.transformation_rates[index-first_transformation_index] = parameter; return; } 
 
 	return; 
 }
