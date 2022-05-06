@@ -78,8 +78,10 @@
 
 namespace PhysiCell{
 
-unsigned int SeedRandom( unsigned int input );
-unsigned int SeedRandom( void );
+// unsigned int SeedRandom( unsigned int input );
+// unsigned int SeedRandom( void );
+void SeedRandom( unsigned int input );
+void SeedRandom( void );
 
 double UniformRandom( void );
 

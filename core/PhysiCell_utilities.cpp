@@ -73,27 +73,52 @@
 namespace PhysiCell{
 
 // std::random_device rd;
-std::mt19937_64 physicell_PRNG_generator; // (rd()); 
+std::mt19937_64 physicell_PRNG_generator; 
+int	physicell_random_seed; 
+
 // std::mt19937 gen(rd());
 
-unsigned int SeedRandom( unsigned int input )
+// unsigned int SeedRandom( unsigned int input )
+
+void SeedRandom( unsigned int input )
 {
-	physicell_PRNG_generator.seed( input);
-	return input;
+	physicell_random_seed = input; 
+	physicell_PRNG_generator.seed( input ); 	
+	return; 
 }
 
-unsigned int SeedRandom( void )
+// unsigned int SeedRandom( void )
+
+void SeedRandom( void )
 { 
+	physicell_PRNG_generator.seed( clock() );
+	return; 
+/*
 	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
 	physicell_PRNG_generator.seed(seed);
 	return seed;
+*/	
 }
 
-double UniformRandom()
+double UniformRandom_()
 {
+	return std::generate_canonical<double, 10>(physicell_PRNG_generator);
+}
+
+double UniformRandom( void )
+{
+	thread_local std::mt19937_64 generator(std::random_device{}());
+    std::uniform_real_distribution<double> distribution(0.0,1.0);
+    return distribution(generator);
+
+	// helpful info: https://stackoverflow.com/a/29710970
+/*
+
 	static std::uniform_real_distribution<double> distribution(0.0,1.0); 
-	return distribution(physicell_PRNG_generator); 
-	// return std::generate_canonical<double, 10>(gen);
+	double out;
+	out = distribution(physicell_PRNG_generator);
+	return out; 
+*/	
 }
 
 /*
@@ -140,9 +165,9 @@ std::vector<double> UniformOnUnitCircle( void )
 {
 	std::vector<double> output = {0,0,0}; 
 
-	static double two_pi = 6.283185307179586476925286766559;  
+	static long double two_pi = 6.283185307179586476925286766559;  
 	                       
-	double theta = UniformRandom(); //  BioFVM::uniform_random();(); 
+	long double theta = UniformRandom(); //  BioFVM::uniform_random();
 	theta *= two_pi; // Choose theta uniformly distributed on [0, 2*pi).
 
 	output[0] = cos(theta); 
