@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -73,15 +73,16 @@
 #include <cmath>
 #include <string>
 #include <vector>
-#include <random>
 #include <chrono>
+#include <random>
 
 namespace PhysiCell{
 
-long SeedRandom( long input );
-long SeedRandom( void );
+unsigned int SeedRandom( unsigned int input );
+unsigned int SeedRandom( void );
 
 double UniformRandom( void );
+
 int UniformInt( void );
 double NormalRandom( double mean, double standard_deviation );
 std::vector<double> UniformOnUnitSphere( void ); 

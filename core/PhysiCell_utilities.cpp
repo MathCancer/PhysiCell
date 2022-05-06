@@ -70,44 +70,45 @@
 
 #include "PhysiCell.h" 
 
-#include <iostream>
-#include <fstream>
-
 namespace PhysiCell{
 
-std::random_device rd;
-std::mt19937 gen(rd());
+// std::random_device rd;
+std::mt19937_64 physicell_PRNG_generator; // (rd()); 
+// std::mt19937 gen(rd());
 
-long SeedRandom( long input )
+unsigned int SeedRandom( unsigned int input )
 {
-	gen.seed(input);
+	physicell_PRNG_generator.seed( input);
 	return input;
 }
 
-
-long SeedRandom( void )
+unsigned int SeedRandom( void )
 { 
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	gen.seed(seed);
+	unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
+	physicell_PRNG_generator.seed(seed);
 	return seed;
 }
 
 double UniformRandom()
 {
-	return std::generate_canonical<double, 10>(gen);
+	static std::uniform_real_distribution<double> distribution(0.0,1.0); 
+	return distribution(physicell_PRNG_generator); 
+	// return std::generate_canonical<double, 10>(gen);
 }
 
+/*
 int UniformInt()
 {
-	std::uniform_int_distribution<int> int_dis;
-	return int_dis(gen);
+	static std::uniform_int_distribution<int> int_dis;
+	return int_dis(physicell_PRNG_generator);
 }
 
 double NormalRandom( double mean, double standard_deviation )
 {
-	std::normal_distribution<> d(mean,standard_deviation);
-	return d(gen); 
+	static std::normal_distribution<double> d(mean,standard_deviation);
+	return d(physicell_PRNG_generator); 
 }
+*/
 
 std::vector<double> UniformOnUnitSphere( void )
 {
@@ -139,8 +140,9 @@ std::vector<double> UniformOnUnitCircle( void )
 {
 	std::vector<double> output = {0,0,0}; 
 
-	static double two_pi = 6.283185307179586476925286766559; 
-	double theta = UniformRandom();
+	static double two_pi = 6.283185307179586476925286766559;  
+	                       
+	double theta = UniformRandom(); //  BioFVM::uniform_random();(); 
 	theta *= two_pi; // Choose theta uniformly distributed on [0, 2*pi).
 
 	output[0] = cos(theta); 

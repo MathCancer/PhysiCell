@@ -1167,7 +1167,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 		{
 			// dead phagocytosis 
 			probability = phenotype.cell_interactions.dead_phagocytosis_rate * dt; 
-			if( UniformRandom() <= probability ) 
+			if( UniformRandom() < probability ) 
 			{ pCell->ingest_cell(pTarget); } 
 		}
 		else
@@ -1175,7 +1175,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			// live phagocytosis
 			// assume you can only phagocytose one at a time for now 
 			probability = phenotype.cell_interactions.live_phagocytosis_rate(type_name) * dt; // s[type] * dt;  
-			if( UniformRandom() <= probability && phagocytosed == false ) 
+			if( UniformRandom() < probability && phagocytosed == false ) 
 			{
 				pCell->ingest_cell(pTarget);
 				phagocytosed = true; 
@@ -1184,7 +1184,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			// attack 
 			// assume you can only attack one cell at a time 
 			probability = phenotype.cell_interactions.attack_rate(type_name)*dt; // s[type] * dt;  
-			if( UniformRandom() <= probability && attacked == false ) 
+			if( UniformRandom() < probability && attacked == false ) 
 			{
 				pCell->attack_cell(pTarget,dt); 
 				attacked = true;
@@ -1193,7 +1193,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			// fusion 
 			// assume you can only fuse once cell at a time 
 			probability = phenotype.cell_interactions.fusion_rate(type_name)*dt; // s[type] * dt;  
-			if( UniformRandom() <= probability && fused == false  ) 
+			if( UniformRandom() < probability && fused == false  ) 
 			{
 				pCell->fuse_cell(pTarget);
 				fused = true; 
