@@ -74,16 +74,12 @@ This release introduces major new phenotype functionality, including standardize
 + We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
 
 + We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
-	
-+ We will most probably merge all of "core" and "modules" into "core." 
 
 ### Planned future improvements: 
 
 + Further XML-based simulation setup. 
 
 + Read saved simulation states (as MultiCellDS digital snapshots)
-  
-+ Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
  
 + Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
  
