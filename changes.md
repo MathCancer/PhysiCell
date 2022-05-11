@@ -63,7 +63,7 @@ focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracel
 
 + Random motility now uses UniformOnUnitCircle() (in 2D) and UniformOnUnitSphere() (in 3D) to choose the random component of the migration direction, rather than hand-coding selection of the random vector. 
 
-+ In response to PR 91 (https://github.com/MathCancer/PhysiCell/pull/91): Previoulsy, if the make jpeg rule fails, the __*.txt temporary files are left in place, so a subsequent "make jpeg" fails until these files are manually removed. Replacing >> (append) with > (overwrite) fixes the problem. Thanks saikiRA1011!
++ In response to PR 91 (https://github.com/MathCancer/PhysiCell/pull/91): Previoulsy, if the make jpeg rule fails, the `__*.txt` temporary files are left in place, so a subsequent "make jpeg" fails until these files are manually removed. Replacing `>>` (append) with `>` (overwrite) fixes the problem. Thanks [saikiRA1011](https://github.com/saikiRA1011)!
 
 ### Notices for intended changes that may affect backwards compatibility:
  
