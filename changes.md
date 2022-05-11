@@ -4,13 +4,11 @@
 
 **Version:** 1.10.0
 
-**Release date:** ?? April 2022
+**Release date:** 12 May 2022
 
 ## Release summary: 
 
-This release introduces major new phenotype functionality. 
-
-focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracellular modeling, as well as several small bugs in parsing cell definitions in the XML configuration file. It also implements a basic_volume_model that only models total volume. (For internal consistency, it treats the entire cell as cytoplasm.) 
+This release introduces major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
