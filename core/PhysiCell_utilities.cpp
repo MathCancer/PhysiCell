@@ -70,43 +70,125 @@
 
 #include "PhysiCell.h" 
 
-#include <iostream>
-#include <fstream>
-
 namespace PhysiCell{
 
-std::random_device rd;
-std::mt19937 gen(rd());
+thread_local std::mt19937_64 physicell_PRNG_generator; 
+thread_local bool local_pnrg_setup_done = false; 
 
-long SeedRandom( long input )
-{
-	gen.seed(input);
-	return input;
-}
+unsigned int physicell_random_seed = 0; 
+std::vector<unsigned int> physicell_random_seeds; 
 
-
-long SeedRandom( void )
+void SeedRandom( unsigned int input )
 { 
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	gen.seed(seed);
-	return seed;
+	physicell_random_seed = input;
+	physicell_PRNG_generator.seed( physicell_random_seed );
+
+	// now get number of threads and set up a seed for each thread 
+	int num_threads = PhysiCell_settings.omp_num_threads; 
+	physicell_random_seeds.resize( num_threads, 0 ); 
+
+	// use std::seed_seq to create a sequence of seeds 
+	// first, use the base seed 
+	std::vector<unsigned int> initial_sequence( num_threads , 0 ); 
+	// int* initial_sequence; 
+	// initial_sequence = new int [num_threads]; 
+	for( int i=0; i < num_threads ; i++ )
+	{ initial_sequence[i] = physicell_random_seed+i; } 
+	
+	// now we use std::seed_seq 
+	std::seed_seq seq(initial_sequence.begin() , initial_sequence.end() ); 
+
+	// now we call the generator 
+    std::vector<std::uint32_t> seeds(num_threads);
+    seq.generate(seeds.begin(), seeds.end());
+
+	// now transfer these into the seeds for each thread 
+	physicell_random_seeds[0] = physicell_random_seed; 
+	for( int i=1; i < num_threads ; i++ )
+	{ physicell_random_seeds[i] = seeds[i]; }
+
+	return; 
 }
 
-double UniformRandom()
-{
-	return std::generate_canonical<double, 10>(gen);
+void SeedRandom( void )
+{ 
+	physicell_random_seed = std::chrono::system_clock::now().time_since_epoch().count();
+	physicell_PRNG_generator.seed( physicell_random_seed );
+
+	// now get number of threads and set up a seed for each thread 
+	int num_threads = PhysiCell_settings.omp_num_threads; 
+	physicell_random_seeds.resize( num_threads, 0 ); 
+
+	// use std::seed_seq to create a sequence of seeds 
+	// first, use the base seed 
+	std::vector<unsigned int> initial_sequence( num_threads , 0 ); 
+	// int* initial_sequence; 
+	// initial_sequence = new int [num_threads]; 
+	for( int i=0; i < num_threads ; i++ )
+	{ initial_sequence[i] = physicell_random_seed+i; } 
+	
+	// now we use std::seed_seq 
+	std::seed_seq seq(initial_sequence.begin() , initial_sequence.end() ); 
+
+	// now we call the generator 
+    std::vector<std::uint32_t> seeds(num_threads);
+    seq.generate(seeds.begin(), seeds.end());
+
+	// now transfer these into the seeds for each thread 
+	physicell_random_seeds[0] = physicell_random_seed; 
+	for( int i=1; i < num_threads ; i++ )
+	{ physicell_random_seeds[i] = seeds[i]; }
+
+	return; 
 }
+
+double UniformRandom_old_not_thread_safe()
+{
+	return std::generate_canonical<double, 10>(physicell_PRNG_generator);
+}
+
+double UniformRandom( void )
+{
+	std::uniform_real_distribution<double> distribution(0.0,1.0);
+	if( local_pnrg_setup_done == false )
+	{
+		// get my thread number 
+		int i = omp_get_thread_num(); 
+    	physicell_PRNG_generator.seed( physicell_random_seeds[i] ); 
+		local_pnrg_setup_done = true; 
+/*
+		#pragma omp critical 
+		{
+		std::cout << "thread: " << i 
+		<< " seed: " << physicell_random_seeds[i]  << std::endl; 
+		std::cout << "\t first call: " << distribution(physicell_PRNG_generator) << std::endl; 
+		}
+*/
+	}
+    return distribution(physicell_PRNG_generator);
+
+	// helpful info: https://stackoverflow.com/a/29710970
+/*
+
+	static std::uniform_real_distribution<double> distribution(0.0,1.0); 
+	double out;
+	out = distribution(physicell_PRNG_generator);
+	return out; 
+*/	
+}
+
 
 int UniformInt()
 {
-	std::uniform_int_distribution<int> int_dis;
-	return int_dis(gen);
+	static std::uniform_int_distribution<int> int_dis;
+	return int_dis(physicell_PRNG_generator);
 }
+
 
 double NormalRandom( double mean, double standard_deviation )
 {
-	std::normal_distribution<> d(mean,standard_deviation);
-	return d(gen); 
+	std::normal_distribution<double> d(mean,standard_deviation);
+	return d(physicell_PRNG_generator); 
 }
 
 std::vector<double> UniformOnUnitSphere( void )
@@ -139,8 +221,9 @@ std::vector<double> UniformOnUnitCircle( void )
 {
 	std::vector<double> output = {0,0,0}; 
 
-	static double two_pi = 6.283185307179586476925286766559; 
-	double theta = UniformRandom();
+	static long double two_pi = 6.283185307179586476925286766559;  
+	                       
+	long double theta = UniformRandom(); //  BioFVM::uniform_random();
 	theta *= two_pi; // Choose theta uniformly distributed on [0, 2*pi).
 
 	output[0] = cos(theta); 

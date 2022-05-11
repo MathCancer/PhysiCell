@@ -252,6 +252,7 @@ void Cell::update_motility_vector( double dt_ )
 	
 	if( UniformRandom() < dt_ / phenotype.motility.persistence_time || phenotype.motility.persistence_time < dt_ )
 	{
+		/*
 		// choose a uniformly random unit vector 
 		double temp_angle = 6.28318530717959*UniformRandom();
 		double temp_phi = 3.1415926535897932384626433832795*UniformRandom();
@@ -271,7 +272,13 @@ void Cell::update_motility_vector( double dt_ )
 		randvec[0] *= cos( temp_angle ); // cos(theta)*sin(phi)
 		randvec[1] *= sin( temp_angle ); // sin(theta)*sin(phi)
 		randvec[2] = cos_phi; //  cos(phi)
-		
+		*/
+		std::vector<double> randvec(3,0.0);
+		if( phenotype.motility.restrict_to_2D == true )
+		{ randvec = UniformOnUnitCircle(); }
+		else
+		{ randvec = UniformOnUnitSphere(); }
+
 		// if the update_bias_vector function is set, use it  
 		if( functions.update_migration_bias )
 		{
@@ -943,6 +950,7 @@ void Cell::add_potentials(Cell* other_agent)
 	}
 	
 	// August 2017 - back to the original if both have same coefficient 
+
 	double effective_repulsion = sqrt( phenotype.mechanics.cell_cell_repulsion_strength * other_agent->phenotype.mechanics.cell_cell_repulsion_strength ); 
 	temp_r *= effective_repulsion; 
 	
@@ -966,7 +974,15 @@ void Cell::add_potentials(Cell* other_agent)
 		// temp_a *= phenotype.mechanics.cell_cell_adhesion_strength; // original 
 		
 		// August 2017 - back to the original if both have same coefficient 
-		double effective_adhesion = sqrt( phenotype.mechanics.cell_cell_adhesion_strength * other_agent->phenotype.mechanics.cell_cell_adhesion_strength ); 
+		// May 2022 - back to oriinal if both affinities are 1
+		int ii = find_cell_definition_index( this->type ); 
+		int jj = find_cell_definition_index( other_agent->type ); 
+
+		double adhesion_ii = phenotype.mechanics.cell_cell_adhesion_strength * phenotype.mechanics.cell_adhesion_affinities[jj]; 
+		double adhesion_jj = other_agent->phenotype.mechanics.cell_cell_adhesion_strength * other_agent->phenotype.mechanics.cell_adhesion_affinities[ii]; 
+
+		// double effective_adhesion = sqrt( phenotype.mechanics.cell_cell_adhesion_strength * other_agent->phenotype.mechanics.cell_cell_adhesion_strength ); 
+		double effective_adhesion = sqrt( adhesion_ii*adhesion_jj ); 
 		temp_a *= effective_adhesion; 
 		
 		temp_r -= temp_a;

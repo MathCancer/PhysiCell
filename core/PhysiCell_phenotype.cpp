@@ -310,7 +310,7 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 			else
 			{
 				double prob = phenotype.cycle.data.transition_rates[i][k]*dt; 
-				if( UniformRandom() <= prob )
+				if( UniformRandom() < prob )
 				{
 					continue_transition = true; 
 				}
