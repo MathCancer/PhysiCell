@@ -149,7 +149,7 @@ double UniformRandom_old_not_thread_safe()
 
 double UniformRandom( void )
 {
-	std::uniform_real_distribution<double> distribution(0.0,1.0);
+	thread_local std::uniform_real_distribution<double> distribution(0.0,1.0);
 	if( local_pnrg_setup_done == false )
 	{
 		// get my thread number 
