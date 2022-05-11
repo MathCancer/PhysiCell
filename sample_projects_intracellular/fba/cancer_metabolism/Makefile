@@ -25,10 +25,24 @@ LD_PATH  := -L$(DEPS_DIR)/libsbml/lib -L$(DEPS_DIR)/coin-or/lib/
 LIBS     := -lClp-static -lCoinUtils-static -llapack -lsbml-static -lxml2 -lbz2 -lz
 
 # if we're on Windows, we need to provide a (agreed upon) path to some of the dynamic libs
+#ifeq ($(OS),Windows_NT)
+#	WIN_LD_FLAG := -LC:\msys64\mingw64\bin
+#else
+#	WIN_LD_FLAG := 
+#endif
+
 ifeq ($(OS),Windows_NT)
 	WIN_LD_FLAG := -LC:\msys64\mingw64\bin
 else
 	WIN_LD_FLAG := 
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Darwin)
+		UNAME_P := $(shell uname -p)
+		var := $(shell which $(CC) | xargs file)
+		ifeq ($(lastword $(var)),arm64)
+		  CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -fopenmp -m64 -std=c++11
+		endif
+	endif
 endif
 
 COMPILE_COMMAND := $(CC) $(CFLAGS) $(DEPS_CFLAGS)
