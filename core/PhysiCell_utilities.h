@@ -76,10 +76,14 @@
 #include <chrono>
 #include <random>
 
+#include <omp.h> 
+
 namespace PhysiCell{
 
-// unsigned int SeedRandom( unsigned int input );
-// unsigned int SeedRandom( void );
+
+	extern std::vector<unsigned int> physicell_random_seeds; 
+
+
 void SeedRandom( unsigned int input );
 void SeedRandom( void );
 
