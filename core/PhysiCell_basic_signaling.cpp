@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,7 +70,7 @@
 using namespace BioFVM; 
 
 namespace PhysiCell{
-	
+
 Integrated_Signal::Integrated_Signal()
 {
 	base_activity = 0.0; 
@@ -155,4 +155,51 @@ void Integrated_Signal::add_signal( char signal_type , double signal , double we
 void Integrated_Signal::add_signal( char signal_type , double signal )
 { return add_signal( signal_type , signal , 1.0 ); }
 
-}; 
+double Hill_response_function( double s, double half_max , double hill_power )
+{ 
+    // newer. only one expensive a^b operation. 45% less computationl expense. 
+
+	// give an early exit possibility to cut cost on "empty" rules
+	if(s < 1e-16 ) // maybe also try a dynamic threshold: 0.0001 * half_max 
+	{ return 0.0; } 
+
+	// operations to reduce a^b operations and minimize hidden memory allocation / deallocation / copy operations. 
+	// Hill = (s/half_max)^hill_power / ( 1 + (s/half_max)^hill_power  )
+	double temp = s; // s 
+	temp /= half_max; // s/half_max 
+	double temp1 = pow(temp,hill_power); // (s/half_max)^h 
+	temp = temp1;  // (s/half_max)^h 
+	temp +=1 ;  // (1+(s/half_max)^h ); 
+	temp1 /= temp; // (s/half_max)^h / ( 1 + s/half_max)^h) 
+	return temp1; 
+}
+
+double linear_response_function( double s, double s_min , double s_max )
+{
+	if( s <= s_min )
+	{ return 0.0; } 
+	if( s >= s_max )
+	{ return 1.0; } 
+	s -= s_min; // overwrite s with s - s_min 
+	s_max -= s_min; // overwrite s_max with s_max - s_min 
+	s /= s_max; // now we have (s-s_min)/(s_max-s_min
+	return s; 
+}
+
+double decreasing_linear_response_function( double s, double s_min , double s_max )
+{
+	if( s <= s_min )
+	{ return 1.0; } 
+	if( s >= s_max )
+	{ return 0.0; } 
+	// (smax-s)/(smax-smin); 
+	// = -(s-smax)/(smax-smin)
+	s -= s_max; // replace s by s-s_max 
+	s_max -= s_min; // replace s_max = s_max - s_min 
+	s /= s_max; // this is (s-s_max)/(s_max-s_min)
+	s *= -1; // this is (s_max-s)/(s_max-s_min)
+	return s; 
+}
+
+
+};

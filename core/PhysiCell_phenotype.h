@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -83,6 +83,8 @@ namespace PhysiCell{
 class Cell;
 class Cycle_Model; 
 class Phenotype; 
+
+class Cell_Definition; 
 
 /*
 // future use?
@@ -356,9 +358,16 @@ class Mechanics
  public:
 	double cell_cell_adhesion_strength; 
 	double cell_BM_adhesion_strength;
+
 	double cell_cell_repulsion_strength;
 	double cell_BM_repulsion_strength; 
-	
+
+	std::vector<double> cell_adhesion_affinities; 
+	double& cell_adhesion_affinity( std::string type_name ); // done 
+	void sync_to_cell_definitions(); // done 
+	void set_fully_heterotypic( void ); // done 
+	void set_fully_homotypic( Cell* pCell ); // done 
+
 	// this is a multiple of the cell (equivalent) radius
 	double relative_maximum_adhesion_distance; 
 	// double maximum_adhesion_distance; // needed? 
@@ -402,6 +411,14 @@ class Motility
 	
 	int chemotaxis_index; 
 	int chemotaxis_direction; 
+	
+	// advanced chemotaxis 
+	std::vector<double> chemotactic_sensitivities; 
+	double& chemotactic_sensitivity( std::string name ); 
+	
+	void sync_to_current_microenvironment( void ); 
+	void sync_to_microenvironment( Microenvironment* pNew_Microenvironment ); 
+	
 		
 	Motility(); // done 
 };
@@ -579,7 +596,8 @@ class Intracellular
 	virtual std::string get_state() = 0;  
 	
 	virtual Intracellular* clone() = 0;
-    
+	
+	virtual ~Intracellular(){};
 	
 
     // ================  specific to "maboss" ================
@@ -596,6 +614,50 @@ class Intracellular
     virtual int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype) = 0;
     virtual int validate_SBML_species() = 0;
     virtual int create_custom_data_for_SBML(PhysiCell::Phenotype& phenotype) = 0;
+};
+
+class Cell_Interactions
+{
+ private:
+ public: 
+	// phagocytosis parameters (e.g., macrophages)
+	double dead_phagocytosis_rate; 
+	std::vector<double> live_phagocytosis_rates; 
+	// attack parameters (e.g., T cells)
+	std::vector<double> attack_rates;
+	double damage_rate;  
+	// cell fusion parameters 
+	std::vector<double> fusion_rates;
+	
+	// initialization 
+	Cell_Interactions(); // done 
+	void sync_to_cell_definitions(); // done 
+	
+	// ease of access 
+	double& live_phagocytosis_rate( std::string type_name ); // done 
+	double& attack_rate( std::string type_name ); // done 
+	double& fusion_rate( std::string type_name ); // done 
+	
+	// automated cell phagocytosis, attack, and fusion 
+//	void perform_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
+};
+
+class Cell_Transformations
+{
+ private:
+ public: 
+	// rates of transforming into different cell types 
+	std::vector<double> transformation_rates; 
+	
+	// initialization
+	Cell_Transformations(); // done 
+	void sync_to_cell_definitions(); // done 
+	
+	// ease of access 
+	double& transformation_rate( std::string type_name ); // done
+	
+	// automated cell transformations
+	// void perform_transformations( Cell* pCell, Phenotype& phenotype, double dt ); 
 };
 
 class Phenotype
@@ -618,6 +680,9 @@ class Phenotype
     // We need it to be a pointer to allow polymorphism
 	// then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
 	Intracellular* intracellular;
+	
+	Cell_Interactions cell_interactions; 
+	Cell_Transformations cell_transformations; 
 	
 	Phenotype(); // done 
 	Phenotype(const Phenotype &p);

@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:** 1.9.1
+**Version:** 1.10.0-beta
 
-**Release date:** 13 September 2021
+**Release date:** ?? April 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -37,6 +37,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
     ode-energy-sample 
     physiboss-cell-lines-sample 
     cancer-metabolism-sample
+    interaction-sample
 
 
 **make list-projects** : list all available sample projects 
@@ -72,7 +73,7 @@ See changes.md for the full change log.
 * * * 
 ## Release summary: 
 
-This release focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracellular modeling, as well as several small bugs in parsing cell definitions in the XML configuration file. It also implements a basic_volume_model that only models total volume. (For internal consistency, it treats the entire cell as cytoplasm.) 
+This release ... 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
@@ -80,34 +81,22 @@ This release focuses primarily on bug fixes. It fixes memory leaks and other bug
  
 ### Major new features and changes:
 
-+ None in this release. 
++ ...
 
 ### Minor new features and changes: 
 
-+ Implemented basic_volume_model (see standard models), where nuclear volumes are set to zero, and cytoplasmic volumes are updated as normal. 
++ ... 
 
 ### Beta features (not fully supported):
  
-+ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
++ ...
 
 + [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
 
-+ Added a simple Qt GUI for plotting cells only (plot_cells.py and vis_tab_cells_only.py in /beta)
-
-+ Added a simple Qt GUI for plotting substrates and cells (plot_data.py and vis_tab.py in /beta)
-
-+ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
++ ...
   
 ### Bugfixes: 
-+ Fixed bug in legend function where on some rare occasions, the temporary cell could adversely interact with other cells prior to deletion. 
-
-+ Remove an old error printout from standard_elastic_contact_function that causes problem with the ANCIENT version of gcc (4.8.x) that nanoHUB refuses to upgrade. 
-
-+ Fixed Libroadrunner memory leak issue.
-
-+ Made minor bugfixes to parsing cell definitions in the XML configuration files: 
-  + verify motility enabled flag is present before parsing its value
-  + fix bug when parsing multiple death models
++ ...
 
 ### Notices for intended changes that may affect backwards compatibility:
  
