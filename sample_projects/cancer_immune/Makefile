@@ -218,11 +218,11 @@ FRAMERATE := 24
 OUTPUT := output
 
 jpeg: 
-	@magick identify -format "%h" $(OUTPUT)/initial.svg >> __H.txt 
-	@magick identify -format "%w" $(OUTPUT)/initial.svg >> __W.txt 
-	@expr 2 \* \( $$(grep . __H.txt) / 2 \) >> __H1.txt 
-	@expr 2 \* \( $$(grep . __W.txt) / 2 \) >> __W1.txt 
-	@echo "$$(grep . __W1.txt)!x$$(grep . __H1.txt)!" >> __resize.txt 
+	@magick identify -format "%h" $(OUTPUT)/initial.svg > __H.txt 
+	@magick identify -format "%w" $(OUTPUT)/initial.svg > __W.txt 
+	@expr 2 \* \( $$(grep . __H.txt) / 2 \) > __H1.txt 
+	@expr 2 \* \( $$(grep . __W.txt) / 2 \) > __W1.txt 
+	@echo "$$(grep . __W1.txt)!x$$(grep . __H1.txt)!" > __resize.txt 
 	@magick mogrify -format jpg -resize $$(grep . __resize.txt) $(OUTPUT)/s*.svg
 	rm -f __H*.txt __W*.txt __resize.txt 
 	
@@ -241,8 +241,8 @@ pov:
 
 SOURCE := PhysiCell_upgrade.zip 
 get-upgrade: 
-	@echo $$(curl https://raw.githubusercontent.com/MathCancer/PhysiCell/master/VERSION.txt) >> VER.txt 
-	@echo https://github.com/MathCancer/PhysiCell/releases/download/$$(grep . VER.txt)/PhysiCell_V.$$(grep . VER.txt).zip >> DL_FILE.txt 
+	@echo $$(curl https://raw.githubusercontent.com/MathCancer/PhysiCell/master/VERSION.txt) > VER.txt 
+	@echo https://github.com/MathCancer/PhysiCell/releases/download/$$(grep . VER.txt)/PhysiCell_V.$$(grep . VER.txt).zip > DL_FILE.txt 
 	rm -f VER.txt
 	$$(curl -L $$(grep . DL_FILE.txt) --output PhysiCell_upgrade.zip)
 	rm -f DL_FILE.txt 
