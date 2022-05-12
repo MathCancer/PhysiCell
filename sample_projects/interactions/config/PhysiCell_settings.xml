@@ -1265,7 +1265,7 @@
                 <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
               </live_phagocytosis_rates>
               <attack_rates>
-                <attack_rate name="bacteria" units="1/min">0.05</attack_rate>
+                <attack_rate name="bacteria" units="1/min">10</attack_rate>
                 <attack_rate name="blood vessel" units="1/min">0</attack_rate>
                 <attack_rate name="stem" units="1/min">0</attack_rate>
                 <attack_rate name="differentiated" units="1/min">0</attack_rate>
