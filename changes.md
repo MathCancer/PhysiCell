@@ -1,6 +1,4 @@
-# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
-
-# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
 **Version:** 1.10.0
 
@@ -55,7 +53,62 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
    + `double decreasing_linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 1.0 (for inputs `s` below `s_min`) to 0.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
 
 + We introduced a "dictionary" of standard signals that can be used as inputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + dfdf
+  + Major classes of signals include:
+    + extracellular and intracellular substrate concentrations
+    + substrate gradients
+    + contact with dead cells
+    + contact with cells (of type X)
+    + damage
+    + pressure
+    + Use `display_signal_dictionary()` to quickly display a list of available signals. 
+  + Substantial functionality to query signals
+    + `int find_signal_index( std::string signal_name )` : get the index of the named signal 
+    + `std::vector<int> find_signal_indices( std::vector<std::string> signal_names );` get a vector of indices for a vector of named signals 
+    + `std::string signal_name( int i );` display the name of the signal with the given index 
+    + `std::vector<double> get_signals( Cell* pCell );` get a vector of all known signals for the cell 
+    + `std::vector<double> get_cell_contact_signals( Cell* pCell );` get a vector of the cell contact associated signals for the cell 
+    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices );` get a vector of signals for the cell, with the supplied indices
+    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names );` get a vector of signals for the cell, with the supplied human-readable names of the signals 
+    + `double get_single_signal( Cell* pCell, int index );` get a single signal for the cell with the indicated index
+    + `double get_single_signal( Cell* pCell, std::string name );` get a single signal for the cell with the indicated human-readable name 
+
++ We introduced a "dictionary" of standard behaviors that can be used as outputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
+  + Major classes of behaviors include:
+    + secretion, secretion target, uptake, and export rates 
+    + cycle progression
+    + death rates
+    + motility parameters 
+    + chemotactic parameters 
+    + cell-cell adhesion and repulsion parameters
+    + cell adhesion affinities 
+    + cell-BM adhesion and repulsion parameters
+    + phagocytosis rates 
+    + attack rates
+    + fusion rates
+    + transformation rates 
+    + Use `display_behavior_dictionary()` to quickly see a list of posible behaviors.
+  + Substantial functionality to query and set behaviors 
+    + `int find_behavior_index( std::string response_name )` : get the index of the named behavior 
+    + `std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names )` get the indices for the given vector of behavior names. 
+    + `std::string behavior_name( int i );` get the name of the behavior with the given index 
+    + `std::vector<double> create_empty_behavior_vector();` create an empty vector for the full set of behaviors 
+    + `void set_behaviors( Cell* pCell , std::vector<double> parameters );` write the full set of behaviors to the cell's phentoype
+    + `void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters );` write the selected set of behaviors (with supplied indices) to the cell's phenotype
+    + `void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters );` write the selected set of behaviors (with supplied names) to the cell's phenotype 
+    + `void set_single_behavior( Cell* pCell, int index , double parameter );` write a single behavior (by index) to the cell phentoype
+    + `void set_single_behavior( Cell* pCell, std::string name , double parameter );` write a single behavior (by name) to the cell phentoype
+  + Substantial functionality to query the cell's current behavior
+    + `std::vector<double> get_behaviors( Cell* pCell );` get all the cell's current behaviors 
+    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of behaviors (with given indices) 
+    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of behaviors (with given names)
+    + `double get_single_behavior( Cell* pCell , int index );` get a single behavior (by index)
+    + `double get_single_behavior( Cell* pCell , std::string name );` get a single behavior (by name)
+  + Substantial functionality to query the cell's referece behaviors (from its cell definition) 
+    + `std::vector<double> get_base_behaviors( Cell* pCell );` get all the cell's base behaviors 
+    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of base behaviors (with given indices) 
+    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of base behaviors (with given names)
+    + `double get_single_base_behavior( Cell* pCell , int index );` get a single base behavior (by index)
+    + `double get_single_base_behavior( Cell* pCell , std::string name );` get a single base behavior (by name)
 
 + Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
   + dfdf
