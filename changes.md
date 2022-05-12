@@ -111,8 +111,17 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
     + `double get_single_base_behavior( Cell* pCell , std::string name );` get a single base behavior (by name)
 
 + Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
-  + dfdf
-
+  + Blood vessels release resource
+  + Virulet bacteria colonize near vessels (by chemotaxis up towards a secreted quorum factor and resource)
+  + Stem cells divide and differentiate into differentiated cells
+  + Differentiated cells divide until experiencing elevated pressure (to detect confluence)
+  + Bacteria-secreted virulence factor kills stem and differentiated cells. Dead cells release debris.
+  + Macrophages chemotax towards quorum factor and debris and secrete pro-inflammatory factor in presence of dead cells or bacteria
+  + Macrophages phagocytose dead cells
+  + CD8+ T cells chemotax towards pro-inflamatory factor and attack bacteria
+  + Neutrophils chemotax towards pro-inflammatory factor and phagocytose live bacteria
+  + Accumulated damage kills bacteria. 
+  + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
 
 ### Minor new features and changes: 
 
