@@ -19,15 +19,29 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
  
-### Major new features and changes:
+### Major new features and changes in the 1.10.z versions
+#### 1.10.0
 
 + Created `Cell_Interactions` in `Phenotype` as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
+  +  Users can set phagocytosis rates for dead cells via `phenotype.cell_interactions.dead_phagocytosis_rate`. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. 
+  +  Users can set phagocytosis rates for each live cell type via `phenotype.cell_interactions.live_phagocytosis_rates`. There is one rate for each cell type in the simulation. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. Phagocytosis absorbs the target cell's volume and internal contents and flags the target for removal. The cell will eventually shrink back towards its target volume. 
+  +  For convenience, the phagocytosis rates can be accessed (read or written) via `phenotype.cell_interactions.live_phagocytosis_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
+  +  Users can set attack rates for live cells via `phenotype.cell_interactions.attack_rates`. There is one rate for each cell type in the simulation. Cells automaticaly attack neighbors at each mechanics time step based upon the rates. An attack event increases the target cell's `cell.state.damage` by `damage_rate * dt_mechanics` and `cell.state.total_attack_time` by `dt_mechanics`. It is up to the scientist user to set additional hypotheses that increases cell death with accumulated damage or attack time. 
+  +  For convenience, the attack rates can be accessed via `phenotype.cell_interactions.attack_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
+  +  Users can set fusion rates for live cells via `phenotype.cell_interactions.fusion_rates`. There is one rate for each cell type in the simulation. Cells automaticaly fuse with at each mechanics time step based upon the rates. Fusion will merge the two cells' volumes and internal contents, add their nuclei (recorded in `cell.state.number_of_nuclei`), and move the combine cell to the prior center of volume. The combined cell's new target volume is the sum of the two original cells' target volumes. 
+  +  For convenience, the fusion rates can be accessed via `phenotype.cell_interactions.fusion_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
 
 + Created `Cell_Transformations` in `Phenotype` as a standard representation of cell transformations such as differentation or transdifferentiation. 
+  +  Users can set transformation rates for each live cell type via `phenotype.cell_transformations_transformation_rates`. There is one rate for each cell type in the simulation. Cells automatically attempt to transform to these types at each phenotype time step based upon the phagocytosis rates. 
+  +  For convenience, the transformation rates can be accessed (read or written) via `phenotype.cell_transformations.transformation_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
 
 + Updated `Cell_State` to track the number of nuclei (for fusion), total damage (e.g., for cell attack) and total attack time. 
 
 + Added a new `advanced_chemotaxis` function with data stored in `phenotype.motility` to allow chemotaxis up a linear combination of gradients. 
+  + `cell.phenotype.motility.chemotactic_sensitivities` is a vector of chemotactic sensitivies, one for each substrate in the environment. By default, these are all zero for backwards compatibility. A positive sensitivity denotes chemotaxis up a corresponding substrate's gradient (towards higher values), whereas a negative sensitivity gives chemotaxis against a gradient (towards lower values). 
+  + For convenience, you can access (read and write) a substrate's chemotactic sensitivity via `phenotype.motility.chemotactic_sensitivity(name)`, where `name` is the human-readable name of a substrate in the simulation. 
+  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function`, then these sensitivities are used to set the migration bias direction via \[ blah \int_a^b f(x) dx \]. 
+  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function_normalized`, then these sensitivities are used to set the migration bias direction via \[ blah \int_a^b f(x) dx \]. 
 
 + Added a new `adhesion_affinities` to `phenotype.mechanics` to allow preferential adhesion. If cell `i` and cell `j` 
 
@@ -37,7 +51,7 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
    + dfdf
    + dfdf 
 
-+ Updated 
++ Dictionary 
 
 + Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
   + dfdf
@@ -49,14 +63,9 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
 + All sample projects output the executable name to screen for easier reference. 
 
-+ `Cell_Definition` has a new Boolean `is_movable`, so that all cells of a type can be set to non-movable. (Default: `is_movable = true`;)
++ `Cell_Definition` has a new Boolean `is_movable`, so that all cells of a type can be set to non-movable. (Default: `is_movable = true`;) This allows you to use agents as rigid objects or barriers. 
 
 + `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
-
-+ 
-
-	@echo "\n\nExecutable name is " $(PROGRAM_NAME) " \n"
-
 
 ### Beta features (not fully supported):
  
