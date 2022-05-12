@@ -71,25 +71,25 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
-+ When the cell_defaults definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying cell_defaults, the XML parsing will reset motility to off (with NULL function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set legacy_cell_defaults_copy = true in the config file to override this bugfix. 
++ When the `cell_defaults` definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying `cell_defaults`, the XML parsing will reset motility to off (with `NULL` function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set `legacy_cell_defaults_copy = true` in the config file to override this bugfix. 
 
-+ We refactored the pseudorandom number generator (at the basis of UniformRandom()) to improve thread safety. Previously, all threads shared a single PRNG, which was not thread safe. For newer fast processors with many threads, this could lead to sufficiently many "collisions" to introduce subtle biases in some cases (particularly for purely Brownian motion that is not dominated by chemotaxis, proliferation, and other behaviors). This is now corrected by creating a PRNG for each thread, each with its own seed. We used std::seed_seq to determinstically set a good spread of seeds to prevent correlation between the PRNGs, with the convention that the 0th thread's seed is either the user-specified seed or a random seed. This preserves original single-thread behavior from prior versions. 
++ We refactored the pseudorandom number generator (at the basis of `UniformRandom()`) to improve thread safety. Previously, all threads shared a single PRNG, which was not thread safe. For newer fast processors with many threads, this could lead to sufficiently many "collisions" to introduce subtle biases in some cases (particularly for purely Brownian motion that is not dominated by chemotaxis, proliferation, and other behaviors). This is now corrected by creating a PRNG for each thread, each with its own seed. We used `std::seed_seq` to determinstically set a good spread of seeds to prevent correlation between the PRNGs, with the convention that the 0th thread's seed is either the user-specified seed or a random seed. This preserves original single-thread behavior from prior versions. 
 
-+ Random motility now uses UniformOnUnitCircle() (in 2D) and UniformOnUnitSphere() (in 3D) to choose the random component of the migration direction, rather than hand-coding selection of the random vector. 
++ Random motility now uses `UniformOnUnitCircle()` (in 2D) and `UniformOnUnitSphere()` (in 3D) to choose the random component of the migration direction, rather than hand-coding selection of the random vector. 
 
 + In response to PR 91 (https://github.com/MathCancer/PhysiCell/pull/91): Previoulsy, if the make jpeg rule fails, the `__*.txt` temporary files are left in place, so a subsequent "make jpeg" fails until these files are manually removed. Replacing `>>` (append) with `>` (overwrite) fixes the problem. Thanks [saikiRA1011](https://github.com/saikiRA1011)!
 
 ### Notices for intended changes that may affect backwards compatibility:
  
-+ We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
++ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the very near future.  
 
-+ We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
++ We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
 
 + Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
  
-+ We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
++ We will change the timing of when `entry_function`s are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather than both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to execute the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
 
-+ We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
++ We might make `trigger_death` clear out all the cell's functions, or at least add an option to do this. 
 
 ### Planned future improvements: 
 
