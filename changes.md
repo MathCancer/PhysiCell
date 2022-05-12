@@ -10,9 +10,9 @@
 
 This release introduces major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
-A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-transformation-in-physicell-1-10-0
+A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-transformation-in-physicell-1-10-0.
 
-A blog post and tutorial on the new signal and behavior dictionaries can be found at [http://www.mathcancer.org/blog/introducing-cell-signal-behavior-dictionaries-in-physicell-1-10-0](http://www.mathcancer.org/blog/introducing-cell-signal-behavior-dictionaries-in-physicell-1-10-0)
+A blog post and tutorial on the new signal and behavior dictionaries can be found at [http://www.mathcancer.org/blog/introducing-cell-signal-behavior-dictionaries-in-physicell-1-10-0](http://www.mathcancer.org/blog/introducing-cell-signal-behavior-dictionaries-in-physicell-1-10-0).
 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
@@ -21,15 +21,26 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
  
 ### Major new features and changes:
 
-+ Created Cell_Interactions in Phenotype as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
++ Created `Cell_Interactions` in `Phenotype` as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
 
-+ Created Cell_Transformations in Phenotype as a standard representation of cell transformations such as differentation or transdifferentiation. 
++ Created `Cell_Transformations` in `Phenotype` as a standard representation of cell transformations such as differentation or transdifferentiation. 
 
-+ PhysiCell now runs a s
++ Updated `Cell_State` to track the number of nuclei (for fusion), total damage (e.g., for cell attack) and total attack time. 
 
-+ PhysiCell_basic_signaling now includes standard Hill and linear response functions. 
++ Added a new `advanced_chemotaxis` function with data stored in `phenotype.motility` to allow chemotaxis up a linear combination of gradients. 
 
-+ Updated heterogeneity-sample, template, 
++ Added a new `adhesion_affinities` to `phenotype.mechanics` to allow preferential adhesion. If cell `i` and cell `j` 
+
+
+
++ `PhysiCell_basic_signaling` now includes standard Hill and linear response functions: 
+   + dfdf
+   + dfdf 
+
++ Updated 
+
++ Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
+  + dfdf
 
 
 ### Minor new features and changes: 
@@ -38,9 +49,9 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
 + All sample projects output the executable name to screen for easier reference. 
 
-+ Cell_Definition has a new Boolean is_movable, so that all cells of a type can be set to non-movable. (Default: is_movable = true;)
++ `Cell_Definition` has a new Boolean `is_movable`, so that all cells of a type can be set to non-movable. (Default: `is_movable = true`;)
 
-+ create_cell( Cell_Definition ) now uses "is_movable" from the cell def 
++ `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
 
 + 
 
