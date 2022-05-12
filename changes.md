@@ -40,18 +40,22 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Added a new `advanced_chemotaxis` function with data stored in `phenotype.motility` to allow chemotaxis up a linear combination of gradients. 
   + `cell.phenotype.motility.chemotactic_sensitivities` is a vector of chemotactic sensitivies, one for each substrate in the environment. By default, these are all zero for backwards compatibility. A positive sensitivity denotes chemotaxis up a corresponding substrate's gradient (towards higher values), whereas a negative sensitivity gives chemotaxis against a gradient (towards lower values). 
   + For convenience, you can access (read and write) a substrate's chemotactic sensitivity via `phenotype.motility.chemotactic_sensitivity(name)`, where `name` is the human-readable name of a substrate in the simulation. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function`, then these sensitivities are used to set the migration bias direction via \[ blah \int_a^b f(x) dx \]. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function_normalized`, then these sensitivities are used to set the migration bias direction via \[ blah \int_a^b f(x) dx \]. 
+  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * grad(rho_0) + sensitivity_1 * grad(rho_1) + ... + sensitivity_n * grad(rho_n)`. 
+  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function_normalized`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * |grad(rho_0)| + sensitivity_1 * |grad(rho_1)| + ... + sensitivity_n * |grad(rho_n)|.` 
 
-+ Added a new `adhesion_affinities` to `phenotype.mechanics` to allow preferential adhesion. If cell `i` and cell `j` 
-
-
++ Added a new `adhesion_affinities` to `phenotype.mechanics` to allow preferential adhesion.
+  + `cell.phenotype.mechanics.adhesion_affinities` is a vector of adhesive affinities, one for each cell type in the simulation. By default, these are all one for backwards compatibility.  
+  + For convenience, you can access (read and write) a cell's adhesive affinity for a specific cell type via `phenotype.mechanics.adhesive_affinity(name)`, where `name` is the human-readable name of a cell type in the simulation. 
+  + The standard mechanics function (based on potentials) uses this as follows. If cell `i` has an cell-cell adhesion strength `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has a cell-cell adhesion strength of `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
+  + The standard elastic spring function (`standard_elastic_contact_function`) uses this as follows. If cell `i` has an elastic constant `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has an elastic constant `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
 
 + `PhysiCell_basic_signaling` now includes standard Hill and linear response functions: 
-   + dfdf
-   + dfdf 
+   + `Hill_response_function( double s, double half_max , double hill_power )` is a Hill function responding to signal `s` with a half-max of `half_max` and Hill coefficient of `hill_power`. We note that this function is an order of magnitude faster when the `hill_power` is an integer (e.g., 1 or 2) rather than a non-integer power (e.g., 1.4). 
+   + `double linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 0.0 (for inputs `s` below `s_min`) to 1.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
+   + `double decreasing_linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 1.0 (for inputs `s` below `s_min`) to 0.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
 
-+ Dictionary 
++ We introduced a "dictionary" of standard signals that can be used as inputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
+  + dfdf
 
 + Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
   + dfdf
