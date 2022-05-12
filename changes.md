@@ -8,7 +8,12 @@
 
 ## Release summary: 
 
-This release introduces major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
+This release introduces major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
+
+A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-transformation-in-physicell-1-10-0
+
+A blog post and tutorial on the new signal and behavior dictionaries can be found at [http://www.mathcancer.org/blog/introducing-cell-signal-behavior-dictionaries-in-physicell-1-10-0](http://www.mathcancer.org/blog/introducing-cell-signal-behavior-dictionaries-in-physicell-1-10-0)
+
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
