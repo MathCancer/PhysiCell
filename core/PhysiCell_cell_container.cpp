@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -124,7 +124,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 {
 	// secretions and uptakes. Syncing with BioFVM is automated. 
 
-	// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "secretion" << std::endl; 
 	#pragma omp parallel for 
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
@@ -153,7 +152,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
 		// checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "bundled phenotype" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -163,7 +161,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			}
 		}
 		
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "divide / die " << std::endl; 
 		// process divides / removes 
 		for( int i=0; i < cells_ready_to_divide.size(); i++ )
 		{
@@ -197,7 +194,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{ microenvironment.compute_all_gradient_vectors();  }
 		// end of new in Feb 2018 
 		
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "interactions" << std::endl; 
 		// perform interactions -- new in June 2020 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
@@ -209,18 +205,17 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// perform custom computations 
 
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "custom" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
 			Cell* pC = (*all_cells)[i]; 
+						
 			if( pC->functions.custom_cell_rule && pC->is_out_of_domain == false )
 			{ pC->functions.custom_cell_rule( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
 		
 		// update velocities 
 		
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "velocity" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -229,9 +224,32 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{ pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
 
+		// new March 2022: 
+		// run standard interactions (phagocytosis, attack, fusion) here 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics); 
+		}
+		// super-critical to performance! clear the "dummy" cells from phagocytosis / fusion
+		// otherwise, comptuational cost increases at polynomial rate VERY fast, as O(10,000) 
+		// dummy cells of size zero are left ot interact mechanically, etc. 
+		if( cells_ready_to_die.size() > 0 )
+		{
+			/*
+			std::cout << "\tClearing dummy cells from phagocytosis and fusion events ... " << std::endl; 
+			std::cout << "\t\tClearing " << cells_ready_to_die.size() << " cells ... " << std::endl; 
+			// there might be a lot of "dummy" cells ready for removal. Let's do it. 		
+			*/
+			for( int i=0; i < cells_ready_to_die.size(); i++ )
+			{ cells_ready_to_die[i]->die(); }
+			cells_ready_to_die.clear();
+		}
+		
+
 		// update positions 
 		
-		// std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "position" << std::endl; 
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -239,43 +257,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			if( pC->is_out_of_domain == false && pC->is_movable)
 			{ pC->update_position(time_since_last_mechanics); }
 		}
-		
-/*		
-		// Compute custom functions, interations, and velocities
-		#pragma omp parallel for 
-		for( int i=0; i < (*all_cells).size(); i++ )
-		{
-
-			if(!(*all_cells)[i]->is_out_of_domain && (*all_cells)[i]->is_movable && (*all_cells)[i]->functions.update_velocity )
-			{
-				// update_velocity already includes the motility update 
-				//(*all_cells)[i]->phenotype.motility.update_motility_vector( (*all_cells)[i] ,(*all_cells)[i]->phenotype , time_since_last_mechanics ); 
-				(*all_cells)[i]->functions.update_velocity( (*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
-			}
-
-			if( (*all_cells)[i]->functions.custom_cell_rule )
-			{
-				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
-			}
-			
-			// contact interactions 
-			
-			if( (*all_cells)[i]->functions.contact_function )
-			{
-				evaluate_interactions( (*all_cells)[i] , (*all_cells)[i]->phenotype, time_since_last_mechanics );
-			}
-			
-		}
-		// Calculate new positions
-		#pragma omp parallel for 
-		for( int i=0; i < (*all_cells).size(); i++ )
-		{
-			if(!(*all_cells)[i]->is_out_of_domain && (*all_cells)[i]->is_movable)
-			{
-				(*all_cells)[i]->update_position(time_since_last_mechanics);
-			}
-		}
-*/		
 		
 		// When somebody reviews this code, let's add proper braces for clarity!!! 
 		

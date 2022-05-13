@@ -1,4 +1,4 @@
-/*
+	/*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -71,10 +71,19 @@
 #ifndef __PhysiCell_basic_signaling__
 #define __PhysiCell_basic_signaling__
 
-#include "./PhysiCell.h"
+#include "./PhysiCell_constants.h" 
+#include "./PhysiCell_phenotype.h" 
+#include "./PhysiCell_cell.h" 
 
 namespace PhysiCell{
 	
+// std::vector<std::string> 
+
+double Hill_response_function( double s, double half_max , double hill_power ); // done
+// increases from 0 (at s_min) to 1 (at s_max)
+double linear_response_function( double s, double s_min , double s_max ); // done 
+// decreases from 1 (at s_min) to 0 (at s_max)
+double decreasing_linear_response_function( double s, double s_min , double s_max ); // done 
 
 // signal increases/decreases parameter
 // options: hill power
@@ -105,6 +114,7 @@ class Integrated_Signal
 
 	double compute_signal( void );
 };
+
 
 }; 
 

@@ -114,7 +114,7 @@ int main( int argc, char* argv[] )
 	/* Microenvironment setup */ 
 	
 	setup_microenvironment(); // modify this in the custom code 
-	
+
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
@@ -124,7 +124,7 @@ int main( int argc, char* argv[] )
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	create_cell_types();
-	
+
 	setup_tissue();
 
 	/* Users typically stop modifying here. END USERMODS */ 
@@ -169,7 +169,7 @@ int main( int argc, char* argv[] )
 	{	
 		sprintf( filename , "%s/simulation_report.txt" , PhysiCell_settings.folder.c_str() ); 
 		
-		report_file.open(filename); 	// create the data log file 
+		report_file.open(filename); // create the data log file 
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
 	
@@ -221,7 +221,7 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
-			
+
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 		

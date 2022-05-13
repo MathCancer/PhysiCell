@@ -1,4 +1,4 @@
-/*
+	/*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
@@ -64,53 +64,114 @@
 #                                                                             #
 ###############################################################################
 */
-
-#ifndef __PhysiCell_utilities_h__
-#define __PhysiCell_utilities_h__
-
-#include <iostream>
-#include <ctime>
-#include <cmath>
-#include <string>
+ 
 #include <vector>
-#include <chrono>
-#include <random>
+#include <string>
 
-#include <omp.h> 
+#ifndef __PhysiCell_signal_response__
+#define __PhysiCell_signal_response__
+
+#include "./PhysiCell_constants.h" 
+#include "./PhysiCell_phenotype.h" 
+#include "./PhysiCell_cell.h" 
 
 namespace PhysiCell{
 
+// scales for the signals 
+extern std::vector<double> signal_scales; 
+// easy access to get or set scales 
+double& signal_scale( std::string signal_name ); // done 
+double& signal_scale( int signal_index ); // done 
 
-	extern std::vector<unsigned int> physicell_random_seeds; 
+// create the signal and behavior dictionaries 
+void setup_signal_behavior_dictionaries( void ); // done 
 
+// display dictionaries 
+void display_signal_dictionary( void ); // done 
+void display_behavior_dictionary( void ); // done 
 
-void SeedRandom( unsigned int input );
-void SeedRandom( void );
+void display_signal_dictionary( std::ostream& os ); // done 
+void display_behavior_dictionary( std::ostream& os ); // done 
 
-double UniformRandom( void );
+void display_signal_dictionary_with_synonyms( void ); // done 
+void display_behavior_dictionary_with_synonyms( void ); // done 
 
-int UniformInt( void );
-double NormalRandom( double mean, double standard_deviation );
-double LogNormalRandom( double mean, double standard_deviation );
+/* signal functions */ 
 
-std::vector<double> UniformOnUnitSphere( void ); 
-std::vector<double> UniformOnUnitCircle( void ); 
+// find index for named signal (returns -1 if not found)
+int find_signal_index( std::string signal_name ); // done 
 
-std::vector<double> LegacyRandomOnUnitSphere( void ); 
+// coming soon: 
+std::vector<int> find_signal_indices( std::vector<std::string> signal_names ); // done 
 
+// get the name of a signal index 
+std::string signal_name( int i ); // done 
 
-double dist_squared(std::vector<double> p1, std::vector<double> p2);
-double dist(std::vector<double> p1, std::vector<double> p2);
+// create a full signal vector 
+std::vector<double> get_signals( Cell* pCell ); // done 
 
-std::string get_PhysiCell_version( void ); 
-void get_PhysiCell_version( std::string& pString ); 
+// create a signal vector of only the cell contacts 
+std::vector<double> get_cell_contact_signals( Cell* pCell ); // done 
 
-void display_citations( std::ostream& os ); 
-void display_citations( void ); 
-void add_software_citation( std::string name , std::string version, std::string DOI, std::string URL ); 
+// create a subset of the signal vector with the supplied indicies 
+std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices ); // done 
+std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names );  // done 
 
-int choose_event( std::vector<double>& probabilities ); 
+// grab a single signal by its index or name 
+double get_single_signal( Cell* pCell, int index ); // done 
+double get_single_signal( Cell* pCell, std::string name ); // done 
 
-};
+/* behavior functions */ 
 
-#endif
+// find index for named behavior / response / parameter (returns -1 if not found)
+int find_parameter_index( std::string response_name ); // done
+int find_behavior_index( std::string response_name ); // done 
+
+std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names ); // done 
+
+// get the name of a behavior index 
+std::string behavior_name( int i ); // done 
+
+// make a properly sized behavior vector 
+std::vector<double> create_empty_behavior_vector(); // done 
+
+// write a full behavior vector (phenotype parameters) to the cell 
+void set_behaviors( Cell* pCell , std::vector<double> parameters ); // done 
+
+// write a selected set of behavior parameters to the cell 
+void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters ); // done 
+void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters ); // done 
+
+// write a single behavior parameter 
+void set_single_behavior( Cell* pCell, int index , double parameter ); // done  
+void set_single_behavior( Cell* pCell, std::string name , double parameter ); // done 
+
+/* get current behaviors */ 
+
+// get all current behavior
+std::vector<double> get_behaviors( Cell* pCell ); // done 
+
+// get selected current behavior
+std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices ); // doen 
+std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names ); // done 
+
+// get single current behavior 
+double get_single_behavior( Cell* pCell , int index ); // done 
+double get_single_behavior( Cell* pCell , std::string name ); // done 
+
+/* get base behaviors (from cell definition) */ 
+
+// get all base behaviors (from cell's definition) 
+std::vector<double> get_base_behaviors( Cell* pCell );  // done 
+
+// get selected base behaviors (from cell's definition)
+std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices ); // done 
+std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names ); // done 
+
+// get single base behavior (from cell's definition)
+double get_single_base_behavior( Cell* pCell , int index ); // done 
+double get_single_base_behavior( Cell* pCell , std::string name ); // done 
+
+}; 
+
+#endif 

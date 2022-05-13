@@ -14,17 +14,23 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 	if (this->engine != NULL) {
 		delete this->engine;
 	}
-	// Initialize MaBoSS Objects for a model
-	this->network = new Network();
-	this->network->parse(networkFile.c_str());
+	
+	try{
+		// Initialize MaBoSS Objects for a model
+		this->network = new Network();
+		this->network->parse(networkFile.c_str());
 
-	this->config = new RunConfig();
-	this->config->parse(this->network, configFile.c_str());
+		this->config = new RunConfig();
+		this->config->parse(this->network, configFile.c_str());
 
-	IStateGroup::checkAndComplete(this->network);
+		IStateGroup::checkAndComplete(this->network);
 
-	engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
-
+		engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
+	
+	} catch (BNException e) {
+		std::cerr << "MaBoSS ERROR : " << e.getMessage() << std::endl;
+		exit(1);
+	}
 	this->update_time_step = this->config->getMaxTime();
 	
 	// Building map of nodes for fast later access 
@@ -47,7 +53,12 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 void MaBoSSNetwork::mutate(std::map<std::string, double> mutations) 
 {
 	for (auto mutation : mutations) {
-		nodesByName[mutation.first]->mutate(mutation.second);
+		if (nodesByName.find(mutation.first) != nodesByName.end())
+			nodesByName[mutation.first]->mutate(mutation.second);
+		else{
+			std::cerr << "Mutation set for unknown node : can't find node " << mutation.first << std::endl;
+			exit(1);
+		}
 	}
 }
 
@@ -77,9 +88,13 @@ void MaBoSSNetwork::restart_node_values()
 	this->network->initStates(state, engine->random_generator);
 	
 	for (auto initial_value : initial_values) {
-		state.setNodeState(nodesByName[initial_value.first], PhysiCell::UniformRandom() < initial_value.second);
+		if (nodesByName.find(initial_value.first) != nodesByName.end()) {
+			state.setNodeState(nodesByName[initial_value.first], PhysiCell::UniformRandom() < initial_value.second);	
+		} else {
+			std::cerr << "Initial value set for unknown node : can't find node " << initial_value.first << std::endl;
+			exit(1);
+		}
 	}
-	
 	this->set_time_to_update();
 }
 

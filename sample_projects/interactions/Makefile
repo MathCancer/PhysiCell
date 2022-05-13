@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := cancer_immune_3D
+PROGRAM_NAME := interaction_demo
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -58,16 +58,18 @@ PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := cancer_immune_3D.o
+PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
-	
+
+# compile the project 
+
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
-	make name 
+	make name
 
 name:
 	@echo ""
@@ -99,7 +101,7 @@ PhysiCell_custom.o: ./core/PhysiCell_custom.cpp
 	
 PhysiCell_constants.o: ./core/PhysiCell_constants.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_constants.cpp 
-	
+
 PhysiCell_signal_behavior.o: ./core/PhysiCell_signal_behavior.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_signal_behavior.cpp 
 
@@ -148,7 +150,7 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
-	
+
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
 	
@@ -156,15 +158,15 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 	
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 		
-
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 	
+	
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
 	
 # user-defined PhysiCell modules
 
-cancer_immune_3D.o: ./custom_modules/cancer_immune_3D.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/cancer_immune_3D.cpp
+custom.o: ./custom_modules/custom.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 # cleanup
 
@@ -177,6 +179,8 @@ reset:
 	touch ./core/PhysiCell_cell.cpp
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
+	touch ./config/empty.csv
+	rm -f ./config/*.csv
 	
 clean:
 	rm -f *.o
@@ -231,13 +235,8 @@ gif:
 	 
 movie:
 	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/out.mp4
-
-ciPATH := ./sample_projects/cancer_immune/scripts
-pov:
-	cp $(ciPATH)/CI_POV_writer.cpp .
-	$(COMPILE_COMMAND) -o CI_vis CI_POV_writer.cpp ./modules/PhysiCell_POV.cpp $(BioFVM_OBJECTS) $(pugixml_OBJECTS)
-	$(COMPILE_COMMAND) -o CI_script $(ciPATH)/CI_script.cpp  
-	rm CI_POV_writer.cpp
+	
+# upgrade rules 
 
 SOURCE := PhysiCell_upgrade.zip 
 get-upgrade: 
