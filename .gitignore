@@ -1,8 +1,8 @@
-
 *.o
-Makefile-backup
 *.exe
 .DS_Store
+Makefile-backup
+config/PhysiCell_settings-backup.xml
 documentation/.DS_Store
 unit_tests/.DS_Store
 sample_projects/.DS_Store
@@ -12,4 +12,3 @@ sample_projects/cancer_immune/.DS_Store
 sample_projects/celltypes3/.DS_Store
 sample_projects/heterogeneity/.DS_Store
 sample_projects/template/.DS_Store
-config/PhysiCell_settings-backup.xml
