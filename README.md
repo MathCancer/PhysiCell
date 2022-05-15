@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
-**Version:** 1.10.0
+**Version:** 1.10.1
 
-**Release date:** 13 May 2022
+**Release date:** 15 May 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -72,7 +72,9 @@ See changes.md for the full change log.
 * * * 
 ## Release summary: 
 
-This release introduces major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
+Version 1.10.1 introduces bugfixes to increase XML parser robustness and to fix missing PhysiBoSS makefiles. 
+
+The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
 A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations.  
 
@@ -84,8 +86,9 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
  
 ### Major new features and changes in the 1.10.z versions
+#### 1.10.1
++ None in this version. See 1.10.0
 #### 1.10.0
-
 + Created `Cell_Interactions` in `Phenotype` as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
   +  Users can set phagocytosis rates for dead cells via `phenotype.cell_interactions.dead_phagocytosis_rate`. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. 
   +  Users can set phagocytosis rates for each live cell type via `phenotype.cell_interactions.live_phagocytosis_rates`. There is one rate for each cell type in the simulation. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. Phagocytosis absorbs the target cell's volume and internal contents and flags the target for removal. The cell will eventually shrink back towards its target volume. 
@@ -190,7 +193,10 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
   + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
 
 ### Minor new features and changes: 
+#### 1.10.1
++ None in this version. See 1.10.0. 
 
+#### 1.10.0
 + All sample projects have a new rule "make name" to tell you the name of the executable. 
 
 + All sample projects output the executable name to screen for easier reference. 
@@ -200,7 +206,10 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
 
 ### Beta features (not fully supported):
- 
+ #### 1.10.1
+ + None in this version. See 1.10.0. 
+
+ #### 1.10.0
 + Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
 
 + [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
@@ -212,6 +221,14 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
+#### 1.10.1
++ XML parsing has been made more robust to "survive" using an incorrect substrate in the `chemotactic_sensitivities` section.
+
++ Missing PhysiBoSS makefiles have been replaced. 
+
++ Fixed broken makefile for worms sample project. 
+
+#### 1.10.0
 + When the `cell_defaults` definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying `cell_defaults`, the XML parsing will reset motility to off (with `NULL` function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set `legacy_cell_defaults_copy = true` in the config file to override this bugfix. 
 
 + We refactored the pseudorandom number generator (at the basis of `UniformRandom()`) to improve thread safety. Previously, all threads shared a single PRNG, which was not thread safe. For newer fast processors with many threads, this could lead to sufficiently many "collisions" to introduce subtle biases in some cases (particularly for purely Brownian motion that is not dominated by chemotaxis, proliferation, and other behaviors). This is now corrected by creating a PRNG for each thread, each with its own seed. We used `std::seed_seq` to determinstically set a good spread of seeds to prevent correlation between the PRNGs, with the convention that the 0th thread's seed is either the user-specified seed or a random seed. This preserves original single-thread behavior from prior versions. 
