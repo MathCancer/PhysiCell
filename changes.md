@@ -2,7 +2,7 @@
 
 **Version:** 1.10.1
 
-**Release date:** 14 May 2022
+**Release date:** 15 May 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -221,7 +221,10 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 ### Bugfixes: 
 #### 1.10.1
 + XML parsing has been made more robust to "survive" using an incorrect substrate in the `chemotactic_sensitivities` section.
+
 + Missing PhysiBoSS makefiles have been replaced. 
+
++ Fixed broken makefile for worms sample project. 
 
 #### 1.10.0
 + When the `cell_defaults` definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying `cell_defaults`, the XML parsing will reset motility to off (with `NULL` function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set `legacy_cell_defaults_copy = true` in the config file to override this bugfix. 
