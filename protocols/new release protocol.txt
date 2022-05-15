@@ -32,13 +32,13 @@ number.
    a) Move one directory up. Zip everything in PhysiCell 
       into a new zip file. Use 
       
-zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.gitignore -x .DS_Store
-      
+zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.gitignore -x .DS_Store -x PhysiCell/.github/* -x PhysiCell/.travis.yml   
+
       (with appropriate version x.y.z). 
 
    b) Make sure the zip file is named PhysiCell_V.x.y.z.zip (based on version x.y.z)
 
-   c) Make sure the zip file excludes .git and .gitignore
+   c) Make sure the zip file excludes .git, .gitignore, and .github (and .travis.yml)
 
    d) Go to https://sourceforge.net/projects/physicell/files/PhysiCell/ 
 
