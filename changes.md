@@ -194,7 +194,9 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
 ### Minor new features and changes: 
 #### 1.10.2
-+ None in this version. See 1.10.0.
++ Added `dead` to the signals dictionaries, which returns 0.0 or 1.0 based on `phenotype.death.dead`. 
++ Added `time` to the signals dictionaries, which returns the current simulation time based on `PhysiCell_Globals.current_time`. 
+
 #### 1.10.1
 + None in this version. See 1.10.0. 
 #### 1.10.0
