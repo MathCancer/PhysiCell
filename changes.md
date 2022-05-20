@@ -24,20 +24,20 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 **make \[project-name\]**: populates the indicated sample project. 
                      Use "make" to compile it. 
 
-  \[project-name\] choices:
-    template 
-    biorobots-sample 
-    cancer-biorobots-sample 
-    cancer-immune-sample
-    celltypes3-sample 
-    heterogeneity-sample 
-    pred-prey-farmer 
-    virus-macrophage-sample 
-    worm-sample
-    ode-energy-sample 
-    physiboss-cell-lines-sample 
-    cancer-metabolism-sample
-    interaction-sample
+   * **\[project-name\]** choices:
+      * template 
+      * biorobots-sample 
+      * cancer-biorobots-sample 
+      * cancer-immune-sample
+      * celltypes3-sample 
+      * heterogeneity-sample 
+      * pred-prey-farmer 
+      * virus-macrophage-sample 
+      * worm-sample
+      * ode-energy-sample 
+      * physiboss-cell-lines-sample 
+      * cancer-metabolism-sample
+      * interaction-sample
 
 **make list-projects** : list all available sample projects 
 
@@ -274,7 +274,6 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Major refresh of documentation.
 
 * * * 
-	
 **Version:** 1.10.1
 
 **Release date:** 15 May 2022
