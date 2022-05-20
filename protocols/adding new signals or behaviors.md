@@ -1,4 +1,6 @@
-To add a new signal: (in PhysiCell_signal_behavior.cpp)
+# Adding new signals and behaviors to the dictionaries (introduced in Version 1.10.0)
+
+## To add a new signal: (in PhysiCell_signal_behavior.cpp)
 
 Suppose you want to add a new signal "signal name" to the dictionary, and that you can access that the cell's location at pCell->something
 
