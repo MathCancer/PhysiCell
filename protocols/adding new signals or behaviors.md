@@ -10,41 +10,46 @@ Suppose you want to add a new signal "signal name" to the dictionary, and that y
 	void display_signal_dictionary( void );    
 	void display_signal_dictionary_with_synonyms( void );
 	```    
-1. Make sure the signal name you have chosen is unique. (See step 0.)    
+	
+1. Make sure the signal name you have chosen is unique. (See the prior step.)    
 
 1. Add the signal in `setup_signal_behavior_dictionaries()`: 
-
-   1. Search for the function: `void setup_signal_behavior_dictionaries( void )`
-   
-   1. Go to the end of the "signal" section. Just before these lines: 
+ 
+	1. Search for the function: `void setup_signal_behavior_dictionaries( void )`
+	
+	1. Go to the end of the "signal" section. Just before these lines: 
     
 	```
 	behavior_to_int.clear(); 	
 	int_to_behavior.clear();   
 	```
-   1. Add the signal like this: 
+
+	1. Add the signal like this: 
     
 	```
 	map_index++; 
 	signal_to_int["signal name"] = map_index; 
 	int_to_signal[map_index] = "signal name"; 
 	```
-   1. Add any synonyms (or common typos) to the dictionary. Append these just below your entry. 
+	
+	1. Add any synonyms (or common typos) to the dictionary. Append these just below your entry. 
    
 	```
 	// synonyms 
 	signal_to_int["alternate signal name"] = map_index; 
 	```
+	
 1. Add the signal to function to write a full vector of signals 
 
-   1. Search for `std::vector<double> get_signals( Cell* pCell )`
+	1. Search for `std::vector<double> get_signals( Cell* pCell )`
 
-   1. Go to the end of the signals. Just before these lines: 
+	1. Go to the end of the signals. Just before these lines: 
 	```
 	// rescale 
 	signals /= signal_scales;     
 	```
-    1. Add code to write your signal at the appropriate index, like this: 
+	
+	1. Add code to write your signal at the appropriate index, like this: 
    
 	```
 	static int my_signal_ind = find_signal_index( "signal name" ); 
@@ -55,9 +60,9 @@ Suppose you want to add a new signal "signal name" to the dictionary, and that y
 
 1. Add the signal to function to write a single individual signal in `get_single_signal()`: 
 
-   1. Search for `double get_single_signal( Cell* pCell, int index )`
+	1. Search for `double get_single_signal( Cell* pCell, int index )`
 
-   1. Go to the end of signals. Just before these lines: 
+	1. Go to the end of signals. Just before these lines: 
 	```
 	// unknown after here !
 
@@ -65,7 +70,8 @@ Suppose you want to add a new signal "signal name" to the dictionary, and that y
 	          << "         Returning 0.0, but you should fix this!" << std::endl << std::endl;     
 
 	```
-   1. Add code to write your signal at the appropriate index, like this: 
+	
+	1. Add code to write your signal at the appropriate index, like this: 
 	```
 	// my signal name 
 	static int my_signal_ind = find_signal_index( "signal name" ); 
@@ -78,10 +84,6 @@ Suppose you want to add a new signal "signal name" to the dictionary, and that y
 	```
 		
         Make SURE that `my_signal_ind` is unique!
-
-
-
-
 
 
 
