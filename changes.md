@@ -208,7 +208,9 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
 ### Beta features (not fully supported):
 #### 1.10.2
- + Added operator<< for std::vector<int>, since its lack was annoying. Now if v is a vector of integers, std::cout << v << std::endl is fine. 
++ Added `operator<<` for `std::vector<int>`, since its lack was annoying. Now if v is a vector of integers, `std::cout << v << std::endl` is fine. 
+
++ Added `operator<<` for `std::vector<std::string>`, since its lack was annoying. Now if v is a vector of strings, `std::cout << v << std::endl` is fine. 
 #### 1.10.1
  + None in this version. See 1.10.0. 
  #### 1.10.0
@@ -224,7 +226,12 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
   
 ### Bugfixes: 
 #### 1.10.2
-+ 
++ Fixed error in `double get_single_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
+
++ Fixed error in `double get_single_base_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
+
++ Fixed bug in `add_PhysiCell_cells_to_open_xml_pugi()` that mistakenly used the wrong size (number of cell species rather than number of substrate species) when writing the chemotactic sensitivities. 
+
 #### 1.10.1
 + XML parsing has been made more robust to "survive" using an incorrect substrate in the `chemotactic_sensitivities` section.
 

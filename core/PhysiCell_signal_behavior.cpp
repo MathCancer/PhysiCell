@@ -1332,7 +1332,7 @@ double get_single_behavior( Cell* pCell , int index )
 	{ return pCell->phenotype.mechanics.cell_cell_adhesion_strength; }
 
 	// cell-cell "springs"
-	static int cca_spring_index = find_behavior_index( "cell-cell adhesion" );  
+	static int cca_spring_index = find_behavior_index( "cell-cell adhesion elastic constant" );  
 	if( index == cca_spring_index )
 	{ return pCell->phenotype.mechanics.attachment_elastic_constant; }
 
@@ -1654,7 +1654,7 @@ double get_single_base_behavior( Cell* pCell , int index )
 	{ return pCD->phenotype.mechanics.cell_cell_adhesion_strength; }
 
 	// cell-cell "springs"
-	static int cca_spring_index = find_behavior_index( "cell-cell adhesion" );  
+	static int cca_spring_index = find_behavior_index( "cell-cell adhesion elastic constant" );  
 	if( index == cca_spring_index )
 	{ return pCD->phenotype.mechanics.attachment_elastic_constant; }
 
