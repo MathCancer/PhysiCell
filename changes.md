@@ -209,6 +209,10 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
   + `double& Secretion::net_export_rate( std::string name )` allows you to easily read/write the net export rate of a substrate by name. For example: 
 	```pCell->phenotype.secretion.net_export_rate("oxygen") = -100```
 
++ Added new ease of access function for internalized substrates: 
+  + `double& Molecular::internalized_total_substrate( std::string name )` allows you to easily read/write the total amount of internalized substrate by name. For example: 
+	```pCell->phenotype.molecular.internalized_total_substrate( "oxygen" ) = 0.01``
+
 #### 1.10.1
 + None in this version. See 1.10.0. 
 #### 1.10.0
