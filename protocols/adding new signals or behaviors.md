@@ -2,7 +2,7 @@
 
 ## To add a new signal: (in 'PhysiCell_signal_behavior.cpp')
 
-Suppose you want to add a new signal "signal name" to the dictionary, and that you can access that the cell's location at `pCell->something`
+Suppose you want to add a new signal "my signal name" to the dictionary, and that you can access that the cell's location at `pCell->something`
 
 1. Make sure the signal you want to add isn't already there! Take a look at the current dictionaries using: 
 
@@ -28,15 +28,15 @@ Suppose you want to add a new signal "signal name" to the dictionary, and that y
     
 		```
 		map_index++; 
-		signal_to_int["signal name"] = map_index; 
-		int_to_signal[map_index] = "signal name"; 
+		signal_to_int["my signal name"] = map_index; 
+		int_to_signal[map_index] = "my signal name"; 
 		```
 	
 	1. Add any synonyms (or common typos) to the dictionary. Append these just below your entry. 
    
 		```
 		// synonyms 
-		signal_to_int["alternate signal name"] = map_index; 
+		signal_to_int["my alternate signal name"] = map_index; 
 		```
 	
 1. Add the signal to function to write a full vector of signals 
@@ -52,7 +52,7 @@ Suppose you want to add a new signal "signal name" to the dictionary, and that y
 	1. Add code to write your signal at the appropriate index, like this: 
    
 		```
-		static int my_signal_ind = find_signal_index( "signal name" ); 
+		static int my_signal_ind = find_signal_index( "my signal name" ); 
 		signals[my_signal_ind] = pCell->something; 
 		```
 	
@@ -74,7 +74,7 @@ Suppose you want to add a new signal "signal name" to the dictionary, and that y
 	1. Add code to write your signal at the appropriate index, like this: 
 		```
 		// my signal name 
-		static int my_signal_ind = find_signal_index( "signal name" ); 
+		static int my_signal_ind = find_signal_index( "my signal name" ); 
 		if( index == time_ind )
 		{
 	   	   out = pCell->something;      
@@ -87,7 +87,7 @@ Suppose you want to add a new signal "signal name" to the dictionary, and that y
 
 ## To add a new behavior: (in 'PhysiCell_signal_behavior.cpp')
 
-Suppose you want to add a new behavior "behavior name" to the dictionary, and that you can access that at `pCell->something`
+Suppose you want to add a new behavior "my behavior name" to the dictionary, and that you can access that at `pCell->something`
 
 1. Make sure the behavior you want to add isn't already there! Take a look at the current dictionaries using: 
 
@@ -113,7 +113,7 @@ Suppose you want to add a new behavior "behavior name" to the dictionary, and th
     
 		```
 		map_index++; 
-		map_name = "behavior name";
+		map_name = "my behavior name";
 		behavior_to_int[map_name ] = map_index;
 		int_to_behavior[map_index] = map_name; 
 		```	
@@ -122,7 +122,7 @@ Suppose you want to add a new behavior "behavior name" to the dictionary, and th
    
 		```
 		// synonyms 
-		behavior_to_int["alternate behavior name"] = map_index; 
+		behavior_to_int["my alternate behavior name"] = map_index; 
 		```
 	
 1. Add the behavior to function to write a full vector of behaviors 
@@ -135,7 +135,7 @@ Suppose you want to add a new behavior "behavior name" to the dictionary, and th
    
 		```
 		// apoptosis 
-		static int my_behavior_ind = find_behavior_index( "behavior name"); 
+		static int my_behavior_ind = find_behavior_index( "my behavior name"); 
 		pCell->something = parameters[my_behavior_ind]; 
 		```
 	
@@ -150,7 +150,7 @@ Suppose you want to add a new behavior "behavior name" to the dictionary, and th
 	1. Add code to write your behavior to the cell from at the appropriate index, like this: 
 		```
 		// my behavior name 
-		static int my_behavior_ind = find_behavior_index( "behavior name" ); 
+		static int my_behavior_ind = find_behavior_index( "my behavior name" ); 
 		if( index == my_behavior_ind )
 		{ pCell->something = parameter; return; } 
 		```
@@ -167,7 +167,7 @@ Suppose you want to add a new behavior "behavior name" to the dictionary, and th
    
 		```
 		// my behavior
-		static int my_behavior_ind = find_behavior_index("behavior name"); 
+		static int my_behavior_ind = find_behavior_index("my behavior name"); 
 		parameters[my_behavior_ind] = pCell->something; 
 		```
 	
@@ -183,16 +183,46 @@ Suppose you want to add a new behavior "behavior name" to the dictionary, and th
    
 		```
 		// my behavior
-		static int my_behavior_ind = find_behavior_index( "behavior name"); 
+		static int my_behavior_ind = find_behavior_index( "my behavior name"); 
 		if( index == my_behavior_ind )
 		{ return pCell->something; }
 		```
 	
         Make SURE that `my_behavior_ind` is unique!****
 
+1. Add the behavior to the function to get a vector of all base behaviors from a cell's cell definition
 
+	1. Search for `std::vector<double> get_base_behaviors( Cell* pCell )`
+	
+	1. Go to the end of the function. 
+	
+	3. Add code to write your behavior to the , like this: 
 
-1. `std::vector<double> get_base_behaviors( Cell* pCell )` (line 1466)
-2. `double get_single_base_behavior( Cell* pCell , int index )` (line 1605)
+		```
+		// my behavior
+		static int my_behavior_ind = find_behavior_index("my behavior name"); 
+		parameters[my_behavior_ind] = pCD->something; 
+		```
+	Make sure that `my_behavior_ind` is unique. 
+	
+	Notice that `pCD` is set to `Cell_Definition` of the cell in `pCell`. 
+	
+1. Add the behavior to the function to get a single base behavior from a cell's cell definition
+
+	1. Search for `double get_single_base_behavior( Cell* pCell , int index )`
+	
+	1. Go to the end of the function. 
+	
+	3. Add code to write your behavior to the , like this: 
+
+		```
+		// my behavior
+		static int my_behavior_ind = find_behavior_index("my behavior name" ); 
+		if( index == my_behavior_ind )
+		{ return pCD->something; }
+		```
+	Make sure that `my_behavior_ind` is unique. 
+	
+	Notice that `pCD` is set to `Cell_Definition` of the cell in `pCell`. 
 
 
