@@ -194,9 +194,13 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
 ### Minor new features and changes: 
 #### 1.10.2
++ Added `operator<<` for vectors of ints and vectors of strings. So that `std::cout << v << std::endl;` will work if `v` is `std::vector<int>` of `std::vector<std::string>`. It was truly annoying that these were missing, so sorry!
 + Added `dead` to the signals dictionaries, which returns 0.0 or 1.0 based on `phenotype.death.dead`. 
 + Added `time` to the signals dictionaries, which returns the current simulation time based on `PhysiCell_Globals.current_time`. 
 + Added a brief protocol on how to add new signals and behaviors to the dictionaries in the `/protocols` directory. 
++ Added new functions `double& apoptosis_rate()` and `double& necrosis_rate()` to easily read and write these rates. Access via `cell.phenotype.death.apoptosis_rate()` and `cell.phenotype.death.necrosis_rate()`. 
+
+
 #### 1.10.1
 + None in this version. See 1.10.0. 
 #### 1.10.0
