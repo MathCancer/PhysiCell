@@ -199,7 +199,15 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Added `time` to the signals dictionaries, which returns the current simulation time based on `PhysiCell_Globals.current_time`. 
 + Added a brief protocol on how to add new signals and behaviors to the dictionaries in the `/protocols` directory. 
 + Added new functions `double& apoptosis_rate()` and `double& necrosis_rate()` to easily read and write these rates. Access via `cell.phenotype.death.apoptosis_rate()` and `cell.phenotype.death.necrosis_rate()`. 
-
++ Added new ease of access functions for secretion: 
+  + `double& Secretion::secretion_rate( std::string name )` allows you to easily read/write the secretion rate of a substrate by name. For example: 
+	```pCell->phenotype.secretion.secretion_rate("oxygen") = 0.1```
+  + `double& Secretion::uptake_rate( std::string name )` allows you to easily read/write the uptake rate of a substrate by name. For example: 
+	```pCell->phenotype.secretion.uptake_rate("oxygen") = 0.1```
+  + `double& Secretion::saturation_density( std::string name )` allows you to easily read/write the secretion target of a substrate by name. For example: 
+	```pCell->phenotype.secretion.saturation_density("oxygen") = 38```
+  + `double& Secretion::net_export_rate( std::string name )` allows you to easily read/write the net export rate of a substrate by name. For example: 
+	```pCell->phenotype.secretion.net_export_rate("oxygen") = -100```
 
 #### 1.10.1
 + None in this version. See 1.10.0. 
@@ -214,9 +222,7 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
 ### Beta features (not fully supported):
 #### 1.10.2
-+ Added `operator<<` for `std::vector<int>`, since its lack was annoying. Now if v is a vector of integers, `std::cout << v << std::endl` is fine. 
-
-+ Added `operator<<` for `std::vector<std::string>`, since its lack was annoying. Now if v is a vector of strings, `std::cout << v << std::endl` is fine. 
++ None in this version. See 1.10.0.  
 #### 1.10.1
  + None in this version. See 1.10.0. 
  #### 1.10.0
