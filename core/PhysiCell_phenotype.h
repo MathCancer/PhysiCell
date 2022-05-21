@@ -273,7 +273,11 @@ class Death
 	void trigger_death( int death_model_index ); // done 
 	
 	Cycle_Model& current_model( void ); // done
-	Death_Parameters& current_parameters( void ); // done 
+	Death_Parameters& current_parameters( void ); // done '
+
+	// ease of access
+	double& apoptosis_rate(void); 
+	double& necrosis_rate(void); 
 };
 
 class Volume
