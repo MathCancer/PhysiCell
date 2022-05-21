@@ -498,13 +498,13 @@ Cycle_Model& Death::current_model( void )
 double& Death::apoptosis_rate(void)
 {
 	static int nApoptosis = find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
-	return rates[apoptosis_index];
+	return rates[nApoptosis];
 }
 
 double& Death::necrosis_rate(void)
 {
 	static int nNecrosis = find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
-	return rates[necrosis_death_model];
+	return rates[nNecrosis];
 }
 
 
