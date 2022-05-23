@@ -208,7 +208,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-custom.o: ./custom_modules/custom.cpp ./intracellular/PhysiCell_intracellular.h
+custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 librr_intracellular.o: ./addons/libRoadrunner/src/librr_intracellular.cpp ./addons/libRoadrunner/src/librr_intracellular.h
