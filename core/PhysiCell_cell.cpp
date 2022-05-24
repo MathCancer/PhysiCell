@@ -986,6 +986,8 @@ void Cell::add_potentials(Cell* other_agent)
 		temp_a *= effective_adhesion; 
 		
 		temp_r -= temp_a;
+
+		state.neighbors.push_back(other_agent); // move here in 1.10.2 so non-adhesive cells also added. 
 	}
 	/////////////////////////////////////////////////////////////////
 	if( fabs(temp_r) < 1e-16 )
@@ -998,7 +1000,7 @@ void Cell::add_potentials(Cell* other_agent)
 	axpy( &velocity , temp_r , displacement ); 
 	
 	
-	state.neighbors.push_back(other_agent); // new 1.8.0
+	// state.neighbors.push_back(other_agent); // new 1.8.0
 	
 	return;
 }

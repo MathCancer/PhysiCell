@@ -185,6 +185,20 @@ std::ostream& operator<<(std::ostream& os, const std::vector<double>& v )
  return os; 
 }
 
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v )
+{
+ for( unsigned int i=0; i < v.size(); i++ )
+ { os << v[i] << " " ; }
+ return os; 
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v )
+{
+ for( unsigned int i=0; i < v.size(); i++ )
+ { os << v[i] << " " ; }
+ return os; 
+}
+
 // this one returns a new vector that has been normalized
 std::vector<double> normalize( std::vector<double>& v )
 {

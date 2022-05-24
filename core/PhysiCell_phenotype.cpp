@@ -495,6 +495,19 @@ Cycle_Model& Death::current_model( void )
 	return *models[current_death_model_index]; 
 }
 
+double& Death::apoptosis_rate(void)
+{
+	static int nApoptosis = find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+	return rates[nApoptosis];
+}
+
+double& Death::necrosis_rate(void)
+{
+	static int nNecrosis = find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+	return rates[nNecrosis];
+}
+
+
 Cycle::Cycle()
 {
 	pCycle_Model = NULL; 
@@ -987,6 +1000,31 @@ void Secretion::scale_all_uptake_by_factor( double factor )
 	return; 
 }
 
+// ease of access
+double& Secretion::secretion_rate( std::string name )
+{
+	int index = microenvironment.find_density_index(name); 
+	return secretion_rates[index]; 
+}
+
+double& Secretion::uptake_rate( std::string name ) 
+{
+	int index = microenvironment.find_density_index(name); 
+	return uptake_rates[index]; 
+}
+
+double& Secretion::saturation_density( std::string name ) 
+{
+	int index = microenvironment.find_density_index(name); 
+	return saturation_densities[index]; 
+}
+
+double& Secretion::net_export_rate( std::string name )  
+{
+	int index = microenvironment.find_density_index(name); 
+	return net_export_rates[index]; 
+}
+
 Molecular::Molecular()
 {
 	pMicroenvironment = get_default_microenvironment(); 
@@ -1037,6 +1075,12 @@ void Molecular::sync_to_cell( Basic_Agent* pCell )
 	return; 
 }
 
+// ease of access 
+double&  Molecular::internalized_total_substrate( std::string name )
+{
+	int index = microenvironment.find_density_index(name); 
+	return internalized_total_substrates[index]; 
+}
 
 /*
 void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )

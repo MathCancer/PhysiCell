@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
-**Version:** 1.10.1
+**Version:** 1.10.2
 
-**Release date:** 15 May 2022
+**Release date:** 24 May 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -24,20 +24,20 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 **make \[project-name\]**: populates the indicated sample project. 
                      Use "make" to compile it. 
 
-  \[project-name\] choices:
-    template 
-    biorobots-sample 
-    cancer-biorobots-sample 
-    cancer-immune-sample
-    celltypes3-sample 
-    heterogeneity-sample 
-    pred-prey-farmer 
-    virus-macrophage-sample 
-    worm-sample
-    ode-energy-sample 
-    physiboss-cell-lines-sample 
-    cancer-metabolism-sample
-    interaction-sample
+   * **\[project-name\]** choices:
+      * template 
+      * biorobots-sample 
+      * cancer-biorobots-sample 
+      * cancer-immune-sample
+      * celltypes3-sample 
+      * heterogeneity-sample 
+      * pred-prey-farmer 
+      * virus-macrophage-sample 
+      * worm-sample
+      * ode-energy-sample 
+      * physiboss-cell-lines-sample 
+      * cancer-metabolism-sample
+      * interaction-sample
 
 **make list-projects** : list all available sample projects 
 
@@ -71,21 +71,21 @@ See changes.md for the full change log.
 
 * * * 
 ## Release summary: 
-
-Version 1.10.1 introduces bugfixes to increase XML parser robustness and to fix missing PhysiBoSS makefiles. 
+Version 1.10.2 introduces bugfixes to the behavior "dictionary" functiouns, data saves, and updating neighbor lists for nearby non-adhesive cells. It also introduces a number of ease-of-access functions to the phenotype for death rates, secretion, and internalized substrates. 
 
 The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
 A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations.  
 
-A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries.  
-
+A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries. 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
  
 ### Major new features and changes in the 1.10.z versions
+#### 1.10.2
++ None in this version. See 1.10.0
 #### 1.10.1
 + None in this version. See 1.10.0
 #### 1.10.0
@@ -193,9 +193,28 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
   + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
 
 ### Minor new features and changes: 
+#### 1.10.2
++ Added `operator<<` for vectors of ints and vectors of strings. So that `std::cout << v << std::endl;` will work if `v` is `std::vector<int>` of `std::vector<std::string>`. It was truly annoying that these were missing, so sorry!
++ Added `dead` to the signals dictionaries, which returns 0.0 or 1.0 based on `phenotype.death.dead`. 
++ Added `time` to the signals dictionaries, which returns the current simulation time based on `PhysiCell_Globals.current_time`. 
++ Added a brief protocol on how to add new signals and behaviors to the dictionaries in the `/protocols` directory. 
++ Added new functions `double& apoptosis_rate()` and `double& necrosis_rate()` to easily read and write these rates. Access via `cell.phenotype.death.apoptosis_rate()` and `cell.phenotype.death.necrosis_rate()`. 
++ Added new ease of access functions for secretion: 
+  + `double& Secretion::secretion_rate( std::string name )` allows you to easily read/write the secretion rate of a substrate by name. For example: 
+	```pCell->phenotype.secretion.secretion_rate("oxygen") = 0.1```
+  + `double& Secretion::uptake_rate( std::string name )` allows you to easily read/write the uptake rate of a substrate by name. For example: 
+	```pCell->phenotype.secretion.uptake_rate("oxygen") = 0.1```
+  + `double& Secretion::saturation_density( std::string name )` allows you to easily read/write the secretion target of a substrate by name. For example: 
+	```pCell->phenotype.secretion.saturation_density("oxygen") = 38```
+  + `double& Secretion::net_export_rate( std::string name )` allows you to easily read/write the net export rate of a substrate by name. For example: 
+	```pCell->phenotype.secretion.net_export_rate("oxygen") = -100```
+
++ Added new ease of access function for internalized substrates: 
+  + `double& Molecular::internalized_total_substrate( std::string name )` allows you to easily read/write the total amount of internalized substrate by name. For example: 
+	```pCell->phenotype.molecular.internalized_total_substrate( "oxygen" ) = 0.01``
+
 #### 1.10.1
 + None in this version. See 1.10.0. 
-
 #### 1.10.0
 + All sample projects have a new rule "make name" to tell you the name of the executable. 
 
@@ -206,9 +225,10 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
 
 ### Beta features (not fully supported):
- #### 1.10.1
+#### 1.10.2
++ None in this version. See 1.10.0.  
+#### 1.10.1
  + None in this version. See 1.10.0. 
-
  #### 1.10.0
 + Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
 
@@ -221,6 +241,15 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
+#### 1.10.2
++ Fixed error in `double get_single_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
+
++ Fixed error in `double get_single_base_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
+
++ Fixed bug in `add_PhysiCell_cells_to_open_xml_pugi()` that mistakenly used the wrong size (number of cell species rather than number of substrate species) when writing the chemotactic sensitivities. 
+
++ The cell `neighbors` list did not add non-adhesive cells within interaction distance. This is now fixed. 
+
 #### 1.10.1
 + XML parsing has been made more robust to "survive" using an incorrect substrate in the `chemotactic_sensitivities` section.
 
