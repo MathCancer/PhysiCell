@@ -2,7 +2,7 @@
 
 **Version:** 1.10.2
 
-**Release date:** ?? May 2022 (in progress)
+**Release date:** 24 May 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -71,7 +71,7 @@ See changes.md for the full change log.
 
 * * * 
 ## Release summary: 
-Version 1.10.2 introduces bugfixes to ... 
+Version 1.10.2 introduces bugfixes to the behavior "dictionary" functiouns, data saves, and updating neighbor lists for nearby non-adhesive cells. It also introduces a number of ease-of-access functions to the phenotype for death rates, secretion, and internalized substrates. 
 
 The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
@@ -247,6 +247,8 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Fixed error in `double get_single_base_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
 
 + Fixed bug in `add_PhysiCell_cells_to_open_xml_pugi()` that mistakenly used the wrong size (number of cell species rather than number of substrate species) when writing the chemotactic sensitivities. 
+
++ The cell `neighbors` list did not add non-adhesive cells within interaction distance. This is now fixed. 
 
 #### 1.10.1
 + XML parsing has been made more robust to "survive" using an incorrect substrate in the `chemotactic_sensitivities` section.
