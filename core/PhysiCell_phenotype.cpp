@@ -685,12 +685,20 @@ Mechanics::Mechanics()
 	// this is a multiple of the cell (equivalent) radius
 	relative_maximum_adhesion_distance = 1.25; 
 	// maximum_adhesion_distance = 0.0; 
-	
-	
-	relative_maximum_attachment_distance = relative_maximum_adhesion_distance;
-	relative_detachment_distance = relative_maximum_adhesion_distance;
+
+	/* for spring attachments */
 	maximum_number_of_attachments = 12;
 	attachment_elastic_constant = 0.01; 
+
+	attachment_rate = 10; 
+	detachment_rate = 0; 
+
+	/* to be deprecated */ 
+	relative_maximum_attachment_distance = relative_maximum_adhesion_distance;
+	relative_detachment_distance = relative_maximum_adhesion_distance;
+
+	maximum_attachment_rate = 1.0; 
+	
 	maximum_attachment_rate = 1.0; 
 	
 	return; 

@@ -375,12 +375,19 @@ class Mechanics
 	// this is a multiple of the cell (equivalent) radius
 	double relative_maximum_adhesion_distance; 
 	// double maximum_adhesion_distance; // needed? 
-	
-	double relative_maximum_attachment_distance; 
-	double relative_detachment_distance; 
-	
+
+	/* for spring attachments */ 
+
 	int maximum_number_of_attachments; 
 	double attachment_elastic_constant; 
+
+	double attachment_rate; 
+	double detachment_rate; 
+
+	/* to be deprecated */ 
+
+	double relative_maximum_attachment_distance; 
+	double relative_detachment_distance; 
 	double maximum_attachment_rate; 
 	
 	Mechanics(); // done 
