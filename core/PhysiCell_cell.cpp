@@ -1706,6 +1706,18 @@ void display_cell_definitions( std::ostream& os )
 		
 		
 		// mechanics
+
+		Mechanics* pMech = &(pCD->phenotype.mechanics); 
+
+		os << "\tmechanics:" << std::endl 
+			<< "\t\tcell_cell_adhesion_strength: " << pMech->cell_cell_adhesion_strength << std::endl 
+			<< "\t\tcell_cell_repulsion_strength: " << pMech->cell_cell_repulsion_strength << std::endl 
+			<< "\t\trel max adhesion dist: " << pMech->relative_maximum_adhesion_distance << std::endl 
+			<< "\t\tcell_BM_adhesion_strength: " << pMech->cell_BM_adhesion_strength << std::endl 
+			<< "\t\tcell_BM_repulsion_strength: " << pMech->cell_BM_repulsion_strength << std::endl 
+			<< "\t\tattachment_elastic_constant: " << pMech->attachment_elastic_constant << std::endl 
+			<< "\t\tattachment_rate: " << pMech->attachment_rate << std::endl 
+			<< "\t\tdetachment_rate: " << pMech->detachment_rate << std::endl;
 		
 		// size 
 	
@@ -2421,9 +2433,17 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if( node_mech )
 		{ pM->cell_cell_adhesion_strength = xml_get_my_double_value( node_mech ); }	
 
+		node_mech = node.child( "cell_BM_adhesion_strength" );
+		if( node_mech )
+		{ pM->cell_BM_adhesion_strength = xml_get_my_double_value( node_mech ); }	
+
 		node_mech = node.child( "cell_cell_repulsion_strength" );
 		if( node_mech )
 		{ pM->cell_cell_repulsion_strength = xml_get_my_double_value( node_mech ); }	
+
+		node_mech = node.child( "cell_BM_repulsion_strength" );
+		if( node_mech )
+		{ pM->cell_BM_repulsion_strength = xml_get_my_double_value( node_mech ); }	
 
 		node_mech = node.child( "relative_maximum_adhesion_distance" );
 		if( node_mech )
@@ -2474,6 +2494,20 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				}
 			}
 		}
+
+        node_mech = node.child( "attachment_elastic_constant" );
+		if( node_mech )
+		{ pM->attachment_elastic_constant = xml_get_my_double_value( node_mech ); }
+		std::cout << "  --------- attachment_elastic_constant = " << pM->attachment_elastic_constant << std::endl;
+
+        node_mech = node.child( "attachment_rate" );
+		if( node_mech )
+		{ pM->attachment_rate = xml_get_my_double_value( node_mech ); }	
+
+        node_mech = node.child( "detachment_rate" );
+		if( node_mech )
+		{ pM->detachment_rate = xml_get_my_double_value( node_mech ); }	
+
 	}
 	
 	// motility 
