@@ -90,6 +90,8 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	void print_current_nodes(){
 		this->maboss.print_nodes();
 	}
+
+	void display(std::ostream& os);
 	
 	static void save(std::string filename, std::vector<PhysiCell::Cell*>& cells);
 
