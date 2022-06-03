@@ -88,7 +88,10 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 
     // Need 'int' return type to avoid bizarre compile errors.
 	void update();
-    
+	void update(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt) {
+		update();
+		update_phenotype_parameters(phenotype);
+	}
     
     int update_phenotype_parameters(PhysiCell::Phenotype& phenotype);
     int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype);
