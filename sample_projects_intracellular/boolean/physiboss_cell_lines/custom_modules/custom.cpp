@@ -89,7 +89,8 @@ void create_cell_types( void )
 	cell_defaults.functions.update_velocity = NULL;
 
 	cell_defaults.functions.update_migration_bias = NULL; 
-	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.pre_update_intracellular = pre_update_intracellular; 
+	cell_defaults.functions.post_update_intracellular = post_update_intracellular; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
 	
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
@@ -181,17 +182,19 @@ void setup_tissue( void )
 }
 
 
-void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
+void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	if (PhysiCell::PhysiCell_globals.current_time >= 100.0 
 		&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
 	){
 		pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
 	}
-	
-	color_node(pCell);
 }
 
+void post_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	color_node(pCell);
+}
 
 void set_input_nodes(Cell* pCell) {}
 
