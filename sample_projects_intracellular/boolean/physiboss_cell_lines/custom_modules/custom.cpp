@@ -181,7 +181,6 @@ void setup_tissue( void )
 	return; 
 }
 
-
 void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	if (PhysiCell::PhysiCell_globals.current_time >= 100.0 
@@ -195,11 +194,6 @@ void post_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	color_node(pCell);
 }
-
-void set_input_nodes(Cell* pCell) {}
-
-void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt) {}
-
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
