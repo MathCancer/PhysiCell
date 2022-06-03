@@ -606,6 +606,7 @@ class Intracellular
 
 	// This function update the model for the time_step defined in the xml definition
 	virtual void update() = 0;
+	virtual void update(Cell* cell, Phenotype& phenotype, double dt) = 0;
 
 	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
