@@ -1721,6 +1721,12 @@ void display_cell_definitions( std::ostream& os )
 		
 		// size 
 	
+
+		// intracellular
+		if (pCD->phenotype.intracellular != NULL)
+		{
+			pCD->phenotype.intracellular->display(os);
+		}
 		
 		Custom_Cell_Data* pCCD = &(pCD->custom_data); 
 		os << "\tcustom data: " << std::endl; 

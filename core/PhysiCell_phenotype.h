@@ -619,6 +619,8 @@ class Intracellular
 
 	virtual std::string get_state() = 0;  
 	
+	virtual void display(std::ostream& os) = 0;
+
 	virtual Intracellular* clone() = 0;
 	
 	virtual ~Intracellular(){};

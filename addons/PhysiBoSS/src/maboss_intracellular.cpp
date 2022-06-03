@@ -139,6 +139,29 @@ MaBoSSIntracellular* getMaBoSSModel(PhysiCell::Phenotype& phenotype) {
 	return static_cast<MaBoSSIntracellular*>(phenotype.intracellular);
 }
 
+void MaBoSSIntracellular::display(std::ostream& os)
+{
+	os 	<< "\tintracellular model using maboss" << std::endl
+		<< "\t\t model bnd : " << bnd_filename << std::endl
+		<< "\t\t model cfg : " << cfg_filename << std::endl
+		<< "\t\t dt = " << time_step << std::endl
+		<< "\t\t " << initial_values.size() << " initial values override" << std::endl;
+	for (auto& initial_value : initial_values)
+		os << "\t\t\t" << initial_value.first << " = " << initial_value.second << std::endl;
+	
+	os	<< "\t\t " << parameters.size() << " parameters override" << std::endl;
+	for (auto& parameter : parameters)
+		os << "\t\t\t" << parameter.first << " = " << parameter.second << std::endl;
+	
+	os	<< "\t\t " << mutations.size() << " mutations override" << std::endl;
+	for (auto& mutation : mutations)
+		os << "\t\t\t" << mutation.first << " = " << mutation.second << std::endl;
+
+	os 	<< "\t\t scaling = " << scaling << std::endl
+		<< "\t\t time_stochasticity = " << time_stochasticity << std::endl
+		<< std::endl;
+}
+
 void MaBoSSIntracellular::save(std::string filename, std::vector<PhysiCell::Cell*>& cells)
 {
 					
