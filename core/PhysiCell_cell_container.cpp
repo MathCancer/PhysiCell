@@ -146,7 +146,13 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 	{
 		if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
 		{
+			if ((*all_cells)[i]->functions.pre_update_intracellular != NULL)
+				(*all_cells)[i]->functions.pre_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+
 			(*all_cells)[i]->phenotype.intracellular->update( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+
+			if ((*all_cells)[i]->functions.post_update_intracellular != NULL)
+				(*all_cells)[i]->functions.post_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
 		}
 	}
 	

@@ -1149,6 +1149,9 @@ Cell_Functions::Cell_Functions()
 	update_phenotype = NULL; 
 	custom_cell_rule = NULL; 
 	
+	pre_update_intracellular = NULL;
+	post_update_intracellular = NULL;
+
 	update_velocity = NULL; 
 	add_cell_basement_membrane_interactions = NULL; 
 	calculate_distance_to_membrane = NULL; 
