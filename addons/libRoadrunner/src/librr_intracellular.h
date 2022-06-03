@@ -99,7 +99,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	void set_parameter_value(std::string name, double value);
 	
 	std::string get_state();
-
+	void display(std::ostream&os) {}
     // for now, define dummy methods for these in the abstract parent class
     bool has_variable(std::string name) { return false; }
 	bool get_boolean_variable_value(std::string name) { return false; }
