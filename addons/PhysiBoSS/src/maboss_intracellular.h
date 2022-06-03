@@ -57,6 +57,11 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		this->maboss.run_simulation();
 		this->next_physiboss_run += this->maboss.get_time_to_update();
 	}
+
+	void update(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt) {
+		this->maboss.run_simulation();
+		this->next_physiboss_run += this->maboss.get_time_to_update();
+	}
 	
 	bool need_update() {
 		return PhysiCell::PhysiCell_globals.current_time >= this->next_physiboss_run;
@@ -90,6 +95,8 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	void print_current_nodes(){
 		this->maboss.print_nodes();
 	}
+
+	void display(std::ostream& os);
 	
 	static void save(std::string filename, std::vector<PhysiCell::Cell*>& cells);
 
