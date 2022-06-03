@@ -183,23 +183,13 @@ void setup_tissue( void )
 
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	if (PhysiCell::PhysiCell_globals.current_time >= 100.0 
+		&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
+	){
+		pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
+	}
 	
-	if (pCell->phenotype.intracellular->need_update())
-	{	
-		if (
-			pCell->type == get_cell_definition("last_one").type
-			&& PhysiCell::PhysiCell_globals.current_time >= 100.0 
-			&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
-		)
-			pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
-
-		set_input_nodes(pCell);
-
-		pCell->phenotype.intracellular->update();
-		
-		from_nodes_to_cell(pCell, phenotype, dt);
-		color_node(pCell);
-	}	
+	color_node(pCell);
 }
 
 
