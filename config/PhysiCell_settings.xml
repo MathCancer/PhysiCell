@@ -1,9 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+###############################################################################
+# If you use PhysiCell in your project, please cite PhysiCell and the version #
+# number, such as below:                                                      #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
+# Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
+#     as below:                                                               #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
+# with BioFVM [2] to solve the transport equations.                           #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
+#                                                                             #
+###############################################################################
+#                                                                             #
+# BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
+#                                                                             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# All rights reserved.                                                        #
+#                                                                             #
+# Redistribution and use in source and binary forms, with or without          #
+# modification, are permitted provided that the following conditions are met: #
+#                                                                             #
+# 1. Redistributions of source code must retain the above copyright notice,   #
+# this list of conditions and the following disclaimer.                       #
+#                                                                             #
+# 2. Redistributions in binary form must reproduce the above copyright        #
+# notice, this list of conditions and the following disclaimer in the         #
+# documentation and/or other materials provided with the distribution.        #
+#                                                                             #
+# 3. Neither the name of the copyright holder nor the names of its            #
+# contributors may be used to endorse or promote products derived from this   #
+# software without specific prior written permission.                         #
+#                                                                             #
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" #
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE   #
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE  #
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE   #
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR         #
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF        #
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS    #
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN     #
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)     #
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE  #
+# POSSIBILITY OF SUCH DAMAGE.                                                 #
+#                                                                             #
+###############################################################################
+*/
+--> 
+
+<!--
+<user_details />
+-->
+
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-400</x_min>
-		<x_max>400</x_max>
-		<y_min>-400</y_min>
-		<y_max>400</y_max>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -13,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">10080</max_time> 
+		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -23,19 +97,19 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>6</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
-		<folder>output</folder>  
+		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">180</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">30</interval>
+			<interval units="min">15</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -46,1491 +120,330 @@
 	
 	<options>
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
-    <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
-    <legacy_cell_defaults_copy>false</legacy_cell_defaults_copy> 
 	</options>	
 
 	<microenvironment_setup>
-		<variable name="resource" units="dimensionless" ID="0">
-        <physical_parameter_set>
-          <diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
-          <decay_rate units="1/min">0.1</decay_rate>
-        </physical_parameter_set>
-        <initial_condition units="mmHg">1</initial_condition>
-        <Dirichlet_boundary_condition units="mmHg" enabled="False">1</Dirichlet_boundary_condition>
-        <Dirichlet_options><boundary_value ID="xmin" enabled="False">1</boundary_value>
-          <boundary_value ID="xmax" enabled="False">1</boundary_value>
-          <boundary_value ID="ymin" enabled="False">1</boundary_value>
-          <boundary_value ID="ymax" enabled="False">1</boundary_value>
-          <boundary_value ID="zmin" enabled="False">1</boundary_value>
-          <boundary_value ID="zmax" enabled="False">1</boundary_value>
-        </Dirichlet_options>
-        </variable>
+		<variable name="food" units="dimensionless" ID="0">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">100.0</diffusion_coefficient>
+				<decay_rate units="1/min">0</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">1</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->			
+ 		</variable>
+		
+		<variable name="prey signal" units="dimensionless" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>		
 
-      <variable name="toxin" units="dimensionless" ID="1">
-        <physical_parameter_set>
-          <diffusion_coefficient units="micron^2/min">100</diffusion_coefficient>
-          <decay_rate units="1/min">0.1</decay_rate>
-        </physical_parameter_set>
-        <initial_condition units="mmHg">0</initial_condition>
-        <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
-        <Dirichlet_options><boundary_value ID="xmin" enabled="False">0</boundary_value>
-          <boundary_value ID="xmax" enabled="False">0</boundary_value>
-          <boundary_value ID="ymin" enabled="False">0</boundary_value>
-          <boundary_value ID="ymax" enabled="False">0</boundary_value>
-          <boundary_value ID="zmin" enabled="False">0</boundary_value>
-          <boundary_value ID="zmax" enabled="False">0</boundary_value>
-        </Dirichlet_options>
-        </variable>
+		<variable name="predator signal" units="dimensionless" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>		
 
-      <variable name="quorum" units="dimensionless" ID="2">
-        <physical_parameter_set>
-          <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-          <decay_rate units="1/min">0.1</decay_rate>
-        </physical_parameter_set>
-        <initial_condition units="mmHg">0.0</initial_condition>
-        <Dirichlet_boundary_condition units="mmHg" enabled="False">0.0</Dirichlet_boundary_condition>
-        <Dirichlet_options><boundary_value ID="xmin" enabled="False" />
-          <boundary_value ID="xmax" enabled="False" />
-          <boundary_value ID="ymin" enabled="False" />
-          <boundary_value ID="ymax" enabled="False" />
-          <boundary_value ID="zmin" enabled="False" />
-          <boundary_value ID="zmax" enabled="False" />
-        </Dirichlet_options>
-        </variable>
-
-      <variable name="pro-inflammatory" units="dimensionless" ID="3">
-        <physical_parameter_set>
-          <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-          <decay_rate units="1/min">0.01</decay_rate>
-        </physical_parameter_set>
-        <initial_condition units="mmHg">0</initial_condition>
-        <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
-        <Dirichlet_options><boundary_value ID="xmin" enabled="False">0</boundary_value>
-          <boundary_value ID="xmax" enabled="False">0</boundary_value>
-          <boundary_value ID="ymin" enabled="False">0</boundary_value>
-          <boundary_value ID="ymax" enabled="False">0</boundary_value>
-          <boundary_value ID="zmin" enabled="False">0</boundary_value>
-          <boundary_value ID="zmax" enabled="False">0</boundary_value>
-        </Dirichlet_options>
-        </variable>
-
-      <variable name="debris" units="dimensionless" ID="4">
-        <physical_parameter_set>
-          <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-          <decay_rate units="1/min">0.1</decay_rate>
-        </physical_parameter_set>
-        <initial_condition units="mmHg">0.0</initial_condition>
-        <Dirichlet_boundary_condition units="mmHg" enabled="False">0.0</Dirichlet_boundary_condition>
-        <Dirichlet_options><boundary_value ID="xmin" enabled="False" />
-          <boundary_value ID="xmax" enabled="False" />
-          <boundary_value ID="ymin" enabled="False" />
-          <boundary_value ID="ymax" enabled="False" />
-          <boundary_value ID="zmin" enabled="False" />
-          <boundary_value ID="zmax" enabled="False" />
-        </Dirichlet_options>
-        </variable>
-
-      <options>
+		
+		<options>
 			<calculate_gradients>true</calculate_gradients>
 			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
-			 
-			<initial_condition enabled="false" type="matlab">
+			<!-- not yet supported --> 
+			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
 			</initial_condition>
-			 
-			<dirichlet_nodes enabled="false" type="matlab">
+			<!-- not yet supported --> 
+			<dirichlet_nodes type="matlab" enabled="false">
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
 		</options>
 	</microenvironment_setup>	
 	
 	<cell_definitions>
-      <cell_definition name="bacteria" ID="0">
-        <phenotype>
-          <cycle code="5" name="live">
-            <phase_transition_rates units="1/min">
-              <rate start_index="0" end_index="0" fixed_duration="false">0.00028</rate>
-            </phase_transition_rates>
-            </cycle>
+		<cell_definition name="farmer" ID="0">
+			<phenotype>
+				<cycle code="5" name="live">  
+					<!-- phases are: G0/G1 , S, G2, M --> 
 
-          <death>
-            <model code="100" name="apoptosis">
-              <death_rate units="1/min">0.00028</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">516</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-            <model code="101" name="necrosis">
-              <death_rate units="1/min">0.0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">0</duration>
-              <duration index="1" fixed_duration="true">86400</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-          </death>
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<!-- use phase_transition_rates OR phase_durations -->
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
+					</phase_transition_rates>
+					
+					<!-- use phase_transition_rates OR phase_durations -->
+<!--					
+					<phase_durations units="min"> 
+						<duration index="0" fixed_duration="false">300.0</duration>
+						<duration index="1" fixed_duration="true">480</duration>
+						<duration index="2" fixed_duration="true">240</duration>
+						<duration index="3" fixed_duration="true">60</duration>
+					</phase_durations>
+-->					
+				</cycle>
+				
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">0</death_rate>
+						<!-- use phase_transition_rates OR phase_durations -->
+						<!--
+						<phase_transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="true">0.00193798</rate>
+						</phase_transition_rates>
+						-->
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">516</duration>
+						</phase_durations>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
 
-          <volume>
-            <total>500</total>
-            <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>499</nuclear>
-            <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
-            <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
-            <calcified_fraction>0</calcified_fraction>
-            <calcification_rate>0</calcification_rate>
-            <relative_rupture_volume>2.0</relative_rupture_volume>
-          </volume>
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.0</death_rate>
+						<!-- use phase_transition_rates OR phase_durations -->
+						<!-- necrosis uses phase_duration[0] = 0 so that it always immediately
+							 tries to transition and instead checks volume against the rupture
+							 volume --> 
+<!--						
+						<phase_transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
+						</phase_transition_rates>
+-->						
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">0</duration>
+							<duration index="1" fixed_duration="true">86400</duration>
+						</phase_durations>
+						
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>					
 
-          <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
-            <cell_cell_repulsion_strength units="micron/min">20.0</cell_cell_repulsion_strength>
-            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-  					<cell_adhesion_affinities>
-	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
-		  			</cell_adhesion_affinities>
+				<volume>  
+					<total units="micron^3">2494</total>
+					<fluid_fraction units="dimensionless">0.75</fluid_fraction>
+					<nuclear units="micron^3">540</nuclear>
+					
+					<fluid_change_rate units="1/min">0.05</fluid_change_rate>
+					<cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+					<nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+					
+					<calcified_fraction units="dimensionless">0</calcified_fraction>
+					<calcification_rate units="1/min">0</calcification_rate>
+					
+					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+				</volume> 				
+				
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+					
+					<options>
+						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
+				<motility>  
+					<speed units="micron/min">0.25</speed>
+					<persistence_time units="min">5</persistence_time>
+					<migration_bias units="dimensionless">0.5</migration_bias>
+					
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>false</enabled>
+							<substrate>food</substrate>
+							<direction>-1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				
+				<secretion>
+					<substrate name="food">
+						<secretion_rate units="1/min">100</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
 
-            <options>
-              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
-              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
-            </options>
-          </mechanics>
+					<substrate name="predator signal">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
 
-          <motility>
-            <speed>1</speed>
-            <persistence_time>5</persistence_time>
-            <migration_bias>0.2</migration_bias>
-            <options>
-              <enabled>true</enabled>
-              <use_2D>true</use_2D>
-              <chemotaxis>
-                <enabled>false</enabled>
-                <substrate>resource</substrate>
-                <direction>1</direction>
-              </chemotaxis>
+					<substrate name="prey signal">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+				</secretion>
 
-              <advanced_chemotaxis>
-                <enabled>true</enabled>
-                <normalize_each_gradient>false</normalize_each_gradient>
-                <chemotactic_sensitivities>
-                  <chemotactic_sensitivity substrate="resource">1</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="quorum">0.1</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
-                </chemotactic_sensitivities>
-              </advanced_chemotaxis>
+				<molecular />
+			</phenotype>
+			<custom_data>  
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
+				
+				<predator_weight units="dimensionless">-1</predator_weight>
+				<prey_weight units="dimensionless">-1</prey_weight>
+				<food_weight units="dimensionless">-10</food_weight>
+			</custom_data>
+		</cell_definition>
+		
+		<cell_definition name="prey" ID="1" parent_type="farmer">
+			<phenotype>
+				<cycle code="5" name="live">  
+					<!-- phases are: G0/G1 , S, G2, M --> 
 
-            </options>
-          </motility>
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<!-- use phase_transition_rates OR phase_durations -->
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.003</rate>
+					</phase_transition_rates>
+				</cycle> 
+				<secretion>
+					<substrate name="food">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<uptake_rate units="1/min">1</uptake_rate>
+					</substrate> 
 
-          <secretion>
-            <substrate name="resource">
-              <secretion_rate units="1/min">0</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">30</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="toxin">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">100</net_export_rate>
-            </substrate>
-            <substrate name="quorum">
-              <secretion_rate units="1/min">0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">1</net_export_rate>
-            </substrate>
-            <substrate name="pro-inflammatory">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="debris">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            </secretion>
-            <cell_interactions>
-              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
-              <live_phagocytosis_rates>
-                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
-              </live_phagocytosis_rates>
-              <attack_rates>
-                <attack_rate name="bacteria" units="1/min">0</attack_rate>
-                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
-                <attack_rate name="stem" units="1/min">0</attack_rate>
-                <attack_rate name="differentiated" units="1/min">0</attack_rate>
-                <attack_rate name="macrophage" units="1/min">0</attack_rate>
-                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
-                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
-              </attack_rates>
-              <damage_rate units="1/min">1</damage_rate>
-              <fusion_rates>
-                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
-                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
-                <fusion_rate name="stem" units="1/min">0</fusion_rate>
-                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
-                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
-                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
-                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
-              </fusion_rates>
-            </cell_interactions>
-            <cell_transformations>
-              <transformation_rates>
-                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
-                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
-                <transformation_rate name="stem" units="1/min">0</transformation_rate>
-                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
-                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
-                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
-                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
-              </transformation_rates>
-            </cell_transformations>
-          </phenotype>
-        <custom_data>
-          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="">0.25</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.5</migration_bias_halfmax>
-          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="" description="">36</damage_halfmax>
-          <relative_max_damage_death units="" description="">100</relative_max_damage_death>
-          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
-          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
-          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
-        </custom_data>
-          </cell_definition>
+					<substrate name="prey signal">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
+				<motility>
+					<speed units="micron/min">0.5</speed>
+					<persistence_time units="min">5</persistence_time>
+					<migration_bias units="dimensionless">0.5</migration_bias>
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>false</enabled>
+							<substrate>food</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+			</phenotype>
+			<custom_data>  
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
+				
+				<predator_weight units="dimensionless">-100</predator_weight>
+				<prey_weight units="dimensionless">10</prey_weight>
+				<food_weight units="dimensionless">1</food_weight>
+			</custom_data>
+		</cell_definition>
+		
+		<cell_definition name="predator" ID="2" parent_type="farmer">
+			<phenotype>
+				<secretion>
+					<substrate name="food">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<uptake_rate units="1/min">0</uptake_rate>
+					</substrate> 
 
-      <cell_definition name="blood vessel" ID="1">
-        <phenotype>
-          <cycle code="5" name="live">
-            <phase_transition_rates units="1/min">
-              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
-            </phase_transition_rates>
-            </cycle>
+					<substrate name="predator signal">
+						<secretion_rate units="1/min">10</secretion_rate>
+					</substrate> 
+				</secretion>
+				<motility>
+					<speed units="micron/min">0.5</speed>
+					<persistence_time units="min">2.5</persistence_time>
+					<migration_bias units="dimensionless">0.7</migration_bias>
 
-          <death>
-            <model code="100" name="apoptosis">
-              <death_rate units="1/min">0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">516</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-            <model code="101" name="necrosis">
-              <death_rate units="1/min">0.0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">0</duration>
-              <duration index="1" fixed_duration="true">86400</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-          </death>
-
-          <volume>
-            <total>2494</total>
-            <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>540</nuclear>
-            <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
-            <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
-            <calcified_fraction>0</calcified_fraction>
-            <calcification_rate>0</calcification_rate>
-            <relative_rupture_volume>2.0</relative_rupture_volume>
-          </volume>
-
-          <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
-            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-  					<cell_adhesion_affinities>
-	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
-		  			</cell_adhesion_affinities>            
-            <options>
-              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
-              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
-            </options>
-          </mechanics>
-
-          <motility>
-            <speed>1</speed>
-            <persistence_time>1</persistence_time>
-            <migration_bias>.5</migration_bias>
-            <options>
-              <enabled>false</enabled>
-              <use_2D>true</use_2D>
-              <chemotaxis>
-                <enabled>false</enabled>
-                <substrate>debris</substrate>
-                <direction>1</direction>
-              </chemotaxis>
-
-              <advanced_chemotaxis>
-                <enabled>false</enabled>
-                <normalize_each_gradient>false</normalize_each_gradient>
-                <chemotactic_sensitivities>
-                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
-                </chemotactic_sensitivities>
-              </advanced_chemotaxis>
-
-            </options>
-          </motility>
-
-          <secretion>
-            <substrate name="resource">
-              <secretion_rate units="1/min">1000</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="toxin">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="quorum">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="pro-inflammatory">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="debris">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            </secretion>
-            <cell_interactions>
-              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
-              <live_phagocytosis_rates>
-                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
-              </live_phagocytosis_rates>
-              <attack_rates>
-                <attack_rate name="bacteria" units="1/min">0</attack_rate>
-                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
-                <attack_rate name="stem" units="1/min">0</attack_rate>
-                <attack_rate name="differentiated" units="1/min">0</attack_rate>
-                <attack_rate name="macrophage" units="1/min">0</attack_rate>
-                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
-                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
-              </attack_rates>
-              <damage_rate units="1/min">1</damage_rate>
-              <fusion_rates>
-                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
-                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
-                <fusion_rate name="stem" units="1/min">0</fusion_rate>
-                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
-                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
-                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
-                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
-              </fusion_rates>
-            </cell_interactions>
-            <cell_transformations>
-              <transformation_rates>
-                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
-                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
-                <transformation_rate name="stem" units="1/min">0</transformation_rate>
-                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
-                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
-                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
-                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
-              </transformation_rates>
-            </cell_transformations>
-
-          </phenotype>
-        <custom_data>
-          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="" description="">0.0</damage_halfmax>
-          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
-          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
-          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
-        </custom_data>
-          </cell_definition>
-
-      <cell_definition name="stem" ID="2">
-        <phenotype>
-          <cycle code="5" name="live">
-            <phase_transition_rates units="1/min">
-              <rate start_index="0" end_index="0" fixed_duration="false">0.002</rate>
-            </phase_transition_rates>
-            </cycle>
-
-          <death>
-            <model code="100" name="apoptosis">
-              <death_rate units="1/min">5.3e-08</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">516</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-            <model code="101" name="necrosis">
-              <death_rate units="1/min">0.0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">0</duration>
-              <duration index="1" fixed_duration="true">86400</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-          </death>
-
-          <volume>
-            <total>2494</total>
-            <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>540</nuclear>
-            <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
-            <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
-            <calcified_fraction>0</calcified_fraction>
-            <calcification_rate>0</calcification_rate>
-            <relative_rupture_volume>2.0</relative_rupture_volume>
-          </volume>
-
-          <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
-            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-  					<cell_adhesion_affinities>
-	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
-		  			</cell_adhesion_affinities>            
-            <options>
-              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
-              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
-            </options>
-          </mechanics>
-
-          <motility>
-            <speed>1</speed>
-            <persistence_time>1</persistence_time>
-            <migration_bias>.5</migration_bias>
-            <options>
-              <enabled>false</enabled>
-              <use_2D>true</use_2D>
-              <chemotaxis>
-                <enabled>false</enabled>
-                <substrate>debris</substrate>
-                <direction>1</direction>
-              </chemotaxis>
-
-              <advanced_chemotaxis>
-                <enabled>false</enabled>
-                <normalize_each_gradient>false</normalize_each_gradient>
-                <chemotactic_sensitivities>
-                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
-                </chemotactic_sensitivities>
-              </advanced_chemotaxis>
-               
-            </options>
-          </motility>
-
-          <secretion>
-            <substrate name="resource">
-              <secretion_rate units="1/min">0</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">1</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="toxin">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="quorum">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="pro-inflammatory">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="debris">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            </secretion>
-            <cell_interactions>
-              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
-              <live_phagocytosis_rates>
-                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
-              </live_phagocytosis_rates>
-              <attack_rates>
-                <attack_rate name="bacteria" units="1/min">0</attack_rate>
-                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
-                <attack_rate name="stem" units="1/min">0</attack_rate>
-                <attack_rate name="differentiated" units="1/min">0</attack_rate>
-                <attack_rate name="macrophage" units="1/min">0</attack_rate>
-                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
-                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
-              </attack_rates>
-              <damage_rate units="1/min">1</damage_rate>
-              <fusion_rates>
-                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
-                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
-                <fusion_rate name="stem" units="1/min">0</fusion_rate>
-                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
-                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
-                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
-                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
-              </fusion_rates>
-            </cell_interactions>
-            <cell_transformations>
-              <transformation_rates>              
-                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
-                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
-                <transformation_rate name="stem" units="1/min">0</transformation_rate>
-                <transformation_rate name="differentiated" units="1/min">0.0001</transformation_rate>
-                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
-                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
-                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
-              </transformation_rates>
-            </cell_transformations>
-
-          </phenotype>
-        <custom_data>
-          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="" description="">0.4</toxicity_halfmax>
-          <relative_max_toxicity units="" description="">100</relative_max_toxicity>
-          <cycling_contact_halfmax units="" description="">0.1</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="" description="">0.1</differentiation_contact_halfmax>
-          <damage_halfmax units="" description="">0.0</damage_halfmax>
-          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
-          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
-          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
-        </custom_data>
-          </cell_definition>
-
-      <cell_definition name="differentiated" ID="3">
-        <phenotype>
-          <cycle code="5" name="live">
-            <phase_transition_rates units="1/min">
-              <rate start_index="0" end_index="0" fixed_duration="false">5.3e-4</rate>
-            </phase_transition_rates>
-            </cycle>
-
-          <death>
-            <model code="100" name="apoptosis">
-              <death_rate units="1/min">5.3e-05</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">516</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-            <model code="101" name="necrosis">
-              <death_rate units="1/min">0.0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">0</duration>
-              <duration index="1" fixed_duration="true">86400</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-          </death>
-
-          <volume>
-            <total>2494</total>
-            <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>540</nuclear>
-            <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
-            <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
-            <calcified_fraction>0</calcified_fraction>
-            <calcification_rate>0</calcification_rate>
-            <relative_rupture_volume>2.0</relative_rupture_volume>
-          </volume>
-
-          <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
-            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-  					<cell_adhesion_affinities>
-	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
-		  			</cell_adhesion_affinities>            
-            <options>
-              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
-              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
-            </options>
-          </mechanics>
-
-          <motility>
-            <speed>1</speed>
-            <persistence_time>1</persistence_time>
-            <migration_bias>.5</migration_bias>
-            <options>
-              <enabled>false</enabled>
-              <use_2D>true</use_2D>
-              <chemotaxis>
-                <enabled>false</enabled>
-                <substrate>debris</substrate>
-                <direction>1</direction>
-              </chemotaxis>
-
-              <advanced_chemotaxis>
-                <enabled>false</enabled>
-                <normalize_each_gradient>false</normalize_each_gradient>
-                <chemotactic_sensitivities>
-                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
-                </chemotactic_sensitivities>
-              </advanced_chemotaxis>
-
-            </options>
-          </motility>
-
-          <secretion>
-            <substrate name="resource">
-              <secretion_rate units="1/min">0</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">10</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="toxin">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="quorum">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="pro-inflammatory">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="debris">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            </secretion>
-            <cell_interactions>
-              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
-              <live_phagocytosis_rates>
-                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
-              </live_phagocytosis_rates>
-              <attack_rates>
-                <attack_rate name="bacteria" units="1/min">0</attack_rate>
-                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
-                <attack_rate name="stem" units="1/min">0</attack_rate>
-                <attack_rate name="differentiated" units="1/min">0</attack_rate>
-                <attack_rate name="macrophage" units="1/min">0</attack_rate>
-                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
-                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
-              </attack_rates>
-              <damage_rate units="1/min">1</damage_rate>
-              <fusion_rates>
-                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
-                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
-                <fusion_rate name="stem" units="1/min">0</fusion_rate>
-                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
-                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
-                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
-                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
-              </fusion_rates>
-            </cell_interactions>
-            <cell_transformations>
-              <transformation_rates>
-                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
-                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
-                <transformation_rate name="stem" units="1/min">0</transformation_rate>
-                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
-                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
-                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
-                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
-              </transformation_rates>
-            </cell_transformations>
-
-          </phenotype>
-        <custom_data>
-          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.0</migration_bias_halfmax>
-          <toxicity_halfmax units="" description="">0.2</toxicity_halfmax>
-          <relative_max_toxicity units="" description="">100</relative_max_toxicity>
-          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="" description="">0.0</damage_halfmax>
-          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="" description="">0.5</cycling_pressure_halfmax>
-          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
-          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
-          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
-        </custom_data>
-          </cell_definition>
-
-      <cell_definition name="macrophage" ID="4">
-        <phenotype>
-          <cycle code="5" name="live">
-            <phase_transition_rates units="1/min">
-              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
-            </phase_transition_rates>
-            </cycle>
-
-          <death>
-            <model code="100" name="apoptosis">
-              <death_rate units="1/min">0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">516</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-            <model code="101" name="necrosis">
-              <death_rate units="1/min">0.0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">0</duration>
-              <duration index="1" fixed_duration="true">86400</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-          </death>
-
-          <volume>
-            <total>3000</total>
-            <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>600</nuclear>
-            <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.045</cytoplasmic_biomass_change_rate>
-            <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
-            <calcified_fraction>0</calcified_fraction>
-            <calcification_rate>0</calcification_rate>
-            <relative_rupture_volume>2.0</relative_rupture_volume>
-          </volume>
-
-          <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
-            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-  					<cell_adhesion_affinities>
-	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
-		  			</cell_adhesion_affinities>            
-            <options>
-              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
-              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
-            </options>
-          </mechanics>
-
-          <motility>
-            <speed>1</speed>
-            <persistence_time>5</persistence_time>
-            <migration_bias>0.1</migration_bias>
-            <options>
-              <enabled>true</enabled>
-              <use_2D>true</use_2D>
-              <chemotaxis>
-                <enabled>false</enabled>
-                <substrate>debris</substrate>
-                <direction>1</direction>
-              </chemotaxis>
-
-              <advanced_chemotaxis>
-                <enabled>true</enabled>
-                <normalize_each_gradient>false</normalize_each_gradient>
-                <chemotactic_sensitivities>
-                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="quorum">1</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="debris">0.1</chemotactic_sensitivity> 
-                </chemotactic_sensitivities>
-              </advanced_chemotaxis>
-
-            </options>
-          </motility>
-
-          <secretion>
-            <substrate name="resource">
-              <secretion_rate units="1/min">0</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">5</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="toxin">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="quorum">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="pro-inflammatory">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">1.0</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="debris">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">5</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            </secretion>
-            <cell_interactions>
-              <dead_phagocytosis_rate units="1/min">0.05</dead_phagocytosis_rate>
-              <live_phagocytosis_rates>
-                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
-              </live_phagocytosis_rates>
-              <attack_rates>
-                <attack_rate name="bacteria" units="1/min">0</attack_rate>
-                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
-                <attack_rate name="stem" units="1/min">0</attack_rate>
-                <attack_rate name="differentiated" units="1/min">0</attack_rate>
-                <attack_rate name="macrophage" units="1/min">0</attack_rate>
-                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
-                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
-              </attack_rates>
-              <damage_rate units="1/min">1</damage_rate>
-              <fusion_rates>
-                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
-                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
-                <fusion_rate name="stem" units="1/min">0</fusion_rate>
-                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
-                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
-                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
-                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
-              </fusion_rates>
-            </cell_interactions>
-            <cell_transformations>
-              <transformation_rates>
-                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
-                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
-                <transformation_rate name="stem" units="1/min">0</transformation_rate>
-                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
-                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
-                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
-                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
-              </transformation_rates>
-            </cell_transformations>
-
-          </phenotype>
-        <custom_data>
-          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="">0.05</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.01</migration_bias_halfmax>
-          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="" description="">0.0</damage_halfmax>
-          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="" description="">0.005</secretion_halfmax>
-          <debris_sensitivity units="" description="">0.1</debris_sensitivity>
-          <quorum_sensitivity units="" description="">1</quorum_sensitivity>
-          <inflammation_sensitivity units="" description="">0</inflammation_sensitivity>
-        </custom_data>
-          </cell_definition>
-
-      <cell_definition name="CD8+ T cell" ID="5">
-        <phenotype>
-          <cycle code="5" name="live">
-            <phase_transition_rates units="1/min">
-              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
-            </phase_transition_rates>
-            </cycle>
-
-          <death>
-            <model code="100" name="apoptosis">
-              <death_rate units="1/min">0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">516</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-            <model code="101" name="necrosis">
-              <death_rate units="1/min">0.0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">0</duration>
-              <duration index="1" fixed_duration="true">86400</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-          </death>
-
-          <volume>
-            <total>3000</total>
-            <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>600</nuclear>
-            <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.0045</cytoplasmic_biomass_change_rate>
-            <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
-            <calcified_fraction>0</calcified_fraction>
-            <calcification_rate>0</calcification_rate>
-            <relative_rupture_volume>2.0</relative_rupture_volume>
-          </volume>
-
-          <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
-            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-  					<cell_adhesion_affinities>
-	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
-		  			</cell_adhesion_affinities>            
-            <options>
-              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
-              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
-            </options>
-          </mechanics>
-
-          <motility>
-            <speed>1</speed>
-            <persistence_time>5</persistence_time>
-            <migration_bias>0.1</migration_bias>
-            <options>
-              <enabled>true</enabled>
-              <use_2D>true</use_2D>
-              <chemotaxis>
-                <enabled>true</enabled>
-                <substrate>pro-inflammatory</substrate>
-                <direction>1</direction>
-              </chemotaxis>
-
-              <advanced_chemotaxis>
-                <enabled>false</enabled>
-                <normalize_each_gradient>false</normalize_each_gradient>
-                <chemotactic_sensitivities>
-                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
-                </chemotactic_sensitivities>
-              </advanced_chemotaxis>
-
-            </options>
-          </motility>
-
-          <secretion>
-            <substrate name="resource">
-              <secretion_rate units="1/min">0</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">5</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="toxin">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="quorum">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="pro-inflammatory">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">1</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="debris">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            </secretion>
-            <cell_interactions>
-              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
-              <live_phagocytosis_rates>
-                <phagocytosis_rate name="bacteria" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
-              </live_phagocytosis_rates>
-              <attack_rates>
-                <attack_rate name="bacteria" units="1/min">10</attack_rate>
-                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
-                <attack_rate name="stem" units="1/min">0</attack_rate>
-                <attack_rate name="differentiated" units="1/min">0</attack_rate>
-                <attack_rate name="macrophage" units="1/min">0</attack_rate>
-                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
-                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
-              </attack_rates>
-              <damage_rate units="1/min">1</damage_rate>
-              <fusion_rates>
-                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
-                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
-                <fusion_rate name="stem" units="1/min">0</fusion_rate>
-                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
-                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
-                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
-                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
-              </fusion_rates>
-            </cell_interactions>
-            <cell_transformations>
-              <transformation_rates>
-                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
-                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
-                <transformation_rate name="stem" units="1/min">0</transformation_rate>
-                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
-                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
-                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
-                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
-              </transformation_rates>
-            </cell_transformations>
-
-          </phenotype>
-        <custom_data>
-          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.5</migration_bias_halfmax>
-          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="" description="">0.0</damage_halfmax>
-          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
-          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
-          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
-        </custom_data>
-          </cell_definition>
-
-      <cell_definition name="neutrophil" ID="6">
-        <phenotype>
-          <cycle code="5" name="live">
-            <phase_transition_rates units="1/min">
-              <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
-            </phase_transition_rates>
-            </cycle>
-
-          <death>
-            <model code="100" name="apoptosis">
-              <death_rate units="1/min">0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">516</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-            <model code="101" name="necrosis">
-              <death_rate units="1/min">0.0</death_rate>
-              <phase_durations units="min">
-                <duration index="0" fixed_duration="true">0</duration>
-              <duration index="1" fixed_duration="true">86400</duration>
-              </phase_durations>
-              <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
-                <calcification_rate units="1/min">0</calcification_rate>
-                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
-              </parameters>
-            </model>
-          </death>
-
-          <volume>
-            <total>1000</total>
-            <fluid_fraction>0.75</fluid_fraction>
-            <nuclear>200</nuclear>
-            <fluid_change_rate>0.05</fluid_change_rate>
-            <cytoplasmic_biomass_change_rate>0.045</cytoplasmic_biomass_change_rate>
-            <nuclear_biomass_change_rate>0.0055</nuclear_biomass_change_rate>
-            <calcified_fraction>0</calcified_fraction>
-            <calcification_rate>0</calcification_rate>
-            <relative_rupture_volume>2.0</relative_rupture_volume>
-          </volume>
-
-          <mechanics>
-            <cell_cell_adhesion_strength units="micron/min">0.04</cell_cell_adhesion_strength>
-            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-  					<cell_adhesion_affinities>
-	  					<cell_adhesion_affinity name="bacteria">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="blood vessel">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="stem">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="differentiated">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="macrophage">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="CD8+ T cell">1</cell_adhesion_affinity> 
-	  					<cell_adhesion_affinity name="neutrophil">1</cell_adhesion_affinity> 
-		  			</cell_adhesion_affinities>            
-            <options>
-              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
-              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
-            </options>
-          </mechanics>
-
-          <motility>
-            <speed>1</speed>
-            <persistence_time>5</persistence_time>
-            <migration_bias>0.1</migration_bias>
-            <options>
-              <enabled>true</enabled>
-              <use_2D>true</use_2D>
-              <chemotaxis>
-                <enabled>true</enabled>
-                <substrate>pro-inflammatory</substrate>
-                <direction>1</direction>
-              </chemotaxis>
-
-              <advanced_chemotaxis>
-                <enabled>false</enabled>
-                <normalize_each_gradient>false</normalize_each_gradient>
-                <chemotactic_sensitivities>
-                  <chemotactic_sensitivity substrate="resource">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="toxin">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="quorum">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="pro-inflammatory">0</chemotactic_sensitivity> 
-                  <chemotactic_sensitivity substrate="debris">0</chemotactic_sensitivity> 
-                </chemotactic_sensitivities>
-              </advanced_chemotaxis>
-
-            </options>
-          </motility>
-
-          <secretion>
-            <substrate name="resource">
-              <secretion_rate units="1/min">0</secretion_rate>
-              <secretion_target units="substrate density">1</secretion_target>
-              <uptake_rate units="1/min">5</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="toxin">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="quorum">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0.0</uptake_rate>
-              <net_export_rate units="total substrate/min">0</net_export_rate>
-            </substrate>
-            <substrate name="pro-inflammatory">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">1</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            <substrate name="debris">
-              <secretion_rate units="1/min">0.0</secretion_rate>
-              <secretion_target units="substrate density">0.0</secretion_target>
-              <uptake_rate units="1/min">0</uptake_rate>
-              <net_export_rate units="total substrate/min">0.0</net_export_rate>
-            </substrate>
-            </secretion>
-            <cell_interactions>
-              <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
-              <live_phagocytosis_rates>
-                <phagocytosis_rate name="bacteria" units="1/min">0.05</phagocytosis_rate>
-                <phagocytosis_rate name="blood vessel" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="stem" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="differentiated" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="macrophage" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="CD8+ T cell" units="1/min">0</phagocytosis_rate>
-                <phagocytosis_rate name="neutrophil" units="1/min">0</phagocytosis_rate>
-              </live_phagocytosis_rates>
-              <attack_rates>
-                <attack_rate name="bacteria" units="1/min">0</attack_rate>
-                <attack_rate name="blood vessel" units="1/min">0</attack_rate>
-                <attack_rate name="stem" units="1/min">0</attack_rate>
-                <attack_rate name="differentiated" units="1/min">0</attack_rate>
-                <attack_rate name="macrophage" units="1/min">0</attack_rate>
-                <attack_rate name="CD8+ T cell" units="1/min">0</attack_rate>
-                <attack_rate name="neutrophil" units="1/min">0</attack_rate>
-              </attack_rates>
-              <damage_rate units="1/min">1</damage_rate>
-              <fusion_rates>
-                <fusion_rate name="bacteria" units="1/min">0</fusion_rate>
-                <fusion_rate name="blood vessel" units="1/min">0</fusion_rate>
-                <fusion_rate name="stem" units="1/min">0</fusion_rate>
-                <fusion_rate name="differentiated" units="1/min">0</fusion_rate>
-                <fusion_rate name="macrophage" units="1/min">0</fusion_rate>
-                <fusion_rate name="CD8+ T cell" units="1/min">0</fusion_rate>
-                <fusion_rate name="neutrophil" units="1/min">0</fusion_rate>
-              </fusion_rates>
-            </cell_interactions>
-            <cell_transformations>
-              <transformation_rates>
-                <transformation_rate name="bacteria" units="1/min">0</transformation_rate>
-                <transformation_rate name="blood vessel" units="1/min">0</transformation_rate>
-                <transformation_rate name="stem" units="1/min">0</transformation_rate>
-                <transformation_rate name="differentiated" units="1/min">0</transformation_rate>
-                <transformation_rate name="macrophage" units="1/min">0</transformation_rate>
-                <transformation_rate name="CD8+ T cell" units="1/min">0</transformation_rate>
-                <transformation_rate name="neutrophil" units="1/min">0</transformation_rate>
-              </transformation_rates>
-            </cell_transformations>
-
-          </phenotype>
-        <custom_data>
-          <cycling_entry_threshold_resource units="" description="">0.15</cycling_entry_threshold_resource>
-          <necrosis_saturation_resource units="" description="">0.075</necrosis_saturation_resource>
-          <necrosis_threshold_resource units="" description="">0.15</necrosis_threshold_resource>
-          <migration_speed_halfmax units="" description="">0.0</migration_speed_halfmax>
-          <migration_bias_halfmax units="" description="">0.5</migration_bias_halfmax>
-          <toxicity_halfmax units="" description="">0.0</toxicity_halfmax>
-          <relative_max_toxicity units="" description="">0.0</relative_max_toxicity>
-          <cycling_contact_halfmax units="" description="">0.0</cycling_contact_halfmax>
-          <differentiation_contact_halfmax units="" description="">0.0</differentiation_contact_halfmax>
-          <damage_halfmax units="" description="">0.0</damage_halfmax>
-          <relative_max_damage_death units="" description="">0.0</relative_max_damage_death>
-          <cycling_pressure_halfmax units="" description="">0.0</cycling_pressure_halfmax>
-          <secretion_halfmax units="" description="">0.0</secretion_halfmax>
-          <debris_sensitivity units="" description="">0.0</debris_sensitivity>
-          <quorum_sensitivity units="" description="">0.0</quorum_sensitivity>
-          <inflammation_sensitivity units="" description="">0.0</inflammation_sensitivity>
-        </custom_data>
-          </cell_definition>
-
-      </cell_definitions>
-	
-	<initial_conditions>
-		<cell_positions enabled="false" type="csv">
-			<folder />
-			<filename>cells.csv</filename>
-		</cell_positions>
-	</initial_conditions>	
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>false</enabled>
+							<substrate>prey signal</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+			</phenotype>
+			<custom_data>  
+				<energy units="dimensionless">1.0</energy>
+				<energy_use_rate units="1/min">1.0</energy_use_rate>
+				<energy_creation_rate units="1/min">1.0</energy_creation_rate>
+				
+				<predator_weight units="dimensionless">-2</predator_weight>
+				<prey_weight units="dimensionless">100</prey_weight>
+				<food_weight units="dimensionless">1</food_weight>
+			</custom_data>
+		</cell_definition>
+		
+	</cell_definitions>
 	
 	<user_parameters>
-		<random_seed type="int" units="dimensionless" description="">0</random_seed>
-        <number_of_stem_cells type="int" units="none" description="">50</number_of_stem_cells>
-        <number_of_differentiated_cells type="int" units="" description="">400</number_of_differentiated_cells>
-        <number_of_blood_vessels type="int" units="" description="">40</number_of_blood_vessels>
-        <number_of_bacteria type="int" units="" description="">20</number_of_bacteria>
-        <number_of_macrophages type="int" units="" description="">50</number_of_macrophages>
-        <number_of_CD8T_cells type="int" units="" description="">50</number_of_CD8T_cells>
-        <number_of_neutrophils type="int" units="" description="">50</number_of_neutrophils>
-        <max_stem_differentiation type="double" units="" description="maximum stem cell differentiation rate">0.0075</max_stem_differentiation>
-    </user_parameters>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<!-- example parameters from the template --> 
+		
+		<div_initialization type="divider" description="---Initialization settings---"/>
+		
+		<number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">15</number_of_cells>
+	</user_parameters>
 	
 </PhysiCell_settings>
