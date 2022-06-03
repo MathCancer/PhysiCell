@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,44 +65,37 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_MultiCellDS_h__
-#define __PhysiCell_MultiCellDS_h__
-
-#include <iostream>
-#include <ctime>
-#include <cmath>
-#include <string>
-#include <vector>
-#include <random>
-#include <chrono>
-
 #include "../core/PhysiCell.h"
-#include "../BioFVM/BioFVM_MultiCellDS.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-namespace PhysiCell{
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-void add_PhysiCell_cell_to_open_xml_pugi(  pugi::xml_document& xml_dom, Cell& C ); // not implemented -- future edition 
-void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M  ); 
-void add_PhysiCell_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M );
+// setup functions to help us along 
 
-	
-void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double current_simulation_time); 
+void create_cell_types( void );
+void setup_tissue( void ); 
 
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
 
-/* V2 functions */ 
+// custom pathology coloring function 
 
-/*
-void add_PhysiCell_cell_to_open_xml_pugi_v2(  pugi::xml_document& xml_dom, Cell& C ); // not implemented -- future edition 
-void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M  ); 
-void add_PhysiCell_to_open_xml_pugi_v2( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M );
-	
-void save_PhysiCell_to_MultiCellDS_xml_pugi_v2( std::string filename_base , Microenvironment& M , double current_simulation_time); 
-*/
+std::vector<std::string> my_coloring_function( Cell* );
 
-void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M  ); 
-void save_PhysiCell_to_MultiCellDS_v2( std::string filename_base , Microenvironment& M , double current_simulation_time);
+// custom functions can go here 
 
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
-};
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
-#endif
+void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+
+void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+
+void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+
