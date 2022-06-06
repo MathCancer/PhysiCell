@@ -8,6 +8,7 @@
 #include "../../../core/PhysiCell_cell.h"
 #include "../../../modules/PhysiCell_pugixml.h"
 #include "maboss_network.h"
+#include "utils.h"
 
 static std::string PhysiBoSS_Version = "2.1.0"; 
 
