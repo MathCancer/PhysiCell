@@ -32,7 +32,9 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	std::map<std::string, double> parameters;
 
 	std::vector<MaBoSSInput> listOfInputs;
+	std::vector<int> indicesOfInputs;
 	std::vector<MaBoSSOutput> listOfOutputs;
+	std::vector<int> indicesOfOutputs;
 	MaBoSSNetwork maboss;
 
 	double next_physiboss_run = 0;
@@ -62,7 +64,9 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	}
 
 	void update(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt) {
+		this->update_inputs(cell, phenotype, dt);
 		this->maboss.run_simulation();
+		this->update_outputs(cell, phenotype, dt);
 		this->next_physiboss_run += this->maboss.get_time_to_update();
 	}
 	
@@ -70,6 +74,9 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		return PhysiCell::PhysiCell_globals.current_time >= this->next_physiboss_run;
 	}
 	
+	void update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt);
+	void update_outputs(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt);
+
 	bool has_variable(std::string name) {
 		return this->maboss.has_node(name);
 	}

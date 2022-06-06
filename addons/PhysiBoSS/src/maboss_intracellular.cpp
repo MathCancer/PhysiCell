@@ -27,6 +27,8 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 	initial_values = copy->initial_values;
 	mutations = copy->mutations;
 	parameters = copy->parameters;
+	indicesOfInputs = copy->indicesOfInputs;
+	indicesOfOutputs = copy->indicesOfOutputs;
 	listOfInputs = copy->listOfInputs;
 	listOfOutputs = copy->listOfOutputs;
 	
@@ -40,10 +42,51 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		maboss.set_scaling(copy->scaling);
 		maboss.set_time_stochasticity(copy->time_stochasticity);
 		maboss.restart_node_values();
+		indicesOfInputs.clear();
+		for (MaBoSSInput& input: listOfInputs) {
+			indicesOfInputs.push_back(PhysiCell::find_signal_index(input.physicell_name));
+		}
+		indicesOfOutputs.clear();
+		for (MaBoSSOutput& output: listOfOutputs) {
+			indicesOfOutputs.push_back(PhysiCell::find_behavior_index(output.physicell_name));
+		}
 		//maboss.set_state(copy->maboss.get_maboss_state());
 		//std::cout << get_state();
 	}	
 }
+
+void MaBoSSIntracellular::update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt)
+{
+	std::vector<double> signals = PhysiCell::get_selected_signals(cell, indicesOfInputs);
+	
+	for (unsigned int i=0; i < listOfInputs.size(); i++) 
+	{
+		MaBoSSInput& input = listOfInputs[i];
+		if (input.isNode()) {
+			maboss.set_node_value(
+				input.intracellular_name, 
+				input.updateNode(maboss.get_node_value(input.intracellular_name), signals[i])
+			);
+		} else if (input.isParameter()) {
+			maboss.set_parameter_value(
+				input.intracellular_parameter,
+				input.updateParameter(signals[i])
+			);
+		}
+	}
+}
+
+void MaBoSSIntracellular::update_outputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt)
+{
+	std::vector<double> signals = std::vector<double>(listOfOutputs.size(), 0.0);
+	for (unsigned int i=0; i < listOfOutputs.size(); i++) 
+	{
+		MaBoSSOutput& output = listOfOutputs[i];
+		signals[i] = output.update(maboss.get_node_value(output.intracellular_name));
+	}
+	PhysiCell::set_selected_behaviors(cell, indicesOfOutputs, signals);
+}
+
 
 void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)
 {
