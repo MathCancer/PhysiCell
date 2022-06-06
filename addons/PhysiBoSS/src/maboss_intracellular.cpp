@@ -27,6 +27,8 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 	initial_values = copy->initial_values;
 	mutations = copy->mutations;
 	parameters = copy->parameters;
+	listOfInputs = copy->listOfInputs;
+	listOfOutputs = copy->listOfOutputs;
 	
 	if (copy->maboss.has_init()) {
 		maboss.init_maboss(copy->bnd_filename, copy->cfg_filename);
@@ -249,6 +251,63 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 
 	maboss.set_parameters(parameters);	
 
+	// Mappings
+
+	pugi::xml_node node_mappings = node.child( "mapping" );
+	if( node_mappings )
+	{
+
+		pugi::xml_node node_input = node_mappings.child("input");
+		while (node_input) 
+		{
+			pugi::xml_node settings = node_input.child("settings");
+
+			std::string intracellular_name = node_input.attribute( "intracellular_name" ).value();
+			if (intracellular_name[0] == '$') {
+
+				MaBoSSInput input = MaBoSSInput(
+					node_input.attribute( "physicell_name" ).value(),
+					intracellular_name,
+					(settings && settings.child( "scaling" ) ? PhysiCell::xml_get_my_double_value( settings.child( "scaling" )) : 1.0),
+					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
+				);
+
+				listOfInputs.push_back(input);				
+			} else {
+				
+				MaBoSSInput input = MaBoSSInput(
+					node_input.attribute( "physicell_name" ).value(),
+					intracellular_name,
+					PhysiCell::xml_get_my_string_value(settings.child("action")),
+					PhysiCell::xml_get_my_double_value(settings.child("threshold")),
+					(settings && settings.child( "inact_threshold" ) ? PhysiCell::xml_get_my_double_value( settings.child( "inact_threshold" )) : PhysiCell::xml_get_my_double_value(settings.child("threshold"))),
+					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
+				);
+
+				listOfInputs.push_back(input);
+
+			}
+
+			node_input = node_input.next_sibling( "input" ); 
+		}
+		
+		pugi::xml_node node_output = node_mappings.child("output");
+		while (node_output) 
+		{
+			pugi::xml_node settings = node_output.child("settings");
+	
+			listOfOutputs.push_back(MaBoSSOutput(
+				node_output.attribute( "physicell_name" ).value(),
+				node_output.attribute( "intracellular_name" ).value(),
+				PhysiCell::xml_get_my_string_value(settings.child("action")),
+				PhysiCell::xml_get_my_double_value(settings.child("value")),
+				(settings && settings.child( "base_value" ) ? PhysiCell::xml_get_my_double_value( settings.child( "base_value" )) : PhysiCell::xml_get_my_double_value(settings.child("value"))),
+				(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
+			));
+
+			node_output = node_output.next_sibling( "output" ); 	
+		}
+	}
 }
 
 MaBoSSIntracellular* getMaBoSSModel(PhysiCell::Phenotype& phenotype) {
