@@ -333,8 +333,21 @@ void MaBoSSIntracellular::display(std::ostream& os)
 		os << "\t\t\t" << mutation.first << " = " << mutation.second << std::endl;
 
 	os 	<< "\t\t scaling = " << scaling << std::endl
-		<< "\t\t time_stochasticity = " << time_stochasticity << std::endl
-		<< std::endl;
+		<< "\t\t time_stochasticity = " << time_stochasticity << std::endl;
+
+	os	<< "\t\t " << listOfInputs.size() << " input mapping defined" << std::endl;
+	for (auto& input : listOfInputs)
+		os 	<< "\t\t\t" << input.physicell_name << " = " << input.intracellular_name
+			<< "(" << input.threshold << ", " << input.inact_threshold << ", " << input.smoothing << ")"
+			<< std::endl;
+
+	os	<< "\t\t " << listOfOutputs.size() << " output mapping defined" << std::endl;
+	for (auto& output : listOfOutputs)
+		os 	<< "\t\t\t" << output.physicell_name << " = " << output.intracellular_name 
+			<< "(" << output.value << ", " << output.base_value << ", " << output.smoothing << ")"
+			<< std::endl;
+	
+	std::cout << std::endl;
 }
 
 void MaBoSSIntracellular::save(std::string filename, std::vector<PhysiCell::Cell*>& cells)
