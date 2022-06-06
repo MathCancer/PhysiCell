@@ -59,53 +59,126 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		pugi::xml_node node_init_value = node_init_values.child( "initial_value" );
 		while( node_init_value )
 		{
-			std::string node_name = node_init_value.attribute( "node" ).value(); 
+			pugi::xml_attribute node_name = node_init_value.attribute( "node" );
+			pugi::xml_attribute node_intracellular_name = node_init_value.attribute( "intracellular_name" ); 
 			double node_value = PhysiCell::xml_get_my_double_value( node_init_value );
 			
-			initial_values[node_name] = node_value;
-			
+			if (node_intracellular_name) {
+				initial_values[node_intracellular_name.value()] = node_value;
+			} else if (node_name) {
+				std::cout << "The attribute node in mutation is deprecated and will be removed in future versions. Please switch to intracellular_name !" << std::endl;
+				initial_values[node_name.value()] = node_value;
+			}
 			node_init_value = node_init_value.next_sibling( "initial_value" ); 
 		}
 	}
-	
-	pugi::xml_node node_mutations = node.child( "mutations" );
-	if( node_mutations )
-	{
-		pugi::xml_node node_mutation = node_mutations.child( "mutation" );
-		while( node_mutation )
-		{
-			std::string node_name = node_mutation.attribute( "node" ).value(); 
-			double node_value = PhysiCell::xml_get_my_double_value( node_mutation );
-			
-			mutations[node_name] = node_value;
-			
-			node_mutation = node_mutation.next_sibling( "mutation" ); 
-		}
-	}
-	
-	pugi::xml_node node_parameters = node.child( "parameters" );
-	if( node_parameters )
-	{
-		pugi::xml_node node_parameter = node_parameters.child( "parameter" );
-		while( node_parameter )
-		{
-			std::string param_name = node_parameter.attribute( "name" ).value(); 
-			double param_value = PhysiCell::xml_get_my_double_value( node_parameter );
-			
-			parameters[param_name] = param_value;
-			
-			node_parameter = node_parameter.next_sibling( "parameter" ); 
-		}
-	}
-	
+
 	maboss.init_maboss(bnd_filename, cfg_filename);
-	maboss.mutate(mutations);
 	maboss.set_initial_values(initial_values);
-	maboss.set_parameters(parameters);	
+
+	pugi::xml_node node_settings = node.child( "settings" );
+	if ( node_settings ) {
+
+		pugi::xml_node node_mutations = node_settings.child( "mutations" );
+		if( node_mutations )
+		{
+			pugi::xml_node node_mutation = node_mutations.child( "mutation" );
+			while( node_mutation )
+			{
+				pugi::xml_attribute node_name = node_mutation.attribute( "node" ); 
+				pugi::xml_attribute node_intracellular_name = node_mutation.attribute( "intracellular_name" ); 
+				
+				double node_value = PhysiCell::xml_get_my_double_value( node_mutation );
+					
+				if (node_intracellular_name) {
+					mutations[node_intracellular_name.value()] = node_value;
+				} else if (node_name) {
+					std::cout << "The attribute node in mutation is deprecated and will be removed in future versions. Please switch to intracellular_name !" << std::endl;
+					mutations[node_name.value()] = node_value;
+				}
+
+				node_mutation = node_mutation.next_sibling( "mutation" ); 
+			}
+		}
+		
+		maboss.mutate(mutations);
+
+		pugi::xml_node node_parameters = node_settings.child( "parameters" );
+		if( node_parameters )
+		{
+			pugi::xml_node node_parameter = node_parameters.child( "parameter" );
+			while( node_parameter )
+			{
+				pugi::xml_attribute param_name = node_parameter.attribute( "name" ); 
+				pugi::xml_attribute param_intracellular_name = node_parameter.attribute( "intracellular_name" ); 
+				double param_value = PhysiCell::xml_get_my_double_value( node_parameter );
+				
+				if (param_intracellular_name) {
+					parameters[param_intracellular_name.value()] = param_value;
+				} else if (param_name) {
+					std::cout << "The attribute name in parameter is deprecated and will be removed in future versions. Please switch to intracellular_name !" << std::endl;
+					parameters[param_name.value()] = param_value;
+				}
+				node_parameter = node_parameter.next_sibling( "parameter" ); 
+			}
+		}
+
+		maboss.set_parameters(parameters);	
+
+		pugi::xml_node node_timestep = node_settings.child( "time_step" ); 
+		pugi::xml_node node_intracellular_dt = node_settings.child( "intracellular_dt" ); 
+		if( node_intracellular_dt )
+		{ 
+			time_step = PhysiCell::xml_get_my_double_value( node_intracellular_dt );
+			maboss.set_update_time_step(time_step);
+
+		} else if ( node_timestep ) 
+		{
+			std::cout << "The setting timestep in parameter is deprecated and will be removed in future versions. Please switch to intracellular_name !" << std::endl;
+			time_step = PhysiCell::xml_get_my_double_value( node_timestep );
+			maboss.set_update_time_step(time_step);
+		}
+		
+		pugi::xml_node node_discretetime = node_settings.child( "discrete_time" ); 
+		pugi::xml_node node_timetick = node_settings.child( "time_tick" ); 
+
+		if( node_discretetime && node_timetick )
+		{ 
+			discrete_time = PhysiCell::xml_get_my_bool_value( node_discretetime );		
+			time_tick = PhysiCell::xml_get_my_double_value( node_timetick );
+			maboss.set_discrete_time(discrete_time, time_tick);
+		}
+
+		pugi::xml_node node_scaling = node_settings.child( "scaling" ); 
+		if( node_scaling )
+		{ 
+			scaling = PhysiCell::xml_get_my_double_value( node_scaling );
+			maboss.set_scaling(scaling);
+		}
+
+		pugi::xml_node node_time_stochasticity = node_settings.child( "time_stochasticity" );
+		if( node_time_stochasticity )
+		{
+			time_stochasticity = PhysiCell::xml_get_my_double_value( node_time_stochasticity );
+			maboss.set_time_stochasticity(time_stochasticity);
+		}
+
 	
+		}
+	
+	// Old structure, with deprecation warnings
+
 	pugi::xml_node node_timestep = node.child( "time_step" ); 
-	if( node_timestep )
+	pugi::xml_node node_intracellular_dt = node.child( "intracellular_dt" ); 
+	if( node_intracellular_dt )
 	{ 
+		std::cout << "The intracellular_dt needs to be defined inside the settings tag. Please update your settings as this will become incompatible in future versions" << std::endl;
+		time_step = PhysiCell::xml_get_my_double_value( node_intracellular_dt );
+		maboss.set_update_time_step(time_step);
+
+	} else if ( node_timestep ) 
+	{
+		std::cout << "The setting timestep in parameter is deprecated and will be removed in future versions. Please update your settings using intracellular_dt !" << std::endl;
 		time_step = PhysiCell::xml_get_my_double_value( node_timestep );
 		maboss.set_update_time_step(time_step);
 	}
@@ -115,6 +188,8 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 
 	if( node_discretetime && node_timetick )
 	{ 
+		std::cout << "The discrete_time needs to be defined inside the settings tag. Please update your settings as this will become incompatible in future versions" << std::endl;
+		std::cout << "The time_tick needs to be defined inside the settings tag. Please update your settings as this will become incompatible in future versions" << std::endl;
 		discrete_time = PhysiCell::xml_get_my_bool_value( node_discretetime );		
 		time_tick = PhysiCell::xml_get_my_double_value( node_timetick );
 		maboss.set_discrete_time(discrete_time, time_tick);
@@ -123,16 +198,57 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 	pugi::xml_node node_scaling = node.child( "scaling" ); 
 	if( node_scaling )
 	{ 
+		std::cout << "The scaling needs to be defined inside the settings tag. Please update your settings as this will become incompatible in future versions" << std::endl;
 		scaling = PhysiCell::xml_get_my_double_value( node_scaling );
 		maboss.set_scaling(scaling);
 	}
-	
+
 	pugi::xml_node node_time_stochasticity = node.child( "time_stochasticity" );
 	if( node_time_stochasticity )
 	{
+		std::cout << "The time stochasticity needs to be defined inside the settings tag. Please update your settings as this will become incompatible in future versions" << std::endl;
 		time_stochasticity = PhysiCell::xml_get_my_double_value( node_time_stochasticity );
 		maboss.set_time_stochasticity(time_stochasticity);
 	}
+
+
+	pugi::xml_node node_mutations = node.child( "mutations" );
+	if( node_mutations )
+	{
+		std::cout << "The mutant declaration is now defined the the settings tag. Please update your settings as this will be incompatible in future versions !" << std::endl;
+		pugi::xml_node node_mutation = node_mutations.child( "mutation" );
+		while( node_mutation )
+		{
+			pugi::xml_attribute node_name = node_mutation.attribute( "node" ); 
+			
+			double node_value = PhysiCell::xml_get_my_double_value( node_mutation );
+				
+
+			mutations[node_name.value()] = node_value;
+
+			node_mutation = node_mutation.next_sibling( "mutation" ); 
+		}
+	}
+	
+	maboss.mutate(mutations);
+
+	pugi::xml_node node_parameters = node.child( "parameters" );
+	if( node_parameters )
+	{
+		std::cout << "The parameters declaration is now defined the the settings tag. Please update your settings as this will be incompatible in future versions !" << std::endl;
+		pugi::xml_node node_parameter = node.child( "parameter" );
+		while( node_parameter )
+		{
+			pugi::xml_attribute param_name = node_parameter.attribute( "name" ); 
+			double param_value = PhysiCell::xml_get_my_double_value( node_parameter );
+		
+			parameters[param_name.value()] = param_value;
+			node_parameter = node_parameter.next_sibling( "parameter" ); 
+		}
+	}
+
+	maboss.set_parameters(parameters);	
+
 }
 
 MaBoSSIntracellular* getMaBoSSModel(PhysiCell::Phenotype& phenotype) {
