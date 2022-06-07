@@ -125,7 +125,7 @@
 				<decay_rate units="1/min">.1</decay_rate> 
 			</physical_parameter_set>
 			<initial_condition units="mmHg">38.0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="false">38.0</Dirichlet_boundary_condition>
 		</variable>
 
 		<options>
@@ -179,11 +179,30 @@
 				<intracellular type="maboss">
 					<bnd_filename>./config/model_0.bnd</bnd_filename>
 					<cfg_filename>./config/model.cfg</cfg_filename>
-					<time_step>1</time_step>
+					<settings>
+						<intracellular_dt>1</intracellular_dt>
+					</settings>
 					<initial_values>
-						<initial_value node="A">1</initial_value>
-						<initial_value node="C">0</initial_value>
-					</initial_values>	
+						<initial_value intracellular_name="A">1</initial_value>
+						<initial_value intracellular_name="C">0</initial_value>
+					</initial_values>
+					<mapping>
+						<input physicell_name="oxygen" intracellular_name="A">
+							<settings>
+								<action>inhibition</action>
+								<threshold>10</threshold>
+								<inact_threshold>10</inact_threshold>
+							</settings>
+						</input>
+						<output physicell_name="apoptosis" intracellular_name="C">
+							<settings>
+								<action>activation</action>
+								<value>5</value>
+								<base_value>0</base_value>
+								<smoothing>5</smoothing>
+							</settings>
+						</output>
+					</mapping>
 				</intracellular>
 			</phenotype>
 			<custom_data/>
@@ -199,9 +218,11 @@
 		<cell_definition name="another" parent_type="default" ID="2">
 			<phenotype>
 				<intracellular type="maboss">
-					<mutations>
-						<mutation node="C">0.0</mutation>
-					</mutations>
+					<settings>
+						<mutations>
+							<mutation intracellular_name="C">0.0</mutation>
+						</mutations>
+					</settings>
 				</intracellular>			
 			</phenotype>
 			<custom_data/>
@@ -209,9 +230,11 @@
 		<cell_definition name="yet_another" parent_type="default" ID="3">
 			<phenotype>
 				<intracellular type="maboss">
-					<parameters>
-						<parameter name="$time_scale">0.2</parameter>
-					</parameters>
+					<settings>
+						<parameters>
+							<parameter intracellular_name="$time_scale">0.2</parameter>
+						</parameters>
+					</settings>
 				</intracellular>
 			</phenotype>
 			<custom_data/>
@@ -219,7 +242,9 @@
 		<cell_definition name="yet_yet_another" parent_type="default" ID="4">
 			<phenotype>
 				<intracellular type="maboss">
-					<scaling>0.25</scaling>
+					<settings>
+						<scaling>0.25</scaling>
+					</settings>
 				</intracellular>
 			</phenotype>
 			<custom_data/>
@@ -227,9 +252,11 @@
 		<cell_definition name="last_one" parent_type="default" ID="5">
 			<phenotype>
 				<intracellular type="maboss">
-					<parameters>
-						<parameter name="$time_scale">0.0</parameter>
-					</parameters>
+					<settings>
+						<parameters>
+							<parameter intracellular_name="$time_scale">0.0</parameter>
+						</parameters>
+					</settings>
 				</intracellular>
 			</phenotype>
 			<custom_data/>
