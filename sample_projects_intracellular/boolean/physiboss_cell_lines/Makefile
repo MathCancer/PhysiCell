@@ -195,7 +195,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # user-defined PhysiCell modules
 
 Compile_MaBoSS: MaBoSS
-	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make install_alib;make clean; cd ../../../../..
+	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make CXX=$(CC) install_alib;make clean; cd ../../../../..
 
 MaBoSS: 
 ifeq ($(OS), Windows_NT)
