@@ -268,9 +268,7 @@ None in this version. See 1.10.0.
 #### 1.10.3
 + Fixed bug in `get_single_behavior` and `get_single_base_behavior` where querying any cycle exit rate or cycle entry mistakenly returned -1. 
 
-+ 
-+
-+
++ Corrected declaration of `standard_add_basement_membrane_interactions` in `PhysiCell_standard_models.h` to properly use phenotype by reference. Thank you Inês Gonçalves!
 
 #### 1.10.2
 + Fixed error in `double get_single_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
