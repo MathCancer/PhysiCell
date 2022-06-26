@@ -1335,5 +1335,72 @@ double& Cell_Transformations::transformation_rate( std::string type_name )
 	return transformation_rates[n]; 
 }
 
+// beta functionality in 1.10.3 
+Integrity::Integrity()
+{
+ 	damage = 0.0; 
+	damage_rate = 0.0; 
+	damage_repair_rate = 0.0; 
+
+	lipid_damage = 0.0; 
+	lipid_damage_rate = 0.0; 
+	lipid_damage_repair_rate = 0.0; 
+
+	// DNA damage 
+	DNA_damage = 0.0; 
+	DNA_damage_rate = 0.0; 
+	DNA_damage_repair_rate = 0.0; 
+
+	return; 
+}
+
+void Integrity::advance_damage_models( double dt )
+{
+	double temp1;
+	double temp2; 
+	static double tol = 1e-8; 
+
+	// general damage 
+	if( damage_rate > tol || damage_repair_rate > tol )
+	{
+		temp1 = dt; 
+		temp2 = dt; 
+		temp1 *= damage_rate;  
+		temp2 *= damage_repair_rate; 
+		temp2 += 1; 
+
+		damage += temp1; 
+		damage /= temp2; 
+	}
+
+	// lipid damage 
+	if( lipid_damage_rate > tol || lipid_damage_repair_rate > tol )
+	{
+		temp1 = dt;
+		temp2 = dt;
+		temp1 *= lipid_damage_rate;  
+		temp2 *= lipid_damage_repair_rate; 
+		temp2 += 1; 
+	
+		lipid_damage += temp1; 
+		lipid_damage /= temp2; 
+	}
+
+	// DNA damage 
+	if( DNA_damage_rate > tol || DNA_damage_repair_rate > tol )
+	{
+		temp1 = dt;
+		temp2 = dt;
+		temp1 *= DNA_damage_rate;  
+		temp2 *= DNA_damage_repair_rate; 
+		temp2 += 1; 
+
+		DNA_damage += temp1; 
+		DNA_damage /= temp2; 
+	}
+
+	return; 
+}
+
 
 };

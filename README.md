@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
-**Version:** 1.10.2
+**Version:** 1.10.3
 
-**Release date:** 24 May 2022
+**Release date:** 25 June 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -16,15 +16,15 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 
 ### Key makefile rules:
 
-**make**               : compiles the current project. If no 
+**`make`**               : compiles the current project. If no 
                      project has been defined, it first 
                      populates the cancer heterogeneity 2D 
                      sample project and compiles it 
    
-**make \[project-name\]**: populates the indicated sample project. 
+**`make project-name`**: populates the indicated sample project. 
                      Use "make" to compile it. 
 
-   * **\[project-name\]** choices:
+   * **`project-name`** choices:
       * template 
       * biorobots-sample 
       * cancer-biorobots-sample 
@@ -39,21 +39,22 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
       * cancer-metabolism-sample
       * interaction-sample
 
-**make list-projects** : list all available sample projects 
+**`make list-projects`** : list all available sample projects 
 
-**make clean**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
+**`make clean`**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
 
-**make data-cleanup**  : clears out all simulation data 
+**`make data-cleanup`**  : clears out all simulation data 
 
-**make reset**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
+**`make reset`**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
 
-**make jpeg**          : uses ImageMagick to convert the SVG files in the output directory to JPG (with appropriate sizing to make movies). Supply `OUTPUT=foldername` to select a different folder. 
+**`make jpeg`**          : uses ImageMagick to convert the SVG files in the output directory to JPG (with appropriate sizing to make movies). Supply `OUTPUT=foldername` to select a different folder. 
 
-**make movie**         : uses ffmpeg to convert the JPG files in the output directory an mp4 movie. Supply `OUTPUT=foldername` to select a different folder, or `FRAMERATE=framerate` to override the frame rate.
+**`make movie`**         : uses ffmpeg to convert the JPG files in the output directory an mp4 movie. Supply `OUTPUT=foldername` to select a different folder, or `FRAMERATE=framerate` to override the frame rate.
 
-**make upgrade**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
+**`make upgrade`**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
 
-**Homepage:**     http://PhysiCell.MathCancer.org
+### Key Links 
+**Homepage:**     http://PhysiCell.MathCancer.org 
 
 **Downloads:**    http://PhysiCell.sf.net
 
@@ -71,7 +72,7 @@ See changes.md for the full change log.
 
 * * * 
 ## Release summary: 
-Version 1.10.2 introduces bugfixes to the behavior "dictionary" functiouns, data saves, and updating neighbor lists for nearby non-adhesive cells. It also introduces a number of ease-of-access functions to the phenotype for death rates, secretion, and internalized substrates. 
+Version 1.10.3 primarily fixes bugs and further refines the signal and behavior dictionaries, particularly with access to custom variables. It also allows users to designate custom variables as _conserved quantities_ that are divided evenly among daughter cells as division (e.g., melanosomes). 
 
 The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
@@ -84,6 +85,8 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
  
 ### Major new features and changes in the 1.10.z versions
+#### 1.10.3
++ None in this version. See 1.10.0
 #### 1.10.2
 + None in this version. See 1.10.0
 #### 1.10.1
@@ -193,6 +196,15 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
   + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
 
 ### Minor new features and changes: 
+#### 1.10.3
++ Added `attachment_rate` and `detachment_rate` to `phenotype.mechanics` for use in a future standard attachment and detachment model. 
++ Modernized output format: 
+  + More complete cell data saved for each cell agent. 
+  + Merged the previously separate cell matlab files for each time save
+  + Added more metadata to outputs
++ `Variables` and `Vector_Variables` in `Custom_Cell_Data` now have a new Boolean attribute `conserved_quantity` (defaulted to false). If this value is set to true, then the custom variable is divided evenly between daughter cells at division. 
++ Custom cell data can now be designated as conserved by settings an attribute `conserved="true"` in the XMO configuration file. 
+
 #### 1.10.2
 + Added `operator<<` for vectors of ints and vectors of strings. So that `std::cout << v << std::endl;` will work if `v` is `std::vector<int>` of `std::vector<std::string>`. It was truly annoying that these were missing, so sorry!
 + Added `dead` to the signals dictionaries, which returns 0.0 or 1.0 based on `phenotype.death.dead`. 
@@ -212,7 +224,6 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Added new ease of access function for internalized substrates: 
   + `double& Molecular::internalized_total_substrate( std::string name )` allows you to easily read/write the total amount of internalized substrate by name. For example: 
 	```pCell->phenotype.molecular.internalized_total_substrate( "oxygen" ) = 0.01``
-
 #### 1.10.1
 + None in this version. See 1.10.0. 
 #### 1.10.0
@@ -225,6 +236,19 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
 
 ### Beta features (not fully supported):
+#### 1.10.3
++ Each time outputs two cell interaction graphs (as text files): 
+  + neighbor graph records which cells are within interaction distance for each cell agent, with format; 
+    ID: ID1, ID2, ID3, ... (Cell ID: and the IDs of interacting cells)
+  + attached cell graph records which cells are attached for each cell agent, with format; 
+    ID: ID1, ID2, ID3, ... (Cell ID: and the IDs of attached cells)
+  + We might split these into 3 files: 
+    + an ID list that has the ID of each cell in order of appearence. 
+    + neighbor list omits the preceding "ID:" since now each row corresponds to the index in the ID list
+    + attached cell list omits the preceding "ID:" since now each row corresponds to the index in the ID list
+  + Began experimenting with a planned `integrity` subclass to `phenotype` that will record multiple types of cell damage and associated damage and repair rates. It is not yet clear if we wil provide built-in support for damaged-driven apoptotic death and cycle arrest, as these are generally better left to modeler-driven hypotheses. 
+
+None in this version. See 1.10.0. 
 #### 1.10.2
 + None in this version. See 1.10.0.  
 #### 1.10.1
@@ -241,6 +265,11 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
+#### 1.10.3
++ Fixed bug in `get_single_behavior` and `get_single_base_behavior` where querying any cycle exit rate or cycle entry mistakenly returned -1. 
+
++ Corrected declaration of `standard_add_basement_membrane_interactions` in `PhysiCell_standard_models.h` to properly use phenotype by reference. Thank you Inês Gonçalves!
+
 #### 1.10.2
 + Fixed error in `double get_single_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
 
@@ -267,7 +296,8 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + In response to PR 91 (https://github.com/MathCancer/PhysiCell/pull/91): Previoulsy, if the make jpeg rule fails, the `__*.txt` temporary files are left in place, so a subsequent "make jpeg" fails until these files are manually removed. Replacing `>>` (append) with `>` (overwrite) fixes the problem. Thanks [saikiRA1011](https://github.com/saikiRA1011)!
 
 ### Notices for intended changes that may affect backwards compatibility:
- 
++ We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
+
 + We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the very near future.  
 
 + We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
