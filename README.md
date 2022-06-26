@@ -63,8 +63,10 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 **Quick Start:**  Look at QuickStart.md in the documentation folder. 
 
 **User Guide:**   Look at UserGuide.pdf in the documentation folder. 
+
+**Setup and Training:**	See last year's workshop and hackathon at https://github.com/PhysiCell-Training/ws2021  
  
-**Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
+**Old Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
 
 **Latest info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
 
@@ -72,7 +74,7 @@ See changes.md for the full change log.
 
 * * * 
 ## Release summary: 
-Version 1.10.3 primarily fixes bugs and further refines the signal and behavior dictionaries, particularly with access to custom variables. It also allows users to designate custom variables as _conserved quantities_ that are divided evenly among daughter cells as division (e.g., melanosomes). 
+Version 1.10.3 primarily fixes bugs and further refines the signal and behavior dictionaries, particularly with access to custom variables. It also allows users to designate custom variables as _conserved quantities_ that are divided evenly among daughter cells as division (e.g., melanosomes). Lastly, this release continues updates to PhysiBoSS and libRoadrunner to leverage newer core features and improve compatibiltiy, while also improving support for newer Mac (M1 and M2) architectures. 
 
 The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
@@ -204,6 +206,8 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
   + Added more metadata to outputs
 + `Variables` and `Vector_Variables` in `Custom_Cell_Data` now have a new Boolean attribute `conserved_quantity` (defaulted to false). If this value is set to true, then the custom variable is divided evenly between daughter cells at division. 
 + Custom cell data can now be designated as conserved by settings an attribute `conserved="true"` in the XMO configuration file. 
++ Improved support for Apple M1 and M2 chips. 
++ Refinements to PhysiBoSS. 
 
 #### 1.10.2
 + Added `operator<<` for vectors of ints and vectors of strings. So that `std::cout << v << std::endl;` will work if `v` is `std::vector<int>` of `std::vector<std::string>`. It was truly annoying that these were missing, so sorry!
