@@ -686,6 +686,34 @@ class Cell_Transformations
 	// void perform_transformations( Cell* pCell, Phenotype& phenotype, double dt ); 
 };
 
+// pre-beta functionality in 1.10.3 
+class Integrity
+{
+ private:
+ public: 
+	// generic damage variable
+	double damage; 
+	double damage_rate; 
+	double damage_repair_rate; 
+
+	// lipid damage (e.g, cell membrane, organelles)
+	double lipid_damage; 
+	double lipid_damage_rate; 
+	double lipid_damage_repair_rate; 
+
+	// DNA damage 
+	double DNA_damage; 
+	double DNA_damage_rate; 
+	double DNA_damage_repair_rate; 
+
+	// other damages?
+	// mitochondrial? spindle? other? 
+
+	Integrity(); 
+
+	void advance_damage_models( double dt ); 
+};
+
 class Phenotype
 {
  private:
