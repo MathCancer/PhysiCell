@@ -56,6 +56,18 @@ ARCH := native # best auto-tuning
 # CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 
+ifeq ($(OS),Windows_NT)
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Darwin)
+		UNAME_P := $(shell uname -p)
+		var := $(shell which $(CC) | xargs file)
+		ifeq ($(lastword $(var)),arm64)
+		  CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -fopenmp -m64 -std=c++11
+		endif
+	endif
+endif
+
 COMPILE_COMMAND := $(CC) $(CFLAGS) 
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
@@ -183,7 +195,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # user-defined PhysiCell modules
 
 Compile_MaBoSS: MaBoSS
-	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make install_alib;make clean; cd ../../../../..
+	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make CXX=$(CC) install_alib;make clean; cd ../../../../..
 
 MaBoSS: 
 ifeq ($(OS), Windows_NT)
