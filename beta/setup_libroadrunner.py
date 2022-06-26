@@ -52,10 +52,10 @@ else:
         else:
             rr_file = "roadrunner-osx-10.9-cp36m.tar.gz"
             url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
-            url = "https://raw.github.com/PhysiCell-Tools/intracellular_libs/blob/main/ode/libs/macos/roadrunner-osx-10.9-cp36m.tar.gz"
+            # url = "https://raw.github.com/PhysiCell-Tools/intracellular_libs/blob/main/ode/libs/macos/roadrunner-osx-10.9-cp36m.tar.gz"
 
-            rr_file = "roadrunner-osx-10.9-cp36m.tar.gz"
-            url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/libs/macos/roadrunner-osx-10.9-cp36m.tar.gz"
+            # rr_file = "roadrunner-osx-10.9-cp36m.tar.gz"
+            # url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/libs/macos/roadrunner-osx-10.9-cp36m.tar.gz"
     elif os_type.lower().startswith("win"):
         rr_file = "roadrunner-win64-vs14-cp35m.zip"
         url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
