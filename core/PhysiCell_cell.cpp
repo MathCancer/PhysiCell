@@ -509,6 +509,21 @@ Cell* Cell::divide( )
 	
 	// make sure ot remove adhesions 
 	remove_all_attached_cells(); 
+
+	// version 1.10.3: 
+	// conserved quantitites in custom data aer divided in half
+	// so that each daughter cell gets half of the original ;
+	for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
+	{
+		if( custom_data.variables[nn].conserved_quantity == true )
+		{ custom_data.variables[nn].value *= 0.5; }
+	}
+	for( int nn = 0 ; nn < custom_data.vector_variables.size() ; nn++ )
+	{
+		if( custom_data.vector_variables[nn].conserved_quantity == true )
+		{ custom_data.vector_variables[nn].value *= 0.5; }
+	}
+
 	
 	Cell* child = create_cell();
 	child->copy_data( this );	
@@ -1706,9 +1721,27 @@ void display_cell_definitions( std::ostream& os )
 		
 		
 		// mechanics
+
+		Mechanics* pMech = &(pCD->phenotype.mechanics); 
+
+		os << "\tmechanics:" << std::endl 
+			<< "\t\tcell_cell_adhesion_strength: " << pMech->cell_cell_adhesion_strength << std::endl 
+			<< "\t\tcell_cell_repulsion_strength: " << pMech->cell_cell_repulsion_strength << std::endl 
+			<< "\t\trel max adhesion dist: " << pMech->relative_maximum_adhesion_distance << std::endl 
+			<< "\t\tcell_BM_adhesion_strength: " << pMech->cell_BM_adhesion_strength << std::endl 
+			<< "\t\tcell_BM_repulsion_strength: " << pMech->cell_BM_repulsion_strength << std::endl 
+			<< "\t\tattachment_elastic_constant: " << pMech->attachment_elastic_constant << std::endl 
+			<< "\t\tattachment_rate: " << pMech->attachment_rate << std::endl 
+			<< "\t\tdetachment_rate: " << pMech->detachment_rate << std::endl;
 		
 		// size 
 	
+
+		// intracellular
+		if (pCD->phenotype.intracellular != NULL)
+		{
+			pCD->phenotype.intracellular->display(os);
+		}
 		
 		Custom_Cell_Data* pCCD = &(pCD->custom_data); 
 		os << "\tcustom data: " << std::endl; 
@@ -2421,9 +2454,17 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if( node_mech )
 		{ pM->cell_cell_adhesion_strength = xml_get_my_double_value( node_mech ); }	
 
+		node_mech = node.child( "cell_BM_adhesion_strength" );
+		if( node_mech )
+		{ pM->cell_BM_adhesion_strength = xml_get_my_double_value( node_mech ); }	
+
 		node_mech = node.child( "cell_cell_repulsion_strength" );
 		if( node_mech )
 		{ pM->cell_cell_repulsion_strength = xml_get_my_double_value( node_mech ); }	
+
+		node_mech = node.child( "cell_BM_repulsion_strength" );
+		if( node_mech )
+		{ pM->cell_BM_repulsion_strength = xml_get_my_double_value( node_mech ); }	
 
 		node_mech = node.child( "relative_maximum_adhesion_distance" );
 		if( node_mech )
@@ -2474,6 +2515,20 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				}
 			}
 		}
+
+        node_mech = node.child( "attachment_elastic_constant" );
+		if( node_mech )
+		{ pM->attachment_elastic_constant = xml_get_my_double_value( node_mech ); }
+		std::cout << "  --------- attachment_elastic_constant = " << pM->attachment_elastic_constant << std::endl;
+
+        node_mech = node.child( "attachment_rate" );
+		if( node_mech )
+		{ pM->attachment_rate = xml_get_my_double_value( node_mech ); }	
+
+        node_mech = node.child( "detachment_rate" );
+		if( node_mech )
+		{ pM->detachment_rate = xml_get_my_double_value( node_mech ); }	
+
 	}
 	
 	// motility 
@@ -2854,13 +2909,13 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	}	
 
     	// intracellular
-	
 	node = cd_node.child( "phenotype" );
 	node = node.child( "intracellular" ); 
 	if( node )
 	{
 		std::string model_type = node.attribute( "type" ).value(); 
 		
+
 #ifdef ADDON_PHYSIBOSS
 		if (model_type == "maboss") {
 			// If it has already be copied
@@ -2910,7 +2965,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 #endif
 
 	}	
-	
+
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
 	pugi::xml_node node1 = node.first_child(); 
@@ -2920,10 +2975,12 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		std::string name = xml_get_my_name( node1 ); 
 		
 		// units 
-		std::string units = node1.attribute( "units").value(); 
-		
+		std::string units = node1.attribute( "units").value(); 		
 		std::vector<double> values; // ( length, 0.0 ); 
-		
+
+		// conserved quantity 
+		bool conserved = node1.attribute( "conserved").as_bool(); 
+
 		// get value(s)
 		std::string str_values = xml_get_my_string_value( node1 ); 
 		csv_to_vector( str_values.c_str() , values ); 
@@ -2941,6 +2998,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// otherwise, add 
 			else
 			{ pCD->custom_data.add_variable( name, units, values[0] ); }
+
+			n = pCD->custom_data.find_variable_index( name ); 
 		}
 		// or vector 
 		else
@@ -2953,7 +3012,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// otherwise, add 
 			else
 			{ pCD->custom_data.add_vector_variable( name, units, values ); }
+
+			n = pCD->custom_data.find_vector_variable_index( name ); 
 		}
+
+		// set conserved attribute 
 		
 		node1 = node1.next_sibling(); 
 	}

@@ -260,6 +260,11 @@
 						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
 						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
 					</options>
+                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
+                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
+                    <attachment_elastic_constant type="double" units="1/min">0.01</attachment_elastic_constant> 
+                    <attachment_rate type="double" units="1/min">10.0</attachment_rate> 
+                    <detachment_rate type="double" units="1/min">0.0</detachment_rate> 
 				</mechanics>
 				
 				<motility>  
@@ -310,7 +315,7 @@
 				<molecular />
 			</phenotype>
 			<custom_data>  
-				<sample units="dimensionless">1.0</sample>
+				<sample units="dimensionless" conserved="false">1.0</sample>
 			</custom_data>
 		</cell_definition>
 	</cell_definitions>

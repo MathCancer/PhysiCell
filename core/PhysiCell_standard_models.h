@@ -108,7 +108,7 @@ void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt ); // done
 // standard mechanics functions 
 
 void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt); // done 
-void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype phenotype, double dt );
+void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype& phenotype, double dt );
 
 // bounary avoidance functions 
 

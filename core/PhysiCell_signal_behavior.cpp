@@ -213,6 +213,25 @@ void setup_signal_behavior_dictionaries( void )
 	signal_to_int["current time"] = map_index; 
 	signal_to_int["global time"] = map_index; 
 
+	// custom signals
+	for( int nc=0 ; nc < cell_defaults.custom_data.variables.size() ; nc++ )
+	{
+		map_index++; 
+		std::string custom_signal_name = "custom:" ; 
+		custom_signal_name += cell_defaults.custom_data.variables[nc].name; 
+		signal_to_int[custom_signal_name] = map_index; 
+		int_to_signal[map_index] = custom_signal_name; 
+
+		// synonyms  
+		custom_signal_name = "custom: " ; 
+		custom_signal_name += cell_defaults.custom_data.variables[nc].name; 
+		signal_to_int[custom_signal_name] = map_index; 
+
+		custom_signal_name = "custom " ; 
+		custom_signal_name += std::to_string(nc); 
+		signal_to_int[custom_signal_name] = map_index; 
+	}
+
 	behavior_to_int.clear(); 	
 	int_to_behavior.clear(); 
 
@@ -425,6 +444,25 @@ void setup_signal_behavior_dictionaries( void )
 		behavior_to_int[temp] = map_index; 
 	}	
 
+	// custom behaviors
+	for( int nc=0 ; nc < cell_defaults.custom_data.variables.size() ; nc++ )
+	{
+		map_index++; 
+		std::string custom_behavior_name = "custom:" ; 
+		custom_behavior_name += cell_defaults.custom_data.variables[nc].name; 
+		behavior_to_int[custom_behavior_name] = map_index; 
+		int_to_behavior[map_index] = custom_behavior_name; 
+
+		// synonyms  
+		custom_behavior_name = "custom: " ; 
+		custom_behavior_name += cell_defaults.custom_data.variables[nc].name; 
+		behavior_to_int[custom_behavior_name] = map_index; 
+
+		custom_behavior_name = "custom " ; 
+		custom_behavior_name += std::to_string(nc); 
+		behavior_to_int[custom_behavior_name] = map_index; 
+	}
+
     // resize scales; 
     signal_scales.resize( int_to_signal.size() , 1.0 ); 
 
@@ -620,6 +658,14 @@ std::vector<double> get_signals( Cell* pCell )
 	// time 
 	static int time_ind = find_signal_index( "time" ); 
 	signals[time_ind] = PhysiCell_globals.current_time; 
+
+	// custom signals 
+	static int first_custom_ind = find_signal_index( "custom 0" ); 
+	if( first_custom_ind > -1 )
+	{
+		for( int nc=0 ; nc < pCell->custom_data.variables.size() ; nc++ )
+		{ signals[first_custom_ind+nc] = pCell->custom_data.variables[nc].value; }
+	}
 
     // rescale 
     signals /= signal_scales; 
@@ -838,6 +884,16 @@ double get_single_signal( Cell* pCell, int index )
 		return out; 
 	} 
 
+	// custom signals 
+	static int first_custom_ind = find_signal_index( "custom 0" ); 
+	static int max_custom_ind = first_custom_ind+pCell->custom_data.variables.size(); 
+	if( first_custom_ind > -1 && index >= first_custom_ind && index < max_custom_ind )
+	{
+		out = pCell->custom_data.variables[ index-first_custom_ind ].value; 
+		out /= signal_scales[index];
+		return out; 
+	}
+
 	// unknown after here !
 
 	std::cout << "Warning: Requested unknown signal number " << index << "!" << std::endl
@@ -994,6 +1050,14 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 				parameters.begin()+first_transformation_index+n , 
 				pCell->phenotype.cell_transformations.transformation_rates.begin() ); 	
 
+	// custom behaviors
+	static int first_custom_ind = find_behavior_index( "custom 0"); 
+	if( first_custom_ind >= 0 )
+	{
+		for( int nc=0 ; nc < pCell->custom_data.variables.size() ; nc++ )
+		{ pCell->custom_data.variables[nc].value = parameters[first_custom_ind+nc]; }
+	}
+
 	return; 
 }
 
@@ -1137,6 +1201,12 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	if( index >= first_transformation_index && index < first_transformation_index + n )
 	{ pCell->phenotype.cell_transformations.transformation_rates[index-first_transformation_index] = parameter; return; } 
 
+	// custom behavior
+	static int first_custom_ind = find_behavior_index( "custom 0"); 
+	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
+	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
+	{ pCell->custom_data.variables[index-first_custom_ind].value = parameter; }
+
 	return; 
 }
 
@@ -1279,6 +1349,15 @@ std::vector<double> get_behaviors( Cell* pCell )
 				pCell->phenotype.cell_transformations.transformation_rates.end(), 
 				parameters.begin()+first_transformation_index ); 	
 
+	// custom behavior
+	static int first_custom_ind = find_behavior_index( "custom 0"); 
+	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
+	if( first_custom_ind >= 0 )
+	{
+		for( int nc=0; nc < pCell->custom_data.variables.size(); nc++ )
+		{ parameters[first_custom_ind+nc] = pCell->custom_data.variables[nc].value; }	 
+	}
+
 	return parameters; 
 }
 
@@ -1325,7 +1404,7 @@ double get_single_behavior( Cell* pCell , int index )
 		std::cout << "Warning: Standardized behaviors only support exit rate from the first 6 phases of a cell cycle!" << std::endl 
 		          << "         Ignoring any later phase exit rates." << std::endl; 
 	}
-	if( index >= first_cycle_index && index < first_export_index + 6 )
+	if( index >= first_cycle_index && index < first_cycle_index + 6 )
 	{
 		int ind = index - first_cycle_index; 
 		if( ind < max_cycle_index )
@@ -1426,6 +1505,12 @@ double get_single_behavior( Cell* pCell , int index )
 	static int first_transformation_index = find_behavior_index( "transform to " + cell_definitions_by_type[0]->name ); 
 	if( index >= first_transformation_index && index < first_transformation_index+n )
 	{ return pCell->phenotype.cell_transformations.transformation_rates[index-first_transformation_index]; } 
+
+	// custom behavior
+	static int first_custom_ind = find_behavior_index( "custom 0"); 
+	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
+	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
+	{ return pCell->custom_data.variables[index-first_custom_ind].value; }
 
 	return -1; 
 }
@@ -1599,6 +1684,15 @@ std::vector<double> get_base_behaviors( Cell* pCell )
 				pCD->phenotype.cell_transformations.transformation_rates.end(), 
 				parameters.begin()+first_transformation_index ); 	
 
+	// custom behavior
+	static int first_custom_ind = find_behavior_index( "custom 0"); 
+	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
+	if( first_custom_ind >= 0 )
+	{
+		for( int nc=0; nc < pCell->custom_data.variables.size(); nc++ )
+		{ parameters[first_custom_ind+nc] = pCD->custom_data.variables[nc].value; }	 
+	}
+
 	return parameters; 
 }
 
@@ -1647,7 +1741,7 @@ double get_single_base_behavior( Cell* pCell , int index )
 		std::cout << "Warning: Standardized behaviors only support exit rate from the first 6 phases of a cell cycle!" << std::endl 
 		          << "         Ignoring any later phase exit rates." << std::endl; 
 	}
-	if( index >= first_cycle_index && index < first_export_index + 6 )
+	if( index >= first_cycle_index && index < first_cycle_index + 6 )
 	{
 		int ind = index - first_cycle_index; 
 		if( ind < max_cycle_index )
@@ -1748,6 +1842,12 @@ double get_single_base_behavior( Cell* pCell , int index )
 	static int first_transformation_index = find_behavior_index( "transform to " + cell_definitions_by_type[0]->name ); 
 	if( index >= first_transformation_index && index < first_transformation_index + n )
 	{ return pCD->phenotype.cell_transformations.transformation_rates[index-first_transformation_index]; } 
+
+	// custom behavior
+	static int first_custom_ind = find_behavior_index( "custom 0"); 
+	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
+	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
+	{ return pCD->custom_data.variables[index-first_custom_ind].value; }
 
 	return -1; 
 }

@@ -685,12 +685,20 @@ Mechanics::Mechanics()
 	// this is a multiple of the cell (equivalent) radius
 	relative_maximum_adhesion_distance = 1.25; 
 	// maximum_adhesion_distance = 0.0; 
-	
-	
-	relative_maximum_attachment_distance = relative_maximum_adhesion_distance;
-	relative_detachment_distance = relative_maximum_adhesion_distance;
+
+	/* for spring attachments */
 	maximum_number_of_attachments = 12;
 	attachment_elastic_constant = 0.01; 
+
+	attachment_rate = 10; 
+	detachment_rate = 0; 
+
+	/* to be deprecated */ 
+	relative_maximum_attachment_distance = relative_maximum_adhesion_distance;
+	relative_detachment_distance = relative_maximum_adhesion_distance;
+
+	maximum_attachment_rate = 1.0; 
+	
 	maximum_attachment_rate = 1.0; 
 	
 	return; 
@@ -1141,6 +1149,9 @@ Cell_Functions::Cell_Functions()
 	update_phenotype = NULL; 
 	custom_cell_rule = NULL; 
 	
+	pre_update_intracellular = NULL;
+	post_update_intracellular = NULL;
+
 	update_velocity = NULL; 
 	add_cell_basement_membrane_interactions = NULL; 
 	calculate_distance_to_membrane = NULL; 
@@ -1322,6 +1333,73 @@ double& Cell_Transformations::transformation_rate( std::string type_name )
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 	int n = cell_definition_indices_by_name[type_name]; 
 	return transformation_rates[n]; 
+}
+
+// beta functionality in 1.10.3 
+Integrity::Integrity()
+{
+ 	damage = 0.0; 
+	damage_rate = 0.0; 
+	damage_repair_rate = 0.0; 
+
+	lipid_damage = 0.0; 
+	lipid_damage_rate = 0.0; 
+	lipid_damage_repair_rate = 0.0; 
+
+	// DNA damage 
+	DNA_damage = 0.0; 
+	DNA_damage_rate = 0.0; 
+	DNA_damage_repair_rate = 0.0; 
+
+	return; 
+}
+
+void Integrity::advance_damage_models( double dt )
+{
+	double temp1;
+	double temp2; 
+	static double tol = 1e-8; 
+
+	// general damage 
+	if( damage_rate > tol || damage_repair_rate > tol )
+	{
+		temp1 = dt; 
+		temp2 = dt; 
+		temp1 *= damage_rate;  
+		temp2 *= damage_repair_rate; 
+		temp2 += 1; 
+
+		damage += temp1; 
+		damage /= temp2; 
+	}
+
+	// lipid damage 
+	if( lipid_damage_rate > tol || lipid_damage_repair_rate > tol )
+	{
+		temp1 = dt;
+		temp2 = dt;
+		temp1 *= lipid_damage_rate;  
+		temp2 *= lipid_damage_repair_rate; 
+		temp2 += 1; 
+	
+		lipid_damage += temp1; 
+		lipid_damage /= temp2; 
+	}
+
+	// DNA damage 
+	if( DNA_damage_rate > tol || DNA_damage_repair_rate > tol )
+	{
+		temp1 = dt;
+		temp2 = dt;
+		temp1 *= DNA_damage_rate;  
+		temp2 *= DNA_damage_repair_rate; 
+		temp2 += 1; 
+
+		DNA_damage += temp1; 
+		DNA_damage /= temp2; 
+	}
+
+	return; 
 }
 
 
