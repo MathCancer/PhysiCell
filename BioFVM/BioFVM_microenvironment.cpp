@@ -269,7 +269,7 @@ void Microenvironment::apply_dirichlet_conditions( void )
 	{ density_vector( dirichlet_indices[i] ) = dirichlet_value_vectors[i]; }
 	*/
 
-	#pragma omp parallel for 
+	// #pragma omp parallel for 
 	for( unsigned int i=0 ; i < mesh.voxels.size() ;i++ )
 	{
 		/*
