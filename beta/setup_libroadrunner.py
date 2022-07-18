@@ -11,6 +11,22 @@ import sys
 import tarfile
 import zipfile
 
+def reminder_dynamic_link_path_macos():
+    print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+    print("*    NOTE: if you have not yet done this, you need to specify where the shared libs can be found, e.g., via bash shell:")
+    print('export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib')
+
+    print("\n*      To make this permanent, add this line to the bottom of the respective shell startup file, e.g., .bashrc, .bash_profile, or .zshenv in your home directory.")
+    print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+
+def reminder_dynamic_link_path_linux():
+    print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+    print("*    NOTE: if you have not yet done this, you need to specify where the shared libs can be found, e.g., via bash shell:")
+    print('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib')
+
+    print("\n*      To make this permanent, add this line to the bottom of the respective shell startup file, e.g., .bashrc, .bash_profile, or .zshenv in your home directory.")
+    print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+
 if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "libRoadrunner", "roadrunner")):
     print('\nlibroadrunner already installed.\n')
 
@@ -25,9 +41,9 @@ else:
 
     mac_silicon = False
     if os_type.lower() == 'darwin':
+        reminder_dynamic_link_path_macos()
         if "ARM64" in platform.uname().version:
             # pass
-            # reminder_dynamic_link_path()
             # print('... for the arm64 processor.')
             # url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/libs/macos12_arm64/libroadrunner_c_api.dylib"
             rr_file = "roadrunner_macos_arm64.tar.gz"
@@ -40,6 +56,7 @@ else:
         rr_file = "roadrunner-win64-vs14-cp35m.zip"
         url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
     elif os_type.lower().startswith("linux"):
+        reminder_dynamic_link_path_linux()
         rr_file = "cpplibroadrunner-1.3.0-linux_x86_64.tar.gz"
         url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.3/" + rr_file + "/download"
     else:
