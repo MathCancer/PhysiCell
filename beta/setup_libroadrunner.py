@@ -11,23 +11,6 @@ import sys
 import tarfile
 import zipfile
 
-def reminder_dynamic_link_path_macos():
-    print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-    print("*    NOTE: if you have not yet done this, you need to specify where the shared libs can be found, e.g., via bash shell:")
-    print('export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib')
-
-    print("\n*      To make this permanent, add this line to the bottom of the respective shell startup file, e.g., .bashrc, .bash_profile, or .zshenv in your home directory.")
-    print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-
-def reminder_dynamic_link_path_linux():
-    print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-    print("*    NOTE: if you have not yet done this, you need to specify where the shared libs can be found, e.g., via bash shell:")
-    print('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib')
-
-    print("\n*      To make this permanent, add this line to the bottom of the respective shell startup file, e.g., .bashrc, .bash_profile, or .zshenv in your home directory.")
-    print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-
-# print("--------- print reminder!!!!!!!!!!!!!!\n\n")
 if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "libRoadrunner", "roadrunner")):
     print('\nlibroadrunner already installed.\n')
 
@@ -40,8 +23,8 @@ else:
     rr_file = ""
     url = ""
 
+    mac_silicon = False
     if os_type.lower() == 'darwin':
-        reminder_dynamic_link_path_macos()
         if "ARM64" in platform.uname().version:
             # pass
             # reminder_dynamic_link_path()
@@ -49,29 +32,26 @@ else:
             # url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/libs/macos12_arm64/libroadrunner_c_api.dylib"
             rr_file = "roadrunner_macos_arm64.tar.gz"
             url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/roadrunner_macos_arm64.tar.gz"
+            mac_silicon = True
         else:
             rr_file = "roadrunner-osx-10.9-cp36m.tar.gz"
             url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
-            # url = "https://raw.github.com/PhysiCell-Tools/intracellular_libs/blob/main/ode/libs/macos/roadrunner-osx-10.9-cp36m.tar.gz"
-
-            # rr_file = "roadrunner-osx-10.9-cp36m.tar.gz"
-            # url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/libs/macos/roadrunner-osx-10.9-cp36m.tar.gz"
     elif os_type.lower().startswith("win"):
         rr_file = "roadrunner-win64-vs14-cp35m.zip"
         url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
     elif os_type.lower().startswith("linux"):
-        reminder_dynamic_link_path_linux()
         rr_file = "cpplibroadrunner-1.3.0-linux_x86_64.tar.gz"
         url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.3/" + rr_file + "/download"
     else:
         print("Your operating system seems to be unsupported. Please submit a ticket at https://sourceforge.net/p/physicell/tickets/ ")
         sys.exit(1)
 
-    # print("-------- past if block...")
-    # reminder_dynamic_link_path()
-    # fname = url.split('/')[-2]
-    fname = url.split('/')[-1]
-    print("fname = ",fname)
+    print("url=",url)
+    if mac_silicon:
+        fname = url.split('/')[-1]
+    else:
+        fname = url.split('/')[-2]
+    print("fname=",fname)
 
     # home = os.path.expanduser("~")
     print('libRoadRunner will now be installed into this location:')
@@ -115,8 +95,13 @@ else:
     if os_type.lower().startswith("win"):
         rrlib_dir = my_file[:-4]
     else:  # darwin or linux
-        rrlib_dir = my_file[:-7]
-        rrlib_dir = my_file[:-6]
+        if mac_silicon:
+            # idx_end = my_file.rindex('/')
+            # rrlib_dir = my_file[:idx_end]
+            rrlib_dir = my_file[:-7]
+            # rrlib_dir = my_file
+        else:
+            rrlib_dir = my_file[:-7]
     print('rrlib_dir = ',rrlib_dir)
 
     def download_cb(blocknum, blocksize, totalsize):
@@ -133,12 +118,10 @@ else:
 
     urllib.request.urlretrieve(url, my_file, download_cb)
 
-    # sys.exit(-1)
-
     new_dir_name = "roadrunner"
     os.chdir(dir_name)
     print('installing (uncompressing) the file...')
-    if os_type.lower().startswith("win"):   # on Windows
+    if os_type.lower().startswith("win"):
         try:
             with zipfile.ZipFile(rr_file) as zf:
                 zf.extractall('.')
@@ -148,23 +131,24 @@ else:
             exit(1)
     else:  # Darwin or Linux
         try:
-            print("-- attempt to extract from the tar file...", rr_file)
+            print("untarring ",rr_file)
             tar = tarfile.open(rr_file)
             tar.extractall()
             tar.close()
             if 'darwin' in os_type.lower():
-                if "ARM64" in platform.uname().version:   # on the new Mac M1, arm64 processor
-                # if False:
-                #     print("--- TODO: rename ARM64 lib dir")
-                #     sys.exit(-1)
-                    pass  # it already uncompresses and creates the 'roadrunner' dir
+                if mac_silicon:
+                    os.rename("roadrunner_macos_arm64", new_dir_name)
                 else:
                     os.rename("roadrunner-osx-10.9-cp36m", new_dir_name)
             else:
                 os.rename("libroadrunner", new_dir_name)
         except:
-            print('error untarring the file')
-            exit(1)
+            if mac_silicon:
+                print()
+                # pass
+            else:
+                print('error untarring the file')
+                exit(1)
 
     print('Done.\n')
 
