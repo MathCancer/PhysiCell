@@ -74,7 +74,7 @@ See changes.md for the full change log.
 
 * * * 
 ## Release summary: 
-Version 1.10.4 primarily fixes bugs in file output, and refines thread safety in cell phagocytosis. 
+Version 1.10.4 primarily fixes bugs in file output and the ode-energy sample, and refines thread safety in cell phagocytosis. 
 
 The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
@@ -276,6 +276,7 @@ None in this version. See 1.10.0.
 ### Bugfixes: 
 #### 1.10.4
 + Fixed vectorized outputs in MultiCellDS that incorrectly assumed linear data ordering in std::vector. Thank you Randy Heiland! 
++ Fixed errors in the ode-energy-sample project. Thank you Randy Heiland, Furkan Kurtoglu, and John Metzcar!
 + Improved thread safety in phagocytosis. Thank you Michael Getz! 
 
 #### 1.10.3
