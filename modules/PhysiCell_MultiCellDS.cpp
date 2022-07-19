@@ -1751,188 +1751,188 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 
 		// name = "ID"; 
 		dTemp = (double) pCell->ID;
-		fwrite( (char*) &(dTemp) , sizeof(double) , 1 , fp ); 
-		// name = "position"; 
-		fwrite( (char*) &( pCell->position ) , sizeof(double) , 3 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
+		// name = "position";    NOTE very different syntax for writing vectors!
+        std::fwrite( pCell->position.data() , sizeof(double) , 3 , fp );
 		// name = "total_volume"; 
-		fwrite( (char*) &( pCell->phenotype.volume.total ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.total ) , sizeof(double) , 1 , fp ); 
 		// name = "cell_type"; 
 		dTemp = (double) pCell->type;
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "cycle_model"; 
 		dTemp = (double) pCell->phenotype.cycle.model().code; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); // cycle model 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); // cycle model 
 		// name = "current_phase"; 
 		dTemp = (double) pCell->phenotype.cycle.current_phase().code; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); // cycle model 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); // cycle model 
 		// name = "elapsed_time_in_phase"; 
-		fwrite( (char*) &( pCell->phenotype.cycle.data.elapsed_time_in_phase ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.cycle.data.elapsed_time_in_phase ) , sizeof(double) , 1 , fp ); 
 		// name = "nuclear_volume"; 
-		fwrite( (char*) &( pCell->phenotype.volume.nuclear ) , sizeof(double) , 1 , fp );   
+		std::fwrite( &( pCell->phenotype.volume.nuclear ) , sizeof(double) , 1 , fp );   
 		// name = "cytoplasmic_volume"; 
-		fwrite( (char*) &( pCell->phenotype.volume.cytoplasmic ) , sizeof(double) , 1 , fp );
+		std::fwrite( &( pCell->phenotype.volume.cytoplasmic ) , sizeof(double) , 1 , fp );
 		// name = "fluid_fraction"; 
-		fwrite( (char*) &( pCell->phenotype.volume.fluid_fraction ) , sizeof(double) , 1 , fp );
+		std::fwrite( &( pCell->phenotype.volume.fluid_fraction ) , sizeof(double) , 1 , fp );
 		// name = "calcified_fraction"; 
-		fwrite( (char*) &( pCell->phenotype.volume.calcified_fraction ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.calcified_fraction ) , sizeof(double) , 1 , fp ); 
 		// name = "orientation"; 
-		fwrite( (char*) &( pCell->state.orientation ) , sizeof(double) , 3 , fp ); 
+		std::fwrite( &( pCell->state.orientation ) , sizeof(double) , 3 , fp ); 
 		// name = "polarity"; 
-		fwrite( (char*) &( pCell->phenotype.geometry.polarity ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.geometry.polarity ) , sizeof(double) , 1 , fp ); 
 
  /* state variables to save */ 
 // state
 		// name = "velocity"; 
-		fwrite( (char*) &( pCell->velocity ) , sizeof(double) , 3 , fp ); 
+		std::fwrite( pCell->velocity.data() , sizeof(double) , 3 , fp ); 
 		// name = "pressure"; 
-		fwrite( (char*) &( pCell->state.simple_pressure ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->state.simple_pressure ) , sizeof(double) , 1 , fp ); 
 		// name = "number_of_nuclei"; 
 		dTemp = (double) pCell->state.number_of_nuclei; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "damage"; 
-		fwrite( (char*) &( pCell->state.damage ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->state.damage ) , sizeof(double) , 1 , fp ); 
 		// name = "total_attack_time"; 
-		fwrite( (char*) &( pCell->state.total_attack_time ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->state.total_attack_time ) , sizeof(double) , 1 , fp ); 
 		// name = "contact_with_basement_membrane"; 
 		dTemp = (double) pCell->state.contact_with_basement_membrane; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 
 /* now go through phenotype and state */ 
 // cycle 
   // current exit rate // 1 
 		// name = "current_cycle_phase_exit_rate"; 
 		int phase_index = pCell->phenotype.cycle.data.current_phase_index; 
-		fwrite( (char*) &( pCell->phenotype.cycle.data.exit_rate(phase_index) ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.cycle.data.exit_rate(phase_index) ) , sizeof(double) , 1 , fp ); 
 		// name = "elapsed_time_in_phase"; 
-		fwrite( (char*) &( pCell->phenotype.cycle.data.elapsed_time_in_phase ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.cycle.data.elapsed_time_in_phase ) , sizeof(double) , 1 , fp ); 
 
 // death 
   // live or dead state // 1 
 		// name = "dead"; 
 		dTemp = (double) pCell->phenotype.death.dead; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "current_death_model"; // 
 		dTemp = (double) pCell->phenotype.death.current_death_model_index; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "death_rates"; 
-		fwrite( (char*) &( pCell->phenotype.death.rates ) , sizeof(double) , nd , fp ); 
+		std::fwrite( pCell->phenotype.death.rates.data() , sizeof(double) , nd , fp ); 
 		
 	// volume ()
 		// name = "cytoplasmic_biomass_change_rate"; 
-		fwrite( (char*) &( pCell->phenotype.volume.cytoplasmic_biomass_change_rate ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.cytoplasmic_biomass_change_rate ) , sizeof(double) , 1 , fp ); 
 		// name = "nuclear_biomass_change_rate"; 
-		fwrite( (char*) &( pCell->phenotype.volume.nuclear_biomass_change_rate ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.nuclear_biomass_change_rate ) , sizeof(double) , 1 , fp ); 
 		// name = "fluid_change_rate"; 
-		fwrite( (char*) &( pCell->phenotype.volume.fluid_change_rate ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.fluid_change_rate ) , sizeof(double) , 1 , fp ); 
 		// name = "calcification_rate"; 
-		fwrite( (char*) &( pCell->phenotype.volume.calcification_rate ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.calcification_rate ) , sizeof(double) , 1 , fp ); 
 		// name = "target_solid_cytoplasmic"; 
-		fwrite( (char*) &( pCell->phenotype.volume.target_solid_cytoplasmic ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.target_solid_cytoplasmic ) , sizeof(double) , 1 , fp ); 
 		// name = "target_solid_nuclear"; 
-		fwrite( (char*) &( pCell->phenotype.volume.target_solid_nuclear ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.target_solid_nuclear ) , sizeof(double) , 1 , fp ); 
 		// name = "target_fluid_fraction"; 
-		fwrite( (char*) &( pCell->phenotype.volume.target_fluid_fraction ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.volume.target_fluid_fraction ) , sizeof(double) , 1 , fp ); 
 
   // geometry 
      // radius //1 
 		// name = "radius"; 
-		fwrite( (char*) &( pCell->phenotype.geometry.radius ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.geometry.radius ) , sizeof(double) , 1 , fp ); 
 		// name = "nuclear_radius"; 
-		fwrite( (char*) &( pCell->phenotype.geometry.nuclear_radius ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.geometry.nuclear_radius ) , sizeof(double) , 1 , fp ); 
 		// name = "surface_area"; 
-		fwrite( (char*) &( pCell->phenotype.geometry.surface_area ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.geometry.surface_area ) , sizeof(double) , 1 , fp ); 
 
   // mechanics 
 	// cell_cell_adhesion_strength; // 1
 		// name = "cell_cell_adhesion_strength"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.cell_cell_adhesion_strength ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.mechanics.cell_cell_adhesion_strength ) , sizeof(double) , 1 , fp ); 
 		// name = "cell_BM_adhesion_strength"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.cell_BM_adhesion_strength ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.mechanics.cell_BM_adhesion_strength ) , sizeof(double) , 1 , fp ); 
 		// name = "cell_cell_repulsion_strength"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.cell_cell_repulsion_strength ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.mechanics.cell_cell_repulsion_strength ) , sizeof(double) , 1 , fp ); 
 		// name = "cell_BM_repulsion_strength"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.cell_BM_repulsion_strength ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.mechanics.cell_BM_repulsion_strength ) , sizeof(double) , 1 , fp ); 
 		// name = "cell_adhesion_affinities"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.cell_adhesion_affinities ) , sizeof(double) , n , fp ); 
+		std::fwrite( pCell->phenotype.mechanics.cell_adhesion_affinities.data() , sizeof(double) , n , fp ); 
 		// name = "relative_maximum_adhesion_distance"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.relative_maximum_adhesion_distance ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.mechanics.relative_maximum_adhesion_distance ) , sizeof(double) , 1 , fp ); 
 		// name = "maximum_number_of_attachments"; 
 		dTemp = (double) pCell->phenotype.mechanics.maximum_number_of_attachments; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "attachment_elastic_constant"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.attachment_elastic_constant ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.mechanics.attachment_elastic_constant ) , sizeof(double) , 1 , fp ); 
 		// name = "attachment_rate"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.attachment_rate ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.mechanics.attachment_rate ) , sizeof(double) , 1 , fp ); 
  		// name = "detachment_rate"; 
-		fwrite( (char*) &( pCell->phenotype.mechanics.detachment_rate ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.mechanics.detachment_rate ) , sizeof(double) , 1 , fp ); 
 
  // Motility
  		// name = "is_motile"; 
 		dTemp = (double) pCell->phenotype.motility.is_motile; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
  		// name = "persistence_time"; 
-		fwrite( (char*) &( pCell->phenotype.motility.persistence_time ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.motility.persistence_time ) , sizeof(double) , 1 , fp ); 
  		// name = "migration_speed"; 
-		fwrite( (char*) &( pCell->phenotype.motility.migration_speed ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.motility.migration_speed ) , sizeof(double) , 1 , fp ); 
  		// name = "migration_bias_direction"; 
-		fwrite( (char*) &( pCell->phenotype.motility.migration_bias_direction ) , sizeof(double) , 3 , fp ); 
+		std::fwrite( pCell->phenotype.motility.migration_bias_direction.data() , sizeof(double) , 3 , fp ); 
  		// name = "migration_bias"; 
-		fwrite( (char*) &( pCell->phenotype.motility.migration_bias ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.motility.migration_bias ) , sizeof(double) , 1 , fp ); 
  		// name = "motility_vector"; 
-		fwrite( (char*) &( pCell->phenotype.motility.motility_vector ) , sizeof(double) , 3 , fp ); 
+		std::fwrite( pCell->phenotype.motility.motility_vector.data() , sizeof(double) , 3 , fp ); 
  		// name = "chemotaxis_index"; 
 		dTemp = (double) pCell->phenotype.motility.chemotaxis_index; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
  		// name = "chemotaxis_direction"; 
 		dTemp = (double) pCell->phenotype.motility.chemotaxis_direction; 
-		fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
  		// name = "chemotactic_sensitivities"; 
-		fwrite( (char*) &( pCell->phenotype.motility.chemotactic_sensitivities ) , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.motility.chemotactic_sensitivities.data() , sizeof(double) , m , fp ); 
 
 // secretion 
  		// name = "secretion_rates"; 
-		fwrite( (char*) &( pCell->phenotype.secretion.secretion_rates ) , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.secretion.secretion_rates.data() , sizeof(double) , m , fp ); 
 	 	// name = "uptake_rates"; 
-		fwrite( (char*) &( pCell->phenotype.secretion.uptake_rates ) , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.secretion.uptake_rates.data() , sizeof(double) , m , fp ); 
  		// name = "saturation_densities"; 
-		fwrite( (char*) &( pCell->phenotype.secretion.saturation_densities ) , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.secretion.saturation_densities.data() , sizeof(double) , m , fp ); 
  		// name = "net_export_rates"; 
-		fwrite( (char*) &( pCell->phenotype.secretion.net_export_rates ) , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.secretion.net_export_rates.data() , sizeof(double) , m , fp ); 
 
 // molecular 
  		// name = "internalized_total_substrates"; 
-		fwrite( (char*) &( pCell->phenotype.molecular.internalized_total_substrates ) , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.molecular.internalized_total_substrates.data() , sizeof(double) , m , fp ); 
  		// name = "fraction_released_at_death"; 
-		fwrite( (char*) &( pCell->phenotype.molecular.fraction_released_at_death ) , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.molecular.fraction_released_at_death.data() , sizeof(double) , m , fp ); 
  		// name = "fraction_transferred_when_ingested"; 
-		fwrite( (char*) &( pCell->phenotype.molecular.fraction_transferred_when_ingested ) , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.molecular.fraction_transferred_when_ingested.data() , sizeof(double) , m , fp ); 
 
 // interactions 
  		// name = "dead_phagocytosis_rate"; 
-		fwrite( (char*) &( pCell->phenotype.cell_interactions.dead_phagocytosis_rate ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.cell_interactions.dead_phagocytosis_rate ) , sizeof(double) , 1 , fp ); 
  		// name = "live_phagocytosis_rates"; 
-		fwrite( (char*) &( pCell->phenotype.cell_interactions.live_phagocytosis_rates ) , sizeof(double) , n , fp ); 
+		std::fwrite( pCell->phenotype.cell_interactions.live_phagocytosis_rates.data() , sizeof(double) , n , fp ); 
  		// name = "attack_rates"; 
-		fwrite( (char*) &( pCell->phenotype.cell_interactions.attack_rates ) , sizeof(double) , n , fp ); 
+		std::fwrite( pCell->phenotype.cell_interactions.attack_rates.data() , sizeof(double) , n , fp ); 
  		// name = "damage_rate"; 
-		fwrite( (char*) &( pCell->phenotype.cell_interactions.damage_rate ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.cell_interactions.damage_rate ) , sizeof(double) , 1 , fp ); 
  		// name = "fusion_rates"; 
-		fwrite( (char*) &( pCell->phenotype.cell_interactions.fusion_rates ) , sizeof(double) , n , fp ); 
+		std::fwrite( pCell->phenotype.cell_interactions.fusion_rates.data() , sizeof(double) , n , fp ); 
 
 // transformations 
   		// name = "transformation_rates"; 
-		fwrite( (char*) &( pCell->phenotype.cell_transformations.transformation_rates ) , sizeof(double) , n , fp ); 
+		std::fwrite( pCell->phenotype.cell_transformations.transformation_rates.data() , sizeof(double) , n , fp ); 
 
 // custom 
 		// custom scalar variables 
 		for( int j=0 ; j < (*all_cells)[0]->custom_data.variables.size(); j++ )
-		{ fwrite( (char*) &( pCell->custom_data.variables[j].value ) , sizeof(double) , 1 , fp ); }
+		{ std::fwrite( &( pCell->custom_data.variables[j].value ) , sizeof(double) , 1 , fp ); }
 
 		// custom vector variables 
 		for( int j=0 ; j < (*all_cells)[0]->custom_data.vector_variables.size(); j++ )
 		{
 			int size_temp = pCell->custom_data.vector_variables[j].value.size(); 
-			fwrite( (char*) &( pCell->custom_data.vector_variables[j].value ) , sizeof(double) , size_temp , fp );
+			std::fwrite( pCell->custom_data.vector_variables[j].value.data() , sizeof(double) , size_temp , fp );
 		}
 	}
 

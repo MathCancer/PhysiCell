@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
-**Version:** 1.10.3
+**Version:** 1.10.4
 
-**Release date:** 25 June 2022
+**Release date:** 18 July 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -63,10 +63,10 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 **Quick Start:**  Look at QuickStart.md in the documentation folder. 
 
 **User Guide:**   Look at UserGuide.pdf in the documentation folder. 
-
+ 
 **Setup and Training:**	See last year's workshop and hackathon at https://github.com/PhysiCell-Training/ws2021  
  
-**Old Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
+**Older Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
 
 **Latest info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
 
@@ -74,12 +74,11 @@ See changes.md for the full change log.
 
 * * * 
 ## Release summary: 
-Version 1.10.3 primarily fixes bugs and further refines the signal and behavior dictionaries, particularly with access to custom variables. It also allows users to designate custom variables as _conserved quantities_ that are divided evenly among daughter cells as division (e.g., melanosomes). Lastly, this release continues updates to PhysiBoSS and libRoadrunner to leverage newer core features and improve compatibiltiy, while also improving support for newer Mac (M1 and M2) architectures. 
+Version 1.10.4 primarily fixes bugs in file output and the ode-energy sample, and refines thread safety in cell phagocytosis. 
 
 The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
 A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations.  
-
 A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries. 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
@@ -87,6 +86,8 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
  
 ### Major new features and changes in the 1.10.z versions
+#### 1.10.4
++ None in this version. See 1.10.0
 #### 1.10.3
 + None in this version. See 1.10.0
 #### 1.10.2
@@ -198,6 +199,8 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
   + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
 
 ### Minor new features and changes: 
+#### 1.10.4
++ None in this version. 
 #### 1.10.3
 + Added `attachment_rate` and `detachment_rate` to `phenotype.mechanics` for use in a future standard attachment and detachment model. 
 + Modernized output format: 
@@ -240,6 +243,8 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
 
 ### Beta features (not fully supported):
+#### 1.10.4
++ None in this version. 
 #### 1.10.3
 + Each time outputs two cell interaction graphs (as text files): 
   + neighbor graph records which cells are within interaction distance for each cell agent, with format; 
@@ -269,11 +274,16 @@ None in this version. See 1.10.0.
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
+#### 1.10.4
++ Fixed vectorized outputs in MultiCellDS that incorrectly assumed linear data ordering in std::vector. Thank you Randy Heiland! 
++ Fixed errors in the ode-energy-sample project. Thank you Randy Heiland, Furkan Kurtoglu, and John Metzcar!
++ Improved thread safety in phagocytosis. Thank you Michael Getz! 
+
 #### 1.10.3
 + Fixed bug in `get_single_behavior` and `get_single_base_behavior` where querying any cycle exit rate or cycle entry mistakenly returned -1. 
 + Corrected declaration of `standard_add_basement_membrane_interactions` in `PhysiCell_standard_models.h` to properly use phenotype by reference. Thank you Inês Gonçalves!
 + Removed the OpenMP pragma in `void Microenvironment::apply_dirichlet_conditions( void )` (around line 272) that tends to perform more poorly than serial code. 
-  
+
 #### 1.10.2
 + Fixed error in `double get_single_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
 
