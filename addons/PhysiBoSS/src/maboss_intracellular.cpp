@@ -395,14 +395,13 @@ void MaBoSSIntracellular::display(std::ostream& os)
 
 void MaBoSSIntracellular::save(std::string filename, std::vector<PhysiCell::Cell*>& cells)
 {
-					
 	std::ofstream state_file( filename );
 	
 	state_file << "ID,state" << std::endl;
 
 	for( auto cell : cells )
-		state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
-		
+		if (cell->phenotype.intracellular != NULL)
+			state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
+	
 	state_file.close();
-
 }
