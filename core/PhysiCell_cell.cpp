@@ -462,12 +462,7 @@ void Cell::assign_orientation()
 	else
 	{
 		//assign a random unit vector
-		double theta= UniformRandom()*6.28318530717959; //rand*2*pi
-		double z= 2* UniformRandom()-1;
-		double temp= sqrt(1-z*z);
-		state.orientation[0]= temp * cos(theta);
-		state.orientation[1]= temp * sin(theta);
-		state.orientation[2]= z;
+		state.orientation = UniformOnUnitSphere();
 	}
 	
 	return; 
