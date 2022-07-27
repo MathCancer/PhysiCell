@@ -6,11 +6,18 @@ MaBoSSIntracellular::MaBoSSIntracellular() : Intracellular()
 	initial_values.clear();
 	mutations.clear();
 	parameters.clear();
+	listOfInputs.clear();
+	listOfOutputs.clear();
 }
 
 MaBoSSIntracellular::MaBoSSIntracellular(pugi::xml_node& node)
 {
 	intracellular_type = "maboss";
+	initial_values.clear();
+	mutations.clear();
+	parameters.clear();
+	listOfInputs.clear();
+	listOfOutputs.clear();
 	initialize_intracellular_from_pugixml(node);
 }
 
