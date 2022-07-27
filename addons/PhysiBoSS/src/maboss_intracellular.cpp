@@ -215,6 +215,11 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 			maboss.set_time_stochasticity(time_stochasticity);
 		}
 
+		pugi::xml_node node_start_time = node_settings.child( "start_time" );
+		if( node_start_time )
+		{
+			start_time = PhysiCell::xml_get_my_double_value( node_start_time );
+		}
 	
 		}
 	
