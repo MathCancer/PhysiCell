@@ -1,9 +1,8 @@
-# This script attempts to download the libRoadrunner (binary) libraries and
-# headers for your particular operating system. It puts them in a directory
-# of your choosing (default = your home dir) and sets an environment variable
-# to that location which can then be used by a PhysiCell Makefile.
+# This script attempts to download the MaBoSS (binary) library(s) and
+# headers for your particular operating system. It installs them in a standard
+# location (relative to a PhysiCell installation) which will be used by a PhysiCell Makefile.
 #
-# Author: Randy Heiland
+# Authors: Randy Heiland, Vincent Noel
 
 import platform
 import urllib.request
@@ -24,16 +23,23 @@ else:
     url = ""
 
     if os_type.lower() == 'darwin':
-        mb_file = "libMaBoSS-osx64.tar.gz"
-    elif os_type.lower().startswith("win"):
+        if "ARM64" in platform.uname().version:
+            mb_file = "libMaBoSS-macos-arm64.tar.gz"
+            url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/boolean/libMaBoSS-macos-arm64.tar.gz"
+        else:
+            mb_file = "libMaBoSS-osx64.tar.gz"
+            url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/v2.4.1/" + mb_file
+    elif os_type.lower().startswith("win") or os_type.lower().startswith("msys_nt") or os_type.lower().startswith("mingw64_nt"):
         mb_file = "libMaBoSS-win64.tar.gz"
+        url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/v2.4.1/" + mb_file
     elif os_type.lower().startswith("linux"):
         mb_file = "libMaBoSS-linux64.tar.gz"
+        url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/v2.4.1/" + mb_file
     else:
         print("Your operating system seems to be unsupported. Please submit a ticket at https://sourceforge.net/p/physicell/tickets/ ")
         sys.exit(1)
 
-    url = "http://maboss.curie.fr/pub/" + mb_file
+    # url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/v2.4.1/" + mb_file
 
     fname = mb_file
 
@@ -83,17 +89,9 @@ else:
         tar = tarfile.open(mb_file)
         tar.extractall()
         tar.close()
+        os.remove(mb_file)
     except:
         print('error untarring the file')
         exit(1)
 
     print('Done.\n')
-
-    # # LIBRR_DIR := /Users/heiland/libroadrunner/roadrunner-osx-10.9-cp36m
-    # print("Replace the following variables in your PhysiCell Makefile with these:\n")
-    # #print("LIBRR_DIR := /Users/heiland/libroadrunner/roadrunner-osx-10.9-cp36m")
-    # print("LIBRR_DIR := " + rrlib_dir)
-    # if os_type == 'Windows':
-    #     print("LIBRR_LIBS := " + rrlib_dir + "/bin\n")
-    # else:
-    #     print("LIBRR_LIBS := " + rrlib_dir + "/lib\n")

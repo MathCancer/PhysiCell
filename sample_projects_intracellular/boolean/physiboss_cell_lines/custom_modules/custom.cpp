@@ -89,7 +89,8 @@ void create_cell_types( void )
 	cell_defaults.functions.update_velocity = NULL;
 
 	cell_defaults.functions.update_migration_bias = NULL; 
-	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.pre_update_intracellular = pre_update_intracellular; 
+	cell_defaults.functions.post_update_intracellular = post_update_intracellular; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
 	
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
@@ -114,9 +115,20 @@ void create_cell_types( void )
 	*/
 
 	build_cell_definitions_maps(); 
+
+	/*
+	   This intializes cell signal and response dictionaries 
+	*/
+
+	setup_signal_behavior_dictionaries();
+
+	/*
+	   This summarizes the setup. 
+	*/
 	
 	display_cell_definitions( std::cout ); 
-	
+
+
 	return; 
 }
 
@@ -180,33 +192,19 @@ void setup_tissue( void )
 	return; 
 }
 
-
-void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
+void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	
-	if (pCell->phenotype.intracellular->need_update())
-	{	
-		if (
-			pCell->type == get_cell_definition("last_one").type
-			&& PhysiCell::PhysiCell_globals.current_time >= 100.0 
-			&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
-		)
-			pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
-
-		set_input_nodes(pCell);
-
-		pCell->phenotype.intracellular->update();
-		
-		from_nodes_to_cell(pCell, phenotype, dt);
-		color_node(pCell);
-	}	
+	if (PhysiCell::PhysiCell_globals.current_time >= 100.0 
+		&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
+	){
+		pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
+	}
 }
 
-
-void set_input_nodes(Cell* pCell) {}
-
-void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt) {}
-
+void post_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	color_node(pCell);
+}
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {

@@ -8,8 +8,9 @@
 #include "../../../core/PhysiCell_cell.h"
 #include "../../../modules/PhysiCell_pugixml.h"
 #include "maboss_network.h"
+#include "utils.h"
 
-static std::string PhysiBoSS_Version = "2.0.0"; 
+static std::string PhysiBoSS_Version = "2.1.0"; 
 
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
@@ -24,11 +25,16 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	bool discrete_time = false;
 	double time_tick = 0.5;
 	double scaling = 1.0;
-	
+	double time_stochasticity = 0.0;
+
 	std::map<std::string, double> initial_values;
 	std::map<std::string, double> mutations;
 	std::map<std::string, double> parameters;
-	
+
+	std::vector<MaBoSSInput> listOfInputs;
+	std::vector<int> indicesOfInputs;
+	std::vector<MaBoSSOutput> listOfOutputs;
+	std::vector<int> indicesOfOutputs;
 	MaBoSSNetwork maboss;
 
 	double next_physiboss_run = 0;
@@ -56,11 +62,21 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		this->maboss.run_simulation();
 		this->next_physiboss_run += this->maboss.get_time_to_update();
 	}
+
+	void update(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt) {
+		this->update_inputs(cell, phenotype, dt);
+		this->maboss.run_simulation();
+		this->update_outputs(cell, phenotype, dt);
+		this->next_physiboss_run += this->maboss.get_time_to_update();
+	}
 	
 	bool need_update() {
 		return PhysiCell::PhysiCell_globals.current_time >= this->next_physiboss_run;
 	}
 	
+	void update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt);
+	void update_outputs(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt);
+
 	bool has_variable(std::string name) {
 		return this->maboss.has_node(name);
 	}
@@ -89,6 +105,8 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	void print_current_nodes(){
 		this->maboss.print_nodes();
 	}
+
+	void display(std::ostream& os);
 	
 	static void save(std::string filename, std::vector<PhysiCell::Cell*>& cells);
 

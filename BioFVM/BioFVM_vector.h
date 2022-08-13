@@ -80,6 +80,8 @@ void operator/=( std::vector<double>& v1, const double& a );
 /* other commonly needed operations on vectors */ 
 
 std::ostream& operator<<(std::ostream& os, const std::vector<double>& v ); 
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v );
+std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v );
 
 // this one returns a new vector that has been normalized
 std::vector<double> normalize( std::vector<double>& v );

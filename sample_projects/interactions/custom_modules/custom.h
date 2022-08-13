@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,19 +65,37 @@
 ###############################################################################
 */
 
-#ifndef __PhysiCell_intracellular_h__
-#define __PhysiCell_intracellular_h__
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-// #undef LIBROADRUNNER  // use g++ "-D LIBROADRUNNER"  (or, -U)  
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-#ifdef LIBROADRUNNER
-// These are for C
-// #define STATIC_RRC
-#include "rrc_api.h"
-#include "rrc_types.h"
-// #include "rrc_utilities.h"
-extern "C" rrc::RRHandle createRRInstance();
-#endif // LIBROADRUNNER
+// setup functions to help us along 
 
+void create_cell_types( void );
+void setup_tissue( void ); 
 
-#endif
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
+
+// custom pathology coloring function 
+
+std::vector<std::string> my_coloring_function( Cell* );
+
+// custom functions can go here 
+
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
+
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
+
+void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+
+void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+
+void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+
