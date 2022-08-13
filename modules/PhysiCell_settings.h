@@ -179,6 +179,7 @@ class Parameters
 	void add_parameter( Parameter<T> param );
 	
 	int find_index( std::string search_name ); 
+	int find_variable_index (std::string search_name); // same result above, but will return -1 if search_name is not a parameter
 	
 	// these access the values 
 	T& operator()( int i );
