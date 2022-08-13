@@ -375,7 +375,16 @@ int Parameters<T>::find_index( std::string search_name )
 {
 	return name_to_index_map[ search_name ]; 
 }
-
+	
+template <class T>
+int Parameters<T>::find_variable_index( std::string search_name )
+{
+	// this should return -1 if not found, not zero 
+	auto out = name_to_index_map.find( search_name ); 
+	if( out != name_to_index_map.end() )
+	{ return out->second; }
+	return -1; 
+}
 
 template <class T>
 std::ostream& operator<<( std::ostream& os , const Parameters<T>& params )
