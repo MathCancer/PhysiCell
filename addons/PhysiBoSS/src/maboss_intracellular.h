@@ -74,6 +74,8 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		return PhysiCell::PhysiCell_globals.current_time >= this->next_physiboss_run;
 	}
 	
+	void inherit(PhysiCell::Cell * cell) {
+	}
 	void update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt);
 	void update_outputs(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt);
 

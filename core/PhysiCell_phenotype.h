@@ -611,6 +611,9 @@ class Intracellular
 	virtual void update() = 0;
 	virtual void update(Cell* cell, Phenotype& phenotype, double dt) = 0;
 
+	// This function deals with inheritance from mother to daughter cells
+	virtual void inherit(Cell* cell) = 0;
+
 	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
 	

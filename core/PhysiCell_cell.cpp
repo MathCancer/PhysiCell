@@ -598,9 +598,10 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 
-    if (child->phenotype.intracellular)
+    if (child->phenotype.intracellular){
         child->phenotype.intracellular->start();
-	
+		child->phenotype.intracellular->inherit(this);
+	}
 // #ifdef ADDON_PHYSIDFBA
 // 	child->fba_model = this->fba_model;
 // #endif
