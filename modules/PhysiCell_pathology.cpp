@@ -745,7 +745,7 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 		// place a big circle with cytoplasm colors 
 		Write_SVG_circle(os,cursor_x, cursor_y , temp_cell_radius , 1.0 , colors[1] , colors[0] ); 
 		// place a small circle with nuclear colors 
-		Write_SVG_circle(os,cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[2] , colors[3] ); 
+		Write_SVG_circle(os,cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[3] , colors[2] ); 
 		
 		// place the label 
 		
