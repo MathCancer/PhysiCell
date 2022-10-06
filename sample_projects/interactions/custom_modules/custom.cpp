@@ -342,6 +342,12 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	 
 }
 
+std::vector<std::string> my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc )
+{
+	 return paint_by_density_percentage( concentration,  max_conc,  min_conc); 
+	 
+}
+
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
 

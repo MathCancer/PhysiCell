@@ -37,6 +37,11 @@
 		<SVG>
 			<interval units="min">30</interval>
 			<enable>true</enable>
+      <plot_substrate enabled="true">
+        <substrate>toxin</substrate>
+        <min_conc>0.0</min_conc>
+        <max_conc>0.1</max_conc>
+      </plot_substrate>
 		</SVG>
 		
 		<legacy_data>
@@ -59,7 +64,8 @@
         </physical_parameter_set>
         <initial_condition units="mmHg">1</initial_condition>
         <Dirichlet_boundary_condition units="mmHg" enabled="False">1</Dirichlet_boundary_condition>
-        <Dirichlet_options><boundary_value ID="xmin" enabled="False">1</boundary_value>
+        <Dirichlet_options>
+          <boundary_value ID="xmin" enabled="False">1</boundary_value>
           <boundary_value ID="xmax" enabled="False">1</boundary_value>
           <boundary_value ID="ymin" enabled="False">1</boundary_value>
           <boundary_value ID="ymax" enabled="False">1</boundary_value>

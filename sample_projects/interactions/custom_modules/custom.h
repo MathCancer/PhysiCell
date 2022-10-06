@@ -83,6 +83,8 @@ void setup_microenvironment( void );
 
 std::vector<std::string> my_coloring_function( Cell* );
 
+std::vector<std::string> my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc );
+
 // custom functions can go here 
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
