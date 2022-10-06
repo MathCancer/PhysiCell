@@ -117,6 +117,11 @@ class PhysiCell_Settings
 	double SVG_save_interval = 60; 
 	bool enable_SVG_saves = true; 
 
+	bool enable_substrate_plot = false;
+	std::string substrate_to_monitor = "oxygen"; 
+	double min_concentration = -1.0;
+	double max_concentration = -1.0;
+
 	double intracellular_save_interval = 60; 
 	bool enable_intracellular_saves = false; 
 	

@@ -126,7 +126,11 @@ PhysiCell_Settings::PhysiCell_Settings()
 	enable_legacy_saves = false; 
 	
 	SVG_save_interval = 60; 
-	enable_SVG_saves = true; 
+	enable_SVG_saves = false; 
+	enable_substrate_plot = false;
+	substrate_to_monitor = "oxygen"; 
+	min_concentration = -1.0;
+	max_concentration = -1.0;
 
 	intracellular_save_interval = 60;  
 	enable_intracellular_saves = false; 
@@ -186,6 +190,16 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	node = xml_find_node( node , "SVG" ); 
 	SVG_save_interval = xml_get_double_value( node , "interval" );
 	enable_SVG_saves = xml_get_bool_value( node , "enable" ); 
+
+	pugi::xml_node node_plot_substrate; 
+	node_plot_substrate = xml_find_node( node , "plot_substrate" );
+	enable_substrate_plot = node_plot_substrate.attribute("enabled").as_bool();
+
+	if(enable_substrate_plot){
+		substrate_to_monitor = xml_get_string_value(node_plot_substrate, "substrate");
+		min_concentration = xml_get_double_value(node_plot_substrate, "min_conc");
+		max_concentration = xml_get_double_value(node_plot_substrate, "max_conc");
+	};
 	node = node.parent(); 
 
 	node = xml_find_node( node , "intracellular_data" ); 
