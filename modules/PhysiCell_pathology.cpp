@@ -402,7 +402,7 @@ std::string formatted_minutes_to_DDHHMM( double minutes )
 	return output ;
 }
 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) )
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*ECM_coloring_function)(double, double, double) )
 {
 	double X_lower = M.mesh.bounding_box[0];
 	double X_upper = M.mesh.bounding_box[3];
@@ -475,6 +475,74 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	double normalizer = 78.539816339744831 / (voxel_size*voxel_size*voxel_size); 
  
  // color in the background ECM
+	if(PhysiCell_settings.enable_substrate_plot == true)
+	{
+		double dz_stroma = M.mesh.dz;
+		double max_conc;
+		double min_conc;
+
+		std::string sub = PhysiCell_settings.substrate_to_monitor;
+		int sub_index = M.find_density_index(sub); // check the substrate does actually exist
+		if(sub_index == -1){
+			std::cout << "ERROR SAMPLING THE SUBSTRATE: COULD NOT FIND THE SUBSTRATE " << sub << std::endl; //if not print error message
+		}
+		else
+		{
+			if(PhysiCell_settings.max_concentration != 0 | PhysiCell_settings.min_concentration != 0){
+			 max_conc = PhysiCell_settings.max_concentration;
+			 min_conc = PhysiCell_settings.min_concentration;
+			}
+			else{
+			 max_conc = M.density_vector(5)[sub_index];
+			 min_conc = M.density_vector(5)[sub_index];	 // so here I am sampling the concentration to set a min and a mx
+			//look for the max and min concentration among all the substrates
+			for (int n = 0; n < M.number_of_voxels(); n++)
+			{
+				double concentration = M.density_vector(n)[sub_index];
+				if (concentration > max_conc)
+					max_conc = concentration;
+				if (concentration < min_conc)
+					min_conc = concentration;
+			}
+			};
+
+			//check that max conc is not zero otherwise it is a big problem!
+			if(max_conc == 0){
+
+				max_conc = 1.0;
+
+			};
+		
+			for (int n = 0; n < M.number_of_voxels(); n++)
+			{
+				auto current_voxel = M.voxels(n);
+				int z_center = current_voxel.center[2];
+				double z_displ = z_center -  dz_stroma/2; 
+				
+				double z_compare = z_displ;
+
+				if (default_microenvironment_options.simulate_2D == true){
+				z_compare = z_center;
+				};
+
+				if (z_slice == z_compare){			//this is to make sure the substrate is sampled in the voxel visualized (so basically the slice)
+					int x_center = current_voxel.center[0];
+					int y_center = current_voxel.center[1];
+					
+					double x_displ = x_center -  dx_stroma/2;
+					double y_displ = (y_center - dy_stroma) +  dy_stroma/2;
+
+					double concentration = M.density_vector(n)[sub_index];
+
+					std::vector< std::string > output = ECM_coloring_function(concentration, max_conc, min_conc );
+
+					Write_SVG_rect( os , x_displ - X_lower , y_displ - Y_lower, dx_stroma, dy_stroma , 0 , "none", output[0] );
+				}
+
+			}
+
+		}
+	}
 /* 
  if( ECM.TellRows() > 0 )
  {
@@ -647,6 +715,21 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	os.close();
  
 	return; 
+}
+
+std::vector<std::string> paint_by_density_percentage( double concentration, double max_conc, double min_conc ){
+
+	std::vector< std::string > output( 4 , "black" );
+	int color = (int) round( ((concentration - min_conc) / (max_conc - min_conc)) * 255 );
+	if(color > 255){
+		color = 255;
+	}
+	char szTempString [128];
+	sprintf( szTempString , "rgb(%u,234,197)", 255 - color);
+	output[0].assign( szTempString );
+
+	return output;
+
 }
 
 std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
