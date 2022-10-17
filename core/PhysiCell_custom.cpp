@@ -79,7 +79,6 @@ Variable::Variable()
 	name = "unnamed"; 
 	units = "dimensionless"; 
 	value = 0.0; 
-	conserved_quantity = false; 
 	return; 
 }
 
@@ -95,7 +94,6 @@ Vector_Variable::Vector_Variable()
 	name = "unnamed"; 
 	units = "dimensionless"; 
 	value.resize(3, 0.0 );
-	conserved_quantity = false; 
 	return; 
 }
 

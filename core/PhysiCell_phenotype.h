@@ -273,11 +273,7 @@ class Death
 	void trigger_death( int death_model_index ); // done 
 	
 	Cycle_Model& current_model( void ); // done
-	Death_Parameters& current_parameters( void ); // done '
-
-	// ease of access
-	double& apoptosis_rate(void); 
-	double& necrosis_rate(void); 
+	Death_Parameters& current_parameters( void ); // done 
 };
 
 class Volume
@@ -375,19 +371,12 @@ class Mechanics
 	// this is a multiple of the cell (equivalent) radius
 	double relative_maximum_adhesion_distance; 
 	// double maximum_adhesion_distance; // needed? 
-
-	/* for spring attachments */ 
-
-	int maximum_number_of_attachments; 
-	double attachment_elastic_constant; 
-
-	double attachment_rate; 
-	double detachment_rate; 
-
-	/* to be deprecated */ 
-
+	
 	double relative_maximum_attachment_distance; 
 	double relative_detachment_distance; 
+	
+	int maximum_number_of_attachments; 
+	double attachment_elastic_constant; 
 	double maximum_attachment_rate; 
 	
 	Mechanics(); // done 
@@ -462,12 +451,6 @@ class Secretion
 	void set_all_uptake_to_zero( void ); // NEW
 	void scale_all_secretion_by_factor( double factor ); // NEW
 	void scale_all_uptake_by_factor( double factor ); // NEW
-
-	// ease of access
-	double& secretion_rate( std::string name ); 
-	double& uptake_rate( std::string name ); 
-	double& saturation_density( std::string name ); 
-	double& net_export_rate( std::string name );  	
 };
 
 class Cell_Functions
@@ -482,9 +465,6 @@ class Cell_Functions
 	void (*custom_cell_rule)( Cell* pCell, Phenotype& phenotype, double dt ); 
 	void (*update_phenotype)( Cell* pCell, Phenotype& phenotype, double dt ); // used in celll
 	
-	void (*pre_update_intracellular) ( Cell* pCell, Phenotype& phenotype, double dt );
-	void (*post_update_intracellular) ( Cell* pCell, Phenotype& phenotype, double dt );
-
 	void (*update_velocity)( Cell* pCell, Phenotype& phenotype, double dt ); 
 	
 	void (*add_cell_basement_membrane_interactions)(Cell* pCell, Phenotype& phenotype, double dt );
@@ -580,9 +560,6 @@ class Molecular
 		
 		// use this 
 		void sync_to_cell( Basic_Agent* pCell ); 
-
-		// ease of access 
-		double&  internalized_total_substrate( std::string name ); 
 		
 };
 
@@ -609,7 +586,6 @@ class Intracellular
 
 	// This function update the model for the time_step defined in the xml definition
 	virtual void update() = 0;
-	virtual void update(Cell* cell, Phenotype& phenotype, double dt) = 0;
 
 	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
@@ -619,8 +595,6 @@ class Intracellular
 
 	virtual std::string get_state() = 0;  
 	
-	virtual void display(std::ostream& os) = 0;
-
 	virtual Intracellular* clone() = 0;
 	
 	virtual ~Intracellular(){};
@@ -684,34 +658,6 @@ class Cell_Transformations
 	
 	// automated cell transformations
 	// void perform_transformations( Cell* pCell, Phenotype& phenotype, double dt ); 
-};
-
-// pre-beta functionality in 1.10.3 
-class Integrity
-{
- private:
- public: 
-	// generic damage variable
-	double damage; 
-	double damage_rate; 
-	double damage_repair_rate; 
-
-	// lipid damage (e.g, cell membrane, organelles)
-	double lipid_damage; 
-	double lipid_damage_rate; 
-	double lipid_damage_repair_rate; 
-
-	// DNA damage 
-	double DNA_damage; 
-	double DNA_damage_rate; 
-	double DNA_damage_repair_rate; 
-
-	// other damages?
-	// mitochondrial? spindle? other? 
-
-	Integrity(); 
-
-	void advance_damage_models( double dt ); 
 };
 
 class Phenotype
