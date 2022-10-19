@@ -986,6 +986,8 @@ void Cell::add_potentials(Cell* other_agent)
 		temp_a *= effective_adhesion; 
 		
 		temp_r -= temp_a;
+
+		state.neighbors.push_back(other_agent); // move here in 1.10.2 so non-adhesive cells also added. 
 	}
 	/////////////////////////////////////////////////////////////////
 	if( fabs(temp_r) < 1e-16 )
@@ -998,7 +1000,7 @@ void Cell::add_potentials(Cell* other_agent)
 	axpy( &velocity , temp_r , displacement ); 
 	
 	
-	state.neighbors.push_back(other_agent); // new 1.8.0
+	// state.neighbors.push_back(other_agent); // new 1.8.0
 	
 	return;
 }
@@ -2586,7 +2588,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					{
 						std::string substrate_name = node_cs.attribute( "substrate").value(); 
 						int index = microenvironment.find_density_index( substrate_name ); 
-						std::string actual_name = microenvironment.density_names[ index ]; 
+						std::string actual_name = ""; 
+						if( index > -1 )
+						{ actual_name = microenvironment.density_names[ index ]; }
 			
 						// error check 
 						if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )						
@@ -2599,7 +2603,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 						{ pCD->phenotype.motility.chemotactic_sensitivities[index] = xml_get_my_double_value(node_cs); }
 						node_cs = node_cs.next_sibling( "chemotactic_sensitivity" ); 
 					}
-
 
 				}
 				else

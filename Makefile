@@ -395,6 +395,7 @@ gif:
 	done
 	convert -resize 500x500 -delay 5 -loop 0 $(OUTPUT)/*.png $(OUTPUT)/out.gif 
 	rm $(OUTPUT)/*.png 
+	 
 movie:
 	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/out.mp4
 	

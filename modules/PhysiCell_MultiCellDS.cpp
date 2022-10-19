@@ -365,9 +365,10 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 
 			extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 			int number_of_cell_defs = cell_definition_indices_by_name.size(); 
+			int number_of_substrates = microenvironment.number_of_densities(); 
 
 			// new in 2022: chemotactic sensitivies
-			size = number_of_cell_defs; 
+			size = number_of_substrates; // number_of_cell_defs; 
 			node_temp1 = node_temp1.append_child( "label" );
 			node_temp1.append_child( pugi::node_pcdata ).set_value( "chemotactic_sensitivities" ); 
 			attrib = node_temp1.append_attribute( "index" ); 
@@ -537,11 +538,12 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 
 		// figure out size of 2022 phenotype items 
 		extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+		int number_of_substrates = microenvironment.number_of_densities(); 
 		int number_of_cell_defs = cell_definition_indices_by_name.size(); 
 
 		// advanced chemotaxis
 		size_of_each_datum += 
-			number_of_cell_defs;		
+			number_of_substrates; // number_of_cell_defs;		
 
 		// cell adhesion affinities 
 		size_of_each_datum += 
@@ -638,7 +640,8 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 
 
 			// new in 2022: interactions : 
-			fwrite( (char*) &( pCell->phenotype.motility.chemotactic_sensitivities ) , sizeof(double) , number_of_cell_defs , fp ); // chemotactic_sensitivities 
+			// fwrite( (char*) &( pCell->phenotype.motility.chemotactic_sensitivities ) , sizeof(double) , number_of_cell_defs , fp ); // chemotactic_sensitivities 
+			fwrite( (char*) &( pCell->phenotype.motility.chemotactic_sensitivities ) , sizeof(double) , number_of_substrates , fp ); // chemotactic_sensitivities 
 			fwrite( (char*) &( pCell->phenotype.mechanics.cell_adhesion_affinities ) , sizeof(double) , number_of_cell_defs , fp ); // cell_adhesion_affinities 
 			fwrite( (char*) &( pCell->phenotype.cell_interactions.dead_phagocytosis_rate ) , sizeof(double) , 1 , fp ); // dead_phagocytosis_rate 
 			fwrite( (char*) &( pCell->phenotype.cell_interactions.live_phagocytosis_rates ) , sizeof(double) , number_of_cell_defs , fp ); // live_phagocytosis_rates 
