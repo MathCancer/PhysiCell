@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">14400</max_time> <!-- 10 days * 24 h * 60 min -->
+		<max_time units="min">2880</max_time> <!-- 10 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -390,9 +390,9 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		
 		<!-- for main --> 
-		<therapy_activation_time type="double" units="min">10080</therapy_activation_time>
+		<therapy_activation_time type="double" units="min">770</therapy_activation_time>
 			<!-- activate in 7 days --> 
-		<save_interval_after_therapy_start type="double" units="min">3</save_interval_after_therapy_start>
+		<save_interval_after_therapy_start type="double" units="min">30</save_interval_after_therapy_start>
 		
 		<!-- cargo cell setup --> 
 		<cargo_o2_relative_uptake type="double" units="dimensionless">0.1</cargo_o2_relative_uptake>
@@ -415,7 +415,7 @@
 		<number_of_injected_cells type="int" units="dimensionless">500</number_of_injected_cells>
 		
 		<!-- tissue setup -->
-		<tumor_radius type="double" units="micron">200</tumor_radius> 
+		<tumor_radius type="double" units="micron">150</tumor_radius> 
 		
 		<!-- custom mechanics --> 
 		<max_elastic_displacement type="double" units="micron">50.0</max_elastic_displacement>
