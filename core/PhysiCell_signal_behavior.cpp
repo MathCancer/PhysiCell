@@ -193,25 +193,10 @@ void setup_signal_behavior_dictionaries( void )
 	signal_to_int["damage"] = map_index; 
 	int_to_signal[map_index] = "damage"; 
 	
-	// live / dead state 
-	map_index++; 
-	signal_to_int["dead"] = map_index; 
-	int_to_signal[map_index] = "dead"; 
-	// synonym 
-	signal_to_int["is dead"] = map_index; 
-
 	// total attack time 
 	map_index++; 
 	signal_to_int["total attack time"] = map_index; 
 	int_to_signal[map_index] = "total attack time"; 
-
-	// current time
-	map_index++; 
-	signal_to_int["time"] = map_index; 
-	int_to_signal[map_index] = "time"; 
-	// synonyms 
-	signal_to_int["current time"] = map_index; 
-	signal_to_int["global time"] = map_index; 
 
 	behavior_to_int.clear(); 	
 	int_to_behavior.clear(); 
@@ -608,18 +593,10 @@ std::vector<double> get_signals( Cell* pCell )
 	// damage
 	static int damage_ind = find_signal_index( "damage"); 
 	signals[damage_ind] = pCell->state.damage; 
-
-	// live / dead state 
-	static int dead_ind = find_signal_index( "dead" ); 
-	signals[dead_ind] = (double) pCell->phenotype.death.dead; 
 	
 	// integrated total attack time 
 	static int tot_attack_ind = find_signal_index( "total attack time"); 
 	signals[tot_attack_ind] = pCell->state.total_attack_time;     
-
-	// time 
-	static int time_ind = find_signal_index( "time" ); 
-	signals[time_ind] = PhysiCell_globals.current_time; 
 
     // rescale 
     signals /= signal_scales; 
@@ -811,29 +788,11 @@ double get_single_signal( Cell* pCell, int index )
 		return out; 
 	} 
 
-	// live / dead state 
-	static int dead_ind = find_signal_index( "dead" ); 
-	if( index == dead_ind )
-	{
-		out = (double) pCell->phenotype.death.dead;  
-		out /= signal_scales[index]; 
-		return out; 
-	} 
-
 	// integrated total attack time 
 	static int tot_attack_ind = find_signal_index( "total attack time"); 
 	if( index == tot_attack_ind )
 	{
 		out = pCell->state.total_attack_time;     
-		out /= signal_scales[index]; 
-		return out; 
-	} 
-
-	// time 
-	static int time_ind = find_signal_index( "time" ); 
-	if( index == time_ind )
-	{
-		out = PhysiCell_globals.current_time;      
 		out /= signal_scales[index]; 
 		return out; 
 	} 
@@ -1373,7 +1332,7 @@ double get_single_behavior( Cell* pCell , int index )
 	{ return pCell->phenotype.mechanics.cell_cell_adhesion_strength; }
 
 	// cell-cell "springs"
-	static int cca_spring_index = find_behavior_index( "cell-cell adhesion elastic constant" );  
+	static int cca_spring_index = find_behavior_index( "cell-cell adhesion" );  
 	if( index == cca_spring_index )
 	{ return pCell->phenotype.mechanics.attachment_elastic_constant; }
 
@@ -1695,7 +1654,7 @@ double get_single_base_behavior( Cell* pCell , int index )
 	{ return pCD->phenotype.mechanics.cell_cell_adhesion_strength; }
 
 	// cell-cell "springs"
-	static int cca_spring_index = find_behavior_index( "cell-cell adhesion elastic constant" );  
+	static int cca_spring_index = find_behavior_index( "cell-cell adhesion" );  
 	if( index == cca_spring_index )
 	{ return pCD->phenotype.mechanics.attachment_elastic_constant; }
 

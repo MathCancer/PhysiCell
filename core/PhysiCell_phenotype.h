@@ -273,11 +273,7 @@ class Death
 	void trigger_death( int death_model_index ); // done 
 	
 	Cycle_Model& current_model( void ); // done
-	Death_Parameters& current_parameters( void ); // done '
-
-	// ease of access
-	double& apoptosis_rate(void); 
-	double& necrosis_rate(void); 
+	Death_Parameters& current_parameters( void ); // done 
 };
 
 class Volume
@@ -455,12 +451,6 @@ class Secretion
 	void set_all_uptake_to_zero( void ); // NEW
 	void scale_all_secretion_by_factor( double factor ); // NEW
 	void scale_all_uptake_by_factor( double factor ); // NEW
-
-	// ease of access
-	double& secretion_rate( std::string name ); 
-	double& uptake_rate( std::string name ); 
-	double& saturation_density( std::string name ); 
-	double& net_export_rate( std::string name );  	
 };
 
 class Cell_Functions
@@ -570,9 +560,6 @@ class Molecular
 		
 		// use this 
 		void sync_to_cell( Basic_Agent* pCell ); 
-
-		// ease of access 
-		double&  internalized_total_substrate( std::string name ); 
 		
 };
 

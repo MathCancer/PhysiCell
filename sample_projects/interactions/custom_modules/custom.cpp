@@ -98,18 +98,6 @@ void create_cell_types( void )
 	*/
 	
 	initialize_cell_definitions_from_pugixml(); 
-
-	/*
-	   This builds the map of cell definitions and summarizes the setup. 
-	*/
-		
-	build_cell_definitions_maps(); 
-
-	/*
-	   This intializes cell signal and response dictionaries 
-	*/
-
-	setup_signal_behavior_dictionaries(); 		
 	
 	/* 
 	   Put any modifications to individual cell definitions here. 
