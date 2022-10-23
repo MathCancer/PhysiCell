@@ -78,6 +78,15 @@ list-projects:
 	@echo "Sample intracellular projects: ode-energy-sample physiboss-cell-lines-sample cancer-metabolism-sample"
 	@echo ""
 	
+abm-template:
+	cp ./sample_projects/abm-template/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/abm-template/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/abm-template/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/abm-template/config/* ./config/
+
 template:
 	cp ./sample_projects/template/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
