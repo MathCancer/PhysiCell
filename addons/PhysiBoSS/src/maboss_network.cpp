@@ -112,11 +112,18 @@ bool MaBoSSNetwork::has_node( std::string name ) {
 }
 
 void MaBoSSNetwork::set_node_value(std::string name, bool value) {
-	state.setNodeState(nodesByName[name], value);
+	if (has_node(name))
+		state.setNodeState(nodesByName[name], value);
+	else 
+		std::cout << "Can't find node " << name  << "!!!!" << std::endl;
 }
 
 bool MaBoSSNetwork::get_node_value(std::string name) {
-	return state.getNodeState(nodesByName[name]);
+	if (has_node(name))
+		return state.getNodeState(nodesByName[name]);
+	else
+		std::cout << "Can't find node " << name  << "!!!!" << std::endl;
+		return true;
 }
 
 std::string MaBoSSNetwork::get_state() {
