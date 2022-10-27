@@ -16,13 +16,17 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 	}
 	
 	try{
-		// Initialize MaBoSS Objects for a model
-		this->network = new Network();
-		this->network->parse(networkFile.c_str());
+		
+		#pragma omp critical
+		{
+			// Initialize MaBoSS Objects for a model
+			this->network = new Network();
+			this->network->parse(networkFile.c_str());
 
-		this->config = new RunConfig();
-		this->config->parse(this->network, configFile.c_str());
-
+			this->config = new RunConfig();
+			this->config->parse(this->network, configFile.c_str());
+		}
+		
 		IStateGroup::checkAndComplete(this->network);
 
 		engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
