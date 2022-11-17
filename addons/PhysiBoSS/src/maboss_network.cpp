@@ -27,6 +27,12 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 			this->config->parse(this->network, configFile.c_str());
 		}
 		
+		// Some models will have chosen to use the physical randon number generator 
+		// This is a problem, as it will open /dev/urandom for each cell, and overload the number of file open
+		// So for now we just don't use this, and choose by default mersen twister
+		this->config->setParameter("use_physrandgen", false);
+		this->config->setParameter("use_mtrandgen", true);
+		
 		IStateGroup::checkAndComplete(this->network);
 
 		engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
