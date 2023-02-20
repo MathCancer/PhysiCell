@@ -1,0 +1,83 @@
+0) Make sure everything is cleaned up:
+
+   a) make reset
+
+   b) make data-cleanup 
+
+   c) only PhysiCell_settings.xml in ./config
+
+   d) only empty.txt in ./output
+
+1) update version number in core/PhysiCell.h 
+
+(See static std::string PhysiCell_version.) 
+
+2) Update VERSION.txt with a string only containing the version 
+number. There should be no spaces in this file. 
+
+3) update CITATION.txt to reflect the new version 
+number. 
+
+4) Append most recent changes in README.md. Copy everything after 
+   "Release summary" in changes.md (the most recent version x.y.z only) 
+   to overwrite everything after "* * * " in README.md 
+
+6) Make appropriate changes to ./documentation/User_Guide.tex, and 
+   recompile the LaTeX document. Don't forget to set \Version to x.y.z 
+   at the top of the document. Set the \ReleaseDate to today (manually). 
+
+7) create (and approve) a pull request from the development branch to the master branch.
+
+8) Sourceforge.net release 
+   a) Move one directory up. Zip everything in PhysiCell 
+      into a new zip file. Use 
+      
+zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.gitignore -x .DS_Store -x PhysiCell/.github/* -x PhysiCell/.travis.yml   
+
+      (with appropriate version x.y.z). 
+
+   b) Make sure the zip file is named PhysiCell_V.x.y.z.zip (based on version x.y.z)
+
+   c) Make sure the zip file excludes .git, .gitignore, and .github (and .travis.yml)
+
+   d) Go to https://sourceforge.net/projects/physicell/files/PhysiCell/ 
+
+   e) Create a new folder named PhysiCell x.y.z (based on version x.y.z)
+
+   f) Upload the zip file and README.md file to the new folder
+
+   g) Edit the zip file (on SF) to make it the default download for 
+      all operating systems. 
+
+   g) Edit the README.md file (on SF) to exclude it from stats tracking. 
+
+9) GitHub release: 
+
+   a) Go to https://github.com/MathCancer/PhysiCell/releases
+      Click "Draft a new release" 
+
+   b) For "Tag version", Use x.y.z (for the version x.y.z)
+
+   c) For "Release title," use "Version x.y.z" (for the version x.y.z)
+
+   d) Copy / paste everything from README.md in the "write" field. 
+
+   e) On the "attach binaries", use the zip file you created for the 
+      SourceForge release.  
+
+   f) Click "publish release" 
+
+10) Update MathCancer.org
+
+   a) Update the version number on http://MathCancer.org/OpenSource.php
+
+   b) Update the version number on http://MathCancer.org/PhysiCell/index.php
+
+   c) Update the "news" to include the new release, and a brief summary. 
+      Follow prior examples as a template 
+
+   d) Update the "downloads" section to include two table rules 
+
+11) Make a new development branch 
+
+12) Create a new section in changes.md in the new dev branch 

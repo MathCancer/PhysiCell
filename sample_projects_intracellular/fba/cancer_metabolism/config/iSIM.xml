@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" xmlns:fbc="http://www.sbml.org/sbml/level3/version1/fbc/version2" sboTerm="SBO:0000624" level="3" version="1" fbc:required="false">
+  <model metaid="meta_iSIM" id="iSIM" fbc:strict="true">
+    <listOfUnitDefinitions>
+      <unitDefinition id="mmol_per_gDW_per_hr">
+        <listOfUnits>
+          <unit kind="mole" exponent="1" scale="-3" multiplier="1"/>
+          <unit kind="gram" exponent="-1" scale="0" multiplier="1"/>
+          <unit kind="second" exponent="-1" scale="0" multiplier="3600"/>
+        </listOfUnits>
+      </unitDefinition>
+    </listOfUnitDefinitions>
+    <listOfCompartments>
+      <compartment id="c" constant="true"/>
+      <compartment id="m" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="M_m04c" name="glucose" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m07c" name="lactate" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m08c" name="02" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m06c" name="H20" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m03c" name="CO2" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m01c" name="ADP" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m09c" name="Pi" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m02c" name="ATP" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m05m" name="H" compartment="m" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="M_m05c" name="H" compartment="c" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter sboTerm="SBO:0000626" id="cobra_default_lb" value="-1000" constant="true"/>
+      <parameter sboTerm="SBO:0000626" id="cobra_default_ub" value="1000" constant="true"/>
+      <parameter sboTerm="SBO:0000626" id="cobra_0_bound" value="0" constant="true"/>
+      <parameter sboTerm="SBO:0000625" id="minus_inf" value="-INF" constant="true"/>
+      <parameter sboTerm="SBO:0000625" id="plus_inf" value="INF" constant="true"/>
+      <parameter sboTerm="SBO:0000625" id="R_E1_lower_bound" value="-1" units="mmol_per_gDW_per_hr" constant="true"/>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction id="R_E1" name="glucose exchange" reversible="true" fast="false" fbc:lowerFluxBound="R_E1_lower_bound" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m04c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_GLUT"/>
+        </fbc:geneProductAssociation>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="Vmax" value="1" units="mmol_per_gDW_per_hr"/>
+            <localParameter id="Km" value="1" units="mmol_per_gDW_per_hr"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction id="R_E2" name="lactate exchange" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m07c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_LDH"/>
+        </fbc:geneProductAssociation>
+        <kineticLaw>
+          <listOfLocalParameters>
+            <localParameter id="Vmax" value="1" units="mmol_per_gDW_per_hr"/>
+            <localParameter id="Km" value="1" units="mmol_per_gDW_per_hr"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction id="R_E3" name="O2 exchange" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m08c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_ETC"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R_E4" name="H20 exchange" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m06c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_AQP"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R_E5" name="CO2 exchange" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m03c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_CO2"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R_R1" name="glycolysis" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m01c" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_m09c" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_m04c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_m02c" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_m07c" stoichiometry="2" constant="true"/>
+          <speciesReference species="M_m06c" stoichiometry="2" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_PFK"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R_R2" name="TCA + ETC" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m05m" stoichiometry="56" constant="true"/>
+          <speciesReference species="M_m07c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_m08c" stoichiometry="3" constant="true"/>
+          <speciesReference species="M_m01c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_m09c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_m05c" stoichiometry="56" constant="true"/>
+          <speciesReference species="M_m06c" stoichiometry="4" constant="true"/>
+          <speciesReference species="M_m03c" stoichiometry="3" constant="true"/>
+          <speciesReference species="M_m02c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_CS"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R_R3" name="ATP synthase" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m01c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_m09c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_m05c" stoichiometry="4" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_m06c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_m02c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_m05m" stoichiometry="4" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_ATPV"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+      <reaction id="R_R4" name="ATP demand" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+          <speciesReference species="M_m06c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_m02c" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="M_m01c" stoichiometry="1" constant="true"/>
+          <speciesReference species="M_m09c" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation>
+          <fbc:geneProductRef fbc:geneProduct="G_MYH2"/>
+        </fbc:geneProductAssociation>
+      </reaction>
+    </listOfReactions>
+    <fbc:listOfObjectives fbc:activeObjective="obj">
+      <fbc:objective fbc:id="obj" fbc:type="maximize">
+        <fbc:listOfFluxObjectives>
+          <fbc:fluxObjective fbc:reaction="R_R4" fbc:coefficient="1"/>
+        </fbc:listOfFluxObjectives>
+      </fbc:objective>
+    </fbc:listOfObjectives>
+    <fbc:listOfGeneProducts>
+      <fbc:geneProduct fbc:id="G_GLUT" fbc:name="G_GLUT" fbc:label="G_GLUT"/>
+      <fbc:geneProduct fbc:id="G_LDH" fbc:name="G_LDH" fbc:label="G_LDH"/>
+      <fbc:geneProduct fbc:id="G_ETC" fbc:name="G_ETC" fbc:label="G_ETC"/>
+      <fbc:geneProduct fbc:id="G_AQP" fbc:name="G_AQP" fbc:label="G_AQP"/>
+      <fbc:geneProduct fbc:id="G_CO2" fbc:name="G_CO2" fbc:label="G_CO2"/>
+      <fbc:geneProduct fbc:id="G_PFK" fbc:name="G_PFK" fbc:label="G_PFK"/>
+      <fbc:geneProduct fbc:id="G_CS" fbc:name="G_CS" fbc:label="G_CS"/>
+      <fbc:geneProduct fbc:id="G_ATPV" fbc:name="G_ATPV" fbc:label="G_ATPV"/>
+      <fbc:geneProduct fbc:id="G_MYH2" fbc:name="G_MYH2" fbc:label="G_MYH2"/>
+    </fbc:listOfGeneProducts>
+  </model>
+</sbml>
