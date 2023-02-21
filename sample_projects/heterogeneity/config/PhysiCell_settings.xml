@@ -58,10 +58,10 @@
         <initial_condition units="mmHg">38</initial_condition>
         <Dirichlet_boundary_condition units="mmHg" enabled="True">38</Dirichlet_boundary_condition>
         <Dirichlet_options>
-          <boundary_value ID="xmin" enabled="False">38</boundary_value>
-          <boundary_value ID="xmax" enabled="False">38</boundary_value>
-          <boundary_value ID="ymin" enabled="False">38</boundary_value>
-          <boundary_value ID="ymax" enabled="False">38</boundary_value>
+          <boundary_value ID="xmin" enabled="True">38</boundary_value>
+          <boundary_value ID="xmax" enabled="True">38</boundary_value>
+          <boundary_value ID="ymin" enabled="True">38</boundary_value>
+          <boundary_value ID="ymax" enabled="True">38</boundary_value>
           <boundary_value ID="zmin" enabled="False">38</boundary_value>
           <boundary_value ID="zmax" enabled="False">38</boundary_value>
         </Dirichlet_options>

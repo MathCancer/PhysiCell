@@ -124,7 +124,6 @@ void create_cell_types( void )
 	Cell_Definition* pCD = find_cell_definition( "cancer cell"); 
 	pCD->functions.update_phenotype = tumor_cell_phenotype_with_oncoprotein; 
 
-
 	pCD->parameters.o2_proliferation_saturation = 38; 
 	pCD->parameters.o2_reference = 38; 
 

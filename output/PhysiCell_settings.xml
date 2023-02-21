@@ -82,7 +82,7 @@
 	</microenvironment_setup>	
 	
 	<cell_definitions>
-		<cell_definition name="tumor" ID="0">
+		<cell_definition name="cancer cell" ID="0">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
@@ -139,7 +139,7 @@
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
             <cell_adhesion_affinities>
-                <cell_adhesion_affinity name="tumor">1</cell_adhesion_affinity>
+                <cell_adhesion_affinity name="cancer cell">1</cell_adhesion_affinity>
                 </cell_adhesion_affinities>
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
@@ -186,23 +186,23 @@
           <cell_interactions>
             <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
             <live_phagocytosis_rates>
-                <phagocytosis_rate name="tumor" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="cancer cell" units="1/min">0</phagocytosis_rate>
                 </live_phagocytosis_rates>
 
             <attack_rates>
-                  <attack_rate name="tumor" units="1/min">0</attack_rate>
+                  <attack_rate name="cancer cell" units="1/min">0</attack_rate>
                   </attack_rates>
 
             <damage_rate units="1/min">1</damage_rate>
             <fusion_rates>
-                  <fusion_rate name="tumor" units="1/min">0</fusion_rate>
+                  <fusion_rate name="cancer cell" units="1/min">0</fusion_rate>
                   </fusion_rates>
 
           </cell_interactions>
 
           <cell_transformations>
             <transformation_rates>
-                <transformation_rate name="tumor" units="1/min">0</transformation_rate>
+                <transformation_rate name="cancer cell" units="1/min">0</transformation_rate>
                 </transformation_rates>
             </cell_transformations>
 
