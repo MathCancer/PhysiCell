@@ -2,7 +2,7 @@
 
 **Version:** 1.11.0
 
-**Release date:** 24 February 2023
+**Release date:** ?? February 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -136,7 +136,7 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 ### Minor new features and changes: 
 #### 1.11.0
 + New `apoptotic` and `necrotic` cell signals are available for use in simulation rules. 
-+ 
++ Added `is_movable` to the set of cell behaviors. Set this to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. 
 
 
 ### Beta features (not fully supported):
