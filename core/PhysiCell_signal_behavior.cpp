@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -200,6 +200,9 @@ void setup_signal_behavior_dictionaries( void )
 	// synonym 
 	signal_to_int["is dead"] = map_index; 
 
+
+
+
 	// total attack time 
 	map_index++; 
 	signal_to_int["total attack time"] = map_index; 
@@ -231,6 +234,20 @@ void setup_signal_behavior_dictionaries( void )
 		custom_signal_name += std::to_string(nc); 
 		signal_to_int[custom_signal_name] = map_index; 
 	}
+
+	map_index++; 
+	signal_to_int["apoptotic"] = map_index; 
+	int_to_signal[map_index] = "apoptotic"; 
+	// synonyms 
+	signal_to_int["is_apoptotic"] = map_index; 
+
+	map_index++; 
+	signal_to_int["necrotic"] = map_index; 
+	int_to_signal[map_index] = "necrotic"; 
+	// synonyms 
+	signal_to_int["is_necrotic"] = map_index; 
+
+	/* add new signals above this line */
 
 	behavior_to_int.clear(); 	
 	int_to_behavior.clear(); 
@@ -463,6 +480,16 @@ void setup_signal_behavior_dictionaries( void )
 		behavior_to_int[custom_behavior_name] = map_index; 
 	}
 
+	map_index++; 
+	map_name = "is_movable";
+	behavior_to_int[map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+	// synonyms
+	behavior_to_int["movable"] = map_index; 
+	behavior_to_int["is movable"] = map_index; 
+
+	/* add new behaviors above this line */
+
     // resize scales; 
     signal_scales.resize( int_to_signal.size() , 1.0 ); 
 
@@ -666,6 +693,20 @@ std::vector<double> get_signals( Cell* pCell )
 		for( int nc=0 ; nc < pCell->custom_data.variables.size() ; nc++ )
 		{ signals[first_custom_ind+nc] = pCell->custom_data.variables[nc].value; }
 	}
+
+	static int apoptotic_ind = find_signal_index( "apoptotic" ); 
+	if(pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic )
+	{ signals[apoptotic_ind] = 1; }
+	else
+	{ signals[apoptotic_ind] = 0; }
+
+	static int necrotic_ind = find_signal_index( "necrotic" ); 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+	{ signals[necrotic_ind] = 1; }
+	else
+	{ signals[necrotic_ind] = 0; }
 
     // rescale 
     signals /= signal_scales; 
@@ -894,6 +935,26 @@ double get_single_signal( Cell* pCell, int index )
 		return out; 
 	}
 
+	static int apoptotic_ind = find_signal_index( "apoptotic" ); 
+	if( index == apoptotic_ind )
+	{
+		if(pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic )
+		{ return 1; }
+		else
+		{ return 0; }
+	}
+
+	static int necrotic_ind = find_signal_index( "necrotic" ); 
+	if( index == necrotic_ind )
+	{
+		if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+			pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+			pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+		{ return 1; }
+		else
+		{ return 0; }
+	}
+
 	// unknown after here !
 
 	std::cout << "Warning: Requested unknown signal number " << index << "!" << std::endl
@@ -1058,6 +1119,12 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 		{ pCell->custom_data.variables[nc].value = parameters[first_custom_ind+nc]; }
 	}
 
+	// set cell to movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( parameters[movable_ind] > 0.5 )
+	{ pCell->is_movable = true; }
+	else
+	{ pCell->is_movable = false; }
 	return; 
 }
 
@@ -1206,6 +1273,13 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
 	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
 	{ pCell->custom_data.variables[index-first_custom_ind].value = parameter; }
+
+	// set cell to movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( parameter > 0.5 )
+	{ pCell->is_movable = true; }
+	else
+	{ pCell->is_movable = false; }
 
 	return; 
 }
@@ -1357,6 +1431,13 @@ std::vector<double> get_behaviors( Cell* pCell )
 		for( int nc=0; nc < pCell->custom_data.variables.size(); nc++ )
 		{ parameters[first_custom_ind+nc] = pCell->custom_data.variables[nc].value; }	 
 	}
+
+	// is the cell movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( pCell->is_movable == true )
+	{ parameters[movable_ind] = 1; }
+	else
+	{ parameters[movable_ind] = 0; }
 
 	return parameters; 
 }
@@ -1511,6 +1592,13 @@ double get_single_behavior( Cell* pCell , int index )
 	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
 	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
 	{ return pCell->custom_data.variables[index-first_custom_ind].value; }
+
+	// is the cell movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( pCell->is_movable == true )
+	{ return 1.0; }
+	else
+	{ return 0.0; }
 
 	return -1; 
 }
@@ -1693,6 +1781,13 @@ std::vector<double> get_base_behaviors( Cell* pCell )
 		{ parameters[first_custom_ind+nc] = pCD->custom_data.variables[nc].value; }	 
 	}
 
+	// is the cell movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( pCD->is_movable == true )
+	{ parameters[movable_ind] = 1; }
+	else
+	{ parameters[movable_ind] = 0; }
+
 	return parameters; 
 }
 
@@ -1848,6 +1943,13 @@ double get_single_base_behavior( Cell* pCell , int index )
 	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
 	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
 	{ return pCD->custom_data.variables[index-first_custom_ind].value; }
+
+	// is the cell movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( pCell->is_movable == true )
+	{ return 1.0; }
+	else
+	{ return 0.0; }
 
 	return -1; 
 }

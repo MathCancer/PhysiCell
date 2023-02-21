@@ -231,7 +231,7 @@ void setup_tissue( void )
 		Cell* pC;
 		pC = create_cell( *pDirectorDef ); 
 		pC->assign_position( position );
-		pC->is_movable = false; 
+		set_single_behavior( pC, "movable" , false); 
 	}
 	
 	// place cargo clusters on the fringes 
