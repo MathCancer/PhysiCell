@@ -93,11 +93,47 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
  
 ### Major new features and changes in the 1.10.z versions
 #### 1.11.0
-+ 
++ New and improved (v2) cell CSV format for cell import. This allows more intuitive statement of initial cell positions. The first line of your CSV file must be: 
+
+   ```x,y,z,cell type```
+
+  Every subsequent line is a single cell, now referencing cell types by their human-readable names (as defined in your XML configuration file) rather than requiring the integer `ID`. So, a sample second line to place a CD8 T cell at (30,-10,12) would be: 
+
+   ```30,-10,12,CD8 T cell```
+
+  Moreover, the new format allows you to initialize a variety of individual cell properties, including (total) `volume` and any supported cell beheavior. For example, if your cell definitions have custom variables `GFP` ond `oncoprotein`, then you can extend the first header line to: 
+
+  ```x,y,z,cell type,custom:GFP,custom:oncoprotein```
+
+  And then subsequent cells look like this: 
+
+    ```30,-10,12,CD8 T cell,0.5,3.2```
+ 
+  You can tell our parser to skip specifying a specific variable with `s` or `S` or an empty entry. Here, the first cell would skip writing the initial value of the GFP, and teh second would skip initializing the oncoprotein: 
+
+    ```30,-10,12,CD8 T cell,,3.2```  
+    ```50,13,-4,M0 Macrophage,0.5,s```
+
+  We will continue to automatically support older CSV cell files; any cells CSV file missing the first line of headers will be processed in the old format.  
+
++ Ability to save and load user projects
+   + Use `make save PROJ=project_name` to save your project to a folder in `./user_projects` named `project_name`. For example: 
+
+       ```make save PROJ=new_tumor_sample```
+
+     saves your project as `new_tumor_sample`. In particular, it saves your `Makefile`, `main.cpp`, everything in `./config`, and everything in `./custom_modules`. 
+
+   + Use `make load PROJ=project_name` to load your project from a folder in `./user_projects` named `project_name`. For example: 
+
+        ```make load PROJ=new_tumor_sample```
+
+     loads your project from `new_tumor_sample`. In particular, it loads your `Makefile`, `main.cpp`, everything in `./config`, and everything in `./custom_modules`. 
+
++ dfd
 
 ### Minor new features and changes: 
 #### 1.11.0
-+ ...
++ New `apoptotic` and `necrotic` cell signals are available for use in simulation rules. 
 
 
 ### Beta features (not fully supported):
