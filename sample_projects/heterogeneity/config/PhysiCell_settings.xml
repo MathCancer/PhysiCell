@@ -223,7 +223,7 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless" description="">0</random_seed>
-        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">5</number_of_cells>
+        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
         <tumor_radius type="double" units="micron" description="">250</tumor_radius>
         <oncoprotein_mean type="double" units="" description="">1</oncoprotein_mean>
         <oncoprotein_sd type="double" units="" description="">0.25</oncoprotein_sd>
