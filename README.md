@@ -132,6 +132,7 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 + Migrated built-in sample projects to be compatible with the model builder GUI and the upcoming PhysiCell Studio, including: 
   + template
   + biorobots (updates spring constant from 0.05 to 0.5)
+  + heterogeneity
 
 ### Minor new features and changes: 
 #### 1.11.0

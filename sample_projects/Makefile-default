@@ -129,7 +129,7 @@ celltypes3-sample:
 heterogeneity-sample:
 	cp ./sample_projects/heterogeneity/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/heterogeneity/main-heterogeneity.cpp ./main.cpp 
+	cp ./sample_projects/heterogeneity/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/heterogeneity/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 

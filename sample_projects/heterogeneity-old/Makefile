@@ -58,18 +58,18 @@ PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := custom.o
+PhysiCell_custom_module_OBJECTS := heterogeneity.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
-# compile the project 
+# compile the project  
 
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
-	make name
+	make name 
 
 name:
 	@echo ""
@@ -150,23 +150,23 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
-
+	
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
 	
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 	
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 
 	
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp
 	
 # user-defined PhysiCell modules
 
-custom.o: ./custom_modules/custom.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
+heterogeneity.o: ./custom_modules/heterogeneity.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/heterogeneity.cpp
 
 # cleanup
 
@@ -187,6 +187,9 @@ clean:
 	rm -f $(PROGRAM_NAME)*
 	
 data-cleanup:
+	# rm -f *.mat
+	# rm -f *.xml
+	# rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
