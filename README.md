@@ -129,11 +129,14 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
      loads your project from `new_tumor_sample`. In particular, it loads your `Makefile`, `main.cpp`, everything in `./config`, and everything in `./custom_modules`. 
 
-+ dfd
++ Migrated built-in sample projects to be compatible with the model builder GUI and the upcoming PhysiCell Studio, including: 
+  + template
+  + biorobots (updates spring constant from 0.05 to 0.5)
 
 ### Minor new features and changes: 
 #### 1.11.0
 + New `apoptotic` and `necrotic` cell signals are available for use in simulation rules. 
++ 
 
 
 ### Beta features (not fully supported):

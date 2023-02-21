@@ -93,7 +93,7 @@ template:
 biorobots-sample:
 	cp ./sample_projects/biorobots/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/biorobots/main-biorobots.cpp ./main.cpp 
+	cp ./sample_projects/biorobots/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/biorobots/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
