@@ -1276,10 +1276,13 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 
 	// set cell to movable / not movable 
 	static int movable_ind = find_behavior_index( "is_movable"); 
-	if( parameter > 0.5 )
-	{ pCell->is_movable = true; }
-	else
-	{ pCell->is_movable = false; }
+	if( index == movable_ind )
+	{
+		if( parameter > 0.5 )
+		{ pCell->is_movable = true; }
+		else
+		{ pCell->is_movable = false; }
+	}
 
 	return; 
 }
@@ -1595,10 +1598,13 @@ double get_single_behavior( Cell* pCell , int index )
 
 	// is the cell movable / not movable 
 	static int movable_ind = find_behavior_index( "is_movable"); 
-	if( pCell->is_movable == true )
-	{ return 1.0; }
-	else
-	{ return 0.0; }
+	if( index == movable_ind )
+	{
+		if( pCell->is_movable == true )
+		{ return 1.0; }
+		else
+		{ return 0.0; }
+	}
 
 	return -1; 
 }
@@ -1946,10 +1952,13 @@ double get_single_base_behavior( Cell* pCell , int index )
 
 	// is the cell movable / not movable 
 	static int movable_ind = find_behavior_index( "is_movable"); 
-	if( pCell->is_movable == true )
-	{ return 1.0; }
-	else
-	{ return 0.0; }
+	if( index == movable_ind )
+	{
+		if( pCell->is_movable == true )
+		{ return 1.0; }
+		else
+		{ return 0.0; }
+	}
 
 	return -1; 
 }
