@@ -1192,7 +1192,14 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			
 			// attack 
 			// assume you can only attack one cell at a time 
-			probability = phenotype.cell_interactions.attack_rate(type_name)*dt; // s[type] * dt;  
+			// probability = phenotype.cell_interactions.attack_rate(type_name)*dt; // s[type] * dt;  
+
+			double attack_ij = phenotype.cell_interactions.attack_rate(type_name); 
+			double immunogenicity_ji = pTarget->phenotype.cell_interactions.immunogenicity(pCell->type_name); 
+
+			probability = attack_ij * immunogenicity_ji * dt; 
+			
+			dt; // s[type] * dt;  
 			if( UniformRandom() < probability && attacked == false ) 
 			{
 				pCell->attack_cell(pTarget,dt); 
