@@ -128,6 +128,14 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
         ```make load PROJ=new_tumor_sample```
 
      loads your project from `new_tumor_sample`. In particular, it loads your `Makefile`, `main.cpp`, everything in `./config`, and everything in `./custom_modules`. 
+     
++ Extended `cell_interactions` to include a vector `immunogenicities`: for a cell, `immunogenicity[j]` is how immunogenic this cell is to the jth cell type. By default, these will all be set to 1. (See next point.) 
+
++ Updated the built-in "attack" model: 
+  $$\textrm{Probability cell } i \textrm{ attacks cell } j \textrm{ in } [t,t+\Delta t] = 
+  \textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t $$. 
+  
+  By setting $\textrm{immunogenicity}\_{ji} = 1$ as teh default value, we maintain compatibiltiy with prior models. This is a way to further modulate immunogenic and cytotoxic interactions. 
 
 + Migrated built-in sample projects to be compatible with the model builder GUI and the upcoming PhysiCell Studio, including: 
   + template
