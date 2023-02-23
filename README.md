@@ -133,6 +133,7 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
   + template
   + biorobots (updates spring constant from 0.05 to 0.5)
   + heterogeneity
+  + cancer biorobots (updates spring constant from 0.05 to 0.5)
 
 ### Minor new features and changes: 
 #### 1.11.0
@@ -147,6 +148,7 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 ### Bugfixes: 
 
 #### 1.11.0
++ Fixed bug in cancer biorobots project that mistakenly set max cancer cell proliferation rate to 0.000072 instead of 0.00072
 
 
 ### Notices for intended changes that may affect backwards compatibility:
