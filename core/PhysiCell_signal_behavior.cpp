@@ -200,9 +200,6 @@ void setup_signal_behavior_dictionaries( void )
 	// synonym 
 	signal_to_int["is dead"] = map_index; 
 
-
-
-
 	// total attack time 
 	map_index++; 
 	signal_to_int["total attack time"] = map_index; 
@@ -246,6 +243,19 @@ void setup_signal_behavior_dictionaries( void )
 	int_to_signal[map_index] = "necrotic"; 
 	// synonyms 
 	signal_to_int["is_necrotic"] = map_index; 
+
+	// immunogenicity to each cell type 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string temp =  "immunogenicity to " + pCD->name; 
+		signal_to_int[temp] = map_index; 
+		int_to_signal[map_index] = temp; 		
+				// synonyms 
+		std::string temp1 = "immunogenicity to cell type " + std::to_string( pCD->type ); 
+		signal_to_int[temp1] = map_index; 
+	}
 
 	/* add new signals above this line */
 
@@ -488,6 +498,20 @@ void setup_signal_behavior_dictionaries( void )
 	behavior_to_int["movable"] = map_index; 
 	behavior_to_int["is movable"] = map_index; 
 
+	// immunogenicity to each cell type 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string map_name =  "immunogenicity to " + pCD->name; 
+		behavior_to_int[map_name ] = map_index;
+		int_to_behavior[map_index] = map_name; 
+
+		// synonyms 
+		std::string temp1 = "immunogenicity to cell type " + std::to_string( pCD->type ); 
+		behavior_to_int[temp1] = map_index; 
+	}
+
 	/* add new behaviors above this line */
 
     // resize scales; 
@@ -707,6 +731,12 @@ std::vector<double> get_signals( Cell* pCell )
 	{ signals[necrotic_ind] = 1; }
 	else
 	{ signals[necrotic_ind] = 0; }
+
+	// vector of immunogenicity signals 
+	static int start_immunogenicity_ind = find_signal_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+    std::copy( pCell->phenotype.cell_interactions.immunogenicities.begin() , 
+	           pCell->phenotype.cell_interactions.immunogenicities.end(), 
+			   signals.begin()+start_immunogenicity_ind);  
 
     // rescale 
     signals /= signal_scales; 
@@ -955,6 +985,17 @@ double get_single_signal( Cell* pCell, int index )
 		{ return 0; }
 	}
 
+	static int start_immunogenicity_ind = find_signal_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+	static int max_immunogenicity_ind = start_immunogenicity_ind+n; 
+	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
+	{
+		int j = index - start_immunogenicity_ind; 
+		out = pCell->phenotype.cell_interactions.immunogenicities[j]; 
+		out /= signal_scales[index];
+		return out; 
+	}
+
+
 	// unknown after here !
 
 	std::cout << "Warning: Requested unknown signal number " << index << "!" << std::endl
@@ -1125,6 +1166,13 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 	{ pCell->is_movable = true; }
 	else
 	{ pCell->is_movable = false; }
+
+	// vector of immunogenicity signals 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+    std::copy( parameters.begin()+start_immunogenicity_ind , 
+			   parameters.begin()+start_immunogenicity_ind+n , 
+			   pCell->phenotype.cell_interactions.immunogenicities.begin() );  
+
 	return; 
 }
 
@@ -1284,6 +1332,11 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 		{ pCell->is_movable = false; }
 	}
 
+    // immunogenicity to each cell type 
+	static int first_immunogenicity_index = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+	if( index >= first_immunogenicity_index && index < first_immunogenicity_index + n )
+	{ pCell->phenotype.cell_interactions.immunogenicities[index-first_immunogenicity_index] = parameter ; return; } 
+
 	return; 
 }
 
@@ -1441,6 +1494,12 @@ std::vector<double> get_behaviors( Cell* pCell )
 	{ parameters[movable_ind] = 1; }
 	else
 	{ parameters[movable_ind] = 0; }
+
+	// vector of immunogenicity behaviors 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+    std::copy( pCell->phenotype.cell_interactions.immunogenicities.begin(),
+			   pCell->phenotype.cell_interactions.immunogenicities.end(), 
+			   parameters.begin()+start_immunogenicity_ind );  
 
 	return parameters; 
 }
@@ -1605,6 +1664,12 @@ double get_single_behavior( Cell* pCell , int index )
 		else
 		{ return 0.0; }
 	}
+
+	// vector of immunogenicity behaviors 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+	static int max_immunogenicity_ind = start_immunogenicity_ind + n; 
+	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
+	{ return pCell->phenotype.cell_interactions.immunogenicities[index-start_immunogenicity_ind]; }
 
 	return -1; 
 }
@@ -1794,6 +1859,13 @@ std::vector<double> get_base_behaviors( Cell* pCell )
 	else
 	{ parameters[movable_ind] = 0; }
 
+	// vector of immunogenicity behaviors 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+    std::copy( pCD->phenotype.cell_interactions.immunogenicities.begin(),
+			   pCD->phenotype.cell_interactions.immunogenicities.end(), 
+			   parameters.begin()+start_immunogenicity_ind );  
+
+
 	return parameters; 
 }
 
@@ -1954,11 +2026,17 @@ double get_single_base_behavior( Cell* pCell , int index )
 	static int movable_ind = find_behavior_index( "is_movable"); 
 	if( index == movable_ind )
 	{
-		if( pCell->is_movable == true )
+		if( pCD->is_movable == true )
 		{ return 1.0; }
 		else
 		{ return 0.0; }
 	}
+
+	// vector of immunogenicity behaviors 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+	static int max_immunogenicity_ind = start_immunogenicity_ind + n; 
+	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
+	{ return pCD->phenotype.cell_interactions.immunogenicities[index-start_immunogenicity_ind]; }
 
 	return -1; 
 }
