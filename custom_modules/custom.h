@@ -1,4 +1,4 @@
-	/*
+/*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -64,60 +64,44 @@
 #                                                                             #
 ###############################################################################
 */
- 
-#include <vector>
-#include <string>
 
-#ifndef __PhysiCell_basic_signaling__
-#define __PhysiCell_basic_signaling__
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-#include "./PhysiCell_constants.h" 
-#include "./PhysiCell_phenotype.h" 
-#include "./PhysiCell_cell.h" 
+using namespace BioFVM; 
+using namespace PhysiCell;
 
-namespace PhysiCell{
-	
-// std::vector<std::string> 
+// setup functions to help us along 
 
-double Hill_response_function( double s, double half_max , double hill_power ); // done
-// increases from 0 (at s_min) to 1 (at s_max)
-double linear_response_function( double s, double s_min , double s_max ); // done 
-// decreases from 1 (at s_min) to 0 (at s_max)
-double decreasing_linear_response_function( double s, double s_min , double s_max ); // done 
+void create_cell_types( void );
+void setup_tissue( void ); 
 
-double interpolate_behavior( double base_value , double max_value, double response ); 
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
 
-// signal increases/decreases parameter
-// options: hill power
-// options: half max
+// custom pathology coloring function 
 
-class Integrated_Signal
-{
- private:
- public: 
-	double base_activity; 
-	double max_activity; 
-	
-	std::vector<double> promoters; 
-	std::vector<double> promoter_weights; 
-	double promoters_Hill;
-	double promoters_half_max; 
-	
-	std::vector<double> inhibitors; 
-	std::vector<double> inhibitor_weights; 
-	double inhibitors_Hill;
-	double inhibitors_half_max; 
-	
-	Integrated_Signal();
-	void reset( void ); 
-	
-	void add_signal( char signal_type , double signal , double weight ); 
-	void add_signal( char signal_type , double signal );
+std::vector<std::string> my_coloring_function( Cell* );
 
-	double compute_signal( void );
-};
+// custom functions can go here 
 
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
-}; 
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
-#endif 
+// cancer cells
+void cancer_cell_phenotype( Cell* pCell, Phenotype& phenotype , double dt ); 
+
+// immune cells 
+void immune_cell_rule( Cell* pCell, Phenotype& phenotype , double dt ); 
+bool immune_cell_attempt_apoptosis( Cell* pAttacker, Cell* pTarget, double dt ); 
+bool immune_cell_trigger_apoptosis( Cell* pAttacker, Cell* pTarget ); 
+Cell* immune_cell_check_neighbors_for_attachment( Cell* pAttacker , double dt ); 
+bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt ); 
+
+// shared 
+void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt ); 
+
+bool read_microenvironment_from_matlab( std::string mat_filename ); 
+

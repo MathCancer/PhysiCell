@@ -1,16 +1,16 @@
 <PhysiCell_settings version="devel-version">
 
     <domain>
-        <x_min>-250</x_min>
-        <x_max>250</x_max>
-        <y_min>-250</y_min>
-        <y_max>250</y_max>
-        <z_min>-250</z_min>
-        <z_max>250</z_max>
+        <x_min>-750</x_min>
+        <x_max>750</x_max>
+        <y_min>-750</y_min>
+        <y_max>750</y_max>
+        <z_min>-10</z_min>
+        <z_max>10</z_max>
         <dx>20</dx>
         <dy>20</dy>
         <dz>20</dz>
-        <use_2D>false</use_2D>
+        <use_2D>true</use_2D>
     </domain>
 
     <overall>
@@ -365,7 +365,7 @@
                 </cell_transformations>
             </phenotype>
             <custom_data>
-                <oncoprotein conserved="false" units="dimensionless" description="">0</oncoprotein>
+                <oncoprotein conserved="false" units="dimensionless" description="">1.0</oncoprotein>
                 <elastic_coefficient conserved="false" units="" description="">0.01</elastic_coefficient>
                 <kill_rate conserved="false" units="" description="">0.06667</kill_rate>
                 <attachment_lifetime conserved="false" units="" description="">60</attachment_lifetime>

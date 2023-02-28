@@ -592,6 +592,9 @@ int find_signal_index( std::string signal_name )
 	// safety first! 
 	if( search != signal_to_int.end() )
     { return search->second; }   
+
+	std::cout << "having trouble finding " << signal_name << std::endl; 
+
     return -1; 
 }
 
