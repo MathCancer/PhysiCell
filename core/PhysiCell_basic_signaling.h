@@ -85,7 +85,7 @@ double linear_response_function( double s, double s_min , double s_max ); // don
 // decreases from 1 (at s_min) to 0 (at s_max)
 double decreasing_linear_response_function( double s, double s_min , double s_max ); // done 
 
-double interpolate_behavior( double base_value , double max_value, double response ); 
+double interpolate_behavior( double base_value , double max_changed_value, double response ); 
 
 // signal increases/decreases parameter
 // options: hill power

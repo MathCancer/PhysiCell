@@ -201,9 +201,9 @@ double decreasing_linear_response_function( double s, double s_min , double s_ma
 	return s; 
 }
 
-double interpolate_behavior( double base_value , double max_value, double response )
+double interpolate_behavior( double base_value , double max_changed_value, double response )
 {
-	double output = max_value; // bM
+	double output = max_changed_value; // bM
 	output -= base_value; // (bM-b0); 
 	output *= response; // R*(bM-b0); 
 	output += base_value; // b0 + (bM-b0)*R; 
