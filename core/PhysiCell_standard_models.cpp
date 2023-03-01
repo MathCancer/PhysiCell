@@ -545,12 +545,11 @@ void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double 
 	phenotype.volume.nuclear = phenotype.volume.nuclear_solid + phenotype.volume.nuclear_fluid; 
 	phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + phenotype.volume.cytoplasmic_fluid; 
 	
-	phenotype.volume.calcified_fraction = dt * phenotype.volume.calcification_rate 
+	phenotype.volume.calcified_fraction += dt * phenotype.volume.calcification_rate 
 		* (1- phenotype.volume.calcified_fraction);
    
 	phenotype.volume.total = phenotype.volume.cytoplasmic + phenotype.volume.nuclear; 
-	
-	
+		
 	phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
 		( 1e-16 + phenotype.volume.total ); 
    
