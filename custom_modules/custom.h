@@ -103,5 +103,5 @@ bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt 
 // shared 
 void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt ); 
 
-bool read_microenvironment_from_matlab( std::string mat_filename ); 
+// bool read_microenvironment_from_matlab( std::string mat_filename ); 
 

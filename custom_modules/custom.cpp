@@ -466,6 +466,7 @@ bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt 
 	return false; 
 }
 
+/*
 bool read_microenvironment_from_matlab( std::string mat_filename )
 {
 	std::cout << std::endl << "Attempting to load the microenvironment from " << mat_filename << " ... " << std::endl; 
@@ -509,6 +510,7 @@ bool read_microenvironment_from_matlab( std::string mat_filename )
 	std::cout << "done!" << std::endl << std::endl; 
 	return true; 
 }
+*/
 
 void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt )
 {

@@ -188,6 +188,10 @@ void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string file
 
 void save_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double current_simulation_time); 
 
+/* beta in PhysiCell 1.11.0 */
+
+bool read_microenvironment_from_matlab( std::string mat_filename ); 
+
 /* future / not yet supported */
 
 void read_BioFVM_from_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double& current_simulation_time , Microenvironment& M );

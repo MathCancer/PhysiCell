@@ -1,16 +1,16 @@
 <PhysiCell_settings version="devel-version">
 
     <domain>
-        <x_min>-250</x_min>
-        <x_max>250</x_max>
-        <y_min>-250</y_min>
-        <y_max>250</y_max>
-        <z_min>-250</z_min>
-        <z_max>250</z_max>
+        <x_min>-750</x_min>
+        <x_max>750</x_max>
+        <y_min>-750</y_min>
+        <y_max>750</y_max>
+        <z_min>-10</z_min>
+        <z_max>10</z_max>
         <dx>20</dx>
         <dy>20</dy>
         <dz>20</dz>
-        <use_2D>false</use_2D>
+        <use_2D>true</use_2D>
     </domain>
 
     <overall>
@@ -189,7 +189,7 @@
                         <net_export_rate units="total substrate/min">0</net_export_rate>
                     </substrate>
                     <substrate name="immunostimulatory factor">
-                        <secretion_rate units="1/min">10</secretion_rate>
+                        <secretion_rate units="1/min">0</secretion_rate>
                         <secretion_target units="substrate density">1</secretion_target>
                         <uptake_rate units="1/min">0.0</uptake_rate>
                         <net_export_rate units="total substrate/min">0.0</net_export_rate>
@@ -285,7 +285,7 @@
                 </volume>
                 <mechanics>
                     <cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
-                    <cell_cell_repulsion_strength units="micron/min">50</cell_cell_repulsion_strength>
+                    <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
                     <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
                         <cell_adhesion_affinity name="cancer cell">1.0</cell_adhesion_affinity>
@@ -327,7 +327,7 @@
                     <substrate name="oxygen">
                         <secretion_rate units="1/min">0</secretion_rate>
                         <secretion_target units="substrate density">38</secretion_target>
-                        <uptake_rate units="1/min">1</uptake_rate>
+                        <uptake_rate units="1/min">10</uptake_rate>
                         <net_export_rate units="total substrate/min">0</net_export_rate>
                     </substrate>
                     <substrate name="immunostimulatory factor">
@@ -365,7 +365,7 @@
                 </cell_transformations>
             </phenotype>
             <custom_data>
-                <oncoprotein conserved="false" units="dimensionless" description="">0</oncoprotein>
+                <oncoprotein conserved="false" units="dimensionless" description="">1.0</oncoprotein>
                 <elastic_coefficient conserved="false" units="" description="">0.01</elastic_coefficient>
                 <kill_rate conserved="false" units="" description="">0.06667</kill_rate>
                 <attachment_lifetime conserved="false" units="" description="">60</attachment_lifetime>
