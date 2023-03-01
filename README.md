@@ -150,8 +150,22 @@ A blog post and tutorial on the new signal and behavior dictionaries can be foun
 
 ### Beta features (not fully supported):
 #### 1.11.0
-+ None in this version. 
-  
++ Added `bool read_microenvironment_from_matlab( std::string mat_filename )` to `BioFVM_MultiCellDS`. This will read and overwrite from a stored microenvironment (in `mat_filename`, saved as a level 4 Matlab file) if it has the following format: 
+  + Number of columns = number of voxels (must match the size as configured in the `PhysiCell_settings.xml` file)
+  + Number of rows = 3 + 1 + number of diffusing substrates (must match the size and ordering as configured in the `PhysiCell_settings.xml` file)
+  + Row 0: x coordinate of each voxel
+  + Row 1: y coordinate of each voxel 
+  + Row 2: z coordinate of each voxel
+  + Row 3: volume of each voxel 
+  + Rows j to end: value of (j-4)th substrate in each voxel 
+  + Column ordering: 
+    * For each z from low to high:
+      * For each y from low to high: 
+        * for each x from low to high: 
+          store voxel X[i] , Y[j], Z[k]. 
+  + **Note:** This matches how PhysiCell saves the microenvironment. This will read any PhysiCell-saved microenvironment, so long as its sizes matches your current settings.  
+  + **Note:** This may be fragile. It has only minimal error-checking. 
+ 
 ### Bugfixes: 
 
 #### 1.11.0
