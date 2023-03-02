@@ -32,9 +32,9 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	std::map<std::string, double> mutations;
 	std::map<std::string, double> parameters;
 
-	std::vector<MaBoSSInput> listOfInputs;
+	std::map<std::string, MaBoSSInput> listOfInputs;
 	std::vector<int> indicesOfInputs;
-	std::vector<MaBoSSOutput> listOfOutputs;
+	std::map<std::string, MaBoSSOutput> listOfOutputs;
 	std::vector<int> indicesOfOutputs;
 	MaBoSSNetwork maboss;
 

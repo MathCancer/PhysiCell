@@ -50,12 +50,12 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		maboss.set_time_stochasticity(copy->time_stochasticity);
 		maboss.restart_node_values();
 		indicesOfInputs.clear();
-		for (MaBoSSInput& input: listOfInputs) {
-			indicesOfInputs.push_back(PhysiCell::find_signal_index(input.physicell_name));
+		for (const auto& input: listOfInputs) {
+			indicesOfInputs.push_back(PhysiCell::find_signal_index(input.second.physicell_name));
 		}
 		indicesOfOutputs.clear();
-		for (MaBoSSOutput& output: listOfOutputs) {
-			indicesOfOutputs.push_back(PhysiCell::find_behavior_index(output.physicell_name));
+		for (const auto& output: listOfOutputs) {
+			indicesOfOutputs.push_back(PhysiCell::find_behavior_index(output.second.physicell_name));
 		}
 		//maboss.set_state(copy->maboss.get_maboss_state());
 		//std::cout << get_state();
@@ -66,30 +66,33 @@ void MaBoSSIntracellular::update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenot
 {
 	std::vector<double> signals = PhysiCell::get_selected_signals(cell, indicesOfInputs);
 	
-	for (unsigned int i=0; i < listOfInputs.size(); i++) 
+	int i=0;
+	for (auto& input: listOfInputs) 
 	{
-		MaBoSSInput& input = listOfInputs[i];
-		if (input.isNode()) {
+		if (input.second.isNode()) {
 			maboss.set_node_value(
-				input.intracellular_name, 
-				input.updateNode(maboss.get_node_value(input.intracellular_name), signals[i])
+				input.first,
+				input.second.updateNode(maboss.get_node_value(input.second.intracellular_name), signals[i])
 			);
-		} else if (input.isParameter()) {
+		} else if (input.second.isParameter()) {
 			maboss.set_parameter_value(
-				input.intracellular_parameter,
-				input.updateParameter(signals[i])
+				input.first,
+				input.second.updateParameter(signals[i])
 			);
 		}
+		i++;
 	}
 }
 
 void MaBoSSIntracellular::update_outputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt)
 {
 	std::vector<double> signals = std::vector<double>(listOfOutputs.size(), 0.0);
-	for (unsigned int i=0; i < listOfOutputs.size(); i++) 
+	
+	int i=0;
+	for (auto& output: listOfOutputs) 
 	{
-		MaBoSSOutput& output = listOfOutputs[i];
-		signals[i] = output.update(maboss.get_node_value(output.intracellular_name));
+		signals[i] = output.second.update(maboss.get_node_value(output.second.intracellular_name));
+		i++;
 	}
 	PhysiCell::set_selected_behaviors(cell, indicesOfOutputs, signals);
 }
@@ -327,7 +330,7 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
 				);
 
-				listOfInputs.push_back(input);				
+				listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
 			} else {
 				
 				MaBoSSInput input = MaBoSSInput(
@@ -339,7 +342,7 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
 				);
 
-				listOfInputs.push_back(input);
+				listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
 
 			}
 
@@ -350,16 +353,17 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		while (node_output) 
 		{
 			pugi::xml_node settings = node_output.child("settings");
-	
-			listOfOutputs.push_back(MaBoSSOutput(
-				node_output.attribute( "physicell_name" ).value(),
+			std::string physicell_name = node_output.attribute( "physicell_name" ).value();
+			MaBoSSOutput output = MaBoSSOutput(
+				physicell_name,
 				node_output.attribute( "intracellular_name" ).value(),
 				PhysiCell::xml_get_my_string_value(settings.child("action")),
 				PhysiCell::xml_get_my_double_value(settings.child("value")),
 				(settings && settings.child( "base_value" ) ? PhysiCell::xml_get_my_double_value( settings.child( "base_value" )) : PhysiCell::xml_get_my_double_value(settings.child("value"))),
 				(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
-			));
+			);
 
+			listOfOutputs.insert(std::pair<std::string, MaBoSSOutput>(physicell_name, output));
 			node_output = node_output.next_sibling( "output" ); 	
 		}
 	}
@@ -392,15 +396,15 @@ void MaBoSSIntracellular::display(std::ostream& os)
 		<< "\t\t start_time = " << start_time << std::endl;
 
 	os	<< "\t\t " << listOfInputs.size() << " input mapping defined" << std::endl;
-	for (auto& input : listOfInputs)
-		os 	<< "\t\t\t" << input.physicell_name << " = " << input.intracellular_name
-			<< "(" << input.threshold << ", " << input.inact_threshold << ", " << input.smoothing << ")"
+	for (const auto& input : listOfInputs)
+		os 	<< "\t\t\t" << input.second.physicell_name << " = " << input.first
+			<< "(" << input.second.threshold << ", " << input.second.inact_threshold << ", " << input.second.smoothing << ")"
 			<< std::endl;
 
 	os	<< "\t\t " << listOfOutputs.size() << " output mapping defined" << std::endl;
-	for (auto& output : listOfOutputs)
-		os 	<< "\t\t\t" << output.physicell_name << " = " << output.intracellular_name 
-			<< "(" << output.value << ", " << output.base_value << ", " << output.smoothing << ")"
+	for (const auto& output : listOfOutputs)
+		os 	<< "\t\t\t" << output.first << " = " << output.second.intracellular_name 
+			<< "(" << output.second.value << ", " << output.second.base_value << ", " << output.second.smoothing << ")"
 			<< std::endl;
 	
 	std::cout << std::endl;
