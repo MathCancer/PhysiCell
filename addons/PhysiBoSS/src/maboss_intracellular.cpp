@@ -388,7 +388,8 @@ void MaBoSSIntracellular::display(std::ostream& os)
 		os << "\t\t\t" << mutation.first << " = " << mutation.second << std::endl;
 
 	os 	<< "\t\t scaling = " << scaling << std::endl
-		<< "\t\t time_stochasticity = " << time_stochasticity << std::endl;
+		<< "\t\t time_stochasticity = " << time_stochasticity << std::endl
+		<< "\t\t start_time = " << start_time << std::endl;
 
 	os	<< "\t\t " << listOfInputs.size() << " input mapping defined" << std::endl;
 	for (auto& input : listOfInputs)
