@@ -90,3 +90,13 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
+void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt ); 
+void fiber_custom_function( Cell* pCell, Phenotype& phenotype , double dt );
+void fiber_contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
+void rotating_migration_bias( Cell* pCell, Phenotype& phenotype , double dt );
+
+
+
+
+
+
