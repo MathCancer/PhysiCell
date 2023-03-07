@@ -203,6 +203,7 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
 { return; } 
 
+/*
 #include <cmath>
 struct Point {
     double x;
@@ -264,6 +265,7 @@ Point getAngularHarmonicForce_Monasse(Point A, Point B, Point C, double k, doubl
     return Point(F_a, F_b, F_c)
 
 }
+*/
 
 /*
  * import numpy as np

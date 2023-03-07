@@ -499,7 +499,7 @@ void vector3_to_list( const std::vector<double>& vect , char*& buffer , char del
 }
 
 // 
-double dot_product( std::vector<double> a , std::vector<dobule> b )
+double dot_product( std::vector<double> a , std::vector<double> b )
 {
 	double out = 0.0; 
 	for( unsigned int i=0 ; i < a.size() ; i++ )
@@ -516,3 +516,5 @@ std::vector<double> cross_product( std::vector<double> a , std::vector<double> b
 
 	return out; 
 } 
+
+};

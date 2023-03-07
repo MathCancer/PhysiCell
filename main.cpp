@@ -101,6 +101,33 @@ int main( int argc, char* argv[] )
 	}
 	if( !XML_status )
 	{ exit(-1); }
+
+/*
+	std::vector<double> iii = {1,0,0}; 
+	std::vector<double> jjj = {0,1,0}; 
+	std::vector<double> kkk = {0,0,1}; 
+
+	std::cout << dot_product( iii, iii ) << std::endl; 
+	std::cout << dot_product( jjj, jjj ) << std::endl; 
+	std::cout << dot_product( kkk, kkk ) << std::endl; 
+
+	std::cout << dot_product( iii, jjj ) << std::endl; 
+	std::cout << dot_product( jjj, kkk ) << std::endl; 
+	std::cout << dot_product( kkk, iii ) << std::endl; 
+
+
+	std::cout << cross_product( iii, jjj ) << std::endl; 
+	std::cout << cross_product( jjj, kkk ) << std::endl; 
+	std::cout << cross_product( kkk, iii ) << std::endl; 
+
+	std::cout << cross_product( jjj , iii ) << std::endl; 
+	std::cout << cross_product( kkk, jjj ) << std::endl; 
+	std::cout << cross_product( iii,kkk ) << std::endl; 
+
+	std::cout << "done" << std::endl;
+
+	exit(0); 
+*/
 	
 	// copy config file to output directry 
 	system( copy_command ); 
