@@ -55,10 +55,10 @@
             <initial_condition units="mmHg">0</initial_condition>
             <Dirichlet_boundary_condition units="mmHg" enabled="True">0</Dirichlet_boundary_condition>
             <Dirichlet_options>
-                <boundary_value ID="xmin" enabled="True">1</boundary_value>
-                <boundary_value ID="xmax" enabled="True">1</boundary_value>
-                <boundary_value ID="ymin" enabled="True">1</boundary_value>
-                <boundary_value ID="ymax" enabled="True">1</boundary_value>
+                <boundary_value ID="xmin" enabled="True">0.1</boundary_value>
+                <boundary_value ID="xmax" enabled="True">0.1</boundary_value>
+                <boundary_value ID="ymin" enabled="True">0.1</boundary_value>
+                <boundary_value ID="ymax" enabled="True">0.1</boundary_value>
                 <boundary_value ID="zmin" enabled="False">0</boundary_value>
                 <boundary_value ID="zmax" enabled="False">0</boundary_value>
             </Dirichlet_options>
@@ -197,7 +197,7 @@
     </cell_definitions>
 
     <initial_conditions>
-        <cell_positions type="csv" enabled="true">
+        <cell_positions type="csv" enabled="false">
             <folder>./config</folder>
             <filename>cells.csv</filename>
         </cell_positions>
@@ -205,6 +205,6 @@
 
     <user_parameters>
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
-        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">1500</number_of_cells>
+        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">500</number_of_cells>
     </user_parameters>
 </PhysiCell_settings>
