@@ -131,6 +131,10 @@ void create_cell_types( void )
     pCD->phenotype.mechanics.attachment_rate = .1; 
     pCD->phenotype.mechanics.detachment_rate = 0; 
 
+    pCD = find_cell_definition( "pusher"); 
+    if( pCD )
+    { pCD->functions.update_migration_bias = rotating_migration_bias;}
+
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -205,6 +209,14 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 {
     
     std::vector<std::string> out = paint_by_number_cell_coloring(pCell); 
+
+    if( pCell->type_name == "pusher" )
+    {
+        out[0] = "orange"; 
+        out[2] = "orange";
+        out[3] = "orange";
+        return out; 
+    }
     
     int n_attached= pCell->state.number_of_attached_cells(); 
 
@@ -218,6 +230,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
     { out[0] = "blue"; }
 
     out[2] = out[0]; 
+    out[3] = out[0]; 
 
     return out; 
 }
@@ -368,8 +381,9 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
     double detachment_probability = phenotype.mechanics.detachment_rate * dt; 
     for( int j=0; j < pCell->state.attached_cells.size(); j++ )
     {
+        Cell* pTest = pCell->state.attached_cells[j]; 
         if( UniformRandom() <= detachment_probability )
-        { detach_cells( pCell , pCell->state.attached_cells[j] ); }
+        { detach_cells( pCell , pTest ); }
     }
 
     // check if I have max number of attachments 
@@ -385,8 +399,12 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
         Cell* pTest = pCell->state.neighbors[j]; 
         if( pTest->state.number_of_attached_cells() < pTest->phenotype.mechanics.maximum_number_of_attachments )
         {
+            // double affinity = phenotype.mechanics.cell_adhesion_affinity[ pTest->type]; 
+            std::string search_string = "adhesive affinity to " + pTest->type_name; 
+            double affinity = get_single_behavior( pCell , search_string );
 
-            if( UniformRandom() <= attachment_probability )
+            double prob = attachment_probability * affinity; 
+            if( UniformRandom() <= prob )
             {
                 // attempt the attachment. testing for prior connection is already automated 
                 attach_cells( pCell, pTest ); 
@@ -475,9 +493,23 @@ void fiber_contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Pheno
 
 void rotating_migration_bias( Cell* pCell, Phenotype& phenotype , double dt )
 {
+    double t =  PhysiCell_globals.current_time; 
+    if( t > 200 && t < 400 )
+    {
+        set_single_behavior( pCell , "migration speed" , 0 ); 
+        set_single_behavior( pCell , "quorum factor secretion" , 10 ); 
+    }
+    else
+    {
+        double sp = get_single_base_behavior( pCell, "migration speed"); 
+        set_single_behavior( pCell , "migration speed" , sp ); 
+        set_single_behavior( pCell , "quorum factor secretion" , 0 );         
+    }
+
     double x = pCell->position[0]; 
     double y = pCell->position[1]; 
-    phenotype.motility.migration_bias_direction = { -y + 0.1*x , x + 0.1*y , 0} ; 
+    double radial = 0.0;
+    phenotype.motility.migration_bias_direction = { -y + radial*x , x + radial*y , 0} ; 
     normalize ( &(phenotype.motility.migration_bias_direction) );  
 
     return; 
