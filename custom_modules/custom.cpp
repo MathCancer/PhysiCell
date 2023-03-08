@@ -376,7 +376,11 @@ def getAngularHarmonicForce_Monasse(A, B, C, k, theta0):
 
 // std::vector<Point> getAngularHarmonicForce_Monasse(Point A, Point B, Point C, double k, double theta0); 
 
-/* This is from ... */
+/* Force calculation based on:
+	Monasse, Bernard, and Frédéric Boussinot. 
+    "Determination of forces from a potential in molecular dynamics." 
+    arXiv preprint arXiv:1401.1181 (2014).
+*/
 std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pCell , Phenotype& phenotype , double dt )
 {
     if( pCell->state.number_of_attached_cells() < 2 )
@@ -405,13 +409,14 @@ std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pC
 
 //    std::cout << BA << " " << BC << " " << CB <<  " " << BA_mag << " " << BC_mag << std::endl; 
 
-//  If BA and BC are colinear, take an arbitrary orthogonal vector
-    // https://math.stackexchange.com/q/3077100
     std::vector<double> BA_cross_BC = BioFVM::cross_product( BA, BC );
 
 //    std::cout << BA_cross_BC << std::endl; 
 
     std::vector<double> p_a, p_b, p_c;
+
+	// If BA and BC are colinear (cross product is 0 vector), 
+	// take an arbitrary orthogonal vector (see: https://math.stackexchange.com/q/3077100)
     if ( not (norm(BA_cross_BC) > 0)){
         std::vector<double> orthogonal_vector = {
             BA[1] + BA[2],
