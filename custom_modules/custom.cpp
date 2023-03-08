@@ -244,135 +244,61 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
 { return; } 
 
-/*
-#include <cmath>
-struct Point {
-    double x;
-    double y;
-    double z;
-    double dot(Point P){
-        return x*P.x + y*P.y + z*P.z;
-    }
-    double mag(){
-        return sqrt(this.dot(this))
-    }
-}
-Point cross(Point A, Point B){ // TODO
-    return Point(0.0, 0.0, 0.0) ;
-}
 
-Point getAngularHarmonicForce_Monasse(Point A, Point B, Point C, double k, double theta0){
+#include <cmath>
+typedef std::vector<double> Point;
+
+
+std::vector<Point> getAngularHarmonicForce_Monasse(Point A, Point B, Point C, double k, double theta0){
     Point BA = B - A;
     Point BC = B - C;
     Point CB = C - B;
 
-    double BA.mag(); 
-    double BC_mag = BC.mag();
+    double BA_mag = norm(BA); 
+    double BC_mag = norm(BC);
 
 //  If BA and BC are colinear, take an arbitrary orthogonal vector
     // https://math.stackexchange.com/q/3077100
-    Point BA_cross_BC = np.cross( BA, BC );
-    if ( not (BA_cross_BC > 0)){
+    Point BA_cross_BC =BioFVM::cross_product( BA, BC );
+    Point p_a, p_b, p_c;
+    if ( not (norm(BA_cross_BC) > 0)){
         Point orthogonal_vector = {
-            BA.y + BA.z,
-            BA.z - BA.x,
-            -BA.x - BA.y
-        };
-        Point p_a = cross( BA , orthogonal_vector );
-        p_a = p_a / p_a.mag();
-        Point p_c = cross( CB , orthogonal_vector );
-        p_c = p_c / p_c.mag();
+            BA[1] + BA[2],
+            BA[2] - BA[0],
+            -BA[0] - BA[1]
+            };
+        p_a = BioFVM::cross_product( BA , orthogonal_vector );
+        p_a = (1/ norm(p_a)) * p_a ;
+        p_c = BioFVM::cross_product( CB , orthogonal_vector );
+        p_c = (1/ norm(p_c))* p_c  ;
     }
     else{
-        Point p_a = cross( BA , BA_cross_BC );
-        p_a = p_a / p_a.mag();
-        Point p_c = cross( CB , BA_cross_BC );
-        p_c = p_c / p_c.mag();
+        p_a = BioFVM::cross_product( BA , BA_cross_BC );
+        p_a = (1/norm(p_a)) * p_a  ;
+        p_c = BioFVM::cross_product( CB , BA_cross_BC );
+        p_c = (1 / norm(p_c) ) * p_c ;
     }
 
     // rounding is necessary to avoid numerical errors 
     // when vectors are colinear the argument can be = 1.0000000000000002
     // which is outside of the range of np.arccos, defined for [-1, 1]
-    double costheta = BA.dot(BC) / BA_mag * BC_mag;
-    double theta = arccos(round(costheta))
+    double costheta = BioFVM::dot_product(BA,BC) / BA_mag * BC_mag;
+    double theta = acos(round(costheta));
 
-    double delta_theta = k*(theta - theta0)
+    double delta_theta = k*(theta - theta0);
 
-    double F_a = delta_theta/BA_mag * p_a 
-    double F_c = delta_theta/BC_mag * p_c 
+    Point F_a = (delta_theta/BA_mag) * p_a  ;
+    Point F_c = (delta_theta/BC_mag) * p_c ;
 
-    double F_b = -F_a - F_c
+    Point F_b = (-1.0)*F_a - F_c;
+    std::vector<Point> out;
+    out.push_back(F_a);
+    out.push_back(F_b);
+    out.push_back(F_c);
 
-    return Point(F_a, F_b, F_c)
+    return out;
 
 }
-*/
-
-/*
- * import numpy as np
-
-def getAngularHarmonicForce_Monasse(A, B, C, k, theta0):
-    """
-    Monasse, Bernard, and Frédéric Boussinot. 
-    "Determination of forces from a potential in molecular dynamics." 
-    arXiv preprint arXiv:1401.1181 (2014).
-    Returns the angular harmonic forces (F_a, F_b, F_c) in the bond
-    A--B--C
-    - A, B, and C are lists with coordinates of the points.
-    - k is the spring constant.
-    - theta0 the rest length of the bond in radians.
-    The forces on A, B, and C are calculated as:
-    
-    F_a = k*(theta - theta0) * p_a # was: F_a = ( -k*(theta - theta0) / |BA| ) * p_a
-    
-    F_c = k*(theta - theta0) * p_c # was: F_c = ( -k*(theta - theta0) / |BC| ) * p_c 
-    
-    F_b = -F_a - F_c
-    
-    - p_a is a unit vector in the ABC plane orthogonal to (BA)
-    - p_c is a unit vector in the ABC plane orthogonal to (CB)
-    - theta is the angle ABC in radians
-    """
-    A = np.array(A)
-    B = np.array(B)
-    C = np.array(C)
-
-    BA = B - A
-    BC = B - C
-    CB = C - B
-
-    BA_mag = mag(BA)   # |BA|
-    BC_mag = mag(BC)   # |BC|
-
-    # If BA and BC are colinear, take an arbitrary orthogonal vector
-    # https://math.stackexchange.com/q/3077100
-    BA_cross_BC = np.cross( BA, BC )
-    if mag(BA_cross_BC) == 0:
-        orthogonal_vector = np.array( [BA[1] + BA[2], BA[2] - BA[0], - BA[0] - BA[1]] )
-        p_a = np.cross( BA , orthogonal_vector )
-        p_a = p_a / mag(p_a)
-        p_c = np.cross( CB , orthogonal_vector )
-        p_c = p_c / mag(p_c)
-    else:
-        p_a = np.cross( BA , BA_cross_BC )
-        p_a = p_a / mag(p_a)
-        p_c = np.cross( CB , BA_cross_BC )
-        p_c = p_c / mag(p_c)
-
-    # rounding is necessary to avoid numerical errors 
-    # when vectors are colinear the argument can be = 1.0000000000000002
-    # which is outside of the range of np.arccos, defined for [-1, 1]
-    theta = np.arccos( round( BA.dot(BC) / ( BA_mag * BC_mag ), 10) )
-
-    delta_theta = k*(theta - theta0)
-
-    F_a = delta_theta/BA_mag * p_a 
-    F_c = delta_theta/BC_mag * p_c 
-
-    F_b = -F_a - F_c
-
-    return(F_a, F_b, F_c)
- */
 
 
 void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
