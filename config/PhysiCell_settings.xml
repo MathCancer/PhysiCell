@@ -23,7 +23,7 @@
     </overall>
 
     <parallel>
-        <omp_num_threads>6</omp_num_threads>
+        <omp_num_threads>1</omp_num_threads>
     </parallel>
 
     <save>
@@ -200,8 +200,8 @@
                 </cell_transformations>
             </phenotype>
             <custom_data>
-                <preferred_angle conserved="false" units="radians" description="">0</preferred_angle>
-                <angular_spring_constant conserved="false" units="none" description="">0.0</angular_spring_constant>
+                <preferred_angle conserved="false" units="radians" description="">0.7</preferred_angle>
+                <angular_spring_constant conserved="false" units="none" description="">1</angular_spring_constant>
             </custom_data>
         </cell_definition>
         <cell_definition name="pusher" ID="1">

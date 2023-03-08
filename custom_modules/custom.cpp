@@ -383,7 +383,7 @@ std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pC
     { std::cout << "bad move genius" << std::endl; exit(-1); }
 
     double theta0 = get_single_signal( pCell , "custom:preferred_angle" ); 
-    double k = get_single_base_behavior( pCell , "custom:angular_spring_constant" ); 
+    double k = get_single_signal( pCell , "custom:angular_spring_constant" ); 
     
     Cell* pLeft = pCell->state.attached_cells[0];
     Cell* pMiddle = pCell; 
@@ -393,16 +393,24 @@ std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pC
     std::vector<double> B = pMiddle->position;  
     std::vector<double> C = pRight->position;  
 
+//    std::cout << A << " " << B << " " << C << std::endl; 
+ //   std::cout << theta0 << " " << k << std::endl; 
+
     std::vector<double> BA = B-A; 
-    std::vector<double> BC = C-B;
+    std::vector<double> BC = B-C;
     std::vector<double> CB = C-B; 
 
     double BA_mag = norm(BA); 
     double BC_mag = norm(BC);
 
+//    std::cout << BA << " " << BC << " " << CB <<  " " << BA_mag << " " << BC_mag << std::endl; 
+
 //  If BA and BC are colinear, take an arbitrary orthogonal vector
     // https://math.stackexchange.com/q/3077100
     std::vector<double> BA_cross_BC = BioFVM::cross_product( BA, BC );
+
+//    std::cout << BA_cross_BC << std::endl; 
+
     std::vector<double> p_a, p_b, p_c;
     if ( not (norm(BA_cross_BC) > 0)){
         std::vector<double> orthogonal_vector = {
@@ -425,10 +433,17 @@ std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pC
     // rounding is necessary to avoid numerical errors 
     // when vectors are colinear the argument can be = 1.0000000000000002
     // which is outside of the range of np.arccos, defined for [-1, 1]
-    double costheta = BioFVM::dot_product(BA,BC) / BA_mag * BC_mag;
-    double theta = acos(round(costheta));
+    double costheta = BioFVM::dot_product(BA,BC) / ( BA_mag * BC_mag );
+    double theta = acos(costheta); // acos(round(costheta));
+    if( theta > 1 )
+    { theta = 1; }
+    if( theta < -1 )
+    { theta = -1; }
 
     double delta_theta = k*(theta - theta0);
+ //   std::cout << p_a << " " << p_c << std::endl; 
+ //   std::cout << costheta << " " << theta << " " << delta_theta << std::endl; 
+
 
     std::vector<double> F_a = (delta_theta/BA_mag) * p_a  ;
     std::vector<double> F_c = (delta_theta/BC_mag) * p_c ;
@@ -502,6 +517,12 @@ void fiber_custom_function( Cell* pCell, Phenotype& phenotype , double dt )
             pLeft->velocity += forces[0]; 
             pRight->velocity += forces[2]; 
         }
+    }
+
+    if( PhysiCell_globals.current_time > 200 )
+    {
+        set_single_behavior( pCell , "migration speed" , 0); 
+        return; 
     }
 
     // just test code from here on down. 
