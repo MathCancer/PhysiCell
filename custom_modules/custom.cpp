@@ -435,15 +435,16 @@ std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pC
         p_c = (1 / norm(p_c) ) * p_c ;
     }
 
-    // rounding is necessary to avoid numerical errors 
+    // Capping the value is necessary to avoid numerical errors 
     // when vectors are colinear the argument can be = 1.0000000000000002
-    // which is outside of the range of np.arccos, defined for [-1, 1]
+    // which is outside of the range of acos, defined for [-1, 1]
     double costheta = BioFVM::dot_product(BA,BC) / ( BA_mag * BC_mag );
+    if( costheta > 1 )
+    { costheta = 1; }
+    if( costheta < -1 )
+    { costheta = -1; }
+
     double theta = acos(costheta); // acos(round(costheta));
-    if( theta > 1 )
-    { theta = 1; }
-    if( theta < -1 )
-    { theta = -1; }
 
     double delta_theta = k*(theta - theta0);
  //   std::cout << p_a << " " << p_c << std::endl; 
