@@ -374,7 +374,7 @@ def getAngularHarmonicForce_Monasse(A, B, C, k, theta0):
     return(F_a, F_b, F_c)
  */
 
-std::vector<Point> getAngularHarmonicForce_Monasse(Point A, Point B, Point C, double k, double theta0); 
+// std::vector<Point> getAngularHarmonicForce_Monasse(Point A, Point B, Point C, double k, double theta0); 
 
 /* This is from ... */
 std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pCell , Phenotype& phenotype , double dt )
@@ -496,9 +496,12 @@ void fiber_custom_function( Cell* pCell, Phenotype& phenotype , double dt )
         Cell* pMiddle = pCell;
         Cell* pRight = pCell->state.attached_cells[1];
 
-        pLeft->velocity += forces[0]; 
         pMiddle->velocity += forces[1]; 
-        pRight->velocity += forces[2]; 
+        #pragma omp critical 
+        {
+            pLeft->velocity += forces[0]; 
+            pRight->velocity += forces[2]; 
+        }
     }
 
     // just test code from here on down. 

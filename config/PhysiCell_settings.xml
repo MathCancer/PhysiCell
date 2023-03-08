@@ -14,7 +14,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">600</max_time>
+        <max_time units="min">1200</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -131,7 +131,7 @@
                     <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
                         <cell_adhesion_affinity name="ECM">1</cell_adhesion_affinity>
-                        <cell_adhesion_affinity name="pusher">0.0</cell_adhesion_affinity>
+                        <cell_adhesion_affinity name="pusher">1.0</cell_adhesion_affinity>
                     </cell_adhesion_affinities>
                     <options>
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
@@ -201,7 +201,7 @@
             </phenotype>
             <custom_data>
                 <preferred_angle conserved="false" units="radians" description="">0</preferred_angle>
-                <angular_spring_constant conserved="false" units="none" description="">1</angular_spring_constant> 
+                <angular_spring_constant conserved="false" units="none" description="">0.0</angular_spring_constant>
             </custom_data>
         </cell_definition>
         <cell_definition name="pusher" ID="1">
@@ -329,7 +329,7 @@
             </phenotype>
             <custom_data>
                 <preferred_angle conserved="false" units="radians" description="">0</preferred_angle>
-                <angular_spring_constant conserved="false" units="none" description="">1</angular_spring_constant> 
+                <angular_spring_constant conserved="false" units="none" description="">1</angular_spring_constant>
             </custom_data>
         </cell_definition>
     </cell_definitions>
