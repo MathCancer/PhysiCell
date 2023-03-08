@@ -374,6 +374,74 @@ def getAngularHarmonicForce_Monasse(A, B, C, k, theta0):
     return(F_a, F_b, F_c)
  */
 
+std::vector<Point> getAngularHarmonicForce_Monasse(Point A, Point B, Point C, double k, double theta0); 
+
+/* This is from ... */
+std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pCell , Phenotype& phenotype , double dt )
+{
+    if( pCell->state.number_of_attached_cells() < 2 )
+    { std::cout << "bad move genius" << std::endl; exit(-1); }
+
+    double theta0 = get_single_signal( pCell , "custom:preferred_angle" ); 
+    double k = get_single_base_behavior( pCell , "custom:angular_spring_constant" ); 
+    
+    Cell* pLeft = pCell->state.attached_cells[0];
+    Cell* pMiddle = pCell; 
+    Cell* pRight = pCell->state.attached_cells[1]; 
+
+    std::vector<double> A = pLeft->position; 
+    std::vector<double> B = pMiddle->position;  
+    std::vector<double> C = pRight->position;  
+
+    std::vector<double> BA = B-A; 
+    std::vector<double> BC = C-B;
+    std::vector<double> CB = C-B; 
+
+    double BA_mag = norm(BA); 
+    double BC_mag = norm(BC);
+
+//  If BA and BC are colinear, take an arbitrary orthogonal vector
+    // https://math.stackexchange.com/q/3077100
+    std::vector<double> BA_cross_BC = BioFVM::cross_product( BA, BC );
+    std::vector<double> p_a, p_b, p_c;
+    if ( not (norm(BA_cross_BC) > 0)){
+        std::vector<double> orthogonal_vector = {
+            BA[1] + BA[2],
+            BA[2] - BA[0],
+            -BA[0] - BA[1]
+            };
+        p_a = BioFVM::cross_product( BA , orthogonal_vector );
+        p_a = (1/ norm(p_a)) * p_a ;
+        p_c = BioFVM::cross_product( CB , orthogonal_vector );
+        p_c = (1/ norm(p_c))* p_c  ;
+    }
+    else{
+        p_a = BioFVM::cross_product( BA , BA_cross_BC );
+        p_a = (1/norm(p_a)) * p_a  ;
+        p_c = BioFVM::cross_product( CB , BA_cross_BC );
+        p_c = (1 / norm(p_c) ) * p_c ;
+    }
+
+    // rounding is necessary to avoid numerical errors 
+    // when vectors are colinear the argument can be = 1.0000000000000002
+    // which is outside of the range of np.arccos, defined for [-1, 1]
+    double costheta = BioFVM::dot_product(BA,BC) / BA_mag * BC_mag;
+    double theta = acos(round(costheta));
+
+    double delta_theta = k*(theta - theta0);
+
+    std::vector<double> F_a = (delta_theta/BA_mag) * p_a  ;
+    std::vector<double> F_c = (delta_theta/BC_mag) * p_c ;
+    std::vector<double> F_b = (-1.0)*F_a - F_c;
+    std::vector< std::vector<double> > out;
+    out.push_back(F_a);
+    out.push_back(F_b);
+    out.push_back(F_c);
+
+    return out;
+}
+
+
 
 void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 {
@@ -420,6 +488,18 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 void fiber_custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 {
     dynamic_spring_attachments(pCell, phenotype, dt ); 
+
+    if( pCell->state.number_of_attached_cells() >= 2 )
+    {
+        std::vector< std::vector<double> > forces = compute_angular_force_contributions(pCell,phenotype,dt); 
+        Cell* pLeft = pCell->state.attached_cells[0];
+        Cell* pMiddle = pCell;
+        Cell* pRight = pCell->state.attached_cells[1];
+
+        pLeft->velocity += forces[0]; 
+        pMiddle->velocity += forces[1]; 
+        pRight->velocity += forces[2]; 
+    }
 
     // just test code from here on down. 
 

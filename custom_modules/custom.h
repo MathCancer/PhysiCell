@@ -95,6 +95,8 @@ void fiber_custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 void fiber_contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 void rotating_migration_bias( Cell* pCell, Phenotype& phenotype , double dt );
 
+std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pCell , Phenotype& phenotype , double dt ); 
+
 
 
 
