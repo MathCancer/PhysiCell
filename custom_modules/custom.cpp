@@ -389,9 +389,9 @@ def getAngularHarmonicForce_Monasse(A, B, C, k, theta0):
     - theta0 the rest length of the bond in radians.
     The forces on A, B, and C are calculated as:
     
-    F_a = k*(theta - theta0) * p_a # was: F_a = ( -k*(theta - theta0) / |BA| ) * p_a
+    F_a = k*(theta - theta0) * p_a
     
-    F_c = k*(theta - theta0) * p_c # was: F_c = ( -k*(theta - theta0) / |BC| ) * p_c 
+    F_c = k*(theta - theta0) * p_c
     
     F_b = -F_a - F_c
     
@@ -462,7 +462,7 @@ std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pC
     if( costheta < -1 )
     { costheta = -1; }
 
-    double theta = acos(costheta); // acos(round(costheta));
+    double theta = acos(costheta); 
 
     double delta_theta = k*(theta - theta0);
  //   std::cout << p_a << " " << p_c << std::endl; 
