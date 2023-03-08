@@ -380,6 +380,24 @@ def getAngularHarmonicForce_Monasse(A, B, C, k, theta0):
 	Monasse, Bernard, and Frédéric Boussinot. 
     "Determination of forces from a potential in molecular dynamics." 
     arXiv preprint arXiv:1401.1181 (2014).
+
+
+    Returns the angular harmonic forces (F_a, F_b, F_c) in the bond
+    A--B--C
+    - A, B, and C are lists with coordinates of the points.
+    - k is the spring constant.
+    - theta0 the rest length of the bond in radians.
+    The forces on A, B, and C are calculated as:
+    
+    F_a = k*(theta - theta0) * p_a # was: F_a = ( -k*(theta - theta0) / |BA| ) * p_a
+    
+    F_c = k*(theta - theta0) * p_c # was: F_c = ( -k*(theta - theta0) / |BC| ) * p_c 
+    
+    F_b = -F_a - F_c
+    
+    - p_a is a unit vector in the ABC plane orthogonal to (BA)
+    - p_c is a unit vector in the ABC plane orthogonal to (CB)
+    - theta is the angle ABC in radians
 */
 std::vector< std::vector<double> > compute_angular_force_contributions( Cell* pCell , Phenotype& phenotype , double dt )
 {
