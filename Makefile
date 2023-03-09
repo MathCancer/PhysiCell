@@ -222,16 +222,16 @@ FRAMERATE := 24
 OUTPUT := output
 
 jpeg: 
-	@magick identify -format "%h" $(OUTPUT)/initial.svg > __H.txt 
-	@magick identify -format "%w" $(OUTPUT)/initial.svg > __W.txt 
+	@magick identify -format "%h" $(OUTPUT)/initial.svg > __H.txt 2>/dev/null || identify -format "%h" $(OUTPUT)/initial.svg > __H.txt 2>/dev/null || echo "Error: ImageMagick was not found in the system."
+	@magick identify -format "%w" $(OUTPUT)/initial.svg > __W.txt 2>/dev/null || identify -format "%w" $(OUTPUT)/initial.svg > __W.txt 2>/dev/null || echo "Error: magick command failed"
 	@expr 2 \* \( $$(grep . __H.txt) / 2 \) > __H1.txt 
 	@expr 2 \* \( $$(grep . __W.txt) / 2 \) > __W1.txt 
 	@echo "$$(grep . __W1.txt)!x$$(grep . __H1.txt)!" > __resize.txt 
-	@magick mogrify -format jpg -resize $$(grep . __resize.txt) $(OUTPUT)/s*.svg
+	@magick mogrify -format jpg -resize $$(grep . __resize.txt) $(OUTPUT)/s*.svg 2>/dev/null || mogrify -format jpg -resize $$(grep . __resize.txt) $(OUTPUT)/s*.svg 2>/dev/null || echo "Error: magick command failed"
 	rm -f __H*.txt __W*.txt __resize.txt 
 	
 gif: 
-	magick convert $(OUTPUT)/s*.svg $(OUTPUT)/out.gif 
+	@magick convert $(OUTPUT)/s*.svg $(OUTPUT)/out.gif 2>/dev/null || convert $(OUTPUT)/s*.svg $(OUTPUT)/out.gif 2>/dev/null || echo "Error: magick command failed"
 	 
 movie:
 	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/out.mp4
