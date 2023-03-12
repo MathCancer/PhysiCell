@@ -150,10 +150,13 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + `maximum number of cell attachments` is the maximum number of spring links. 
   + `is_movable` can be set to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. This behavior right now is somewhat fragile if used dynmaically, but can reliably be used during tissue setup. 
 
-+ Added new standard model `void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt );`
-  This .. 
-
-
++ Added new standard model `void dynamic_attachments(Cell*, Phenotype& ,double);` This function can automate dynamic attachments and detachments. When calling this function for cell $i$: 
+  + For each current attachment, it detaches with probability $\textrm{detachment rate}\_i \Delta t$ 
+  + For each cell $j$ in the neighbors list, it forms an attachment with probability 
+    $$ \textrm{Prob attach } i \textrm{ to cell } j = \textrm{adhesion affinity}\_j \cdot \textrm{attachment rate}\_i \cdot \Delta t.$$
+    The attachment is only formed if both cell $i$ and $j$ have not exceeded their maximum number of 
+    attachments. 
+    
 ### Minor new features and changes: 
 #### 1.11.0
 + Added `is_movable` to the set of cell behaviors. Set this to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. This behaviro 
