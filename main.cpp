@@ -127,6 +127,10 @@ int main( int argc, char* argv[] )
 
 	/* Users typically start modifying here. START USERMODS */ 
 
+	// some testing here
+
+	exit(-1);
+
 	// named_vector_data m = read_matlab_with_names( "./config/m.mat" );
 
 	/* Users typically stop modifying here. END USERMODS */ 

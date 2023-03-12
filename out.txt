@@ -1,0 +1,174 @@
+Using config file ./config/PhysiCell_settings.xml ... 
+1
+dc? 1
+User parameters in XML config file: 
+Bool parameters:: 
+
+Int parameters:: 
+random_seed: 0 [dimensionless]
+number_of_cells: 5 [none]
+
+Double parameters:: 
+
+String parameters:: 
+
+
+which boundaries?
+1 1 1 1 1 1
+
+Microenvironment summary: microenvironment: 
+
+Mesh information: 
+type: uniform Cartesian
+Domain: [-750,750] micron x [-750,750] micron x [-10,10] micron
+   resolution: dx = 20 micron
+   voxels: 5625
+   voxel faces: 0
+   volume: 4.5e+07 cubic micron
+Densities: (2 total)
+   oxygen:
+     units: dimensionless
+     diffusion coefficient: 100000 micron^2 / min
+     decay rate: 0.1 min^-1
+     diffusion length scale: 1000 micron
+     initial condition: 38 dimensionless
+     boundary condition: 38 dimensionless (enabled: true)
+   immunostimulatory factor:
+     units: dimensionless
+     diffusion coefficient: 1000 micron^2 / min
+     decay rate: 0.016 min^-1
+     diffusion length scale: 250 micron
+     initial condition: 0 dimensionless
+     boundary condition: 0 dimensionless (enabled: false)
+
+virtual_wall_at_domain_edge: enabled
+Pre-processing type 0 named cancer cell
+Pre-processing type 1 named immune cell
+Processing cancer cell ... 
+Note: setting cell definition to 2D based on microenvironment domain settings ... 
+  --------- attachment_elastic_constant = 0.01
+Warning: When processing the cancer cell cell definition: 
+	Could not find cell type default for phagocytosis.
+	Ignoring this live phagocytosis rate!
+
+Warning: When processing the cancer cell cell definition: 
+	Could not find cell type default for cell attack.
+	Ignoring this cell attack rate!
+
+Warning: When processing the cancer cell cell definition: 
+	Could not find cell type default for cell fusion.
+	Ignoring this cell fusion rate!
+
+Warning: When processing the cancer cell cell definition: 
+	Could not find cell type default for cell transformation.
+	Ignoring this cell transformation rate!
+
+Processing immune cell ... 
+	Copying from type cancer cell ... 
+Note: setting cell definition to 2D based on microenvironment domain settings ... 
+copying data ... 
+cancer cell to immune cell
+  --------- attachment_elastic_constant = 0.01
+Cells of type immune cell use standard chemotaxis: 
+	 d_bias (before normalization) = 1 * grad(immunostimulatory factor)
+Warning: When processing the immune cell cell definition: 
+	Could not find cell type default for phagocytosis.
+	Ignoring this live phagocytosis rate!
+
+Warning: When processing the immune cell cell definition: 
+	Could not find cell type default for cell attack.
+	Ignoring this cell attack rate!
+
+Warning: When processing the immune cell cell definition: 
+	Could not find cell type default for cell fusion.
+	Ignoring this cell fusion rate!
+
+Warning: When processing the immune cell cell definition: 
+	Could not find cell type default for cell transformation.
+	Ignoring this cell transformation rate!
+
+Signals: 
+=======
+0 : oxygen
+1 : immunostimulatory factor
+2 : intracellular oxygen
+3 : intracellular immunostimulatory factor
+4 : oxygen gradient
+5 : immunostimulatory factor gradient
+6 : pressure
+7 : volume
+8 : contact with cancer cell
+9 : contact with immune cell
+10 : contact with live cell
+11 : contact with dead cell
+12 : contact with basement membrane
+13 : damage
+14 : dead
+15 : total attack time
+16 : time
+17 : custom:oncoprotein
+18 : custom:elastic_coefficient
+19 : custom:kill_rate
+20 : custom:attachment_lifetime
+21 : custom:attachment_rate
+22 : custom:oncoprotein_saturation
+23 : custom:oncoprotein_threshold
+24 : custom:max_attachment_distance
+25 : custom:min_attachment_distance
+26 : apoptotic
+27 : necrotic
+
+
+Behaviors: 
+=========
+0 : oxygen secretion
+1 : immunostimulatory factor secretion
+2 : oxygen secretion target
+3 : immunostimulatory factor secretion target
+4 : oxygen uptake
+5 : immunostimulatory factor uptake
+6 : oxygen export
+7 : immunostimulatory factor export
+8 : cycle entry
+9 : exit from cycle phase 1
+10 : exit from cycle phase 2
+11 : exit from cycle phase 3
+12 : exit from cycle phase 4
+13 : exit from cycle phase 5
+14 : apoptosis
+15 : necrosis
+16 : migration speed
+17 : migration bias
+18 : migration persistence time
+19 : chemotactic response to oxygen
+20 : chemotactic response to immunostimulatory factor
+21 : cell-cell adhesion
+22 : cell-cell adhesion elastic constant
+23 : adhesive affinity to cancer cell
+24 : adhesive affinity to immune cell
+25 : relative maximum adhesion distance
+26 : cell-cell repulsion
+27 : cell-BM adhesion
+28 : cell-BM repulsion
+29 : phagocytose dead cell
+30 : phagocytose cancer cell
+31 : phagocytose immune cell
+32 : attack cancer cell
+33 : attack immune cell
+34 : fuse to cancer cell
+35 : fuse to immune cell
+36 : transform to cancer cell
+37 : transform to immune cell
+38 : custom:oncoprotein
+39 : custom:elastic_coefficient
+40 : custom:kill_rate
+41 : custom:attachment_lifetime
+42 : custom:attachment_rate
+43 : custom:oncoprotein_saturation
+44 : custom:oncoprotein_threshold
+45 : custom:max_attachment_distance
+46 : custom:min_attachment_distance
+47 : is_movable
+
+
+Warning! Cell_Definition for cargo cell not found!

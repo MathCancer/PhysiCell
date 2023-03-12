@@ -172,6 +172,8 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 
 + Fixed calcification bug reported in issue [133](https://github.com/MathCancer/PhysiCell/issues/133). Thank you, @JulianoGianlupi! 
 
++ Fixed typo in cell signals that used `contact with dead dell` instead of `contact with dead cell`
+
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
 

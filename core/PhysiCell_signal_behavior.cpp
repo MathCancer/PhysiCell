@@ -1628,7 +1628,7 @@ double get_single_behavior( Cell* pCell , int index )
 	{ return pCell->phenotype.mechanics.cell_BM_repulsion_strength; }
 
 	// dead cell phagocytosis
-	static int dead_phag_index = find_behavior_index("phagocytose dead dell" ); 
+	static int dead_phag_index = find_behavior_index("phagocytose dead cell" ); 
 	if( index == dead_phag_index )
 	{ return pCell->phenotype.cell_interactions.dead_phagocytosis_rate; }
 
@@ -1995,7 +1995,7 @@ double get_single_base_behavior( Cell* pCell , int index )
 	{ return pCD->phenotype.mechanics.cell_BM_repulsion_strength; }
 
 	// dead cell phagocytosis
-	static int dead_phag_index = find_behavior_index("phagocytose dead dell" ); 
+	static int dead_phag_index = find_behavior_index("phagocytose dead cell" ); 
 	if( index == dead_phag_index )
 	{ return pCD->phenotype.cell_interactions.dead_phagocytosis_rate; }
 
