@@ -1199,17 +1199,17 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 			   parameters.begin()+start_immunogenicity_ind+n , 
 			   pCell->phenotype.cell_interactions.immunogenicities.begin() );  
 
-
 	// set cell attachment rate  
 	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
 	pCell->phenotype.mechanics.attachment_rate = parameters[attachment_rate_ind];
 
 	// set cell detachment rate  
-	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
-	pCell->phenotype.mechanics.attachment_rate = parameters[attachment_rate_ind];
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	pCell->phenotype.mechanics.detachment_rate = parameters[detachment_rate_ind];
 
-
-
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	pCell->phenotype.mechanics.maximum_number_of_attachments = parameters[max_attachments_ind];
 
 	return; 
 }
@@ -1375,6 +1375,22 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	if( index >= first_immunogenicity_index && index < first_immunogenicity_index + n )
 	{ pCell->phenotype.cell_interactions.immunogenicities[index-first_immunogenicity_index] = parameter ; return; } 
 
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	if( index == attachment_rate_ind )
+	{ pCell->phenotype.mechanics.attachment_rate = parameter; }
+
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	if( index == detachment_rate_ind )
+	{ pCell->phenotype.mechanics.detachment_rate = parameter; }
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	if( index == max_attachments_ind )
+	{ pCell->phenotype.mechanics.maximum_number_of_attachments = parameter; }
+
 	return; 
 }
 
@@ -1538,6 +1554,18 @@ std::vector<double> get_behaviors( Cell* pCell )
     std::copy( pCell->phenotype.cell_interactions.immunogenicities.begin(),
 			   pCell->phenotype.cell_interactions.immunogenicities.end(), 
 			   parameters.begin()+start_immunogenicity_ind );  
+
+	// get cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	parameters[attachment_rate_ind] = pCell->phenotype.mechanics.attachment_rate; 
+
+	// get cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	parameters[detachment_rate_ind] = pCell->phenotype.mechanics.detachment_rate; 
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	parameters[max_attachments_ind] = pCell->phenotype.mechanics.maximum_number_of_attachments; 
 
 	return parameters; 
 }
@@ -1708,6 +1736,22 @@ double get_single_behavior( Cell* pCell , int index )
 	static int max_immunogenicity_ind = start_immunogenicity_ind + n; 
 	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
 	{ return pCell->phenotype.cell_interactions.immunogenicities[index-start_immunogenicity_ind]; }
+
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	if( index == attachment_rate_ind )
+	return pCell->phenotype.mechanics.attachment_rate; 
+	
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	if( index == detachment_rate_ind )
+	{ return pCell->phenotype.mechanics.detachment_rate; }
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	if( index == max_attachments_ind )
+	{ return pCell->phenotype.mechanics.maximum_number_of_attachments; }
 
 	return -1; 
 }
@@ -1904,6 +1948,18 @@ std::vector<double> get_base_behaviors( Cell* pCell )
 			   parameters.begin()+start_immunogenicity_ind );  
 
 
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	parameters[attachment_rate_ind] = pCD->phenotype.mechanics.attachment_rate; 
+
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	parameters[detachment_rate_ind] = pCD->phenotype.mechanics.detachment_rate; 
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	parameters[max_attachments_ind] = pCD->phenotype.mechanics.maximum_number_of_attachments; 
+
 	return parameters; 
 }
 
@@ -2075,6 +2131,22 @@ double get_single_base_behavior( Cell* pCell , int index )
 	static int max_immunogenicity_ind = start_immunogenicity_ind + n; 
 	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
 	{ return pCD->phenotype.cell_interactions.immunogenicities[index-start_immunogenicity_ind]; }
+
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	if( index == attachment_rate_ind )
+	{ return pCD->phenotype.mechanics.attachment_rate; }
+
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	if( index == detachment_rate_ind )
+	{ return pCD->phenotype.mechanics.detachment_rate; }
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	if( index == max_attachments_ind )
+	{ return pCD->phenotype.mechanics.maximum_number_of_attachments; }
 
 	return -1; 
 }
