@@ -90,3 +90,4 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
+void cancer_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt ); 

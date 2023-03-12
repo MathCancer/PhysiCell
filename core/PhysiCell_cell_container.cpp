@@ -241,6 +241,30 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{ pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
 
+		// new March 2023: 
+		// dynamic spring attachments, followed by built-in springs
+
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			dynamic_spring_attachments(pC,pC->phenotype,time_since_last_mechanics); 
+		}		
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->is_movable )
+			{
+				for( int j=0; j < pC->state.spring_attachments.size(); j++ )
+				{
+					Cell* pC1 = pC->state.spring_attachments[j]; 
+					standard_elastic_contact_function_confluent_rest_length(pC,pC->phenotype,pC1,pC1->phenotype,time_since_last_mechanics);  
+					// standard_elastic_contact_function(pC,pC->phenotype,pC1,pC1->phenotype,time_since_last_mechanics);  
+				}
+			}
+		}	
+
 		// new March 2022: 
 		// run standard interactions (phagocytosis, attack, fusion) here 
 		#pragma omp parallel for 

@@ -127,6 +127,7 @@ int main( int argc, char* argv[] )
 	
 	setup_tissue();
 
+
 	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
@@ -141,11 +142,14 @@ int main( int argc, char* argv[] )
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
-	
+
+
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
 
 	PhysiCell_SVG_options.length_bar = 200; 
+
+
 
 	// for simplicity, set a pathology coloring function 
 	
@@ -158,6 +162,8 @@ int main( int argc, char* argv[] )
 	create_plot_legend( filename , cell_coloring_function ); 
 	
 	display_citations(); 
+
+
 	
 	// set the performance timers 
 

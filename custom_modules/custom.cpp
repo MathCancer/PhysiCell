@@ -120,6 +120,21 @@ void create_cell_types( void )
 	cell_defaults.functions.update_phenotype = phenotype_function; 
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
+
+	Cell_Definition* pCD = find_cell_definition( "cancer"); 
+	pCD->phenotype.mechanics.maximum_number_of_attachments = 6; 
+	pCD->phenotype.mechanics.attachment_elastic_constant = 0.002; // 0.00142; // 0.1; // 0.00142; // 0.1;  
+	pCD->phenotype.mechanics.attachment_rate = 1;  
+	pCD->phenotype.mechanics.detachment_rate = 0.01; 
+	pCD->functions.update_phenotype = cancer_phenotype_function; 
+	
+	pCD = find_cell_definition( "BM"); 
+	pCD->phenotype.mechanics.maximum_number_of_attachments = 6; 
+	pCD->phenotype.mechanics.attachment_elastic_constant = 1; // 0.0142; // 100; // 0.0142 ; // 1;  
+	pCD->phenotype.mechanics.attachment_rate = 1;  
+	pCD->phenotype.mechanics.detachment_rate = 0; 
+	
+	
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -187,15 +202,74 @@ void setup_tissue( void )
 	
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
+
+	for( int n=0; n < (*all_cells).size() ; n++ )
+	{
+		Cell* pC = (*all_cells)[n]; 
+		if( fabs( pC->position[0]) > 450 )
+		{ set_single_behavior( pC, "is movable" , 0); }
+
+	}
 	
 	return; 
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{ return paint_by_number_cell_coloring(pCell); }
+{ 
+	std::vector<std::string> out = { "black" , "black" , "black" , "black"};
+
+	int n_springs = pCell->state.spring_attachments.size(); 
+	if( pCell->type_name != "BM" )
+	{
+		if( n_springs == 0 )
+		{ out[0] = "grey"; }
+		if( n_springs == 1 )
+		{ out[0] = "indigo"; }
+		if( n_springs == 2 )
+		{ out[0] = "blue"; }
+		if( n_springs == 3 )
+		{ out[0] = "green"; }
+		if( n_springs == 4 )
+		{ out[0] = "yellow"; }
+		if( n_springs == 5 )
+		{ out[0] = "orange"; }
+		if( n_springs == 6 )
+		{ out[0] = "red"; }
+		if( n_springs > 6 )
+		{ out[0] = "magenta"; }
+	}
+
+	out[2] = out[0];
+	out[3] = out[0];
+
+	// std::vector<std::string> out = paint_by_number_cell_coloring(pCell); 
+	return out; 
+}
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
-{ return; }
+{
+	
+	 return;	 
+}
+
+void cancer_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	if( get_single_signal(pCell,"dead") > 0.5 )
+	{ return; }
+
+	double b = get_single_base_behavior( pCell , "cycle entry" ); 
+	if( get_single_signal( pCell , "pressure") > 0.75 )
+	{ b = 0; }
+	set_single_behavior( pCell , "cycle entry" , b ); 	
+
+	if( get_single_signal(pCell,"time") > 10000 )
+	{
+		set_single_behavior(pCell,"apoptosis",9e99); 
+		set_single_behavior(pCell,"cell detachment rate",9e9); 
+	}
+	return;	 
+}
+
 
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 { return; } 

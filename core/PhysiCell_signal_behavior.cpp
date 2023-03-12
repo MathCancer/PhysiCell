@@ -1209,7 +1209,7 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 
 	// maximum number of cell attachments 
 	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
-	pCell->phenotype.mechanics.maximum_number_of_attachments = parameters[max_attachments_ind];
+	pCell->phenotype.mechanics.maximum_number_of_attachments = (int) parameters[max_attachments_ind];
 
 	return; 
 }
@@ -1389,7 +1389,7 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	// maximum number of cell attachments 
 	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
 	if( index == max_attachments_ind )
-	{ pCell->phenotype.mechanics.maximum_number_of_attachments = parameter; }
+	{ pCell->phenotype.mechanics.maximum_number_of_attachments = (int) parameter; }
 
 	return; 
 }
