@@ -121,11 +121,17 @@ int main( int argc, char* argv[] )
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
-	/* Users typically start modifying here. START USERMODS */ 
-	
 	create_cell_types();
 	
 	setup_tissue();
+
+	/* Users typically start modifying here. START USERMODS */ 
+
+	// some testing here
+
+	exit(-1);
+
+	// named_vector_data m = read_matlab_with_names( "./config/m.mat" );
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	

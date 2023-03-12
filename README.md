@@ -139,10 +139,20 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + heterogeneity
   + cancer biorobots (updates spring constant from 0.05 to 0.5)
 
++ Added new signals: 
+  + `apoptotic` returns 1 if a cell is apoptotic, and 0 otherwise 
+  + `necrotic` returns 1 if a cell is necrotic, and 0 otherwise 
+
++ Added new behaviors: 
+  + `immunogenicity to [cell type]` is the cell's immunogenicity to a specific cell type. The probability that cell `i` attacks cell `j` in $[t,t+\Delta t]$ is $\textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t.$
+  + `cell attachment rate` is the rate at which the cell forms spring links with other cells. 
+  + `cell detachment rate` is the rate at which spring links break. 
+  + `maximum number of cell attachments` is the maximum number of spring links. 
+  + `is_movable` can be set to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. This behavior right now is somewhat fragile if used dynmaically, but can reliably be used during tissue setup. 
+
 ### Minor new features and changes: 
 #### 1.11.0
-+ New `apoptotic` and `necrotic` cell signals are available for use in simulation rules. 
-+ Added `is_movable` to the set of cell behaviors. Set this to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. 
++ Added `is_movable` to the set of cell behaviors. Set this to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. This behaviro 
 
 
 ### Beta features (not fully supported):
@@ -173,6 +183,8 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Fixed calcification bug reported in issue [133](https://github.com/MathCancer/PhysiCell/issues/133). Thank you, @JulianoGianlupi! 
 
 + Fixed typo in cell signals that used `contact with dead dell` instead of `contact with dead cell`
+
++ Changed default full data output to 60 minutes (to match the SVG output interval) for better compatibility with the model builder GUI. 
 
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 

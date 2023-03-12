@@ -244,6 +244,7 @@ void setup_signal_behavior_dictionaries( void )
 	// synonyms 
 	signal_to_int["is_necrotic"] = map_index; 
 
+/*
 	// immunogenicity to each cell type 
 	for( int i=0; i < n ; i++ )
 	{
@@ -256,6 +257,9 @@ void setup_signal_behavior_dictionaries( void )
 		std::string temp1 = "immunogenicity to cell type " + std::to_string( pCD->type ); 
 		signal_to_int[temp1] = map_index; 
 	}
+*/
+
+
 
 	/* add new signals above this line */
 
@@ -512,6 +516,21 @@ void setup_signal_behavior_dictionaries( void )
 		behavior_to_int[temp1] = map_index; 
 	}
 
+	map_index++; 
+	map_name = "cell attachment rate";
+	behavior_to_int[map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "cell detachment rate";
+	behavior_to_int[map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "maximum number of cell attachments";
+	behavior_to_int[map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
 	/* add new behaviors above this line */
 
     // resize scales; 
@@ -735,11 +754,13 @@ std::vector<double> get_signals( Cell* pCell )
 	else
 	{ signals[necrotic_ind] = 0; }
 
+/*
 	// vector of immunogenicity signals 
 	static int start_immunogenicity_ind = find_signal_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
     std::copy( pCell->phenotype.cell_interactions.immunogenicities.begin() , 
 	           pCell->phenotype.cell_interactions.immunogenicities.end(), 
 			   signals.begin()+start_immunogenicity_ind);  
+*/
 
     // rescale 
     signals /= signal_scales; 
@@ -988,6 +1009,7 @@ double get_single_signal( Cell* pCell, int index )
 		{ return 0; }
 	}
 
+/*
 	static int start_immunogenicity_ind = find_signal_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
 	static int max_immunogenicity_ind = start_immunogenicity_ind+n; 
 	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
@@ -997,6 +1019,7 @@ double get_single_signal( Cell* pCell, int index )
 		out /= signal_scales[index];
 		return out; 
 	}
+*/
 
 
 	// unknown after here !
@@ -1175,6 +1198,18 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
     std::copy( parameters.begin()+start_immunogenicity_ind , 
 			   parameters.begin()+start_immunogenicity_ind+n , 
 			   pCell->phenotype.cell_interactions.immunogenicities.begin() );  
+
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	pCell->phenotype.mechanics.attachment_rate = parameters[attachment_rate_ind];
+
+	// set cell detachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	pCell->phenotype.mechanics.attachment_rate = parameters[attachment_rate_ind];
+
+
+
 
 	return; 
 }

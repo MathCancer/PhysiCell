@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := project
+PROGRAM_NAME := cancer_immune_3D
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name

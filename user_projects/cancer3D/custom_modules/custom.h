@@ -90,3 +90,18 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
+// cancer cells
+void cancer_cell_phenotype( Cell* pCell, Phenotype& phenotype , double dt ); 
+
+// immune cells 
+void immune_cell_rule( Cell* pCell, Phenotype& phenotype , double dt ); 
+bool immune_cell_attempt_apoptosis( Cell* pAttacker, Cell* pTarget, double dt ); 
+bool immune_cell_trigger_apoptosis( Cell* pAttacker, Cell* pTarget ); 
+Cell* immune_cell_check_neighbors_for_attachment( Cell* pAttacker , double dt ); 
+bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt ); 
+
+// shared 
+void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt ); 
+
+// bool read_microenvironment_from_matlab( std::string mat_filename ); 
+
