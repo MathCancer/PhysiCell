@@ -146,6 +146,7 @@ void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt
 void advanced_chemotaxis_function_normalized( Cell* pCell, Phenotype& phenotype , double dt ); 
 void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
 
+void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt ); 
 
 	
 };
