@@ -1236,7 +1236,6 @@ void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt
 	
 }
 
-
 void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 {
     // check for detachments 
@@ -1261,9 +1260,9 @@ void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt )
         Cell* pTest = pCell->state.neighbors[j]; 
         if( pTest->state.number_of_attached_cells() < pTest->phenotype.mechanics.maximum_number_of_attachments )
         {
-            // double affinity = phenotype.mechanics.cell_adhesion_affinity[ pTest->type]; 
-            std::string search_string = "adhesive affinity to " + pTest->type_name; 
-            double affinity = get_single_behavior( pCell , search_string );
+            // std::string search_string = "adhesive affinity to " + pTest->type_name; 
+            // double affinity = get_single_behavior( pCell , search_string );
+			double affinity = phenotype.mechanics.cell_adhesion_affinity(pTest->type_name); 
 
             double prob = attachment_probability * affinity; 
             if( UniformRandom() <= prob )
