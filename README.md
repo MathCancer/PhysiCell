@@ -129,8 +129,7 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Extended `cell_interactions` to include a vector `immunogenicities`: for a cell, `immunogenicity[j]` is how immunogenic this cell is to the jth cell type. By default, these will all be set to 1. (See next point.) 
 
 + Updated the built-in "attack" model: 
-  $$\textrm{Probability cell } i \textrm{ attacks cell } j \textrm{ in } [t,t+\Delta t] = \textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t $$. 
-  
+  $$\textrm{Probability cell } i \textrm{ attacks cell } j \textrm{ in } [t,t+\Delta t] = \textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t $$ 
   By setting $\textrm{immunogenicity}\_{ji} = 1$ as teh default value, we maintain compatibiltiy with prior models. This is a way to further modulate immunogenic and cytotoxic interactions. 
 
 + Migrated built-in sample projects to be compatible with the model builder GUI and the upcoming PhysiCell Studio, including: 
@@ -153,7 +152,9 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Added new standard model `void dynamic_attachments(Cell*, Phenotype& ,double);` This function can automate dynamic attachments and detachments. When calling this function for cell $i$: 
   + For each current attachment, it detaches with probability $\textrm{detachment rate}\_i \Delta t$ 
   + For each cell $j$ in the neighbors list, it forms an attachment with probability 
-    $$ \textrm{Prob attach } i \textrm{ to cell } j = \textrm{adhesion affinity}\_j \cdot \textrm{attachment rate}\_i \cdot \Delta t.$$
+  
+    $$\textrm{Prob attach } i \textrm{ to cell } j = \textrm{adhesion affinity}\_j \cdot \textrm{attachment rate}\_i \cdot \Delta t.$$
+    
     The attachment is only formed if both cell $i$ and $j$ have not exceeded their maximum number of 
     attachments. 
     
