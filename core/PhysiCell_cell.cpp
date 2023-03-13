@@ -1057,6 +1057,9 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->functions = cd.functions; 
 	
 	pNew->phenotype = cd.phenotype; 
+	if (pNew->phenotype.intracellular)
+		pNew->phenotype.intracellular->start();
+
 	pNew->is_movable = cd.is_movable; //  true;
 	pNew->is_out_of_domain = false;
 	pNew->displacement.resize(3,0.0); // state? 
