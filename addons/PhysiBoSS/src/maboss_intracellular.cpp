@@ -338,6 +338,7 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		{
 			pugi::xml_node settings = node_input.child("settings");
 
+			std::cout << "Input found : intracellular = " << node_input.attribute("intracellular_name").value() << ", physicell = " << node_input.attribute("physicell_name").value() << std::endl;
 			std::string intracellular_name = node_input.attribute( "intracellular_name" ).value();
 			if (intracellular_name[0] == '$') {
 
@@ -348,7 +349,11 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
 				);
 
-				listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
+				// This construct is a trick to avoid making inputs and outputs constructible and assignable, or using c++17 insert_or_assign
+				// Using the same construct below
+				auto const res = listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
+				if (!(res.second)) { res.first->second = input; }
+				
 			} else {
 				
 				MaBoSSInput input = MaBoSSInput(
@@ -360,8 +365,8 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
 				);
 
-				listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
-
+				auto const res = listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
+				if (!(res.second)) { res.first->second = input; }
 			}
 
 			node_input = node_input.next_sibling( "input" ); 
@@ -381,7 +386,8 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 				(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
 			);
 
-			listOfOutputs.insert(std::pair<std::string, MaBoSSOutput>(physicell_name, output));
+			auto const res = listOfOutputs.insert(std::pair<std::string, MaBoSSOutput>(physicell_name, output));
+			if (!(res.second)) { res.first->second = output; }
 			node_output = node_output.next_sibling( "output" ); 	
 		}
 	}
