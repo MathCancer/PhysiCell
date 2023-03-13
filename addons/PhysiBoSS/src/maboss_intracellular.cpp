@@ -31,6 +31,8 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 	time_tick = copy->time_tick;
 	scaling = copy->scaling;
 	time_stochasticity = copy->time_stochasticity;
+	inherit_state = copy->inherit_state;
+	inherit_nodes = copy->inherit_nodes;
 	initial_values = copy->initial_values;
 	mutations = copy->mutations;
 	parameters = copy->parameters;
@@ -57,8 +59,6 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		for (const auto& output: listOfOutputs) {
 			indicesOfOutputs.push_back(PhysiCell::find_behavior_index(output.second.physicell_name));
 		}
-		//maboss.set_state(copy->maboss.get_maboss_state());
-		//std::cout << get_state();
 	}	
 }
 
@@ -216,6 +216,24 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		{
 			time_stochasticity = PhysiCell::xml_get_my_double_value( node_time_stochasticity );
 			maboss.set_time_stochasticity(time_stochasticity);
+		}
+
+		pugi::xml_node node_inheritance = node_settings.child( "inheritance" );
+		if( node_inheritance )
+		{
+			pugi::xml_attribute global_inheritance = node_inheritance.attribute( "global" ); 
+			inherit_state = global_inheritance.as_bool();
+			
+			pugi::xml_node node_inherit_node = node_inheritance.child( "inherit_node" );
+			while( node_inherit_node )
+			{
+				pugi::xml_attribute node_inherit_intracellular_name = node_inherit_node.attribute( "intracellular_name" ); 
+				bool inherit_value = PhysiCell::xml_get_my_bool_value( node_inherit_node );
+				inherit_nodes[node_inherit_intracellular_name.value()] = inherit_value;
+				
+				node_inherit_node = node_inheritance.next_sibling( "inherit_node" ); 
+			}
+
 		}
 
 		pugi::xml_node node_start_time = node_settings.child( "start_time" );
@@ -406,7 +424,13 @@ void MaBoSSIntracellular::display(std::ostream& os)
 		os 	<< "\t\t\t" << output.first << " = " << output.second.intracellular_name 
 			<< "(" << output.second.value << ", " << output.second.base_value << ", " << output.second.smoothing << ")"
 			<< std::endl;
-	
+
+	os 	<< "\t\t global inheritance = " << inherit_state << std::endl;
+	os	<< "\t\t " << inherit_nodes.size() << " node-specific inheritance defined" << std::endl;
+	for (const auto& node_inheritance : inherit_nodes)
+		os 	<< "\t\t\t" << node_inheritance.first << " = " << node_inheritance.second
+			<< std::endl;
+
 	std::cout << std::endl;
 }
 
