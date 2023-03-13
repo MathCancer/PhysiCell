@@ -125,7 +125,7 @@ void create_cell_types( void )
 	pCD->phenotype.mechanics.maximum_number_of_attachments = 6; 
 	pCD->phenotype.mechanics.attachment_elastic_constant = 0.002; // 0.00142; // 0.1; // 0.00142; // 0.1;  
 	pCD->phenotype.mechanics.attachment_rate = 1;  
-	pCD->phenotype.mechanics.detachment_rate = 0.01; 
+	pCD->phenotype.mechanics.detachment_rate = 0.01; // 0.01
 	pCD->functions.update_phenotype = cancer_phenotype_function; 
 	
 	pCD = find_cell_definition( "BM"); 
