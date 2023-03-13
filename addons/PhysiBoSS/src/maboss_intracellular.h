@@ -26,6 +26,8 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	double time_tick = 0.5;
 	double scaling = 1.0;
 	double time_stochasticity = 0.0;
+	bool inherit_state = false;
+	std::map<std::string, bool> inherit_nodes;
 	double start_time = 0.0;
 
 	std::map<std::string, double> initial_values;
@@ -57,7 +59,7 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	
 	void start() {
 		this->maboss.restart_node_values();
-		this->next_physiboss_run = this->start_time;
+		this->next_physiboss_run = std::max(this->start_time, PhysiCell::PhysiCell_globals.current_time);
 	}
 	
 	void update() {
@@ -77,6 +79,10 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	}
 	
 	void inherit(PhysiCell::Cell * cell) {
+		maboss.inherit_state(
+			static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->maboss.get_maboss_state(), 
+			inherit_state, inherit_nodes
+		);
 	}
 	void update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt);
 	void update_outputs(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt);
