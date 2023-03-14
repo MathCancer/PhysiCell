@@ -38,6 +38,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
       * physiboss-cell-lines-sample 
       * cancer-metabolism-sample
       * interaction-sample
+      * mechano-sample
 
 **`make list-projects`** : list all available sample projects 
 
@@ -141,6 +142,7 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Added new signals: 
   + `apoptotic` returns 1 if a cell is apoptotic, and 0 otherwise 
   + `necrotic` returns 1 if a cell is necrotic, and 0 otherwise 
+As always, 
 
 + Added new behaviors: 
   + `immunogenicity to [cell type]` is the cell's immunogenicity to a specific cell type. The probability that cell `i` attacks cell `j` in $[t,t+\Delta t]$ is $\textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t.$
