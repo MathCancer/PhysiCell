@@ -160,17 +160,13 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 
 + Added a new `spring_attachments` (of type `std::vector<Cell*>`) to cell `state` to track automated formation and removal of spring-link adhesions separately of the user-focused `attached` data struture. This will allow users to continue managing the `attachments` structure on their own for custom contact functions, without interference from automated springs (see more below).
 
-+ Added new standard model `void dynamic_spring_attachments(Cell*, Phenotype& ,double);` This function can automate dynamic attachments and detachments. When calling this function for cell $i$: 
-  + For each current attachment, it detaches with probability $\textrm{detachment rate}\_i \Delta t$ 
-  + For each cell $j$ in the neighbors list, it forms an attachment with probability 
-  
-    $$\textrm{Prob attach } i \textrm{ to cell } j = \textrm{adhesion affinity}\_j \cdot \textrm{attachment rate}\_i \cdot \Delta t.$$
-    
-    The attachment is only formed if both cell $i$ and $j$ have not exceeded their maximum number of 
-    attachments. 
++ Added new standard model `void dynamic_spring_attachments(Cell*, Phenotype& ,double);` This functions exactly as the `dynamic_attachments` function, except it stores them to `cell.state.spring_attachments` to avoid interfering with the user-controlled `cell.state.attachments` data struture. 
 
-
-+ Automated spring attachments / detachments: the new `dynmamic 
++ Automated spring attachments / detachments: the new `dynamic_spring_attachments` function is automatically called at every mechancis time step, with cell-cell spring attachment and detachment based on the cells' current rates. Each cell evaluates spring-like elastic adhesion betwen itslef and cells in `cell.state.spring_attachments` to add to its own velocity. Some notes: 
+  + Each cell automatically removes all its spring attachments during division 
+  + Each cell automatically removes all its spring attachments at the *end* of death. If you want dead cells to have increased detachment, add a rule accordingly using the built-in behavior dictionary. 
+  + If a cell is not movable (`is_movable = false`), then it is not moved by springs, but it can exert spring forces on other cells, allowing it to act as an "anchor". 
+  + This automated spring functionality is completely independent of (and does not interfer with) the user-defined contact function and user-manageed `cell.state.attached` data structure. 
 
 + Added a new `mechano-sample` project that shows automated dynamic attachment and detachment of cells: 
   + Constant cancer cell birth and death
@@ -178,7 +174,6 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + Cancer cell phenotype sets high detachment rate upon death. 
   + Automated connection of cancer, basement membrane (BM) agents with spring links using the built-ins noted above. No user intervention or code required beyond setting nonzero rates. 
   + Cancer cells manually set to apoptose at 10000 min. 
-  +  
 
 ### Minor new features and changes: 
 #### 1.11.0
