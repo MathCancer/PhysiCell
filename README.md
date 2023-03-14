@@ -142,6 +142,7 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Added new signals: 
   + `apoptotic` returns 1 if a cell is apoptotic, and 0 otherwise 
   + `necrotic` returns 1 if a cell is necrotic, and 0 otherwise 
+  
 As always, 
 
 + Added new behaviors: 
