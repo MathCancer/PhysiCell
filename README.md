@@ -167,12 +167,12 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 
 + Added new standard model `void dynamic_spring_attachments(Cell*, Phenotype& ,double);` This functions exactly as the `dynamic_attachments` function, except it stores attached cells to `cell.state.spring_attachments` to avoid interfering with the user-managed `cell.state.attachments` data struture. 
 
-+ *Automated spring attachments / detachments:* the new `dynamic_spring_attachments` function is automatically called at every mechancis time step, with cell-cell spring attachment and detachment based on the cells' current rates. Each cell evaluates spring-like elastic adhesion betwen itslef and cells in `cell.state.spring_attachments` to add to its own velocity. Some notes: 
++ **Automated spring attachments / detachments:** the new `dynamic_spring_attachments` function is automatically called at every mechancis time step, with cell-cell spring attachment and detachment based on the cells' current rates. Each cell evaluates spring-like elastic adhesion betwen itslef and cells in `cell.state.spring_attachments` to add to its own velocity. Some notes: 
   + Each cell automatically removes all its spring attachments during division 
   + Each cell automatically removes all its spring attachments at the *end* of death. If you want dead cells to have increased detachment, add a rule accordingly using the built-in behavior dictionary. 
   + If a cell is not movable (`is_movable = false`), then it is not moved by springs, but it can exert spring forces on other cells, allowing it to act as an "anchor". 
   + This automated spring functionality is completely independent of (and does not interfer with) the user-defined contact function and user-manageed `cell.state.attached` data structure. 
-  + *WARNING:* If in a past life you set `phenotype.mechanics.attachment_rate` to a nonzero rate, you may find yourself surprised with unintended spring adhesions as this new automation kicks in. Please review and revise your configuration file as necessary. 
+  + **WARNING:** If in a past life you set `phenotype.mechanics.attachment_rate` to a nonzero rate, you may find yourself surprised with unintended spring adhesions as this new automation kicks in. Please review and revise your configuration file as necessary. 
 
 + Added a new `mechano-sample` project that shows automated dynamic attachment and detachment of cells: 
   + Constant cancer cell birth and death
