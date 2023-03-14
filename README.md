@@ -143,7 +143,7 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + `apoptotic` returns 1 if a cell is apoptotic, and 0 otherwise 
   + `necrotic` returns 1 if a cell is necrotic, and 0 otherwise 
 
-  As always, 
+  As always, access these via `double get_single_signal(Cell* pCell,std::string sig_name)`. 
 
 + Added new behaviors: 
   + `immunogenicity to [cell type]` is the cell's immunogenicity to a specific cell type. The probability that cell `i` attacks cell `j` in $[t,t+\Delta t]$ is $\textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t.$
@@ -151,6 +151,8 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + `cell detachment rate` is the rate at which spring links break. 
   + `maximum number of cell attachments` is the maximum number of spring links. 
   + `is_movable` can be set to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. This behavior right now is somewhat fragile if used dynmaically, but can reliably be used during tissue setup. 
+
+  As always, access these via `double get_single_behavior(Cell* pCell,std::string beh_name)` and `void set_single_behavior(Cell* pCell,std::string beh_name,double new_value)`.
 
 + Added new standard model `void dynamic_attachments(Cell*, Phenotype& ,double);` This function can automate dynamic attachments and detachments. When calling this function for cell $i$: 
   + For each current attachment, it detaches with probability $\textrm{detachment rate}\_i \Delta t$ 
