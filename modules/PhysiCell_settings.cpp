@@ -223,7 +223,15 @@ void PhysiCell_Settings::read_from_pugixml( void )
 			cell_division_orientation = LegacyRandomOnUnitSphere; 
 		}
 	
+		settings = xml_get_bool_value( node_options, "disable_automated_spring_adhesions" ); 
+		if( settings )
+		{
+			std::cout << "Disabling automated spring adhesions and detachments!" << std::endl; 
+			PhysiCell_settings.disable_automated_spring_adhesions = true; 
+		}
+
 		// other options can go here, eventually 
+
 	}
 	
 	// domain options 

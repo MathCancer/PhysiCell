@@ -173,6 +173,11 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + If a cell is not movable (`is_movable = false`), then it is not moved by springs, but it can exert spring forces on other cells, allowing it to act as an "anchor". 
   + This automated spring functionality is completely independent of (and does not interfer with) the user-defined contact function and user-manageed `cell.state.attached` data structure. 
   + **WARNING:** If in a past life you set `phenotype.mechanics.attachment_rate` to a nonzero rate, you may find yourself surprised with unintended spring adhesions as this new automation kicks in. Please review and revise your configuration file as necessary. 
+  + You can disable this behavior in the XML configuration file: 
+  ```	<options>
+        <!-- other options -->
+        <disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
+	    </options>```
 
 + Added a new `mechano-sample` project that shows automated dynamic attachment and detachment of cells: 
   + Constant cancer cell birth and death

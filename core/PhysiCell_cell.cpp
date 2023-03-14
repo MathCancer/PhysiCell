@@ -3052,6 +3052,7 @@ void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
 			std::cout << "virtual_wall_at_domain_edge: enabled" << std::endl; 
 			cell_defaults.functions.add_cell_basement_membrane_interactions = standard_domain_edge_avoidance_interactions;
 		}
+
 	}
 	
 	// first, let's pre-build the map. 
