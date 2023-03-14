@@ -165,7 +165,7 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 
 + Added a new `spring_attachments` (of type `std::vector<Cell*>`) to cell `state` to track automated formation and removal of spring-link adhesions separately of the user-focused `attached` data struture. This will allow users to continue managing the `attachments` structure on their own for custom contact functions, without interference from automated springs (see more below).
 
-+ Added new standard model `void dynamic_spring_attachments(Cell*, Phenotype& ,double);` This functions exactly as the `dynamic_attachments` function, except it stores them to `cell.state.spring_attachments` to avoid interfering with the user-controlled `cell.state.attachments` data struture. 
++ Added new standard model `void dynamic_spring_attachments(Cell*, Phenotype& ,double);` This functions exactly as the `dynamic_attachments` function, except it stores attached cells to `cell.state.spring_attachments` to avoid interfering with the user-managed `cell.state.attachments` data struture. 
 
 + *Automated spring attachments / detachments:* the new `dynamic_spring_attachments` function is automatically called at every mechancis time step, with cell-cell spring attachment and detachment based on the cells' current rates. Each cell evaluates spring-like elastic adhesion betwen itslef and cells in `cell.state.spring_attachments` to add to its own velocity. Some notes: 
   + Each cell automatically removes all its spring attachments during division 
