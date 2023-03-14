@@ -690,7 +690,7 @@ Mechanics::Mechanics()
 	maximum_number_of_attachments = 12;
 	attachment_elastic_constant = 0.01; 
 
-	attachment_rate = 10; 
+	attachment_rate = 0; // 10.0 prior ot March 2023
 	detachment_rate = 0; 
 
 	/* to be deprecated */ 

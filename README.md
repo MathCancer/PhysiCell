@@ -191,6 +191,8 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 #### 1.11.0
 + Updated the `paint_by_number_cell_coloring` coloring function to paint the entire cell white if apoptotic, and brown if necrotic. (Previously, we colored the nucleus based on live/dead status.) This improves compatibility with the model GUI. 
 
++ Changed the default value of `attachment_rate` from 10 to 0 (in the `Mechanics` class) to avoid unexpected triggering of automated spring adheions. 
+
 ### Beta features (not fully supported):
 #### 1.11.0
 + Added `bool read_microenvironment_from_matlab( std::string mat_filename )` to `BioFVM_MultiCellDS`. This will read and overwrite from a stored microenvironment (in `mat_filename`, saved as a level 4 Matlab file) if it has the following format: 
