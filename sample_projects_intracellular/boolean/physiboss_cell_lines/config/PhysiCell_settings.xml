@@ -117,6 +117,10 @@
 			<enable>true</enable>
 		</legacy_data>
 	</save>
+
+	<options>
+		<disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
+	</options>
 	
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
