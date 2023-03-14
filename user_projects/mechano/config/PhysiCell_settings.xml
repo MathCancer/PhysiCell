@@ -128,7 +128,7 @@
                 <mechanics>
                     <cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
                     <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
-                    <relative_maximum_adhesion_distance units="dimensionless">1.8</relative_maximum_adhesion_distance>
+                    <relative_maximum_adhesion_distance units="dimensionless">1.6</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
                         <cell_adhesion_affinity name="cancer">1</cell_adhesion_affinity>
                         <cell_adhesion_affinity name="BM">1.0</cell_adhesion_affinity>
@@ -330,8 +330,8 @@
 
     <initial_conditions>
         <cell_positions type="csv" enabled="true">
-            <folder>./config</folder>
-            <filename>cells.csv</filename>
+            <folder>/Users/macklinp/GitHub/PhysiCell/config</folder>
+            <filename>cells-shell.csv</filename>
         </cell_positions>
     </initial_conditions>
 
