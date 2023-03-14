@@ -157,11 +157,10 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
     
     The attachment is only formed if both cell $i$ and $j$ have not exceeded their maximum number of 
     attachments. 
-    
+
 ### Minor new features and changes: 
 #### 1.11.0
-+ Added `is_movable` to the set of cell behaviors. Set this to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. This behaviro 
-
++ Updated the `paint_by_number_cell_coloring` coloring function to paint the entire cell white if apoptotic, and brown if necrotic. (Previously, we colored the nucleus based on live/dead status.) This improves compatibility with the model GUI. 
 
 ### Beta features (not fully supported):
 #### 1.11.0
