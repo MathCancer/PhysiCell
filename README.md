@@ -176,7 +176,7 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + You can disable this behavior in the XML configuration file: 
   ```	<options>
         <!-- other options -->
-        <disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
+             <disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
 	    </options>
 
 + Added a new `mechano-sample` project that shows automated dynamic attachment and detachment of cells: 
