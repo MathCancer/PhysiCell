@@ -338,7 +338,6 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		{
 			pugi::xml_node settings = node_input.child("settings");
 
-			std::cout << "Input found : intracellular = " << node_input.attribute("intracellular_name").value() << ", physicell = " << node_input.attribute("physicell_name").value() << std::endl;
 			std::string intracellular_name = node_input.attribute( "intracellular_name" ).value();
 			if (intracellular_name[0] == '$') {
 
