@@ -354,6 +354,11 @@ T& Parameters<T>::operator()( int i )
 template <class T>
 T& Parameters<T>::operator()( std::string str )
 {
+	if (name_to_index_map.find(str) == name_to_index_map.end())
+	{
+		std::cerr << "ERROR : Unknown parameter " << str << " ! Quitting." << std::endl;
+		exit(-1);
+	}
 	return parameters[ name_to_index_map[str] ].value; 
 }
 
@@ -366,6 +371,11 @@ Parameter<T>& Parameters<T>::operator[]( int i )
 template <class T>
 Parameter<T>& Parameters<T>::operator[]( std::string str )
 {
+	if (name_to_index_map.find(str) == name_to_index_map.end())
+	{
+		std::cerr << "ERROR : Unknown parameter " << str << " ! Quitting." << std::endl;
+		exit(-1);
+	}
 	return parameters[ name_to_index_map[str] ]; 
 }
 
