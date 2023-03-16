@@ -10,7 +10,7 @@
 #include "maboss_network.h"
 #include "utils.h"
 
-static std::string PhysiBoSS_Version = "2.1.0"; 
+static std::string PhysiBoSS_Version = "2.2.0"; 
 
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
