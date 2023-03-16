@@ -121,6 +121,7 @@ void create_cell_types( void )
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
 
+/*
 	Cell_Definition* pCD = find_cell_definition( "cancer"); 
 	pCD->phenotype.mechanics.maximum_number_of_attachments = 6; 
 	pCD->phenotype.mechanics.attachment_elastic_constant = 0.002; // 0.00142; // 0.1; // 0.00142; // 0.1;  
@@ -133,8 +134,20 @@ void create_cell_types( void )
 	pCD->phenotype.mechanics.attachment_elastic_constant = 1; // 0.0142; // 100; // 0.0142 ; // 1;  
 	pCD->phenotype.mechanics.attachment_rate = 1;  
 	pCD->phenotype.mechanics.detachment_rate = 0; 
+*/
+
+	Cell_Definition* pCD = find_cell_definition( "cancer"); 
+	pCD->phenotype.mechanics.maximum_number_of_attachments = 6; 
+	pCD->phenotype.mechanics.attachment_elastic_constant = 0.00142; // 0.00142; // 0.1 for confluent version; // 0.002
+	pCD->phenotype.mechanics.attachment_rate = 1;  
+	pCD->phenotype.mechanics.detachment_rate = 0.01; // 0.01
+	pCD->functions.update_phenotype = cancer_phenotype_function; 
 	
-	
+	pCD = find_cell_definition( "BM"); 
+	pCD->phenotype.mechanics.maximum_number_of_attachments = 6; 
+	pCD->phenotype.mechanics.attachment_elastic_constant = 0.05; // 0.0142; // 1;   
+	pCD->phenotype.mechanics.attachment_rate = 1;  
+	pCD->phenotype.mechanics.detachment_rate = 0; 
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 

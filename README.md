@@ -133,7 +133,7 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   $$\textrm{Probability cell } i \textrm{ attacks cell } j \textrm{ in } [t,t+\Delta t] = \textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t $$ 
   By setting $\textrm{immunogenicity}\_{ji} = 1$ as teh default value, we maintain compatibiltiy with prior models. This is a way to further modulate immunogenic and cytotoxic interactions. 
 
-+ Migrated built-in sample projects to be compatible with the model builder GUI and the upcoming PhysiCell Studio, including: 
++ Began migrating built-in sample projects to be compatible with the model builder GUI and the upcoming PhysiCell Studio, including: 
   + template
   + biorobots (updates spring constant from 0.05 to 0.5)
   + heterogeneity

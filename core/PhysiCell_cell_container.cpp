@@ -261,8 +261,8 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 					for( int j=0; j < pC->state.spring_attachments.size(); j++ )
 					{
 						Cell* pC1 = pC->state.spring_attachments[j]; 
-						standard_elastic_contact_function_confluent_rest_length(pC,pC->phenotype,pC1,pC1->phenotype,time_since_last_mechanics);  
-						// standard_elastic_contact_function(pC,pC->phenotype,pC1,pC1->phenotype,time_since_last_mechanics);  
+						// standard_elastic_contact_function_confluent_rest_length(pC,pC->phenotype,pC1,pC1->phenotype,time_since_last_mechanics);  
+						standard_elastic_contact_function(pC,pC->phenotype,pC1,pC1->phenotype,time_since_last_mechanics);  
 					}
 				}
 			}	

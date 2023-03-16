@@ -167,7 +167,7 @@
             </options>
             <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
             <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
-            <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
+            <attachment_elastic_constant units="1/min">0.5</attachment_elastic_constant>
             <attachment_rate units="1/min">10.0</attachment_rate>
             <detachment_rate units="1/min">0.0</detachment_rate>
           </mechanics>
@@ -314,7 +314,7 @@
             </options>
             <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
             <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
-            <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
+            <attachment_elastic_constant units="1/min">0.5</attachment_elastic_constant>
             <attachment_rate units="1/min">10.0</attachment_rate>
             <detachment_rate units="1/min">0.0</detachment_rate>
           </mechanics>
@@ -461,7 +461,7 @@
             </options>
             <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
             <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
-            <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
+            <attachment_elastic_constant units="1/min">0.5</attachment_elastic_constant>
             <attachment_rate units="1/min">10.0</attachment_rate>
             <detachment_rate units="1/min">0.0</detachment_rate>
           </mechanics>
