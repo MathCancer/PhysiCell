@@ -103,10 +103,31 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 	pugi::xml_node node_bnd = node.child( "bnd_filename" );
 	if ( node_bnd )
 	{ bnd_filename = PhysiCell::xml_get_my_string_value (node_bnd); }
+	else 
+	{ std::cerr << "Error : No BND model file defined !" << std::endl; exit(-1); }
 	
 	pugi::xml_node node_cfg = node.child( "cfg_filename" );
 	if ( node_cfg )
 	{ cfg_filename = PhysiCell::xml_get_my_string_value (node_cfg); }
+	else 
+	{ std::cerr << "Error : No CFG model file defined !" << std::endl; exit(-1); }
+	
+	// Setting all the rest to default values : Nothing should be kept from the existing intracellular object (NO INHERITANCE)
+	time_step = 12;
+	discrete_time = false;
+	time_tick = 0.5;
+	scaling = 1.0;
+	time_stochasticity = 0.0;
+	inherit_state = false;
+	start_time = 0.0;
+	initial_values.clear();
+	mutations.clear();
+	parameters.clear();
+	inherit_nodes.clear();
+	listOfInputs.clear();
+	indicesOfInputs.clear();
+	listOfOutputs.clear();
+	indicesOfOutputs.clear();
 	
 	pugi::xml_node node_init_values = node.child( "initial_values" );
 	if( node_init_values )
