@@ -231,16 +231,7 @@
                         <start_time>0.0</start_time>
                         <inheritance global="False" />
                     </settings>
-                    <mapping>
-                        <output physicell_name="apoptosis" intracellular_name="C">
-                            <settings>
-                                <action>activation</action>
-                                <value>5</value>
-                                <base_value>0</base_value>
-                                <smoothing>5</smoothing>
-                            </settings>
-                        </output>
-                    </mapping>
+                    <mapping/>
                 </intracellular>
             </phenotype>
             <custom_data>
@@ -401,16 +392,7 @@
                         <start_time>0.0</start_time>
                         <inheritance global="False" />
                     </settings>
-                    <mapping>
-                        <output physicell_name="apoptosis" intracellular_name="C">
-                            <settings>
-                                <action>activation</action>
-                                <value>5</value>
-                                <base_value>0</base_value>
-                                <smoothing>5</smoothing>
-                            </settings>
-                        </output>
-                    </mapping>
+                    <mapping/>
                 </intracellular>
             </phenotype>
             <custom_data>
@@ -574,16 +556,7 @@
                             <mutation intracellular_name="C">0</mutation>
                         </mutations>
                     </settings>
-                    <mapping>
-                        <output physicell_name="apoptosis" intracellular_name="C">
-                            <settings>
-                                <action>activation</action>
-                                <value>5</value>
-                                <base_value>0</base_value>
-                                <smoothing>5</smoothing>
-                            </settings>
-                        </output>
-                    </mapping>
+                    <mapping/>
                 </intracellular>
             </phenotype>
             <custom_data>
@@ -747,16 +720,7 @@
                             <parameter intracellular_name="$time_scale">0.2</parameter>
                         </parameters>
                     </settings>
-                    <mapping>
-                        <output physicell_name="apoptosis" intracellular_name="C">
-                            <settings>
-                                <action>activation</action>
-                                <value>5</value>
-                                <base_value>0</base_value>
-                                <smoothing>5</smoothing>
-                            </settings>
-                        </output>
-                    </mapping>
+                    <mapping/>
                 </intracellular>
             </phenotype>
             <custom_data>
@@ -917,16 +881,7 @@
                         <start_time>0.0</start_time>
                         <inheritance global="False" />
                     </settings>
-                    <mapping>
-                        <output physicell_name="apoptosis" intracellular_name="C">
-                            <settings>
-                                <action>activation</action>
-                                <value>5</value>
-                                <base_value>0</base_value>
-                                <smoothing>5</smoothing>
-                            </settings>
-                        </output>
-                    </mapping>
+                    <mapping/>
                 </intracellular>
             </phenotype>
             <custom_data>
@@ -1078,7 +1033,7 @@
                     <cfg_filename>./config/model.cfg</cfg_filename>
                     <initial_values>
                         <initial_value intracellular_name="C">0</initial_value>
-                        <initial_value intracellular_name="A">0</initial_value>
+                        <initial_value intracellular_name="A">1</initial_value>
                     </initial_values>
                     <settings>
                         <intracellular_dt>1</intracellular_dt>
@@ -1087,26 +1042,10 @@
                         <start_time>0.0</start_time>
                         <inheritance global="False" />
                         <parameters>
-                            <parameter intracellular_name="$time_scale">0.1</parameter>
+                            <parameter intracellular_name="$time_scale">0.0</parameter>
                         </parameters>
                     </settings>
-                    <mapping>
-                        <input physicell_name="time" intracellular_name="A">
-                            <settings>
-                                <action>activation</action>
-                                <threshold>100</threshold>
-                                <smoothing>0</smoothing>
-                            </settings>
-                        </input>
-                        <output physicell_name="apoptosis" intracellular_name="C">
-                            <settings>
-                                <action>activation</action>
-                                <value>5</value>
-                                <base_value>0</base_value>
-                                <smoothing>5</smoothing>
-                            </settings>
-                        </output>
-                    </mapping>
+                    <mapping/>
                 </intracellular>
             </phenotype>
             <custom_data>
