@@ -210,6 +210,8 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
           store voxel X[i] , Y[j], Z[k]. 
   + **Note:** This matches how PhysiCell saves the microenvironment. This will read any PhysiCell-saved microenvironment, so long as its sizes matches your current settings.  
   + **Note:** This may be fragile. It has only minimal error-checking. 
+
+  + Set default cell attachment rate to 0 in the template project and most sample projects to avoid unexpectedly triggering the new autmoated spring adhesions; users must affirmatively set a nonzero attachment rate to trigger this new automation in an individual cell. 
  
 ### Bugfixes: 
 
@@ -223,6 +225,8 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Fixed typo in cell signals that used `contact with dead dell` instead of `contact with dead cell`
 
 + Changed default full data output to 60 minutes (to match the SVG output interval) for better compatibility with the model builder GUI. 
+
++ Fixed incorrect parameters for necrotic cell volume changes that prevented necrotic cell lysis and shrinkage. 
 
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 

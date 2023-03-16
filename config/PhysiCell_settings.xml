@@ -58,10 +58,10 @@
         <initial_condition units="mmHg">38</initial_condition>
         <Dirichlet_boundary_condition units="mmHg" enabled="True">38</Dirichlet_boundary_condition>
         <Dirichlet_options>
-          <boundary_value ID="xmin" enabled="True">38</boundary_value>
-          <boundary_value ID="xmax" enabled="True">38</boundary_value>
-          <boundary_value ID="ymin" enabled="True">38</boundary_value>
-          <boundary_value ID="ymax" enabled="True">38</boundary_value>
+          <boundary_value ID="xmin" enabled="False">38</boundary_value>
+          <boundary_value ID="xmax" enabled="False">38</boundary_value>
+          <boundary_value ID="ymin" enabled="False">38</boundary_value>
+          <boundary_value ID="ymax" enabled="False">38</boundary_value>
           <boundary_value ID="zmin" enabled="False">38</boundary_value>
           <boundary_value ID="zmax" enabled="False">38</boundary_value>
         </Dirichlet_options>
@@ -82,7 +82,7 @@
 	</microenvironment_setup>	
 	
 	<cell_definitions>
-		<cell_definition name="cancer cell" ID="0">
+		<cell_definition name="tumor" ID="0">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
@@ -112,10 +112,10 @@
               <duration index="1" fixed_duration="true">86400</duration>
               </phase_durations>
               <parameters>
-                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+                <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+                <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+                <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
                 <calcification_rate units="1/min">0</calcification_rate>
                 <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
               </parameters>
@@ -139,7 +139,7 @@
             <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
             <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
             <cell_adhesion_affinities>
-                <cell_adhesion_affinity name="cancer cell">1</cell_adhesion_affinity>
+                <cell_adhesion_affinity name="tumor">1</cell_adhesion_affinity>
                 </cell_adhesion_affinities>
             <options>
               <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
@@ -186,23 +186,23 @@
           <cell_interactions>
             <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
             <live_phagocytosis_rates>
-                <phagocytosis_rate name="cancer cell" units="1/min">0</phagocytosis_rate>
+                <phagocytosis_rate name="tumor" units="1/min">0</phagocytosis_rate>
                 </live_phagocytosis_rates>
 
             <attack_rates>
-                  <attack_rate name="cancer cell" units="1/min">0</attack_rate>
+                  <attack_rate name="tumor" units="1/min">0</attack_rate>
                   </attack_rates>
 
             <damage_rate units="1/min">1</damage_rate>
             <fusion_rates>
-                  <fusion_rate name="cancer cell" units="1/min">0</fusion_rate>
+                  <fusion_rate name="tumor" units="1/min">0</fusion_rate>
                   </fusion_rates>
 
           </cell_interactions>
 
           <cell_transformations>
             <transformation_rates>
-                <transformation_rate name="cancer cell" units="1/min">0</transformation_rate>
+                <transformation_rate name="tumor" units="1/min">0</transformation_rate>
                 </transformation_rates>
             </cell_transformations>
 
@@ -223,7 +223,7 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless" description="">0</random_seed>
-        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
+        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">5</number_of_cells>
         <tumor_radius type="double" units="micron" description="">250</tumor_radius>
         <oncoprotein_mean type="double" units="" description="">1</oncoprotein_mean>
         <oncoprotein_sd type="double" units="" description="">0.25</oncoprotein_sd>
