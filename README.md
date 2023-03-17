@@ -210,6 +210,8 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + **Note:** This may be fragile. It has only minimal error-checking. 
 
   + Set default cell attachment rate to 0 in the template project and most sample projects to avoid unexpectedly triggering the new autmoated spring adhesions; users must affirmatively set a nonzero attachment rate to trigger this new automation in an individual cell. 
+
+  + In repsonse to [PR 123](https://github.com/MathCancer/PhysiCell/pull/123), `parameters.TYPE.find_index(search_name)` now returns -1 if the searched term isn't found. Thanks, Daniel Bergman! 
  
 ### Bugfixes: 
 
