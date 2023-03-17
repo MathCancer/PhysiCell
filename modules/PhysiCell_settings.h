@@ -119,6 +119,7 @@ class PhysiCell_Settings
 
 	bool enable_substrate_plot = false;
 	std::string substrate_to_monitor = "oxygen"; 
+	bool limits_substrate_plot = false;
 	double min_concentration = -1.0;
 	double max_concentration = -1.0;
 

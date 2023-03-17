@@ -129,6 +129,7 @@ PhysiCell_Settings::PhysiCell_Settings()
 	enable_SVG_saves = false; 
 	enable_substrate_plot = false;
 	substrate_to_monitor = "oxygen"; 
+	limits_substrate_plot = false;
 	min_concentration = -1.0;
 	max_concentration = -1.0;
 
@@ -194,11 +195,14 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	pugi::xml_node node_plot_substrate; 
 	node_plot_substrate = xml_find_node( node , "plot_substrate" );
 	enable_substrate_plot = node_plot_substrate.attribute("enabled").as_bool();
+	limits_substrate_plot = node_plot_substrate.attribute("limits").as_bool();
 
 	if(enable_substrate_plot){
 		substrate_to_monitor = xml_get_string_value(node_plot_substrate, "substrate");
-		min_concentration = xml_get_double_value(node_plot_substrate, "min_conc");
-		max_concentration = xml_get_double_value(node_plot_substrate, "max_conc");
+		if (limits_substrate_plot) {
+			min_concentration = xml_get_double_value(node_plot_substrate, "min_conc");
+			max_concentration = xml_get_double_value(node_plot_substrate, "max_conc");
+		}
 	};
 	node = node.parent(); 
 

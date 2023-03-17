@@ -501,7 +501,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 		}
 		else
 		{
-			if(PhysiCell_settings.max_concentration != 0 | PhysiCell_settings.min_concentration != 0){
+			if(PhysiCell_settings.limits_substrate_plot){
 			 max_conc = PhysiCell_settings.max_concentration;
 			 min_conc = PhysiCell_settings.min_concentration;
 			}
