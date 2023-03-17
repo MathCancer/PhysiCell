@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -231,6 +231,37 @@ void setup_signal_behavior_dictionaries( void )
 		custom_signal_name += std::to_string(nc); 
 		signal_to_int[custom_signal_name] = map_index; 
 	}
+
+	map_index++; 
+	signal_to_int["apoptotic"] = map_index; 
+	int_to_signal[map_index] = "apoptotic"; 
+	// synonyms 
+	signal_to_int["is_apoptotic"] = map_index; 
+
+	map_index++; 
+	signal_to_int["necrotic"] = map_index; 
+	int_to_signal[map_index] = "necrotic"; 
+	// synonyms 
+	signal_to_int["is_necrotic"] = map_index; 
+
+/*
+	// immunogenicity to each cell type 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string temp =  "immunogenicity to " + pCD->name; 
+		signal_to_int[temp] = map_index; 
+		int_to_signal[map_index] = temp; 		
+				// synonyms 
+		std::string temp1 = "immunogenicity to cell type " + std::to_string( pCD->type ); 
+		signal_to_int[temp1] = map_index; 
+	}
+*/
+
+
+
+	/* add new signals above this line */
 
 	behavior_to_int.clear(); 	
 	int_to_behavior.clear(); 
@@ -463,6 +494,45 @@ void setup_signal_behavior_dictionaries( void )
 		behavior_to_int[custom_behavior_name] = map_index; 
 	}
 
+	map_index++; 
+	map_name = "is_movable";
+	behavior_to_int[map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+	// synonyms
+	behavior_to_int["movable"] = map_index; 
+	behavior_to_int["is movable"] = map_index; 
+
+	// immunogenicity to each cell type 
+	for( int i=0; i < n ; i++ )
+	{
+		map_index++; 
+		Cell_Definition* pCD = cell_definitions_by_type[i]; 
+		std::string map_name =  "immunogenicity to " + pCD->name; 
+		behavior_to_int[map_name ] = map_index;
+		int_to_behavior[map_index] = map_name; 
+
+		// synonyms 
+		std::string temp1 = "immunogenicity to cell type " + std::to_string( pCD->type ); 
+		behavior_to_int[temp1] = map_index; 
+	}
+
+	map_index++; 
+	map_name = "cell attachment rate";
+	behavior_to_int[map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "cell detachment rate";
+	behavior_to_int[map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	map_index++; 
+	map_name = "maximum number of cell attachments";
+	behavior_to_int[map_name ] = map_index;
+	int_to_behavior[map_index] = map_name; 
+
+	/* add new behaviors above this line */
+
     // resize scales; 
     signal_scales.resize( int_to_signal.size() , 1.0 ); 
 
@@ -541,6 +611,9 @@ int find_signal_index( std::string signal_name )
 	// safety first! 
 	if( search != signal_to_int.end() )
     { return search->second; }   
+
+	std::cout << "having trouble finding " << signal_name << std::endl; 
+
     return -1; 
 }
 
@@ -666,6 +739,28 @@ std::vector<double> get_signals( Cell* pCell )
 		for( int nc=0 ; nc < pCell->custom_data.variables.size() ; nc++ )
 		{ signals[first_custom_ind+nc] = pCell->custom_data.variables[nc].value; }
 	}
+
+	static int apoptotic_ind = find_signal_index( "apoptotic" ); 
+	if(pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic )
+	{ signals[apoptotic_ind] = 1; }
+	else
+	{ signals[apoptotic_ind] = 0; }
+
+	static int necrotic_ind = find_signal_index( "necrotic" ); 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+	{ signals[necrotic_ind] = 1; }
+	else
+	{ signals[necrotic_ind] = 0; }
+
+/*
+	// vector of immunogenicity signals 
+	static int start_immunogenicity_ind = find_signal_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+    std::copy( pCell->phenotype.cell_interactions.immunogenicities.begin() , 
+	           pCell->phenotype.cell_interactions.immunogenicities.end(), 
+			   signals.begin()+start_immunogenicity_ind);  
+*/
 
     // rescale 
     signals /= signal_scales; 
@@ -894,6 +989,39 @@ double get_single_signal( Cell* pCell, int index )
 		return out; 
 	}
 
+	static int apoptotic_ind = find_signal_index( "apoptotic" ); 
+	if( index == apoptotic_ind )
+	{
+		if(pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic )
+		{ return 1; }
+		else
+		{ return 0; }
+	}
+
+	static int necrotic_ind = find_signal_index( "necrotic" ); 
+	if( index == necrotic_ind )
+	{
+		if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+			pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+			pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+		{ return 1; }
+		else
+		{ return 0; }
+	}
+
+/*
+	static int start_immunogenicity_ind = find_signal_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+	static int max_immunogenicity_ind = start_immunogenicity_ind+n; 
+	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
+	{
+		int j = index - start_immunogenicity_ind; 
+		out = pCell->phenotype.cell_interactions.immunogenicities[j]; 
+		out /= signal_scales[index];
+		return out; 
+	}
+*/
+
+
 	// unknown after here !
 
 	std::cout << "Warning: Requested unknown signal number " << index << "!" << std::endl
@@ -1058,6 +1186,31 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 		{ pCell->custom_data.variables[nc].value = parameters[first_custom_ind+nc]; }
 	}
 
+	// set cell to movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( parameters[movable_ind] > 0.5 )
+	{ pCell->is_movable = true; }
+	else
+	{ pCell->is_movable = false; }
+
+	// vector of immunogenicity signals 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+    std::copy( parameters.begin()+start_immunogenicity_ind , 
+			   parameters.begin()+start_immunogenicity_ind+n , 
+			   pCell->phenotype.cell_interactions.immunogenicities.begin() );  
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	pCell->phenotype.mechanics.attachment_rate = parameters[attachment_rate_ind];
+
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	pCell->phenotype.mechanics.detachment_rate = parameters[detachment_rate_ind];
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	pCell->phenotype.mechanics.maximum_number_of_attachments = (int) parameters[max_attachments_ind];
+
 	return; 
 }
 
@@ -1206,6 +1359,37 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
 	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
 	{ pCell->custom_data.variables[index-first_custom_ind].value = parameter; }
+
+	// set cell to movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( index == movable_ind )
+	{
+		if( parameter > 0.5 )
+		{ pCell->is_movable = true; }
+		else
+		{ pCell->is_movable = false; }
+	}
+
+    // immunogenicity to each cell type 
+	static int first_immunogenicity_index = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+	if( index >= first_immunogenicity_index && index < first_immunogenicity_index + n )
+	{ pCell->phenotype.cell_interactions.immunogenicities[index-first_immunogenicity_index] = parameter ; return; } 
+
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	if( index == attachment_rate_ind )
+	{ pCell->phenotype.mechanics.attachment_rate = parameter; }
+
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	if( index == detachment_rate_ind )
+	{ pCell->phenotype.mechanics.detachment_rate = parameter; }
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	if( index == max_attachments_ind )
+	{ pCell->phenotype.mechanics.maximum_number_of_attachments = (int) parameter; }
 
 	return; 
 }
@@ -1358,6 +1542,31 @@ std::vector<double> get_behaviors( Cell* pCell )
 		{ parameters[first_custom_ind+nc] = pCell->custom_data.variables[nc].value; }	 
 	}
 
+	// is the cell movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( pCell->is_movable == true )
+	{ parameters[movable_ind] = 1; }
+	else
+	{ parameters[movable_ind] = 0; }
+
+	// vector of immunogenicity behaviors 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+    std::copy( pCell->phenotype.cell_interactions.immunogenicities.begin(),
+			   pCell->phenotype.cell_interactions.immunogenicities.end(), 
+			   parameters.begin()+start_immunogenicity_ind );  
+
+	// get cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	parameters[attachment_rate_ind] = pCell->phenotype.mechanics.attachment_rate; 
+
+	// get cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	parameters[detachment_rate_ind] = pCell->phenotype.mechanics.detachment_rate; 
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	parameters[max_attachments_ind] = pCell->phenotype.mechanics.maximum_number_of_attachments; 
+
 	return parameters; 
 }
 
@@ -1482,7 +1691,7 @@ double get_single_behavior( Cell* pCell , int index )
 	{ return pCell->phenotype.mechanics.cell_BM_repulsion_strength; }
 
 	// dead cell phagocytosis
-	static int dead_phag_index = find_behavior_index("phagocytose dead dell" ); 
+	static int dead_phag_index = find_behavior_index("phagocytose dead cell" ); 
 	if( index == dead_phag_index )
 	{ return pCell->phenotype.cell_interactions.dead_phagocytosis_rate; }
 
@@ -1511,6 +1720,38 @@ double get_single_behavior( Cell* pCell , int index )
 	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
 	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
 	{ return pCell->custom_data.variables[index-first_custom_ind].value; }
+
+	// is the cell movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( index == movable_ind )
+	{
+		if( pCell->is_movable == true )
+		{ return 1.0; }
+		else
+		{ return 0.0; }
+	}
+
+	// vector of immunogenicity behaviors 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+	static int max_immunogenicity_ind = start_immunogenicity_ind + n; 
+	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
+	{ return pCell->phenotype.cell_interactions.immunogenicities[index-start_immunogenicity_ind]; }
+
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	if( index == attachment_rate_ind )
+	return pCell->phenotype.mechanics.attachment_rate; 
+	
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	if( index == detachment_rate_ind )
+	{ return pCell->phenotype.mechanics.detachment_rate; }
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	if( index == max_attachments_ind )
+	{ return pCell->phenotype.mechanics.maximum_number_of_attachments; }
 
 	return -1; 
 }
@@ -1693,6 +1934,32 @@ std::vector<double> get_base_behaviors( Cell* pCell )
 		{ parameters[first_custom_ind+nc] = pCD->custom_data.variables[nc].value; }	 
 	}
 
+	// is the cell movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( pCD->is_movable == true )
+	{ parameters[movable_ind] = 1; }
+	else
+	{ parameters[movable_ind] = 0; }
+
+	// vector of immunogenicity behaviors 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+    std::copy( pCD->phenotype.cell_interactions.immunogenicities.begin(),
+			   pCD->phenotype.cell_interactions.immunogenicities.end(), 
+			   parameters.begin()+start_immunogenicity_ind );  
+
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	parameters[attachment_rate_ind] = pCD->phenotype.mechanics.attachment_rate; 
+
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	parameters[detachment_rate_ind] = pCD->phenotype.mechanics.detachment_rate; 
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	parameters[max_attachments_ind] = pCD->phenotype.mechanics.maximum_number_of_attachments; 
+
 	return parameters; 
 }
 
@@ -1819,7 +2086,7 @@ double get_single_base_behavior( Cell* pCell , int index )
 	{ return pCD->phenotype.mechanics.cell_BM_repulsion_strength; }
 
 	// dead cell phagocytosis
-	static int dead_phag_index = find_behavior_index("phagocytose dead dell" ); 
+	static int dead_phag_index = find_behavior_index("phagocytose dead cell" ); 
 	if( index == dead_phag_index )
 	{ return pCD->phenotype.cell_interactions.dead_phagocytosis_rate; }
 
@@ -1848,6 +2115,38 @@ double get_single_base_behavior( Cell* pCell , int index )
 	static int max_custom_ind = first_custom_ind + pCell->custom_data.variables.size();  
 	if( first_custom_ind >= 0 && index >= first_custom_ind && index < max_custom_ind )
 	{ return pCD->custom_data.variables[index-first_custom_ind].value; }
+
+	// is the cell movable / not movable 
+	static int movable_ind = find_behavior_index( "is_movable"); 
+	if( index == movable_ind )
+	{
+		if( pCD->is_movable == true )
+		{ return 1.0; }
+		else
+		{ return 0.0; }
+	}
+
+	// vector of immunogenicity behaviors 
+	static int start_immunogenicity_ind = find_behavior_index( "immunogenicity to " + cell_definitions_by_type[0]->name ); 
+	static int max_immunogenicity_ind = start_immunogenicity_ind + n; 
+	if( start_immunogenicity_ind > -1 && index >= start_immunogenicity_ind && index < max_immunogenicity_ind )
+	{ return pCD->phenotype.cell_interactions.immunogenicities[index-start_immunogenicity_ind]; }
+
+
+	// set cell attachment rate  
+	static int attachment_rate_ind = find_behavior_index( "cell attachment rate"); 
+	if( index == attachment_rate_ind )
+	{ return pCD->phenotype.mechanics.attachment_rate; }
+
+	// set cell detachment rate  
+	static int detachment_rate_ind = find_behavior_index( "cell detachment rate"); 
+	if( index == detachment_rate_ind )
+	{ return pCD->phenotype.mechanics.detachment_rate; }
+
+	// maximum number of cell attachments 
+	static int max_attachments_ind = find_behavior_index( "maximum number of cell attachments"); 
+	if( index == max_attachments_ind )
+	{ return pCD->phenotype.mechanics.maximum_number_of_attachments; }
 
 	return -1; 
 }

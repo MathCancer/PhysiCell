@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -68,49 +68,29 @@
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
-using namespace BioFVM;
+using namespace BioFVM; 
 using namespace PhysiCell;
 
-/*
-// declare the cell types 
-
-static Cell_Definition worker_cell; 
-static Cell_Definition cargo_cell; 
-static Cell_Definition director_cell; 
-static Cell_Definition linker_cell; 
-
-static int worker_ID = 0;
-static int cargo_ID = 1;
-static int linker_ID = 2; 
-static int director_ID = 3;
-*/
-
-// set up the microenvironment 
-
-void setup_microenvironment( void ); // done 
-
-// set up the cell types 
+// setup functions to help us along 
 
 void create_cell_types( void );
-
-// set up the problem geometry 
-
 void setup_tissue( void ); 
 
-// coloring functions 
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
 
-std::vector<std::string> robot_coloring_function( Cell* pCell ); 
+// custom pathology coloring function 
 
-// these are the custom functions for these cells 
+std::vector<std::string> my_coloring_function( Cell* );
 
-// void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt );
+// custom functions can go here 
 
-void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
-void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
-void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt ); 
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
-void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );  // done 
+std::vector<std::string> heterogeneity_coloring_function( Cell* );
 
-
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt ); 
 

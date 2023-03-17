@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -84,6 +84,8 @@ double Hill_response_function( double s, double half_max , double hill_power ); 
 double linear_response_function( double s, double s_min , double s_max ); // done 
 // decreases from 1 (at s_min) to 0 (at s_max)
 double decreasing_linear_response_function( double s, double s_min , double s_max ); // done 
+
+double interpolate_behavior( double base_value , double max_changed_value, double response ); 
 
 // signal increases/decreases parameter
 // options: hill power

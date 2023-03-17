@@ -226,11 +226,14 @@ Cell_Definition cell_defaults;
 Cell_State::Cell_State()
 {
 	neighbors.resize(0); 
+	spring_attachments.resize(0); 
+
 	orientation.resize( 3 , 0.0 ); 
 	
 	simple_pressure = 0.0; 
 	
 	attached_cells.clear(); 
+	spring_attachments.clear(); 
 	
 	number_of_nuclei = 1; 
 	
@@ -420,6 +423,8 @@ Cell::~Cell()
 		{
 			// release any attached cells (as of 1.7.2 release)
 			this->remove_all_attached_cells(); 
+			// 1.11.0
+			this->remove_all_spring_attachments(); 
 			
 			// released internalized substrates (as of 1.5.x releases)
 			this->release_internalized_substrates(); 
@@ -509,6 +514,7 @@ Cell* Cell::divide( )
 	
 	// make sure ot remove adhesions 
 	remove_all_attached_cells(); 
+	remove_all_spring_attachments(); 
 
 	// version 1.10.3: 
 	// conserved quantitites in custom data aer divided in half
@@ -1101,6 +1107,8 @@ void delete_cell( int index )
 	
 	// release any attached cells (as of 1.7.2 release)
 	pDeleteMe->remove_all_attached_cells(); 
+	// 1.11.0 
+	pDeleteMe->remove_all_spring_attachments(); 
 	
 	// released internalized substrates (as of 1.5.x releases)
 	pDeleteMe->release_internalized_substrates(); 
@@ -1130,6 +1138,8 @@ void delete_cell_original( int index ) // before June 11, 2020
 	
 	// release any attached cells (as of 1.7.2 release)
 	(*all_cells)[index]->remove_all_attached_cells(); 
+	// 1.11.0
+	(*all_cells)[index]->remove_all_spring_attachments(); 
 	
 	// released internalized substrates (as of 1.5.x releases)
 	(*all_cells)[index]->release_internalized_substrates(); 
@@ -1335,6 +1345,7 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	// things that have their own thread safety 
 	pCell_to_eat->flag_for_removal();
 	pCell_to_eat->remove_all_attached_cells();
+	pCell_to_eat->remove_all_spring_attachments();
 	
 	return; 
 }
@@ -1495,6 +1506,7 @@ void Cell::fuse_cell( Cell* pCell_to_fuse )
 	// things that have their own thread safety 
 	pCell_to_fuse->flag_for_removal();
 	pCell_to_fuse->remove_all_attached_cells();
+	pCell_to_fuse->remove_all_spring_attachments();
 
 	return; 
 }
@@ -3040,6 +3052,7 @@ void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
 			std::cout << "virtual_wall_at_domain_edge: enabled" << std::endl; 
 			cell_defaults.functions.add_cell_basement_membrane_interactions = standard_domain_edge_avoidance_interactions;
 		}
+
 	}
 	
 	// first, let's pre-build the map. 
@@ -3098,6 +3111,23 @@ void Cell::attach_cell( Cell* pAddMe )
 	return; 
 }
 
+void Cell::attach_cell_as_spring( Cell* pAddMe )
+{
+	#pragma omp critical
+	{
+		bool already_attached = false; 
+		for( int i=0 ; i < state.spring_attachments.size() ; i++ )
+		{
+			if( state.spring_attachments[i] == pAddMe )
+			{ already_attached = true; }
+		}
+		if( already_attached == false )
+		{ state.spring_attachments.push_back( pAddMe ); }
+	}
+	// pAddMe->attach_cell( this ); 
+	return; 
+}
+
 void Cell::detach_cell( Cell* pRemoveMe )
 {
 	#pragma omp critical
@@ -3122,6 +3152,30 @@ void Cell::detach_cell( Cell* pRemoveMe )
 	return; 
 }
 
+void Cell::detach_cell_as_spring( Cell* pRemoveMe )
+{
+	#pragma omp critical
+	{
+		bool found = false; 
+		int i = 0; 
+		while( !found && i < state.spring_attachments.size() )
+		{
+			// if pRemoveMe is in the cell's list, remove it
+			if( state.spring_attachments[i] == pRemoveMe )
+			{
+				int n = state.spring_attachments.size(); 
+				// copy last entry to current position 
+				state.spring_attachments[i] = state.spring_attachments[n-1]; 
+				// shrink by one 
+				state.spring_attachments.pop_back(); 
+				found = true; 
+			}
+			i++; 
+		}
+	}
+	return; 
+}
+
 void Cell::remove_all_attached_cells( void )
 {
 	{
@@ -3136,6 +3190,21 @@ void Cell::remove_all_attached_cells( void )
 	return; 
 }
 
+void Cell::remove_all_spring_attachments( void )
+{
+	{
+		// remove self from any attached cell's list. 
+		for( int i = 0; i < state.spring_attachments.size() ; i++ )
+		{
+			state.spring_attachments[i]->detach_cell_as_spring( this ); 
+		}
+		// clear my list 
+		state.spring_attachments.clear(); 
+	}
+	return; 
+}
+
+
 void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 {
 	pCell_1->attach_cell( pCell_2 );
@@ -3143,10 +3212,24 @@ void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 	return; 
 }
 
+void attach_cells_as_spring( Cell* pCell_1, Cell* pCell_2 )
+{
+	pCell_1->attach_cell_as_spring( pCell_2 );
+	pCell_2->attach_cell_as_spring( pCell_1 );
+	return; 
+}
+
 void detach_cells( Cell* pCell_1 , Cell* pCell_2 )
 {
 	pCell_1->detach_cell( pCell_2 );
 	pCell_2->detach_cell( pCell_1 );
+	return; 
+}
+
+void detach_cells_as_spring( Cell* pCell_1 , Cell* pCell_2 )
+{
+	pCell_1->detach_cell_as_spring( pCell_2 );
+	pCell_2->detach_cell_as_spring( pCell_1 );
 	return; 
 }
 

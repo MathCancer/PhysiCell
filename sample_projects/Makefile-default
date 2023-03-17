@@ -73,7 +73,7 @@ name:
 list-projects:
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
-	@echo "                 worm-sample interaction-sample"
+	@echo "                 worm-sample interaction-sample mechano-sample"
 	@echo ""
 	@echo "Sample intracellular projects: ode-energy-sample physiboss-cell-lines-sample cancer-metabolism-sample"
 	@echo ""
@@ -93,7 +93,7 @@ template:
 biorobots-sample:
 	cp ./sample_projects/biorobots/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/biorobots/main-biorobots.cpp ./main.cpp 
+	cp ./sample_projects/biorobots/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/biorobots/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
@@ -129,7 +129,7 @@ celltypes3-sample:
 heterogeneity-sample:
 	cp ./sample_projects/heterogeneity/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/heterogeneity/main-heterogeneity.cpp ./main.cpp 
+	cp ./sample_projects/heterogeneity/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/heterogeneity/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
@@ -208,6 +208,13 @@ cancer-metabolism-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
 	cp ./sample_projects_intracellular/fba/cancer_metabolism/config/* ./config/
 
+mechano-sample:
+	cp ./sample_projects/mechano/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/mechano/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/mechano/Makefile .
+	cp ./sample_projects/mechano/config/* ./config/
 
 # early examples for convergence testing 
 
@@ -422,3 +429,25 @@ upgrade: $(SOURCE)
 	mv -f PhysiCell/documentation/User_Guide.pdf documentation
 	rm -f -r PhysiCell
 	rm -f $(SOURCE) 
+
+# use: make save PROJ=your_project_name
+PROJ := my_project
+
+save: 
+	echo "Saving project as $(PROJ) ... "
+	mkdir -p ./user_projects
+	mkdir -p ./user_projects/$(PROJ)
+	mkdir -p ./user_projects/$(PROJ)/custom_modules
+	mkdir -p ./user_projects/$(PROJ)/config 
+	cp main.cpp ./user_projects/$(PROJ)
+	cp Makefile ./user_projects/$(PROJ)
+	cp VERSION.txt ./user_projects/$(PROJ)
+	cp ./config/* ./user_projects/$(PROJ)/config
+	cp ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
+
+load: 
+	echo "Loading project from $(PROJ) ... "
+	cp ./user_projects/$(PROJ)/main.cpp .
+	cp ./user_projects/$(PROJ)/Makefile .
+	cp ./user_projects/$(PROJ)/config/* ./config/ 
+	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 

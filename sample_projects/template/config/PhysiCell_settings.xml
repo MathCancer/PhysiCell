@@ -104,7 +104,7 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">360</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		
@@ -121,6 +121,7 @@
 	<options>
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
 		<virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
+        <disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
 	</options>	
 
 	<microenvironment_setup>
@@ -224,10 +225,10 @@
 						</phase_durations>
 						
 						<parameters>
-							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
 							<calcification_rate units="1/min">0</calcification_rate>
 							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
 						</parameters>
@@ -263,7 +264,7 @@
                     <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
                     <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant type="double" units="1/min">0.01</attachment_elastic_constant> 
-                    <attachment_rate type="double" units="1/min">10.0</attachment_rate> 
+                    <attachment_rate type="double" units="1/min">0.0</attachment_rate> 
                     <detachment_rate type="double" units="1/min">0.0</detachment_rate> 
 				</mechanics>
 				
