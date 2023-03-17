@@ -76,7 +76,8 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	void update(){ };
 
 	void update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt);
-    
+    void inherit(PhysiCell::Cell * cell) {}
+	
 	int update_phenotype_parameters(PhysiCell::Phenotype& phenotype);
 	bool has_variable(std::string name) { return true; }
 
