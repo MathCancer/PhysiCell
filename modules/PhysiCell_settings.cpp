@@ -381,7 +381,11 @@ Parameter<T>& Parameters<T>::operator[]( std::string str )
 template <class T>
 int Parameters<T>::find_index( std::string search_name )
 {
-	return name_to_index_map[ search_name ]; 
+	auto out = name_to_index_map.find( search_name ); 
+	if( out != name_to_index_map.end() )
+	{ return out->second; }
+	return -1; 
+	// return name_to_index_map[ search_name ]; 
 }
 
 
