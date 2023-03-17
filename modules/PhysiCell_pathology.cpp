@@ -402,7 +402,7 @@ std::string formatted_minutes_to_DDHHMM( double minutes )
 	return output ;
 }
 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*ECM_coloring_function)(double, double, double) )
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*substrate_coloring_function)(double, double, double) )
 {
 	double X_lower = M.mesh.bounding_box[0];
 	double X_upper = M.mesh.bounding_box[3];
@@ -429,7 +429,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 		exit(-1); 
 	} 
 	
-	if(PhysiCell_settings.enable_substrate_plot == true && (*ECM_coloring_function) != NULL){
+	if(PhysiCell_settings.enable_substrate_plot == true && (*substrate_coloring_function) != NULL){
 
 		double legend_padding = 200.0; // I have to add a margin on the left to visualize the bar plot and the values
 
@@ -488,7 +488,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	double normalizer = 78.539816339744831 / (voxel_size*voxel_size*voxel_size); 
  
  // color in the background ECM
-	if(PhysiCell_settings.enable_substrate_plot == true && (*ECM_coloring_function) != NULL)
+	if(PhysiCell_settings.enable_substrate_plot == true && (*substrate_coloring_function) != NULL)
 	{
 		double dz_stroma = M.mesh.dz;
 		double max_conc;
@@ -547,7 +547,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 
 					double concentration = M.density_vector(n)[sub_index];
 
-					std::vector< std::string > output = ECM_coloring_function(concentration, max_conc, min_conc );
+					std::vector< std::string > output = substrate_coloring_function(concentration, max_conc, min_conc );
 
 					Write_SVG_rect( os , x_displ - X_lower , y_displ - Y_lower, dx_stroma, dy_stroma , 0 , "none", output[0] );
 				}
@@ -567,7 +567,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 
 				double concentration_sample = min_conc + (conc_interval * i); // the color depends on the concentration, starting from the min concentration to the max (which was sampled before)
 
-				std::vector< std::string > output = ECM_coloring_function(concentration_sample, max_conc, min_conc );
+				std::vector< std::string > output = substrate_coloring_function(concentration_sample, max_conc, min_conc );
 
 				padding = 25 * i;
 
