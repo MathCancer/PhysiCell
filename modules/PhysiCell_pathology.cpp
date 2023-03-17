@@ -704,6 +704,25 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
 			output[3] = "rgb(139,69,19)";
 		}
 	}
+
+	// new March 2023 (for better compatibility with studio)
+
+	// if dead, use live color for the outline
+	if( pCell->phenotype.death.dead == true )
+	{ output[1] = interior_color; } 
+
+	// necrotic cells are brown 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+	{ interior_color = "saddlebrown"; }
+	// apoptotic cells are white 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic ) 
+	{ interior_color = "white"; }
+
+	output[0] = interior_color; // set cytoplasm color 
+	output[2] = interior_color; // set cytoplasm color 
+	output[3] = interior_color; // set cytoplasm color 
 	
 	return output; 
 }	

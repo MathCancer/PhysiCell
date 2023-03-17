@@ -20,8 +20,7 @@ Suppose you want to add a new signal "my signal name" to the dictionary, and tha
 	1. Go to the end of the "signal" section. Just before these lines: 
     
 		```
-		behavior_to_int.clear(); 	
-		int_to_behavior.clear();   
+		/* add new signals above this line */ 
 		```
 
 	1. Add the signal like this: 
@@ -105,6 +104,8 @@ Suppose you want to add a new behavior "my behavior name" to the dictionary, and
 	1. Go to the end of the "behavior" section. Just before these lines: 
     
 		```
+		/* add new behaviors above this line */
+
 		// resize scales; 
     		signal_scales.resize( int_to_signal.size() , 1.0 );   
 		```

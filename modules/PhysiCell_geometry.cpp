@@ -225,13 +225,17 @@ void draw_line( std::vector<double> start , std::vector<double> end , Cell_Defin
 void draw_line( std::vector<double> start , std::vector<double> end , int cell_type , double compression )
 { return draw_line(start,end,find_cell_definition(cell_type),compression); }
 
-void load_cells_csv( std::string filename )
+void load_cells_csv_v1( std::string filename )
 {
 	std::ifstream file( filename, std::ios::in );
 	if( !file )
 	{ 
 		std::cout << "Error: " << filename << " not found during cell loading. Quitting." << std::endl; 
 		exit(-1);
+	}
+	else
+	{
+		std::cout << "Loading cells from simple (v1) CSV file " << filename << " ... " << std::endl; 
 	}
 
 	std::string line;
@@ -331,5 +335,178 @@ bool load_cells_from_pugixml( pugi::xml_node root )
 
 bool load_cells_from_pugixml( void )
 { return load_cells_from_pugixml( physicell_config_root ); }
+
+std::vector<std::string> split_csv_labels( std::string labels_line )
+{
+	std::vector< std::string > label_tokens; 
+	std::string s; 
+
+	std::stringstream stream(labels_line); 
+	while( std::getline( stream , s , ',' ) )
+	{ label_tokens.push_back(s); }
+
+	return label_tokens;
+}
+
+Cell* process_csv_v2_line( std::string line , std::vector<std::string> labels )
+{
+	// split the line into tokens 
+	std::vector< std::string > tokens; 
+
+	std::stringstream stream(line); 
+	std::string s; 
+	while( std::getline( stream , s , ',' ) )
+	{ tokens.push_back(s); }
+
+	// get the cell position 
+	std::vector<double> position; 
+	char* pTemp;
+	for( int i=0; i < 3 ; i++ )
+	{ position.push_back( strtod( tokens[i].c_str() , &pTemp ) ); } 
+
+	// the cell type 
+	std::string celltype = tokens[3]; 
+	Cell_Definition* pCD = find_cell_definition( celltype ); 
+	if( pCD == NULL )
+	{
+		std::cout << "Warning! CSV file requests creating cell type " << celltype << std::endl 
+			<< "\tat " << position << "but I don't recognize that type. Skipping cell!" << std::endl << std::endl; 
+		return NULL;
+	}
+
+	// create the cell IF the definition was found 
+	std::cout << "Creating " << pCD->name << " (type=" << pCD->type << ") at " 
+		<< position << std::endl; 
+
+	Cell* pCell = create_cell( *pCD ); 
+	pCell->assign_position( position ); 
+
+	// now write any extra data 
+
+	for( int k=4 ; k < tokens.size(); k++ )
+	{
+		double dval = strtod(tokens[k].c_str() , &pTemp ); 
+		bool processed = false; 
+		bool skip = false; 
+
+
+		// if the string is empty, skip 
+		if( tokens[k].size() == 0 )
+		{ skip = true; }
+		else
+		{
+			char c = tokens[k].c_str()[0]; 
+			// use 's' or 'S' to skip the entry 
+			if( c == 's' || c == 'S' )
+			{ skip = true; }
+		}
+
+		// special cases: 
+
+			// volume 
+		if( labels[k] == "volume" && skip == false )
+		{ 
+			pCell->set_total_volume( dval ); 
+			processed = true; 
+		}
+
+		// check behavior dictionary 
+
+		if( processed == false && skip == false )
+		{
+			// if the behavior is found in the dictionary, process it 
+			if( find_behavior_index( labels[k] ) > -1 )
+			{
+				set_single_behavior( pCell , labels[k] , dval ); 
+				processed = true; 
+			}
+		}
+
+		// warning message for any unprocessed variables 
+		if( processed == false && skip == false )
+		{
+			std::cout << "\tWarning: I don't know how to process " << labels[k] 
+			<< " so I skipped it." << std::endl;
+		}
+		// give a notation for any intentinoally skipped variables 
+		if( skip == true )
+		{
+			std::cout << "\tNote: Skipping " << labels[k] 
+			<< " for this cell." << std::endl;
+		}
+
+
+	}
+
+	return pCell;  
+}
+
+void load_cells_csv_v2( std::string filename )
+{
+	// open file 
+	std::ifstream file( filename, std::ios::in );
+	if( !file )
+	{ 
+		std::cout << "Error: " << filename << " not found during cell loading. Quitting." << std::endl; 
+		exit(-1);
+	}
+	else
+	{
+		std::cout << "Loading cells from detailed (v2) CSV file " << filename << " ... " << std::endl; 
+	}
+
+	// get the first line (labels)
+
+	std::string line; 
+	std::getline( file , line ); 
+
+	// tokenize the labels 
+
+	std::vector<std::string> labels = split_csv_labels( line ); 
+
+	// process all remaining lines 
+
+	while (std::getline(file, line))
+	{ process_csv_v2_line(line,labels); }	
+
+	// close the file 
+
+	file.close(); 
+	std::cout << "Done! " << std::endl << std::endl; 
+
+	return; 
+}
+
+void load_cells_csv( std::string filename )
+{
+	// open file 
+	std::ifstream file( filename, std::ios::in );
+	if( !file )
+	{ 
+		std::cout << "Error: " << filename << " not found during cell loading. Quitting." << std::endl; 
+		exit(-1);
+	}
+
+	// determine version 
+	std::string line; 
+	std::getline( file , line );
+	char c = line.c_str()[0]; 
+
+	file.close(); 
+
+	if( c == 'X' || c == 'x' )
+	{ 
+		// v2
+		return load_cells_csv_v2( filename ); 
+	}
+	else
+	{
+		// v1
+		return load_cells_csv_v1( filename ); 
+	}
+
+	return; 
+}
+
 
 }; 

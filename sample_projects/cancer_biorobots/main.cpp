@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -72,14 +72,13 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
-#include <string> 
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
-// custom user modules 
+// put custom code modules here! 
 
-#include "./custom_modules/heterogeneity.h" 
+#include "./custom_modules/custom.h" 
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -105,31 +104,29 @@ int main( int argc, char* argv[] )
 	
 	// copy config file to output directry 
 	system( copy_command ); 
-
+	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
-	
-	// PNRG setup 
-	SeedRandom(); 
 	
 	// time setup 
 	std::string time_units = "min"; 
 
 	/* Microenvironment setup */ 
 	
-	setup_microenvironment(); 
-
+	setup_microenvironment(); // modify this in the custom code 
+	
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
-	create_cell_types();
-	setup_tissue();
-	
 	/* Users typically start modifying here. START USERMODS */ 
 	
+	create_cell_types();
+	
+	setup_tissue();
+
 	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
@@ -152,13 +149,13 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = heterogeneity_coloring_function;
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = cancer_biorobots_coloring_function; 
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
 	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
-	create_plot_legend( filename , cell_coloring_function ); 	
+	create_plot_legend( filename , cell_coloring_function ); 
 	
 	display_citations(); 
 	
@@ -177,11 +174,27 @@ int main( int argc, char* argv[] )
 	}
 	
 	// main loop 
+
+	bool therapy_introduced = false; 
+	double therapy_activation_time = parameters.doubles("therapy_activation_time"); 
 	
 	try 
-	{	
+	{		
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
 		{
+			if( PhysiCell_globals.current_time > therapy_activation_time - 0.01*diffusion_dt && therapy_introduced == false )
+			{
+				std::cout << "Therapy started!" << std::endl; 
+				therapy_introduced = true; 
+				PhysiCell_settings.full_save_interval = parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
+				PhysiCell_settings.SVG_save_interval = parameters.doubles("save_interval_after_therapy_start"); // 3.0; 
+				
+				PhysiCell_globals.next_full_save_time = PhysiCell_globals.current_time; 
+				PhysiCell_globals.next_SVG_save_time = PhysiCell_globals.current_time; 
+				
+				introduce_biorobots();
+			} 	
+
 			// save data if it's time. 
 			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
 			{
@@ -214,12 +227,16 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
 			}
-			
+
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
+			
+			/*
+			  Custom add-ons could potentially go here. 
+			*/
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}

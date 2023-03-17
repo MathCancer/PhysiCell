@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -71,33 +71,34 @@
 using namespace BioFVM; 
 using namespace PhysiCell;
 
-// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
-void tumor_cell_phenotype_with_therapy( Cell* pCell, Phenotype& phenotype, double dt ); // done 
+// setup functions to help us along 
 
-void create_cargo_cell_type( void );  //done 
-void create_worker_cell_type( void ); // done 
+void create_cell_types( void );
+void setup_tissue( void ); 
 
-// set the tumor cell properties, then call the function 
-// to set up the tumor cells 
-void create_cell_types( void ); // done 
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
 
-void setup_tissue(); 
+// custom pathology coloring function 
 
-void introduce_biorobots( void );  // done 
+std::vector<std::string> my_coloring_function( Cell* );
 
-// set up the microenvironment to include the immunostimulatory factor 
-void setup_microenvironment( void );   // done 
+// custom functions can go here 
 
-std::vector<std::string> cancer_biorobots_coloring_function( Cell* ); // done 
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
-// cell rules for extra elastic adhesion
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
-bool worker_cell_attempt_attachment( Cell* pWorker, Cell* pCargo , double dt ); // done 
+std::vector<std::string> robot_coloring_function( Cell* pCell ); 
 
-void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); // at mechanics time scale 
+void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); 
+void cargo_cell_rule( Cell* pCell , Phenotype& phenotype , double dt ); 
+void director_cell_rule( Cell* pCell , Phenotype& phenotype , double dt );  
+
 void worker_cell_motility( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-void cargo_cell_phenotype_rule( Cell* pCell , Phenotype& phenotype , double dt ); // done 
-void cargo_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); // done 
 
-void biorobots_contact_function( Cell* , Phenotype& , Cell* , Phenotype& , double ); 
+void create_cargo_cluster_6( std::vector<double>& center ); 
+void create_cargo_cluster_7( std::vector<double>& center ); 
+void create_cargo_cluster_3( std::vector<double>& center );

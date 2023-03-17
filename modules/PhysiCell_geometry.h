@@ -70,6 +70,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include "../core/PhysiCell.h"
 #include "./PhysiCell_settings.h"
@@ -79,13 +80,23 @@ namespace PhysiCell
 {
 // loaders 
 	
-void load_cells_csv( std::string filename ); // done 
+void load_cells_csv_v1( std::string filename ); // done 
+
+
+std::vector<std::string> split_csv_labels( std::string labels_line ); // done 
+Cell* process_csv_v2_line( std::string line , std::vector<std::string> labels ); // done 
+void load_cells_csv_v2( std::string filename ); // done 
+
+
+void load_cells_csv( std::string filename ); 
+
+
+
 void load_cells_mat( std::string filename ); 
 void load_cells_physicell( std::string filename ); 
 
 bool load_cells_from_pugixml( pugi::xml_node root ); 
 bool load_cells_from_pugixml( void ); // load cells based on default config XML root 
-
 
 //	
 // 2D functions 

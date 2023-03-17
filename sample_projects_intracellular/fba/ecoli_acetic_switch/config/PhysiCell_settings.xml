@@ -95,6 +95,10 @@
 		<dt_phenotype units="min">3</dt_phenotype>  <!-- 6 min -->
 	</overall>
 	
+	<options>
+		<disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
+	</options>
+
 	<parallel>
 		<omp_num_threads>8</omp_num_threads>
 	</parallel> 

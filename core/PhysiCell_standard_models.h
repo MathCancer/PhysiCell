@@ -135,6 +135,7 @@ void initialize_default_cell_definition( void ); // done
 void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
 
 void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt );
+void standard_elastic_contact_function_confluent_rest_length( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt );
 void evaluate_interactions( Cell* pCell, Phenotype& phenotype, double dt );
 
 // new in 1.10.0 
@@ -146,6 +147,8 @@ void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt
 void advanced_chemotaxis_function_normalized( Cell* pCell, Phenotype& phenotype , double dt ); 
 void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
 
+void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt ); 
+void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt ); 
 
 	
 };
