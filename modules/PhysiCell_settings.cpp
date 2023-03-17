@@ -126,7 +126,7 @@ PhysiCell_Settings::PhysiCell_Settings()
 	enable_legacy_saves = false; 
 	
 	SVG_save_interval = 60; 
-	enable_SVG_saves = false; 
+	enable_SVG_saves = true; 
 	enable_substrate_plot = false;
 	substrate_to_monitor = "oxygen"; 
 	limits_substrate_plot = false;
