@@ -19,8 +19,8 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: base-devel flex bison gcc make diffutils mingw-w64-x86_64-toolchain
-        
+        install: base-devel flex bison gcc make diffutils mingw-w64-x86_64-toolchain mingw-w64-x86_64-ca-certificates
+    
     - name: Build Virus Macrophage project
       run: |
         make virus-macrophage-sample
