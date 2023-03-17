@@ -102,7 +102,7 @@ biorobots-sample:
 cancer-biorobots-sample:
 	cp ./sample_projects/cancer_biorobots/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/cancer_biorobots/main-cancer_biorobots.cpp ./main.cpp 
+	cp ./sample_projects/cancer_biorobots/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/cancer_biorobots/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
