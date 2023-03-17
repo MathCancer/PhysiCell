@@ -342,7 +342,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	 
 }
 
-std::vector<std::string> my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc )
+std::vector<std::string> my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc )
 {
 	 return paint_by_density_percentage( concentration,  max_conc,  min_conc); 
 	 
