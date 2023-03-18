@@ -2040,12 +2040,13 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 	return; 
 }
 
-void write_neighbor_graph( std::string filename_base )
+void write_neighbor_graph( std::string filename )
 {
+	/*
 	char filename [1024]; 
 	sprintf( filename , "%s_cell_neighbor_graph.txt" , filename_base.c_str() ); 
 	
-	/* store filename without the relative pathing (if any) */ 
+	// store filename without the relative pathing (if any) 
 	char filename_without_pathing [1024];
 	char* filename_start = strrchr( filename , '/' ); 
 	if( filename_start == NULL )
@@ -2053,6 +2054,7 @@ void write_neighbor_graph( std::string filename_base )
 	else	
 	{ filename_start++; } 
 	strcpy( filename_without_pathing , filename_start );  
+	*/
 
 	std::ofstream of( filename , std::ios::out ); 
 	std::stringstream buffer; 
@@ -2077,12 +2079,13 @@ void write_neighbor_graph( std::string filename_base )
 }
 
 
-void write_attached_cells_graph( std::string filename_base ) 
+void write_attached_cells_graph( std::string filename ) 
 {
+	/*
 	char filename [1024]; 
 	sprintf( filename , "%s_cell_attached_graph.txt" , filename_base.c_str() ); 
 	
-	/* store filename without the relative pathing (if any) */ 
+	// store filename without the relative pathing (if any) 
 	char filename_without_pathing [1024];
 	char* filename_start = strrchr( filename , '/' ); 
 	if( filename_start == NULL )
@@ -2090,6 +2093,7 @@ void write_attached_cells_graph( std::string filename_base )
 	else	
 	{ filename_start++; } 
 	strcpy( filename_without_pathing , filename_start );  
+	*/
 
 	std::ofstream of( filename , std::ios::out ); 
 	std::stringstream buffer; 
