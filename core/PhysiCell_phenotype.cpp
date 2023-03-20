@@ -698,9 +698,7 @@ Mechanics::Mechanics()
 	relative_detachment_distance = relative_maximum_adhesion_distance;
 
 	maximum_attachment_rate = 1.0; 
-	
-	maximum_attachment_rate = 1.0; 
-	
+		
 	return; 
 }
 
