@@ -2,7 +2,7 @@
 
 **Version:** 1.11.0
 
-**Release date:** 18 March 2023
+**Release date:** 20 March 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -185,6 +185,8 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + Automated connection of cancer, basement membrane (BM) agents with spring links using the built-ins noted above. No user intervention or code required beyond setting nonzero rates. 
   + Cancer cells manually set to apoptose at 10000 min. 
 
++ Updated PhysiBoSS to remove cell definition "inheritance," (with "flat", self-standing cell definitions), to make it compatible with PhysiCell Studio. Hereafter, all properties of each cell definition must be explicitely defined. 
+
 ### Minor new features and changes: 
 #### 1.11.0
 + Updated the `paint_by_number_cell_coloring` coloring function to paint the entire cell white if apoptotic, and brown if necrotic. (Previously, we colored the nucleus based on live/dead status.) This improves compatibility with the model GUI. 
@@ -192,6 +194,12 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Changed the default value of `attachment_rate` from 10 to 0 (in the `Mechanics` class) to avoid unexpected triggering of automated spring adheions. 
 
 + Added a safety check to `operator[]` for Parameters, based on [PR145](https://github.com/MathCancer/PhysiCell/pull/145/). Thanks, Vincent Noel!! 
+
++ In PhysiBoSS, introduced a new state inheritance mechanism (global, and node-specific). 
+
++ PhisBoSS has a new optional start time, to initiate the intracellular model at t > 0.
+
++ Updated PhysiBoSS Cell Lines sample project (flatten XML, initial positions as CSV).
 
 ### Beta features (not fully supported):
 #### 1.11.0
@@ -233,6 +241,10 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Merged Daniel Bergman's [PR 126](https://github.com/MathCancer/PhysiCell/pull/126), which fixes cell legend colors. Thank's Daniel! 
 
 + Improved safety checks in the cell orientation function, thanks to Randy Heiland's [PR 122](https://github.com/MathCancer/PhysiCell/pull/122). Thanks, Randy!
+
++ Now forcing Mersenne Twister as random generator in PhysiBoSS (use or /dev/random by MaBoSS would max out system descriptor)
+
++ MaBoSS BND/CFG parsing is now in an OpenMP critical block (flex/bison parser is not thread safe)
 
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
