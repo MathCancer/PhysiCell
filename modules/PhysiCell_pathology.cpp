@@ -402,7 +402,7 @@ std::string formatted_minutes_to_DDHHMM( double minutes )
 	return output ;
 }
 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) )
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*substrate_coloring_function)(double, double, double) )
 {
 	double X_lower = M.mesh.bounding_box[0];
 	double X_upper = M.mesh.bounding_box[3];
@@ -429,11 +429,24 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 		exit(-1); 
 	} 
 	
-	Write_SVG_start( os, plot_width , plot_height + top_margin );
+	if(PhysiCell_settings.enable_substrate_plot == true && (*substrate_coloring_function) != NULL){
 
-	// draw the background 
-	Write_SVG_rect( os , 0 , 0 , plot_width, plot_height + top_margin , 0.002 * plot_height , "white", "white" );
+		double legend_padding = 200.0; // I have to add a margin on the left to visualize the bar plot and the values
 
+		Write_SVG_start( os, plot_width + legend_padding, plot_height + top_margin );
+
+		// draw the background 
+		Write_SVG_rect( os , 0 , 0 , plot_width + legend_padding, plot_height + top_margin , 0.002 * plot_height , "white", "white" );
+
+	}
+	else{
+
+		Write_SVG_start( os, plot_width , plot_height + top_margin );
+
+		// draw the background 
+		Write_SVG_rect( os , 0 , 0 , plot_width, plot_height + top_margin , 0.002 * plot_height , "white", "white" );
+
+	}
 	// write the simulation time to the top of the plot
  
 	char* szString; 
@@ -475,6 +488,115 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	double normalizer = 78.539816339744831 / (voxel_size*voxel_size*voxel_size); 
  
  // color in the background ECM
+	if(PhysiCell_settings.enable_substrate_plot == true && (*substrate_coloring_function) != NULL)
+	{
+		double dz_stroma = M.mesh.dz;
+		double max_conc;
+		double min_conc;
+
+		std::string sub = PhysiCell_settings.substrate_to_monitor;
+		int sub_index = M.find_density_index(sub); // check the substrate does actually exist
+		if(sub_index == -1){
+			std::cout << "ERROR SAMPLING THE SUBSTRATE: COULD NOT FIND THE SUBSTRATE " << sub << std::endl; //if not print error message
+		}
+		else
+		{
+			if(PhysiCell_settings.limits_substrate_plot){
+			 max_conc = PhysiCell_settings.max_concentration;
+			 min_conc = PhysiCell_settings.min_concentration;
+			}
+			else{
+			 max_conc = M.density_vector(5)[sub_index];
+			 min_conc = M.density_vector(5)[sub_index];	 // so here I am sampling the concentration to set a min and a mx
+			//look for the max and min concentration among all the substrates
+			for (int n = 0; n < M.number_of_voxels(); n++)
+			{
+				double concentration = M.density_vector(n)[sub_index];
+				if (concentration > max_conc)
+					max_conc = concentration;
+				if (concentration < min_conc)
+					min_conc = concentration;
+			}
+			};
+
+			//check that max conc is not zero otherwise it is a big problem!
+			if(max_conc == 0){
+
+				max_conc = 1.0;
+
+			};
+		
+			for (int n = 0; n < M.number_of_voxels(); n++)
+			{
+				auto current_voxel = M.voxels(n);
+				int z_center = current_voxel.center[2];
+				double z_displ = z_center -  dz_stroma/2; 
+				
+				double z_compare = z_displ;
+
+				if (default_microenvironment_options.simulate_2D == true){
+				z_compare = z_center;
+				};
+
+				if (z_slice == z_compare){			//this is to make sure the substrate is sampled in the voxel visualized (so basically the slice)
+					int x_center = current_voxel.center[0];
+					int y_center = current_voxel.center[1];
+					
+					double x_displ = x_center -  dx_stroma/2;
+					double y_displ = (y_center - dy_stroma) +  dy_stroma/2;
+
+					double concentration = M.density_vector(n)[sub_index];
+
+					std::vector< std::string > output = substrate_coloring_function(concentration, max_conc, min_conc );
+
+					Write_SVG_rect( os , x_displ - X_lower , y_displ - Y_lower, dx_stroma, dy_stroma , 0 , "none", output[0] );
+				}
+
+			}
+
+			// add legend for the substrate
+
+			os << " <g id=\"legend\" " << std::endl 
+	   		   << "    transform=\"translate(0," << plot_height + 25 << ") scale(1,-1)\">" << std::endl;  //for some misterious reasons, the tissue part in the SVG is rotated so I have to re-rotate to draw
+																										  // the legend, otherwise it will be printed upside down
+			int padding = 0;
+
+			double conc_interval = (max_conc - min_conc) / 13; // setting the interval for the values in the legend. I will divide the legend in 13 parts (as in the jupyter notebook)
+
+			for(int i = 0; i <= 12; i++){ //creating 13 rectangoles for the bar, each one with a different shade of color.
+
+				double concentration_sample = min_conc + (conc_interval * i); // the color depends on the concentration, starting from the min concentration to the max (which was sampled before)
+
+				std::vector< std::string > output = substrate_coloring_function(concentration_sample, max_conc, min_conc );
+
+				padding = 25 * i;
+
+				double upper_left_x = plot_width + 25.0;
+				double upper_left_y = ((plot_height - 25) / 13.0) * i; // here I set the position of each rectangole
+
+				Write_SVG_rect(os, upper_left_x, plot_height - upper_left_y - 60, 25.0, ((plot_height - 25.0) / 13.0), 0 , "none", output[0]); //drawing each piece of the barplot
+
+				if(i%2 == 0){ // of course I am not printing each value of the barplot, otherwise is too crowded, so just one each 2
+
+					char* szString; 
+					szString = new char [1024]; 
+
+					sprintf( szString , "- %e", concentration_sample);
+
+					Write_SVG_text( os , szString, upper_left_x + 24, plot_height - upper_left_y + 5.31, font_size , 
+						PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() ); // misterious values set with a trial and error approach due to OCD. But now the legend is coherent at pixel level
+
+					delete [] szString;
+
+				}
+
+			}
+
+			Write_SVG_rect(os, 25.0 + plot_width, 25.0, 25.0, plot_height - 25.0, 0.002 * plot_height , "black", "none"); // nice black contour around the legend
+
+			os << "  </g>" << std::endl; // no more rotation, restoring the tissue object in the SVG
+		}
+	}
 /* 
  if( ECM.TellRows() > 0 )
  {
@@ -649,6 +771,21 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	return; 
 }
 
+std::vector<std::string> paint_by_density_percentage( double concentration, double max_conc, double min_conc ){
+
+	std::vector< std::string > output( 4 , "black" );
+	int color = (int) round( ((concentration - min_conc) / (max_conc - min_conc)) * 255 );
+	if(color > 255){
+		color = 255;
+	}
+	char szTempString [128];
+	sprintf( szTempString , "rgb(%u,234,197)", 255 - color);
+	output[0].assign( szTempString );
+
+	return output;
+
+}
+
 std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
 {
 	static std::vector< std::string > colors(0); 
@@ -704,6 +841,25 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
 			output[3] = "rgb(139,69,19)";
 		}
 	}
+
+	// new March 2023 (for better compatibility with studio)
+
+	// if dead, use live color for the outline
+	if( pCell->phenotype.death.dead == true )
+	{ output[1] = interior_color; } 
+
+	// necrotic cells are brown 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+	{ interior_color = "saddlebrown"; }
+	// apoptotic cells are white 
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic ) 
+	{ interior_color = "white"; }
+
+	output[0] = interior_color; // set cytoplasm color 
+	output[2] = interior_color; // set cytoplasm color 
+	output[3] = interior_color; // set cytoplasm color 
 	
 	return output; 
 }	
@@ -745,7 +901,7 @@ void create_plot_legend( std::string filename , std::vector<std::string> (*cell_
 		// place a big circle with cytoplasm colors 
 		Write_SVG_circle(os,cursor_x, cursor_y , temp_cell_radius , 1.0 , colors[1] , colors[0] ); 
 		// place a small circle with nuclear colors 
-		Write_SVG_circle(os,cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[2] , colors[3] ); 
+		Write_SVG_circle(os,cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[3] , colors[2] ); 
 		
 		// place the label 
 		

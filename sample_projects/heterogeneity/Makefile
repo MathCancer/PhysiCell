@@ -58,18 +58,18 @@ PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := heterogeneity.o
+PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
-# compile the project  
+# compile the project 
 
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
-	make name 
+	make name
 
 name:
 	@echo ""
@@ -150,23 +150,23 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
-	
+
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
 	
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 	
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 	
 	
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
 	
 # user-defined PhysiCell modules
 
-heterogeneity.o: ./custom_modules/heterogeneity.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/heterogeneity.cpp
+custom.o: ./custom_modules/custom.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 # cleanup
 
@@ -187,9 +187,6 @@ clean:
 	rm -f $(PROGRAM_NAME)*
 	
 data-cleanup:
-	# rm -f *.mat
-	# rm -f *.xml
-	# rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
@@ -267,3 +264,25 @@ upgrade: $(SOURCE)
 	mv -f PhysiCell/documentation/User_Guide.pdf documentation
 	rm -f -r PhysiCell
 	rm -f $(SOURCE) 
+
+# use: make save PROJ=your_project_name
+PROJ := my_project
+
+save: 
+	echo "Saving project as $(PROJ) ... "
+	mkdir -p ./user_projects
+	mkdir -p ./user_projects/$(PROJ)
+	mkdir -p ./user_projects/$(PROJ)/custom_modules
+	mkdir -p ./user_projects/$(PROJ)/config 
+	cp main.cpp ./user_projects/$(PROJ)
+	cp Makefile ./user_projects/$(PROJ)
+	cp VERSION.txt ./user_projects/$(PROJ)
+	cp ./config/* ./user_projects/$(PROJ)/config
+	cp ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
+
+load: 
+	echo "Loading project from $(PROJ) ... "
+	cp ./user_projects/$(PROJ)/main.cpp .
+	cp ./user_projects/$(PROJ)/Makefile .
+	cp ./user_projects/$(PROJ)/config/* ./config/ 
+	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 

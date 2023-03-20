@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -200,6 +200,17 @@ double decreasing_linear_response_function( double s, double s_min , double s_ma
 	s *= -1; // this is (s_max-s)/(s_max-s_min)
 	return s; 
 }
+
+double interpolate_behavior( double base_value , double max_changed_value, double response )
+{
+	double output = max_changed_value; // bM
+	output -= base_value; // (bM-b0); 
+	output *= response; // R*(bM-b0); 
+	output += base_value; // b0 + (bM-b0)*R; 
+	return output; 
+}
+
+
 
 
 };

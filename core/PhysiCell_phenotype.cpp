@@ -690,7 +690,7 @@ Mechanics::Mechanics()
 	maximum_number_of_attachments = 12;
 	attachment_elastic_constant = 0.01; 
 
-	attachment_rate = 10; 
+	attachment_rate = 0; // 10.0 prior ot March 2023
 	detachment_rate = 0; 
 
 	/* to be deprecated */ 
@@ -698,9 +698,7 @@ Mechanics::Mechanics()
 	relative_detachment_distance = relative_maximum_adhesion_distance;
 
 	maximum_attachment_rate = 1.0; 
-	
-	maximum_attachment_rate = 1.0; 
-	
+		
 	return; 
 }
 
@@ -1266,6 +1264,7 @@ Cell_Interactions::Cell_Interactions()
 	live_phagocytosis_rates = {0.0}; 
 	damage_rate = 1.0; 
 	attack_rates = {0.0}; 
+	immunogenicities = {1}; 
 	fusion_rates = {0.0}; 
 	
 	return; 
@@ -1281,6 +1280,7 @@ void Cell_Interactions::sync_to_cell_definitions()
 		live_phagocytosis_rates.resize( number_of_cell_defs, 0.0); 
 		attack_rates.resize( number_of_cell_defs, 0.0); 
 		fusion_rates.resize( number_of_cell_defs, 0.0); 
+		immunogenicities.resize( number_of_cell_defs , 1.0 ); 
 	}
 	
 	return; 
@@ -1307,6 +1307,13 @@ double& Cell_Interactions::fusion_rate( std::string type_name )
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 	int n = cell_definition_indices_by_name[type_name]; 
 	return fusion_rates[n]; 
+}
+
+double& Cell_Interactions::immunogenicity( std::string type_name )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name]; 
+	return immunogenicities[n]; 
 }
 
 Cell_Transformations::Cell_Transformations()

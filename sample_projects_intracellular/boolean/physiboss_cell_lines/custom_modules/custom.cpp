@@ -148,48 +148,8 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	Cell* pC;
-	
-	// We have four different cells populations
-	// All start with A active and C inactive, B is random
-	// We print the value of C
-	
-	for (int i=0; i < 90; i+= 10)
-		for (int j=0; j < 90; j+= 10){
-			
-			// bottom left : default
-			// the formula for C is A&B. Meaning that C will only activate for half the cells
-			pC = create_cell(get_cell_definition("default")); 
-			pC->assign_position(-i-10, -j-10, 0.0 );
-			
-			// bottom middle : other
-			// the formula for C is A|B. C will activate in all cells
-			pC = create_cell(get_cell_definition("other")); 
-			pC->assign_position(i+10, -j-10, 0.0 );
-
-			// top left : another
-			// Here we mutate the C node at zero, so it will stay there
-			pC = create_cell(get_cell_definition("another")); 
-			pC->assign_position(-i-10, j+10, 0.0 );
-			
-			// top middle : yet_another
-			// Here we change the default value for the rates, acelerating the activation of C
-			pC = create_cell(get_cell_definition("yet_another")); 
-			pC->assign_position(i+10, j+10, 0.0 );
-			
-			// top right : yet_yet_another
-			// Here we acelerate the activation of C by changing the scaling value
-			pC = create_cell(get_cell_definition("yet_yet_another")); 
-			pC->assign_position(i+110, j+10, 0.0 );
-			
-			// bottom right : last_one
-			// Here we start with $time_scale = 0, then at the middle of the simulation we set it to 0.1
-			pC = create_cell(get_cell_definition("last_one")); 
-			pC->assign_position(i+110, -j-10, 0.0 );
-		}
-
-		
-	return; 
+	// load cells from your CSV file
+	load_cells_from_pugixml(); 	
 }
 
 void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
@@ -199,6 +159,7 @@ void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
 	){
 		pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
 	}
+
 }
 
 void post_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )

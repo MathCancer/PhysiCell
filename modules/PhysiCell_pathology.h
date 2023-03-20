@@ -103,6 +103,9 @@ std::vector<double> transmission( std::vector<double>& incoming_light, std::vect
 // each string is either rgb(R,G,B) or none 
 
 std::vector<std::string> simple_cell_coloring( Cell* pCell ); // done 
+
+std::vector<std::string> paint_by_density_percentage( double concentration, double max_conc, double min_conc ); //done
+
 std::vector<std::string> false_cell_coloring_Ki67( Cell* pCell ); // done 
 std::vector<std::string> false_cell_coloring_live_dead( Cell* pCell ); // done 
 
@@ -117,7 +120,7 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell ); // done
 
 std::string formatted_minutes_to_DDHHMM( double minutes ); 
 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) ); // done
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*substrate_coloring_function)(double, double, double) = NULL ); // done
 
 void SVG_plot_with_stroma( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) , 
 	int ECM_index, std::vector<std::string> (*ECM_coloring_function)(double) ); // planned

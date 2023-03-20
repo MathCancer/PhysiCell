@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -142,6 +142,7 @@ class Cell_State
  private:
  public:
 	std::vector<Cell*> attached_cells; 
+	std::vector<Cell*> spring_attachments; 
 
 	std::vector<Cell*> neighbors; 
 	std::vector<double> orientation;
@@ -231,6 +232,10 @@ class Cell : public Basic_Agent
 	void detach_cell( Cell* pRemoveMe ); // done 
 	void remove_all_attached_cells( void ); // done 
 
+	void attach_cell_as_spring( Cell* pAddMe ); // done 
+	void detach_cell_as_spring( Cell* pRemoveMe ); // done 
+	void remove_all_spring_attachments( void ); // done 
+
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 
 	
@@ -285,6 +290,10 @@ extern std::vector<double> (*cell_division_orientation)(void);
 
 void attach_cells( Cell* pCell_1, Cell* pCell_2 );
 void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
+
+void attach_cells_as_spring( Cell* pCell_1, Cell* pCell_2 );
+void detach_cells_as_spring( Cell* pCell_1 , Cell* pCell_2 );
+
 
 std::vector<Cell*> find_nearby_cells( Cell* pCell ); // new in 1.8.0
 std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell ); // new in 1.8.0

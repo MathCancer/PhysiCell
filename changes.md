@@ -1,8 +1,291 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
-**Version:** 1.10.4
+**Versions:** 1.11.0 - 
 
-**Release date:** 18 July 2022
+**Release dates:** 20 March 2023 - 
+
+## Overview: 
+PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
+
+**Reference:** A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
+
+Visit http://MathCancer.org/blog for the latest tutorials and help. 
+
+**Notable recognition:**
++ [2019 PLoS Computational Biology Research Prize for Public Impact](https://blogs.plos.org/biologue/2019/05/31/announcing-the-winners-of-the-2019-plos-computational-biology-research-prize/)
+
+### Key makefile rules:
+
+**`make`**: compiles the current project. If no 
+                     project has been defined, it first 
+                     populates the cancer heterogeneity 2D 
+                     sample project and compiles it 
+   
+**`make project-name`**: populates the indicated sample project. 
+                     Use "make" to compile it. 
+
+   * **`project-name`** choices:
+      * template 
+      * biorobots-sample 
+      * cancer-biorobots-sample 
+      * cancer-immune-sample
+      * celltypes3-sample 
+      * heterogeneity-sample 
+      * pred-prey-farmer 
+      * virus-macrophage-sample 
+      * worm-sample
+      * ode-energy-sample 
+      * physiboss-cell-lines-sample 
+      * cancer-metabolism-sample
+      * interaction-sample
+      * mechano-sample
+
+**`make list-projects`** : list all available sample projects 
+
+**`make clean`**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
+
+**`make data-cleanup`**  : clears out all simulation data 
+
+**`make reset`**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
+
+**`make jpeg`**          : uses ImageMagick to convert the SVG files in the output directory to JPG (with appropriate sizing to make movies). Supply `OUTPUT=foldername` to select a different folder. 
+
+**`make movie`**         : uses ffmpeg to convert the JPG files in the output directory an mp4 movie. Supply `OUTPUT=foldername` to select a different folder, or `FRAMERATE=framerate` to override the frame rate.
+
+**`make upgrade`**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
+
+### Key Links 
+**Homepage:**     http://PhysiCell.MathCancer.org 
+
+**Downloads:**    http://PhysiCell.sf.net
+
+**Support:**      https://sourceforge.net/p/physicell/tickets/
+
+**Quick Start:**  Look at QuickStart.md in the documentation folder. 
+
+**User Guide:**   Look at UserGuide.pdf in the documentation folder. 
+ 
+**Setup and Training:**	See last year's workshop and hackathon at https://github.com/PhysiCell-Training/ws2021  
+ 
+**Older Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
+
+**Latest info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
+
+See changes.md for the full change log. 
+
+* * * 
+## Release summary: 
+Version 1.11.0 adds several notable features, fixes bugs, and further expands the "signals" and "behaviors" that can be read and written with a simple API to facilitate building models. In particular, we add a brand new CSV format for initial cell positions (with more robust naming of cells by their human-readable names, a "header" line, and ability to extensively add and specificy individual cell properties), a new ability to save and load user projects in the `user_projects` directory, automated dynamic formation and breakage of spring-based cell-cell adhesions (based upon the cell-cell adhesion affinities, attachment rates, and detachment rates), automated inclusion of spring-based adhesions (at the mechanics time step) without need for the user to explicitly supply a spring function, a new "mechano" sample project to illustrate the new automated spring functionality, and updates to PhysiBoSS to ensure compatibility with the rapidly improving PhysiCell Studio. In addition, there is new capability of adding a background coloring (e.g., an oxygen heatmap) to SVG ouptuts--see the `interaction-sample` for an illustration (use the alternate XML config file to enable). This release includes several bugfixes, the most critical of which is to update the parameters for necrotic cells (which had previously been misset in the XML files, thus disabling necrotic cell lysis and shrinking). 
+
+**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
+
+**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
+ 
+### Major new features and changes in the 1.11.z versions
+#### 1.11.0
++ New and improved (v2) cell CSV format for cell import. This allows more intuitive statement of initial cell positions. The first line of your CSV file must be: 
+
+   ```x,y,z,cell type```
+
+  Every subsequent line is a single cell, now referencing cell types by their human-readable names (as defined in your XML configuration file) rather than requiring the integer `ID`. So, a sample second line to place a CD8 T cell at (30,-10,12) would be: 
+
+   ```30,-10,12,CD8 T cell```
+
+  Moreover, the new format allows you to initialize a variety of individual cell properties, including (total) `volume` and any supported cell beheavior. For example, if your cell definitions have custom variables `GFP` ond `oncoprotein`, then you can extend the first header line to: 
+
+  ```x,y,z,cell type,custom:GFP,custom:oncoprotein```
+
+  And then subsequent cells look like this: 
+
+    ```30,-10,12,CD8 T cell,0.5,3.2```
+ 
+  You can tell our parser to skip specifying a specific variable with `s` or `S` or an empty entry. Here, the first cell would skip writing the initial value of the GFP, and teh second would skip initializing the oncoprotein: 
+
+    ```30,-10,12,CD8 T cell,,3.2```  
+    ```50,13,-4,M0 Macrophage,0.5,s```
+
+  We will continue to automatically support older CSV cell files; any cells CSV file missing the first line of headers will be processed in the old format.  
+
++ Ability to save and load user projects
+   + Use `make save PROJ=project_name` to save your project to a folder in `./user_projects` named `project_name`. For example: 
+
+       ```make save PROJ=new_tumor_sample```
+
+     saves your project as `new_tumor_sample`. In particular, it saves your `Makefile`, `main.cpp`, everything in `./config`, and everything in `./custom_modules`. 
+
+   + Use `make load PROJ=project_name` to load your project from a folder in `./user_projects` named `project_name`. For example: 
+
+        ```make load PROJ=new_tumor_sample```
+
+     loads your project from `new_tumor_sample`. In particular, it loads your `Makefile`, `main.cpp`, everything in `./config`, and everything in `./custom_modules`. 
+     
++ Extended `cell_interactions` to include a vector `immunogenicities`: for a cell, `immunogenicity[j]` is how immunogenic this cell is to the jth cell type. By default, these will all be set to 1. (See next point.) 
+
++ Updated the built-in "attack" model: 
+  $$\textrm{Probability cell } i \textrm{ attacks cell } j \textrm{ in } [t,t+\Delta t] = \textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t $$ 
+  By setting $\textrm{immunogenicity}\_{ji} = 1$ as teh default value, we maintain compatibiltiy with prior models. This is a way to further modulate immunogenic and cytotoxic interactions. 
+
++ Began migrating built-in sample projects to be compatible with the model builder GUI and the upcoming PhysiCell Studio, including: 
+  + template
+  + biorobots (updates spring constant from 0.05 to 0.5)
+  + heterogeneity
+  + cancer biorobots (updates spring constant from 0.05 to 0.5)
+
++ Added new signals: 
+  + `apoptotic` returns 1 if a cell is apoptotic, and 0 otherwise 
+  + `necrotic` returns 1 if a cell is necrotic, and 0 otherwise 
+
+  As always, access these via `double get_single_signal(Cell* pCell,std::string sig_name)`. 
+
++ Added new behaviors: 
+  + `immunogenicity to [cell type]` is the cell's immunogenicity to a specific cell type. The probability that cell `i` attacks cell `j` in $[t,t+\Delta t]$ is $\textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t.$
+  + `cell attachment rate` is the rate at which the cell forms spring links with other cells. 
+  + `cell detachment rate` is the rate at which spring links break. 
+  + `maximum number of cell attachments` is the maximum number of spring links. 
+  + `is_movable` can be set to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. This behavior right now is somewhat fragile if used dynmaically, but can reliably be used during tissue setup. 
+
+  As always, access these via `double get_single_behavior(Cell* pCell,std::string beh_name)` and `void set_single_behavior(Cell* pCell,std::string beh_name,double new_value)`.
+
++ Added new standard model `void dynamic_attachments(Cell*, Phenotype& ,double);` This function can automate dynamic attachments and detachments. When calling this function for cell $i$: 
+  + For each current attachment, it detaches with probability $\textrm{detachment rate}\_i \Delta t$ 
+  + For each cell $j$ in the neighbors list, it forms an attachment with probability 
+  
+    $$\textrm{Prob attach } i \textrm{ to cell } j = \textrm{adhesion affinity}\_j \cdot \textrm{attachment rate}\_i \cdot \Delta t.$$
+    
+    The attachment is only formed if both cell $i$ and $j$ have not exceeded their maximum number of 
+    attachments. 
+
++ Added a new `spring_attachments` (of type `std::vector<Cell*>`) to cell `state` to track automated formation and removal of spring-link adhesions separately of the user-focused `attached` data struture. This will allow users to continue managing the `attachments` structure on their own for custom contact functions, without interference from automated springs (see more below).
+
++ Added new standard model `void dynamic_spring_attachments(Cell*, Phenotype& ,double);` This functions exactly as the `dynamic_attachments` function, except it stores attached cells to `cell.state.spring_attachments` to avoid interfering with the user-managed `cell.state.attachments` data struture. 
+
++ **Automated spring attachments / detachments:** the new `dynamic_spring_attachments` function is automatically called at every mechancis time step, with cell-cell spring attachment and detachment based on the cells' current rates. Each cell evaluates spring-like elastic adhesion betwen itslef and cells in `cell.state.spring_attachments` to add to its own velocity. Some notes: 
+  + Each cell automatically removes all its spring attachments during division 
+  + Each cell automatically removes all its spring attachments at the *end* of death. If you want dead cells to have increased detachment, add a rule accordingly using the built-in behavior dictionary. 
+  + If a cell is not movable (`is_movable = false`), then it is not moved by springs, but it can exert spring forces on other cells, allowing it to act as an "anchor". 
+  + This automated spring functionality is completely independent of (and does not interfere with) the user-defined contact function and user-manageed `cell.state.attached` data structure. 
+  + **WARNING:** If in a past life you set `phenotype.mechanics.attachment_rate` to a nonzero rate, you may find yourself surprised with unintended spring adhesions as this new automation kicks in. Please review and revise your configuration file as necessary. 
+  + You can disable this behavior in the XML configuration file: 
+  ```
+      <options>
+          <!-- other options -->
+          <disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
+      </options>
+
++ Added a new `mechano-sample` project that shows automated dynamic attachment and detachment of cells: 
+  + Constant cancer cell birth and death
+  + Basic mechano feedback: high-pressure sets cancer cell birth to zero
+  + Cancer cell phenotype sets high detachment rate upon death. 
+  + Automated connection of cancer, basement membrane (BM) agents with spring links using the built-ins noted above. No user intervention or code required beyond setting nonzero rates. 
+  + Cancer cells manually set to apoptose at 10000 min. 
+
++ Updated PhysiBoSS to remove cell definition "inheritance," (with "flat", self-standing cell definitions), to make it compatible with PhysiCell Studio. Hereafter, all properties of each cell definition must be explicitely defined. 
+
+### Minor new features and changes: 
+#### 1.11.0
++ Updated the `paint_by_number_cell_coloring` coloring function to paint the entire cell white if apoptotic, and brown if necrotic. (Previously, we colored the nucleus based on live/dead status.) This improves compatibility with the model GUI. 
+
++ Changed the default value of `attachment_rate` from 10 to 0 (in the `Mechanics` class) to avoid unexpected triggering of automated spring adheions. 
+
++ Added a safety check to `operator[]` for Parameters, based on [PR145](https://github.com/MathCancer/PhysiCell/pull/145/). Thanks, Vincent Noel!! 
+
++ In PhysiBoSS, introduced a new state inheritance mechanism (global, and node-specific). 
+
++ PhisBoSS has a new optional start time, to initiate the intracellular model at t > 0.
+
++ Updated PhysiBoSS Cell Lines sample project (flatten XML, initial positions as CSV).
+
++ Started combining change log into a more compact format: Each release family (1.y.z, such as 1.10.z) receives an extended entry with new changes grouped by minor release. This allows major releases to be grouped with subsequent minor feature enhancements and bug fixes, for a much shorter change log that's easier to read. README will document all changes of the current release family. 
+
+### Beta features (not fully supported):
+#### 1.11.0
++ Added `bool read_microenvironment_from_matlab( std::string mat_filename )` to `BioFVM_MultiCellDS`. This will read and overwrite from a stored microenvironment (in `mat_filename`, saved as a level 4 Matlab file) if it has the following format: 
+  + Number of columns = number of voxels (must match the size as configured in the `PhysiCell_settings.xml` file)
+  + Number of rows = 3 + 1 + number of diffusing substrates (must match the size and ordering as configured in the `PhysiCell_settings.xml` file)
+  + Row 0: x coordinate of each voxel
+  + Row 1: y coordinate of each voxel 
+  + Row 2: z coordinate of each voxel
+  + Row 3: volume of each voxel 
+  + Rows j to end: value of (j-4)th substrate in each voxel 
+  + Column ordering: 
+    * For each z from low to high:
+      * For each y from low to high: 
+        * for each x from low to high: 
+          store voxel X[i] , Y[j], Z[k]. 
+  + **Note:** This matches how PhysiCell saves the microenvironment. This will read any PhysiCell-saved microenvironment, so long as its sizes matches your current settings.  
+  + **Note:** This may be fragile. It has only minimal error-checking. 
+
+  + Set default cell attachment rate to 0 in the template project and most sample projects to avoid unexpectedly triggering the new autmoated spring adhesions; users must affirmatively set a nonzero attachment rate to trigger this new automation in an individual cell. 
+
+  + In repsonse to [PR 123](https://github.com/MathCancer/PhysiCell/pull/123), `parameters.TYPE.find_index(search_name)` now returns -1 if the searched term isn't found. Thanks, Daniel Bergman! 
+ 
+### Bugfixes: 
+
+#### 1.11.0
++ Fixed bug in cancer biorobots project that mistakenly set max cancer cell proliferation rate to 0.000072 instead of 0.00072
+
++ Fixed multiple broken signals/behaviors. 
+
++ Fixed calcification bug reported in issue [133](https://github.com/MathCancer/PhysiCell/issues/133). Thank you, @JulianoGianlupi! 
+
++ Fixed typo in cell signals that used `contact with dead dell` instead of `contact with dead cell`
+
++ Changed default full data output to 60 minutes (to match the SVG output interval) for better compatibility with the model builder GUI. 
+
++ Fixed incorrect parameters for necrotic cell volume changes that prevented necrotic cell lysis and shrinkage. 
+
++ Merged Daniel Bergman's [PR 126](https://github.com/MathCancer/PhysiCell/pull/126), which fixes cell legend colors. Thank's Daniel! 
+
++ Improved safety checks in the cell orientation function, thanks to Randy Heiland's [PR 122](https://github.com/MathCancer/PhysiCell/pull/122). Thanks, Randy!
+
++ Now forcing Mersenne Twister as random generator in PhysiBoSS (use or /dev/random by MaBoSS would max out system descriptor)
+
++ MaBoSS BND/CFG parsing is now in an OpenMP critical block (flex/bison parser is not thread safe)
+
++ Remove duplicate initialization of maximum attachment rate from the Phenotype.Mechanics constructor.
+
++ Fixed bug in neighbor/attached graph output filenames (previously double-appended a suffix to the filenames). 
+
+### Notices for intended changes that may affect backwards compatibility:
++ We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
+
++ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the future.  
+
++ We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
+
++ Additional search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+ 
++ We will change the timing of when `entry_function`s are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather than both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to execute the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
+
++ We might make `trigger_death` clear out all the cell's functions, or at least add an option to do this. 
+
+### Planned future improvements: 
+
++ Further XML-based simulation setup. 
+
++ Read saved simulation states (as MultiCellDS digital snapshots)
+ 
++ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
+ 
++ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
+ 
++ Create an angiogenesis sample project 
+ 
++ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
+
++ Improved plotting options in SVG 
+
++ Further update sample projects to make use of more efficient interaction testing available
+
++ Major refresh of documentation.
+
+* * * 
+
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
+
+**Versions:** 1.10.0 - 1.10.4
+
+**Release dates:** 13 May 2022 - 18 July 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -73,17 +356,31 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 See changes.md for the full change log. 
 
 * * * 
-## Release summary: 
-Version 1.10.4 primarily fixes bugs in file output and the ode-energy sample, and refines thread safety in cell phagocytosis. 
-
-The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
-
-A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations.  
-A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries. 
+## Release summaries:
+The 1.10.z releases introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
+
+### 1.10.4 (18 July 2022):  
+Version 1.10.4 primarily fixes bugs in file output and the ode-energy sample, and refines thread safety in cell phagocytosis. 
+
+### 1.10.3 (25 June 2022): 
+Version 1.10.3 primarily fixes bugs and further refines the signal and behavior dictionaries, particularly with access to custom variables. It also allows users to designate custom variables as _conserved quantities_ that are divided evenly among daughter cells as division (e.g., melanosomes). Lastly, this release continues updates to PhysiBoSS and libRoadrunner to leverage newer core features and improve compatibiltiy, while also improving support for newer Mac (M1 and M2) architectures. 
+
+### 1.10.2 (24 May 2022): 
+Version 1.10.2 introduces bugfixes to the behavior "dictionary" functiouns, data saves, and updating neighbor lists for nearby non-adhesive cells. It also introduces a number of ease-of-access functions to the phenotype for death rates, secretion, and internalized substrates. 
+
+### 1.10.1 (15 May 2022): 
+Version 1.10.1 introduces bugfixes to increase XML parser robustness and to fix missing PhysiBoSS makefiles. 
+
+### 1.10.0 (13 May 2022): 
+The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
+
+A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations. 
+
+A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries. 
  
 ### Major new features and changes in the 1.10.z versions
 #### 1.10.4
@@ -344,1132 +641,40 @@ None in this version. See 1.10.0.
 
 * * * 
 
-
-**Version:** 1.10.3
-
-**Release date:** 25 June 2022
-
-## Overview: 
-PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
-
-**Reference:** A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
-
-Visit http://MathCancer.org/blog for the latest tutorials and help. 
-
-**Notable recognition:**
-+ [2019 PLoS Computational Biology Research Prize for Public Impact](https://blogs.plos.org/biologue/2019/05/31/announcing-the-winners-of-the-2019-plos-computational-biology-research-prize/)
-
-### Key makefile rules:
-
-**`make`**               : compiles the current project. If no 
-                     project has been defined, it first 
-                     populates the cancer heterogeneity 2D 
-                     sample project and compiles it 
-   
-**`make project-name`**: populates the indicated sample project. 
-                     Use "make" to compile it. 
-
-   * **`project-name`** choices:
-      * template 
-      * biorobots-sample 
-      * cancer-biorobots-sample 
-      * cancer-immune-sample
-      * celltypes3-sample 
-      * heterogeneity-sample 
-      * pred-prey-farmer 
-      * virus-macrophage-sample 
-      * worm-sample
-      * ode-energy-sample 
-      * physiboss-cell-lines-sample 
-      * cancer-metabolism-sample
-      * interaction-sample
-
-**`make list-projects`** : list all available sample projects 
-
-**`make clean`**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
-
-**`make data-cleanup`**  : clears out all simulation data 
-
-**`make reset`**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
-
-**`make jpeg`**          : uses ImageMagick to convert the SVG files in the output directory to JPG (with appropriate sizing to make movies). Supply `OUTPUT=foldername` to select a different folder. 
-
-**`make movie`**         : uses ffmpeg to convert the JPG files in the output directory an mp4 movie. Supply `OUTPUT=foldername` to select a different folder, or `FRAMERATE=framerate` to override the frame rate.
-
-**`make upgrade`**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
-
-### Key Links 
-**Homepage:**     http://PhysiCell.MathCancer.org 
-
-**Downloads:**    http://PhysiCell.sf.net
-
-**Support:**      https://sourceforge.net/p/physicell/tickets/
-
-**Quick Start:**  Look at QuickStart.md in the documentation folder. 
-
-**User Guide:**   Look at UserGuide.pdf in the documentation folder. 
- 
-**Setup and Training:**	See last year's workshop and hackathon at https://github.com/PhysiCell-Training/ws2021  
- 
-**Older Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
-
-**Latest info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
-
-See changes.md for the full change log. 
-
-* * * 
-## Release summary: 
-Version 1.10.3 primarily fixes bugs and further refines the signal and behavior dictionaries, particularly with access to custom variables. It also allows users to designate custom variables as _conserved quantities_ that are divided evenly among daughter cells as division (e.g., melanosomes). Lastly, this release continues updates to PhysiBoSS and libRoadrunner to leverage newer core features and improve compatibiltiy, while also improving support for newer Mac (M1 and M2) architectures. 
-
-The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
-
-A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations.  
-A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries. 
-
-**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
-
-**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
- 
-### Major new features and changes in the 1.10.z versions
-#### 1.10.3
-+ None in this version. See 1.10.0
-#### 1.10.2
-+ None in this version. See 1.10.0
-#### 1.10.1
-+ None in this version. See 1.10.0
-#### 1.10.0
-+ Created `Cell_Interactions` in `Phenotype` as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
-  +  Users can set phagocytosis rates for dead cells via `phenotype.cell_interactions.dead_phagocytosis_rate`. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. 
-  +  Users can set phagocytosis rates for each live cell type via `phenotype.cell_interactions.live_phagocytosis_rates`. There is one rate for each cell type in the simulation. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. Phagocytosis absorbs the target cell's volume and internal contents and flags the target for removal. The cell will eventually shrink back towards its target volume. 
-  +  For convenience, the phagocytosis rates can be accessed (read or written) via `phenotype.cell_interactions.live_phagocytosis_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
-  +  Users can set attack rates for live cells via `phenotype.cell_interactions.attack_rates`. There is one rate for each cell type in the simulation. Cells automaticaly attack neighbors at each mechanics time step based upon the rates. An attack event increases the target cell's `cell.state.damage` by `damage_rate * dt_mechanics` and `cell.state.total_attack_time` by `dt_mechanics`. It is up to the scientist user to set additional hypotheses that increases cell death with accumulated damage or attack time. 
-  +  For convenience, the attack rates can be accessed via `phenotype.cell_interactions.attack_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
-  +  Users can set fusion rates for live cells via `phenotype.cell_interactions.fusion_rates`. There is one rate for each cell type in the simulation. Cells automaticaly fuse with at each mechanics time step based upon the rates. Fusion will merge the two cells' volumes and internal contents, add their nuclei (recorded in `cell.state.number_of_nuclei`), and move the combine cell to the prior center of volume. The combined cell's new target volume is the sum of the two original cells' target volumes. 
-  +  For convenience, the fusion rates can be accessed via `phenotype.cell_interactions.fusion_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
-
-+ Created `Cell_Transformations` in `Phenotype` as a standard representation of cell transformations such as differentation or transdifferentiation. 
-  +  Users can set transformation rates for each live cell type via `phenotype.cell_transformations_transformation_rates`. There is one rate for each cell type in the simulation. Cells automatically attempt to transform to these types at each phenotype time step based upon the phagocytosis rates. 
-  +  For convenience, the transformation rates can be accessed (read or written) via `phenotype.cell_transformations.transformation_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
-
-+ Updated `Cell_State` to track the number of nuclei (for fusion), total damage (e.g., for cell attack) and total attack time. 
-
-+ Added a new `advanced_chemotaxis` function with data stored in `phenotype.motility` to allow chemotaxis up a linear combination of gradients. 
-  + `cell.phenotype.motility.chemotactic_sensitivities` is a vector of chemotactic sensitivies, one for each substrate in the environment. By default, these are all zero for backwards compatibility. A positive sensitivity denotes chemotaxis up a corresponding substrate's gradient (towards higher values), whereas a negative sensitivity gives chemotaxis against a gradient (towards lower values). 
-  + For convenience, you can access (read and write) a substrate's chemotactic sensitivity via `phenotype.motility.chemotactic_sensitivity(name)`, where `name` is the human-readable name of a substrate in the simulation. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * grad(rho_0) + sensitivity_1 * grad(rho_1) + ... + sensitivity_n * grad(rho_n)`. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function_normalized`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * |grad(rho_0)| + sensitivity_1 * |grad(rho_1)| + ... + sensitivity_n * |grad(rho_n)|.` 
-
-+ Added a new `adhesion_affinities` to `phenotype.mechanics` to allow preferential adhesion.
-  + `cell.phenotype.mechanics.adhesion_affinities` is a vector of adhesive affinities, one for each cell type in the simulation. By default, these are all one for backwards compatibility.  
-  + For convenience, you can access (read and write) a cell's adhesive affinity for a specific cell type via `phenotype.mechanics.adhesive_affinity(name)`, where `name` is the human-readable name of a cell type in the simulation. 
-  + The standard mechanics function (based on potentials) uses this as follows. If cell `i` has an cell-cell adhesion strength `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has a cell-cell adhesion strength of `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
-  + The standard elastic spring function (`standard_elastic_contact_function`) uses this as follows. If cell `i` has an elastic constant `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has an elastic constant `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
-
-+ `PhysiCell_basic_signaling` now includes standard Hill and linear response functions: 
-   + `Hill_response_function( double s, double half_max , double hill_power )` is a Hill function responding to signal `s` with a half-max of `half_max` and Hill coefficient of `hill_power`. We note that this function is an order of magnitude faster when the `hill_power` is an integer (e.g., 1 or 2) rather than a non-integer power (e.g., 1.4). 
-   + `double linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 0.0 (for inputs `s` below `s_min`) to 1.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
-   + `double decreasing_linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 1.0 (for inputs `s` below `s_min`) to 0.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
-
-+ We introduced a "dictionary" of standard signals that can be used as inputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + Major classes of signals include:
-    + extracellular and intracellular substrate concentrations
-    + substrate gradients
-    + contact with dead cells
-    + contact with cells (of type X)
-    + damage
-    + pressure
-    + Use `display_signal_dictionary()` to quickly display a list of available signals. 
-  + Substantial functionality to query signals
-    + `int find_signal_index( std::string signal_name )` : get the index of the named signal 
-    + `std::vector<int> find_signal_indices( std::vector<std::string> signal_names );` get a vector of indices for a vector of named signals 
-    + `std::string signal_name( int i );` display the name of the signal with the given index 
-    + `std::vector<double> get_signals( Cell* pCell );` get a vector of all known signals for the cell 
-    + `std::vector<double> get_cell_contact_signals( Cell* pCell );` get a vector of the cell contact associated signals for the cell 
-    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices );` get a vector of signals for the cell, with the supplied indices
-    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names );` get a vector of signals for the cell, with the supplied human-readable names of the signals 
-    + `double get_single_signal( Cell* pCell, int index );` get a single signal for the cell with the indicated index
-    + `double get_single_signal( Cell* pCell, std::string name );` get a single signal for the cell with the indicated human-readable name 
-
-+ We introduced a "dictionary" of standard behaviors that can be used as outputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + Major classes of behaviors include:
-    + secretion, secretion target, uptake, and export rates 
-    + cycle progression
-    + death rates
-    + motility parameters 
-    + chemotactic parameters 
-    + cell-cell adhesion and repulsion parameters
-    + cell adhesion affinities 
-    + cell-BM adhesion and repulsion parameters
-    + phagocytosis rates 
-    + attack rates
-    + fusion rates
-    + transformation rates 
-    + Use `display_behavior_dictionary()` to quickly see a list of posible behaviors.
-  + Substantial functionality to query and set behaviors 
-    + `int find_behavior_index( std::string response_name )` : get the index of the named behavior 
-    + `std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names )` get the indices for the given vector of behavior names. 
-    + `std::string behavior_name( int i );` get the name of the behavior with the given index 
-    + `std::vector<double> create_empty_behavior_vector();` create an empty vector for the full set of behaviors 
-    + `void set_behaviors( Cell* pCell , std::vector<double> parameters );` write the full set of behaviors to the cell's phentoype
-    + `void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters );` write the selected set of behaviors (with supplied indices) to the cell's phenotype
-    + `void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters );` write the selected set of behaviors (with supplied names) to the cell's phenotype 
-    + `void set_single_behavior( Cell* pCell, int index , double parameter );` write a single behavior (by index) to the cell phentoype
-    + `void set_single_behavior( Cell* pCell, std::string name , double parameter );` write a single behavior (by name) to the cell phentoype
-  + Substantial functionality to query the cell's current behavior
-    + `std::vector<double> get_behaviors( Cell* pCell );` get all the cell's current behaviors 
-    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of behaviors (with given indices) 
-    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of behaviors (with given names)
-    + `double get_single_behavior( Cell* pCell , int index );` get a single behavior (by index)
-    + `double get_single_behavior( Cell* pCell , std::string name );` get a single behavior (by name)
-  + Substantial functionality to query the cell's referece behaviors (from its cell definition) 
-    + `std::vector<double> get_base_behaviors( Cell* pCell );` get all the cell's base behaviors 
-    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of base behaviors (with given indices) 
-    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of base behaviors (with given names)
-    + `double get_single_base_behavior( Cell* pCell , int index );` get a single base behavior (by index)
-    + `double get_single_base_behavior( Cell* pCell , std::string name );` get a single base behavior (by name)
-
-+ Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
-  + Blood vessels release resource
-  + Virulet bacteria colonize near vessels (by chemotaxis up towards a secreted quorum factor and resource)
-  + Stem cells divide and differentiate into differentiated cells
-  + Differentiated cells divide until experiencing elevated pressure (to detect confluence)
-  + Bacteria-secreted virulence factor kills stem and differentiated cells. Dead cells release debris.
-  + Macrophages chemotax towards quorum factor and debris and secrete pro-inflammatory factor in presence of dead cells or bacteria
-  + Macrophages phagocytose dead cells
-  + CD8+ T cells chemotax towards pro-inflamatory factor and attack bacteria
-  + Neutrophils chemotax towards pro-inflammatory factor and phagocytose live bacteria
-  + Accumulated damage kills bacteria. 
-  + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
-
-### Minor new features and changes: 
-#### 1.10.3
-+ Added `attachment_rate` and `detachment_rate` to `phenotype.mechanics` for use in a future standard attachment and detachment model. 
-+ Modernized output format: 
-  + More complete cell data saved for each cell agent. 
-  + Merged the previously separate cell matlab files for each time save
-  + Added more metadata to outputs
-+ `Variables` and `Vector_Variables` in `Custom_Cell_Data` now have a new Boolean attribute `conserved_quantity` (defaulted to false). If this value is set to true, then the custom variable is divided evenly between daughter cells at division. 
-+ Custom cell data can now be designated as conserved by settings an attribute `conserved="true"` in the XMO configuration file. 
-+ Improved support for Apple M1 and M2 chips. 
-+ Refinements to PhysiBoSS. 
-
-#### 1.10.2
-+ Added `operator<<` for vectors of ints and vectors of strings. So that `std::cout << v << std::endl;` will work if `v` is `std::vector<int>` of `std::vector<std::string>`. It was truly annoying that these were missing, so sorry!
-+ Added `dead` to the signals dictionaries, which returns 0.0 or 1.0 based on `phenotype.death.dead`. 
-+ Added `time` to the signals dictionaries, which returns the current simulation time based on `PhysiCell_Globals.current_time`. 
-+ Added a brief protocol on how to add new signals and behaviors to the dictionaries in the `/protocols` directory. 
-+ Added new functions `double& apoptosis_rate()` and `double& necrosis_rate()` to easily read and write these rates. Access via `cell.phenotype.death.apoptosis_rate()` and `cell.phenotype.death.necrosis_rate()`. 
-+ Added new ease of access functions for secretion: 
-  + `double& Secretion::secretion_rate( std::string name )` allows you to easily read/write the secretion rate of a substrate by name. For example: 
-	```pCell->phenotype.secretion.secretion_rate("oxygen") = 0.1```
-  + `double& Secretion::uptake_rate( std::string name )` allows you to easily read/write the uptake rate of a substrate by name. For example: 
-	```pCell->phenotype.secretion.uptake_rate("oxygen") = 0.1```
-  + `double& Secretion::saturation_density( std::string name )` allows you to easily read/write the secretion target of a substrate by name. For example: 
-	```pCell->phenotype.secretion.saturation_density("oxygen") = 38```
-  + `double& Secretion::net_export_rate( std::string name )` allows you to easily read/write the net export rate of a substrate by name. For example: 
-	```pCell->phenotype.secretion.net_export_rate("oxygen") = -100```
-
-+ Added new ease of access function for internalized substrates: 
-  + `double& Molecular::internalized_total_substrate( std::string name )` allows you to easily read/write the total amount of internalized substrate by name. For example: 
-	```pCell->phenotype.molecular.internalized_total_substrate( "oxygen" ) = 0.01``
-#### 1.10.1
-+ None in this version. See 1.10.0. 
-#### 1.10.0
-+ All sample projects have a new rule "make name" to tell you the name of the executable. 
-
-+ All sample projects output the executable name to screen for easier reference. 
-
-+ `Cell_Definition` has a new Boolean `is_movable`, so that all cells of a type can be set to non-movable. (Default: `is_movable = true`;) This allows you to use agents as rigid objects or barriers. 
-
-+ `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
-
-### Beta features (not fully supported):
-#### 1.10.3
-+ Each time outputs two cell interaction graphs (as text files): 
-  + neighbor graph records which cells are within interaction distance for each cell agent, with format; 
-    ID: ID1, ID2, ID3, ... (Cell ID: and the IDs of interacting cells)
-  + attached cell graph records which cells are attached for each cell agent, with format; 
-    ID: ID1, ID2, ID3, ... (Cell ID: and the IDs of attached cells)
-  + We might split these into 3 files: 
-    + an ID list that has the ID of each cell in order of appearence. 
-    + neighbor list omits the preceding "ID:" since now each row corresponds to the index in the ID list
-    + attached cell list omits the preceding "ID:" since now each row corresponds to the index in the ID list
-  + Began experimenting with a planned `integrity` subclass to `phenotype` that will record multiple types of cell damage and associated damage and repair rates. It is not yet clear if we wil provide built-in support for damaged-driven apoptotic death and cycle arrest, as these are generally better left to modeler-driven hypotheses. 
-
-None in this version. See 1.10.0. 
-#### 1.10.2
-+ None in this version. See 1.10.0.  
-#### 1.10.1
- + None in this version. See 1.10.0. 
- #### 1.10.0
-+ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
-
-+ [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
-
-+ Added a simple Qt GUI for plotting cells only (plot_cells.py and vis_tab_cells_only.py in /beta)
-
-+ Added a simple Qt GUI for plotting substrates and cells (plot_data.py and vis_tab.py in /beta)
-
-+ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
-  
-### Bugfixes: 
-#### 1.10.3
-+ Fixed bug in `get_single_behavior` and `get_single_base_behavior` where querying any cycle exit rate or cycle entry mistakenly returned -1. 
-+ Corrected declaration of `standard_add_basement_membrane_interactions` in `PhysiCell_standard_models.h` to properly use phenotype by reference. Thank you Inês Gonçalves!
-+ Removed the OpenMP pragma in `void Microenvironment::apply_dirichlet_conditions( void )` (around line 272) that tends to perform more poorly than serial code. 
-
-#### 1.10.2
-+ Fixed error in `double get_single_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
-
-+ Fixed error in `double get_single_base_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
-
-+ Fixed bug in `add_PhysiCell_cells_to_open_xml_pugi()` that mistakenly used the wrong size (number of cell species rather than number of substrate species) when writing the chemotactic sensitivities. 
-
-+ The cell `neighbors` list did not add non-adhesive cells within interaction distance. This is now fixed. 
-
-#### 1.10.1
-+ XML parsing has been made more robust to "survive" using an incorrect substrate in the `chemotactic_sensitivities` section.
-
-+ Missing PhysiBoSS makefiles have been replaced. 
-
-+ Fixed broken makefile for worms sample project. 
-
-#### 1.10.0
-+ When the `cell_defaults` definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying `cell_defaults`, the XML parsing will reset motility to off (with `NULL` function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set `legacy_cell_defaults_copy = true` in the config file to override this bugfix. 
-
-+ We refactored the pseudorandom number generator (at the basis of `UniformRandom()`) to improve thread safety. Previously, all threads shared a single PRNG, which was not thread safe. For newer fast processors with many threads, this could lead to sufficiently many "collisions" to introduce subtle biases in some cases (particularly for purely Brownian motion that is not dominated by chemotaxis, proliferation, and other behaviors). This is now corrected by creating a PRNG for each thread, each with its own seed. We used `std::seed_seq` to determinstically set a good spread of seeds to prevent correlation between the PRNGs, with the convention that the 0th thread's seed is either the user-specified seed or a random seed. This preserves original single-thread behavior from prior versions. 
-
-+ Random motility now uses `UniformOnUnitCircle()` (in 2D) and `UniformOnUnitSphere()` (in 3D) to choose the random component of the migration direction, rather than hand-coding selection of the random vector. 
-
-+ In response to PR 91 (https://github.com/MathCancer/PhysiCell/pull/91): Previoulsy, if the make jpeg rule fails, the `__*.txt` temporary files are left in place, so a subsequent "make jpeg" fails until these files are manually removed. Replacing `>>` (append) with `>` (overwrite) fixes the problem. Thanks [saikiRA1011](https://github.com/saikiRA1011)!
-
-### Notices for intended changes that may affect backwards compatibility:
-+ We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
-
-+ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the very near future.  
-
-+ We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
-
-+ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
- 
-+ We will change the timing of when `entry_function`s are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather than both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to execute the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
-
-+ We might make `trigger_death` clear out all the cell's functions, or at least add an option to do this. 
-
-### Planned future improvements: 
-
-+ Further XML-based simulation setup. 
-
-+ Read saved simulation states (as MultiCellDS digital snapshots)
- 
-+ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
- 
-+ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
- 
-+ Create an angiogenesis sample project 
- 
-+ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
-
-+ Improved plotting options in SVG 
-
-+ Further update sample projects to make use of more efficient interaction testing available
-
-+ Major refresh of documentation.
+end of 1.10.x changes 
 
 * * * 
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
-**Version:** 1.10.2
+**Versions:** 1.9.0 - 1.9.1
 
-**Release date:** 24 May 2022
+**Release dates:** 12 July 2021 - 13 September 2021
 
-## Overview: 
-PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
+## Release summaries: 
+Version 1.9.z introduces intracellular modeling, i.e., models inside individual cells, for PhysiCell. We support three types of intracellular models: boolean networks, ordinary differential equations (ODEs), and dynamic flux balance analysis (dFBA). An intracellular model is part of a cell type's phenotype specification. Currently, we only support a single intracellular model per cell type; however, different *types* of models can be used for different cell types, e.g., a boolean network for cell type A and ODEs for cell type B.
 
-**Reference:** A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
+### Version 1.9.1 (13 September 2021): 
+Version 1.9.1 release focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracellular modeling, as well as several small bugs in parsing cell definitions in the XML configuration file. It also implements a basic_volume_model that only models total volume. (For internal consistency, it treats the entire cell as cytoplasm.) 
 
-Visit http://MathCancer.org/blog for the latest tutorials and help. 
+### Version 1.9.0 (12 July 2021): 
+Version 1.9.0 introduces intracellular modeling, i.e., models inside individual cells, for PhysiCell. We support three types of intracellular models: boolean networks, ordinary differential equations (ODEs), and dynamic flux balance analysis (dFBA). An intracellular model is part of a cell type's phenotype specification. Currently, we only support a single intracellular model per cell type; however, different *types* of models can be used for different cell types, e.g., a boolean network for cell type A and ODEs for cell type B.
 
-**Notable recognition:**
-+ [2019 PLoS Computational Biology Research Prize for Public Impact](https://blogs.plos.org/biologue/2019/05/31/announcing-the-winners-of-the-2019-plos-computational-biology-research-prize/)
-
-### Key makefile rules:
-
-**`make`**               : compiles the current project. If no 
-                     project has been defined, it first 
-                     populates the cancer heterogeneity 2D 
-                     sample project and compiles it 
-   
-**`make project-name`**: populates the indicated sample project. 
-                     Use "make" to compile it. 
-
-   * **`project-name`** choices:
-      * template 
-      * biorobots-sample 
-      * cancer-biorobots-sample 
-      * cancer-immune-sample
-      * celltypes3-sample 
-      * heterogeneity-sample 
-      * pred-prey-farmer 
-      * virus-macrophage-sample 
-      * worm-sample
-      * ode-energy-sample 
-      * physiboss-cell-lines-sample 
-      * cancer-metabolism-sample
-      * interaction-sample
-
-**`make list-projects`** : list all available sample projects 
-
-**`make clean`**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
-
-**make data-cleanup**  : clears out all simulation data 
-
-**make reset**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
-
-**make jpeg**          : uses ImageMagick to convert the SVG files in the output directory to JPG (with appropriate sizing to make movies). Supply `OUTPUT=foldername` to select a different folder. 
-
-**make movie**         : uses ffmpeg to convert the JPG files in the output directory an mp4 movie. Supply `OUTPUT=foldername` to select a different folder, or `FRAMERATE=framerate` to override the frame rate.
-
-**make upgrade**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
-
-**Homepage:**     http://PhysiCell.MathCancer.org
-
-**Downloads:**    http://PhysiCell.sf.net
-
-**Support:**      https://sourceforge.net/p/physicell/tickets/
-
-**Quick Start:**  Look at QuickStart.md in the documentation folder. 
-
-**User Guide:**   Look at UserGuide.pdf in the documentation folder. 
- 
-**Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
-
-**Latest info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
-
-See changes.md for the full change log. 
-
-* * * 
-## Release summary: 
-Version 1.10.2 introduces bugfixes to the behavior "dictionary" functiouns, data saves, and updating neighbor lists for nearby non-adhesive cells. It also introduces a number of ease-of-access functions to the phenotype for death rates, secretion, and internalized substrates. 
-
-The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
-
-A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations.  
-
-A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries. 
-
-**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
-
-**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
- 
-### Major new features and changes in the 1.10.z versions
-#### 1.10.2
-+ None in this version. See 1.10.0
-#### 1.10.1
-+ None in this version. See 1.10.0
-#### 1.10.0
-+ Created `Cell_Interactions` in `Phenotype` as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
-  +  Users can set phagocytosis rates for dead cells via `phenotype.cell_interactions.dead_phagocytosis_rate`. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. 
-  +  Users can set phagocytosis rates for each live cell type via `phenotype.cell_interactions.live_phagocytosis_rates`. There is one rate for each cell type in the simulation. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. Phagocytosis absorbs the target cell's volume and internal contents and flags the target for removal. The cell will eventually shrink back towards its target volume. 
-  +  For convenience, the phagocytosis rates can be accessed (read or written) via `phenotype.cell_interactions.live_phagocytosis_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
-  +  Users can set attack rates for live cells via `phenotype.cell_interactions.attack_rates`. There is one rate for each cell type in the simulation. Cells automaticaly attack neighbors at each mechanics time step based upon the rates. An attack event increases the target cell's `cell.state.damage` by `damage_rate * dt_mechanics` and `cell.state.total_attack_time` by `dt_mechanics`. It is up to the scientist user to set additional hypotheses that increases cell death with accumulated damage or attack time. 
-  +  For convenience, the attack rates can be accessed via `phenotype.cell_interactions.attack_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
-  +  Users can set fusion rates for live cells via `phenotype.cell_interactions.fusion_rates`. There is one rate for each cell type in the simulation. Cells automaticaly fuse with at each mechanics time step based upon the rates. Fusion will merge the two cells' volumes and internal contents, add their nuclei (recorded in `cell.state.number_of_nuclei`), and move the combine cell to the prior center of volume. The combined cell's new target volume is the sum of the two original cells' target volumes. 
-  +  For convenience, the fusion rates can be accessed via `phenotype.cell_interactions.fusion_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
-
-+ Created `Cell_Transformations` in `Phenotype` as a standard representation of cell transformations such as differentation or transdifferentiation. 
-  +  Users can set transformation rates for each live cell type via `phenotype.cell_transformations_transformation_rates`. There is one rate for each cell type in the simulation. Cells automatically attempt to transform to these types at each phenotype time step based upon the phagocytosis rates. 
-  +  For convenience, the transformation rates can be accessed (read or written) via `phenotype.cell_transformations.transformation_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
-
-+ Updated `Cell_State` to track the number of nuclei (for fusion), total damage (e.g., for cell attack) and total attack time. 
-
-+ Added a new `advanced_chemotaxis` function with data stored in `phenotype.motility` to allow chemotaxis up a linear combination of gradients. 
-  + `cell.phenotype.motility.chemotactic_sensitivities` is a vector of chemotactic sensitivies, one for each substrate in the environment. By default, these are all zero for backwards compatibility. A positive sensitivity denotes chemotaxis up a corresponding substrate's gradient (towards higher values), whereas a negative sensitivity gives chemotaxis against a gradient (towards lower values). 
-  + For convenience, you can access (read and write) a substrate's chemotactic sensitivity via `phenotype.motility.chemotactic_sensitivity(name)`, where `name` is the human-readable name of a substrate in the simulation. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * grad(rho_0) + sensitivity_1 * grad(rho_1) + ... + sensitivity_n * grad(rho_n)`. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function_normalized`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * |grad(rho_0)| + sensitivity_1 * |grad(rho_1)| + ... + sensitivity_n * |grad(rho_n)|.` 
-
-+ Added a new `adhesion_affinities` to `phenotype.mechanics` to allow preferential adhesion.
-  + `cell.phenotype.mechanics.adhesion_affinities` is a vector of adhesive affinities, one for each cell type in the simulation. By default, these are all one for backwards compatibility.  
-  + For convenience, you can access (read and write) a cell's adhesive affinity for a specific cell type via `phenotype.mechanics.adhesive_affinity(name)`, where `name` is the human-readable name of a cell type in the simulation. 
-  + The standard mechanics function (based on potentials) uses this as follows. If cell `i` has an cell-cell adhesion strength `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has a cell-cell adhesion strength of `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
-  + The standard elastic spring function (`standard_elastic_contact_function`) uses this as follows. If cell `i` has an elastic constant `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has an elastic constant `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
-
-+ `PhysiCell_basic_signaling` now includes standard Hill and linear response functions: 
-   + `Hill_response_function( double s, double half_max , double hill_power )` is a Hill function responding to signal `s` with a half-max of `half_max` and Hill coefficient of `hill_power`. We note that this function is an order of magnitude faster when the `hill_power` is an integer (e.g., 1 or 2) rather than a non-integer power (e.g., 1.4). 
-   + `double linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 0.0 (for inputs `s` below `s_min`) to 1.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
-   + `double decreasing_linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 1.0 (for inputs `s` below `s_min`) to 0.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
-
-+ We introduced a "dictionary" of standard signals that can be used as inputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + Major classes of signals include:
-    + extracellular and intracellular substrate concentrations
-    + substrate gradients
-    + contact with dead cells
-    + contact with cells (of type X)
-    + damage
-    + pressure
-    + Use `display_signal_dictionary()` to quickly display a list of available signals. 
-  + Substantial functionality to query signals
-    + `int find_signal_index( std::string signal_name )` : get the index of the named signal 
-    + `std::vector<int> find_signal_indices( std::vector<std::string> signal_names );` get a vector of indices for a vector of named signals 
-    + `std::string signal_name( int i );` display the name of the signal with the given index 
-    + `std::vector<double> get_signals( Cell* pCell );` get a vector of all known signals for the cell 
-    + `std::vector<double> get_cell_contact_signals( Cell* pCell );` get a vector of the cell contact associated signals for the cell 
-    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices );` get a vector of signals for the cell, with the supplied indices
-    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names );` get a vector of signals for the cell, with the supplied human-readable names of the signals 
-    + `double get_single_signal( Cell* pCell, int index );` get a single signal for the cell with the indicated index
-    + `double get_single_signal( Cell* pCell, std::string name );` get a single signal for the cell with the indicated human-readable name 
-
-+ We introduced a "dictionary" of standard behaviors that can be used as outputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + Major classes of behaviors include:
-    + secretion, secretion target, uptake, and export rates 
-    + cycle progression
-    + death rates
-    + motility parameters 
-    + chemotactic parameters 
-    + cell-cell adhesion and repulsion parameters
-    + cell adhesion affinities 
-    + cell-BM adhesion and repulsion parameters
-    + phagocytosis rates 
-    + attack rates
-    + fusion rates
-    + transformation rates 
-    + Use `display_behavior_dictionary()` to quickly see a list of posible behaviors.
-  + Substantial functionality to query and set behaviors 
-    + `int find_behavior_index( std::string response_name )` : get the index of the named behavior 
-    + `std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names )` get the indices for the given vector of behavior names. 
-    + `std::string behavior_name( int i );` get the name of the behavior with the given index 
-    + `std::vector<double> create_empty_behavior_vector();` create an empty vector for the full set of behaviors 
-    + `void set_behaviors( Cell* pCell , std::vector<double> parameters );` write the full set of behaviors to the cell's phentoype
-    + `void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters );` write the selected set of behaviors (with supplied indices) to the cell's phenotype
-    + `void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters );` write the selected set of behaviors (with supplied names) to the cell's phenotype 
-    + `void set_single_behavior( Cell* pCell, int index , double parameter );` write a single behavior (by index) to the cell phentoype
-    + `void set_single_behavior( Cell* pCell, std::string name , double parameter );` write a single behavior (by name) to the cell phentoype
-  + Substantial functionality to query the cell's current behavior
-    + `std::vector<double> get_behaviors( Cell* pCell );` get all the cell's current behaviors 
-    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of behaviors (with given indices) 
-    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of behaviors (with given names)
-    + `double get_single_behavior( Cell* pCell , int index );` get a single behavior (by index)
-    + `double get_single_behavior( Cell* pCell , std::string name );` get a single behavior (by name)
-  + Substantial functionality to query the cell's referece behaviors (from its cell definition) 
-    + `std::vector<double> get_base_behaviors( Cell* pCell );` get all the cell's base behaviors 
-    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of base behaviors (with given indices) 
-    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of base behaviors (with given names)
-    + `double get_single_base_behavior( Cell* pCell , int index );` get a single base behavior (by index)
-    + `double get_single_base_behavior( Cell* pCell , std::string name );` get a single base behavior (by name)
-
-+ Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
-  + Blood vessels release resource
-  + Virulet bacteria colonize near vessels (by chemotaxis up towards a secreted quorum factor and resource)
-  + Stem cells divide and differentiate into differentiated cells
-  + Differentiated cells divide until experiencing elevated pressure (to detect confluence)
-  + Bacteria-secreted virulence factor kills stem and differentiated cells. Dead cells release debris.
-  + Macrophages chemotax towards quorum factor and debris and secrete pro-inflammatory factor in presence of dead cells or bacteria
-  + Macrophages phagocytose dead cells
-  + CD8+ T cells chemotax towards pro-inflamatory factor and attack bacteria
-  + Neutrophils chemotax towards pro-inflammatory factor and phagocytose live bacteria
-  + Accumulated damage kills bacteria. 
-  + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
-
-### Minor new features and changes: 
-#### 1.10.2
-+ Added `operator<<` for vectors of ints and vectors of strings. So that `std::cout << v << std::endl;` will work if `v` is `std::vector<int>` of `std::vector<std::string>`. It was truly annoying that these were missing, so sorry!
-+ Added `dead` to the signals dictionaries, which returns 0.0 or 1.0 based on `phenotype.death.dead`. 
-+ Added `time` to the signals dictionaries, which returns the current simulation time based on `PhysiCell_Globals.current_time`. 
-+ Added a brief protocol on how to add new signals and behaviors to the dictionaries in the `/protocols` directory. 
-+ Added new functions `double& apoptosis_rate()` and `double& necrosis_rate()` to easily read and write these rates. Access via `cell.phenotype.death.apoptosis_rate()` and `cell.phenotype.death.necrosis_rate()`. 
-+ Added new ease of access functions for secretion: 
-  + `double& Secretion::secretion_rate( std::string name )` allows you to easily read/write the secretion rate of a substrate by name. For example: 
-	```pCell->phenotype.secretion.secretion_rate("oxygen") = 0.1```
-  + `double& Secretion::uptake_rate( std::string name )` allows you to easily read/write the uptake rate of a substrate by name. For example: 
-	```pCell->phenotype.secretion.uptake_rate("oxygen") = 0.1```
-  + `double& Secretion::saturation_density( std::string name )` allows you to easily read/write the secretion target of a substrate by name. For example: 
-	```pCell->phenotype.secretion.saturation_density("oxygen") = 38```
-  + `double& Secretion::net_export_rate( std::string name )` allows you to easily read/write the net export rate of a substrate by name. For example: 
-	```pCell->phenotype.secretion.net_export_rate("oxygen") = -100```
-
-+ Added new ease of access function for internalized substrates: 
-  + `double& Molecular::internalized_total_substrate( std::string name )` allows you to easily read/write the total amount of internalized substrate by name. For example: 
-	```pCell->phenotype.molecular.internalized_total_substrate( "oxygen" ) = 0.01``
-
-#### 1.10.1
-+ None in this version. See 1.10.0. 
-#### 1.10.0
-+ All sample projects have a new rule "make name" to tell you the name of the executable. 
-
-+ All sample projects output the executable name to screen for easier reference. 
-
-+ `Cell_Definition` has a new Boolean `is_movable`, so that all cells of a type can be set to non-movable. (Default: `is_movable = true`;) This allows you to use agents as rigid objects or barriers. 
-
-+ `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
-
-### Beta features (not fully supported):
-#### 1.10.2
-+ None in this version. See 1.10.0.  
-#### 1.10.1
- + None in this version. See 1.10.0. 
- #### 1.10.0
-+ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
-
-+ [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
-
-+ Added a simple Qt GUI for plotting cells only (plot_cells.py and vis_tab_cells_only.py in /beta)
-
-+ Added a simple Qt GUI for plotting substrates and cells (plot_data.py and vis_tab.py in /beta)
-
-+ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
-  
-### Bugfixes: 
-#### 1.10.2
-+ Fixed error in `double get_single_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
-
-+ Fixed error in `double get_single_base_behavior()` where the `cell-cell adhesion elastic constant` behavior was not found.  
-
-+ Fixed bug in `add_PhysiCell_cells_to_open_xml_pugi()` that mistakenly used the wrong size (number of cell species rather than number of substrate species) when writing the chemotactic sensitivities. 
-
-+ The cell `neighbors` list did not add non-adhesive cells within interaction distance. This is now fixed. 
-
-#### 1.10.1
-+ XML parsing has been made more robust to "survive" using an incorrect substrate in the `chemotactic_sensitivities` section.
-
-+ Missing PhysiBoSS makefiles have been replaced. 
-
-+ Fixed broken makefile for worms sample project. 
-
-#### 1.10.0
-+ When the `cell_defaults` definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying `cell_defaults`, the XML parsing will reset motility to off (with `NULL` function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set `legacy_cell_defaults_copy = true` in the config file to override this bugfix. 
-
-+ We refactored the pseudorandom number generator (at the basis of `UniformRandom()`) to improve thread safety. Previously, all threads shared a single PRNG, which was not thread safe. For newer fast processors with many threads, this could lead to sufficiently many "collisions" to introduce subtle biases in some cases (particularly for purely Brownian motion that is not dominated by chemotaxis, proliferation, and other behaviors). This is now corrected by creating a PRNG for each thread, each with its own seed. We used `std::seed_seq` to determinstically set a good spread of seeds to prevent correlation between the PRNGs, with the convention that the 0th thread's seed is either the user-specified seed or a random seed. This preserves original single-thread behavior from prior versions. 
-
-+ Random motility now uses `UniformOnUnitCircle()` (in 2D) and `UniformOnUnitSphere()` (in 3D) to choose the random component of the migration direction, rather than hand-coding selection of the random vector. 
-
-+ In response to PR 91 (https://github.com/MathCancer/PhysiCell/pull/91): Previoulsy, if the make jpeg rule fails, the `__*.txt` temporary files are left in place, so a subsequent "make jpeg" fails until these files are manually removed. Replacing `>>` (append) with `>` (overwrite) fixes the problem. Thanks [saikiRA1011](https://github.com/saikiRA1011)!
-
-### Notices for intended changes that may affect backwards compatibility:
- 
-+ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the very near future.  
-
-+ We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
-
-+ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
- 
-+ We will change the timing of when `entry_function`s are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather than both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to execute the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
-
-+ We might make `trigger_death` clear out all the cell's functions, or at least add an option to do this. 
-
-### Planned future improvements: 
-
-+ Further XML-based simulation setup. 
-
-+ Read saved simulation states (as MultiCellDS digital snapshots)
- 
-+ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
- 
-+ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
- 
-+ Create an angiogenesis sample project 
- 
-+ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
-
-+ Improved plotting options in SVG 
-
-+ Further update sample projects to make use of more efficient interaction testing available
-
-+ Major refresh of documentation.
-
-* * * 
-**Version:** 1.10.1
-
-**Release date:** 15 May 2022
-
-## Release summary: 
-
-Version 1.10.1 introduces bugfixes to increase XML parser robustness and to fix missing PhysiBoSS makefiles. 
-
-The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
-
-A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations.  
-
-A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries. 
-
-**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
-
-**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
- 
-### Major new features and changes in the 1.10.z versions
-#### 1.10.1
-+ None in this version. See 1.10.0
-#### 1.10.0
-+ Created `Cell_Interactions` in `Phenotype` as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
-  +  Users can set phagocytosis rates for dead cells via `phenotype.cell_interactions.dead_phagocytosis_rate`. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. 
-  +  Users can set phagocytosis rates for each live cell type via `phenotype.cell_interactions.live_phagocytosis_rates`. There is one rate for each cell type in the simulation. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. Phagocytosis absorbs the target cell's volume and internal contents and flags the target for removal. The cell will eventually shrink back towards its target volume. 
-  +  For convenience, the phagocytosis rates can be accessed (read or written) via `phenotype.cell_interactions.live_phagocytosis_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
-  +  Users can set attack rates for live cells via `phenotype.cell_interactions.attack_rates`. There is one rate for each cell type in the simulation. Cells automaticaly attack neighbors at each mechanics time step based upon the rates. An attack event increases the target cell's `cell.state.damage` by `damage_rate * dt_mechanics` and `cell.state.total_attack_time` by `dt_mechanics`. It is up to the scientist user to set additional hypotheses that increases cell death with accumulated damage or attack time. 
-  +  For convenience, the attack rates can be accessed via `phenotype.cell_interactions.attack_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
-  +  Users can set fusion rates for live cells via `phenotype.cell_interactions.fusion_rates`. There is one rate for each cell type in the simulation. Cells automaticaly fuse with at each mechanics time step based upon the rates. Fusion will merge the two cells' volumes and internal contents, add their nuclei (recorded in `cell.state.number_of_nuclei`), and move the combine cell to the prior center of volume. The combined cell's new target volume is the sum of the two original cells' target volumes. 
-  +  For convenience, the fusion rates can be accessed via `phenotype.cell_interactions.fusion_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
-
-+ Created `Cell_Transformations` in `Phenotype` as a standard representation of cell transformations such as differentation or transdifferentiation. 
-  +  Users can set transformation rates for each live cell type via `phenotype.cell_transformations_transformation_rates`. There is one rate for each cell type in the simulation. Cells automatically attempt to transform to these types at each phenotype time step based upon the phagocytosis rates. 
-  +  For convenience, the transformation rates can be accessed (read or written) via `phenotype.cell_transformations.transformation_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
-
-+ Updated `Cell_State` to track the number of nuclei (for fusion), total damage (e.g., for cell attack) and total attack time. 
-
-+ Added a new `advanced_chemotaxis` function with data stored in `phenotype.motility` to allow chemotaxis up a linear combination of gradients. 
-  + `cell.phenotype.motility.chemotactic_sensitivities` is a vector of chemotactic sensitivies, one for each substrate in the environment. By default, these are all zero for backwards compatibility. A positive sensitivity denotes chemotaxis up a corresponding substrate's gradient (towards higher values), whereas a negative sensitivity gives chemotaxis against a gradient (towards lower values). 
-  + For convenience, you can access (read and write) a substrate's chemotactic sensitivity via `phenotype.motility.chemotactic_sensitivity(name)`, where `name` is the human-readable name of a substrate in the simulation. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * grad(rho_0) + sensitivity_1 * grad(rho_1) + ... + sensitivity_n * grad(rho_n)`. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function_normalized`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * |grad(rho_0)| + sensitivity_1 * |grad(rho_1)| + ... + sensitivity_n * |grad(rho_n)|.` 
-
-+ Added a new `adhesion_affinities` to `phenotype.mechanics` to allow preferential adhesion.
-  + `cell.phenotype.mechanics.adhesion_affinities` is a vector of adhesive affinities, one for each cell type in the simulation. By default, these are all one for backwards compatibility.  
-  + For convenience, you can access (read and write) a cell's adhesive affinity for a specific cell type via `phenotype.mechanics.adhesive_affinity(name)`, where `name` is the human-readable name of a cell type in the simulation. 
-  + The standard mechanics function (based on potentials) uses this as follows. If cell `i` has an cell-cell adhesion strength `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has a cell-cell adhesion strength of `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
-  + The standard elastic spring function (`standard_elastic_contact_function`) uses this as follows. If cell `i` has an elastic constant `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has an elastic constant `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
-
-+ `PhysiCell_basic_signaling` now includes standard Hill and linear response functions: 
-   + `Hill_response_function( double s, double half_max , double hill_power )` is a Hill function responding to signal `s` with a half-max of `half_max` and Hill coefficient of `hill_power`. We note that this function is an order of magnitude faster when the `hill_power` is an integer (e.g., 1 or 2) rather than a non-integer power (e.g., 1.4). 
-   + `double linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 0.0 (for inputs `s` below `s_min`) to 1.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
-   + `double decreasing_linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 1.0 (for inputs `s` below `s_min`) to 0.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
-
-+ We introduced a "dictionary" of standard signals that can be used as inputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + Major classes of signals include:
-    + extracellular and intracellular substrate concentrations
-    + substrate gradients
-    + contact with dead cells
-    + contact with cells (of type X)
-    + damage
-    + pressure
-    + Use `display_signal_dictionary()` to quickly display a list of available signals. 
-  + Substantial functionality to query signals
-    + `int find_signal_index( std::string signal_name )` : get the index of the named signal 
-    + `std::vector<int> find_signal_indices( std::vector<std::string> signal_names );` get a vector of indices for a vector of named signals 
-    + `std::string signal_name( int i );` display the name of the signal with the given index 
-    + `std::vector<double> get_signals( Cell* pCell );` get a vector of all known signals for the cell 
-    + `std::vector<double> get_cell_contact_signals( Cell* pCell );` get a vector of the cell contact associated signals for the cell 
-    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices );` get a vector of signals for the cell, with the supplied indices
-    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names );` get a vector of signals for the cell, with the supplied human-readable names of the signals 
-    + `double get_single_signal( Cell* pCell, int index );` get a single signal for the cell with the indicated index
-    + `double get_single_signal( Cell* pCell, std::string name );` get a single signal for the cell with the indicated human-readable name 
-
-+ We introduced a "dictionary" of standard behaviors that can be used as outputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + Major classes of behaviors include:
-    + secretion, secretion target, uptake, and export rates 
-    + cycle progression
-    + death rates
-    + motility parameters 
-    + chemotactic parameters 
-    + cell-cell adhesion and repulsion parameters
-    + cell adhesion affinities 
-    + cell-BM adhesion and repulsion parameters
-    + phagocytosis rates 
-    + attack rates
-    + fusion rates
-    + transformation rates 
-    + Use `display_behavior_dictionary()` to quickly see a list of posible behaviors.
-  + Substantial functionality to query and set behaviors 
-    + `int find_behavior_index( std::string response_name )` : get the index of the named behavior 
-    + `std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names )` get the indices for the given vector of behavior names. 
-    + `std::string behavior_name( int i );` get the name of the behavior with the given index 
-    + `std::vector<double> create_empty_behavior_vector();` create an empty vector for the full set of behaviors 
-    + `void set_behaviors( Cell* pCell , std::vector<double> parameters );` write the full set of behaviors to the cell's phentoype
-    + `void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters );` write the selected set of behaviors (with supplied indices) to the cell's phenotype
-    + `void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters );` write the selected set of behaviors (with supplied names) to the cell's phenotype 
-    + `void set_single_behavior( Cell* pCell, int index , double parameter );` write a single behavior (by index) to the cell phentoype
-    + `void set_single_behavior( Cell* pCell, std::string name , double parameter );` write a single behavior (by name) to the cell phentoype
-  + Substantial functionality to query the cell's current behavior
-    + `std::vector<double> get_behaviors( Cell* pCell );` get all the cell's current behaviors 
-    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of behaviors (with given indices) 
-    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of behaviors (with given names)
-    + `double get_single_behavior( Cell* pCell , int index );` get a single behavior (by index)
-    + `double get_single_behavior( Cell* pCell , std::string name );` get a single behavior (by name)
-  + Substantial functionality to query the cell's referece behaviors (from its cell definition) 
-    + `std::vector<double> get_base_behaviors( Cell* pCell );` get all the cell's base behaviors 
-    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of base behaviors (with given indices) 
-    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of base behaviors (with given names)
-    + `double get_single_base_behavior( Cell* pCell , int index );` get a single base behavior (by index)
-    + `double get_single_base_behavior( Cell* pCell , std::string name );` get a single base behavior (by name)
-
-+ Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
-  + Blood vessels release resource
-  + Virulet bacteria colonize near vessels (by chemotaxis up towards a secreted quorum factor and resource)
-  + Stem cells divide and differentiate into differentiated cells
-  + Differentiated cells divide until experiencing elevated pressure (to detect confluence)
-  + Bacteria-secreted virulence factor kills stem and differentiated cells. Dead cells release debris.
-  + Macrophages chemotax towards quorum factor and debris and secrete pro-inflammatory factor in presence of dead cells or bacteria
-  + Macrophages phagocytose dead cells
-  + CD8+ T cells chemotax towards pro-inflamatory factor and attack bacteria
-  + Neutrophils chemotax towards pro-inflammatory factor and phagocytose live bacteria
-  + Accumulated damage kills bacteria. 
-  + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
-
-### Minor new features and changes: 
-#### 1.10.1
-+ None in this version. See 1.10.0. 
-#### 1.10.0
-+ All sample projects have a new rule "make name" to tell you the name of the executable. 
-
-+ All sample projects output the executable name to screen for easier reference. 
-
-+ `Cell_Definition` has a new Boolean `is_movable`, so that all cells of a type can be set to non-movable. (Default: `is_movable = true`;) This allows you to use agents as rigid objects or barriers. 
-
-+ `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
-
-### Beta features (not fully supported):
- #### 1.10.1
- + None in this version. See 1.10.0. 
- #### 1.10.0
-+ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
-
-+ [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
-
-+ Added a simple Qt GUI for plotting cells only (plot_cells.py and vis_tab_cells_only.py in /beta)
-
-+ Added a simple Qt GUI for plotting substrates and cells (plot_data.py and vis_tab.py in /beta)
-
-+ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
-  
-### Bugfixes: 
-#### 1.10.1
-+ XML parsing has been made more robust to "survive" using an incorrect substrate in the `chemotactic_sensitivities` section.
-
-+ Missing PhysiBoSS makefiles have been replaced. 
-
-+ Fixed broken makefile for worms sample project. 
-
-#### 1.10.0
-+ When the `cell_defaults` definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying `cell_defaults`, the XML parsing will reset motility to off (with `NULL` function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set `legacy_cell_defaults_copy = true` in the config file to override this bugfix. 
-
-+ We refactored the pseudorandom number generator (at the basis of `UniformRandom()`) to improve thread safety. Previously, all threads shared a single PRNG, which was not thread safe. For newer fast processors with many threads, this could lead to sufficiently many "collisions" to introduce subtle biases in some cases (particularly for purely Brownian motion that is not dominated by chemotaxis, proliferation, and other behaviors). This is now corrected by creating a PRNG for each thread, each with its own seed. We used `std::seed_seq` to determinstically set a good spread of seeds to prevent correlation between the PRNGs, with the convention that the 0th thread's seed is either the user-specified seed or a random seed. This preserves original single-thread behavior from prior versions. 
-
-+ Random motility now uses `UniformOnUnitCircle()` (in 2D) and `UniformOnUnitSphere()` (in 3D) to choose the random component of the migration direction, rather than hand-coding selection of the random vector. 
-
-+ In response to PR 91 (https://github.com/MathCancer/PhysiCell/pull/91): Previoulsy, if the make jpeg rule fails, the `__*.txt` temporary files are left in place, so a subsequent "make jpeg" fails until these files are manually removed. Replacing `>>` (append) with `>` (overwrite) fixes the problem. Thanks [saikiRA1011](https://github.com/saikiRA1011)!
-
-### Notices for intended changes that may affect backwards compatibility:
- 
-+ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the very near future.  
-
-+ We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
-
-+ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
- 
-+ We will change the timing of when `entry_function`s are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather than both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to execute the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
-
-+ We might make `trigger_death` clear out all the cell's functions, or at least add an option to do this. 
-
-### Planned future improvements: 
-
-+ Further XML-based simulation setup. 
-
-+ Read saved simulation states (as MultiCellDS digital snapshots)
- 
-+ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
- 
-+ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
- 
-+ Create an angiogenesis sample project 
- 
-+ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
-
-+ Improved plotting options in SVG 
-
-+ Further update sample projects to make use of more efficient interaction testing available
-
-+ Major refresh of documentation.
-
-* * * 	
-	
-**Version:** 1.10.0
-
-**Release date:** 13 May 2022
-
-## Release summary: 
-
-This release introduces major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
-
-A blog post and tutorial on the new phenotype elements can be found at http://www.mathcancer.org/blog/introducing-cell-interactions-and-transformations
-
-A blog post and tutorial on the new signal and behavior dictionaries can be found at http://www.mathcancer.org/blog/introducing-cell-signal-and-behavior-dictionaries. 
-
-**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
-
-**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
- 
-### Major new features and changes in the 1.10.z versions
-#### 1.10.0
-
-+ Created `Cell_Interactions` in `Phenotype` as a standard representation of essential cell-cell interactions, including phagocytosis, "attack", and fusion. 
-  +  Users can set phagocytosis rates for dead cells via `phenotype.cell_interactions.dead_phagocytosis_rate`. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. 
-  +  Users can set phagocytosis rates for each live cell type via `phenotype.cell_interactions.live_phagocytosis_rates`. There is one rate for each cell type in the simulation. Cells automatically phagocytose live and dead neighbors at each mechancis time step based upon the phagocytosis rates. Phagocytosis absorbs the target cell's volume and internal contents and flags the target for removal. The cell will eventually shrink back towards its target volume. 
-  +  For convenience, the phagocytosis rates can be accessed (read or written) via `phenotype.cell_interactions.live_phagocytosis_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
-  +  Users can set attack rates for live cells via `phenotype.cell_interactions.attack_rates`. There is one rate for each cell type in the simulation. Cells automaticaly attack neighbors at each mechanics time step based upon the rates. An attack event increases the target cell's `cell.state.damage` by `damage_rate * dt_mechanics` and `cell.state.total_attack_time` by `dt_mechanics`. It is up to the scientist user to set additional hypotheses that increases cell death with accumulated damage or attack time. 
-  +  For convenience, the attack rates can be accessed via `phenotype.cell_interactions.attack_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
-  +  Users can set fusion rates for live cells via `phenotype.cell_interactions.fusion_rates`. There is one rate for each cell type in the simulation. Cells automaticaly fuse with at each mechanics time step based upon the rates. Fusion will merge the two cells' volumes and internal contents, add their nuclei (recorded in `cell.state.number_of_nuclei`), and move the combine cell to the prior center of volume. The combined cell's new target volume is the sum of the two original cells' target volumes. 
-  +  For convenience, the fusion rates can be accessed via `phenotype.cell_interactions.fusion_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type.   
-
-+ Created `Cell_Transformations` in `Phenotype` as a standard representation of cell transformations such as differentation or transdifferentiation. 
-  +  Users can set transformation rates for each live cell type via `phenotype.cell_transformations_transformation_rates`. There is one rate for each cell type in the simulation. Cells automatically attempt to transform to these types at each phenotype time step based upon the phagocytosis rates. 
-  +  For convenience, the transformation rates can be accessed (read or written) via `phenotype.cell_transformations.transformation_rate(name)` where `name` (a `std::string`) is the human-readable name of a cell type. 
-
-+ Updated `Cell_State` to track the number of nuclei (for fusion), total damage (e.g., for cell attack) and total attack time. 
-
-+ Added a new `advanced_chemotaxis` function with data stored in `phenotype.motility` to allow chemotaxis up a linear combination of gradients. 
-  + `cell.phenotype.motility.chemotactic_sensitivities` is a vector of chemotactic sensitivies, one for each substrate in the environment. By default, these are all zero for backwards compatibility. A positive sensitivity denotes chemotaxis up a corresponding substrate's gradient (towards higher values), whereas a negative sensitivity gives chemotaxis against a gradient (towards lower values). 
-  + For convenience, you can access (read and write) a substrate's chemotactic sensitivity via `phenotype.motility.chemotactic_sensitivity(name)`, where `name` is the human-readable name of a substrate in the simulation. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * grad(rho_0) + sensitivity_1 * grad(rho_1) + ... + sensitivity_n * grad(rho_n)`. 
-  + If the user sets `cell.cell_functions.update_migration_bias = advanced_chemotaxis_function_normalized`, then these sensitivities are used to set the migration bias direction via  `d_mot = sensitivity_0 * |grad(rho_0)| + sensitivity_1 * |grad(rho_1)| + ... + sensitivity_n * |grad(rho_n)|.` 
-
-+ Added a new `adhesion_affinities` to `phenotype.mechanics` to allow preferential adhesion.
-  + `cell.phenotype.mechanics.adhesion_affinities` is a vector of adhesive affinities, one for each cell type in the simulation. By default, these are all one for backwards compatibility.  
-  + For convenience, you can access (read and write) a cell's adhesive affinity for a specific cell type via `phenotype.mechanics.adhesive_affinity(name)`, where `name` is the human-readable name of a cell type in the simulation. 
-  + The standard mechanics function (based on potentials) uses this as follows. If cell `i` has an cell-cell adhesion strength `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has a cell-cell adhesion strength of `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
-  + The standard elastic spring function (`standard_elastic_contact_function`) uses this as follows. If cell `i` has an elastic constant `a_i` and an adhesive affinity `p_ij` to cell type `j` , and if cell `j` has an elastic constant `a_j` and an adhesive affinity `p_ji` to cell type `i`, then the strength of their adhesion is `sqrt(  a_i p_ij a_j p_ji )`. Notice that if `a_i = a_j` and `p_ij = p_ji`, then this reduces to `a_i a_pj`. 
-
-+ `PhysiCell_basic_signaling` now includes standard Hill and linear response functions: 
-   + `Hill_response_function( double s, double half_max , double hill_power )` is a Hill function responding to signal `s` with a half-max of `half_max` and Hill coefficient of `hill_power`. We note that this function is an order of magnitude faster when the `hill_power` is an integer (e.g., 1 or 2) rather than a non-integer power (e.g., 1.4). 
-   + `double linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 0.0 (for inputs `s` below `s_min`) to 1.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
-   + `double decreasing_linear_response_function( double s, double s_min , double s_max )` is a linear ramping from 1.0 (for inputs `s` below `s_min`) to 0.0  (for inputs `s` above `s_max`). The outputs are clamped to the range [0,1].
-
-+ We introduced a "dictionary" of standard signals that can be used as inputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + Major classes of signals include:
-    + extracellular and intracellular substrate concentrations
-    + substrate gradients
-    + contact with dead cells
-    + contact with cells (of type X)
-    + damage
-    + pressure
-    + Use `display_signal_dictionary()` to quickly display a list of available signals. 
-  + Substantial functionality to query signals
-    + `int find_signal_index( std::string signal_name )` : get the index of the named signal 
-    + `std::vector<int> find_signal_indices( std::vector<std::string> signal_names );` get a vector of indices for a vector of named signals 
-    + `std::string signal_name( int i );` display the name of the signal with the given index 
-    + `std::vector<double> get_signals( Cell* pCell );` get a vector of all known signals for the cell 
-    + `std::vector<double> get_cell_contact_signals( Cell* pCell );` get a vector of the cell contact associated signals for the cell 
-    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices );` get a vector of signals for the cell, with the supplied indices
-    + `std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names );` get a vector of signals for the cell, with the supplied human-readable names of the signals 
-    + `double get_single_signal( Cell* pCell, int index );` get a single signal for the cell with the indicated index
-    + `double get_single_signal( Cell* pCell, std::string name );` get a single signal for the cell with the indicated human-readable name 
-
-+ We introduced a "dictionary" of standard behaviors that can be used as outputs to intracellular and rule-based models. This dictionary is automatically constructed at the start of each simulation based upon the combinations of signaling substrates and cell types. 
-  + Major classes of behaviors include:
-    + secretion, secretion target, uptake, and export rates 
-    + cycle progression
-    + death rates
-    + motility parameters 
-    + chemotactic parameters 
-    + cell-cell adhesion and repulsion parameters
-    + cell adhesion affinities 
-    + cell-BM adhesion and repulsion parameters
-    + phagocytosis rates 
-    + attack rates
-    + fusion rates
-    + transformation rates 
-    + Use `display_behavior_dictionary()` to quickly see a list of posible behaviors.
-  + Substantial functionality to query and set behaviors 
-    + `int find_behavior_index( std::string response_name )` : get the index of the named behavior 
-    + `std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names )` get the indices for the given vector of behavior names. 
-    + `std::string behavior_name( int i );` get the name of the behavior with the given index 
-    + `std::vector<double> create_empty_behavior_vector();` create an empty vector for the full set of behaviors 
-    + `void set_behaviors( Cell* pCell , std::vector<double> parameters );` write the full set of behaviors to the cell's phentoype
-    + `void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters );` write the selected set of behaviors (with supplied indices) to the cell's phenotype
-    + `void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters );` write the selected set of behaviors (with supplied names) to the cell's phenotype 
-    + `void set_single_behavior( Cell* pCell, int index , double parameter );` write a single behavior (by index) to the cell phentoype
-    + `void set_single_behavior( Cell* pCell, std::string name , double parameter );` write a single behavior (by name) to the cell phentoype
-  + Substantial functionality to query the cell's current behavior
-    + `std::vector<double> get_behaviors( Cell* pCell );` get all the cell's current behaviors 
-    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of behaviors (with given indices) 
-    + `std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of behaviors (with given names)
-    + `double get_single_behavior( Cell* pCell , int index );` get a single behavior (by index)
-    + `double get_single_behavior( Cell* pCell , std::string name );` get a single behavior (by name)
-  + Substantial functionality to query the cell's referece behaviors (from its cell definition) 
-    + `std::vector<double> get_base_behaviors( Cell* pCell );` get all the cell's base behaviors 
-    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices );` get a subset of base behaviors (with given indices) 
-    + `std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names );` get a subset of base behaviors (with given names)
-    + `double get_single_base_behavior( Cell* pCell , int index );` get a single base behavior (by index)
-    + `double get_single_base_behavior( Cell* pCell , std::string name );` get a single base behavior (by name)
-
-+ Created a new `interaction-sample` project to illustrate the new interactions and transformations: 
-  + Blood vessels release resource
-  + Virulet bacteria colonize near vessels (by chemotaxis up towards a secreted quorum factor and resource)
-  + Stem cells divide and differentiate into differentiated cells
-  + Differentiated cells divide until experiencing elevated pressure (to detect confluence)
-  + Bacteria-secreted virulence factor kills stem and differentiated cells. Dead cells release debris.
-  + Macrophages chemotax towards quorum factor and debris and secrete pro-inflammatory factor in presence of dead cells or bacteria
-  + Macrophages phagocytose dead cells
-  + CD8+ T cells chemotax towards pro-inflamatory factor and attack bacteria
-  + Neutrophils chemotax towards pro-inflammatory factor and phagocytose live bacteria
-  + Accumulated damage kills bacteria. 
-  + With default parameters, bacteria kill off cells ot form abscesses, until death attracts macrophages to activate immune response to kill the invaders, after which the tissue can regrow. 
-
-### Minor new features and changes: 
-
-+ All sample projects have a new rule "make name" to tell you the name of the executable. 
-
-+ All sample projects output the executable name to screen for easier reference. 
-
-+ `Cell_Definition` has a new Boolean `is_movable`, so that all cells of a type can be set to non-movable. (Default: `is_movable = true`;) This allows you to use agents as rigid objects or barriers. 
-
-+ `create_cell( Cell_Definition )` now uses "`is_movable`" from the cell definition.  
-
-### Beta features (not fully supported):
- 
-+ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
-
-+ [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
-
-+ Added a simple Qt GUI for plotting cells only (plot_cells.py and vis_tab_cells_only.py in /beta)
-
-+ Added a simple Qt GUI for plotting substrates and cells (plot_data.py and vis_tab.py in /beta)
-
-+ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
-  
-### Bugfixes: 
-+ When the `cell_defaults` definition has been altered, new cell types may unwittingly copy nonzero parameter values from this default. Now, immediately after copying `cell_defaults`, the XML parsing will reset motility to off (with `NULL` function for bias direction), reset all secretion/uptake/export to zero, reset all cell interactions and transformations to zero. It will then continue to parse the XML file. Set `legacy_cell_defaults_copy = true` in the config file to override this bugfix. 
-
-+ We refactored the pseudorandom number generator (at the basis of `UniformRandom()`) to improve thread safety. Previously, all threads shared a single PRNG, which was not thread safe. For newer fast processors with many threads, this could lead to sufficiently many "collisions" to introduce subtle biases in some cases (particularly for purely Brownian motion that is not dominated by chemotaxis, proliferation, and other behaviors). This is now corrected by creating a PRNG for each thread, each with its own seed. We used `std::seed_seq` to determinstically set a good spread of seeds to prevent correlation between the PRNGs, with the convention that the 0th thread's seed is either the user-specified seed or a random seed. This preserves original single-thread behavior from prior versions. 
-
-+ Random motility now uses `UniformOnUnitCircle()` (in 2D) and `UniformOnUnitSphere()` (in 3D) to choose the random component of the migration direction, rather than hand-coding selection of the random vector. 
-
-+ In response to PR 91 (https://github.com/MathCancer/PhysiCell/pull/91): Previoulsy, if the make jpeg rule fails, the `__*.txt` temporary files are left in place, so a subsequent "make jpeg" fails until these files are manually removed. Replacing `>>` (append) with `>` (overwrite) fixes the problem. Thanks [saikiRA1011](https://github.com/saikiRA1011)!
-
-### Notices for intended changes that may affect backwards compatibility:
- 
-+ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the very near future.  
-
-+ We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
-
-+ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
- 
-+ We will change the timing of when `entry_function`s are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather than both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to execute the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
-
-+ We might make `trigger_death` clear out all the cell's functions, or at least add an option to do this. 
-
-### Planned future improvements: 
-
-+ Further XML-based simulation setup. 
-
-+ Read saved simulation states (as MultiCellDS digital snapshots)
- 
-+ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
- 
-+ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
- 
-+ Create an angiogenesis sample project 
- 
-+ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
-
-+ Improved plotting options in SVG 
-
-+ Further update sample projects to make use of more efficient interaction testing available
-
-+ Major refresh of documentation.
-
-* * * 
-
-**Version:** 1.9.1
-
-**Release date:** 13 September 2021
-
-## Release summary: 
-
-This release focuses primarily on bug fixes. It fixes memory leaks and other bugs in intracellular modeling, as well as several small bugs in parsing cell definitions in the XML configuration file. It also implements a basic_volume_model that only models total volume. (For internal consistency, it treats the entire cell as cytoplasm.) 
-
-**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
-
-**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
- 
-### Major new features and changes:
-
-+ None in this release. 
-
-### Minor new features and changes: 
-
-+ Implemented basic_volume_model (see standard models), where nuclear volumes are set to zero, and cytoplasmic volumes are updated as normal. 
-
-### Beta features (not fully supported):
- 
-+ Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
-
-+ [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
-
-+ Added a simple Qt GUI for plotting cells only (plot_cells.py and vis_tab_cells_only.py in /beta)
-
-+ Added a simple Qt GUI for plotting substrates and cells (plot_data.py and vis_tab.py in /beta)
-
-+ Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
-  
-### Bugfixes: 
-+ Fixed bug in legend function where on some rare occasions, the temporary cell could adversely interact with other cells prior to deletion. 
-
-+ Remove an old error printout from standard_elastic_contact_function that causes problem with the ANCIENT version of gcc (4.8.x) that nanoHUB refuses to upgrade. 
-
-+ Fixed Libroadrunner memory leak issue.
-
-+ Made minor bugfixes to parsing cell definitions in the XML configuration files: 
-  + verify motility enabled flag is present before parsing its value
-  + fix bug when parsing multiple death models
-
-### Notices for intended changes that may affect backwards compatibility:
- 
-+ We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
-
-+ We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
-
-+ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
- 
-+ We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
-
-+ We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
-	
-+ We will most probably merge all of "core" and "modules" into "core." 
-
-### Planned future improvements: 
-
-+ Further XML-based simulation setup. 
-
-+ Read saved simulation states (as MultiCellDS digital snapshots)
-  
-+ Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
- 
-+ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
- 
-+ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
- 
-+ Create an angiogenesis sample project 
- 
-+ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
-
-+ Improved plotting options in SVG 
-
-+ Further update sample projects to make use of more efficient interaction testing available
-
-+ Major refresh of documentation.
-
-* * * 
-
-**Version:** 1.9.0
-
-**Release date:** 12 July 2021
-
-## Release summary: 
-
-This release introduces intracellular modeling, i.e., models inside individual cells, for PhysiCell. We support three types of intracellular models: boolean networks, ordinary differential equations (ODEs), and dynamic flux balance analysis (dFBA). An intracellular model is part of a cell type's phenotype specification. Currently, we only support a single intracellular model per cell type; however, different *types* of models can be used for different cell types, e.g., a boolean network for cell type A and ODEs for cell type B.
-
-This new functionality has been a collaborative effort with the Institut Curie, the Barcelona Supercomputing Center, and the University of Washington. 
-We provide a unified C++ interface between each intracellular model and PhysiCell.
+This new functionality has been a collaborative effort with the Institut Curie, the Barcelona Supercomputing Center, and the University of Washington. We provide a unified C++ interface between each intracellular model and PhysiCell.
 
 The Systems Biology Markup Language (SBML) is used to define both the ODEs and FBA models; boolean networks are defined using MaBoSS's custom 
 configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the full SBML specification; details are provided elsewhere.)
 
-
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
- 
+
 ### Major new features and changes:
 
+#### Version 1.9.1: 
++ None in this release. 
+
+#### Version 1.9.0: 
 + First full support for intracellular models: boolean networks, ordinary differential equations (ODEs), and dynamic flux balance analysis (dFBA).
 
 + Added an abstract `Intracellular` class in core/PhysiCell_phenotype.h. Concrete classes for the supported intracellular models provide the functionality in the abstract class.
@@ -1481,7 +686,10 @@ configuration (.cfg and .bnd) files. (NOTE: PhysiCell does *not* support the ful
 + If a PhysiCell model uses an intracellular model, the PhysiCell Makefile will run a Python script (in the /beta directory) that checks to see if you have already downloaded the software (library) for the intracellular solver and, if not, downloads it and puts it in a directory within your PhysiCell project where it can be found and linked. The Python script will download the appropriate library for your operating system.
 
 ### Minor new features and changes: 
+#### Version 1.9.1:
++ Implemented basic_volume_model (see standard models), where nuclear volumes are set to zero, and cytoplasmic volumes are updated as normal. 
 
+#### Version 1.9.0:
 + Added `intracellular` XML element (inside `phenotype`) that specifies the type of intracellular model, its model definition file, its PhysiCell dt value to be evaluated, and relevant mappings between it and PhysiCell data.
 
 + Added Python scripts in /beta to download intracellular solver libraries: setup_libroadrunner.py, setup_libmaboss.py, setup_fba.py
@@ -1508,7 +716,10 @@ However, it is up to each intracellular model as to how, or if, it will be used.
 + Bug fix and improvements to /beta/params_run.py to perform parameter explorations of models.
 
 ### Beta features (not fully supported):
- 
+#### Version 1.9.1: 
++ No new beta features this release. 
+
+#### Version 1.9.0: 
 + Started writing a standardized set of functions for Hill functions and promoter/inhibitor signaling. 
 
 + [Model Builder Tool](https://github.com/PhysiCell-Tools/PhysiCell-model-builder/releases) 
@@ -1520,7 +731,18 @@ However, it is up to each intracellular model as to how, or if, it will be used.
 + Added simple contour plotting of a substrate (anim_substrate2D.py in /beta; copy to /output) 
   
 ### Bugfixes: 
+#### Version 1.9.1: 
++ Fixed bug in legend function where on some rare occasions, the temporary cell could adversely interact with other cells prior to deletion. 
 
++ Remove an old error printout from standard_elastic_contact_function that causes problem with the ANCIENT version of gcc (4.8.x) that nanoHUB refuses to upgrade. 
+
++ Fixed Libroadrunner memory leak issue.
+
++ Made minor bugfixes to parsing cell definitions in the XML configuration files: 
+  + verify motility enabled flag is present before parsing its value
+  + fix bug when parsing multiple death models
+
+#### Version 1.9.0: 
 + In core/PhysiCell_cell.cpp, replace `switch` statement with `if`/`else if` to prevent compiler errors related to `static const int` from PhysiCell_constants.
 
 + core/PhysiCell_cell.cpp: assign_position(double x, double y, double z): make sure the current mechanics voxel is initialized.
@@ -1540,6 +762,8 @@ However, it is up to each intracellular model as to how, or if, it will be used.
 + We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
 
 + We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
+	
++ We will most probably merge all of "core" and "modules" into "core." 
 
 ### Planned future improvements: 
 

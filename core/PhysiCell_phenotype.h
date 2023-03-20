@@ -611,6 +611,9 @@ class Intracellular
 	virtual void update() = 0;
 	virtual void update(Cell* cell, Phenotype& phenotype, double dt) = 0;
 
+	// This function deals with inheritance from mother to daughter cells
+	virtual void inherit(Cell* cell) = 0;
+
 	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
 	
@@ -650,7 +653,13 @@ class Cell_Interactions
 	double dead_phagocytosis_rate; 
 	std::vector<double> live_phagocytosis_rates; 
 	// attack parameters (e.g., T cells)
+
 	std::vector<double> attack_rates;
+		// do I attack cell type j? 
+
+	std::vector<double> immunogenicities; // new! 
+		// how immnogenic am I to cell type j? 
+
 	double damage_rate;  
 	// cell fusion parameters 
 	std::vector<double> fusion_rates;
@@ -663,6 +672,7 @@ class Cell_Interactions
 	double& live_phagocytosis_rate( std::string type_name ); // done 
 	double& attack_rate( std::string type_name ); // done 
 	double& fusion_rate( std::string type_name ); // done 
+	double& immunogenicity( std::string type_name ); // done 
 	
 	// automated cell phagocytosis, attack, and fusion 
 //	void perform_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
