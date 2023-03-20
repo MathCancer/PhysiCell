@@ -75,13 +75,7 @@ See changes.md for the full change log.
 
 * * * 
 ## Release summary: 
-Version 1.11.0 ... 
-
-primarily fixes bugs in file output and the ode-energy sample, and refines thread safety in cell phagocytosis. 
-
-The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
-
-**PAUL STILL NEEDS TO FINISH WRITING THIS SECTION**
+Version 1.11.0 adds several notable features, fixes bugs, and further expands the "signals" and "behaviors" that can be read and written with a simple API to facilitate building models. In particular, we add a brand new CSV format for initial cell positions (with more robust naming of cells by their human-readable names, a "header" line, and ability to extensively add and specificy individual cell properties), a new ability to save and load user projects in the `user_projects` directory, automated dynamic formation and breakage of spring-based cell-cell adhesions (based upon the cell-cell adhesion affinities, attachment rates, and detachment rates), automated inclusion of spring-based adhesions (at the mechanics time step) without need for the user to explicitly supply a spring function, a new "mechano" sample project to illustrate the new automated spring functionality, and updates to PhysiBoSS to ensure compatibility with the rapidly improving PhysiCell Studio. In addition, there is new capability of adding a background coloring (e.g., an oxygen heatmap) to SVG ouptuts--see the `interaction-sample` for an illustration (use the alternate XML config file to enable). This release includes several bugfixes, the most critical of which is to update the parameters for necrotic cells (which had previously been misset in the XML files, thus disabling necrotic cell lysis and shrinking). 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
@@ -169,7 +163,7 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
   + Each cell automatically removes all its spring attachments during division 
   + Each cell automatically removes all its spring attachments at the *end* of death. If you want dead cells to have increased detachment, add a rule accordingly using the built-in behavior dictionary. 
   + If a cell is not movable (`is_movable = false`), then it is not moved by springs, but it can exert spring forces on other cells, allowing it to act as an "anchor". 
-  + This automated spring functionality is completely independent of (and does not interfer with) the user-defined contact function and user-manageed `cell.state.attached` data structure. 
+  + This automated spring functionality is completely independent of (and does not interfere with) the user-defined contact function and user-manageed `cell.state.attached` data structure. 
   + **WARNING:** If in a past life you set `phenotype.mechanics.attachment_rate` to a nonzero rate, you may find yourself surprised with unintended spring adhesions as this new automation kicks in. Please review and revise your configuration file as necessary. 
   + You can disable this behavior in the XML configuration file: 
   ```
@@ -245,6 +239,10 @@ The 1.10.0 release introduced major new phenotype functionality, including stand
 + Now forcing Mersenne Twister as random generator in PhysiBoSS (use or /dev/random by MaBoSS would max out system descriptor)
 
 + MaBoSS BND/CFG parsing is now in an OpenMP critical block (flex/bison parser is not thread safe)
+
++ Remove duplicate initialization of maximum attachment rate from the Phenotype.Mechanics constructor.
+
++ Fixed bug in neighbor/attached graph output filenames (previously double-appended a suffix to the filenames). 
 
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
