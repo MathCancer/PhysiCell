@@ -195,6 +195,8 @@ Version 1.11.0 adds several notable features, fixes bugs, and further expands th
 
 + Updated PhysiBoSS Cell Lines sample project (flatten XML, initial positions as CSV).
 
++ Started combining change log into a more compact format: Each release family (1.y.z, such as 1.10.z) receives an extended entry with new changes grouped by minor release. This allows major releases to be grouped with subsequent minor feature enhancements and bug fixes, for a much shorter change log that's easier to read. README will document all changes of the current release family. 
+
 ### Beta features (not fully supported):
 #### 1.11.0
 + Added `bool read_microenvironment_from_matlab( std::string mat_filename )` to `BioFVM_MultiCellDS`. This will read and overwrite from a stored microenvironment (in `mat_filename`, saved as a level 4 Matlab file) if it has the following format: 
