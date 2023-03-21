@@ -1229,7 +1229,6 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 
 			probability = attack_ij * immunogenicity_ji * dt; 
 			
-			dt; // s[type] * dt;  
 			if( UniformRandom() < probability && attacked == false ) 
 			{
 				pCell->attack_cell(pTarget,dt); 
