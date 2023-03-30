@@ -141,9 +141,9 @@ void vector_to_list( const std::vector<double>& vect , char*& buffer , char deli
 
 void vector3_to_list( const std::vector<double>& vect , char*& buffer , char delim ); 
 
-double dot_product( std::vector<double>& a , std::vector<double>& b ); 
-std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b );
-
+double dot_product( const std::vector<double>& a , const std::vector<double>& b );
+std::vector<double> cross_product( const std::vector<double>& a , const std::vector<double>& b );
+    
 };
 
 #endif
