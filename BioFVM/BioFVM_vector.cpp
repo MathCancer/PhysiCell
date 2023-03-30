@@ -319,7 +319,7 @@ void randomize( std::vector<double>* v )
 
 /* axpy and related BLAS-type operations */ 
 
-void axpy( std::vector<double>* y, double& a , std::vector<double>& x )
+void axpy( std::vector<double>* y, const double& a , const std::vector<double>& x )
 {
  for( unsigned int i=0; i < (*y).size() ; i++ )
  {
@@ -328,7 +328,7 @@ void axpy( std::vector<double>* y, double& a , std::vector<double>& x )
  return ; 
 }
 
-void axpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>& x )
+void axpy( std::vector<double>* y, const std::vector<double>& a , const std::vector<double>& x )
 {
  for( unsigned int i=0; i < (*y).size() ; i++ )
  {
@@ -337,7 +337,7 @@ void axpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>&
  return; 
 }
 
-void naxpy( std::vector<double>* y, double& a , std::vector<double>& x )
+void naxpy( std::vector<double>* y, const double& a , const std::vector<double>& x )
 {
  for( unsigned int i=0; i < (*y).size() ; i++ )
  {
@@ -346,7 +346,7 @@ void naxpy( std::vector<double>* y, double& a , std::vector<double>& x )
  return ; 
 }
 
-void naxpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>& x )
+void naxpy( std::vector<double>* y, const std::vector<double>& a , const std::vector<double>& x )
 {
  for( unsigned int i=0; i < (*y).size() ; i++ )
  {
