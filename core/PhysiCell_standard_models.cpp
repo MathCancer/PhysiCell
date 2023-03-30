@@ -67,6 +67,7 @@
 
 #include "PhysiCell_standard_models.h" 
 #include "PhysiCell_cell.h" 
+#include "../modules/PhysiCell_pathology.h"
 
 namespace PhysiCell{
 	
@@ -758,6 +759,9 @@ void initialize_default_cell_definition( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
 	cell_defaults.functions.set_orientation = NULL;
+	
+	cell_defaults.functions.plot_agent_SVG = standard_agent_SVG;
+	cell_defaults.functions.plot_agent_legend = standard_agent_legend;
 	
 	// add the standard death models to the default phenotype. 
 	cell_defaults.phenotype.death.add_death_model( 0.00319/60.0 , &apoptosis , apoptosis_parameters );
