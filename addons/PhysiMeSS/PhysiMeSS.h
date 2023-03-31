@@ -8,6 +8,8 @@
 
 using namespace PhysiCell;
 
+static std::string PhysiMeSS_Version = "1.0.0"; 
+
 bool isFibre(Cell* pCell);
 bool isFibre(Cell_Definition * cellDef);
 
