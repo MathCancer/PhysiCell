@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1</max_time> 
+		<max_time units="min">0</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -259,7 +259,7 @@
           </custom_data>
           </cell_definition>
 
-      <cell_definition name="fibre_horizontal" ID="2">
+      <cell_definition name="attractant" ID="2">
         <phenotype>
           <cycle code="5" name="live">
             <phase_transition_rates units="1/min">
@@ -354,7 +354,7 @@
       </cell_definitions>
 	
 	<initial_conditions>
-		<cell_positions type="csv" enabled="true">
+		<cell_positions type="csv" enabled="false">
 			<folder>./config/Fibre_Initialisation</folder>
 			<filename>initialfibres.csv</filename>
 		</cell_positions>
@@ -365,11 +365,11 @@
         <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
         
         <number_of_fibres type="int" units="none" description="initial number of fibres (for each fibre type)">2000</number_of_fibres>
-        <anisotropic_fibres type="bool" units="none" description="flag for whether we want anisotropic fibres">true</anisotropic_fibres>
-        <fibre_length type="double" units="microns" description="length of fibres">40.0</fibre_length>
+        <anisotropic_fibres type="bool" units="none" description="flag for whether we want anisotropic fibres">false</anisotropic_fibres>
+        <fibre_length type="double" units="microns" description="length of fibres">75.0</fibre_length>
         <length_normdist_sd type="double" units="microns" description="standard deviation of fibre length">0.0</length_normdist_sd>
         <fibre_radius type="double" units="microns" description="radius of fibres">2.0</fibre_radius>
-        <fibre_angle type="double" units="radians" description="angle of fibre orientation">1.57</fibre_angle>
+        <fibre_angle type="double" units="radians" description="angle of fibre orientation">0.0</fibre_angle>
         <angle_normdist_sd type="double" units="radians" description="standard deviation of fibre orientation angle">0.0</angle_normdist_sd>
         
         <fibre_degradation type="bool" units="none" description="flag for fibre degradation">false</fibre_degradation>
