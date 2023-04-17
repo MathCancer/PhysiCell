@@ -13,7 +13,7 @@ PhysiMeSS comes with a dedicated sample project, called **physimess-sample**. To
 The following basic examples are populated in config directory once the **physimess-sample** project is loaded.
 
 ### Fibre_Initialisation
-A simple example in which you can initialise fibres in the domain. Fibres are cylindrical agents described by their centre, radius, length and orientation. The centre of each fibre is prescribed either from a csv file or at random (as per cells in PhysiCell), the other attributes can be altered via user parameters in the xml or GUI. The following are default parameters found in ```mymodel_initialisation.xml```
+A simple example in which you can initialise fibres in the domain. Fibres are cylindrical agents described by their centre, radius, length and orientation. The centre of each fibre is prescribed either from a csv file or at random (as per cells in PhysiCell). The other attributes can be altered via user parameters in the xml or GUI. The following are default parameters found in ```mymodel_initialisation.xml```
 
 ```
 number_of_fibres = 2000
@@ -25,7 +25,9 @@ fibre_angle = 0.0 (radians)
 angle_normdist_sd = 0.0 (radians)
 ```
 
-Using these parameters you can set up a domain with 2000 fibres randomly positioned and aligned with a length of 75 microns and radius of 2 microns. Note since we remove any fibres which overlap the boundaries of the domain 1931 fibres remain after initialisation. Although fibres are cylinders they are visualised in the domain as lines.  
+Using these parameters you can set up a domain with 2000 fibres randomly positioned and randomly aligned with a length of 75 microns and radius of 2 microns. Note since we remove any fibres which overlap the boundaries of the domain 1931 fibres remain after initialisation. Although fibres are cylinders, they are visualised in the domain as lines.
+
+A second xml file ```mymodel_initialisation_maze.xml``` along with the csv ```initial fibres.csv``` allows the user to create a maze with horizontal and vertical fibres.
 
 ### Fibre_Degradation 
 * mymodel_fibre_degradation.xml and cells_and_fibres_attractant.csv to model one cell degrading fibres to reach attractant
