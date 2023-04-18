@@ -27,11 +27,26 @@ angle_normdist_sd = 0.0 (radians)
 
 Using these parameters you can set up a domain with 2000 fibres randomly positioned and randomly aligned with a length of 75 microns and radius of 2 microns. Note since we remove any fibres which overlap the boundaries of the domain 1931 fibres remain after initialisation. Although fibres are cylinders, they are visualised in the domain as lines.
 
-A second xml file ```mymodel_initialisation_maze.xml``` along with the csv ```initial fibres.csv``` allows the user to create a maze with horizontal and vertical fibres.
+A second xml file ```mymodel_initialisation_maze.xml``` along with the csv ```initialfibres.csv``` allows the user to create a maze with horizontal and vertical fibres.
 
 ### Fibre_Degradation 
-* mymodel_fibre_degradation.xml and cells_and_fibres_attractant.csv to model one cell degrading fibres to reach attractant
-* mymodel_matrix_degradation.xml and cells_and_fibres.csv to model growth of cell mass degrading matrix
+In these examples we show how fibre degradation affects simulations of cell migration and cell proliferation.
+
+* Cell migration towards an attractant through fibres uses xml file ```mymodel_fibre_degradation.xml``` with csv file ```cells_and_fibres_attractant.csv```. Fibres are assigned a position, radius and length but their orientation is random.
+
+* Cell proliferation within a fibrous mesh uses xml file ```mymodel_matrix_degradation.xml``` with csv file ```cells_and_fibres.csv```. The fibrous mesh is as above.
+
+Default parameters are:
+
+```
+fibre_length = 40.0 (microns)
+fibre_degradation = true 
+fibre_deg_rate = 0.01 (1/min)
+fibre_stuck = 10.0 (mechanics timesteps)
+```
+
+Note the parameter ```fibre_stuck``` determines how many mechanics time steps a cell needs to have been stuck before it can possibly degrade a fibre at the rate ```fibre_deg_rate```.
+
 
 ### Cell_Fibre_Mechanics
 * mymodel_fibremaze.xml and fibre_maze.csv to model cell moving around a maze made of fibres
