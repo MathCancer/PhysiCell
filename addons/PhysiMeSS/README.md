@@ -49,6 +49,38 @@ Note the parameter ```fibre_stuck``` determines how many mechanics time steps a 
 
 
 ### Cell_Fibre_Mechanics
-* mymodel_fibremaze.xml and fibre_maze.csv to model cell moving around a maze made of fibres
-* mymodel_potentials.xml and snowplough.csv to model both fibre pushing and rotation by cells
-* mymodel_hinge.xml and hinge.csv to model fibres being rotated at their hinge crosslink point by a cell
+In these examples we demonstrate the cell-fibre mechanics. 
+
+* In ```mymodel_fibremaze.xml``` which uses  ````fibre_maze.csv``` we simulate a single cell moving around a maze made of fibres towards an attractant secreting a nutrient.
+
+Default parameters are:
+
+```
+fibre_length = 60.0 (microns)
+vel_adhesion = 0.6 
+vel_contact = 0.1
+cell_velocity_max = 1.0
+```
+
+* In ```mymodel_pushing.xml``` which uses  ```snowplough.csv``` we simulate a single cell pushing a single free/non-crosslinked fibre out of the way to access an attractant. 
+
+Default parameters are:
+
+```
+fibre_length = 40.0 (microns)
+fibre_pushing = true
+```
+
+* In ```mymodel_rotating.xml``` which uses  ```snowplough.csv``` we simulate a single cell rotating free/non-crosslinked fibres to acces an attractant. 
+
+Default parameters are:
+
+```
+fibre_length = 40.0 (microns)
+fibre_sticky = 1.0
+fibre_rotation = true
+```
+
+Note the parameter ```fibre_sticky`` modulates how much a cell can rotate a fibre. Values less than 1.0 decrease how much the cell rotates the fibre per timestep and values greater than 1.0 increase how much the cell rotates the fibre per timestep.
+
+* In ```mymodel_hinge.xml``` which uses ```hinge.csv``` we simulate two fibres being rotated at their hinge crosslink point by a single cell in order for the cell to access an attractant.
