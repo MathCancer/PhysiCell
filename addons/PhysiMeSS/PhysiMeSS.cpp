@@ -537,7 +537,7 @@ void add_potentials_cell_to_fibre(Cell* pCell, Cell* other_agent)
                     //std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
                     // (*other_agent).parameters.degradation_flag = true;
                     other_agent->flag_for_removal();
-                    std::cout << "Killing a cell using flag for removal !!" << std::endl;
+                    std::cout << "Degrading fibre agent " << (*other_agent).ID << " using flag for removal !!" << std::endl;
                     pCell->custom_data["stuck_counter"] = 0;
                 }
             }
@@ -848,8 +848,8 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
     int unstuck_threshold = 1;
 
     if (pCell->custom_data["stuck_counter"] == stuck_threshold){
-        std::cout << "!HELP! cell " << pCell->ID << " gets stuck at time "
-        << PhysiCell_globals.current_time << std::endl;
+        //std::cout << "!HELP! cell " << pCell->ID << " gets stuck at time "
+        //<< PhysiCell_globals.current_time << std::endl;
         pCell->custom_data["stuck_counter"] = 0;
         pCell->custom_data["unstuck_counter"] = 1;
     }
