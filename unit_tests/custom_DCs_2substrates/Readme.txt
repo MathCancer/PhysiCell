@@ -12,4 +12,4 @@ cp custom_modules/custom.*  ../../custom_modules
 
 cd ../..
 make
-test_custom_DCs 
+test_custom_DCs <with-various-config-files>
