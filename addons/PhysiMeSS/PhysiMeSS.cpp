@@ -282,73 +282,56 @@ void check_fibre_crosslinks(Cell* fibre, Cell *fibre_neighbor) {
         normalize(&centre_to_centre);
 
         /* test if fibres intersect
-            (1) if fibres are coplanar and parallel:
-            the cross product of the two fibre vectors is zero
-            [(P2 - P1) x (P4 - P3)].[(P2 - P1) x (P4 - P3)] = 0 */
+           (1) if fibres are coplanar and parallel:
+           the cross product of the two fibre vectors is zero
+           [(P2 - P1) x (P4 - P3)].[(P2 - P1) x (P4 - P3)] = 0 */
         std::vector<double> FCP = cross_product(p1_to_p2, p3_to_p4);
-        /* parallel fibres could intersect if colinear
-            we need to take into account the length of fibres
-            possibly could put a tolerance on this to take into
-            account the radius of fibres */
+        /*  coplanar parallel fibres could intersect if colinear
+            i.e. the orientation of the fibres are parallel or
+            antiparallel to the centre_to_centre vector and
+            distance between fibre centres is less than their co_length */
         if (dot_product(FCP,FCP) == 0 &&
             (centre_to_centre == fibre->state.orientation ||
             centre_to_centre == -1.0 * fibre->state.orientation) &&
             distance <= co_length) {
-            //std::cout << "fibre " << fibre->ID << " crosslinks end to end with parallel fibre " <<  (*fibre_neighbor).ID << std::endl;
+            //std::cout << "fibre " << fibre->ID << " crosslinks with parallel colinear fibre " <<  (*fibre_neighbor).ID << std::endl;
             if (std::find(fibres_crosslinkers[fibre].begin(), fibres_crosslinkers[fibre].end(), (fibre_neighbor)) ==
                 fibres_crosslinkers[fibre].end()) {
                 fibres_crosslinkers[fibre].push_back(fibre_neighbor);
             }
-            if (std::find(fibres_crosslinkers[fibre_neighbor].begin(), fibres_crosslinkers[fibre_neighbor].end(), (fibre)) ==
-                fibres_crosslinkers[fibre_neighbor].end()) {
-                fibres_crosslinkers[fibre_neighbor].push_back(fibre);
-            }
             fibres_crosslink_point[fibre] = fibre->position + fibre->custom_data["mLength"] * centre_to_centre;
-            fibres_crosslink_point[fibre_neighbor] = fibres_crosslink_point[fibre];
         }
+        /* (2) parallel fibres may sit on top of one another
+            we check the distance between fibre end points and
+            the nearest point on neighbor fibre to see if they do */
         std::vector<double> displacement(3, 0.0);
         nearest_point_on_fibre(point1, fibre_neighbor, displacement);
         double test_point1 = dist(zero, displacement);
         nearest_point_on_fibre(point2, fibre_neighbor, displacement);
         double test_point2 = dist(zero, displacement);
-        if (test_point1 <= co_radius &&
+        nearest_point_on_fibre(point3, fibre, displacement);
+        double test_point3 = dist(zero, displacement);
+        nearest_point_on_fibre(point4, fibre, displacement);
+        double test_point4 = dist(zero, displacement);
+        if (std::abs(test_point1) <= co_radius ||
+            std::abs(test_point2) <= co_radius ||
+            std::abs(test_point3) <= co_radius ||
+            std::abs(test_point4) <= co_radius &&
             centre_to_centre != fibre->state.orientation &&
             centre_to_centre != -1.0 * fibre->state.orientation) {
             //std::cout << "fibre " << fibre->ID << " crosslinks in parallel plane with fibre " <<  (*fibre_neighbor).ID << std::endl;
             if (std::find(fibres_crosslinkers[fibre].begin(), fibres_crosslinkers[fibre].end(), (fibre_neighbor)) ==
                 fibres_crosslinkers[fibre].end()) {
                 fibres_crosslinkers[fibre].push_back(fibre_neighbor);
-            }
-            if (std::find(fibres_crosslinkers[fibre_neighbor].begin(), fibres_crosslinkers[fibre_neighbor].end(), (fibre)) ==
-                fibres_crosslinkers[fibre_neighbor].end()) {
-                fibres_crosslinkers[fibre_neighbor].push_back(fibre);
             }
             fibres_crosslink_point[fibre] = point1;
-            fibres_crosslink_point[fibre_neighbor] = fibres_crosslink_point[fibre];
         }
-        if (test_point2 <= co_radius &&
-            centre_to_centre != fibre->state.orientation &&
-            centre_to_centre != -1.0 * fibre->state.orientation) {
-            //std::cout << "fibre " << fibre->ID << " crosslinks in parallel plane with fibre " <<  (*fibre_neighbor).ID << std::endl;
-            if (std::find(fibres_crosslinkers[fibre].begin(), fibres_crosslinkers[fibre].end(), (fibre_neighbor)) ==
-                fibres_crosslinkers[fibre].end()) {
-                fibres_crosslinkers[fibre].push_back(fibre_neighbor);
-            }
-            if (std::find(fibres_crosslinkers[fibre_neighbor].begin(), fibres_crosslinkers[fibre_neighbor].end(), (fibre)) ==
-                fibres_crosslinkers[fibre_neighbor].end()) {
-                fibres_crosslinkers[fibre_neighbor].push_back(fibre);
-            }
-            fibres_crosslink_point[fibre] = point2;
-            fibres_crosslink_point[fibre_neighbor] = fibres_crosslink_point[fibre];
-        }
-        /*  (2) if fibres are skew (in parallel planes):
+        /*  (3) if fibres are skew (in parallel planes):
             the scalar triple product (P3 - P1) . [(P2 - P1) x (P4 - P3)] != 0
+            so intersecting fibres require (P3 - P1) . [(P2 - P1) x (P4 - P3)] = 0
             we include a tolerance on this to allow for fibre radius */
         double test2_tolerance = co_radius;
         double test2 = dot_product(p1_to_p3, FCP);
-        /*  For fibres to intersect neither (1) not (2) must be true
-            and the "t" values for both line equations must lie in [0,1]
-            again we include a tolerance to allow for fibre radius */
         if (std::abs(test2) < test2_tolerance) {
             double a = dot_product(p1_to_p2, p1_to_p3) / dot_product(p1_to_p2, p1_to_p2);
             double b = dot_product(p1_to_p2, p3_to_p4) / dot_product(p1_to_p2, p1_to_p2);
@@ -364,33 +347,19 @@ void check_fibre_crosslinks(Cell* fibre, Cell *fibre_neighbor) {
             for (int i = 0; i < 2; i++) {
                 crosslink_point[i] = point1[i] + t_this * p1_to_p2[i];
             }
-            double tolerance = (*fibre_neighbor).custom_data["mRadius"] / (2 * fibre->custom_data["mLength"]);
+            /*  For fibres to intersect the "t" values for both line equations
+                must lie in [0,1] we include a tolerance to allow for fibre normalized co_radius */
+            double tolerance = co_radius/co_length; //(*fibre_neighbor).custom_data["mRadius"] / (2 * fibre->custom_data["mLength"]);
             double lower_bound = 0.0 - tolerance;
             double upper_bound = 1.0 + tolerance;
             if (lower_bound <= t_neighbor && t_neighbor <= upper_bound &&
                 lower_bound <= t_this && t_this <= upper_bound) {
-                // if (std::find(fibre->state.crosslinkers.begin(), fibre->state.crosslinkers.end(), (fibre_neighbor)) ==
-                //     fibre->state.crosslinkers.end()) {
-                //     //std::cout << "fibre " << fibre->ID << " crosslinks with fibre " << (*fibre_neighbor).ID << std::endl;
-                //     fibre->state.crosslinkers.push_back(fibre_neighbor);
-                // }
-                // if (std::find(fibre_neighbor->state.crosslinkers.begin(), fibre_neighbor->state.crosslinkers.end(), (fibre)) ==
-                //     fibre_neighbor->state.crosslinkers.end()) {
-                //     fibre_neighbor->state.crosslinkers.push_back(fibre);
-                // }
                 if (std::find(fibres_crosslinkers[fibre].begin(), fibres_crosslinkers[fibre].end(), (fibre_neighbor)) ==
                     fibres_crosslinkers[fibre].end()) {
                     //std::cout << "fibre " << fibre->ID << " crosslinks with fibre " << (*fibre_neighbor).ID << std::endl;
                     fibres_crosslinkers[fibre].push_back(fibre_neighbor);
                 }
-                if (std::find(fibres_crosslinkers[fibre_neighbor].begin(), fibres_crosslinkers[fibre_neighbor].end(), (fibre)) ==
-                    fibres_crosslinkers[fibre_neighbor].end()) {
-                    fibres_crosslinkers[fibre_neighbor].push_back(fibre);
-                }
-                // fibre->state.crosslink_point = crosslink_point;
-                // fibre_neighbor->state.crosslink_point = crosslink_point;
                 fibres_crosslink_point[fibre] = crosslink_point;
-                fibres_crosslink_point[fibre_neighbor] = crosslink_point;
             }
         }
     } else { return; }
@@ -819,7 +788,7 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
     // Count crosslinks
     pCell->custom_data["X_crosslink_count"] = 0;
     if (pCell->type_name == "fibre" && get_crosslinkers(pCell).size()  > 0){
-        //std::cout << " fibre " << pCell->ID <<  " has " << pCell->state.crosslinkers.size()  << " cross-links " << std::endl;
+        std::cout << " fibre " << pCell->ID <<  " has " << get_crosslinkers(pCell).size()  << " cross-links " << std::endl;
         pCell->custom_data["X_crosslink_count"] = get_crosslinkers(pCell).size();
     }
 
