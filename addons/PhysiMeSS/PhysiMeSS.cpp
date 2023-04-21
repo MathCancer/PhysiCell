@@ -501,8 +501,8 @@ void add_potentials_cell_to_fibre(Cell* pCell, Cell* other_agent)
         // Fibre degradation by cell - switched on by flag fibre_degradation
         int stuck_threshold = parameters.doubles("fibre_stuck");
         if (parameters.bools("fibre_degradation") && pCell->custom_data["stuck_counter"] >= stuck_threshold) {
-            //std::cout << "Cell " << this->ID << " is stuck at time " << PhysiCell_globals.current_time
-            //<< " near fibre " << (*other_agent).ID  << std::endl;
+            // std::cout << "Cell " << pCell->ID << " is stuck at time " << PhysiCell_globals.current_time
+            // << " near fibre " << (*other_agent).ID  << std::endl;
             pCell->displacement *= -1.0/distance;
             double dotproduct = dot_product(pCell->displacement, pCell->phenotype.motility.motility_vector);
             if (dotproduct >= 0) {
@@ -789,48 +789,81 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
 	}
 	
 	pCell->state.simple_pressure = 0.0;
+	pCell->state.neighbors.clear(); // new 1.8.0
 
     // !!! PHYSIMESS CODE BLOCK START !!! //
     // Count crosslinks
     pCell->custom_data["X_crosslink_count"] = 0;
     if (pCell->type_name == "fibre" && get_crosslinkers(pCell).size()  > 0){
-        std::cout << " fibre " << pCell->ID <<  " has " << get_crosslinkers(pCell).size()  << " cross-links " << std::endl;
         pCell->custom_data["X_crosslink_count"] = get_crosslinkers(pCell).size();
     }
 
-    //std::cout << " AGENT " << pCell->type_name << " " << pCell->ID << " has " ;
+    if (pCell->type_name != "fibre") {
+        //First check the neighbors in my current voxel
+        std::vector<Cell*>::iterator neighbor;
+        std::vector<Cell*>::iterator end = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
+        for(neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
+        {
+            if ((*neighbor)->type_name != "fibre") {
+                pCell->add_potentials(*neighbor);
+            }
+        }
+        std::vector<int>::iterator neighbor_voxel_index;
+        std::vector<int>::iterator neighbor_voxel_index_end = 
+            pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].end();
+
+        for( neighbor_voxel_index = 
+            pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].begin();
+            neighbor_voxel_index != neighbor_voxel_index_end; 
+            ++neighbor_voxel_index )
+        {
+            if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+                continue;
+            end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
+            for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
+            {
+                if ((*neighbor)->type_name != "fibre") {
+                    pCell->add_potentials(*neighbor);
+                }
+            }
+        }
+    } 
+
+    // std::cout << " AGENT " << pCell->type_name << " " << pCell->ID << " has " ;
     //add potentials between pCell and its neighbors
     std::vector<Cell*>::iterator neighbor;
-    std::vector<Cell*>::iterator end = pCell->state.neighbors.end();
+    std::vector<Cell*>::iterator end = get_neighbors(pCell).end();
     //std::cout << pCell->state.neighbors.size() << " neighbors: " ;
-    for(neighbor = pCell->state.neighbors.begin(); neighbor != end; ++neighbor) {
-        //std::cout << (*neighbor)->type_name << " " << (*neighbor)->ID << " " ;
+    for(neighbor = get_neighbors(pCell).begin(); neighbor != end; ++neighbor) {
+        // std::cout << (*neighbor)->type_name << " " << (*neighbor)->ID << " " ;
         
         // if( this->ID == other_agent->ID )
         if( pCell != *neighbor )
         { 
             if (pCell->type_name != "fibre" && (*neighbor)->type_name != "fibre") {
-                pCell->add_potentials(*neighbor);
-            } else if (pCell->type_name != "fibre" && (*neighbor)->type_name == "fibre") {
+                //Already done above
+                continue;
+            } else 
+            if (pCell->type_name != "fibre" && (*neighbor)->type_name == "fibre") {
                 add_potentials_cell_to_fibre(pCell, *neighbor);
             } else  if (pCell->type_name == "fibre" && (*neighbor)->type_name != "fibre") {
                 add_potentials_fibre_to_cell(pCell, *neighbor);
             } else if (pCell->type_name == "fibre" && (*neighbor)->type_name == "fibre") {
                 add_potentials_fibre_to_fibre(pCell, *neighbor);
             } else {
-                std::cout << " WARNING: interaction between errant cell-types has been called " << std::endl;
+                std::cout << " WARNING: interaction between errant cell-types has been called : " << pCell->type_name << ", " << (*neighbor)->type_name << std::endl;
                 return;
             }
         }
     }
-    //std::cout << std::endl;
-
+    // std::cout << std::endl;
+    
     int stuck_threshold = 10;
     int unstuck_threshold = 1;
 
     if (pCell->custom_data["stuck_counter"] == stuck_threshold){
-        //std::cout << "!HELP! cell " << pCell->ID << " gets stuck at time "
-        //<< PhysiCell_globals.current_time << std::endl;
+        // std::cout << "!HELP! cell " << pCell->ID << " gets stuck at time "
+        // << PhysiCell_globals.current_time << std::endl;
         pCell->custom_data["stuck_counter"] = 0;
         pCell->custom_data["unstuck_counter"] = 1;
     }
