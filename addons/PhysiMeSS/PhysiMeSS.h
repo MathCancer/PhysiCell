@@ -19,10 +19,11 @@ void remove_physimess_out_of_bounds_fibres();
 void initialize_crosslinkers(Cell* pCell);
 void initialize_crosslink_points(Cell* pCell);
 void initialize_neighbors(Cell* pCell);
+void initialize_voxels(Cell* pCell);
 std::vector<Cell*>& get_crosslinkers(Cell*);
 std::vector<double>& get_crosslink_point(Cell*);
 std::vector<Cell*>& get_neighbors(Cell*);
-
+std::list<int>& get_voxels(Cell*);
 
 void add_potentials_cell_to_fibre(Cell* cell, Cell* other_agent);
 void add_potentials_fibre_to_cell(Cell* cell, Cell* other_agent);
@@ -34,7 +35,7 @@ void force_update_motility_vector(Cell* pCell, double dt_);
 void add_crosslinks( Cell* pCell );
 void check_fibre_crosslinks(Cell* fibre, Cell* fibre_neighbor);
 
-std::list<int> register_fibre_voxels( Cell* pCell );
+void register_fibre_voxels( Cell* pCell );
 void deregister_fibre_voxels( Cell* pCell );
 
 std::list<int> find_agent_voxels(Cell * pCell );

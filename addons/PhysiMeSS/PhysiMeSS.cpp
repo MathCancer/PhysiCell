@@ -7,7 +7,7 @@
 std::map<Cell*, std::vector<Cell*> > fibres_crosslinkers;
 std::map<Cell*, std::vector<double> > fibres_crosslink_point;
 std::map<Cell*, std::vector<Cell*> > physimess_neighbors; 
-
+std::map<Cell*, std::list<int> > physimess_voxels;
 static double last_update_time = -mechanics_dt;
 
 bool isFibre(Cell* pCell) 
@@ -50,7 +50,8 @@ void initialize_physimess_fibre(Cell* pCell, std::vector<double>& position, doub
     initialize_crosslinkers(pCell);
     initialize_crosslink_points(pCell);
     initialize_neighbors(pCell);
-
+    initialize_voxels(pCell);
+    
     pCell->custom_data.add_variable("mLength", NormalRandom(parameters.doubles("fibre_length"), parameters.doubles("length_normdist_sd")) / 2.0);
     pCell->custom_data.add_variable("mRadius", parameters.doubles("fibre_radius"));
     pCell->custom_data.add_variable("X_crosslink_count", 0);
@@ -164,6 +165,7 @@ void initialize_physimess_cell(Cell* pCell)
     pCell->custom_data.add_variable("stuck_counter", 0);
     pCell->custom_data.add_variable("unstuck_counter", 0);
     initialize_neighbors(pCell);
+    initialize_voxels(pCell);
 }
 
 void remove_physimess_out_of_bounds_fibres()
@@ -181,9 +183,11 @@ void remove_physimess_out_of_bounds_fibres()
 void initialize_crosslinkers(Cell* pCell) { fibres_crosslinkers[pCell] = std::vector<Cell*>(); }
 void initialize_crosslink_points(Cell* pCell) { fibres_crosslink_point[pCell] = std::vector<double>(3); }
 void initialize_neighbors(Cell* pCell) { physimess_neighbors[pCell] = std::vector<Cell*>(); }
+void initialize_voxels(Cell* pCell) { physimess_voxels[pCell] = std::list<int>(); }
 std::vector<Cell*>& get_crosslinkers(Cell* pCell) { return fibres_crosslinkers[pCell]; }
 std::vector<double>& get_crosslink_point(Cell* pCell) { return fibres_crosslink_point[pCell]; }
 std::vector<Cell*>& get_neighbors(Cell* pCell) { return physimess_neighbors[pCell]; }
+std::list<int>& get_voxels(Cell* pCell) { return physimess_voxels[pCell]; }
 
 std::vector<double> nearest_point_on_fibre(std::vector<double> point, Cell *fibre_agent, std::vector<double> &displacement) 
 {
@@ -643,16 +647,15 @@ void add_crosslinks( Cell* pCell) {
 // !!! PHYSIMESS CODE BLOCK END !!! //
 
 // !!! PHYSIMESS CODE BLOCK START !!! //
-std::list<int> register_fibre_voxels(Cell *pCell) {
+void register_fibre_voxels(Cell *pCell) {
 
-    std::list<int> agent_voxels;
     int voxel;
 
     //std::cout << "Agent " << pCell->ID << " is in voxels: " ;
     //a cell will be in one voxel
     if (pCell->type_name != "fibre") {
         voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(pCell->position);
-        agent_voxels.push_back(voxel);
+        get_voxels(pCell).push_back(voxel);
         //std::cout << voxel << std:: endl;
     }
 
@@ -670,7 +673,7 @@ std::list<int> register_fibre_voxels(Cell *pCell) {
         // first add the voxel of the fibre end point
         voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(fibre_end);
         //std::cout << voxel << " " ;
-        agent_voxels.push_back(voxel);
+        get_voxels(pCell).push_back(voxel);
         if (std::find(pCell->get_container()->agent_grid[voxel].begin(),
                         pCell->get_container()->agent_grid[voxel].end(),
                         pCell) == pCell->get_container()->agent_grid[voxel].end()) {
@@ -684,7 +687,7 @@ std::list<int> register_fibre_voxels(Cell *pCell) {
             }
             voxel = pCell->get_container()->underlying_mesh.nearest_voxel_index(point_on_fibre);
             //std::cout << voxel << " " ;
-            agent_voxels.push_back(voxel);
+            get_voxels(pCell).push_back(voxel);
             if (std::find(pCell->get_container()->agent_grid[voxel].begin(),
                             pCell->get_container()->agent_grid[voxel].end(),
                             pCell) == pCell->get_container()->agent_grid[voxel].end()) {
@@ -693,11 +696,10 @@ std::list<int> register_fibre_voxels(Cell *pCell) {
         }
         //std::cout << std::endl;
 
-        agent_voxels.sort();
-        agent_voxels.unique();
+        get_voxels(pCell).sort();
+        get_voxels(pCell).unique();
     }
 
-    return agent_voxels;
 }
 
 void deregister_fibre_voxels(Cell *pCell) {
@@ -706,10 +708,9 @@ void deregister_fibre_voxels(Cell *pCell) {
     if (pCell->type_name != "fibre") { return;}
 
     if (pCell->type_name == "fibre") {
-        std::list<int> voxels = register_fibre_voxels(pCell);
         int centre_voxel =
                 (*pCell).get_container()->underlying_mesh.nearest_voxel_index(pCell->position);
-        for (int x: voxels) {
+        for (int x: get_voxels(pCell)) {
             if (x != centre_voxel) {
                 (*pCell).get_container()->remove_agent_from_voxel(pCell, x);
             }
@@ -722,8 +723,7 @@ std::list<int> find_agent_voxels(Cell *pCell) {
     /* this code is for creating a list of all voxels which either contain the agent
         * or are neighboring voxels of the voxel containing the agent */
     std::list<int> all_agent_voxels_to_test;
-    std::list<int> voxels = register_fibre_voxels(pCell);
-    for (int x: voxels) {
+    for (int x: get_voxels(pCell)) {
         all_agent_voxels_to_test.push_back(x);
         std::vector<int>::iterator xx;
         std::vector<int>::iterator x_end =
@@ -900,6 +900,7 @@ void physimess_mechanics( double dt )
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
+            get_voxels(pC).clear();
             if( !pC->is_out_of_domain )
             {
                 register_fibre_voxels(pC);
