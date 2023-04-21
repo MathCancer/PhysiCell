@@ -156,7 +156,7 @@ Microenvironment::Microenvironment()
 	
 	dirichlet_activation_vectors.assign( 1 , dirichlet_activation_vector ); 
 	
-	default_microenvironment_options.Dirichlet_all.assign( 1 , true ); 
+	default_microenvironment_options.Dirichlet_all.assign( 1 , false ); 
 	default_microenvironment_options.Dirichlet_xmin.assign( 1 , false ); 
 	default_microenvironment_options.Dirichlet_xmax.assign( 1 , false ); 
 	default_microenvironment_options.Dirichlet_ymin.assign( 1 , false ); 
@@ -452,7 +452,7 @@ void Microenvironment::resize_densities( int new_size )
 	
 	default_microenvironment_options.initial_condition_vector.assign( new_size , 1.0 ); 
 	
-	default_microenvironment_options.Dirichlet_all.assign( new_size , true ); 
+	default_microenvironment_options.Dirichlet_all.assign( new_size , false ); 
 //	default_microenvironment_options.Dirichlet_interior.assign( new_size, true );
 	default_microenvironment_options.Dirichlet_xmin.assign( new_size , false ); 
 	default_microenvironment_options.Dirichlet_xmax.assign( new_size , false ); 
@@ -514,7 +514,7 @@ void Microenvironment::add_density( void )
 	one_third /= 3.0; 
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.push_back( true ); 
+	dirichlet_activation_vector.push_back( false ); 
 	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
 	
 	// Fixes in PhysiCell preview November 2017
@@ -523,7 +523,7 @@ void Microenvironment::add_density( void )
 	
 	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
 
-	default_microenvironment_options.Dirichlet_all.push_back( true ); 
+	default_microenvironment_options.Dirichlet_all.push_back( false ); 
 //	default_microenvironment_options.Dirichlet_interior.push_back( true );
 	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
@@ -591,7 +591,7 @@ void Microenvironment::add_density( std::string name , std::string units )
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
 	default_microenvironment_options.Dirichlet_activation_vector.push_back( false ); // assign( number_of_densities(), false ); 
 
-	default_microenvironment_options.Dirichlet_all.push_back( false );
+	default_microenvironment_options.Dirichlet_all.push_back( false ); // false before DB's changes
 	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
 	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
@@ -662,7 +662,7 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	
 	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
 	
-	default_microenvironment_options.Dirichlet_all.push_back( true ); 
+	default_microenvironment_options.Dirichlet_all.push_back( false ); 
 //	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
 	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
@@ -1247,7 +1247,7 @@ Microenvironment_Options::Microenvironment_Options()
 	
 	track_internalized_substrates_in_each_agent = false; 
 
-	Dirichlet_all.push_back( true ); 
+	Dirichlet_all.push_back( false ); 
 //	Dirichlet_interior.push_back( true ); 
 	Dirichlet_xmin.push_back( false ); 
 	Dirichlet_xmax.push_back( false ); 
