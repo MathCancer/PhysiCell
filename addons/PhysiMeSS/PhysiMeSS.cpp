@@ -661,7 +661,7 @@ void register_fibre_voxels(Cell *pCell) {
 
     //only do this for fibres
     if (pCell->type_name == "fibre") {
-        int voxel_size = 30; // note this must be the same as the mechanics_voxel_size
+        int voxel_size = pCell->get_container()->underlying_mesh.dx; // note this must be the same as the mechanics_voxel_size
         int test = 2.0 * pCell->custom_data["mLength"] / voxel_size; //allows us to sample along the fibre
 
         std::vector<double> fibre_start(3, 0.0);
