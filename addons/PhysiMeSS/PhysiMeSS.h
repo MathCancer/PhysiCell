@@ -18,8 +18,10 @@ void initialize_physimess_cell(Cell* pCell);
 void remove_physimess_out_of_bounds_fibres();
 void initialize_crosslinkers(Cell* pCell);
 void initialize_crosslink_points(Cell* pCell);
+void initialize_neighbors(Cell* pCell);
 std::vector<Cell*>& get_crosslinkers(Cell*);
 std::vector<double>& get_crosslink_point(Cell*);
+std::vector<Cell*>& get_neighbors(Cell*);
 
 
 void add_potentials_cell_to_fibre(Cell* cell, Cell* other_agent);

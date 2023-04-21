@@ -6,6 +6,8 @@
 
 std::map<Cell*, std::vector<Cell*> > fibres_crosslinkers;
 std::map<Cell*, std::vector<double> > fibres_crosslink_point;
+std::map<Cell*, std::vector<Cell*> > physimess_neighbors; 
+
 static double last_update_time = -mechanics_dt;
 
 bool isFibre(Cell* pCell) 
@@ -47,7 +49,8 @@ void initialize_physimess_fibre(Cell* pCell, std::vector<double>& position, doub
 {
     initialize_crosslinkers(pCell);
     initialize_crosslink_points(pCell);
-    
+    initialize_neighbors(pCell);
+
     pCell->custom_data.add_variable("mLength", NormalRandom(parameters.doubles("fibre_length"), parameters.doubles("length_normdist_sd")) / 2.0);
     pCell->custom_data.add_variable("mRadius", parameters.doubles("fibre_radius"));
     pCell->custom_data.add_variable("X_crosslink_count", 0);
@@ -160,6 +163,7 @@ void initialize_physimess_cell(Cell* pCell)
 {
     pCell->custom_data.add_variable("stuck_counter", 0);
     pCell->custom_data.add_variable("unstuck_counter", 0);
+    initialize_neighbors(pCell);
 }
 
 void remove_physimess_out_of_bounds_fibres()
@@ -176,8 +180,10 @@ void remove_physimess_out_of_bounds_fibres()
     
 void initialize_crosslinkers(Cell* pCell) { fibres_crosslinkers[pCell] = std::vector<Cell*>(); }
 void initialize_crosslink_points(Cell* pCell) { fibres_crosslink_point[pCell] = std::vector<double>(3); }
+void initialize_neighbors(Cell* pCell) { physimess_neighbors[pCell] = std::vector<Cell*>(); }
 std::vector<Cell*>& get_crosslinkers(Cell* pCell) { return fibres_crosslinkers[pCell]; }
 std::vector<double>& get_crosslink_point(Cell* pCell) { return fibres_crosslink_point[pCell]; }
+std::vector<Cell*>& get_neighbors(Cell* pCell) { return physimess_neighbors[pCell]; }
 
 std::vector<double> nearest_point_on_fibre(std::vector<double> point, Cell *fibre_agent, std::vector<double> &displacement) 
 {
@@ -626,8 +632,8 @@ void add_crosslinks( Cell* pCell) {
     // Determine all crosslinks between pCell and its neighbors provided both are fibres
     else if (pCell->type_name == "fibre") {
         std::vector<Cell *>::iterator f_neighbor;
-        std::vector<Cell *>::iterator f_end = pCell->state.neighbors.end();
-        for (f_neighbor = pCell->state.neighbors.begin(); f_neighbor != f_end; ++f_neighbor) {
+        std::vector<Cell *>::iterator f_end = get_neighbors(pCell).end();
+        for (f_neighbor = get_neighbors(pCell).begin(); f_neighbor != f_end; ++f_neighbor) {
             if ((*f_neighbor)->type_name == "fibre") {
                 check_fibre_crosslinks(pCell, *f_neighbor);
             }
@@ -747,9 +753,9 @@ void find_agent_neighbors(Cell *pCell) {
         std::vector<Cell *>::iterator end = pCell->get_container()->agent_grid[x].end();
         for (neighbor = pCell->get_container()->agent_grid[x].begin(); neighbor != end; ++neighbor) {
             // do not include the neighbor if it is the agent itself or if it is in the list already
-            if (std::find(pCell->state.neighbors.begin(), pCell->state.neighbors.end(), (*neighbor)) ==
-                pCell->state.neighbors.end() && pCell != (*neighbor)) {
-                pCell->state.neighbors.push_back(*neighbor);
+            if (std::find(get_neighbors(pCell).begin(), get_neighbors(pCell).end(), (*neighbor)) ==
+                get_neighbors(pCell).end() && pCell != (*neighbor)) {
+                get_neighbors(pCell).push_back(*neighbor);
             }
         }
     }
@@ -871,7 +877,7 @@ void physimess_mechanics( double dt )
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
-            pC->state.neighbors.clear();
+            get_neighbors(pC).clear();
             if (isFibre(pC)) {
                 get_crosslinkers(pC).clear();
             }
