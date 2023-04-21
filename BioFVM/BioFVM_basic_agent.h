@@ -111,7 +111,7 @@ class Basic_Agent
 	void update_position( double dt );
 	
 	Basic_Agent(); 
-
+	virtual ~Basic_Agent(){};
 	// simulate secretion and uptake at the nearest voxel at the indicated microenvironment.
 	// if no microenvironment indicated, use the currently selected microenvironment. 
 	void simulate_secretion_and_uptake( Microenvironment* M, double dt ); 
