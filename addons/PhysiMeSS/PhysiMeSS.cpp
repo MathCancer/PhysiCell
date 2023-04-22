@@ -910,6 +910,14 @@ void physimess_mechanics( double dt )
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
+            
+            // Look for uninitialized physimess cells
+            if (pC->type_name != "fibre" 
+                && physimess_voxels.find(pC) == physimess_voxels.end()
+            ) {
+                initialize_physimess_cell(pC);
+            }
+            
             get_voxels(pC).clear();
             if( !pC->is_out_of_domain )
             {
