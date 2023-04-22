@@ -248,6 +248,16 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 std::vector<std::string> my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc )
 { return paint_by_density_percentage( concentration,  max_conc,  min_conc); }
 
+void my_cellcount_function(char* string){
+	int nb_fibres = 0;
+	for (Cell* cell : *all_cells) {
+		if (cell->type_name == "fibre")
+			nb_fibres++;
+	}
+
+	sprintf( string , "%lu cells, %u fibres" , all_cells->size()-nb_fibres, nb_fibres ); 
+}
+
 void custom_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
 
