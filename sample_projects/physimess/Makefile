@@ -187,7 +187,8 @@ reset:
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	touch ./config/empty.csv
-	rm -f ./config/*.csv
+	rm -f ./config/mymodel.xml *.csv
+	rm -fr ./config/Cell_Fibre_Mechanics ./config/Fibre_Crosslinks ./config/Fibre_Initialisation ./config/Neighbours_in_voxels
 	
 clean:
 	rm -f *.o
