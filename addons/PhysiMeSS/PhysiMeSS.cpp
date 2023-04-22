@@ -9,7 +9,7 @@ std::map<Cell*, std::vector<double> > fibres_crosslink_point;
 std::map<Cell*, std::vector<Cell*> > physimess_neighbors; 
 std::map<Cell*, std::list<int> > physimess_voxels;
 static double last_update_time = -mechanics_dt;
-
+std::vector<Cell*> fibres_removed;
 bool isFibre(Cell* pCell) 
 {
     const auto agentname = std::string(pCell->type_name);
@@ -518,6 +518,7 @@ void add_potentials_cell_to_fibre(Cell* pCell, Cell* other_agent)
                     other_agent->flag_for_removal();
                     std::cout << "Degrading fibre agent " << (*other_agent).ID << " using flag for removal !!" << std::endl;
                     pCell->custom_data["stuck_counter"] = 0;
+                    fibres_removed.push_back(other_agent);
                 }
             }
         }
@@ -895,6 +896,15 @@ void physimess_mechanics( double dt )
     if(fabs(((PhysiCell_globals.current_time - last_update_time)) - dt) < dt_tolerance)
     {
         last_update_time = PhysiCell_globals.current_time;
+        
+        for (auto* fibre : fibres_removed) {
+            std::cout << "Cleaning PhysiMESS data structure for fibre " << reinterpret_cast<void *>(fibre) << std::endl;
+            fibres_crosslinkers.erase(fibre);
+            fibres_crosslink_point.erase(fibre);
+            physimess_voxels.erase(fibre);
+            physimess_neighbors.erase(fibre);
+        }
+        fibres_removed.clear();
         
         #pragma omp parallel for
         for( int i=0; i < (*all_cells).size(); i++ )
