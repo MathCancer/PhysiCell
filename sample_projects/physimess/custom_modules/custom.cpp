@@ -83,7 +83,8 @@ void create_cell_types( void )
 	
 	initialize_default_cell_definition(); 
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
-	
+
+	cell_defaults.functions.instantiate_cell = instantiate_physimess_cell;	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = physimess_update_cell_velocity;
 
@@ -127,6 +128,43 @@ void create_cell_types( void )
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
     
+	// std::string("ecm");
+    // const auto matrix = std::string("matrix");
+    // const auto fiber = std::string("fiber");
+    // const auto fibre = std::string("fibre");
+    // const auto rod = std::string("rod");
+	Cell_Definition* pCD;
+	pCD = PhysiCell::find_cell_definition("ecm");
+	if (pCD) {
+		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
+		pCD->functions.plot_agent_SVG = fibre_agent_SVG;
+		pCD->functions.plot_agent_legend = fibre_agent_legend;
+	
+	}
+	pCD = PhysiCell::find_cell_definition("matrix");
+	if (pCD) 
+		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
+	
+	pCD = PhysiCell::find_cell_definition("fiber");
+	if (pCD) 
+		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
+	
+	pCD = PhysiCell::find_cell_definition("fibre");
+	if (pCD) 
+		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
+	
+	pCD = PhysiCell::find_cell_definition("rod");
+	if (pCD) 
+		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
+	
+	pCD = PhysiCell::find_cell_definition("fibre_horizontal");
+	if (pCD) 
+		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
+	
+	pCD = PhysiCell::find_cell_definition("fibre_vertical");
+	if (pCD) 
+		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
+	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -181,12 +219,9 @@ void setup_tissue( void )
             /* fibre positions are given by csv
                assign fibre orientation and test whether out of bounds */
             isFibreFromFile = true;
-            initialize_physimess_fibre((*all_cells)[i], (*all_cells)[i]->position, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax); 
-        }
-        else
-        {
-            // type is a normal cell
-            initialize_physimess_cell((*all_cells)[i]);
+			static_cast<PhysiMESS_Fibre*>((*all_cells)[i])->assign_fibre_orientation();
+			// (*all_cells)[i]->type_name = "fibre";
+            // initialize_physimess_fibre((*all_cells)[i], (*all_cells)[i]->position, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax); 
         }
     }
 
@@ -212,7 +247,7 @@ void setup_tissue( void )
 
                     pC = create_cell(*pCD);
                     
-                    initialize_physimess_cell(pC);
+                    // initialize_physimess_cell(pC);
                     
                     pC->assign_position(position);
                 }
@@ -228,7 +263,7 @@ void setup_tissue( void )
 
                     pC = create_cell(*pCD);
 
-                    initialize_physimess_fibre(pC, position, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax);
+                    static_cast<PhysiMESS_Fibre*>(pC)->check_out_of_bounds(position);
                     
                     pC->assign_position(position);
                 }
@@ -271,7 +306,7 @@ std::vector<std::string> my_coloring_function_for_substrate( double concentratio
 void my_cellcount_function(char* string){
 	int nb_fibres = 0;
 	for (Cell* cell : *all_cells) {
-		if (cell->type_name == "fibre")
+		if (isFibre(cell))
 			nb_fibres++;
 	}
 
@@ -286,3 +321,6 @@ void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
 { return; } 
+
+Cell* instantiate_physimess_cell() { return new PhysiMESS_Cell; }
+Cell* instantiate_physimess_fibre() { return new PhysiMESS_Fibre; }

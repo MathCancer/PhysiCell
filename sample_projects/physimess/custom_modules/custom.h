@@ -92,3 +92,5 @@ void custom_function( Cell* pCell, Phenotype& phenotype, double dt );
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
+Cell* instantiate_physimess_cell();
+Cell* instantiate_physimess_fibre();
