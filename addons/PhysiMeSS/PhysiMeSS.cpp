@@ -678,7 +678,10 @@ void register_fibre_voxels(Cell *pCell) {
         if (std::find(pCell->get_container()->agent_grid[voxel].begin(),
                         pCell->get_container()->agent_grid[voxel].end(),
                         pCell) == pCell->get_container()->agent_grid[voxel].end()) {
-            pCell->get_container()->agent_grid[voxel].push_back(pCell);
+            #pragma omp critical
+            {
+                pCell->get_container()->agent_grid[voxel].push_back(pCell);
+            }
         }
         // then walk along the fibre from fibre start point sampling and adding voxels as we go
         std::vector<double> point_on_fibre(3, 0.0);
@@ -692,7 +695,10 @@ void register_fibre_voxels(Cell *pCell) {
             if (std::find(pCell->get_container()->agent_grid[voxel].begin(),
                             pCell->get_container()->agent_grid[voxel].end(),
                             pCell) == pCell->get_container()->agent_grid[voxel].end()) {
-                pCell->get_container()->agent_grid[voxel].push_back(pCell);
+                #pragma omp critical
+                {
+                    pCell->get_container()->agent_grid[voxel].push_back(pCell);
+                }
             }
         }
         //std::cout << std::endl;
@@ -713,7 +719,10 @@ void deregister_fibre_voxels(Cell *pCell) {
                 (*pCell).get_container()->underlying_mesh.nearest_voxel_index(pCell->position);
         for (int x: get_voxels(pCell)) {
             if (x != centre_voxel) {
-                (*pCell).get_container()->remove_agent_from_voxel(pCell, x);
+                #pragma omp critical
+                {
+                    (*pCell).get_container()->remove_agent_from_voxel(pCell, x);
+                }
             }
         }
     }
