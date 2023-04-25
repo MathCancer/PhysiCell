@@ -241,10 +241,30 @@ void setup_tissue( void )
     std::cout << std::endl;
 }
 
+std::vector<std::string> paint_by_cell_pressure( Cell* pCell ){
+
+	std::vector< std::string > output( 0);
+	int color = (int) round( ((pCell->state.simple_pressure) / 10) * 255 );
+	if(color > 255){
+		color = 255;
+	}
+	char szTempString [128];
+	sprintf( szTempString , "rgb(%u,0,%u)", color, 255 - color);
+	output.push_back( std::string("black") );
+	output.push_back( szTempString );
+	output.push_back( szTempString );
+	output.push_back( szTempString );
+	return output;
+}
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{ return paint_by_number_cell_coloring(pCell); }
-
+{ 
+	if (parameters.bools("color_cells_by_pressure")){
+		return paint_by_cell_pressure(pCell); 
+	} else {
+		return paint_by_number_cell_coloring(pCell);
+	}
+}
 std::vector<std::string> my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc )
 { return paint_by_density_percentage( concentration,  max_conc,  min_conc); }
 

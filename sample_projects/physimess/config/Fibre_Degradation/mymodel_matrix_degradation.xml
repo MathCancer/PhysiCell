@@ -292,6 +292,7 @@
         <vel_adhesion type="double" units="" description="cell velocity parallel to fibre">0.6</vel_adhesion>
         <vel_contact type="double" units="" description="cell velocity orthogonal to fibre">0.1</vel_contact>
         <cell_velocity_max type="double" units="" description="max cell velocity">1.0</cell_velocity_max>
+        <color_cells_by_pressure type="bool" units="" description="flag for coloring cells by pressure">true</color_cells_by_pressure>
         </user_parameters>
 	
 </PhysiCell_settings>
