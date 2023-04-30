@@ -85,6 +85,14 @@ double linear_response_function( double s, double s_min , double s_max ); // don
 // decreases from 1 (at s_min) to 0 (at s_max)
 double decreasing_linear_response_function( double s, double s_min , double s_max ); // done 
 
+
+double multivariate_Hill_response_function( std::vector<double> signals, std::vector<double> half_maxes , std::vector<double> hill_powers ); 
+double multivariate_linear_response_function( std::vector<double> signals, std::vector<double> min_thresholds , std::vector<double> max_thresholds ); 
+
+std::vector<double> linear_response_to_Hill_parameters( double s0, double s1 ); 
+std::vector<double> Hill_response_to_linear_parameters( double half_max , double Hill_power ); 
+
+
 double interpolate_behavior( double base_value , double max_changed_value, double response ); 
 
 // signal increases/decreases parameter

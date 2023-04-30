@@ -6,11 +6,18 @@ MaBoSSIntracellular::MaBoSSIntracellular() : Intracellular()
 	initial_values.clear();
 	mutations.clear();
 	parameters.clear();
+	listOfInputs.clear();
+	listOfOutputs.clear();
 }
 
 MaBoSSIntracellular::MaBoSSIntracellular(pugi::xml_node& node)
 {
 	intracellular_type = "maboss";
+	initial_values.clear();
+	mutations.clear();
+	parameters.clear();
+	listOfInputs.clear();
+	listOfOutputs.clear();
 	initialize_intracellular_from_pugixml(node);
 }
 
@@ -24,6 +31,8 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 	time_tick = copy->time_tick;
 	scaling = copy->scaling;
 	time_stochasticity = copy->time_stochasticity;
+	inherit_state = copy->inherit_state;
+	inherit_nodes = copy->inherit_nodes;
 	initial_values = copy->initial_values;
 	mutations = copy->mutations;
 	parameters = copy->parameters;
@@ -43,15 +52,13 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		maboss.set_time_stochasticity(copy->time_stochasticity);
 		maboss.restart_node_values();
 		indicesOfInputs.clear();
-		for (MaBoSSInput& input: listOfInputs) {
-			indicesOfInputs.push_back(PhysiCell::find_signal_index(input.physicell_name));
+		for (const auto& input: listOfInputs) {
+			indicesOfInputs.push_back(PhysiCell::find_signal_index(input.second.physicell_name));
 		}
 		indicesOfOutputs.clear();
-		for (MaBoSSOutput& output: listOfOutputs) {
-			indicesOfOutputs.push_back(PhysiCell::find_behavior_index(output.physicell_name));
+		for (const auto& output: listOfOutputs) {
+			indicesOfOutputs.push_back(PhysiCell::find_behavior_index(output.second.physicell_name));
 		}
-		//maboss.set_state(copy->maboss.get_maboss_state());
-		//std::cout << get_state();
 	}	
 }
 
@@ -59,30 +66,33 @@ void MaBoSSIntracellular::update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenot
 {
 	std::vector<double> signals = PhysiCell::get_selected_signals(cell, indicesOfInputs);
 	
-	for (unsigned int i=0; i < listOfInputs.size(); i++) 
+	int i=0;
+	for (auto& input: listOfInputs) 
 	{
-		MaBoSSInput& input = listOfInputs[i];
-		if (input.isNode()) {
+		if (input.second.isNode()) {
 			maboss.set_node_value(
-				input.intracellular_name, 
-				input.updateNode(maboss.get_node_value(input.intracellular_name), signals[i])
+				input.first,
+				input.second.updateNode(maboss.get_node_value(input.second.intracellular_name), signals[i])
 			);
-		} else if (input.isParameter()) {
+		} else if (input.second.isParameter()) {
 			maboss.set_parameter_value(
-				input.intracellular_parameter,
-				input.updateParameter(signals[i])
+				input.first,
+				input.second.updateParameter(signals[i])
 			);
 		}
+		i++;
 	}
 }
 
 void MaBoSSIntracellular::update_outputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt)
 {
 	std::vector<double> signals = std::vector<double>(listOfOutputs.size(), 0.0);
-	for (unsigned int i=0; i < listOfOutputs.size(); i++) 
+	
+	int i=0;
+	for (auto& output: listOfOutputs) 
 	{
-		MaBoSSOutput& output = listOfOutputs[i];
-		signals[i] = output.update(maboss.get_node_value(output.intracellular_name));
+		signals[i] = output.second.update(maboss.get_node_value(output.second.intracellular_name));
+		i++;
 	}
 	PhysiCell::set_selected_behaviors(cell, indicesOfOutputs, signals);
 }
@@ -93,10 +103,31 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 	pugi::xml_node node_bnd = node.child( "bnd_filename" );
 	if ( node_bnd )
 	{ bnd_filename = PhysiCell::xml_get_my_string_value (node_bnd); }
+	else 
+	{ std::cerr << "Error : No BND model file defined !" << std::endl; exit(-1); }
 	
 	pugi::xml_node node_cfg = node.child( "cfg_filename" );
 	if ( node_cfg )
 	{ cfg_filename = PhysiCell::xml_get_my_string_value (node_cfg); }
+	else 
+	{ std::cerr << "Error : No CFG model file defined !" << std::endl; exit(-1); }
+	
+	// Setting all the rest to default values : Nothing should be kept from the existing intracellular object (NO INHERITANCE)
+	time_step = 12;
+	discrete_time = false;
+	time_tick = 0.5;
+	scaling = 1.0;
+	time_stochasticity = 0.0;
+	inherit_state = false;
+	start_time = 0.0;
+	initial_values.clear();
+	mutations.clear();
+	parameters.clear();
+	inherit_nodes.clear();
+	listOfInputs.clear();
+	indicesOfInputs.clear();
+	listOfOutputs.clear();
+	indicesOfOutputs.clear();
 	
 	pugi::xml_node node_init_values = node.child( "initial_values" );
 	if( node_init_values )
@@ -208,6 +239,29 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 			maboss.set_time_stochasticity(time_stochasticity);
 		}
 
+		pugi::xml_node node_inheritance = node_settings.child( "inheritance" );
+		if( node_inheritance )
+		{
+			pugi::xml_attribute global_inheritance = node_inheritance.attribute( "global" ); 
+			inherit_state = global_inheritance.as_bool();
+			
+			pugi::xml_node node_inherit_node = node_inheritance.child( "inherit_node" );
+			while( node_inherit_node )
+			{
+				pugi::xml_attribute node_inherit_intracellular_name = node_inherit_node.attribute( "intracellular_name" ); 
+				bool inherit_value = PhysiCell::xml_get_my_bool_value( node_inherit_node );
+				inherit_nodes[node_inherit_intracellular_name.value()] = inherit_value;
+				
+				node_inherit_node = node_inheritance.next_sibling( "inherit_node" ); 
+			}
+
+		}
+
+		pugi::xml_node node_start_time = node_settings.child( "start_time" );
+		if( node_start_time )
+		{
+			start_time = PhysiCell::xml_get_my_double_value( node_start_time );
+		}
 	
 		}
 	
@@ -315,7 +369,11 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
 				);
 
-				listOfInputs.push_back(input);				
+				// This construct is a trick to avoid making inputs and outputs constructible and assignable, or using c++17 insert_or_assign
+				// Using the same construct below
+				auto const res = listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
+				if (!(res.second)) { res.first->second = input; }
+				
 			} else {
 				
 				MaBoSSInput input = MaBoSSInput(
@@ -327,8 +385,8 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
 				);
 
-				listOfInputs.push_back(input);
-
+				auto const res = listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
+				if (!(res.second)) { res.first->second = input; }
 			}
 
 			node_input = node_input.next_sibling( "input" ); 
@@ -338,16 +396,18 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		while (node_output) 
 		{
 			pugi::xml_node settings = node_output.child("settings");
-	
-			listOfOutputs.push_back(MaBoSSOutput(
-				node_output.attribute( "physicell_name" ).value(),
+			std::string physicell_name = node_output.attribute( "physicell_name" ).value();
+			MaBoSSOutput output = MaBoSSOutput(
+				physicell_name,
 				node_output.attribute( "intracellular_name" ).value(),
 				PhysiCell::xml_get_my_string_value(settings.child("action")),
 				PhysiCell::xml_get_my_double_value(settings.child("value")),
 				(settings && settings.child( "base_value" ) ? PhysiCell::xml_get_my_double_value( settings.child( "base_value" )) : PhysiCell::xml_get_my_double_value(settings.child("value"))),
 				(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
-			));
+			);
 
+			auto const res = listOfOutputs.insert(std::pair<std::string, MaBoSSOutput>(physicell_name, output));
+			if (!(res.second)) { res.first->second = output; }
 			node_output = node_output.next_sibling( "output" ); 	
 		}
 	}
@@ -376,33 +436,39 @@ void MaBoSSIntracellular::display(std::ostream& os)
 		os << "\t\t\t" << mutation.first << " = " << mutation.second << std::endl;
 
 	os 	<< "\t\t scaling = " << scaling << std::endl
-		<< "\t\t time_stochasticity = " << time_stochasticity << std::endl;
+		<< "\t\t time_stochasticity = " << time_stochasticity << std::endl
+		<< "\t\t start_time = " << start_time << std::endl;
 
 	os	<< "\t\t " << listOfInputs.size() << " input mapping defined" << std::endl;
-	for (auto& input : listOfInputs)
-		os 	<< "\t\t\t" << input.physicell_name << " = " << input.intracellular_name
-			<< "(" << input.threshold << ", " << input.inact_threshold << ", " << input.smoothing << ")"
+	for (const auto& input : listOfInputs)
+		os 	<< "\t\t\t" << input.second.physicell_name << " = " << input.first
+			<< "(" << input.second.threshold << ", " << input.second.inact_threshold << ", " << input.second.smoothing << ")"
 			<< std::endl;
 
 	os	<< "\t\t " << listOfOutputs.size() << " output mapping defined" << std::endl;
-	for (auto& output : listOfOutputs)
-		os 	<< "\t\t\t" << output.physicell_name << " = " << output.intracellular_name 
-			<< "(" << output.value << ", " << output.base_value << ", " << output.smoothing << ")"
+	for (const auto& output : listOfOutputs)
+		os 	<< "\t\t\t" << output.first << " = " << output.second.intracellular_name 
+			<< "(" << output.second.value << ", " << output.second.base_value << ", " << output.second.smoothing << ")"
 			<< std::endl;
-	
+
+	os 	<< "\t\t global inheritance = " << inherit_state << std::endl;
+	os	<< "\t\t " << inherit_nodes.size() << " node-specific inheritance defined" << std::endl;
+	for (const auto& node_inheritance : inherit_nodes)
+		os 	<< "\t\t\t" << node_inheritance.first << " = " << node_inheritance.second
+			<< std::endl;
+
 	std::cout << std::endl;
 }
 
 void MaBoSSIntracellular::save(std::string filename, std::vector<PhysiCell::Cell*>& cells)
 {
-					
 	std::ofstream state_file( filename );
 	
 	state_file << "ID,state" << std::endl;
 
 	for( auto cell : cells )
-		state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
-		
+		if (cell->phenotype.intracellular != NULL)
+			state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
+	
 	state_file.close();
-
 }

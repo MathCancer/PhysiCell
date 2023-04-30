@@ -101,7 +101,13 @@ Vector_Variable::Vector_Variable()
 
 std::ostream& operator<<(std::ostream& os, const Vector_Variable& v)
 {
-	os << v.name << ": ";
+ 	os << v.name << ": ";
+	if( v.value.size() == 0 )
+	{ os << "[empty]"; return os; }
+/*
+	if( v.value.size() == 1 )
+	{ os << v.value[0] << " (" << v.units << ")"; return os;  }
+*/
 	for( int i=0; i < v.value.size()-1 ; i++ )
 	{ os << v.value[i] << ","; }
 	os << v.value[v.value.size()-1] << " (" << v.units << ")"; 

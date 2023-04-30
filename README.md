@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
-**Version:** 1.11.0
+**Version:** 1.12.0
 
-**Release date:** 18 March 2023
+**Release date:** ?? April 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -75,165 +75,67 @@ See changes.md for the full change log.
 
 * * * 
 ## Release summary: 
-Version 1.11.0 ... 
+Version 1.12.0 ... 
 
-primarily fixes bugs in file output and the ode-energy sample, and refines thread safety in cell phagocytosis. 
-
-The 1.10.0 release introduced major new phenotype functionality, including standardized support for cell-cell interactions (phagocytosis, cell attack that increases a tracked damage variable, and cell fusion), cell transformations, advanced chemotaxis, and cell adhesion affinities for preferential adhesion. This release also includes new, auto-generated "dictionaries" of signals and behaviors to facilitate writing cell behavioral models and intracellular models, as well as standardized Hill and linear response functions for use in intracellular models. Lastly, this release includes a number of bugfixes, most notably pseudorandom number generators with improved thread safety. 
-
-**PAUL STILL NEEDS TO FINISH WRITING THIS SECTION**
+adds several notable features, fixes bugs, and further expands the "signals" and "behaviors" that can be read and written with a simple API to facilitate building models. In particular, we add a brand new CSV format for initial cell positions (with more robust naming of cells by their human-readable names, a "header" line, and ability to extensively add and specificy individual cell properties), a new ability to save and load user projects in the `user_projects` directory, automated dynamic formation and breakage of spring-based cell-cell adhesions (based upon the cell-cell adhesion affinities, attachment rates, and detachment rates), automated inclusion of spring-based adhesions (at the mechanics time step) without need for the user to explicitly supply a spring function, a new "mechano" sample project to illustrate the new automated spring functionality, and updates to PhysiBoSS to ensure compatibility with the rapidly improving PhysiCell Studio. In addition, there is new capability of adding a background coloring (e.g., an oxygen heatmap) to SVG ouptuts--see the `interaction-sample` for an illustration (use the alternate XML config file to enable). This release includes several bugfixes, the most critical of which is to update the parameters for necrotic cells (which had previously been misset in the XML files, thus disabling necrotic cell lysis and shrinking). 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
  
-### Major new features and changes in the 1.11.z versions
-#### 1.11.0
-+ New and improved (v2) cell CSV format for cell import. This allows more intuitive statement of initial cell positions. The first line of your CSV file must be: 
+### Major new features and changes in the 1.12.z versions
+#### 1.12.0
++ **Rules-based modeling:** 
 
-   ```x,y,z,cell type```
++ **Automated annotation of the model hypotheses:** 
 
-  Every subsequent line is a single cell, now referencing cell types by their human-readable names (as defined in your XML configuration file) rather than requiring the integer `ID`. So, a sample second line to place a CD8 T cell at (30,-10,12) would be: 
++ **CSV-based specification of model rules:**
 
-   ```30,-10,12,CD8 T cell```
+  ```cell_type , signal , direction , behavior , base_value , max_response_value , half_max , Hill_power , applies_to_dead```
 
-  Moreover, the new format allows you to initialize a variety of individual cell properties, including (total) `volume` and any supported cell beheavior. For example, if your cell definitions have custom variables `GFP` ond `oncoprotein`, then you can extend the first header line to: 
+  + `cell_type`: The (human-readable) name of any cell type in the simulation, matching their declarations in the XML configuration file. 
+    + Allowed values: Any named cell type in the simulation. 
+  + `signal`: Any signal in the simulation's signal dictionary that can be queried to modulate a behavior. 
+    + Allowed values: Any signal that is known to the signal dictionary. 
+  + `direction`: Tells whether the signal increases or decreases the behavior. 
+    + Allowed values: `increases` or `decreases` 
+  + `behavior`: Any behavioral parameter in the simulation's behavior dictionary that can be edited to modulate a behavior. 
+    + Allowed values: Any behavioral parameter that is known in the behavior dictionary. 
+  + `value_value` 
 
-  ```x,y,z,cell type,custom:GFP,custom:oncoprotein```
-
-  And then subsequent cells look like this: 
-
-    ```30,-10,12,CD8 T cell,0.5,3.2```
- 
-  You can tell our parser to skip specifying a specific variable with `s` or `S` or an empty entry. Here, the first cell would skip writing the initial value of the GFP, and teh second would skip initializing the oncoprotein: 
-
-    ```30,-10,12,CD8 T cell,,3.2```  
-    ```50,13,-4,M0 Macrophage,0.5,s```
-
-  We will continue to automatically support older CSV cell files; any cells CSV file missing the first line of headers will be processed in the old format.  
-
-+ Ability to save and load user projects
-   + Use `make save PROJ=project_name` to save your project to a folder in `./user_projects` named `project_name`. For example: 
-
-       ```make save PROJ=new_tumor_sample```
-
-     saves your project as `new_tumor_sample`. In particular, it saves your `Makefile`, `main.cpp`, everything in `./config`, and everything in `./custom_modules`. 
-
-   + Use `make load PROJ=project_name` to load your project from a folder in `./user_projects` named `project_name`. For example: 
-
-        ```make load PROJ=new_tumor_sample```
-
-     loads your project from `new_tumor_sample`. In particular, it loads your `Makefile`, `main.cpp`, everything in `./config`, and everything in `./custom_modules`. 
-     
-+ Extended `cell_interactions` to include a vector `immunogenicities`: for a cell, `immunogenicity[j]` is how immunogenic this cell is to the jth cell type. By default, these will all be set to 1. (See next point.) 
-
-+ Updated the built-in "attack" model: 
-  $$\textrm{Probability cell } i \textrm{ attacks cell } j \textrm{ in } [t,t+\Delta t] = \textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t $$ 
-  By setting $\textrm{immunogenicity}\_{ji} = 1$ as teh default value, we maintain compatibiltiy with prior models. This is a way to further modulate immunogenic and cytotoxic interactions. 
-
-+ Began migrating built-in sample projects to be compatible with the model builder GUI and the upcoming PhysiCell Studio, including: 
-  + template
-  + biorobots (updates spring constant from 0.05 to 0.5)
-  + heterogeneity
-  + cancer biorobots (updates spring constant from 0.05 to 0.5)
-
-+ Added new signals: 
-  + `apoptotic` returns 1 if a cell is apoptotic, and 0 otherwise 
-  + `necrotic` returns 1 if a cell is necrotic, and 0 otherwise 
-
-  As always, access these via `double get_single_signal(Cell* pCell,std::string sig_name)`. 
-
-+ Added new behaviors: 
-  + `immunogenicity to [cell type]` is the cell's immunogenicity to a specific cell type. The probability that cell `i` attacks cell `j` in $[t,t+\Delta t]$ is $\textrm{attack}\_{ij} \cdot \textrm{immunogenicity}\_{ji} \Delta t.$
-  + `cell attachment rate` is the rate at which the cell forms spring links with other cells. 
-  + `cell detachment rate` is the rate at which spring links break. 
-  + `maximum number of cell attachments` is the maximum number of spring links. 
-  + `is_movable` can be set to 0 (false) to make an agent rigid: it will exert forces on other cells, but it itself cannot be moved. This behavior right now is somewhat fragile if used dynmaically, but can reliably be used during tissue setup. 
-
-  As always, access these via `double get_single_behavior(Cell* pCell,std::string beh_name)` and `void set_single_behavior(Cell* pCell,std::string beh_name,double new_value)`.
-
-+ Added new standard model `void dynamic_attachments(Cell*, Phenotype& ,double);` This function can automate dynamic attachments and detachments. When calling this function for cell $i$: 
-  + For each current attachment, it detaches with probability $\textrm{detachment rate}\_i \Delta t$ 
-  + For each cell $j$ in the neighbors list, it forms an attachment with probability 
-  
-    $$\textrm{Prob attach } i \textrm{ to cell } j = \textrm{adhesion affinity}\_j \cdot \textrm{attachment rate}\_i \cdot \Delta t.$$
-    
-    The attachment is only formed if both cell $i$ and $j$ have not exceeded their maximum number of 
-    attachments. 
-
-+ Added a new `spring_attachments` (of type `std::vector<Cell*>`) to cell `state` to track automated formation and removal of spring-link adhesions separately of the user-focused `attached` data struture. This will allow users to continue managing the `attachments` structure on their own for custom contact functions, without interference from automated springs (see more below).
-
-+ Added new standard model `void dynamic_spring_attachments(Cell*, Phenotype& ,double);` This functions exactly as the `dynamic_attachments` function, except it stores attached cells to `cell.state.spring_attachments` to avoid interfering with the user-managed `cell.state.attachments` data struture. 
-
-+ **Automated spring attachments / detachments:** the new `dynamic_spring_attachments` function is automatically called at every mechancis time step, with cell-cell spring attachment and detachment based on the cells' current rates. Each cell evaluates spring-like elastic adhesion betwen itslef and cells in `cell.state.spring_attachments` to add to its own velocity. Some notes: 
-  + Each cell automatically removes all its spring attachments during division 
-  + Each cell automatically removes all its spring attachments at the *end* of death. If you want dead cells to have increased detachment, add a rule accordingly using the built-in behavior dictionary. 
-  + If a cell is not movable (`is_movable = false`), then it is not moved by springs, but it can exert spring forces on other cells, allowing it to act as an "anchor". 
-  + This automated spring functionality is completely independent of (and does not interfer with) the user-defined contact function and user-manageed `cell.state.attached` data structure. 
-  + **WARNING:** If in a past life you set `phenotype.mechanics.attachment_rate` to a nonzero rate, you may find yourself surprised with unintended spring adhesions as this new automation kicks in. Please review and revise your configuration file as necessary. 
-  + You can disable this behavior in the XML configuration file: 
-  ```
-      <options>
-          <!-- other options -->
-          <disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
-      </options>
-
-+ Added a new `mechano-sample` project that shows automated dynamic attachment and detachment of cells: 
-  + Constant cancer cell birth and death
-  + Basic mechano feedback: high-pressure sets cancer cell birth to zero
-  + Cancer cell phenotype sets high detachment rate upon death. 
-  + Automated connection of cancer, basement membrane (BM) agents with spring links using the built-ins noted above. No user intervention or code required beyond setting nonzero rates. 
-  + Cancer cells manually set to apoptose at 10000 min. 
++ Code-free model specification by PhysiCell Studio. 
 
 ### Minor new features and changes: 
-#### 1.11.0
-+ Updated the `paint_by_number_cell_coloring` coloring function to paint the entire cell white if apoptotic, and brown if necrotic. (Previously, we colored the nucleus based on live/dead status.) This improves compatibility with the model GUI. 
+#### 1.12.0
++ Added new functions to `PhysiCell_basic_signaling`: 
+  + `multivariate_Hill_response_function` combines multiple signals (`std::vector<double> signals`) with individual half-maxes (`std::vector<double> half_maxes`) and Hill powers (`std::vector<double> hill_powers`) into a multivariate Hill response function, such that if only supplied with a single nonzero signal, then it returns the regular single-variable Hill function for that corresponding signal. 
+  + `multivariate_linear_response_function` combines multiple signals (`std::vector<double> signals`) with independent minimal thresholds (`std::vector<double> min_thresholds`: values below which individual linear responses are zero) and maximum thresholds (`std::vector<double> max_thresholds )`: values above which individual linear responses are one) into a multivariate linear response, such that if only supplied with a single nonzero signal, then it returns the regular single-variable linear response function for that corresponding signal. This function is "capped" between 0 and 1. 
+  + `linear_response_to_Hill_parameters` determines a half-maximum and Hill power to approximate a linear response function (with minimum threshold `s0` and maximum threshold `s1`) with a Hill response function. 
+  + `Hill_response_to_linear_parameters` determins minimum and maximum thresholds to approximate a Hill response function (with half-maximum `half_max` and Hill power `double Hill_power`) with a linear response function.
++ Added `double get_single_base_behavior( Cell_Definition* pCD , std::string name )` to `PhysiCell_signal_behavior` to extract single base behaviors directly from a `Cell_Definition`. **TO DO** Double-check that it's right, and update the "protocols" to write this function. 
 
-+ Changed the default value of `attachment_rate` from 10 to 0 (in the `Mechanics` class) to avoid unexpected triggering of automated spring adheions. 
++ **TO DO** Modified `double get_single_base_behavior(Cell*,std::string)` to call `get_single_base_behavior(Cell_Definition*,std::string)`. 
+
++ **TO DO** Output the full dictionary at runtime. 
 
 ### Beta features (not fully supported):
-#### 1.11.0
-+ Added `bool read_microenvironment_from_matlab( std::string mat_filename )` to `BioFVM_MultiCellDS`. This will read and overwrite from a stored microenvironment (in `mat_filename`, saved as a level 4 Matlab file) if it has the following format: 
-  + Number of columns = number of voxels (must match the size as configured in the `PhysiCell_settings.xml` file)
-  + Number of rows = 3 + 1 + number of diffusing substrates (must match the size and ordering as configured in the `PhysiCell_settings.xml` file)
-  + Row 0: x coordinate of each voxel
-  + Row 1: y coordinate of each voxel 
-  + Row 2: z coordinate of each voxel
-  + Row 3: volume of each voxel 
-  + Rows j to end: value of (j-4)th substrate in each voxel 
-  + Column ordering: 
-    * For each z from low to high:
-      * For each y from low to high: 
-        * for each x from low to high: 
-          store voxel X[i] , Y[j], Z[k]. 
-  + **Note:** This matches how PhysiCell saves the microenvironment. This will read any PhysiCell-saved microenvironment, so long as its sizes matches your current settings.  
-  + **Note:** This may be fragile. It has only minimal error-checking. 
+#### 1.12.0
 
-  + Set default cell attachment rate to 0 in the template project and most sample projects to avoid unexpectedly triggering the new autmoated spring adhesions; users must affirmatively set a nonzero attachment rate to trigger this new automation in an individual cell. 
  
 ### Bugfixes: 
 
-#### 1.11.0
-+ Fixed bug in cancer biorobots project that mistakenly set max cancer cell proliferation rate to 0.000072 instead of 0.00072
+#### 1.12.0
++ None in this release. 
 
-+ Fixed multiple broken signals/behaviors. 
-
-+ Fixed calcification bug reported in issue [133](https://github.com/MathCancer/PhysiCell/issues/133). Thank you, @JulianoGianlupi! 
-
-+ Fixed typo in cell signals that used `contact with dead dell` instead of `contact with dead cell`
-
-+ Changed default full data output to 60 minutes (to match the SVG output interval) for better compatibility with the model builder GUI. 
-
-+ Fixed incorrect parameters for necrotic cell volume changes that prevented necrotic cell lysis and shrinkage. 
 
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
 
-+ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the very near future.  
++ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the future.  
 
 + We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
 
-+ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
++ Additional search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
  
 + We will change the timing of when `entry_function`s are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather than both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to execute the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
 

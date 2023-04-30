@@ -172,6 +172,9 @@ std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> n
 double get_single_base_behavior( Cell* pCell , int index ); // done 
 double get_single_base_behavior( Cell* pCell , std::string name ); // done 
 
+double get_single_base_behavior( Cell_Definition* pCD , std::string name ); 
+
+
 }; 
 
 #endif 

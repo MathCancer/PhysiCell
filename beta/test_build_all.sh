@@ -39,6 +39,9 @@ make
 make reset
 make  interaction-sample
 make
+make reset
+make  mechano-sample
+make
 
 # now the intracellular models, requiring additional libs
 make reset

@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -83,21 +83,10 @@ void setup_microenvironment( void );
 
 std::vector<std::string> my_coloring_function( Cell* );
 
-std::vector<std::string> my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc );
-
 // custom functions can go here 
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
 void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
-
-void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
-
-void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
-void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
-void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
-
-void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
-void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
 

@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,39 +65,165 @@
 ###############################################################################
 */
 
-#include "../core/PhysiCell.h"
-#include "../modules/PhysiCell_standard_modules.h" 
+#include "./custom.h"
 
-using namespace BioFVM; 
-using namespace PhysiCell;
+void create_cell_types( void )
+{
+	// set the random seed 
+	SeedRandom( parameters.ints("random_seed") );  
+	
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
+	
+	initialize_default_cell_definition(); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
-// setup functions to help us along 
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	cell_defaults.functions.contact_function = NULL; 
+	
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
+	
+	initialize_cell_definitions_from_pugixml(); 
 
-void create_cell_types( void );
-void setup_tissue( void ); 
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	build_cell_definitions_maps(); 
 
-// set up the BioFVM microenvironment 
-void setup_microenvironment( void ); 
+	/*
+	   This intializes cell signal and response dictionaries 
+	*/
 
-// custom pathology coloring function 
+	setup_signal_behavior_dictionaries(); 	
 
-std::vector<std::string> my_coloring_function( Cell* );
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
+	
+	cell_defaults.functions.update_phenotype = phenotype_function; 
+	// cell_defaults.functions.custom_cell_rule = custom_function; 
+	// cell_defaults.functions.contact_function = contact_function; 
+	
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	display_cell_definitions( std::cout ); 
+	
+	return; 
+}
 
-std::vector<std::string> my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc );
+void setup_microenvironment( void )
+{
+	// initialize BioFVM 
+	
+	initialize_microenvironment(); 	
 
-// custom functions can go here 
+    int idx_oxygen = 0;
+    double oxy_value = 40.0;  // set voxel values sequentially
 
-void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt );
-void custom_function( Cell* pCell, Phenotype& phenotype , double dt );
+    int idx_xmax = microenvironment.mesh.x_coordinates.size() - 1; 
+    int idx_ymax = microenvironment.mesh.y_coordinates.size() - 1;
+    int idx_zmax = microenvironment.mesh.z_coordinates.size() - 1;
 
-void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
+    for (int idz=0; idz<microenvironment.mesh.z_coordinates.size(); idz++)
+        for (int idy=0; idy<microenvironment.mesh.y_coordinates.size(); idy++)
+            for (int idx=0; idx<microenvironment.mesh.x_coordinates.size(); idx++)
+            {
+                microenvironment.update_dirichlet_node( 
+                    microenvironment.voxel_index(idx, idy, idz), 
+                    idx_oxygen, oxy_value);
+                microenvironment.set_substrate_dirichlet_activation( idx_oxygen, 
+                    microenvironment.voxel_index(idx, idy, idz), true);
 
-void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+                oxy_value += 1.0;
+            }
+	
+	return; 
+}
 
-void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
-void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
-void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+void setup_tissue( void )
+{
+	double Xmin = microenvironment.mesh.bounding_box[0]; 
+	double Ymin = microenvironment.mesh.bounding_box[1]; 
+	double Zmin = microenvironment.mesh.bounding_box[2]; 
 
-void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
-void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt ); // final 
+	double Xmax = microenvironment.mesh.bounding_box[3]; 
+	double Ymax = microenvironment.mesh.bounding_box[4]; 
+	double Zmax = microenvironment.mesh.bounding_box[5]; 
+	
+	if( default_microenvironment_options.simulate_2D == true )
+	{
+		Zmin = 0.0; 
+		Zmax = 0.0; 
+	}
+    std::cout << "\n\n------- setup_tissue(): Xmin,Xmax= " << Xmin << ", " << Xmax<<std::endl; 
+    std::cout << "------- setup_tissue(): Ymin,Ymax= " << Ymin << ", " << Ymax<<std::endl; 
+	
+	double Xrange = Xmax - Xmin; 
+	double Yrange = Ymax - Ymin; 
+	double Zrange = Zmax - Zmin; 
+	
+	// create some of each type of cell 
+	
+	Cell* pC;
+	
+	// for( int k=0; k < cell_definitions_by_index.size() ; k++ )
+	// {
+	// 	Cell_Definition* pCD = cell_definitions_by_index[k]; 
+	// 	std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl; 
+	// 	for( int n = 0 ; n < parameters.ints("number_of_cells") ; n++ )
+	// 	{
+	// 		std::vector<double> position = {0,0,0}; 
+	// 		position[0] = Xmin + UniformRandom()*Xrange; 
+	// 		position[1] = Ymin + UniformRandom()*Yrange; 
+	// 		position[2] = Zmin + UniformRandom()*Zrange; 
+			
+	// 		pC = create_cell( *pCD ); 
+	// 		pC->assign_position( position );
+	// 	}
+	// }
+	// std::cout << std::endl; 
 
+    // single cell at origin
+    Cell_Definition* pCD = cell_definitions_by_index[0]; 
+    std::vector<double> position = {0,0,0}; 
+    pC = create_cell( *pCD ); 
+    pC->assign_position( position );
+	
+
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 	
+	return; 
+}
+
+std::vector<std::string> my_coloring_function( Cell* pCell )
+{ return paint_by_number_cell_coloring(pCell); }
+
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{ 
+    return; 
+}
+
+void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
+{ return; } 
+
+void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
+{ return; } 

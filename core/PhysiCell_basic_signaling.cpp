@@ -210,6 +210,75 @@ double interpolate_behavior( double base_value , double max_changed_value, doubl
 	return output; 
 }
 
+double multivariate_Hill_response_function( std::vector<double> signals, std::vector<double> half_maxes , std::vector<double> hill_powers )
+{
+	double temp1 = 0.0; 
+	double temp2 = 0.0; 
+	double temp3 = 0.0; 
+	// create the generalized (s^h), stored in temp1; 
+	for( int j=0 ; j < signals.size(); j++ )
+	{
+		temp2 = signals[j];     // s
+		temp2 /= half_maxes[j]; // s/s_half 
+		temp3 = pow( temp2 , hill_powers[j] ); // (s/s_half)^h 
+		temp1 += temp3; 
+	}
+	temp2 = temp1;   // numerator (S^h)
+	temp1 += 1.0;    // denominator (1+S^h)
+	temp2 /= temp1;  // numerator/denominator = S^h / (1+S^h)
+	return temp2; 
+}
+
+double multivariate_linear_response_function( std::vector<double> signals, std::vector<double> min_thresholds , std::vector<double> max_thresholds ) 
+{
+    double output = 0.0; 
+
+	for( int j=0 ; j < signals.size(); j++ )
+	{ output += linear_response_function( signals[j] , min_thresholds[j], max_thresholds[j] ); }
+
+    if( output > 1.0 )
+    { return 1.0; }
+
+	return output; 
+}
+
+std::vector<double> linear_response_to_Hill_parameters( double s0, double s1 )
+{
+	static double tol = 0.1; 
+	static double param1 = (1-tol)/tol; 
+	static double param2 = log(param1); 
+
+	// half max, then hill power 
+	double hm = 0.5* (s0+s1); 
+
+	// hp so that H(s1) ~ (1-tol)
+	double hp = round( param2 / log(s1/hm) ); 
+
+	std::vector<double> output = { hm , hp }; 
+
+	return output; 
+}
+
+std::vector<double> Hill_response_to_linear_parameters( double half_max , double Hill_power )
+{
+	static double tol = 0.1; 
+	static double param1 = (1-tol)/tol; 
+	double param2 = pow( param1 , 1.0/ Hill_power ); 
+
+	// s1 such that H(s1) ~ (1-tol)
+	double s1 = half_max * param2; 
+
+	// s0 for symmetry
+	double s0 = 2*half_max -s1; 
+	if( s0 < 0 )
+	{ s0 = 0.0; }
+
+	std::vector<double> output = {s0,s1}; 
+
+	return output; 
+}
+
+
 
 
 

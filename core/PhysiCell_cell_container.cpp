@@ -138,21 +138,24 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 
 	static double phenotype_dt_tolerance = 0.001 * phenotype_dt_; 
 	static double mechanics_dt_tolerance = 0.001 * mechanics_dt_; 
-	
+
 	// intracellular update. called for every diffusion_dt, but actually depends on the intracellular_dt of each cell (as it can be noisy)
 
 	#pragma omp parallel for 
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
-		if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
-		{
-			if ((*all_cells)[i]->functions.pre_update_intracellular != NULL)
-				(*all_cells)[i]->functions.pre_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+		if( (*all_cells)[i]->is_out_of_domain == false && initialzed ) {
 
-			(*all_cells)[i]->phenotype.intracellular->update( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+			if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
+			{
+				if ((*all_cells)[i]->functions.pre_update_intracellular != NULL)
+					(*all_cells)[i]->functions.pre_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
 
-			if ((*all_cells)[i]->functions.post_update_intracellular != NULL)
-				(*all_cells)[i]->functions.post_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+				(*all_cells)[i]->phenotype.intracellular->update( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+
+				if ((*all_cells)[i]->functions.post_update_intracellular != NULL)
+					(*all_cells)[i]->functions.post_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+			}
 		}
 	}
 	
@@ -337,6 +340,10 @@ void Cell_Container::add_agent_to_outer_voxel(Cell* agent)
 
 void Cell_Container::remove_agent_from_voxel(Cell* agent, int voxel_index)
 {
+	if (voxel_index < 0)
+	{
+		return; 
+	}
 	int delete_index = 0; 
 	while( agent_grid[voxel_index][ delete_index ] != agent )
 	{
