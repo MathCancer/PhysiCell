@@ -504,15 +504,23 @@ void add_potentials_cell_to_fibre(Cell* pCell, Cell* other_agent)
 
         // Fibre degradation by cell - switched on by flag fibre_degradation
         int stuck_threshold = parameters.doubles("fibre_stuck");
-        if (parameters.bools("fibre_degradation") && (pCell->custom_data["stuck_counter"] >= stuck_threshold || pCell->state.simple_pressure > 1)) {
-            // std::cout << "Cell " << pCell->ID << " is stuck at time " << PhysiCell_globals.current_time
-            // << " near fibre " << (*other_agent).ID  << std::endl;
+        double pressure_threshold = 10.0;
+        if (parameters.bools("fibre_degradation") && (pCell->custom_data["stuck_counter"] >= stuck_threshold
+                                                      || pCell->state.simple_pressure > pressure_threshold)) {
+            if (pCell->custom_data["stuck_counter"] >= stuck_threshold){
+                std::cout << "Cell " << pCell->ID << " is stuck at time " << PhysiCell_globals.current_time
+                          << " near fibre " << (*other_agent).ID  << std::endl;;
+            }
+            if (pCell->state.simple_pressure > pressure_threshold){
+                std::cout << "Cell " << pCell->ID << " is under pressure of " << pCell->state.simple_pressure << " at "
+                          << PhysiCell_globals.current_time << " near fibre " << (*other_agent).ID  << std::endl;;
+            }
             pCell->displacement *= -1.0/distance;
             double dotproduct = dot_product(pCell->displacement, pCell->phenotype.motility.motility_vector);
             if (dotproduct >= 0) {
                 double rand_degradation = UniformRandom();
                 double prob_degradation = parameters.doubles("fibre_deg_rate");
-                if (pCell->state.simple_pressure > 1.0){
+                if (pCell->state.simple_pressure > pressure_threshold){
                     prob_degradation *= pCell->state.simple_pressure;
                 }
                 if (rand_degradation <= prob_degradation) {
