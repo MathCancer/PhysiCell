@@ -2,7 +2,7 @@
 
 **Version:** 1.12.0
 
-**Release date:** ?? April 2023
+**Release date:** ?? May 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -114,13 +114,15 @@ adds several notable features, fixes bugs, and further expands the "signals" and
   + `Hill_response_to_linear_parameters` determins minimum and maximum thresholds to approximate a Hill response function (with half-maximum `half_max` and Hill power `double Hill_power`) with a linear response function.
 + Added `double get_single_base_behavior( Cell_Definition* pCD , std::string name )` to `PhysiCell_signal_behavior` to extract single base behaviors directly from a `Cell_Definition`. **TO DO** Double-check that it's right, and update the "protocols" to write this function. 
 
++ 
+
 + **TO DO** Modified `double get_single_base_behavior(Cell*,std::string)` to call `get_single_base_behavior(Cell_Definition*,std::string)`. 
 
 + **TO DO** Output the full dictionary at runtime. 
 
 ### Beta features (not fully supported):
 #### 1.12.0
-
++ None in this release. 
  
 ### Bugfixes: 
 
