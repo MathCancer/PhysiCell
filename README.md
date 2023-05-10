@@ -2,7 +2,7 @@
 
 **Version:** 1.12.0
 
-**Release date:** ?? May 2023
+**Release date:** 10 May 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -90,18 +90,49 @@ adds several notable features, fixes bugs, and further expands the "signals" and
 + **Automated annotation of the model hypotheses:** 
 
 + **CSV-based specification of model rules:**
+  + Version 1: 
+    ```cell_type , signal , direction , behavior , base_value , max_response_value , half_max , Hill_power , applies_to_dead```
 
-  ```cell_type , signal , direction , behavior , base_value , max_response_value , half_max , Hill_power , applies_to_dead```
+    + `cell_type`: The (human-readable) name of any cell type in the simulation, matching their declarations in the XML configuration file. 
+      + Allowed values: Any named cell type in the simulation. 
+    + `signal`: Any signal in the simulation's signal dictionary that can be queried to modulate a behavior. 
+      + Allowed values: Any signal that is known to the signal dictionary. 
+    + `direction`: Tells whether the signal increases or decreases the behavior. 
+      + Allowed values: `increases` or `decreases` 
+    + `behavior`: Any behavioral parameter in the simulation's behavior dictionary that can be edited to modulate a behavior. 
+      + Allowed values: Any behavioral parameter that is known in the behavior dictionary. 
+    + `base_value`: The value of the behavioral parameter in the absence of any signals 
+      + Allowed value: Must match the behavior's parameter value in the cell definition 
+    + `max_response_value`: The maximally changed behavior when acting under high values of signal
+      + Allowed values (for rules that increase the behavior): Any positive value equalling or exceeding the `base_value`. E.g., ten times the base value. 
+      + Allowed values (for rules that decrease the behavior): Any positive value equal to or less than the `base_value`. E.g., one tenth the base value. 
+    + `half_max`: Value of the signal at which the behavior undergoes half of its maximal change. 
+      + Allowed values: Non-zero positive numbers. 
+    + `Hill_power`: The Hill coefficient in a Hill response function. 
+      + Allowed values: Any non-zero positive number. **Integer values are MUCH more computationally efficient.** 
+    + 'applies_to_dead': Indicates if the rule should also be applied to dead cells. 
+      + Allowed values: 0 (for false) or 1 (for true).    
 
-  + `cell_type`: The (human-readable) name of any cell type in the simulation, matching their declarations in the XML configuration file. 
-    + Allowed values: Any named cell type in the simulation. 
-  + `signal`: Any signal in the simulation's signal dictionary that can be queried to modulate a behavior. 
-    + Allowed values: Any signal that is known to the signal dictionary. 
-  + `direction`: Tells whether the signal increases or decreases the behavior. 
-    + Allowed values: `increases` or `decreases` 
-  + `behavior`: Any behavioral parameter in the simulation's behavior dictionary that can be edited to modulate a behavior. 
-    + Allowed values: Any behavioral parameter that is known in the behavior dictionary. 
-  + `value_value` 
+  + Version 2: 
+    ```cell_type , signal , direction , behavior , max_response_value , half_max , Hill_power , applies_to_dead```
+    This version always copies the `base_values` from the corresponding cell definition. 
+    + `cell_type`: The (human-readable) name of any cell type in the simulation, matching their declarations in the XML configuration file. 
+      + Allowed values: Any named cell type in the simulation. 
+    + `signal`: Any signal in the simulation's signal dictionary that can be queried to modulate a behavior. 
+      + Allowed values: Any signal that is known to the signal dictionary. 
+    + `direction`: Tells whether the signal increases or decreases the behavior. 
+      + Allowed values: `increases` or `decreases` 
+    + `behavior`: Any behavioral parameter in the simulation's behavior dictionary that can be edited to modulate a behavior. 
+      + Allowed values: Any behavioral parameter that is known in the behavior dictionary. 
+    + `max_response_value`: The maximally changed behavior when acting under high values of signal
+      + Allowed values (for rules that increase the behavior): Any positive value equalling or exceeding the `base_value`. E.g., ten times the base value. 
+      + Allowed values (for rules that decrease the behavior): Any positive value equal to or less than the `base_value`. E.g., one tenth the base value. 
+    + `half_max`: Value of the signal at which the behavior undergoes half of its maximal change. 
+      + Allowed values: Non-zero positive numbers. 
+    + `Hill_power`: The Hill coefficient in a Hill response function. 
+      + Allowed values: Any non-zero positive number. **Integer values are MUCH more computationally efficient.** 
+    + 'applies_to_dead': Indicates if the rule should also be applied to dead cells. 
+      + Allowed values: 0 (for false) or 1 (for true).    
 
 + Code-free model specification by PhysiCell Studio. 
 
