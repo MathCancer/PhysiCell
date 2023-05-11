@@ -2,7 +2,7 @@
 
 **Version:** 1.12.0
 
-**Release date:** 10 May 2023
+**Release date:** 11 May 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
