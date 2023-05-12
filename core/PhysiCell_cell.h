@@ -254,7 +254,6 @@ class Cell : public Basic_Agent
 Cell* create_cell( void );  
 Cell* create_cell( Cell_Definition& cd );  
 
-
 void delete_cell( int ); 
 void delete_cell( Cell* ); 
 void save_all_cells_to_matlab( std::string filename ); 

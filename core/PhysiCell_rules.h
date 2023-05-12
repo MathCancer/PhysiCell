@@ -73,8 +73,8 @@
 // using namespace BioFVM; 
 // using namespace PhysiCell;
 
-#ifndef _PhysiCell_rules_h_
-#define _PhysiCell_rules_h_
+#ifndef __PhysiCell_rules_h__
+#define __PhysiCell_rules_h__
 
 using namespace BioFVM; 
 namespace PhysiCell{

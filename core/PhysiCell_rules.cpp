@@ -69,6 +69,10 @@
 
 namespace PhysiCell{
 
+#ifndef __PhysiCell_rules_cpp__
+#define __PhysiCell_rules_cpp__
+#endif 
+
 Hypothesis_Rule::Hypothesis_Rule()
 {
 	signals_map.clear();  
