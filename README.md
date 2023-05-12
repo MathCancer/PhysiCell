@@ -78,7 +78,7 @@ See changes.md for the full change log.
 ## Release summary: 
 Version 1.12.0 introduces rules-based modeling: human-interpretable statements of the form 
 
-``In cell type T, signal S increases/decreases behavior B''
+> In cell type T, signal S increases/decreases behavior B
 
 are represented with a CSV format that can _directly_ and _uniquely_ map onto a Hill response function to auto-generate simulation code. `T` is any cell type in the simulation, `S` can be any signal in the signal dictionary, and `B` any supported behavior in the behavior dictionary. For example: 
 
@@ -88,11 +88,6 @@ are represented with a CSV format that can _directly_ and _uniquely_ map onto a 
 * In effector T cells, IFN-gamma increases attack of malignant epithelial cells. 
 
 The CSV version of these statements can be parsed and transformed into code dynamically at runtime, without additional user-written C++ or recompiling. This will be the basis of a pre-compiled PhysiCell Studio (model design, execution, and visualization in one package) and similar PhysiCell Cloud (install-free, browser-based model design, execution, and visualization). This allows modelers to focus on choosing their hypotheses--how signals (stimuli) change cell behavior--and less on coding and debugging. It is our hope that this language is sufficiently expressive to write most models without additional user code. However, users can still write custom phenotype functions that can be integrated with rules-based modeling, allowing further fine-tuning of individual cell behavior. 
-
-
-... 
-
-adds several notable features, fixes bugs, and further expands the "signals" and "behaviors" that can be read and written with a simple API to facilitate building models. In particular, we add a brand new CSV format for initial cell positions (with more robust naming of cells by their human-readable names, a "header" line, and ability to extensively add and specificy individual cell properties), a new ability to save and load user projects in the `user_projects` directory, automated dynamic formation and breakage of spring-based cell-cell adhesions (based upon the cell-cell adhesion affinities, attachment rates, and detachment rates), automated inclusion of spring-based adhesions (at the mechanics time step) without need for the user to explicitly supply a spring function, a new "mechano" sample project to illustrate the new automated spring functionality, and updates to PhysiBoSS to ensure compatibility with the rapidly improving PhysiCell Studio. In addition, there is new capability of adding a background coloring (e.g., an oxygen heatmap) to SVG ouptuts--see the `interaction-sample` for an illustration (use the alternate XML config file to enable). This release includes several bugfixes, the most critical of which is to update the parameters for necrotic cells (which had previously been misset in the XML files, thus disabling necrotic cell lysis and shrinking). 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
@@ -161,6 +156,8 @@ adds several notable features, fixes bugs, and further expands the "signals" and
 + Added `double get_single_base_behavior( Cell_Definition* pCD , std::string name )` to `PhysiCell_signal_behavior` to extract single base behaviors directly from a `Cell_Definition`. 
 + Added `double get_single_base_behavior( Cell* pCD , std::string name )` to `PhysiCell_signal_behavior` to extract single base behaviors directly from a cell's corresponding `Cell_Definition`. 
 + PhysiCell outputs `dictionary.txt` at runtime with the current list of known signals and behaviors (for use in rules-based modeling). 
++ `BioFVM_vector` now includes `double dot_product( std::vector<double>& a , std::vector<double>& b );` for a standardized dot product. 
++ `BioFVM_vector` now includes `std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b );` for a standardized cross product. 
 
 ### Beta features (not fully supported):
 #### 1.12.0
