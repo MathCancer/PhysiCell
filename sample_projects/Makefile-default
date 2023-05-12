@@ -73,7 +73,7 @@ name:
 list-projects:
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
-	@echo "                 worm-sample interaction-sample mechano-sample"
+	@echo "                 worm-sample interaction-sample mechano-sample rules-sample"
 	@echo ""
 	@echo "Sample intracellular projects: ode-energy-sample physiboss-cell-lines-sample cancer-metabolism-sample"
 	@echo ""
@@ -171,6 +171,14 @@ interaction-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/interactions/config/* ./config/
 
+mechano-sample:
+	cp ./sample_projects/mechano/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/mechano/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/mechano/Makefile .
+	cp ./sample_projects/mechano/config/* ./config/
+
 rules-sample:
 	cp ./sample_projects/rules_sample/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
@@ -218,13 +226,6 @@ cancer-metabolism-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
 	cp ./sample_projects_intracellular/fba/cancer_metabolism/config/* ./config/
 
-mechano-sample:
-	cp ./sample_projects/mechano/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/mechano/main.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/mechano/Makefile .
-	cp ./sample_projects/mechano/config/* ./config/
 
 # early examples for convergence testing 
 
