@@ -13,7 +13,8 @@ M0 macrophage,apoptotic debris,decreases,migration speed,0.1,0.005,4,0
 M0 macrophage,necrotic debris,decreases,migration speed,0.1,0.005,4,0
 M0 macrophage,volume,decreases,phagocytose dead cell,0,6000,4,0
 // M1 macrophages 
-M1 macrophage,oxygen,decreases,transform to M2 macrophage,0.0,5,8,0
+// M1 macrophage,oxygen,decreases,transform to M2 macrophage,0.0,5,8,0
+M1 macrophage,oxygen,decreases,transform to M2 macrophage,0.0001,5,8,0
 M1 macrophage,apoptotic debris,decreases,migration speed,0.1,0.005,4,0
 M1 macrophage,necrotic debris,decreases,migration speed,0.1,0.005,4,0
 M1 macrophage,volume,decreases,phagocytose dead cell,0.0,6000,4,0

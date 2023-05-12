@@ -153,7 +153,7 @@
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
-                        <death_rate units="1/min">5.31667e-05</death_rate>
+                        <death_rate units="1/min">7e-05</death_rate>
                         <phase_durations units="min">
                             <duration index="0" fixed_duration="true">516</duration>
                         </phase_durations>
@@ -340,7 +340,7 @@
                     <model code="101" name="necrosis">
                         <death_rate units="1/min">0.0</death_rate>
                         <phase_transition_rates units="1/min">
-                            <rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+                            <rate start_index="0" end_index="1" fixed_duration="false">9000000000.0</rate>
                             <rate start_index="1" end_index="2" fixed_duration="true">1.15741e-05</rate>
                         </phase_transition_rates>
                         <parameters>
@@ -511,7 +511,7 @@
                     <model code="101" name="necrosis">
                         <death_rate units="1/min">0.0</death_rate>
                         <phase_transition_rates units="1/min">
-                            <rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+                            <rate start_index="0" end_index="1" fixed_duration="false">9000000000.0</rate>
                             <rate start_index="1" end_index="2" fixed_duration="true">1.15741e-05</rate>
                         </phase_transition_rates>
                         <parameters>
@@ -647,7 +647,7 @@
                         <transformation_rate name="malignant epithelial cell" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="M0 macrophage" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="M1 macrophage" units="1/min">0.0</transformation_rate>
-                        <transformation_rate name="M2 macrophage" units="1/min">0.005</transformation_rate>
+                        <transformation_rate name="M2 macrophage" units="1/min">0.001</transformation_rate>
                         <transformation_rate name="effector T cell" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="exhausted T cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
@@ -682,7 +682,7 @@
                     <model code="101" name="necrosis">
                         <death_rate units="1/min">0.0</death_rate>
                         <phase_transition_rates units="1/min">
-                            <rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+                            <rate start_index="0" end_index="1" fixed_duration="false">9000000000.0</rate>
                             <rate start_index="1" end_index="2" fixed_duration="true">1.15741e-05</rate>
                         </phase_transition_rates>
                         <parameters>
@@ -808,7 +808,7 @@
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M1 macrophage" units="1/min">0.0</fusion_rate>
-                        <fusion_rate name="M2 macrophage" units="1/min">0.0</fusion_rate>
+                        <fusion_rate name="M2 macrophage" units="1/min">0.00</fusion_rate>
                         <fusion_rate name="effector T cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="exhausted T cell" units="1/min">0.0</fusion_rate>
                     </fusion_rates>
@@ -853,7 +853,7 @@
                     <model code="101" name="necrosis">
                         <death_rate units="1/min">0.0</death_rate>
                         <phase_transition_rates units="1/min">
-                            <rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+                            <rate start_index="0" end_index="1" fixed_duration="false">9000000000.0</rate>
                             <rate start_index="1" end_index="2" fixed_duration="true">1.15741e-05</rate>
                         </phase_transition_rates>
                         <parameters>
@@ -1024,7 +1024,7 @@
                     <model code="101" name="necrosis">
                         <death_rate units="1/min">0.0</death_rate>
                         <phase_transition_rates units="1/min">
-                            <rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+                            <rate start_index="0" end_index="1" fixed_duration="false">9000000000.0</rate>
                             <rate start_index="1" end_index="2" fixed_duration="true">1.15741e-05</rate>
                         </phase_transition_rates>
                         <parameters>

@@ -171,6 +171,16 @@ interaction-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/interactions/config/* ./config/
 
+rules-sample:
+	cp ./sample_projects/rules_sample/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/rules_sample/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/rules_sample/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/rules_sample/config/* ./config/
+
+
 # ---- intracellular projects 
 ode-energy-sample:
 	cp ./sample_projects_intracellular/ode/ode_energy/custom_modules/* ./custom_modules/
