@@ -249,8 +249,6 @@ The CSV version of these statements can be parsed and transformed into code dyna
 
 * * * 
 
-=======================================================================
-
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 **Versions:** 1.11.0 - 1.11.0 
 
@@ -533,7 +531,6 @@ Version 1.11.0 adds several notable features, fixes bugs, and further expands th
 + Major refresh of documentation.
 
 * * * 
-=======================================================================
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
@@ -899,8 +896,6 @@ None in this version. See 1.10.0.
 + Major refresh of documentation.
 
 * * * 
-=======================================================================
-
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 
