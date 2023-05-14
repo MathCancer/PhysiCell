@@ -146,6 +146,8 @@ The CSV version of these statements can be parsed and transformed into code dyna
 
 + Code-free model specification by PhysiCell Studio. 
 
++ Updated PhysiBoSS to remove cell definition "inheritance," (with "flat", self-standing cell definitions), to make it compatible with PhysiCell Studio. Hereafter, all properties of each cell definition must be explicitely defined. 
+
 ### Minor new features and changes: 
 #### 1.12.0
 + Added new functions to `PhysiCell_basic_signaling`: 
@@ -161,6 +163,16 @@ The CSV version of these statements can be parsed and transformed into code dyna
 + Added new `rules-sample` sample project to demonstrate rules-based modeling. It's a "toy model" with tumor cells, macrophages, and T cells. 
 + Updated sample projects for compatibility. 
 
++ Added a safety check to `operator[]` for Parameters, based on [PR145](https://github.com/MathCancer/PhysiCell/pull/145/). Thanks, Vincent Noel!! 
+
++ In PhysiBoSS, introduced a new state inheritance mechanism (global, and node-specific). 
+
++ PhisBoSS has a new optional start time, to initiate the intracellular model at t > 0.
+
++ Updated PhysiBoSS Cell Lines sample project (flatten XML, initial positions as CSV).
+
++ Started combining change log into a more compact format: Each release family (1.y.z, such as 1.10.z) receives an extended entry with new changes grouped by minor release. This allows major releases to be grouped with subsequent minor feature enhancements and bug fixes, for a much shorter change log that's easier to read. README will document all changes of the current release family. 
+
 ### Beta features (not fully supported):
 #### 1.12.0
 + None in this release. 
@@ -169,6 +181,18 @@ The CSV version of these statements can be parsed and transformed into code dyna
 
 #### 1.12.0
 + None in this release. 
+
++ Merged Daniel Bergman's [PR 126](https://github.com/MathCancer/PhysiCell/pull/126), which fixes cell legend colors. Thank's Daniel! 
+
++ Improved safety checks in the cell orientation function, thanks to Randy Heiland's [PR 122](https://github.com/MathCancer/PhysiCell/pull/122). Thanks, Randy!
+
++ Now forcing Mersenne Twister as random generator in PhysiBoSS (use or /dev/random by MaBoSS would max out system descriptor)
+
++ MaBoSS BND/CFG parsing is now in an OpenMP critical block (flex/bison parser is not thread safe)
+
++ Remove duplicate initialization of maximum attachment rate from the Phenotype.Mechanics constructor.
+
++ Fixed bug in neighbor/attached graph output filenames (previously double-appended a suffix to the filenames). 
 
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
