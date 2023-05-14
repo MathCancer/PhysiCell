@@ -140,6 +140,8 @@ PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
 
+PhysiCell_rules.o: ./core/PhysiCell_rules.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_rules.cpp 
 	
 # BioFVM core components (needed by PhysiCell)
 	

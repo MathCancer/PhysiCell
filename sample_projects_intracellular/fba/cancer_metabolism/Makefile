@@ -119,8 +119,8 @@ PhysiCell_signal_behavior.o: ./core/PhysiCell_signal_behavior.cpp
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp
 	
-PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
+PhysiCell_rules.o: ./core/PhysiCell_rules.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_rules.cpp 
 
 
 # BioFVM core components (needed by PhysiCell)
@@ -175,6 +175,8 @@ PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 
+PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
 
 # PhysiFBA addon modules
 libFBA: 
