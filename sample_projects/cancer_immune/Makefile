@@ -290,3 +290,7 @@ load:
 	cp ./user_projects/$(PROJ)/Makefile .
 	cp ./user_projects/$(PROJ)/config/* ./config/ 
 	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
+
+list-user-projects:
+	@echo "user projects::"
+	@cd ./user_projects && ls -dt1 * | grep . | sed 's!empty.txt!!'

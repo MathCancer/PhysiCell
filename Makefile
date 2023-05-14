@@ -468,10 +468,4 @@ load:
 
 list-user-projects:
 	@echo "user projects::"
-	@cd ./user_projects && ls -d1 * | grep . | sed 's!empty.txt!!'
-	@echo " "
-
-# | grep . | sed 's/\/\$//'	
-
-
-# cd ./user_projects && ls -d1 | grep . | sed 's_/_U_'  
+	@cd ./user_projects && ls -dt1 * | grep . | sed 's!empty.txt!!'
