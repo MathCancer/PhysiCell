@@ -1,8 +1,88 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
+**Versions:** 1.12.0 - 
 
-**Versions:** 1.11.0 - 
+**Release dates:** 14 May 2023 - 
+* 1.12.0 : 14 May 2023
 
-**Release dates:** 20 March 2023 - 
+## Overview: 
+PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
+
+**Reference:** A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
+
+Visit http://MathCancer.org/blog for the latest tutorials and help. 
+
+**Notable recognition:**
++ [2019 PLoS Computational Biology Research Prize for Public Impact](https://blogs.plos.org/biologue/2019/05/31/announcing-the-winners-of-the-2019-plos-computational-biology-research-prize/)
+
+### Key makefile rules:
+
+**`make`**: compiles the current project. If no 
+                     project has been defined, it first 
+                     populates the cancer heterogeneity 2D 
+                     sample project and compiles it 
+   
+**`make project-name`**: populates the indicated sample project. 
+                     Use "make" to compile it. 
+
+   * **`project-name`** choices:
+      * template 
+      * biorobots-sample 
+      * cancer-biorobots-sample 
+      * cancer-immune-sample
+      * celltypes3-sample 
+      * heterogeneity-sample 
+      * pred-prey-farmer 
+      * virus-macrophage-sample 
+      * worm-sample
+      * ode-energy-sample 
+      * physiboss-cell-lines-sample 
+      * cancer-metabolism-sample
+      * interaction-sample
+      * mechano-sample
+      * rules-sample
+
+**`make list-projects`** : list all available sample projects 
+
+**`make clean`**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
+
+**`make data-cleanup`**  : clears out all simulation data 
+
+**`make reset`**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
+
+**`make jpeg`**          : uses ImageMagick to convert the SVG files in the output directory to JPG (with appropriate sizing to make movies). Supply `OUTPUT=foldername` to select a different folder. 
+
+**`make movie`**         : uses ffmpeg to convert the JPG files in the output directory an mp4 movie. Supply `OUTPUT=foldername` to select a different folder, or `FRAMERATE=framerate` to override the frame rate.
+
+**`make upgrade`**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
+
+### Key Links 
+**Homepage:**     http://PhysiCell.MathCancer.org 
+
+**Downloads:**    http://PhysiCell.sf.net
+
+**Support:**      https://sourceforge.net/p/physicell/tickets/
+
+**Quick Start:**  Look at QuickStart.md in the documentation folder. 
+
+**User Guide:**   Look at UserGuide.pdf in the documentation folder. 
+ 
+**Setup and Training:**	See last year's workshop and hackathon at https://github.com/PhysiCell-Training/ws2021  
+ 
+**Older Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
+
+**Latest info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
+
+See changes.md for the full change log. 
+
+
+
+* * * 
+
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
+**Versions:** 1.11.0 - 1.11.0 
+
+**Release dates:** 20 March 2023 - 20 March 2023
+* 1.11.0 : 20 March 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -286,6 +366,11 @@ Version 1.11.0 adds several notable features, fixes bugs, and further expands th
 **Versions:** 1.10.0 - 1.10.4
 
 **Release dates:** 13 May 2022 - 18 July 2022
+* 1.10.0 : 13 May 2022
+* 1.10.1 : 15 May 2022
+* 1.10.2 : 24 May 2022
+* 1.10.3 : 25 June 2022
+* 1.10.4 : 18 July 2022
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -638,10 +723,6 @@ None in this version. See 1.10.0.
 + Further update sample projects to make use of more efficient interaction testing available
 
 + Major refresh of documentation.
-
-* * * 
-
-end of 1.10.x changes 
 
 * * * 
 
