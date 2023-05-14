@@ -1529,6 +1529,7 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless" description="">0</random_seed>
+        <number_of_cells type="int" units="none" description="">0</number_of_cells>
         <number_of_stem_cells type="int" units="none" description="">50</number_of_stem_cells>
         <number_of_differentiated_cells type="int" units="" description="">400</number_of_differentiated_cells>
         <number_of_blood_vessels type="int" units="" description="">40</number_of_blood_vessels>

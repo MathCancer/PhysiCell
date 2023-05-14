@@ -139,6 +139,10 @@ PhysiCell_Settings::PhysiCell_Settings()
 	// parallel options 
 	
 	omp_num_threads = 4; 
+
+	rules_enabled = false; 
+	rules_protocol = "Cell Behavior Hypothesis Grammar (CBHG)"; 
+	rules_protocol_version = "1.0"; 
 	 
 	return; 
 }

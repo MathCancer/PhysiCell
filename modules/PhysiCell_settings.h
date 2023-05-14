@@ -125,6 +125,11 @@ class PhysiCell_Settings
 
 	double intracellular_save_interval = 60; 
 	bool enable_intracellular_saves = false; 
+
+	// cell rules option
+	bool rules_enabled = false; 
+	std::string rules_protocol = "Cell Behavior Hypothesis Grammar (CBHG)"; 
+	std::string rules_protocol_version = "1.0"; 
 	
 	PhysiCell_Settings();
 	

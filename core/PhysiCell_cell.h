@@ -78,6 +78,7 @@
 #include "../modules/PhysiCell_settings.h" 
 
 #include "./PhysiCell_standard_models.h" 
+#include "./PhysiCell_rules.h"
 
 using namespace BioFVM; 
 
@@ -252,7 +253,6 @@ class Cell : public Basic_Agent
 
 Cell* create_cell( void );  
 Cell* create_cell( Cell_Definition& cd );  
-
 
 void delete_cell( int ); 
 void delete_cell( Cell* ); 
