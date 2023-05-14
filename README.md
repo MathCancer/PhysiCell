@@ -159,6 +159,7 @@ The CSV version of these statements can be parsed and transformed into code dyna
 + `BioFVM_vector` now includes `double dot_product( std::vector<double>& a , std::vector<double>& b );` for a standardized dot product. 
 + `BioFVM_vector` now includes `std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b );` for a standardized cross product. 
 + Added new `rules-sample` sample project to demonstrate rules-based modeling. It's a "toy model" with tumor cells, macrophages, and T cells. 
++ Updated sample projects for compatibility. 
 
 ### Beta features (not fully supported):
 #### 1.12.0
