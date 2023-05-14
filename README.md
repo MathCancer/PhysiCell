@@ -49,6 +49,12 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 
 **`make reset`**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
 
+**`make save PROJ=name`**: save the current project (including the `Makefile`, `main.cpp`, and everything in `./config` and `./custom_modules/`) in `./user_projects/name`, where `name` is your choice for the project. If the project already exists, overwrite it. 
+
+**`make load PROJ=name`**: load the user project `name` from `./user_projects/name` (including the `Makefile`, `main.cpp`, and everything in `./config` and `./custom_modules/`).  
+
+**`make list-user-projects`**: list all user projects in `./user_projects/`. (Use these names without the trailing `/` in `make load PROJ=name`.)
+
 **`make jpeg`**          : uses ImageMagick to convert the SVG files in the output directory to JPG (with appropriate sizing to make movies). Supply `OUTPUT=foldername` to select a different folder. 
 
 **`make movie`**         : uses ffmpeg to convert the JPG files in the output directory an mp4 movie. Supply `OUTPUT=foldername` to select a different folder, or `FRAMERATE=framerate` to override the frame rate.
@@ -75,6 +81,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 See changes.md for the full change log. 
 
 * * * 
+
 ## Release summary: 
 Version 1.12.0 introduces rules-based modeling: human-interpretable statements of the form 
 
@@ -92,7 +99,7 @@ The CSV version of these statements can be parsed and transformed into code dyna
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
- 
+
 ### Major new features and changes in the 1.12.z versions
 #### 1.12.0
 + **Rules-based modeling:** See introduction above. 
@@ -193,16 +200,6 @@ The CSV version of these statements can be parsed and transformed into code dyna
 + Added new `rules-sample` sample project to demonstrate rules-based modeling. It's a "toy model" with tumor cells, macrophages, and T cells. 
 
 + Updated sample projects for compatibility. 
-
-+ Added a safety check to `operator[]` for Parameters, based on [PR145](https://github.com/MathCancer/PhysiCell/pull/145/). Thanks, Vincent Noel!! 
-
-+ In PhysiBoSS, introduced a new state inheritance mechanism (global, and node-specific). 
-
-+ PhisBoSS has a new optional start time, to initiate the intracellular model at t > 0.
-
-+ Updated PhysiBoSS Cell Lines sample project (flatten XML, initial positions as CSV).
-
-+ Started combining change log into a more compact format: Each release family (1.y.z, such as 1.10.z) receives an extended entry with new changes grouped by minor release. This allows major releases to be grouped with subsequent minor feature enhancements and bug fixes, for a much shorter change log that's easier to read. README will document all changes of the current release family. 
 
 ### Beta features (not fully supported):
 #### 1.12.0
