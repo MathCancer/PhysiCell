@@ -201,6 +201,8 @@ The CSV version of these statements can be parsed and transformed into code dyna
 
 + Updated sample projects for compatibility. 
 
++ Added `make list-user-projects` rule to Makefile to list all user projects available for loading 
+
 ### Beta features (not fully supported):
 #### 1.12.0
 + None in this release. 

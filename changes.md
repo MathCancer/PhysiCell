@@ -201,15 +201,7 @@ The CSV version of these statements can be parsed and transformed into code dyna
 
 + Updated sample projects for compatibility. 
 
-+ Added a safety check to `operator[]` for Parameters, based on [PR145](https://github.com/MathCancer/PhysiCell/pull/145/). Thanks, Vincent Noel!! 
-
-+ In PhysiBoSS, introduced a new state inheritance mechanism (global, and node-specific). 
-
-+ PhisBoSS has a new optional start time, to initiate the intracellular model at t > 0.
-
-+ Updated PhysiBoSS Cell Lines sample project (flatten XML, initial positions as CSV).
-
-+ Started combining change log into a more compact format: Each release family (1.y.z, such as 1.10.z) receives an extended entry with new changes grouped by minor release. This allows major releases to be grouped with subsequent minor feature enhancements and bug fixes, for a much shorter change log that's easier to read. README will document all changes of the current release family. 
++ Added `make list-user-projects` rule to Makefile to list all user projects available for loading 
 
 ### Beta features (not fully supported):
 #### 1.12.0
