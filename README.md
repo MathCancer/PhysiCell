@@ -1,9 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
+**Versions:** 1.12.0 - 
 
-**Versions:** 1.12
-
-**Release dates:** 14 May 2023 (1.12.0)
-
+**Release dates:** 14 May 2023 - 
+* 1.12.0 : 14 May 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -142,26 +141,57 @@ The CSV version of these statements can be parsed and transformed into code dyna
       + Allowed values: Non-zero positive numbers. 
     + `Hill_power`: The Hill coefficient in a Hill response function. 
       + Allowed values: Any non-zero positive number. **Integer values are MUCH more computationally efficient.** 
-    + 'applies_to_dead': Indicates if the rule should also be applied to dead cells. 
+    + `applies_to_dead`: Indicates if the rule should also be applied to dead cells. 
       + Allowed values: 0 (for false) or 1 (for true).    
+
++ Support for both rules-based behavior and traditional phenotype functions: If both are specified, then rules-based phenotype are applied first, followed by user-supplied phenotype functions that can further fine-tune cell behavior (as needed). 
 
 + Code-free model specification by PhysiCell Studio. 
 
 + Updated PhysiBoSS to remove cell definition "inheritance," (with "flat", self-standing cell definitions), to make it compatible with PhysiCell Studio. Hereafter, all properties of each cell definition must be explicitely defined. 
 
++ New section in `PhysiCell_settings.xml` to indicate a rules CSV file file: 
+```
+<cell_rules>
+    <rulesets>
+        <ruleset protocol="CBHG" version="2.0" format="csv" enabled="true">
+            <folder>./config</folder>
+            <filename>cell_rules.csv</filename>
+        </ruleset>
+    </rulesets>
+    <settings />
+</cell_rules>
+```
+  + `protocol`: This value should always be `CBHG` (cell behavior hypothesis grammar)
+  + `version`: Use `0.0` (or none for pre-beta files, but migrate away from this.) Use `1.0` for v1 rules as specified above. Use `2.0` for v2 rules as specified above. 
+  + `format`: For now, only `csv` is supported. 
+  + `enabled`: Set `true` to apply the rules, and `false` otherwise. 
+  * `folder`: Set the folder containing the rules file. This should typically be `./config`. 
+  * `filename`: Set the name of the rules file. e.g., `cell_rules.csv`. 
+
 ### Minor new features and changes: 
 #### 1.12.0
 + Added new functions to `PhysiCell_basic_signaling`: 
   + `multivariate_Hill_response_function` combines multiple signals (`std::vector<double> signals`) with individual half-maxes (`std::vector<double> half_maxes`) and Hill powers (`std::vector<double> hill_powers`) into a multivariate Hill response function, such that if only supplied with a single nonzero signal, then it returns the regular single-variable Hill function for that corresponding signal. 
+
   + `multivariate_linear_response_function` combines multiple signals (`std::vector<double> signals`) with independent minimal thresholds (`std::vector<double> min_thresholds`: values below which individual linear responses are zero) and maximum thresholds (`std::vector<double> max_thresholds )`: values above which individual linear responses are one) into a multivariate linear response, such that if only supplied with a single nonzero signal, then it returns the regular single-variable linear response function for that corresponding signal. This function is "capped" between 0 and 1. 
+ 
   + `linear_response_to_Hill_parameters` determines a half-maximum and Hill power to approximate a linear response function (with minimum threshold `s0` and maximum threshold `s1`) with a Hill response function. 
+
   + `Hill_response_to_linear_parameters` determins minimum and maximum thresholds to approximate a Hill response function (with half-maximum `half_max` and Hill power `double Hill_power`) with a linear response function.
+
 + Added `double get_single_base_behavior( Cell_Definition* pCD , std::string name )` to `PhysiCell_signal_behavior` to extract single base behaviors directly from a `Cell_Definition`. 
+
 + Added `double get_single_base_behavior( Cell* pCD , std::string name )` to `PhysiCell_signal_behavior` to extract single base behaviors directly from a cell's corresponding `Cell_Definition`. 
+
 + PhysiCell outputs `dictionary.txt` at runtime with the current list of known signals and behaviors (for use in rules-based modeling). 
+
 + `BioFVM_vector` now includes `double dot_product( std::vector<double>& a , std::vector<double>& b );` for a standardized dot product. 
+
 + `BioFVM_vector` now includes `std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b );` for a standardized cross product. 
+
 + Added new `rules-sample` sample project to demonstrate rules-based modeling. It's a "toy model" with tumor cells, macrophages, and T cells. 
+
 + Updated sample projects for compatibility. 
 
 + Added a safety check to `operator[]` for Parameters, based on [PR145](https://github.com/MathCancer/PhysiCell/pull/145/). Thanks, Vincent Noel!! 
@@ -183,18 +213,6 @@ The CSV version of these statements can be parsed and transformed into code dyna
 #### 1.12.0
 + None in this release. 
 
-+ Merged Daniel Bergman's [PR 126](https://github.com/MathCancer/PhysiCell/pull/126), which fixes cell legend colors. Thank's Daniel! 
-
-+ Improved safety checks in the cell orientation function, thanks to Randy Heiland's [PR 122](https://github.com/MathCancer/PhysiCell/pull/122). Thanks, Randy!
-
-+ Now forcing Mersenne Twister as random generator in PhysiBoSS (use or /dev/random by MaBoSS would max out system descriptor)
-
-+ MaBoSS BND/CFG parsing is now in an OpenMP critical block (flex/bison parser is not thread safe)
-
-+ Remove duplicate initialization of maximum attachment rate from the Phenotype.Mechanics constructor.
-
-+ Fixed bug in neighbor/attached graph output filenames (previously double-appended a suffix to the filenames). 
-
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
 
@@ -208,6 +226,8 @@ The CSV version of these statements can be parsed and transformed into code dyna
 
 + We might make `trigger_death` clear out all the cell's functions, or at least add an option to do this. 
 
++ We might change the behavior of copied Custom Data when a cell changes type (changes to a new cell definition). Currently, all custom data elements in a cell are overwritten based on those in the new cell definition. This is not the best behavior for custom data elements that represent state variables instead of type-dependent parameters. 
+
 ### Planned future improvements: 
 
 + Further XML-based simulation setup. 
@@ -215,9 +235,7 @@ The CSV version of these statements can be parsed and transformed into code dyna
 + Read saved simulation states (as MultiCellDS digital snapshots)
  
 + Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
- 
-+ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
- 
+  
 + Create an angiogenesis sample project 
  
 + Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
