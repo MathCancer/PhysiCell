@@ -2,7 +2,7 @@
 
 **Version:** 1.12.0
 
-**Release date:** 12 May 2023
+**Release date:** 13 May 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -158,6 +158,7 @@ The CSV version of these statements can be parsed and transformed into code dyna
 + PhysiCell outputs `dictionary.txt` at runtime with the current list of known signals and behaviors (for use in rules-based modeling). 
 + `BioFVM_vector` now includes `double dot_product( std::vector<double>& a , std::vector<double>& b );` for a standardized dot product. 
 + `BioFVM_vector` now includes `std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b );` for a standardized cross product. 
++ Added new `rules-sample` sample project to demonstrate rules-based modeling. It's a "toy model" with tumor cells, macrophages, and T cells. 
 
 ### Beta features (not fully supported):
 #### 1.12.0
