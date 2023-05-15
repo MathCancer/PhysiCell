@@ -824,6 +824,7 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
 	
 	output[0] = interior_color; // set cytoplasm color 
 	
+	/*
 	if( pCell->phenotype.death.dead == false ) // if live, color nucleus same color 
 	{
 		output[2] = interior_color; 
@@ -840,13 +841,17 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
 			output[2] = "rgb(139,69,19)";
 			output[3] = "rgb(139,69,19)";
 		}
+
+
+
 	}
+	*/
 
 	// new March 2023 (for better compatibility with studio)
 
 	// if dead, use live color for the outline
-	if( pCell->phenotype.death.dead == true )
-	{ output[1] = interior_color; } 
+	// if( pCell->phenotype.death.dead == true )
+	// { output[1] = interior_color; } 
 
 	// necrotic cells are brown 
 	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
@@ -855,11 +860,13 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
 	{ interior_color = "saddlebrown"; }
 	// apoptotic cells are white 
 	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic ) 
-	{ interior_color = "white"; }
+	{ interior_color = "black"; }
 
 	output[0] = interior_color; // set cytoplasm color 
 	output[2] = interior_color; // set cytoplasm color 
 	output[3] = interior_color; // set cytoplasm color 
+
+	output[1] = "black"; 
 	
 	return output; 
 }	

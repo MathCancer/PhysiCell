@@ -127,6 +127,20 @@ void create_cell_types( void )
 	*/
 		
 	build_cell_definitions_maps(); 
+
+	/*
+	   This intializes cell signal and response dictionaries 
+	*/
+
+	setup_signal_behavior_dictionaries(); 	
+
+	/*
+       Cell rule definitions 
+	*/
+
+	setup_cell_rules(); 
+
+
 	display_cell_definitions( std::cout ); 
 	
 	return; 
