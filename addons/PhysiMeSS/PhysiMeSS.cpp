@@ -53,7 +53,7 @@ void initialize_physimess_fibre(Cell* pCell, std::vector<double>& position, doub
     initialize_voxels(pCell);
     
     pCell->custom_data.add_variable("mLength", NormalRandom(parameters.doubles("fibre_length"), parameters.doubles("length_normdist_sd")) / 2.0);
-    pCell->custom_data.add_variable("mRadius", parameters.doubles("fibre_radius"));
+    pCell->custom_data.add_variable("mRadius", NormalRandom(parameters.doubles("fibre_radius"), parameters.doubles("radius_normdist_sd")));
     pCell->custom_data.add_variable("X_crosslink_count", 0);
     pCell->custom_data.add_variable("fail_count", 0);
     

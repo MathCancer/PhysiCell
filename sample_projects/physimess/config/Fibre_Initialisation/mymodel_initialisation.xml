@@ -369,6 +369,7 @@
         <fibre_length type="double" units="microns" description="length of fibres">75.0</fibre_length>
         <length_normdist_sd type="double" units="microns" description="standard deviation of fibre length">0.0</length_normdist_sd>
         <fibre_radius type="double" units="microns" description="radius of fibres">2.0</fibre_radius>
+        <radius_normdist_sd type="double" units="microns" description="standard deviation of fibre radius">0.0</radius_normdist_sd>
         <fibre_angle type="double" units="radians" description="angle of fibre orientation">0.0</fibre_angle>
         <angle_normdist_sd type="double" units="radians" description="standard deviation of fibre orientation angle">0.0</angle_normdist_sd>
         
@@ -383,6 +384,7 @@
         <vel_adhesion type="double" units="" description="cell velocity parallel to fibre">0.6</vel_adhesion>
         <vel_contact type="double" units="" description="cell velocity orthogonal to fibre">0.1</vel_contact>
         <cell_velocity_max type="double" units="" description="max cell velocity">1.0</cell_velocity_max>
+        <color_cells_by_pressure type="bool" units="" description="flag for coloring cells by pressure">false</color_cells_by_pressure>
         </user_parameters>
 	
 </PhysiCell_settings>
