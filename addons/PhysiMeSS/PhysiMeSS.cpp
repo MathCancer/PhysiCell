@@ -503,8 +503,8 @@ void add_potentials_cell_to_fibre(Cell* pCell, Cell* other_agent)
         naxpy(&(pCell->velocity), fibre_repulsion, previous_velocity);
 
         // Fibre degradation by cell - switched on by flag fibre_degradation
-        int stuck_threshold = parameters.doubles("fibre_stuck");
-        double pressure_threshold = 10.0;
+        double stuck_threshold = parameters.doubles("fibre_stuck_time");
+        double pressure_threshold = parameters.doubles("fibre_pressure_threshold");
         if (parameters.bools("fibre_degradation") && (pCell->custom_data["stuck_counter"] >= stuck_threshold
                                                       || pCell->state.simple_pressure > pressure_threshold)) {
             if (pCell->custom_data["stuck_counter"] >= stuck_threshold){
@@ -519,7 +519,7 @@ void add_potentials_cell_to_fibre(Cell* pCell, Cell* other_agent)
             double dotproduct = dot_product(pCell->displacement, pCell->phenotype.motility.motility_vector);
             if (dotproduct >= 0) {
                 double rand_degradation = UniformRandom();
-                double prob_degradation = parameters.doubles("fibre_deg_rate");
+                double prob_degradation = parameters.doubles("fibre_degradation_rate");
                 if (pCell->state.simple_pressure > pressure_threshold){
                     prob_degradation *= pCell->state.simple_pressure;
                 }
