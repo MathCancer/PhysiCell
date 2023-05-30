@@ -106,11 +106,11 @@ void add_potentials_cell_to_fibre(PhysiMESS_Cell* pCell, PhysiMESS_Fibre* pFibre
                                                       || pCell->state.simple_pressure > pressure_threshold)) {
             if (pCell->stuck_counter >= stuck_threshold){
                 std::cout << "Cell " << pCell->ID << " is stuck at time " << PhysiCell_globals.current_time
-                          << " near fibre " << (*other_agent).ID  << std::endl;;
+                          << " near fibre " << pFibre->ID  << std::endl;;
             }
             if (pCell->state.simple_pressure > pressure_threshold){
                 std::cout << "Cell " << pCell->ID << " is under pressure of " << pCell->state.simple_pressure << " at "
-                          << PhysiCell_globals.current_time << " near fibre " << (*other_agent).ID  << std::endl;;
+                          << PhysiCell_globals.current_time << " near fibre " << pFibre->ID  << std::endl;;
             }
             pCell->displacement *= -1.0/distance;
             double dotproduct = dot_product(pCell->displacement, pCell->phenotype.motility.motility_vector);
