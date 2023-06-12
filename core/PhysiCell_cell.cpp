@@ -89,7 +89,7 @@
 #include <iterator> 
 
 namespace PhysiCell{
-	
+
 std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name; 
 std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
 std::vector<Cell_Definition*> cell_definitions_by_index;
@@ -307,7 +307,28 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	// New March 2022
 	// perform transformations 
 	standard_cell_transformations( this,this->phenotype,dt_ ); 
-	
+
+	// New March 2023 in Version 1.12.0 
+	// call the rules-based code to update the phenotype 
+	if( PhysiCell_settings.rules_enabled )
+	{ apply_ruleset( this ); }
+	if( get_single_signal(this,"necrotic") > 0.5 )
+	{
+		double rupture = this->phenotype.volume.rupture_volume; 
+		double volume = this->phenotype.volume.total; 
+		if( volume > rupture )
+		{
+			std::cout << this->phenotype.volume.total << " vs " << this->phenotype.volume.rupture_volume << 
+			" dead: " << get_single_signal( this, "dead") << 	std::endl; 
+			std::cout << this->phenotype.cycle.current_phase_index() << " " 
+			<< this->phenotype.cycle.pCycle_Model->name << std::endl; 
+		}
+
+	}
+
+//	if( functions.update_phenotype )
+//	{ functions.update_phenotype( this , phenotype , dt_ ); }
+
 	// call the custom code to update the phenotype 
 	if( functions.update_phenotype )
 	{ functions.update_phenotype( this , phenotype , dt_ ); }
@@ -1079,8 +1100,7 @@ Cell* create_cell( Cell_Definition& cd )
 }
 
 void Cell::convert_to_cell_definition( Cell_Definition& cd )
-{
-	
+{	
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 

@@ -104,6 +104,8 @@ void create_immune_cell_type( void )
 	pImmuneCell->functions.update_migration_bias = immune_cell_motility;
 	pImmuneCell->functions.contact_function = adhesion_contact_function; 
 	
+
+
 	// set custom data values 
 	
 	return; 
@@ -153,6 +155,20 @@ void create_cell_types( void )
 	create_immune_cell_type(); 
 
 	build_cell_definitions_maps(); 
+
+	/*
+	   This intializes cell signal and response dictionaries 
+	*/
+
+	setup_signal_behavior_dictionaries(); 	
+
+	/*
+       Cell rule definitions 
+	*/
+
+	setup_cell_rules(); 
+
+
 	display_cell_definitions( std::cout ); 
 	
 	return; 
