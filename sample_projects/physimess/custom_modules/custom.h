@@ -94,3 +94,11 @@ void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& 
 
 Cell* instantiate_physimess_cell();
 Cell* instantiate_physimess_fibre();
+Cell* instantiate_physimess_cell_custom_degrade();
+
+class PhysiMESS_Cell_Custom_Degrade : public PhysiMESS_Cell
+{
+  public:  
+  void degrade_fibre(PhysiMESS_Fibre* pFibre);
+};
+// void PhysiMESS_Cell::other_degrade_fibre(PhysiMESS_Fibre* pFibre);
