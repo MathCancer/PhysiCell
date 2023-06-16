@@ -25,6 +25,8 @@ class PhysiMESS_Cell : public PhysiMESS_Agent
     void deregister_fibre_voxels();
     
     void force_update_motility_vector(double dt_);
+    
+    virtual void degrade_fibre(PhysiMESS_Fibre* pFibre); 
 
 };
 
