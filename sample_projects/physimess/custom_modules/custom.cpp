@@ -132,11 +132,6 @@ void create_cell_types( void )
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
     
-	// std::string("ecm");
-    // const auto matrix = std::string("matrix");
-    // const auto fiber = std::string("fiber");
-    // const auto fibre = std::string("fibre");
-    // const auto rod = std::string("rod");
 	Cell_Definition* pCD;
 	pCD = PhysiCell::find_cell_definition("ecm");
 	if (pCD) {
@@ -224,9 +219,8 @@ void setup_tissue( void )
                assign fibre orientation and test whether out of bounds */
             isFibreFromFile = true;
 			static_cast<PhysiMESS_Fibre*>((*all_cells)[i])->assign_fibre_orientation();
-			// (*all_cells)[i]->type_name = "fibre";
-            // initialize_physimess_fibre((*all_cells)[i], (*all_cells)[i]->position, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax); 
-        }
+			
+        } 
     }
 
     /* agents have not been added from the file but do want them
@@ -250,9 +244,7 @@ void setup_tissue( void )
                     position[2] = Zmin + UniformRandom() * Zrange;
 
                     pC = create_cell(*pCD);
-                    
-                    // initialize_physimess_cell(pC);
-                    
+                                        
                     pC->assign_position(position);
                 }
             } 
