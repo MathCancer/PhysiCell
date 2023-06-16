@@ -474,6 +474,7 @@
         <fibre_degradation_rate type="double" units="1/min" description="fibre degradation rate">0.01</fibre_degradation_rate>
         <fibre_degradation_depends_on_pressure type="bool" units="none" description="flag for having degradation depends on pressure">false</fibre_degradation_depends_on_pressure>
         <fibre_stuck_time type="double" units="1/min" description="time before stuck cell can degrade fibre">10.0</fibre_stuck_time>
+        <fibre_stuck_threshold type="double" units="none" description="movement threshold to declare a cell stuck">0.05</fibre_stuck_threshold>
         <fibre_pressure_threshold type="double" units="1/min" description="time before stuck cell can degrade fibre">10.0</fibre_pressure_threshold>
         <color_cells_by_pressure type="bool" units="" description="flag for coloring cells by pressure">false</color_cells_by_pressure>
         

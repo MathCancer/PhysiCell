@@ -526,6 +526,7 @@
         <fibre_deg_rate type="double" units="1/min" description="fibre degradation rate">0.01</fibre_deg_rate>
         <fibre_degradation_depends_on_pressure type="bool" units="none" description="flag for having degradation depends on pressure">false</fibre_degradation_depends_on_pressure>
         <fibre_stuck type="double" units="1/min" description="time before stuck cell can degrade fibre">10.0</fibre_stuck>
+        <fibre_stuck_threshold type="double" units="none" description="movement threshold to declare a cell stuck">0.05</fibre_stuck_threshold>
         <fibre_pushing type="bool" units="none" description="flag for fibre pushing">false</fibre_pushing>
         <fibre_sticky type="double" units="none" description="measure of how easy it is to move a fibre">1.0</fibre_sticky>
         <fibre_rotation type="bool" units="none" description="flag for fibre rotation">false</fibre_rotation>
