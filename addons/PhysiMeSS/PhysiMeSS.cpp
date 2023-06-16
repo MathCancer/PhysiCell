@@ -88,10 +88,6 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
 
     // std::cout << " AGENT " << pCell->type_name << " " << pCell->ID << " has " ;
     //add potentials between pCell and its neighbors
-    // std::vector<Cell*>::iterator neighbor;
-    // std::vector<Cell*>::iterator end = static_cast<PhysiMESS_Agent*>(pCell)->physimess_neighbors.end();
-    // //std::cout << pCell->state.neighbors.size() << " neighbors: " ;
-    // for(neighbor = static_cast<PhysiMESS_Agent*>(pCell)->physimess_neighbors.begin(); neighbor != end; ++neighbor) {
     for (auto* neighbor : static_cast<PhysiMESS_Agent*>(pCell)->physimess_neighbors)
     {
         // std::cout << (*neighbor)->type_name << " " << (*neighbor)->ID << " " ;
