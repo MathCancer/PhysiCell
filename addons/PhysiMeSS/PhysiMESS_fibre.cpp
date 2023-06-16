@@ -1,5 +1,5 @@
 #include "PhysiMESS_fibre.h"
-
+#include "PhysiMESS_cell.h"
 #include <algorithm>
 
 bool isFibre(PhysiCell::Cell* pCell) 
@@ -172,6 +172,110 @@ void PhysiMESS_Fibre::check_out_of_bounds(std::vector<double>& position)
     }
 }
 
+
+void PhysiMESS_Fibre::add_potentials_from_cell(PhysiMESS_Cell* cell) 
+{
+    // PhysiMESS_Fibre* pFibre = static_cast<PhysiMESS_Fibre*>(pCell);
+    // fibres only get pushed or rotated by motile cells
+    if (!cell->phenotype.motility.is_motile || X_crosslink_count >= 2) {
+        return;
+    }
+
+    double distance = 0.0;
+    nearest_point_on_fibre(cell->position, displacement);
+    for (int index = 0; index < 3; index++) {
+        distance += displacement[index] * displacement[index];
+    }
+    distance = std::max(sqrt(distance), 0.00001);
+    // fibre should only interact with cell if it comes within cell radius plus fibre radius (note fibre radius ~2 micron)
+    double R = phenotype.geometry.radius + mRadius;
+    if (distance <= R) {
+        std::vector<double> point_of_impact(3, 0.0);
+        for (int index = 0; index < 3; index++) {
+            point_of_impact[index] = (*cell).position[index] - displacement[index];
+        }
+        // cell-fibre pushing only if fibre no crosslinks
+        if (X_crosslink_count == 0) {
+            //fibre pushing turned on
+            if (PhysiCell::parameters.bools("fibre_pushing")) {
+                // as per PhysiCell
+                static double simple_pressure_scale = 0.027288820670331;
+                // temp_r = 1 - distance/R;
+                double temp_r = 0;
+                temp_r = -distance;
+                temp_r /= R;
+                temp_r += 1.0;
+                temp_r *= temp_r;
+                // add the relative pressure contribution NOT SURE IF NEEDED
+                state.simple_pressure += (temp_r / simple_pressure_scale);
+
+                double effective_repulsion = sqrt(phenotype.mechanics.cell_cell_repulsion_strength *
+                                                    (*cell).phenotype.mechanics.cell_cell_repulsion_strength);
+                temp_r *= effective_repulsion;
+
+                if (fabs(temp_r) < 1e-16) { return; }
+                temp_r /= distance;
+                naxpy(&velocity, temp_r, displacement);
+            }
+
+            // fibre rotation turned on (2D)
+            if (PhysiCell::parameters.bools("fibre_rotation")) {
+                std::vector<double> old_orientation(3, 0.0);
+                for (int i = 0; i < 2; i++) {
+                    old_orientation[i] = state.orientation[i];
+                }
+
+                double moment_arm_magnitude = sqrt(
+                        point_of_impact[0] * point_of_impact[0] + point_of_impact[1] * point_of_impact[1]);
+                double impulse = PhysiCell::parameters.doubles("fibre_sticky")*(*cell).phenotype.motility.migration_speed * moment_arm_magnitude;
+                double fibre_length = 2 * mLength;
+                double angular_velocity = impulse / (0.5 * fibre_length * fibre_length);
+                double angle = angular_velocity;
+                state.orientation[0] = old_orientation[0] * cos(angle) - old_orientation[1] * sin(angle);
+                state.orientation[1] = old_orientation[0] * sin(angle) + old_orientation[1] * cos(angle);
+                normalize(&state.orientation);
+            }
+        }
+
+        // fibre rotation around other fibre (2D only and fibres intersect at a single point)
+        if (PhysiCell::parameters.bools("fibre_rotation") && X_crosslink_count == 1) {
+            double distance_fibre_centre_to_crosslink = 0.0;
+            std::vector<double> fibre_centre_to_crosslink(3, 0.0);
+            for (int i = 0; i < 2; i++) {
+                fibre_centre_to_crosslink[i] = fibres_crosslink_point[i]-position[i];
+                distance_fibre_centre_to_crosslink += fibre_centre_to_crosslink[i]*fibre_centre_to_crosslink[i];
+            }
+            distance_fibre_centre_to_crosslink = sqrt(distance_fibre_centre_to_crosslink);
+
+            std::vector<double> old_orientation(3, 0.0);
+            for (int i = 0; i < 2; i++) {
+                old_orientation[i] = state.orientation[i];
+            }
+            double moment_arm_magnitude = sqrt(
+                    point_of_impact[0] * point_of_impact[0] + point_of_impact[1] * point_of_impact[1]);
+            double impulse = PhysiCell::parameters.doubles("fibre_sticky")*(*cell).phenotype.motility.migration_speed * moment_arm_magnitude;
+            double fibre_length = 2 * mLength;
+            double angular_velocity = impulse / (0.5 * fibre_length * fibre_length);
+            double angle = angular_velocity;
+            state.orientation[0] = old_orientation[0] * cos(angle) - old_orientation[1] * sin(angle);
+            state.orientation[1] = old_orientation[0] * sin(angle) + old_orientation[1] * cos(angle);
+            normalize(&state.orientation);
+            position[0] = fibres_crosslink_point[0]-distance_fibre_centre_to_crosslink*state.orientation[0];
+            position[1] = fibres_crosslink_point[1]-distance_fibre_centre_to_crosslink*state.orientation[1];
+        }
+    }
+
+    return;
+}
+
+
+void PhysiMESS_Fibre::add_potentials_from_fibre(PhysiMESS_Fibre* other_fibre) 
+{
+    /* probably want something here to model tension along fibres
+        * this will be strong tension along the fibre for those fibres with a crosslink
+        * and weak tension with background ECM */
+    return;
+}
 
 void PhysiMESS_Fibre::register_fibre_voxels() {
 

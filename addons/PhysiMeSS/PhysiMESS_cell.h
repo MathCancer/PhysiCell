@@ -2,6 +2,9 @@
 #define __PhysiMESS_cell_h__
 
 #include "PhysiMESS_agent.h"
+#include "PhysiMESS_fibre.h"
+
+class PhysiMESS_Fibre;
 
 // using namespace PhysiCell;
 
@@ -15,6 +18,8 @@ class PhysiMESS_Cell : public PhysiMESS_Agent
     
     PhysiMESS_Cell();
     ~PhysiMESS_Cell() {};
+    
+    void add_potentials_from_fibre(PhysiMESS_Fibre* fibre);
     
     void register_fibre_voxels();
     void deregister_fibre_voxels();

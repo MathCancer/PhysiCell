@@ -27,10 +27,6 @@ void remove_physimess_out_of_bounds_fibres();
 // std::vector<Cell*>& get_neighbors(Cell*);
 // std::list<int>& get_voxels(Cell*);
 
-void add_potentials_cell_to_fibre(PhysiMESS_Cell* cell, PhysiMESS_Fibre* other_agent);
-void add_potentials_fibre_to_cell(PhysiMESS_Fibre* cell, PhysiMESS_Cell* other_agent);
-void add_potentials_fibre_to_fibre(PhysiMESS_Fibre* cell, PhysiMESS_Fibre* other_agent);
-
 // std::vector<double> nearest_point_on_fibre(std::vector<double> point, Cell* fibre_agent , std::vector<double>& displacement);
 // void force_update_motility_vector(Cell* pCell, double dt_);
 

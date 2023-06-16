@@ -3,6 +3,8 @@
 
 #include "PhysiMESS_agent.h"
 
+class PhysiMESS_Cell;
+
 bool isFibre(PhysiCell::Cell* pCell);
 
 bool isFibre(PhysiCell::Cell_Definition * cellDef);
@@ -24,7 +26,9 @@ class PhysiMESS_Fibre : public PhysiMESS_Agent
     void assign_fibre_orientation() ;
     
     void check_out_of_bounds(std::vector<double>& position);
-    
+    void add_potentials_from_fibre(PhysiMESS_Fibre* other_fibre);
+    void add_potentials_from_cell(PhysiMESS_Cell* cell);
+
     void register_fibre_voxels();
     void deregister_fibre_voxels();
     
