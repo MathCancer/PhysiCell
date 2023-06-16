@@ -79,12 +79,7 @@ void PhysiMESS_Fibre::assign_fibre_orientation()
         this->state.orientation[1] = 0.0;
         this->state.orientation[2] = 0.0;
     }
-    //###########################################//
-    
-    // relabel so that the rest of the code works (HACK)
-    // std::cout << ", orientation : " << this->state.orientation << std::endl;
-    
-    // this->type_name = "fibre";   
+    //###########################################// 
 }
 
 void PhysiMESS_Fibre::check_out_of_bounds(std::vector<double>& position)
@@ -175,7 +170,6 @@ void PhysiMESS_Fibre::check_out_of_bounds(std::vector<double>& position)
 
 void PhysiMESS_Fibre::add_potentials_from_cell(PhysiMESS_Cell* cell) 
 {
-    // PhysiMESS_Fibre* pFibre = static_cast<PhysiMESS_Fibre*>(pCell);
     // fibres only get pushed or rotated by motile cells
     if (!cell->phenotype.motility.is_motile || X_crosslink_count >= 2) {
         return;

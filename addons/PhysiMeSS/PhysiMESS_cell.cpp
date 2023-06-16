@@ -149,7 +149,7 @@ void PhysiMESS_Cell::degrade_fibre(PhysiMESS_Fibre* pFibre)
         }
     }
 }
-// !!! PHYSIMESS CODE BLOCK START !!! //
+
 void PhysiMESS_Cell::force_update_motility_vector(double dt_) {
 
     if (!this->phenotype.motility.is_motile) {

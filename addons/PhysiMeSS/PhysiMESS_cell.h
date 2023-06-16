@@ -6,8 +6,6 @@
 
 class PhysiMESS_Fibre;
 
-// using namespace PhysiCell;
-
 class PhysiMESS_Cell : public PhysiMESS_Agent 
 {
     private:

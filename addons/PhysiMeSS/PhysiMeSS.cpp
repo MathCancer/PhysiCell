@@ -22,7 +22,6 @@ void remove_physimess_out_of_bounds_fibres()
 void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 {
     
-    // !!! PHYSIMESS CODE BLOCK START !!! //
     double movement_threshold = 0.05;
     if (!isFibre(pCell) && phenotype.motility.is_motile) {
 	
@@ -35,8 +34,6 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
             static_cast<PhysiMESS_Cell*>(pCell)->stuck_counter = 0;
         }
     }
-    // !!! PHYSIMESS CODE BLOCK END !!! //
-    
     
 	if( pCell->functions.add_cell_basement_membrane_interactions )
 	{
@@ -45,35 +42,24 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
 	
 	pCell->state.simple_pressure = 0.0;
 	pCell->state.neighbors.clear(); // new 1.8.0
-
-    // !!! PHYSIMESS CODE BLOCK START !!! //
     
     if (!isFibre(pCell)) {
         //First check the neighbors in my current voxel
-        std::vector<Cell*>::iterator neighbor;
-        std::vector<Cell*>::iterator end = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
-        for(neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
+        for (auto* neighbor: pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()])
         {
-            if (!isFibre(*neighbor)) {
-                pCell->add_potentials(*neighbor);
+            if (!isFibre(neighbor)) {
+                pCell->add_potentials(neighbor);
             }
         }
-        std::vector<int>::iterator neighbor_voxel_index;
-        std::vector<int>::iterator neighbor_voxel_index_end = 
-            pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].end();
-
-        for( neighbor_voxel_index = 
-            pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()].begin();
-            neighbor_voxel_index != neighbor_voxel_index_end; 
-            ++neighbor_voxel_index )
+        for (auto neighbor_voxel_index: pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()])
         {
-            if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[*neighbor_voxel_index].center, *neighbor_voxel_index))
+            if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[neighbor_voxel_index].center, neighbor_voxel_index))
                 continue;
-            end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
-            for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
+        
+            for (auto* neighbor: pCell->get_container()->agent_grid[neighbor_voxel_index])
             {
-                if (!isFibre(*neighbor)) {
-                    pCell->add_potentials(*neighbor);
+                if (!isFibre(neighbor)) {
+                    pCell->add_potentials(neighbor);
                 }
             }
         }
@@ -90,7 +76,7 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
     //add potentials between pCell and its neighbors
     for (auto* neighbor : static_cast<PhysiMESS_Agent*>(pCell)->physimess_neighbors)
     {
-        // std::cout << (*neighbor)->type_name << " " << (*neighbor)->ID << " " ;
+        // std::cout << neighbor->type_name << " " << neighbor->ID << " " ;
         
         // if( this->ID == other_agent->ID )
         if( pCell != neighbor )
@@ -141,8 +127,7 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
         if(ppCell->unstuck_counter == unstuck_threshold+1){
             ppCell->unstuck_counter = 0;
         }
-        // !!! PHYSIMESS CODE BLOCK END !!! //
-}
+    }
     return;
 
 }
@@ -204,7 +189,7 @@ void physimess_mechanics( double dt )
 
 
 void fibre_agent_SVG(std::ofstream& os, PhysiCell::Cell* pC, double z_slice, std::vector<std::string> (*cell_coloring_function)(Cell*), double X_lower, double Y_lower) {
-	// !!! PHYSIMESS CODE BLOCK START !!! //
+
 	// place a rod if it's a fibre (note fibre already renamed here)
 	if (isFibre(pC) ){
     
@@ -258,7 +243,6 @@ void fibre_agent_legend(std::ofstream& os, Cell_Definition* cell_definition, dou
 	std::vector<std::string> colors = cell_coloring_function(&C); 	
 
 	// place the label 
-	// !!! PHYSIMESS CODE BLOCK START !!! //
 	// place a rod if it's a fibre (note fibre not yet renamed)
 	if (isFibre(&C)) {
 		//Write_SVG_fibre(os, cursor_x, cursor_y , 0.5*temp_cell_radius , 1.0 , colors[1] , colors[0] );
@@ -267,5 +251,4 @@ void fibre_agent_legend(std::ofstream& os, Cell_Definition* cell_definition, dou
 	else {
 		standard_agent_legend(os, cell_definition, cursor_x, cursor_y, cell_coloring_function, temp_cell_radius);
 	}
-	// !!! PHYSIMESS CODE BLOCK END !!! //
 }
