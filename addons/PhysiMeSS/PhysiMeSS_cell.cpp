@@ -1,14 +1,14 @@
-#include "PhysiMESS_cell.h"
-#include "PhysiMESS_fibre.h"
+#include "PhysiMeSS_cell.h"
+#include "PhysiMeSS_fibre.h"
 
-PhysiMESS_Cell::PhysiMESS_Cell()
+PhysiMeSS_Cell::PhysiMeSS_Cell()
 {
     stuck_counter = 0;
     unstuck_counter = 0;
 }
 
 
-void PhysiMESS_Cell::register_fibre_voxels() 
+void PhysiMeSS_Cell::register_fibre_voxels() 
 {
     //a cell will be in one voxel
     int voxel = this->get_container()->underlying_mesh.nearest_voxel_index(this->position);
@@ -16,14 +16,14 @@ void PhysiMESS_Cell::register_fibre_voxels()
 
 }
 
-void PhysiMESS_Cell::deregister_fibre_voxels() {
+void PhysiMeSS_Cell::deregister_fibre_voxels() {
 
     //only do this for fibres
     return;
 }
 
 
-void PhysiMESS_Cell::add_potentials_from_fibre(PhysiMESS_Fibre* pFibre)
+void PhysiMeSS_Cell::add_potentials_from_fibre(PhysiMeSS_Fibre* pFibre)
 {
     
     double distance = 0.0;
@@ -108,7 +108,7 @@ void PhysiMESS_Cell::add_potentials_from_fibre(PhysiMESS_Fibre* pFibre)
 }
 
 
-void PhysiMESS_Cell::degrade_fibre(PhysiMESS_Fibre* pFibre)
+void PhysiMeSS_Cell::degrade_fibre(PhysiMeSS_Fibre* pFibre)
 {
     
     double distance = 0.0;
@@ -141,7 +141,7 @@ void PhysiMESS_Cell::degrade_fibre(PhysiMESS_Fibre* pFibre)
     }
 }
 
-void PhysiMESS_Cell::force_update_motility_vector(double dt_) {
+void PhysiMeSS_Cell::force_update_motility_vector(double dt_) {
 
     if (!this->phenotype.motility.is_motile) {
         this->phenotype.motility.motility_vector.assign(3, 0.0);

@@ -56,7 +56,7 @@ PhysiCell_signal_behavior.o PhysiCell_rules.o
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
-PhysiMeSS_OBJECTS := PhysiMeSS.o PhysiMESS_agent.o PhysiMESS_fibre.o PhysiMESS_cell.o
+PhysiMeSS_OBJECTS := PhysiMeSS.o PhysiMeSS_agent.o PhysiMeSS_fibre.o PhysiMeSS_cell.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
@@ -172,14 +172,14 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 PhysiMeSS.o: ./addons/PhysiMeSS/PhysiMeSS.cpp 
 	$(COMPILE_COMMAND) -c ./addons/PhysiMeSS/PhysiMeSS.cpp
 
-PhysiMESS_agent.o: ./addons/PhysiMeSS/PhysiMESS_agent.cpp 
-	$(COMPILE_COMMAND) -c ./addons/PhysiMeSS/PhysiMESS_agent.cpp
+PhysiMeSS_agent.o: ./addons/PhysiMeSS/PhysiMeSS_agent.cpp 
+	$(COMPILE_COMMAND) -c ./addons/PhysiMeSS/PhysiMeSS_agent.cpp
 
-PhysiMESS_fibre.o: ./addons/PhysiMeSS/PhysiMESS_fibre.cpp 
-	$(COMPILE_COMMAND) -c ./addons/PhysiMeSS/PhysiMESS_fibre.cpp
+PhysiMeSS_fibre.o: ./addons/PhysiMeSS/PhysiMeSS_fibre.cpp 
+	$(COMPILE_COMMAND) -c ./addons/PhysiMeSS/PhysiMeSS_fibre.cpp
 
-PhysiMESS_cell.o: ./addons/PhysiMeSS/PhysiMESS_cell.cpp 
-	$(COMPILE_COMMAND) -c ./addons/PhysiMeSS/PhysiMESS_cell.cpp
+PhysiMeSS_cell.o: ./addons/PhysiMeSS/PhysiMeSS_cell.cpp 
+	$(COMPILE_COMMAND) -c ./addons/PhysiMeSS/PhysiMeSS_cell.cpp
 
 # user-defined PhysiCell modules
 

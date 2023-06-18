@@ -1,15 +1,15 @@
-#ifndef __PhysiMESS_fibre_h__
-#define __PhysiMESS_fibre_h__
+#ifndef __PhysiMeSS_fibre_h__
+#define __PhysiMeSS_fibre_h__
 
-#include "PhysiMESS_agent.h"
+#include "PhysiMeSS_agent.h"
 
-class PhysiMESS_Cell;
+class PhysiMeSS_Cell;
 
 bool isFibre(PhysiCell::Cell* pCell);
 
 bool isFibre(PhysiCell::Cell_Definition * cellDef);
 
-class PhysiMESS_Fibre : public PhysiMESS_Agent
+class PhysiMeSS_Fibre : public PhysiMeSS_Agent
 {
     private:
     public:
@@ -21,20 +21,20 @@ class PhysiMESS_Fibre : public PhysiMESS_Agent
     int X_crosslink_count;
     int fail_count;
     
-    PhysiMESS_Fibre();
-    ~PhysiMESS_Fibre() {};
+    PhysiMeSS_Fibre();
+    ~PhysiMeSS_Fibre() {};
     void assign_fibre_orientation() ;
     
     void check_out_of_bounds(std::vector<double>& position);
-    void add_potentials_from_fibre(PhysiMESS_Fibre* other_fibre);
-    void add_potentials_from_cell(PhysiMESS_Cell* cell);
+    void add_potentials_from_fibre(PhysiMeSS_Fibre* other_fibre);
+    void add_potentials_from_cell(PhysiMeSS_Cell* cell);
 
     void register_fibre_voxels();
     void deregister_fibre_voxels();
     
     std::vector<double> nearest_point_on_fibre(std::vector<double> point, std::vector<double> &displacement);
 
-    void check_fibre_crosslinks(PhysiMESS_Fibre *fibre_neighbor);
+    void check_fibre_crosslinks(PhysiMeSS_Fibre *fibre_neighbor);
     void add_crosslinks();
 
 };

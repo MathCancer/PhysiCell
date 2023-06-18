@@ -96,9 +96,9 @@ Cell* instantiate_physimess_cell();
 Cell* instantiate_physimess_fibre();
 Cell* instantiate_physimess_cell_custom_degrade();
 
-class PhysiMESS_Cell_Custom_Degrade : public PhysiMESS_Cell
+class PhysiMeSS_Cell_Custom_Degrade : public PhysiMeSS_Cell
 {
   public:  
-  void degrade_fibre(PhysiMESS_Fibre* pFibre);
+  void degrade_fibre(PhysiMeSS_Fibre* pFibre);
 };
-// void PhysiMESS_Cell::other_degrade_fibre(PhysiMESS_Fibre* pFibre);
+// void PhysiMeSS_Cell::other_degrade_fibre(PhysiMeSS_Fibre* pFibre);

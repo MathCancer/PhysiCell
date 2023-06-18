@@ -1,15 +1,15 @@
-#include "PhysiMESS_agent.h"
+#include "PhysiMeSS_agent.h"
 
 #include <algorithm>
-// #include "PhysiMESS_fibre.h"
+// #include "PhysiMeSS_fibre.h"
 
-PhysiMESS_Agent::PhysiMESS_Agent()
+PhysiMeSS_Agent::PhysiMeSS_Agent()
 {
     physimess_neighbors.clear();
     physimess_voxels.clear();
 }
 
-std::list<int> PhysiMESS_Agent::find_agent_voxels() {
+std::list<int> PhysiMeSS_Agent::find_agent_voxels() {
 
     // this code is for creating a list of all voxels which either contain the agent
     // or are neighboring voxels of the voxel containing the agent 
@@ -31,7 +31,7 @@ std::list<int> PhysiMESS_Agent::find_agent_voxels() {
     return all_agent_voxels_to_test;
 }
 
-void PhysiMESS_Agent::find_agent_neighbors() {
+void PhysiMeSS_Agent::find_agent_neighbors() {
 
     // this code is for finding all neighbors of an agent: first we call find_agent_voxels
     // to create a list of all the voxels to test, then we search for agents in those voxels

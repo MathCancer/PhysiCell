@@ -3,8 +3,8 @@
 
 #include "../../core/PhysiCell_cell.h"
 #include "../../modules/PhysiCell_pathology.h"
-#include "PhysiMESS_cell.h"
-#include "PhysiMESS_fibre.h"
+#include "PhysiMeSS_cell.h"
+#include "PhysiMeSS_fibre.h"
 
 #include <list>
 

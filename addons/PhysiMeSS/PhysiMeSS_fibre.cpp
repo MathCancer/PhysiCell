@@ -1,5 +1,5 @@
-#include "PhysiMESS_fibre.h"
-#include "PhysiMESS_cell.h"
+#include "PhysiMeSS_fibre.h"
+#include "PhysiMeSS_cell.h"
 #include <algorithm>
 
 bool isFibre(PhysiCell::Cell* pCell) 
@@ -36,9 +36,9 @@ bool isFibre(PhysiCell::Cell_Definition * cellDef)
     );
 }
 
-PhysiMESS_Fibre::PhysiMESS_Fibre() 
+PhysiMeSS_Fibre::PhysiMeSS_Fibre() 
 {
-    // std::cout << "PhysiMESS_Fibre constructor,";
+    // std::cout << "PhysiMeSS_Fibre constructor,";
     fibres_crosslinkers.clear();
     fibres_crosslink_point.clear();
     
@@ -49,7 +49,7 @@ PhysiMESS_Fibre::PhysiMESS_Fibre()
     fail_count = 0;
 }
 
-void PhysiMESS_Fibre::assign_fibre_orientation() 
+void PhysiMeSS_Fibre::assign_fibre_orientation() 
 { 
     this->assign_orientation();
     if (default_microenvironment_options.simulate_2D) {
@@ -82,7 +82,7 @@ void PhysiMESS_Fibre::assign_fibre_orientation()
     //###########################################// 
 }
 
-void PhysiMESS_Fibre::check_out_of_bounds(std::vector<double>& position)
+void PhysiMeSS_Fibre::check_out_of_bounds(std::vector<double>& position)
 {
     double Xmin = BioFVM::get_default_microenvironment()->mesh.bounding_box[0]; 
 	double Ymin = BioFVM::get_default_microenvironment()->mesh.bounding_box[1]; 
@@ -168,7 +168,7 @@ void PhysiMESS_Fibre::check_out_of_bounds(std::vector<double>& position)
 }
 
 
-void PhysiMESS_Fibre::add_potentials_from_cell(PhysiMESS_Cell* cell) 
+void PhysiMeSS_Fibre::add_potentials_from_cell(PhysiMeSS_Cell* cell) 
 {
     // fibres only get pushed or rotated by motile cells
     if (!cell->phenotype.motility.is_motile || X_crosslink_count >= 2) {
@@ -263,7 +263,7 @@ void PhysiMESS_Fibre::add_potentials_from_cell(PhysiMESS_Cell* cell)
 }
 
 
-void PhysiMESS_Fibre::add_potentials_from_fibre(PhysiMESS_Fibre* other_fibre) 
+void PhysiMeSS_Fibre::add_potentials_from_fibre(PhysiMeSS_Fibre* other_fibre) 
 {
     /* probably want something here to model tension along fibres
         * this will be strong tension along the fibre for those fibres with a crosslink
@@ -271,7 +271,7 @@ void PhysiMESS_Fibre::add_potentials_from_fibre(PhysiMESS_Fibre* other_fibre)
     return;
 }
 
-void PhysiMESS_Fibre::register_fibre_voxels() {
+void PhysiMeSS_Fibre::register_fibre_voxels() {
 
     int voxel;
     int voxel_size = this->get_container()->underlying_mesh.dx; // note this must be the same as the mechanics_voxel_size
@@ -313,7 +313,7 @@ void PhysiMESS_Fibre::register_fibre_voxels() {
     physimess_voxels.unique();
 }
 
-void PhysiMESS_Fibre::deregister_fibre_voxels() 
+void PhysiMeSS_Fibre::deregister_fibre_voxels() 
 {
     int centre_voxel = this->get_container()->underlying_mesh.nearest_voxel_index(this->position);
     for (int voxel: physimess_voxels) {
@@ -324,7 +324,7 @@ void PhysiMESS_Fibre::deregister_fibre_voxels()
 }
 
 
-std::vector<double> PhysiMESS_Fibre::nearest_point_on_fibre(std::vector<double> point, std::vector<double> &displacement) 
+std::vector<double> PhysiMeSS_Fibre::nearest_point_on_fibre(std::vector<double> point, std::vector<double> &displacement) 
 {
 
     // don't bother if the "fibre_agent" is not a fibre
@@ -382,7 +382,7 @@ std::vector<double> PhysiMESS_Fibre::nearest_point_on_fibre(std::vector<double> 
 
 
 
-void PhysiMESS_Fibre::check_fibre_crosslinks(PhysiMESS_Fibre *fibre_neighbor) {
+void PhysiMeSS_Fibre::check_fibre_crosslinks(PhysiMeSS_Fibre *fibre_neighbor) {
 
     if (this == fibre_neighbor) { return; }
 
@@ -509,12 +509,12 @@ void PhysiMESS_Fibre::check_fibre_crosslinks(PhysiMESS_Fibre *fibre_neighbor) {
 }
 
 
-void PhysiMESS_Fibre::add_crosslinks() 
+void PhysiMeSS_Fibre::add_crosslinks() 
 {
     for (auto* neighbor : physimess_neighbors)
     {
         if (isFibre(neighbor)) {
-            this->check_fibre_crosslinks(static_cast<PhysiMESS_Fibre*>(neighbor));
+            this->check_fibre_crosslinks(static_cast<PhysiMeSS_Fibre*>(neighbor));
         }
     }
 }

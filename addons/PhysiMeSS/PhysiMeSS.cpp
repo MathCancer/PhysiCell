@@ -9,7 +9,7 @@ static double last_update_time = -mechanics_dt;
 void remove_physimess_out_of_bounds_fibres()
 {
     for (auto* cell : *all_cells) {
-        if (isFibre(cell) && static_cast<PhysiMESS_Fibre*>(cell)->fail_count >= 10)
+        if (isFibre(cell) && static_cast<PhysiMeSS_Fibre*>(cell)->fail_count >= 10)
         {
             std::cout << "I failed to place " << cell->type_name << " " 
                       << cell->ID << " in the domain - I am deleting agent " 
@@ -29,9 +29,9 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
         // So I'm using the previous velocity, which is not exactly the same (because of Adams-Bashforth), but is a good proxy
         // if (dist(pCell->old_position, pCell->position) < movement_threshold) {
         if (norm(pCell->get_previous_velocity())*mechanics_dt < movement_threshold) {
-			static_cast<PhysiMESS_Cell*>(pCell)->stuck_counter++;
+			static_cast<PhysiMeSS_Cell*>(pCell)->stuck_counter++;
         } else {
-            static_cast<PhysiMESS_Cell*>(pCell)->stuck_counter = 0;
+            static_cast<PhysiMeSS_Cell*>(pCell)->stuck_counter = 0;
         }
     }
     
@@ -65,16 +65,16 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
         }
     } else {
         // Count crosslinks
-        static_cast<PhysiMESS_Fibre*>(pCell)->X_crosslink_count = 0;
-        if (static_cast<PhysiMESS_Fibre*>(pCell)->fibres_crosslinkers.size() > 0){
-            static_cast<PhysiMESS_Fibre*>(pCell)->X_crosslink_count = static_cast<PhysiMESS_Fibre*>(pCell)->fibres_crosslinkers.size();
+        static_cast<PhysiMeSS_Fibre*>(pCell)->X_crosslink_count = 0;
+        if (static_cast<PhysiMeSS_Fibre*>(pCell)->fibres_crosslinkers.size() > 0){
+            static_cast<PhysiMeSS_Fibre*>(pCell)->X_crosslink_count = static_cast<PhysiMeSS_Fibre*>(pCell)->fibres_crosslinkers.size();
         }
 
     }
 
     // std::cout << " AGENT " << pCell->type_name << " " << pCell->ID << " has " ;
     //add potentials between pCell and its neighbors
-    for (auto* neighbor : static_cast<PhysiMESS_Agent*>(pCell)->physimess_neighbors)
+    for (auto* neighbor : static_cast<PhysiMeSS_Agent*>(pCell)->physimess_neighbors)
     {
         // std::cout << neighbor->type_name << " " << neighbor->ID << " " ;
         
@@ -86,11 +86,11 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
                 continue;
             } else 
             if (!isFibre(pCell) && isFibre(neighbor)) {
-                static_cast<PhysiMESS_Cell*>(pCell)->add_potentials_from_fibre(static_cast<PhysiMESS_Fibre*>(neighbor));
+                static_cast<PhysiMeSS_Cell*>(pCell)->add_potentials_from_fibre(static_cast<PhysiMeSS_Fibre*>(neighbor));
             } else  if (isFibre(pCell) && !isFibre(neighbor)) {
-                static_cast<PhysiMESS_Fibre*>(pCell)->add_potentials_from_cell(static_cast<PhysiMESS_Cell*>(neighbor));
+                static_cast<PhysiMeSS_Fibre*>(pCell)->add_potentials_from_cell(static_cast<PhysiMeSS_Cell*>(neighbor));
             } else if (isFibre(pCell) && isFibre(neighbor)) {
-                static_cast<PhysiMESS_Fibre*>(pCell)->add_potentials_from_fibre(static_cast<PhysiMESS_Fibre*>(neighbor));
+                static_cast<PhysiMeSS_Fibre*>(pCell)->add_potentials_from_fibre(static_cast<PhysiMeSS_Fibre*>(neighbor));
             } else {
                 std::cout << " WARNING: interaction between errant cell-types has been called : " << pCell->type_name << ", " << neighbor->type_name << std::endl;
                 return;
@@ -101,7 +101,7 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
 
     if (!isFibre(pCell)) {
         
-        PhysiMESS_Cell* ppCell = static_cast<PhysiMESS_Cell*>(pCell);
+        PhysiMeSS_Cell* ppCell = static_cast<PhysiMeSS_Cell*>(pCell);
         int stuck_threshold = 10;
         int unstuck_threshold = 1;
 
@@ -144,10 +144,10 @@ void physimess_mechanics( double dt )
         {
             Cell* pC = (*all_cells)[i];
             
-            static_cast<PhysiMESS_Agent*>(pC)->physimess_voxels.clear();
+            static_cast<PhysiMeSS_Agent*>(pC)->physimess_voxels.clear();
             if( !pC->is_out_of_domain )
             {
-                static_cast<PhysiMESS_Agent*>(pC)->register_fibre_voxels();
+                static_cast<PhysiMeSS_Agent*>(pC)->register_fibre_voxels();
             }
         }
 
@@ -155,13 +155,13 @@ void physimess_mechanics( double dt )
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
-            static_cast<PhysiMESS_Agent*>(pC)->physimess_neighbors.clear();
+            static_cast<PhysiMeSS_Agent*>(pC)->physimess_neighbors.clear();
             if (isFibre(pC)) {
-                static_cast<PhysiMESS_Fibre*>(pC)->fibres_crosslinkers.clear();
+                static_cast<PhysiMeSS_Fibre*>(pC)->fibres_crosslinkers.clear();
             }
             if( !pC->is_out_of_domain )
             {
-                static_cast<PhysiMESS_Agent*>(pC)->find_agent_neighbors();
+                static_cast<PhysiMeSS_Agent*>(pC)->find_agent_neighbors();
             }
         }
 
@@ -171,7 +171,7 @@ void physimess_mechanics( double dt )
             Cell* pC = (*all_cells)[i];
             if( !pC->is_out_of_domain )
             {
-                static_cast<PhysiMESS_Agent*>(pC)->deregister_fibre_voxels();
+                static_cast<PhysiMeSS_Agent*>(pC)->deregister_fibre_voxels();
             }
         }
         
@@ -181,7 +181,7 @@ void physimess_mechanics( double dt )
         {
             Cell* pC = (*all_cells)[i];
             if (isFibre(pC)) {
-                static_cast<PhysiMESS_Fibre*>(pC)->add_crosslinks();
+                static_cast<PhysiMeSS_Fibre*>(pC)->add_crosslinks();
             }
         }
     }
@@ -193,7 +193,7 @@ void fibre_agent_SVG(std::ofstream& os, PhysiCell::Cell* pC, double z_slice, std
 	// place a rod if it's a fibre (note fibre already renamed here)
 	if (isFibre(pC) ){
     
-        PhysiMESS_Fibre* pFibre = static_cast<PhysiMESS_Fibre*>(pC);
+        PhysiMeSS_Fibre* pFibre = static_cast<PhysiMeSS_Fibre*>(pC);
 		int crosslinks = pFibre->X_crosslink_count;
         if (crosslinks >= 3){
 			// if fibre has cross-links different colour than if not

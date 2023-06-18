@@ -1,5 +1,5 @@
-#ifndef __PhysiMESS_agent_h__
-#define __PhysiMESS_agent_h__
+#ifndef __PhysiMeSS_agent_h__
+#define __PhysiMeSS_agent_h__
 
 
 #include <list>
@@ -8,7 +8,7 @@
 
 // using namespace PhysiCell;
 
-class PhysiMESS_Agent : public PhysiCell::Cell 
+class PhysiMeSS_Agent : public PhysiCell::Cell 
 {
     private:
     public:
@@ -16,8 +16,8 @@ class PhysiMESS_Agent : public PhysiCell::Cell
     std::vector<PhysiCell::Cell*> physimess_neighbors; 
     std::list<int> physimess_voxels;
     
-    PhysiMESS_Agent();
-    virtual ~PhysiMESS_Agent(){};
+    PhysiMeSS_Agent();
+    virtual ~PhysiMeSS_Agent(){};
     
     virtual void register_fibre_voxels() {};
     virtual void deregister_fibre_voxels() {};

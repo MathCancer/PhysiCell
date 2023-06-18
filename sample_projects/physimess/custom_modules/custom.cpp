@@ -218,7 +218,7 @@ void setup_tissue( void )
             /* fibre positions are given by csv
                assign fibre orientation and test whether out of bounds */
             isFibreFromFile = true;
-			static_cast<PhysiMESS_Fibre*>((*all_cells)[i])->assign_fibre_orientation();
+			static_cast<PhysiMeSS_Fibre*>((*all_cells)[i])->assign_fibre_orientation();
 			
         } 
     }
@@ -259,7 +259,7 @@ void setup_tissue( void )
 
                     pC = create_cell(*pCD);
 
-                    static_cast<PhysiMESS_Fibre*>(pC)->check_out_of_bounds(position);
+                    static_cast<PhysiMeSS_Fibre*>(pC)->check_out_of_bounds(position);
                     
                     pC->assign_position(position);
                 }
@@ -318,12 +318,12 @@ void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
 { return; } 
 
-Cell* instantiate_physimess_cell() { return new PhysiMESS_Cell; }
-Cell* instantiate_physimess_fibre() { return new PhysiMESS_Fibre; }
-Cell* instantiate_physimess_cell_custom_degrade() { return new PhysiMESS_Cell_Custom_Degrade; }
+Cell* instantiate_physimess_cell() { return new PhysiMeSS_Cell; }
+Cell* instantiate_physimess_fibre() { return new PhysiMeSS_Fibre; }
+Cell* instantiate_physimess_cell_custom_degrade() { return new PhysiMeSS_Cell_Custom_Degrade; }
 
 
-void PhysiMESS_Cell_Custom_Degrade::degrade_fibre(PhysiMESS_Fibre* pFibre)
+void PhysiMeSS_Cell_Custom_Degrade::degrade_fibre(PhysiMeSS_Fibre* pFibre)
 {
 	// Here this version of the degrade function takes cell pressure into account in the degradation rate
     double distance = 0.0;
