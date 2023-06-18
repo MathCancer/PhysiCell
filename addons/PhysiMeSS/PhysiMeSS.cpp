@@ -11,9 +11,9 @@ void remove_physimess_out_of_bounds_fibres()
     for (auto* cell : *all_cells) {
         if (isFibre(cell) && static_cast<PhysiMeSS_Fibre*>(cell)->fail_count >= 10)
         {
-            std::cout << "I failed to place " << cell->type_name << " " 
-                      << cell->ID << " in the domain - I am deleting agent " 
-                      << std::endl;
+            // std::cout << "I failed to place " << cell->type_name << " " 
+            //           << cell->ID << " in the domain - I am deleting agent " 
+            //           << std::endl;
             delete_cell(cell);
         }
     }
@@ -92,7 +92,7 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
             } else if (isFibre(pCell) && isFibre(neighbor)) {
                 static_cast<PhysiMeSS_Fibre*>(pCell)->add_potentials_from_fibre(static_cast<PhysiMeSS_Fibre*>(neighbor));
             } else {
-                std::cout << " WARNING: interaction between errant cell-types has been called : " << pCell->type_name << ", " << neighbor->type_name << std::endl;
+                // std::cout << " WARNING: interaction between errant cell-types has been called : " << pCell->type_name << ", " << neighbor->type_name << std::endl;
                 return;
             }
         }

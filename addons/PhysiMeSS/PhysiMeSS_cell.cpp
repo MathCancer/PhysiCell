@@ -121,10 +121,10 @@ void PhysiMeSS_Cell::degrade_fibre(PhysiMeSS_Fibre* pFibre)
     // Fibre degradation by cell - switched on by flag fibre_degradation
     double stuck_threshold = PhysiCell::parameters.doubles("fibre_stuck_time");
     if (PhysiCell::parameters.bools("fibre_degradation") && stuck_counter >= stuck_threshold) {
-        if (stuck_counter >= stuck_threshold){
-            std::cout << "Cell " << ID << " is stuck at time " << PhysiCell::PhysiCell_globals.current_time
-                        << " near fibre " << pFibre->ID  << std::endl;;
-        }
+        // if (stuck_counter >= stuck_threshold){
+        //     std::cout << "Cell " << ID << " is stuck at time " << PhysiCell::PhysiCell_globals.current_time
+        //                 << " near fibre " << pFibre->ID  << std::endl;;
+        // }
         displacement *= -1.0/distance;
         double dotproduct = dot_product(displacement, phenotype.motility.motility_vector);
         if (dotproduct >= 0) {
@@ -134,7 +134,7 @@ void PhysiMeSS_Cell::degrade_fibre(PhysiMeSS_Fibre* pFibre)
                 //std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
                 // (*other_agent).parameters.degradation_flag = true;
                 pFibre->flag_for_removal();
-                std::cout << "Degrading fibre agent " << pFibre->ID << " using flag for removal !!" << std::endl;
+                // std::cout << "Degrading fibre agent " << pFibre->ID << " using flag for removal !!" << std::endl;
                 stuck_counter = 0;
             }
         }

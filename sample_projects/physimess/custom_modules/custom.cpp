@@ -233,7 +233,7 @@ void setup_tissue( void )
         for( int k=0; k < cell_definitions_by_index.size() ; k++ ) {
 
             Cell_Definition *pCD = cell_definitions_by_index[k];
-            std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl;
+            // std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl;
             
             if (!isFibre(pCD))
             {
@@ -269,7 +269,7 @@ void setup_tissue( void )
 
     remove_physimess_out_of_bounds_fibres();
     
-    std::cout << std::endl;
+    // std::cout << std::endl;
 }
 
 std::vector<std::string> paint_by_cell_pressure( Cell* pCell ){
@@ -339,14 +339,14 @@ void PhysiMeSS_Cell_Custom_Degrade::degrade_fibre(PhysiMeSS_Fibre* pFibre)
         double pressure_threshold = PhysiCell::parameters.doubles("fibre_pressure_threshold");
         if (PhysiCell::parameters.bools("fibre_degradation") && (stuck_counter >= stuck_threshold
                                                         || state.simple_pressure > pressure_threshold)) {
-            if (stuck_counter >= stuck_threshold){
-                std::cout << "Cell " << ID << " is stuck at time " << PhysiCell::PhysiCell_globals.current_time
-                            << " near fibre " << pFibre->ID  << std::endl;;
-            }
-            if (state.simple_pressure > pressure_threshold){
-                std::cout << "Cell " << ID << " is under pressure of " << state.simple_pressure << " at "
-                            << PhysiCell::PhysiCell_globals.current_time << " near fibre " << pFibre->ID  << std::endl;;
-            }
+            // if (stuck_counter >= stuck_threshold){
+            //     std::cout << "Cell " << ID << " is stuck at time " << PhysiCell::PhysiCell_globals.current_time
+            //                 << " near fibre " << pFibre->ID  << std::endl;;
+            // }
+            // if (state.simple_pressure > pressure_threshold){
+            //     std::cout << "Cell " << ID << " is under pressure of " << state.simple_pressure << " at "
+            //                 << PhysiCell::PhysiCell_globals.current_time << " near fibre " << pFibre->ID  << std::endl;;
+            // }
             displacement *= -1.0/distance;
             double dotproduct = dot_product(displacement, phenotype.motility.motility_vector);
             if (dotproduct >= 0) {
@@ -359,7 +359,7 @@ void PhysiMeSS_Cell_Custom_Degrade::degrade_fibre(PhysiMeSS_Fibre* pFibre)
                     //std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
                     // (*other_agent).parameters.degradation_flag = true;
                     pFibre->flag_for_removal();
-                    std::cout << "Degrading fibre agent " << pFibre->ID << " using flag for removal !!" << std::endl;
+                    // std::cout << "Degrading fibre agent " << pFibre->ID << " using flag for removal !!" << std::endl;
                     stuck_counter = 0;
                 }
             }
