@@ -40,38 +40,11 @@ std::vector<PhysiCell::Cell_Definition*>* getFibreCellDefinitions() {
     std::vector<PhysiCell::Cell_Definition*>* result = new std::vector<PhysiCell::Cell_Definition*>();
     PhysiCell::Cell_Definition* pCD;
     
-    pCD = PhysiCell::find_cell_definition("ecm");
-	if (pCD) {
-        result->push_back(pCD);
-	}
-	pCD = PhysiCell::find_cell_definition("matrix");
-	if (pCD){
-        result->push_back(pCD);
-    }
-	
-	pCD = PhysiCell::find_cell_definition("fiber");
-	if (pCD) {
-        result->push_back(pCD);
-    }
-	
-	pCD = PhysiCell::find_cell_definition("fibre");
-	if (pCD) {
-        result->push_back(pCD);
-    }
     
-	pCD = PhysiCell::find_cell_definition("rod");
-	if (pCD) {
-        result->push_back(pCD);
-    }
-    
-	pCD = PhysiCell::find_cell_definition("fibre_horizontal");
-	if (pCD) {
-        result->push_back(pCD);
-    }
-
-	pCD = PhysiCell::find_cell_definition("fibre_vertical");
-	if (pCD) {
-        result->push_back(pCD);
+    for (auto& cd_name: PhysiCell::cell_definitions_by_name) {
+        if (isFibre(cd_name.second)) {
+            result->push_back(cd_name.second);
+        }
     }
     
     return result;
