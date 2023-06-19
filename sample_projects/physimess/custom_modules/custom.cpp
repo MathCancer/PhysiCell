@@ -260,7 +260,8 @@ void setup_tissue( void )
                     pC = create_cell(*pCD);
 
                     static_cast<PhysiMeSS_Fibre*>(pC)->check_out_of_bounds(position);
-                    
+                    static_cast<PhysiMeSS_Fibre*>(pC)->assign_fibre_orientation();
+
                     pC->assign_position(position);
                 }
             }
