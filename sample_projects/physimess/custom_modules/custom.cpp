@@ -84,7 +84,7 @@ void create_cell_types( void )
 	initialize_default_cell_definition(); 
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 
-	if (PhysiCell::parameters.bools("fibre_degradation_depends_on_pressure"))
+	if (PhysiCell::parameters.bools("fibre_custom_degradation"))
 		cell_defaults.functions.instantiate_cell = instantiate_physimess_cell_custom_degrade;	
 	else
 		cell_defaults.functions.instantiate_cell = instantiate_physimess_cell;	
