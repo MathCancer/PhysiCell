@@ -9,6 +9,8 @@ bool isFibre(PhysiCell::Cell* pCell);
 
 bool isFibre(PhysiCell::Cell_Definition * cellDef);
 
+std::vector<PhysiCell::Cell_Definition*>* getFibreCellDefinitions();
+
 class PhysiMeSS_Fibre : public PhysiMeSS_Agent
 {
     private:

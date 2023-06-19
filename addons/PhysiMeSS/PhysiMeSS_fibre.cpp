@@ -36,6 +36,47 @@ bool isFibre(PhysiCell::Cell_Definition * cellDef)
     );
 }
 
+std::vector<PhysiCell::Cell_Definition*>* getFibreCellDefinitions() {
+    std::vector<PhysiCell::Cell_Definition*>* result = new std::vector<PhysiCell::Cell_Definition*>();
+    PhysiCell::Cell_Definition* pCD;
+    
+    pCD = PhysiCell::find_cell_definition("ecm");
+	if (pCD) {
+        result->push_back(pCD);
+	}
+	pCD = PhysiCell::find_cell_definition("matrix");
+	if (pCD){
+        result->push_back(pCD);
+    }
+	
+	pCD = PhysiCell::find_cell_definition("fiber");
+	if (pCD) {
+        result->push_back(pCD);
+    }
+	
+	pCD = PhysiCell::find_cell_definition("fibre");
+	if (pCD) {
+        result->push_back(pCD);
+    }
+    
+	pCD = PhysiCell::find_cell_definition("rod");
+	if (pCD) {
+        result->push_back(pCD);
+    }
+    
+	pCD = PhysiCell::find_cell_definition("fibre_horizontal");
+	if (pCD) {
+        result->push_back(pCD);
+    }
+
+	pCD = PhysiCell::find_cell_definition("fibre_vertical");
+	if (pCD) {
+        result->push_back(pCD);
+    }
+    
+    return result;
+}
+	
 PhysiMeSS_Fibre::PhysiMeSS_Fibre() 
 {
     // std::cout << "PhysiMeSS_Fibre constructor,";

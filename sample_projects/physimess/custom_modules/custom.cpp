@@ -132,37 +132,12 @@ void create_cell_types( void )
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
     
-	Cell_Definition* pCD;
-	pCD = PhysiCell::find_cell_definition("ecm");
-	if (pCD) {
+	for (auto* pCD: *getFibreCellDefinitions()){
 		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
 		pCD->functions.plot_agent_SVG = fibre_agent_SVG;
 		pCD->functions.plot_agent_legend = fibre_agent_legend;
 	
 	}
-	pCD = PhysiCell::find_cell_definition("matrix");
-	if (pCD) 
-		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
-	
-	pCD = PhysiCell::find_cell_definition("fiber");
-	if (pCD) 
-		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
-	
-	pCD = PhysiCell::find_cell_definition("fibre");
-	if (pCD) 
-		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
-	
-	pCD = PhysiCell::find_cell_definition("rod");
-	if (pCD) 
-		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
-	
-	pCD = PhysiCell::find_cell_definition("fibre_horizontal");
-	if (pCD) 
-		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
-	
-	pCD = PhysiCell::find_cell_definition("fibre_vertical");
-	if (pCD) 
-		pCD->functions.instantiate_cell = instantiate_physimess_fibre;
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
