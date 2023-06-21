@@ -144,7 +144,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 	#pragma omp parallel for 
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
-		if( (*all_cells)[i]->is_out_of_domain == false && initialzed ) {
+		if( (*all_cells)[i]->is_out_of_domain == false && !(*all_cells)[i]->phenotype.death.dead && initialzed ) {
 
 			if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
 			{
