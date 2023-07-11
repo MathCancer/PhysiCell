@@ -17,7 +17,7 @@ class PhysiMeSS_Cell : public PhysiMeSS_Agent
     PhysiMeSS_Cell();
     ~PhysiMeSS_Cell() {};
     
-    void add_potentials_from_fibre(PhysiMeSS_Fibre* fibre);
+    virtual void add_potentials_from_fibre(PhysiMeSS_Fibre* fibre);
     
     void register_fibre_voxels();
     void deregister_fibre_voxels();
