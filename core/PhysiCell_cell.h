@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -78,6 +78,7 @@
 #include "../modules/PhysiCell_settings.h" 
 
 #include "./PhysiCell_standard_models.h" 
+#include "./PhysiCell_rules.h"
 
 using namespace BioFVM; 
 
@@ -120,6 +121,8 @@ class Cell_Definition
  public: 
 	int type; 
 	std::string name; 
+
+	bool is_movable; 
  
 	Microenvironment* pMicroenvironment; 
 	
@@ -140,13 +143,20 @@ class Cell_State
  private:
  public:
 	std::vector<Cell*> attached_cells; 
+	std::vector<Cell*> spring_attachments; 
 
-	std::vector<Cell*> neighbors; // not currently tracked! 
+	std::vector<Cell*> neighbors; 
 	std::vector<double> orientation;
 	
 	double simple_pressure; 
 	
 	int number_of_attached_cells( void ); 
+
+	int number_of_nuclei; 
+	
+	double damage; 
+	double total_attack_time; 
+	bool contact_with_basement_membrane; // not implemented yet 
 	
 	Cell_State(); 
 };
@@ -202,8 +212,6 @@ class Cell : public Basic_Agent
 	void set_target_radius(double); 
 	void set_radius(double); 
 	
-	
-	
 	// mechanics 
 	void update_position( double dt ); //
 	std::vector<double> displacement; // this should be moved to state, or made private  
@@ -218,10 +226,16 @@ class Cell : public Basic_Agent
 	void copy_data(Cell *);
 	
 	void ingest_cell( Cell* pCell_to_eat ); // for use in predation, e.g., immune cells 
+	void attack_cell( Cell* pCell_to_attack , double dt ); 
+	void fuse_cell( Cell* pCell_to_fuse ); // done 
 
 	void attach_cell( Cell* pAddMe ); // done 
 	void detach_cell( Cell* pRemoveMe ); // done 
 	void remove_all_attached_cells( void ); // done 
+
+	void attach_cell_as_spring( Cell* pAddMe ); // done 
+	void detach_cell_as_spring( Cell* pRemoveMe ); // done 
+	void remove_all_spring_attachments( void ); // done 
 
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 
@@ -240,7 +254,6 @@ class Cell : public Basic_Agent
 Cell* create_cell( void );  
 Cell* create_cell( Cell_Definition& cd );  
 
-
 void delete_cell( int ); 
 void delete_cell( Cell* ); 
 void save_all_cells_to_matlab( std::string filename ); 
@@ -253,11 +266,18 @@ extern std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name
 extern std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
 extern std::vector<Cell_Definition*> cell_definitions_by_index; // works 
 
+extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+extern std::unordered_map<int,int> cell_definition_indices_by_type; 
+
 void display_cell_definitions( std::ostream& os ); // done 
 void build_cell_definitions_maps( void ); // done 
+void prebuild_cell_definition_index_maps( void ); // done 
 
 Cell_Definition* find_cell_definition( std::string search_string ); // done 
 Cell_Definition* find_cell_definition( int search_type );  
+
+int find_cell_definition_index( std::string search_string ); // done 
+int find_cell_definition_index( int search_type );  // done 
 
 Cell_Definition& get_cell_definition( std::string search_string ); // done 
 Cell_Definition& get_cell_definition( int search_type );  
@@ -270,6 +290,10 @@ extern std::vector<double> (*cell_division_orientation)(void);
 
 void attach_cells( Cell* pCell_1, Cell* pCell_2 );
 void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
+
+void attach_cells_as_spring( Cell* pCell_1, Cell* pCell_2 );
+void detach_cells_as_spring( Cell* pCell_1 , Cell* pCell_2 );
+
 
 std::vector<Cell*> find_nearby_cells( Cell* pCell ); // new in 1.8.0
 std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell ); // new in 1.8.0

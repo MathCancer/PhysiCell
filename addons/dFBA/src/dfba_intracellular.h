@@ -76,7 +76,8 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	void update(){ };
 
 	void update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt);
-    
+    void inherit(PhysiCell::Cell * cell) {}
+	
 	int update_phenotype_parameters(PhysiCell::Phenotype& phenotype);
 	bool has_variable(std::string name) { return true; }
 
@@ -95,6 +96,7 @@ class dFBAIntracellular : public PhysiCell::Intracellular
          void print_current_nodes() {}
 	
         // static void save_PhysiBoSS(std::string path, std::string index);
+	void display(std::ostream&os) {}
 	static void save_dFBA(std::string path, std::string index);
 };
 

@@ -127,6 +127,11 @@ PhysiCell_Settings::PhysiCell_Settings()
 	
 	SVG_save_interval = 60; 
 	enable_SVG_saves = true; 
+	enable_substrate_plot = false;
+	substrate_to_monitor = "oxygen"; 
+	limits_substrate_plot = false;
+	min_concentration = -1.0;
+	max_concentration = -1.0;
 
 	intracellular_save_interval = 60;  
 	enable_intracellular_saves = false; 
@@ -134,6 +139,10 @@ PhysiCell_Settings::PhysiCell_Settings()
 	// parallel options 
 	
 	omp_num_threads = 4; 
+
+	rules_enabled = false; 
+	rules_protocol = "Cell Behavior Hypothesis Grammar (CBHG)"; 
+	rules_protocol_version = "1.0"; 
 	 
 	return; 
 }
@@ -186,6 +195,19 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	node = xml_find_node( node , "SVG" ); 
 	SVG_save_interval = xml_get_double_value( node , "interval" );
 	enable_SVG_saves = xml_get_bool_value( node , "enable" ); 
+
+	pugi::xml_node node_plot_substrate; 
+	node_plot_substrate = xml_find_node( node , "plot_substrate" );
+	enable_substrate_plot = node_plot_substrate.attribute("enabled").as_bool();
+	limits_substrate_plot = node_plot_substrate.attribute("limits").as_bool();
+
+	if(enable_substrate_plot){
+		substrate_to_monitor = xml_get_string_value(node_plot_substrate, "substrate");
+		if (limits_substrate_plot) {
+			min_concentration = xml_get_double_value(node_plot_substrate, "min_conc");
+			max_concentration = xml_get_double_value(node_plot_substrate, "max_conc");
+		}
+	};
 	node = node.parent(); 
 
 	node = xml_find_node( node , "intracellular_data" ); 
@@ -223,7 +245,15 @@ void PhysiCell_Settings::read_from_pugixml( void )
 			cell_division_orientation = LegacyRandomOnUnitSphere; 
 		}
 	
+		settings = xml_get_bool_value( node_options, "disable_automated_spring_adhesions" ); 
+		if( settings )
+		{
+			std::cout << "Disabling automated spring adhesions and detachments!" << std::endl; 
+			PhysiCell_settings.disable_automated_spring_adhesions = true; 
+		}
+
 		// other options can go here, eventually 
+
 	}
 	
 	// domain options 
@@ -354,6 +384,11 @@ T& Parameters<T>::operator()( int i )
 template <class T>
 T& Parameters<T>::operator()( std::string str )
 {
+	if (name_to_index_map.find(str) == name_to_index_map.end())
+	{
+		std::cerr << "ERROR : Unknown parameter " << str << " ! Quitting." << std::endl;
+		exit(-1);
+	}
 	return parameters[ name_to_index_map[str] ].value; 
 }
 
@@ -366,6 +401,11 @@ Parameter<T>& Parameters<T>::operator[]( int i )
 template <class T>
 Parameter<T>& Parameters<T>::operator[]( std::string str )
 {
+	if (name_to_index_map.find(str) == name_to_index_map.end())
+	{
+		std::cerr << "ERROR : Unknown parameter " << str << " ! Quitting." << std::endl;
+		exit(-1);
+	}
 	return parameters[ name_to_index_map[str] ]; 
 }
 
@@ -373,7 +413,11 @@ Parameter<T>& Parameters<T>::operator[]( std::string str )
 template <class T>
 int Parameters<T>::find_index( std::string search_name )
 {
-	return name_to_index_map[ search_name ]; 
+	auto out = name_to_index_map.find( search_name ); 
+	if( out != name_to_index_map.end() )
+	{ return out->second; }
+	return -1; 
+	// return name_to_index_map[ search_name ]; 
 }
 
 

@@ -104,7 +104,7 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">360</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		
@@ -121,6 +121,7 @@
 	<options>
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
 		<virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
+        <disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
 	</options>	
 
 	<microenvironment_setup>
@@ -224,10 +225,10 @@
 						</phase_durations>
 						
 						<parameters>
-							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
-							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
-							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
-							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
 							<calcification_rate units="1/min">0</calcification_rate>
 							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
 						</parameters>
@@ -253,11 +254,18 @@
 					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
 					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
 					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
-					
+  					<cell_adhesion_affinities>
+	  					<cell_adhesion_affinity name="default">1</cell_adhesion_affinity> 
+		  			</cell_adhesion_affinities>					
 					<options>
 						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
 						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
 					</options>
+                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
+                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
+                    <attachment_elastic_constant type="double" units="1/min">0.01</attachment_elastic_constant> 
+                    <attachment_rate type="double" units="1/min">0.0</attachment_rate> 
+                    <detachment_rate type="double" units="1/min">0.0</detachment_rate> 
 				</mechanics>
 				
 				<motility>  
@@ -285,10 +293,30 @@
 					</substrate> 
 				</secretion>
 
+				<cell_interactions>
+				<dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+				<live_phagocytosis_rates>
+					<phagocytosis_rate name="default" units="1/min">0</phagocytosis_rate>
+				</live_phagocytosis_rates>
+				<attack_rates>
+					<attack_rate name="default" units="1/min">0</attack_rate>
+				</attack_rates>
+				<damage_rate units="1/min">1</damage_rate>
+				<fusion_rates>
+					<fusion_rate name="default" units="1/min">0</fusion_rate>
+				</fusion_rates>
+				</cell_interactions>
+				<cell_transformations>
+					<transformation_rates>
+						<transformation_rate name="default" units="1/min">0</transformation_rate>
+					</transformation_rates>
+				</cell_transformations>
+
+
 				<molecular />
 			</phenotype>
 			<custom_data>  
-				<sample units="dimensionless">1.0</sample>
+				<sample units="dimensionless" conserved="false">1.0</sample>
 			</custom_data>
 		</cell_definition>
 	</cell_definitions>
@@ -299,6 +327,16 @@
 			<filename>cells.csv</filename>
 		</cell_positions>
 	</initial_conditions>	
+	
+    <cell_rules>
+        <rulesets>
+            <ruleset protocol="CBHG" version="2.0" format="csv" enabled="false">
+                <folder>./config</folder>
+                <filename>cell_rules.csv</filename>
+            </ruleset>
+        </rulesets>
+        <settings />
+    </cell_rules>
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 

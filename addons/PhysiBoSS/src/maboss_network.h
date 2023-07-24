@@ -4,7 +4,6 @@
 #include "StochasticSimulationEngine.h"
 #include "BooleanNetwork.h"
 #include "RunConfig.h"
-#include "utils.h"
 #include "../../../core/PhysiCell_utilities.h"
 
 /**
@@ -35,7 +34,11 @@ class MaBoSSNetwork
 		/** \brief Real time to update, after applying noise */
 		double time_to_update;
 
+		/** \brief Scaling coefficient for time */
 		double scaling = 1.0;
+		
+		/** \brief Noise coefficient for time to update */
+		double time_stochasticity = 0;
 		
 		/** \brief Initial value probabilities, by node */
 		std::map< std::string, double > initial_values;
@@ -46,7 +49,7 @@ class MaBoSSNetwork
 		std::map< std::string, Node*> nodesByName;
 		std::map< std::string, const Symbol*> parametersByName;
 	
-		inline void set_time_to_update(){this->time_to_update = this->get_update_time_step();}
+		inline void set_time_to_update(){this->time_to_update = PhysiCell::LogNormalRandom( this->get_update_time_step() , time_stochasticity );}
 
 	
 	public:
@@ -130,6 +133,8 @@ class MaBoSSNetwork
 
 		inline void set_scaling(double scaling) { this->scaling = scaling; }
 		
+		inline void set_time_stochasticity(double t_stochasticity) { this->time_stochasticity = t_stochasticity; }
+		
 		/** 
 		 * \brief Print current state of all the nodes of the network 
 		 * \param node_values Boolean vector mapping a boolean network
@@ -138,6 +143,37 @@ class MaBoSSNetwork
 
 		void set_state(NetworkState _state) { state = NetworkState(_state.getState()); }	
 		NetworkState get_maboss_state() { return state;}
+		void inherit_state(NetworkState mother, bool inherit_state, std::map<std::string, bool>& inherit_nodes) {
+			NetworkState new_state;
+			if (inherit_state){
+				// If we inherit, we start from the state of the mother cell
+				new_state = mother;
+			} else {
+				// Else we start from the state of the daughter cell
+				new_state = state;
+			}
+
+			// Then we look at individual inheritance
+			for (auto& inherit_node: inherit_nodes) {
+					
+				Node* node = network->getNode(inherit_node.first);
+
+				// If we inherit from the model, we just do it
+				if (inherit_node.second) {
+					new_state.setNodeState(node,mother.getNodeState(node));
+				
+				} else {
+					if (inherit_state){
+					// Else if we don't inherit this node, but inherit_state is true, it means we exclude this node from the global inheritance
+					// So we take the value in state instead
+						new_state.setNodeState(node, state.getNodeState(node));
+					}
+				}
+			}
+
+			// Finally we set the state
+			set_state(new_state);
+		}
 };
 
 #endif

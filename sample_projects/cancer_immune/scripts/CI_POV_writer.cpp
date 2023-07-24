@@ -87,7 +87,7 @@ void plot_all_cells( std::ostream& os , std::vector<std::vector<double>>& MAT );
 int main( int argc, char* argv[] )
 {
 	char temp [1024]; 
-	sprintf( temp , "./cancer_immune_3D/output%08i_cells_physicell.mat" , atoi( argv[1] ) );
+	sprintf( temp , "./output/output%08i_cells_physicell.mat" , atoi( argv[1] ) );
 	std::cout << "Processing file " << temp << "... " << std::endl; 
 	
 
@@ -350,10 +350,12 @@ void pigment_and_finish_function( std::vector<double>& cyto_pigment, std::vector
 		live = false;
 	}		
 
+	int onco_index = 37; // 27; 
+
 	// live cells are green, but shaded by oncoprotein value 
 	if( live == true )
 	{
-		double oncoprotein = MAT[27][i]; // 0.5 * MAT[27][i];  
+		double oncoprotein = MAT[onco_index][i]; // 0.5 * MAT[27][i];  
 		
 		// map [0.5 1.5] to [0 1]
 		if( oncoprotein > 1.5 )
@@ -446,10 +448,12 @@ void alt_pigment_and_finish_function( std::vector<double>& cyto_pigment, std::ve
 		live = false;
 	}		
 
+	int onco_index = 37; // 27; 
+
 	// live cells are green, but shaded by oncoprotein value 
 	if( live == true )
 	{
-		double oncoprotein = MAT[27][i];  
+		double oncoprotein = MAT[onco_index][i];  
 		// map [0.5 1.5] to [0 1]
 		if( oncoprotein > 1.5 )
 		{ oncoprotein = 1.5; }

@@ -85,6 +85,7 @@ class Variable
 	std::string name; 
 	double value; 
 	std::string units; 
+	bool conserved_quantity; 
 	
 	Variable(); 
 };
@@ -98,6 +99,7 @@ class Vector_Variable
 	std::string name; 
 	std::vector<double> value; 
 	std::string units; 
+	bool conserved_quantity; 
 	
 	Vector_Variable(); 
 };

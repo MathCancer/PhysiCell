@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -79,6 +79,7 @@ Variable::Variable()
 	name = "unnamed"; 
 	units = "dimensionless"; 
 	value = 0.0; 
+	conserved_quantity = false; 
 	return; 
 }
 
@@ -94,12 +95,19 @@ Vector_Variable::Vector_Variable()
 	name = "unnamed"; 
 	units = "dimensionless"; 
 	value.resize(3, 0.0 );
+	conserved_quantity = false; 
 	return; 
 }
 
 std::ostream& operator<<(std::ostream& os, const Vector_Variable& v)
 {
-	os << v.name << ": ";
+ 	os << v.name << ": ";
+	if( v.value.size() == 0 )
+	{ os << "[empty]"; return os; }
+/*
+	if( v.value.size() == 1 )
+	{ os << v.value[0] << " (" << v.units << ")"; return os;  }
+*/
 	for( int i=0; i < v.value.size()-1 ; i++ )
 	{ os << v.value[i] << ","; }
 	os << v.value[v.value.size()-1] << " (" << v.units << ")"; 

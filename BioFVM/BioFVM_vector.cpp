@@ -185,6 +185,20 @@ std::ostream& operator<<(std::ostream& os, const std::vector<double>& v )
  return os; 
 }
 
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v )
+{
+ for( unsigned int i=0; i < v.size(); i++ )
+ { os << v[i] << " " ; }
+ return os; 
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v )
+{
+ for( unsigned int i=0; i < v.size(); i++ )
+ { os << v[i] << " " ; }
+ return os; 
+}
+
 // this one returns a new vector that has been normalized
 std::vector<double> normalize( std::vector<double>& v )
 {
@@ -483,5 +497,23 @@ void vector3_to_list( const std::vector<double>& vect , char*& buffer , char del
 	sprintf( buffer, "%.7e%c%.7e%c%.7e", vect[0] , delim, vect[1] , delim , vect[2] );
 	return; 
 }
+
+double dot_product( std::vector<double>& a , std::vector<double>& b )
+{
+	double out = 0.0; 
+	for( unsigned int i=0 ; i < a.size() ; i++ )
+	{ out += ( a[i] * b[i] ); }
+	return out; 
+}
+
+std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b )
+{
+	std::vector<double> out( 3, 0.0 ); 
+	out[0] = a[1]*b[2] - a[2]*b[1]; 
+	out[1] = a[2]*b[0] - a[0]*b[2];
+	out[2] = a[0]*b[1] - a[1]*b[0];
+
+	return out; 
+} 
 
 };
