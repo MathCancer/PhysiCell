@@ -300,6 +300,10 @@ double Basic_Agent::get_total_volume()
 	return volume;
 }
 
+const std::vector<double>& Basic_Agent::get_previous_velocity( void ) {
+	return previous_velocity;
+}
+
 void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt )
 {
 	if(!is_active)
