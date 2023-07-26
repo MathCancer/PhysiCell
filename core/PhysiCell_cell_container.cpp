@@ -349,10 +349,12 @@ void Cell_Container::remove_agent_from_voxel(Cell* agent, int voxel_index)
 	{
 		delete_index++; 
 	}
-	// move last item to index location  
-	agent_grid[agent->get_current_mechanics_voxel_index()][delete_index] = agent_grid[agent->get_current_mechanics_voxel_index()][agent_grid[agent->get_current_mechanics_voxel_index()].size()-1 ]; 
-	// shrink the vector
-	agent_grid[agent->get_current_mechanics_voxel_index()].pop_back(); 
+	
+	// move last item to index location
+    agent_grid[voxel_index][delete_index] = agent_grid[voxel_index][agent_grid[voxel_index].size()-1 ];
+    // shrink the vector
+    agent_grid[voxel_index].pop_back();
+    
 	return; 
 }		
 
