@@ -152,7 +152,7 @@ Microenvironment::Microenvironment()
 	one_third /= 3.0;
 
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.assign( 1 , true ); 
+	dirichlet_activation_vector.assign( 1 , false );
 	
 	dirichlet_activation_vectors.assign( 1 , dirichlet_activation_vector ); 
 	
@@ -212,7 +212,7 @@ void Microenvironment::update_dirichlet_node( int voxel_index , int substrate_in
 	dirichlet_value_vectors[voxel_index][substrate_index] = new_value; 
 	
 	dirichlet_activation_vectors[voxel_index][substrate_index] = true; 
-	
+
 	return; 
 }
 
@@ -250,6 +250,12 @@ bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index )
 	return dirichlet_activation_vector[substrate_index]; 
 }
 
+// TODO? fix confusing swapped usage of args
+double Microenvironment::get_substrate_dirichlet_value( int substrate_index, int index )
+{ 
+    return dirichlet_value_vectors[index][substrate_index]; 
+}  
+
 // new functions for finer-grained control of Dirichlet conditions -- 1.7.0
 
 void Microenvironment::set_substrate_dirichlet_activation( int substrate_index , int index, bool new_value )
@@ -260,6 +266,7 @@ void Microenvironment::set_substrate_dirichlet_activation( int substrate_index ,
 
 bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index, int index )
 { return dirichlet_activation_vectors[index][substrate_index]; }
+
 
 void Microenvironment::apply_dirichlet_conditions( void )
 {
@@ -436,12 +443,12 @@ void Microenvironment::resize_densities( int new_size )
 	one_third /= 3.0; 
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.assign( new_size, true ); 
+	dirichlet_activation_vector.assign( new_size, false );
 
 	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
 
 	default_microenvironment_options.Dirichlet_condition_vector.assign( new_size , 1.0 );  
-	default_microenvironment_options.Dirichlet_activation_vector.assign( new_size, true ); 
+	default_microenvironment_options.Dirichlet_activation_vector.assign( new_size, false );
 	
 	default_microenvironment_options.initial_condition_vector.assign( new_size , 1.0 ); 
 	
@@ -512,7 +519,7 @@ void Microenvironment::add_density( void )
 	
 	// Fixes in PhysiCell preview November 2017
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
+	default_microenvironment_options.Dirichlet_activation_vector.push_back( false );
 	
 	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
 
@@ -577,15 +584,14 @@ void Microenvironment::add_density( std::string name , std::string units )
 	one_third /= 3.0; 
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.push_back( true ); 
+	dirichlet_activation_vector.push_back( false );
 	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
 	
 	// fix in PhysiCell preview November 2017 
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
+	default_microenvironment_options.Dirichlet_activation_vector.push_back( false ); // assign( number_of_densities(), false ); 
 
-	default_microenvironment_options.Dirichlet_all.push_back( true ); 
-//	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
+	default_microenvironment_options.Dirichlet_all.push_back( false );
 	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
 	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
 	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
@@ -647,12 +653,12 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	one_third /= 3.0; 
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.push_back( true ); 
+	dirichlet_activation_vector.push_back( false ); 
 	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
 	
 	// fix in PhysiCell preview November 2017 
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); // = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
+	default_microenvironment_options.Dirichlet_activation_vector.push_back( false ); // assign( number_of_densities(), false ); 
 	
 	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
 	
@@ -1219,7 +1225,7 @@ Microenvironment_Options::Microenvironment_Options()
 	
 	outer_Dirichlet_conditions = false; 
 	Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 1.0 ); 
-	Dirichlet_activation_vector.assign( pMicroenvironment->number_of_densities() , true ); 
+	Dirichlet_activation_vector.assign( pMicroenvironment->number_of_densities() , false ); 
 	
 	initial_condition_vector.resize(0); //  = Dirichlet_condition_vector; 
 	
@@ -1523,11 +1529,13 @@ void initialize_microenvironment( void )
 	}
 */
 	
-	// set the Dirichlet condition activation vector to match the microenvironment options 
-	for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
-	{
-		microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
-	}
+    // April 2023: no longer necessary after flipping our approach and doing an "additive" instead of "subtractive" DCs handling. I.e., we assume DC activation is false by default; make true on-demand.
+
+	// // set the Dirichlet condition activation vector to match the microenvironment options 
+	// for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
+	// {
+	// 	microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
+	// }
 	
 	microenvironment.display_information( std::cout );
 	return;

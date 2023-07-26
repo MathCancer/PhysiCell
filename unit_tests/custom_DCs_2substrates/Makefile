@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := cancer_biorobots
+PROGRAM_NAME := test_custom_DCs
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -51,7 +51,7 @@ BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_contai
 
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
 PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o \
-PhysiCell_signal_behavior.o PhysiCell_rules.o
+PhysiCell_signal_behavior.o 
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
@@ -104,9 +104,6 @@ PhysiCell_constants.o: ./core/PhysiCell_constants.cpp
 	
 PhysiCell_signal_behavior.o: ./core/PhysiCell_signal_behavior.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_signal_behavior.cpp 
-
-PhysiCell_rules.o: ./core/PhysiCell_rules.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_rules.cpp
 
 # BioFVM core components (needed by PhysiCell)
 	
@@ -268,9 +265,10 @@ upgrade: $(SOURCE)
 	rm -f -r PhysiCell
 	rm -f $(SOURCE) 
 
-# use: make save PROJ=your_project_name
+#===================================================================
+#-------------  1.10.5 addition to save user projects --------------
+# useage: make save PROJ=your_project_name
 PROJ := my_project
-
 save: 
 	echo "Saving project as $(PROJ) ... "
 	mkdir -p ./user_projects
@@ -283,6 +281,7 @@ save:
 	cp ./config/* ./user_projects/$(PROJ)/config
 	cp ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
 
+# useage: make load PROJ=your_project_name
 load: 
 	echo "Loading project from $(PROJ) ... "
 	cp ./user_projects/$(PROJ)/main.cpp .
@@ -290,6 +289,21 @@ load:
 	cp ./user_projects/$(PROJ)/config/* ./config/ 
 	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
 
-list-user-projects:
-	@echo "user projects::"
-	@cd ./user_projects && ls -dt1 * | grep . | sed 's!empty.txt!!'
+# useage: make share PROJ=your_project_name
+share: 
+	@echo "Preparing your project for sharing from $(PROJ) ... "
+	@echo " " 
+	zip -r $(PROJ)_$$(date +%b_%d_%Y_%H%M).zip ./user_projects/$(PROJ)/* 
+	@echo "Project saved in $(PROJ)_$$(date +%b_%d_%Y_%H%M).zip."
+	@echo "It can be unzipped (or use tar -xvf) in a PhysiCell root directory."
+	@echo " "
+
+# sci_package: make sci_package PROJ=your_project_name
+sci_package: 
+	@echo "Preparing your project for scientific archival from $(PROJ) ... "
+	@echo " " 
+	touch output/empty.txt
+	zip -r $(PROJ)_packaged_$$(date +%b_%d_%Y_%H%M).zip main.cpp Makefile ./config/* ./BioFVM/* VERSION.txt ./custom_modules/* ./core/* ./addons/* ./licenses/* ./modules/* ./output/empty.txt
+	@echo "Project saved in $(PROJ)_packaged_$$(date +%b_%d_%Y_%H%M).zip."
+	@echo "It is fully self-contained and can be distributed as a separate GitHub repository."
+	@echo " "
