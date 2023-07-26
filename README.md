@@ -3,6 +3,7 @@
 
 **Release dates:** 15 May 2023 - 
 * 1.12.0 : 15 May 2023
+* 1.12.1 : 28 July 2023 (proposed)
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -101,6 +102,9 @@ The CSV version of these statements can be parsed and transformed into code dyna
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
 
 ### Major new features and changes in the 1.12.z versions
+#### 1.12.1
++ None in this release. 
+  
 #### 1.12.0
 + **Rules-based modeling:** See introduction above. 
 
@@ -177,6 +181,8 @@ The CSV version of these statements can be parsed and transformed into code dyna
   * `filename`: Set the name of the rules file. e.g., `cell_rules.csv`. 
 
 ### Minor new features and changes: 
+#### 1.12.1
+
 #### 1.12.0
 + Added new functions to `PhysiCell_basic_signaling`: 
   + `multivariate_Hill_response_function` combines multiple signals (`std::vector<double> signals`) with individual half-maxes (`std::vector<double> half_maxes`) and Hill powers (`std::vector<double> hill_powers`) into a multivariate Hill response function, such that if only supplied with a single nonzero signal, then it returns the regular single-variable Hill function for that corresponding signal. 
@@ -204,10 +210,16 @@ The CSV version of these statements can be parsed and transformed into code dyna
 + Added `make list-user-projects` rule to Makefile to list all user projects available for loading 
 
 ### Beta features (not fully supported):
+#### 1.12.1 
++ None in this release.
+   
 #### 1.12.0
 + None in this release. 
  
 ### Bugfixes: 
+
+#### 1.12.1 
++ Fix typographical errors in Makefiles in sample projects.
 
 #### 1.12.0
 + None in this release. 
