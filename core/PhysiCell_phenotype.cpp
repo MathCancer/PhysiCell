@@ -1141,6 +1141,8 @@ void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
 
 Cell_Functions::Cell_Functions()
 {
+	instantiate_cell = NULL;
+	
 	volume_update_function = NULL; 
 	update_migration_bias = NULL; 
 	
