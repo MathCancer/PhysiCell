@@ -678,7 +678,7 @@ Mechanics::Mechanics()
 	cell_BM_adhesion_strength = 4.0;
 	
 	cell_cell_repulsion_strength = 10.0; 
-	cell_BM_repulsion_strength = 10.0; 
+	cell_BM_repulsion_strength = 100.0; 
 
 	cell_adhesion_affinities = {1}; 
 	
