@@ -182,6 +182,7 @@ The CSV version of these statements can be parsed and transformed into code dyna
 
 ### Minor new features and changes: 
 #### 1.12.1
++ Preparations for a new derived `Cell` class for use in PhysiBoSS, including a new `instantiate_cell` function in `Cell_Functions` to help facilitate this. See [PR 153](https://github.com/MathCancer/PhysiCell/pull/153) (Thanks, Vincent Noël!) 
 
 #### 1.12.0
 + Added new functions to `PhysiCell_basic_signaling`: 
@@ -220,6 +221,9 @@ The CSV version of these statements can be parsed and transformed into code dyna
 
 #### 1.12.1 
 + Fix typographical errors in Makefiles in sample projects.
++ Set correct value (100) of `cell_BM_repulsion_strength` in `PhysiCell_phenotype.cpp` (Thanks, Elmar Bucher!)
++ Improved handling of `voxel_index` in `remove_agent_from_voxel` in preparation for voxel-spanning objects such as PhysiMeSS. [PR 159](https://github.com/MathCancer/PhysiCell/pull/159). Thanks, Vincent Noël!
+
 
 #### 1.12.0
 + None in this release. 
