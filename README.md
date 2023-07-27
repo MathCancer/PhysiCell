@@ -1,9 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
-**Versions:** 1.12.0 - 
+**Versions:** 1.13.0 - 
 
-**Release dates:** 15 May 2023 - 
-* 1.12.0 : 15 May 2023
-* 1.12.1 : 28 July 2023 (proposed)
+**Release dates:** 28 July 2023 - 
+* 1.13.0 : 28 July 2023 (proposed)
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -84,155 +83,40 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.12.0 introduces rules-based modeling: human-interpretable statements of the form 
+Version 1.13.0 introduced ... **text here**
 
-> In cell type T, signal S increases/decreases behavior B
 
-are represented with a CSV format that can _directly_ and _uniquely_ map onto a Hill response function to auto-generate simulation code. `T` is any cell type in the simulation, `S` can be any signal in the signal dictionary, and `B` any supported behavior in the behavior dictionary. For example: 
-
-* In malignant epithelial cells, pressure decreases cycle entry. 
-* In M0 macrophages, necrotic debris increases transformation to M1 macrophage. 
-* In effector T cells, contact with malignant epithelial cell decreases migration speed. 
-* In effector T cells, IFN-gamma increases attack of malignant epithelial cells. 
-
-The CSV version of these statements can be parsed and transformed into code dynamically at runtime, without additional user-written C++ or recompiling. This will be the basis of a pre-compiled PhysiCell Studio (model design, execution, and visualization in one package) and similar PhysiCell Cloud (install-free, browser-based model design, execution, and visualization). This allows modelers to focus on choosing their hypotheses--how signals (stimuli) change cell behavior--and less on coding and debugging. It is our hope that this language is sufficiently expressive to write most models without additional user code. However, users can still write custom phenotype functions that can be integrated with rules-based modeling, allowing further fine-tuning of individual cell behavior. 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
 
-### Major new features and changes in the 1.12.z versions
-#### 1.12.1
-+ None in this release. 
-  
-#### 1.12.0
-+ **Rules-based modeling:** See introduction above. 
-
-+ **Automated annotation of the model hypotheses:** Upon parsing the rules, PhysiCell auto-generates HTML-formatted text annotating all model hypotheses, for use in a paper's method section. This is to encourage better model interoperability and reproducibility. 
-
-+ **CSV-based specification of model rules:**
-  + Version 1: 
-    ```cell_type , signal , direction , behavior , base_value , max_response_value , half_max , Hill_power , applies_to_dead```
-
-    + `cell_type`: The (human-readable) name of any cell type in the simulation, matching their declarations in the XML configuration file. 
-      + Allowed values: Any named cell type in the simulation. 
-    + `signal`: Any signal in the simulation's signal dictionary that can be queried to modulate a behavior. 
-      + Allowed values: Any signal that is known to the signal dictionary. 
-    + `direction`: Tells whether the signal increases or decreases the behavior. 
-      + Allowed values: `increases` or `decreases` 
-    + `behavior`: Any behavioral parameter in the simulation's behavior dictionary that can be edited to modulate a behavior. 
-      + Allowed values: Any behavioral parameter that is known in the behavior dictionary. 
-    + `base_value`: The value of the behavioral parameter in the absence of any signals 
-      + Allowed value: Must match the behavior's parameter value in the cell definition 
-    + `max_response_value`: The maximally changed behavior when acting under high values of signal
-      + Allowed values (for rules that increase the behavior): Any positive value equalling or exceeding the `base_value`. E.g., ten times the base value. 
-      + Allowed values (for rules that decrease the behavior): Any positive value equal to or less than the `base_value`. E.g., one tenth the base value. 
-    + `half_max`: Value of the signal at which the behavior undergoes half of its maximal change. 
-      + Allowed values: Non-zero positive numbers. 
-    + `Hill_power`: The Hill coefficient in a Hill response function. 
-      + Allowed values: Any non-zero positive number. **Integer values are MUCH more computationally efficient.** 
-    + 'applies_to_dead': Indicates if the rule should also be applied to dead cells. 
-      + Allowed values: 0 (for false) or 1 (for true).    
-
-  + Version 2: 
-    ```cell_type , signal , direction , behavior , max_response_value , half_max , Hill_power , applies_to_dead```
-    This version always copies the `base_values` from the corresponding cell definition. 
-    + `cell_type`: The (human-readable) name of any cell type in the simulation, matching their declarations in the XML configuration file. 
-      + Allowed values: Any named cell type in the simulation. 
-    + `signal`: Any signal in the simulation's signal dictionary that can be queried to modulate a behavior. 
-      + Allowed values: Any signal that is known to the signal dictionary. 
-    + `direction`: Tells whether the signal increases or decreases the behavior. 
-      + Allowed values: `increases` or `decreases` 
-    + `behavior`: Any behavioral parameter in the simulation's behavior dictionary that can be edited to modulate a behavior. 
-      + Allowed values: Any behavioral parameter that is known in the behavior dictionary. 
-    + `max_response_value`: The maximally changed behavior when acting under high values of signal
-      + Allowed values (for rules that increase the behavior): Any positive value equalling or exceeding the `base_value`. E.g., ten times the base value. 
-      + Allowed values (for rules that decrease the behavior): Any positive value equal to or less than the `base_value`. E.g., one tenth the base value. 
-    + `half_max`: Value of the signal at which the behavior undergoes half of its maximal change. 
-      + Allowed values: Non-zero positive numbers. 
-    + `Hill_power`: The Hill coefficient in a Hill response function. 
-      + Allowed values: Any non-zero positive number. **Integer values are MUCH more computationally efficient.** 
-    + `applies_to_dead`: Indicates if the rule should also be applied to dead cells. 
-      + Allowed values: 0 (for false) or 1 (for true).    
-
-+ Support for both rules-based behavior and traditional phenotype functions: If both are specified, then rules-based phenotype are applied first, followed by user-supplied phenotype functions that can further fine-tune cell behavior (as needed). 
-
-+ Code-free model specification by PhysiCell Studio. 
-
-+ Updated PhysiBoSS to remove cell definition "inheritance," (with "flat", self-standing cell definitions), to make it compatible with PhysiCell Studio. Hereafter, all properties of each cell definition must be explicitely defined. 
-
-+ New section in `PhysiCell_settings.xml` to indicate a rules CSV file file: 
-```
-<cell_rules>
-    <rulesets>
-        <ruleset protocol="CBHG" version="2.0" format="csv" enabled="true">
-            <folder>./config</folder>
-            <filename>cell_rules.csv</filename>
-        </ruleset>
-    </rulesets>
-    <settings />
-</cell_rules>
-```
-  + `protocol`: This value should always be `CBHG` (cell behavior hypothesis grammar)
-  + `version`: Use `0.0` (or none for pre-beta files, but migrate away from this.) Use `1.0` for v1 rules as specified above. Use `2.0` for v2 rules as specified above. 
-  + `format`: For now, only `csv` is supported. 
-  + `enabled`: Set `true` to apply the rules, and `false` otherwise. 
-  * `folder`: Set the folder containing the rules file. This should typically be `./config`. 
-  * `filename`: Set the name of the rules file. e.g., `cell_rules.csv`. 
+### Major new features and changes in the 1.13.z versions
+#### 1.13.0
++ Introduced PhysiMeSS, a major addon for modeling fibers of the extracellular matrix. Major thanks to Cicely Macnamara, Vincent Noël, and team!
 
 ### Minor new features and changes: 
-#### 1.12.1
+#### 1.13.0
 + Preparations for a new derived `Cell` class for use in PhysiBoSS, including a new `instantiate_cell` function in `Cell_Functions` to help facilitate this. See [PR 153](https://github.com/MathCancer/PhysiCell/pull/153) (Thanks, Vincent Noël!)
 + Various safety refinements (`const` accessors) in vector operations ([PR 160](https://github.com/MathCancer/PhysiCell/pull/160)). Thanks, Vincent Noël! 
 + Made changes to cell SVG plotting to support broader types of plotting in advance of PhysiMeSS [PR 162](https://github.com/MathCancer/PhysiCell/pull/162). Thanks, Vincent Noēl!
 + Added a safe way to query the current velocity via `Basic_Agent::get_previous_velocity()` in preparation for PhysiMeSS. [PR 163](https://github.com/MathCancer/PhysiCell/pull/163). Thanks, Vincent Noël!
 + Refined control of object counts in SVG for upcoming PhysiMeSS release. [PR 164](https://github.com/MathCancer/PhysiCell/pull/164). Thanks, Vincent!
 + Refined SVG plot options to incorporate substrates. [PR 181](https://github.com/MathCancer/PhysiCell/pull/181). Thanks, Marco Ruscone!
-  
-#### 1.12.0
-+ Added new functions to `PhysiCell_basic_signaling`: 
-  + `multivariate_Hill_response_function` combines multiple signals (`std::vector<double> signals`) with individual half-maxes (`std::vector<double> half_maxes`) and Hill powers (`std::vector<double> hill_powers`) into a multivariate Hill response function, such that if only supplied with a single nonzero signal, then it returns the regular single-variable Hill function for that corresponding signal. 
-
-  + `multivariate_linear_response_function` combines multiple signals (`std::vector<double> signals`) with independent minimal thresholds (`std::vector<double> min_thresholds`: values below which individual linear responses are zero) and maximum thresholds (`std::vector<double> max_thresholds )`: values above which individual linear responses are one) into a multivariate linear response, such that if only supplied with a single nonzero signal, then it returns the regular single-variable linear response function for that corresponding signal. This function is "capped" between 0 and 1. 
- 
-  + `linear_response_to_Hill_parameters` determines a half-maximum and Hill power to approximate a linear response function (with minimum threshold `s0` and maximum threshold `s1`) with a Hill response function. 
-
-  + `Hill_response_to_linear_parameters` determins minimum and maximum thresholds to approximate a Hill response function (with half-maximum `half_max` and Hill power `double Hill_power`) with a linear response function.
-
-+ Added `double get_single_base_behavior( Cell_Definition* pCD , std::string name )` to `PhysiCell_signal_behavior` to extract single base behaviors directly from a `Cell_Definition`. 
-
-+ Added `double get_single_base_behavior( Cell* pCD , std::string name )` to `PhysiCell_signal_behavior` to extract single base behaviors directly from a cell's corresponding `Cell_Definition`. 
-
-+ PhysiCell outputs `dictionary.txt` at runtime with the current list of known signals and behaviors (for use in rules-based modeling). 
-
-+ `BioFVM_vector` now includes `double dot_product( std::vector<double>& a , std::vector<double>& b );` for a standardized dot product. 
-
-+ `BioFVM_vector` now includes `std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b );` for a standardized cross product. 
-
-+ Added new `rules-sample` sample project to demonstrate rules-based modeling. It's a "toy model" with tumor cells, macrophages, and T cells. 
-
-+ Updated sample projects for compatibility. 
-
-+ Added `make list-user-projects` rule to Makefile to list all user projects available for loading 
 
 ### Beta features (not fully supported):
-#### 1.12.1 
-+ None in this release.
-   
-#### 1.12.0
+
+#### 1.13.0
 + None in this release. 
  
 ### Bugfixes: 
 
-#### 1.12.1 
+#### 1.13.0 
 + Fix typographical errors in Makefiles in sample projects.
 + Set correct value (100) of `cell_BM_repulsion_strength` in `PhysiCell_phenotype.cpp` (Thanks, Elmar Bucher!)
 + Improved handling of `voxel_index` in `remove_agent_from_voxel` in preparation for voxel-spanning objects such as PhysiMeSS. [PR 159](https://github.com/MathCancer/PhysiCell/pull/159). Thanks, Vincent Noël!
-+ Fixed bug to ensure cell definitions without `intracellular` defined get a `NULL` intracellular model function. [PR 182](and [PR 182](https://github.com/MathCancer/PhysiCell/pull/182). THanks, Marco Ruscone! 
-
-
-#### 1.12.0
-+ None in this release. 
++ Fixed bug to ensure cell definitions without `intracellular` defined get a `NULL` intracellular model function. [PR 182](and [PR 182](https://github.com/MathCancer/PhysiCell/pull/182). THanks, Marco Ruscone!
++ Fixed a whitespaced bug in SVG output. [PR 179](https://github.com/MathCancer/PhysiCell/pull/179). Thanks, Vincent Noël! 
 
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
