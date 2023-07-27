@@ -402,7 +402,7 @@ std::string formatted_minutes_to_DDHHMM( double minutes )
 	return output ;
 }
 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*substrate_coloring_function)(double, double, double) )
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*substrate_coloring_function)(double, double, double) , void (cell_counts_function)(char*))
 {
 	double X_lower = M.mesh.bounding_box[0];
 	double X_upper = M.mesh.bounding_box[3];
@@ -462,7 +462,13 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 		z_slice , PhysiCell_SVG_options.simulation_space_units.c_str() ); 
 	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1), 
 		font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
-	sprintf( szString , "%u agents" , total_cell_count ); 
+	
+	if (cell_counts_function != NULL){
+		cell_counts_function(szString);
+	} else {
+		sprintf( szString , "%u agents" , total_cell_count ); 
+	}
+	
 	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1+.2+.9), 
 		0.95*font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
 	
