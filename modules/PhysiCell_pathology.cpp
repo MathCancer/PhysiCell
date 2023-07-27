@@ -635,7 +635,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 			
 			pC->functions.plot_agent_SVG(os, pC, z_slice, cell_coloring_function, X_lower, Y_lower);
 
-			os << "  </g>" << std::endl; 
+			os << "   </g>" << std::endl; 
 
 		}
 		
