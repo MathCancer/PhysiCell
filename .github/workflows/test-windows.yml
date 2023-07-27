@@ -40,3 +40,17 @@ jobs:
     - name: Run PhysiBoSS cell lines project
       run: |
         .\\PhysiBoSS_Cell_Lines.exe
+        
+    - name: Build PhysiMeSS project
+      run: |
+        make reset
+        make physimess-sample
+        make clean
+        make
+        
+    - name: Run PhysiMeSS project
+      run: |
+        .\\project config\\mymodel.xml
+        .\\project config\\Fibre_Initialisation\\mymodel_initialisation.xml
+        .\\project config\\Cell_Fibre_Mechanics\\mymodel_rotating.xml
+        
