@@ -25,7 +25,7 @@ fibre_angle = 0.0 (radians)
 angle_normdist_sd = 0.0 (radians)
 ```
 
-Using these parameters you can set up a domain with 2000 fibres randomly positioned and randomly aligned with a length of 75 microns and radius of 2 microns. Note, since we remove any fibres which overlap the boundaries of the domain, 1931 fibres remain after initialisation. Although fibres are cylinders, they are visualised in the domain and plot legend as lines. Note, agent names with the following strings are presumed to be fibres: **ecm**; **fibre**; **fiber**; **rod*; **matrix**.
+Using these parameters you can set up a domain with 2000 fibres randomly positioned and randomly aligned with a length of 75 microns and radius of 2 microns. Note, since we remove any fibres which overlap the boundaries of the domain, 1931 fibres remain after initialisation. Although fibres are cylinders, they are visualised in the domain and plot legend as lines. Note, agent names with the following strings are presumed to be fibres: **ecm**; **fibre**; **fiber**; **rod**; **matrix**.
 
 A second xml file ```mymodel_initialisation_maze.xml``` along with the csv ```initialfibres.csv``` allows you to create a maze with horizontal and vertical fibres. Agent names **fibre_horizontal** and **fibre_vertical** are reserved for creating horizontal and vertical fibres, respectively. In this way fibre agents can be used to create walls in your domain.
 
@@ -51,7 +51,7 @@ Note the parameter ```fibre_stuck``` determines how many mechanics time steps a 
 ### Cell_Fibre_Mechanics
 The directory Cell_Fibre_Mechanics contains examples which demonstrate cell-fibre mechanics. 
 
-* The xml file ```mymodel_fibremaze.xml``` with csv file  ````fibre_maze.csv``` simulates a single cell moving within a maze made of fibres towards an attractant secreting a nutrient. By adjusting parameters you can control whether the cell navigates to the attractant.
+* The xml file ```mymodel_fibremaze.xml``` with csv file  ```fibre_maze.csv``` simulates a single cell moving within a maze made of fibres towards an attractant secreting a nutrient. By adjusting parameters you can control whether the cell navigates to the attractant.
 
 Default parameters are:
 
@@ -71,7 +71,7 @@ fibre_length = 40.0 (microns)
 fibre_pushing = true
 ```
 
-* The xml file ```mymodel_rotating.xml``` with csv file ```snowplough.csv``` simulates a single cell rotating free/non-crosslinked fibres to access an attractant. By turning fibre rotating on (or off) you can control whether the cell can push fibres. Note the parameter ```fibre_sticky`` modulates how much a cell can rotate a fibre. Values less than 1.0 decrease how much the cell rotates the fibre per timestep and values greater than 1.0 increase how much the cell rotates the fibre per timestep.
+* The xml file ```mymodel_rotating.xml``` with csv file ```snowplough.csv``` simulates a single cell rotating free/non-crosslinked fibres to access an attractant. By turning fibre rotating on (or off) you can control whether the cell can push fibres. Note the parameter ```fibre_sticky``` modulates how much a cell can rotate a fibre. Values less than 1.0 decrease how much the cell rotates the fibre per timestep and values greater than 1.0 increase how much the cell rotates the fibre per timestep.
 
 Default parameters are:
 
