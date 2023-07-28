@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
 **Versions:** 1.13.0 - 
 
-**Release dates:** 28 July 2023 - 
-* 1.13.0 : 28 July 2023 (proposed)
+**Release dates:** 29 July 2023 - 
+* 1.13.0 : 29 July 2023 (proposed)
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -103,6 +103,8 @@ Version 1.13.0 introduced ... **text here**
 + Added a safe way to query the current velocity via `Basic_Agent::get_previous_velocity()` in preparation for PhysiMeSS. [PR 163](https://github.com/MathCancer/PhysiCell/pull/163). Thanks, Vincent Noël!
 + Refined control of object counts in SVG for upcoming PhysiMeSS release. [PR 164](https://github.com/MathCancer/PhysiCell/pull/164). Thanks, Vincent!
 + Refined SVG plot options to incorporate substrates. [PR 181](https://github.com/MathCancer/PhysiCell/pull/181). Thanks, Marco Ruscone!
++ Updated PhysiBoSS to Version 2.2.1. See [PR 188](https://github.com/MathCancer/PhysiCell/pull/188). Thanks, Vincent Noël! 
++ Updated unit tests (including `custom_DCs_2substrates`)
 
 ### Beta features (not fully supported):
 
@@ -117,7 +119,14 @@ Version 1.13.0 introduced ... **text here**
 + Improved handling of `voxel_index` in `remove_agent_from_voxel` in preparation for voxel-spanning objects such as PhysiMeSS. [PR 159](https://github.com/MathCancer/PhysiCell/pull/159). Thanks, Vincent Noël!
 + Fixed bug to ensure cell definitions without `intracellular` defined get a `NULL` intracellular model function. [PR 182](and [PR 182](https://github.com/MathCancer/PhysiCell/pull/182). THanks, Marco Ruscone!
 + Fixed a whitespaced bug in SVG output. [PR 179](https://github.com/MathCancer/PhysiCell/pull/179). Thanks, Vincent Noël!
-+ Fixed a PhysiBoSS bug where dead cells could execute models. [PR 180](https://github.com/MathCancer/PhysiCell/pull/180) Thanks, Vincent Noël! 
++ Fixed a PhysiBoSS bug where dead cells could execute models. [PR 180](https://github.com/MathCancer/PhysiCell/pull/180) Thanks, Vincent Noël!
++ Fixed bugs involving Dirichlet conditions and multiple substrates (thanks to Daniel Bergman for pointing it out!) See [Issue 124](rf. https://github.com/MathCancer/PhysiCell/issues/124) and [PR 149](https://github.com/MathCancer/PhysiCell/pull/180). Thank you, Daniel Bergman and Randy Heiland! 
++ `cancer_biorobots` Makefille PROGRAM_NAME is now `cancer_biorobots` instead of `project`
++ Deleted a meaningless line `dt;` in PhysiCell_standard_models.cpp
++ Added missing commas to cell_rules.csv in rules_sample project
++ Fixed typo: `PhyisiCell_rules.o` to `PhysiCell_rules.o` in Makefile-default (thanks to Joseph Abrams for pointing it out!)
++ Fixed errors in SBML ODE models. See [PR 185](https://github.com/MathCancer/PhysiCell/pull/185) and [PR 186](https://github.com/MathCancer/PhysiCell/pull/186). Thanks, Furkan Kurtoglu and Vincent Noël!
++ Fixed errors the PhysiBoSS readme. See [PR 187](https://github.com/MathCancer/PhysiCell/pull/187). Thanks, Vincent Noël!
 
 ### Notices for intended changes that may affect backwards compatibility:
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
