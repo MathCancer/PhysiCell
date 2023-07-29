@@ -2,7 +2,7 @@
 **Versions:** 1.13.0 - 
 
 **Release dates:** 29 July 2023 - 
-* 1.13.0 : 29 July 2023 (proposed)
+* 1.13.0 : 29 July 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -40,6 +40,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
       * interaction-sample
       * mechano-sample
       * rules-sample
+      * physimess-sample
 
 **`make list-projects`** : list all available sample projects 
 
@@ -83,9 +84,9 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.13.0 introduced ... **text here**
+Version 1.13.0 introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created by Cicely Macnamara, Vincent Noël and collaborators, which allows the user to specify rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. This allows the PhysiCell user the ability to investigate fine-grained processes between cellular and fibrous ECM agents. We are providing an sample project together with this addon to demonstrate, via many examples, the possibilities of PhysiMeSS. For more information, consult the PhysiMeSS README available in [./addons/PhysiMeSS/README.md](./addons/PhysiMeSS/README.md). Version 1.13.0 also updates the bundled PhysiBoSS addon, introduces a variety of bug fixes (particularly in handling of Dirichlet boundary conditions), and improves SVG plots. 
 
-
+We are grateful for immense contributions by Cicely Macnamara, Vincent Noël, Randy Heiland, Daniel Bergman, Furkan Kurtoglu, and Elmar Bucher in this release. 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
@@ -105,6 +106,8 @@ Version 1.13.0 introduced ... **text here**
 + Refined SVG plot options to incorporate substrates. [PR 181](https://github.com/MathCancer/PhysiCell/pull/181). Thanks, Marco Ruscone!
 + Updated PhysiBoSS to Version 2.2.1. See [PR 188](https://github.com/MathCancer/PhysiCell/pull/188). Thanks, Vincent Noël! 
 + Updated unit tests (including `custom_DCs_2substrates`)
++ Added `damage rate` (from effector attack) to supported behaviors in the modeling gramamr 
++ minor cleanup 
 
 ### Beta features (not fully supported):
 
