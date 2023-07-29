@@ -86,7 +86,7 @@ See changes.md for the full change log.
 ## Release summary: 
 Version 1.13.0 introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created by Cicely Macnamara, Vincent Noël and collaborators, which allows the user to specify rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. This allows the PhysiCell user the ability to investigate fine-grained processes between cellular and fibrous ECM agents. We are providing an sample project together with this addon to demonstrate, via many examples, the possibilities of PhysiMeSS. For more information, consult the PhysiMeSS README available in [./addons/PhysiMeSS/README.md](./addons/PhysiMeSS/README.md). Version 1.13.0 also updates the bundled PhysiBoSS addon, introduces a variety of bug fixes (particularly in handling of Dirichlet boundary conditions), and improves SVG plots. 
 
-We are grateful for immense contributions by Cicely Macnamara, Vincent Noël, Randy Heiland, Daniel Bergman, Furkan Kurtoglu, and Elmar Bucher in this release. 
+We are grateful for immense contributions by Cicely Macnamara, Vincent Noël, Randy Heiland, Daniel Bergman, Marco Ruscone, Furkan Kurtoglu, and Elmar Bucher in this release. 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
