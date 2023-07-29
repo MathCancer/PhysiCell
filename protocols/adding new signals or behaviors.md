@@ -226,4 +226,18 @@ Suppose you want to add a new behavior "my behavior name" to the dictionary, and
 	
 	Notice that `pCD` is set to `Cell_Definition` of the cell in `pCell`. 
 
+1. Add the behavior to the function to get a single base behavior from a cell's cell definition (queried by cell definiton)
 
+	1. Search for `double get_single_base_behavior( Cell_Definition* pCD , int index )`
+	
+	1. Go to the end of the function. 
+	
+	3. Add code to write your behavior to the , like this: 
+
+		```
+		// my behavior
+		static int my_behavior_ind = find_behavior_index("my behavior name" ); 
+		if( index == my_behavior_ind )
+		{ return pCD->something; }
+		```
+	Make sure that `my_behavior_ind` is unique. 
