@@ -252,6 +252,8 @@ class Microenvironment
 	void set_substrate_dirichlet_activation( int substrate_index , int index, bool new_value );  
 	void set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ); 
 	bool get_substrate_dirichlet_activation( int substrate_index, int index );  
+
+    double get_substrate_dirichlet_value( int substrate_index, int index );
 	
 	bool& is_dirichlet_node( int voxel_index ); 
 

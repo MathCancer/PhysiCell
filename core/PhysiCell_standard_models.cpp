@@ -67,6 +67,7 @@
 
 #include "PhysiCell_standard_models.h" 
 #include "PhysiCell_cell.h" 
+#include "../modules/PhysiCell_pathology.h"
 
 namespace PhysiCell{
 	
@@ -759,6 +760,9 @@ void initialize_default_cell_definition( void )
 	
 	cell_defaults.functions.set_orientation = NULL;
 	
+	cell_defaults.functions.plot_agent_SVG = standard_agent_SVG;
+	cell_defaults.functions.plot_agent_legend = standard_agent_legend;
+	
 	// add the standard death models to the default phenotype. 
 	cell_defaults.phenotype.death.add_death_model( 0.00319/60.0 , &apoptosis , apoptosis_parameters );
 		// MCF10A, to get a 2% apoptotic index 
@@ -1229,7 +1233,6 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 
 			probability = attack_ij * immunogenicity_ji * dt; 
 			
-			dt; // s[type] * dt;  
 			if( UniformRandom() < probability && attacked == false ) 
 			{
 				pCell->attack_cell(pTarget,dt); 

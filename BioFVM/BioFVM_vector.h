@@ -103,14 +103,14 @@ void randomize( std::vector<double>* v );
 /* axpy and related BLAS-type operations */ 
 
 // y = y + a*x 
-void axpy( std::vector<double>* y, double& a , std::vector<double>& x );
+void axpy( std::vector<double>* y, const double& a , const std::vector<double>& x );
 // y = y + a.*x
-void axpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>& x ); 
+void axpy( std::vector<double>* y, const std::vector<double>& a , const std::vector<double>& x ); 
 
 // y = y - a*x 
-void naxpy( std::vector<double>* y, double& a , std::vector<double>& x );
+void naxpy( std::vector<double>* y, const double& a , const std::vector<double>& x );
 // y = y - a.*x
-void naxpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>& x ); 
+void naxpy( std::vector<double>* y, const std::vector<double>& a , const std::vector<double>& x ); 
 
 /* I may cut these from the final version */ 
 /* CLEANUP BEFORE RELEASE */ 
@@ -141,9 +141,9 @@ void vector_to_list( const std::vector<double>& vect , char*& buffer , char deli
 
 void vector3_to_list( const std::vector<double>& vect , char*& buffer , char delim ); 
 
-double dot_product( std::vector<double>& a , std::vector<double>& b ); 
-std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b );
-
+double dot_product( const std::vector<double>& a , const std::vector<double>& b );
+std::vector<double> cross_product( const std::vector<double>& a , const std::vector<double>& b );
+    
 };
 
 #endif

@@ -111,7 +111,7 @@ class Basic_Agent
 	void update_position( double dt );
 	
 	Basic_Agent(); 
-
+	virtual ~Basic_Agent(){};
 	// simulate secretion and uptake at the nearest voxel at the indicated microenvironment.
 	// if no microenvironment indicated, use the currently selected microenvironment. 
 	void simulate_secretion_and_uptake( Microenvironment* M, double dt ); 
@@ -125,6 +125,8 @@ class Basic_Agent
 	std::vector<double>& nearest_gradient( int substrate_index );
 	// directly access a vector of gradients, one gradient per substrate 
 	std::vector<gradient>& nearest_gradient_vector( void ); 
+	
+	const std::vector<double>& get_previous_velocity( void );
 };
 
 extern std::vector<Basic_Agent*> all_basic_agents; 

@@ -474,6 +474,8 @@ class Cell_Functions
 {
  private:
  public:
+	Cell* (*instantiate_cell)(); 
+
 	Cycle_Model cycle_model; 
 
 	void (*volume_update_function)( Cell* pCell, Phenotype& phenotype , double dt ); // used in cell 
@@ -500,6 +502,11 @@ class Cell_Functions
 	void (*internal_substrate_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
 	void (*molecular_model_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
 */
+	
+	
+	void (*plot_agent_SVG)(std::ofstream& os, Cell* pCell, double z_slice, std::vector<std::string> (*cell_coloring_function)(Cell*), double X_lower, double Y_lower);
+	void (*plot_agent_legend)(std::ofstream& os, Cell_Definition* cell_def, double& cursor_x, double& cursor_y, std::vector<std::string> (*cell_coloring_function)(Cell*), double temp_cell_radius);
+
 	
 	Cell_Functions(); // done 
 };
