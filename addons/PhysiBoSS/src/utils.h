@@ -83,13 +83,14 @@ public:
     int smoothing;
     double probability;
     bool initialized = false;
+    int steepness;
 
     MaBoSSOutput(std::string physicell_name, std::string intracellular_name,
                 std::string action, double value, double base_value,
-                int smoothing)
+                int smoothing, int steepness)
         : physicell_name(physicell_name), intracellular_name(intracellular_name),
         action(action), value(value), base_value(base_value),
-        smoothing(smoothing) {
+        smoothing(smoothing), steepness(steepness) {
     probability = 0.5;
     }
 
@@ -115,10 +116,10 @@ public:
     }
 
     if (action == "activation") {
-        double hill = PhysiCell::Hill_response_function(hill_input * 2, 1, 10);
+        double hill = PhysiCell::Hill_response_function(hill_input * 2, 1, steepness);
         return (value - base_value) * hill + base_value;
     } else if (action == "inhibition") {
-        double hill = PhysiCell::Hill_response_function(hill_input * 2, 1, 10);
+        double hill = PhysiCell::Hill_response_function(hill_input * 2, 1, steepness);
         return ((value - base_value) * (1 - hill)) + base_value;
     }
 

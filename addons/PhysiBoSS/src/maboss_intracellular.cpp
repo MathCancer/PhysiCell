@@ -403,7 +403,8 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 				PhysiCell::xml_get_my_string_value(settings.child("action")),
 				PhysiCell::xml_get_my_double_value(settings.child("value")),
 				(settings && settings.child( "base_value" ) ? PhysiCell::xml_get_my_double_value( settings.child( "base_value" )) : PhysiCell::xml_get_my_double_value(settings.child("value"))),
-				(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
+				(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0),
+				(settings && settings.child( "steepness" ) ? PhysiCell::xml_get_my_int_value( settings.child( "steepness" )) : 10)
 			);
 
 			auto const res = listOfOutputs.insert(std::pair<std::string, MaBoSSOutput>(physicell_name, output));
