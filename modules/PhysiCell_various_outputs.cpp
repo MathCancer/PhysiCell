@@ -70,6 +70,10 @@
 
 #include "./PhysiCell_settings.h"
 
+#ifdef ADDON_PHYSIBOSS
+#include "../addons/PhysiBoSS/src/maboss_intracellular.h"	
+#endif
+
 namespace PhysiCell{
 
 int writePov(std::vector<Cell*> all_cells, double timepoint, double scale)
@@ -202,5 +206,28 @@ void log_output(double t, int output_index, Microenvironment microenvironment, s
 	return;
 }
 
+void save_PhysiCell_Timepoint(std::string folder, std::string prefix, int output_index, Microenvironment& microenvironment)
+{
+	char filename[1024];
+	if (prefix == "output")
+		sprintf( filename , "%s/%s%08u" , folder.c_str(), prefix.c_str(),  output_index ); 
+	
+	else
+		sprintf( filename , "%s/%s", folder.c_str(), prefix.c_str()); 
+		
+	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
+
+#ifdef ADDON_PHYSIBOSS
+
+	if (prefix == "output")
+		sprintf( filename , "%s/states_%08u.csv" , folder.c_str(), output_index ); 
+	
+	else
+		sprintf( filename , "%s/states_%s.csv", folder.c_str(), prefix.c_str()); 
+		
+	MaBoSSIntracellular::save( filename );
+	
+#endif
+}
 	
 };

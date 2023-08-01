@@ -180,8 +180,8 @@ PhysiCell_pathology.o: ./modules/PhysiCell_pathology.cpp
 PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_MultiCellDS.cpp
 
-PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
+PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp $(MaBoSS)
+	$(COMPILE_COMMAND) $(INC) -c ./modules/PhysiCell_various_outputs.cpp
 
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
