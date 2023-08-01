@@ -120,7 +120,7 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 
 	void display(std::ostream& os);
 	
-	static void save(std::string filename, std::vector<PhysiCell::Cell*>& cells);
+	static void save(std::string filename);
 
     // unneeded for this type
     int update_phenotype_parameters(PhysiCell::Phenotype& phenotype) {return 0;}
