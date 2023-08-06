@@ -300,6 +300,15 @@ pack:
 	@echo "Other users can unzip $(PROJ).zip in their ./user_projects, compile, and run."
 	@echo " " 
 
+unpack:
+	@echo " "
+	@echo "Preparing shared project $(PROJ).zip for use ... "
+	@echo " " 
+	cd ./user_projects && unzip $(PROJ).zip 
+	@echo " "
+	@echo "Load this project via make load PROJ=$(PROJ) ... "
+	@echo " " 	
+
 list-user-projects:
 	@echo "user projects::"
 	@cd ./user_projects && ls -dt1 * | grep . | sed 's!empty.txt!!'
