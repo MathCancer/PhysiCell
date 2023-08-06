@@ -85,7 +85,7 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.13.x  \introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created to model rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. These releases also introduce numerous bug fixes, particularly to handling of Dirichlet boundary conditions, while introducing numerous minor feature enhancements such as packing and unpacking user projects (to facilitate code sharing). 
+Version 1.13.x introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created to model rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. These releases also introduce numerous bug fixes, particularly to handling of Dirichlet boundary conditions, while introducing numerous minor feature enhancements such as packing and unpacking user projects (to facilitate code sharing). 
 
 ### Version 1.13.1 (6 August 2023): 
 Version 1.13.1 primarily introduces bug fixes for smoother addon support, as well as new makefile rules to pack a user project for sharing (`make pack PROJ=name`) and to unpack a shared project (`make unpack PROJ=name`). These will create (pack) or expand (unpack) zipped projects in the `./user_projects` folder. To share, send the zipped file and encourage the recipient to store it in their own `./user_projects` folder. 
