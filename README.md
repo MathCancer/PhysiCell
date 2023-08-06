@@ -3,6 +3,7 @@
 
 **Release dates:** 29 July 2023 - 
 * 1.13.0 : 29 July 2023
+* 1.13.1 : 6 August 2023
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -67,13 +68,13 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 
 **Downloads:**    http://PhysiCell.sf.net
 
-**Support:**      https://sourceforge.net/p/physicell/tickets/
+**Support:**      https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA 
 
 **Quick Start:**  Look at QuickStart.md in the documentation folder. 
 
 **User Guide:**   Look at UserGuide.pdf in the documentation folder. 
  
-**Setup and Training:**	See last year's workshop and hackathon at https://github.com/PhysiCell-Training/ws2021  
+**Setup and Training:**	See this year's workshop and hackathon at https://github.com/PhysiCell-Training/ws2023  
  
 **Older Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
 
@@ -84,6 +85,12 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
+Version 1.13.x  \introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created to model rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. These releases also introduce numerous bug fixes, particularly to handling of Dirichlet boundary conditions, while introducing numerous minor feature enhancements such as packing and unpacking user projects (to facilitate code sharing). 
+
+### Version 1.13.1 (6 August 2023): 
+Version 1.13.1 primarily introduces bug fixes for smoother addon support, as well as new makefile rules to pack a user project for sharing (`make pack PROJ=name`) and to unpack a shared project (`make unpack PROJ=name`). These will create (pack) or expand (unpack) zipped projects in the `./user_projects` folder. To share, send the zipped file and encourage the recipient to store it in their own `./user_projects` folder. 
+
+### Version 1.13.0 (29 July 2023):
 Version 1.13.0 introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created by Cicely Macnamara, Vincent Noël and collaborators, which allows the user to specify rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. This allows the PhysiCell user the ability to investigate fine-grained processes between cellular and fibrous ECM agents. We are providing an sample project together with this addon to demonstrate, via many examples, the possibilities of PhysiMeSS. For more information, consult the PhysiMeSS README available in [./addons/PhysiMeSS/README.md](./addons/PhysiMeSS/README.md). Version 1.13.0 also updates the bundled PhysiBoSS addon, introduces a variety of bug fixes (particularly in handling of Dirichlet boundary conditions), and improves SVG plots. 
 
 We are grateful for immense contributions by Cicely Macnamara, Vincent Noël, Randy Heiland, Daniel Bergman, Marco Ruscone, Furkan Kurtoglu, and Elmar Bucher in this release. 
@@ -93,10 +100,21 @@ We are grateful for immense contributions by Cicely Macnamara, Vincent Noël, Ra
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
 
 ### Major new features and changes in the 1.13.z versions
+#### 1.13.1 
++ None in this release
 #### 1.13.0
 + Introduced PhysiMeSS, a major addon for modeling fibers of the extracellular matrix. Major thanks to Cicely Macnamara, Vincent Noël, and team!
 
 ### Minor new features and changes: 
+#### 1.13.1 
++ Continued modernization of sample projects for PhysiCell Studio compatibiltiy. See [PR 198](https://github.com/MathCancer/PhysiCell/pull/198).
++ Updated inhibitor behaviors in PhysiBoSS, and further code cleanup.  See [PR 194](https://github.com/MathCancer/PhysiCell/pull/194). Thanks, Marco Ruscone! 
++ PhysiBoSS cell line example migrated to newer MultiCellDS output. See [PR 193](https://github.com/MathCancer/PhysiCell/pull/193). Thanks, Vincent Noël!
++ Added a new makefile rule to simplify sharing user projects: `make pack PROJ=name` will zip all of the `name` user project in `./user_projects/name.zip`. Send this zip file for sharing your project, and have your recipient: 
+  1. Place `name.zip` in thier `./user_projects/` folder (preferably PhysiCell version 1.13.1 or later)
+  2. Have them run the new rule `make unpack PROJ=name` to expand the project.
+  3. After this, the usual rules apply. `make load PROJ=name` to load the project, and a subsequent `make` to compile it. 
++ Added a new makefile rule to simplify use of shared  user projects: `make unpack PROJ=name` will unzip the contents of `./user_projects/name.zip` into a new user project called `name`. Type `make load PROJ=name` to load this project, and `make` to compile it.  
 #### 1.13.0
 + Preparations for a new derived `Cell` class for use in PhysiBoSS, including a new `instantiate_cell` function in `Cell_Functions` to help facilitate this. See [PR 153](https://github.com/MathCancer/PhysiCell/pull/153) (Thanks, Vincent Noël!)
 + Various safety refinements (`const` accessors) in vector operations ([PR 160](https://github.com/MathCancer/PhysiCell/pull/160)). Thanks, Vincent Noël! 
@@ -110,12 +128,17 @@ We are grateful for immense contributions by Cicely Macnamara, Vincent Noël, Ra
 + minor cleanup 
 
 ### Beta features (not fully supported):
-
+#### 1.13.1 
++ The dFBA addon is considered "beta" and unsupported at this time. Compatability work is underway. Thank you, Miguel Ponce de Leon and team! 
 #### 1.13.0
 + None in this release. 
  
 ### Bugfixes: 
-
+#### 1.13.1 
++ Bugfixes to and refinements to the libRoadrunner setup scripts. See [PR 196](https://github.com/MathCancer/PhysiCell/pull/196). Thanks to Randy Heiland and Furkan Kurtoglu. 
++ Updated PHysiBoSS cell line example project to remove “default phenotype” function. See [PR 195](https://github.com/MathCancer/PhysiCell/pull/195). Thanks, Vincent Noël!
++ Fixed default cell constructor to improve backwards compatibility by including new SVG plot function pointers. See [PR 200](https://github.com/MathCancer/PhysiCell/pull/200). Thanks to John Metzcar for catching this and for careful detective work to isolate the cause!
++ Numerous bugfixes to PhysiCell zip distribution, including a better release protocol. Major thanks to Furkan Kurtoglu, Elmar Bucher, John Metzcar, and Randy Heiland for help! 
 #### 1.13.0 
 + Fix typographical errors in Makefiles in sample projects.
 + Set correct value (100) of `cell_BM_repulsion_strength` in `PhysiCell_phenotype.cpp` (Thanks, Elmar Bucher!)

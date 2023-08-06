@@ -161,6 +161,11 @@ Cell_Definition::Cell_Definition()
 	functions.update_velocity = NULL; // standard_update_cell_velocity;
 	functions.add_cell_basement_membrane_interactions = NULL; 
 	functions.calculate_distance_to_membrane = NULL; 
+
+	// bug fix July 31 2023
+	functions.plot_agent_SVG = standard_agent_SVG;
+	functions.plot_agent_legend = standard_agent_legend;
+	// bug fix July 31 2023
 	
 	functions.set_orientation = NULL;
 	
