@@ -28,7 +28,11 @@ number.
 
 7) create (and approve) a pull request from the development branch to the master branch.
 
-8) Sourceforge.net release 
+8) Make a clean GitHub clone of the PhysiCell repo (to ensure no persona/local files remain) before proceeding to make the ZIP for release. 
+
+   a) Make sure ./addons/libRoadrunner/roadrunner is not present. 
+
+9) Sourceforge.net release 
    a) Move one directory up. Zip everything in PhysiCell 
       into a new zip file. Use 
       
@@ -51,7 +55,7 @@ zip PhysiCell_V.x.y.z.zip -r -X PhysiCell/* -x PhysiCell/.git -x PhysiCell/.giti
 
    g) Edit the README.md file (on SF) to exclude it from stats tracking. 
 
-9) GitHub release: 
+10) GitHub release: 
 
    a) Go to https://github.com/MathCancer/PhysiCell/releases
       Click "Draft a new release" 
