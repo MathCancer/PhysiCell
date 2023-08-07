@@ -27,12 +27,24 @@ def reminder_dynamic_link_path_linux():
     print("\n*      To make this permanent, add this line to the bottom of the respective shell startup file, e.g., .bashrc, .bash_profile, or .zshenv in your home directory.")
     print("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
 
-if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "libRoadrunner", "roadrunner")):
+os_type = platform.system()
+
+# Old:
+# if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "libRoadrunner", "roadrunner")):
+
+# New: July 2023 - trying to be smarter about deciding whether to (re)download libRR
+#  NOTE: needs to be tested cross-platform!
+if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "libRoadrunner", "roadrunner","include","rr","C","rrc_api.h")):
     print('\nlibroadrunner already installed.\n')
+
+    # regardless, let's remind the user about the env var requirement!
+    if os_type.lower() == 'darwin':
+        reminder_dynamic_link_path_macos()
+    elif os_type.lower().startswith("linux"):
+        reminder_dynamic_link_path_linux()
 
 else:
     print('\nThis model requires the libRoadrunner libraries which will now be downloaded.')
-    os_type = platform.system()
     print('(for your ',os_type, ' operating system)')
 
     # Assume Windows

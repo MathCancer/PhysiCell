@@ -90,7 +90,7 @@ void create_cell_types( void )
 
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = NULL;
-
+	cell_defaults.functions.update_phenotype = NULL; 
 	cell_defaults.functions.update_migration_bias = NULL; 
 	cell_defaults.functions.pre_update_intracellular = pre_update_intracellular; 
 	cell_defaults.functions.post_update_intracellular = post_update_intracellular; 

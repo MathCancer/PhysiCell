@@ -290,6 +290,25 @@ load:
 	cp ./user_projects/$(PROJ)/config/* ./config/ 
 	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
 
+pack:
+	@echo " "
+	@echo "Preparing project $(PROJ) for sharing ... "
+	@echo " " 
+	cd ./user_projects && zip -r $(PROJ).zip $(PROJ)
+	@echo " "
+	@echo "Share ./user_projects/$(PROJ).zip ... "
+	@echo "Other users can unzip $(PROJ).zip in their ./user_projects, compile, and run."
+	@echo " " 
+
+unpack:
+	@echo " "
+	@echo "Preparing shared project $(PROJ).zip for use ... "
+	@echo " " 
+	cd ./user_projects && unzip $(PROJ).zip 
+	@echo " "
+	@echo "Load this project via make load PROJ=$(PROJ) ... "
+	@echo " " 	
+
 list-user-projects:
 	@echo "user projects::"
 	@cd ./user_projects && ls -dt1 * | grep . | sed 's!empty.txt!!'
