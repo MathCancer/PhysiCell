@@ -1319,9 +1319,25 @@ void initialize_microenvironment( void )
 		default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector; 
 	}
 
-	// set the initial condition 
-	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
-	{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
+	// set the initial condition
+
+	if (default_microenvironment_options.initial_condition_from_file_enabled)
+	{
+		if (default_microenvironment_options.initial_condition_file_type=="matlab")
+		{
+			load_initial_conditions_from_matlab(default_microenvironment_options.initial_condition_file);
+		}
+		else // eventually can add other file types
+		{
+			std::cout << "ERROR : Load BioFVM initial conditions from " << default_microenvironment_options.initial_condition_file_type << " not yet supported." << std::endl;
+			exit(-1);
+		}
+	}
+	else // do what was done before
+	{
+		for (unsigned int n = 0; n < microenvironment.number_of_voxels(); n++)
+		{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
+	}
 
 	// now, figure out which sides have BCs (for at least one substrate): 
 
@@ -1531,14 +1547,63 @@ void initialize_microenvironment( void )
 	
     // April 2023: no longer necessary after flipping our approach and doing an "additive" instead of "subtractive" DCs handling. I.e., we assume DC activation is false by default; make true on-demand.
 
-	// // set the Dirichlet condition activation vector to match the microenvironment options 
+	// // set the Dirichlet condition activation vector to match the microenvironment options
 	// for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
 	// {
-	// 	microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
+	// 	microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] );
 	// }
-	
-	microenvironment.display_information( std::cout );
+
+	microenvironment.display_information(std::cout);
 	return;
 }
 
+void load_initial_conditions_from_matlab(std::string filename)
+{
+	// The .mat file needs to contain exactly one matrix where each row corresponds to a single voxel.
+	// Each row is a vector of values as follows: [x coord, y coord, z coord, substrate id 0 value, substrate id 1 value, ...]
+	// Thus, your matrix should be of size #voxels x (3 + #densities) (rows x columns)
+	// M will be read in such that each element of M is one of these rows
+	std::vector< std::vector<double> > M = read_matlab( filename );
+	int num_mat_voxels = M.size();
+	int num_mat_features = M[1].size();
+	if (num_mat_voxels != microenvironment.number_of_voxels())
+	{
+		std::cout << "ERROR : Wrong number of voxels supplied in the .mat file specifying BioFVM initial conditions." << std::endl
+				  << "\t Expected: " << microenvironment.number_of_voxels() << std::endl
+				  << "\t Found: " << num_mat_voxels << std::endl
+				  << "\t Remember, save your matrix as a #voxels x (3 + #densities) matrix." << std::endl;
+		exit(-1);
+	}
+	if (num_mat_features != (microenvironment.number_of_densities() + 3))
+	{
+		std::cout << "ERROR : Wrong number of density values supplied in the .mat file specifying BioFVM initial conditions." << std::endl
+				  << "\t Expected: " << microenvironment.number_of_voxels() << std::endl
+				  << "\t Found: " << num_mat_features - 3 << std::endl
+				  << "\t Remember, save your matrix as a #voxels x (3 + #densities) matrix." << std::endl;
+		exit(-1);
+	}
+	std::vector<int> voxel_set = {}; // set to check that no voxel value is set twice
+	int voxel_ind;
+	std::vector<double> position;
+	for (unsigned int i = 0; i < num_mat_voxels; i++)
+	{
+		position = {M[i][0], M[i][1], M[i][2]};
+		std::cout << "position = " << position << std::endl;
+		voxel_ind = microenvironment.mesh.nearest_voxel_index(position);
+		for (unsigned int ci = 0; ci < microenvironment.number_of_densities(); ci++)
+		{
+			microenvironment.density_vector(voxel_ind)[ci] = M[i][ci+3];
+		}
+		for (unsigned int j = 0; j < i; j++)
+		{
+			if (voxel_ind==voxel_set[j])
+			{
+				std::cout << "ERROR : the matlab-supplied initial conditions for BioFVM repeat the same voxel. Fix the .mat file and try again." << std::endl
+						  << "\t Position that was repeated: " << position << std::endl;
+				exit(-1);
+			}
+		}
+		voxel_set.push_back(voxel_ind);
+	}
+}
 };

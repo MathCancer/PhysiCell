@@ -339,6 +339,10 @@ class Microenvironment_Options
 	std::vector<double> Dirichlet_zmax_values; 
 	
 	std::vector<double> initial_condition_vector; 
+
+	bool initial_condition_from_file_enabled;
+	std::string initial_condition_file_type;
+	std::string initial_condition_file;
 	
 	bool simulate_2D; 
 	std::vector<double> X_range; 
@@ -359,6 +363,7 @@ extern Microenvironment microenvironment;
 
 void initialize_microenvironment( void ); 
 
+void load_initial_conditions_from_matlab( std::string filename );
 };
 
 #endif
