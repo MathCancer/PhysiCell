@@ -96,7 +96,16 @@ void load_cells_mat( std::string filename );
 void load_cells_physicell( std::string filename ); 
 
 bool load_cells_from_pugixml( pugi::xml_node root ); 
-bool load_cells_from_pugixml( void ); // load cells based on default config XML root 
+bool load_cells_from_pugixml( void ); // load cells based on default config XML root
+
+void set_parameters_from_distributions(pugi::xml_node);
+void set_parameters_from_distributions(void);
+void set_parameters_from_distributions_for_celltype(pugi::xml_node node);
+void set_parameter_from_distribution_for_celltype(pugi::xml_node node_dist);
+void set_parameter_from_distribution_for_celltype(Cell_Definition *pCD, std::string behavior, std::string type, pugi::xml_node node_dist);
+
+bool is_in(std::string x, std::vector<std::string> A);
+bool strcmpi(std::string x, std::string y);
 
 //	
 // 2D functions 

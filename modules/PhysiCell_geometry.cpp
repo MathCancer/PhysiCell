@@ -336,6 +336,243 @@ bool load_cells_from_pugixml( pugi::xml_node root )
 bool load_cells_from_pugixml( void )
 { return load_cells_from_pugixml( physicell_config_root ); }
 
+
+void set_parameters_from_distributions( const pugi::xml_node root )
+{
+	// find the start of cell definitions 
+	pugi::xml_node node = root.child( "cell_definitions" ); 
+	
+	// find the first cell definition 
+	node = node.child( "cell_definition" ); 
+
+	while (node)
+	{
+		pugi::xml_node node_ipd = node.child("initial_parameter_distributions");
+		if (node_ipd && node_ipd.attribute("enabled").as_bool())
+		{ set_parameters_from_distributions_for_celltype(node_ipd);	}
+		node = node.next_sibling("cell_definition");
+	}
+	return;
+}
+
+void set_parameters_from_distributions_for_celltype(const pugi::xml_node node_ipd)
+{
+	pugi::xml_node node_dist = node_ipd.child("distribution");
+	while (node_dist)
+	{
+		set_parameter_from_distribution_for_celltype(node_dist);
+		node_dist = node_dist.next_sibling("distribution");
+	}
+	return;
+}
+
+void set_parameter_from_distribution_for_celltype(pugi::xml_node node_dist)
+{
+	static std::vector<std::string> supported_distributions = {"Uniform","LogUniform","Normal","LogNormal","Log10Normal"};
+	std::string celltype = node_dist.parent().parent().attribute("name").as_string();
+	Cell_Definition *pCD = find_cell_definition(celltype);
+	std::string behavior = xml_get_string_value(node_dist, "behavior");
+	if (!strcmpi(behavior,"volume") && find_behavior_index(behavior) == -1)
+	{
+		std::cout << "\tWarning: I don't know how to process " << behavior
+				  << " so I skipped it." << std::endl;
+		return;
+	}
+	std::string type = xml_get_string_value(node_dist, "type");
+	if (!is_in(type, supported_distributions))
+	{
+		std::cout << "WARNING : Only supporting these distributions:" << std::endl
+				  << "\t" << supported_distributions
+				  << "\t Skipping the distribution for " << behavior << " for " << celltype << std::endl;
+		return;
+	}
+	set_parameter_from_distribution_for_celltype(pCD, behavior, type, node_dist);
+	return;
+}
+
+bool is_in(const std::string x, const std::vector<std::string> A)
+{
+	// checks if x is in A
+	for (unsigned int i = 0; i < A.size(); i++)
+	{
+		if (strcmpi(x, A[i]))
+		{ return true; }
+	}
+	return false;
+}
+
+void set_parameter_from_distribution_for_celltype(Cell_Definition *pCD, std::string behavior, std::string type, pugi::xml_node node_dist)
+{
+	if (strcmpi(type,"uniform"))
+	{
+		double min = xml_get_double_value(node_dist, "min");
+		double max = xml_get_double_value(node_dist, "max");
+		double dv = max - min;
+		if (dv < 0)
+		{
+			std::cout << "ERROR : The min and max values for " << behavior << " in " << pCD->name
+					  << "\tdo not satisfy min <= max" << std::endl;
+			exit(-1);
+		}
+		for (unsigned int i = 0; i < (*all_cells).size(); i++)
+		{
+			if ((*all_cells)[i]->type_name != pCD->name)
+			{
+				continue;
+			}
+			double val = min + dv * UniformRandom();
+			if (strcmpi(behavior,"volume"))
+			{
+				(*all_cells)[i]->set_total_volume(val);
+			}
+			else
+			{
+				set_single_behavior((*all_cells)[i], behavior, val);
+			}
+		}
+	}
+	else if (strcmpi(type,"loguniform"))
+	{
+		double min = xml_get_double_value(node_dist, "min");
+		if (min <= 0)
+		{
+			std::cout << "ERROR : The log uniform distirbution must be defined on a positive interval."
+					  << "\tSet the min and max as the bounds on the value you want, not the bounds on the exponent." << std::endl;
+			exit(-1);
+		}
+		min = log(min);
+		double max = log(xml_get_double_value(node_dist, "max"));
+		double dv = max - min;
+		if (dv < 0)
+		{
+			std::cout << "ERROR : The min and max values for " << behavior << " in " << pCD->name
+					  << "\tdo not satisfy min <= max" << std::endl;
+			exit(-1);
+		}
+		for (unsigned int i = 0; i < (*all_cells).size(); i++)
+		{
+			if ((*all_cells)[i]->type_name != pCD->name)
+			{
+				continue;
+			}
+			double val = exp(min + dv * UniformRandom());
+			if (strcmpi(behavior,"volume"))
+			{
+				(*all_cells)[i]->set_total_volume(val);
+			}
+			else
+			{
+				set_single_behavior((*all_cells)[i], behavior, val);
+			}
+		}
+	}
+	else if (strcmpi(type,"normal"))
+	{
+		double mu = xml_get_double_value(node_dist, "mu");
+		double sigma = xml_get_double_value(node_dist, "sigma");
+		double lb = -9e99;
+		double ub = 9e99;
+		if (node_dist.child("lower_bound"))
+		{ lb = xml_get_double_value(node_dist, "lower_bound"); }
+		if (node_dist.child("upper_bound"))
+		{ ub = xml_get_double_value(node_dist, "upper_bound"); }
+		std::cout << "lb = " << lb << ". ub = " << ub << std::endl;
+		for (unsigned int i = 0; i < (*all_cells).size(); i++)
+		{
+			if ((*all_cells)[i]->type_name != pCD->name)
+			{
+				continue;
+			}
+			double val=lb;
+			while (val<=lb || val>=ub)
+			{ val = NormalRandom(mu, sigma); }
+			if (strcmpi(behavior,"volume"))
+			{
+				(*all_cells)[i]->set_total_volume(val);
+			}
+			else
+			{
+				set_single_behavior((*all_cells)[i], behavior, val);
+			}
+		}
+	}
+	else if (strcmpi(type,"lognormal"))
+	{
+		double mu = xml_get_double_value(node_dist, "mu");
+		double sigma = xml_get_double_value(node_dist, "sigma");
+		double lb = -9e99;
+		double ub = 9e99;
+		if (node_dist.child("lower_bound"))
+		{ lb = xml_get_double_value(node_dist, "lower_bound"); }
+		if (node_dist.child("upper_bound"))
+		{ ub = xml_get_double_value(node_dist, "upper_bound"); }
+		for (unsigned int i = 0; i < (*all_cells).size(); i++)
+		{
+			if ((*all_cells)[i]->type_name != pCD->name)
+			{
+				continue;
+			}
+			double val=lb;
+			while (val<=lb || val>=ub)
+			{ val = exp(NormalRandom(mu, sigma)); }
+			if (strcmpi(behavior,"volume"))
+			{
+				(*all_cells)[i]->set_total_volume(val);
+			}
+			else
+			{
+				set_single_behavior((*all_cells)[i], behavior, val);
+			}
+		}
+	}
+	else if (strcmpi(type,"log10normal"))
+	{
+		static double log10_ = log(10.0);
+		double mu = xml_get_double_value(node_dist, "mu");
+		double sigma = xml_get_double_value(node_dist, "sigma");
+		double lb = -9e99;
+		double ub = 9e99;
+		if (node_dist.child("lower_bound"))
+		{ lb = xml_get_double_value(node_dist, "lower_bound"); }
+		if (node_dist.child("upper_bound"))
+		{ ub = xml_get_double_value(node_dist, "upper_bound"); }
+		for (unsigned int i = 0; i < (*all_cells).size(); i++)
+		{
+			if ((*all_cells)[i]->type_name != pCD->name)
+			{
+				continue;
+			}
+			double val=lb;
+			while (val<=lb || val>=ub)
+			{ val = exp(log10_ * NormalRandom(mu, sigma)); }
+			if (strcmpi(behavior,"volume"))
+			{
+				(*all_cells)[i]->set_total_volume(val);
+			}
+			else
+			{
+				set_single_behavior((*all_cells)[i], behavior, val);
+			}
+		}
+	}
+	return;
+}
+
+bool strcmpi(std::string x, std::string y)
+{
+	// case-Insensitive compare strings
+	for (auto& a : x) {
+        a = tolower(a);
+    }
+	for (auto& a : y) {
+        a = tolower(a);
+    }
+	return x==y;
+}
+
+void set_parameters_from_distributions( void )
+{ return set_parameters_from_distributions( physicell_config_root ); }
+
 std::vector<std::string> split_csv_labels( std::string labels_line )
 {
 	std::vector< std::string > label_tokens; 
