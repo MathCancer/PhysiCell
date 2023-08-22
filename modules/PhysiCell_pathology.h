@@ -120,12 +120,15 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell ); // done
 
 std::string formatted_minutes_to_DDHHMM( double minutes ); 
 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*substrate_coloring_function)(double, double, double) = NULL ); // done
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::vector<std::string> (*substrate_coloring_function)(double, double, double) = NULL, void (*cell_counts_function) (char*) = NULL); // done
 
 void SVG_plot_with_stroma( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) , 
 	int ECM_index, std::vector<std::string> (*ECM_coloring_function)(double) ); // planned
 	
 void create_plot_legend( std::string filename , std::vector<std::string> (*cell_coloring_function)(Cell*) ); 
+
+void standard_agent_SVG(std::ofstream& os, PhysiCell::Cell* pCell, double z_slice, std::vector<std::string> (*cell_coloring_function)(Cell*), double X_lower, double Y_lower);
+void standard_agent_legend(std::ofstream& os, Cell_Definition* cell_definition, double& cursor_x, double& cursor_y, std::vector<std::string> (*cell_coloring_function)(Cell*), double temp_cell_radius);
 
 };
 

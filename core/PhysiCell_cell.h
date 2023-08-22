@@ -200,7 +200,7 @@ class Cell : public Basic_Agent
 	void step(double dt);
 	Cell();
 	
-	~Cell(); 
+	virtual ~Cell(); 
 	
 	bool assign_position(std::vector<double> new_position);
 	bool assign_position(double, double, double);
@@ -251,7 +251,7 @@ class Cell : public Basic_Agent
 	void convert_to_cell_definition( Cell_Definition& cd ); 
 };
 
-Cell* create_cell( void );  
+Cell* create_cell( Cell* (*custom_instantiate)() = NULL );  
 Cell* create_cell( Cell_Definition& cd );  
 
 void delete_cell( int ); 

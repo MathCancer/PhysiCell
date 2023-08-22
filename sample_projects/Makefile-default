@@ -42,7 +42,7 @@ BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_contai
 
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
 PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o \
-PhysiCell_signal_behavior.o PhyisiCell_rules.o
+PhysiCell_signal_behavior.o PhysiCell_rules.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
@@ -73,7 +73,7 @@ name:
 list-projects:
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
-	@echo "                 worm-sample interaction-sample mechano-sample rules-sample"
+	@echo "                 worm-sample interaction-sample mechano-sample rules-sample physimess-sample"
 	@echo ""
 	@echo "Sample intracellular projects: ode-energy-sample physiboss-cell-lines-sample cancer-metabolism-sample"
 	@echo ""
@@ -188,6 +188,14 @@ rules-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/rules_sample/config/* ./config/
 
+physimess-sample:
+	cp ./sample_projects/physimess/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/physimess/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/physimess/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/physimess/config/* ./config/
 
 # ---- intracellular projects 
 ode-energy-sample:
@@ -465,6 +473,25 @@ load:
 	cp ./user_projects/$(PROJ)/Makefile .
 	cp ./user_projects/$(PROJ)/config/* ./config/ 
 	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
+
+pack:
+	@echo " "
+	@echo "Preparing project $(PROJ) for sharing ... "
+	@echo " " 
+	cd ./user_projects && zip -r $(PROJ).zip $(PROJ)
+	@echo " "
+	@echo "Share ./user_projects/$(PROJ).zip ... "
+	@echo "Other users can unzip $(PROJ).zip in their ./user_projects, compile, and run."
+	@echo " " 
+
+unpack:
+	@echo " "
+	@echo "Preparing shared project $(PROJ).zip for use ... "
+	@echo " " 
+	cd ./user_projects && unzip $(PROJ).zip 
+	@echo " "
+	@echo "Load this project via make load PROJ=$(PROJ) ... "
+	@echo " " 	
 
 list-user-projects:
 	@echo "user projects::"

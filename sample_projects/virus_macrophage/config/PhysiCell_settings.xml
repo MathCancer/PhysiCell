@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2880</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">2880</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -101,7 +101,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>output</folder> <!-- use . for root --> 
+		<folder>output</folder>  
 
 		<full_data>
 			<interval units="min">60</interval>
@@ -146,11 +146,11 @@
 		<options>
 			<calculate_gradients>true</calculate_gradients>
 			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
-			<!-- not yet supported --> 
+			 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
 			</initial_condition>
-			<!-- not yet supported --> 
+			 
 			<dirichlet_nodes type="matlab" enabled="false">
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
@@ -161,37 +161,17 @@
 		<cell_definition name="epithelial cell" ID="0">
 			<phenotype>
 				<cycle code="6" name="Flow cytometry model (separated)">  
-					<!-- phases are: G0/G1 , S, G2, M --> 
-
-					<!-- using higher than normal significant digits to match divisions in default code -->
-					<!-- use phase_transition_rates OR phase_durations -->
 					<phase_transition_rates units="1/min"> 
 						<rate start_index="0" end_index="1" fixed_duration="false">0</rate>
 						<rate start_index="1" end_index="2" fixed_duration="true">0.00208333</rate>
 						<rate start_index="2" end_index="3" fixed_duration="true">0.00416667</rate>
 						<rate start_index="3" end_index="0" fixed_duration="true">0.0166667</rate>
 					</phase_transition_rates>
-					
-					<!-- use phase_transition_rates OR phase_durations -->
-<!--					
-					<phase_durations units="min"> 
-						<duration index="0" fixed_duration="false">300.0</duration>
-						<duration index="1" fixed_duration="true">480</duration>
-						<duration index="2" fixed_duration="true">240</duration>
-						<duration index="3" fixed_duration="true">60</duration>
-					</phase_durations>
--->					
 				</cycle>
 				
 				<death>  
 					<model code="100" name="apoptosis"> 
 						<death_rate units="1/min">0</death_rate>
-						<!-- use phase_transition_rates OR phase_durations -->
-						<!--
-						<phase_transition_rates units="1/min">
-							<rate start_index="0" end_index="1" fixed_duration="true">0.00193798</rate>
-						</phase_transition_rates>
-						-->
 						<phase_durations units="min">
 							<duration index="0" fixed_duration="true">516</duration>
 						</phase_durations>
@@ -207,16 +187,9 @@
 
 					<model code="101" name="necrosis">
 						<death_rate units="1/min">0.0</death_rate>
-						<!-- use phase_transition_rates OR phase_durations -->
-						<!-- necrosis uses phase_duration[0] = 0 so that it always immediately
-							 tries to transition and instead checks volume against the rupture
-							 volume --> 
-<!--						
-						<phase_transition_rates units="1/min">
-							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
-							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
-						</phase_transition_rates>
--->						
+						
+						 
+						
 						<phase_durations units="min">
 							<duration index="0" fixed_duration="true">0</duration>
 							<duration index="1" fixed_duration="true">86400</duration>
@@ -294,7 +267,7 @@
 			</phenotype>
 			<custom_data>
 				<viral_replication_rate units="viral particles/min">0.15</viral_replication_rate>  
-				<!-- 0.4167 -->
+				
 				<min_virion_count units="none">1</min_virion_count>
 				<burst_virion_count units="none">100</burst_virion_count>
 				
@@ -306,10 +279,82 @@
 			</custom_data>
 		</cell_definition>
 		
-		<cell_definition name="macrophage" parent_type="epithelial cell" ID="1">
+		<cell_definition name="macrophage" ID="1" visible="true">
 			<phenotype>
+				<cycle code="6" name="Flow cytometry model (separated)">  
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="1" fixed_duration="false">0</rate>
+						<rate start_index="1" end_index="2" fixed_duration="true">0.00208333</rate>
+						<rate start_index="2" end_index="3" fixed_duration="true">0.00416667</rate>
+						<rate start_index="3" end_index="0" fixed_duration="true">0.0166667</rate>
+					</phase_transition_rates>
+				</cycle>
+				
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">0</death_rate>
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">516</duration>
+						</phase_durations>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.0</death_rate>
+						
+						 
+						
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">0</duration>
+							<duration index="1" fixed_duration="true">86400</duration>
+						</phase_durations>
+						
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>					
+
+				<volume>  
+					<total units="micron^3">2494</total>
+					<fluid_fraction units="dimensionless">0.75</fluid_fraction>
+					<nuclear units="micron^3">540</nuclear>
+					
+					<fluid_change_rate units="1/min">0.05</fluid_change_rate>
+					<cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+					<nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+					
+					<calcified_fraction units="dimensionless">0</calcified_fraction>
+					<calcification_rate units="1/min">0</calcification_rate>
+					
+					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+				</volume> 				
+				
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+					
+					<options>
+						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
 				<motility>  
-					<speed units="micron/min">0.5</speed> <!-- try 0.75 to see a very different outcome --> 
+					<speed units="micron/min">0.5</speed>
 					<persistence_time units="min">15</persistence_time>
 					<migration_bias units="dimensionless">0.4</migration_bias>
 					
@@ -323,15 +368,39 @@
 						</chemotaxis>
 					</options>
 				</motility>
+				
 				<secretion>
 					<substrate name="virus">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
 						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+					
+					<substrate name="interferon">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 
 				</secretion>
+				<molecular />
 			</phenotype>
+			<custom_data>
+				<viral_replication_rate units="viral particles/min">0.15</viral_replication_rate>  
+				
+				<min_virion_count units="none">1</min_virion_count>
+				<burst_virion_count units="none">100</burst_virion_count>
+				
+				<virion_threshold_for_interferon units="virions">10</virion_threshold_for_interferon>
+				<max_interferon_secretion_rate units="1/min">1</max_interferon_secretion_rate>
+
+				<min_virion_detection_threshold units="none">1</min_virion_detection_threshold>
+				<virus_digestion_rate units="1/min">0.01</virus_digestion_rate> 
+			</custom_data>
 		</cell_definition>
 		
-	</cell_definitions>
+		</cell_definitions>
 	
 	<initial_conditions>
 		<cell_positions type="csv" enabled="false">
@@ -342,25 +411,12 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless" hidden="true">0</random_seed> 
-		<!-- example parameters from the template --> 
-		
-		<!-- virus properties --> 
-		<number_of_infected_cells type="int" units="none" 
-			description="initial number of infected cells">10</number_of_infected_cells>
-		<number_of_uninfected_cells type="int" units="none" 
-			description="initial number of uninfected cells">1000</number_of_uninfected_cells>
-		<fraction_released_at_death type="double" units="dimensionless"
-			description="fraction of virions released at cell lysis">1.0</fraction_released_at_death>
-		<fraction_transferred_when_ingested type="double" units="dimensionless" 
-			description="fraction of virions absorbed when phagocytosing a cell">1.0</fraction_transferred_when_ingested>
-		<!-- virus diffusion coefficient ~ 1e3 micron^2/min : https://bionumbers.hms.harvard.edu/bionumber.aspx?id=105894 --> 
-		
-		<!-- macrophage properties --> 
+		<number_of_infected_cells type="int" units="none" description="initial number of infected cells">10</number_of_infected_cells>
+		<number_of_uninfected_cells type="int" units="none" description="initial number of uninfected cells">1000</number_of_uninfected_cells>
+		<fraction_released_at_death type="double" units="dimensionless" description="fraction of virions released at cell lysis">1.0</fraction_released_at_death>
+		<fraction_transferred_when_ingested type="double" units="dimensionless" description="fraction of virions absorbed when phagocytosing a cell">1.0</fraction_transferred_when_ingested>
 		<number_of_macrophages type="int" units="none" description="initial number of macrophages">50</number_of_macrophages> 
-		
 		<macrophage_relative_adhesion type="double" units="dimensionless">0.05</macrophage_relative_adhesion>
-				
 	</user_parameters>
-	
 	
 </PhysiCell_settings>

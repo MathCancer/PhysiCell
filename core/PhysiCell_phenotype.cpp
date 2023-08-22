@@ -678,7 +678,7 @@ Mechanics::Mechanics()
 	cell_BM_adhesion_strength = 4.0;
 	
 	cell_cell_repulsion_strength = 10.0; 
-	cell_BM_repulsion_strength = 10.0; 
+	cell_BM_repulsion_strength = 100.0; 
 
 	cell_adhesion_affinities = {1}; 
 	
@@ -1141,6 +1141,8 @@ void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
 
 Cell_Functions::Cell_Functions()
 {
+	instantiate_cell = NULL;
+	
 	volume_update_function = NULL; 
 	update_migration_bias = NULL; 
 	

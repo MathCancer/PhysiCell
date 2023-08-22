@@ -44,3 +44,26 @@ jobs:
     - name: Run PhysiBoSS cell lines project
       run: |
         ./PhysiBoSS_Cell_Lines
+  
+  build_physimess:
+
+    runs-on: macos-11
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run : brew install gcc@11
+      
+    - name: Build PhysiMeSS project
+      run: |
+        make physimess-sample
+        make clean
+        make PHYSICELL_CPP=g++-11
+        
+    - name: Run PhysiMeSS project
+      run: |
+        ./project
+        ./project config/Fibre_Initialisation/mymodel_initialisation.xml
+        ./project config/Cell_Fibre_Mechanics/mymodel_rotating.xml
+        

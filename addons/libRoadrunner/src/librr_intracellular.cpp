@@ -125,17 +125,17 @@ void RoadRunnerIntracellular::start()
     // called when a new cell is created; creates the unique 'rrHandle'
     rrc::RRVectorPtr vptr;
 
-    std::cout << "\n------------ " << __FUNCTION__ << ": librr_intracellular.cpp: start() called\n";
+    //std::cout << "\n------------ " << __FUNCTION__ << ": librr_intracellular.cpp: start() called\n";
     // this->enabled = true;
 
-    std::cout << "\n------------ " << __FUNCTION__ << ": doing: rrHandle = createRRInstance()\n";
+    //std::cout << "\n------------ " << __FUNCTION__ << ": doing: rrHandle = createRRInstance()\n";
 
     rrHandle = createRRInstance();
 
-    std::cout << "\n------------ " << __FUNCTION__ << ": rrHandle = " << rrHandle << std::endl;
+    //std::cout << "\n------------ " << __FUNCTION__ << ": rrHandle = " << rrHandle << std::endl;
 
     // if (!rrc::loadSBML (rrHandle, get_cell_definition("lung epithelium").sbml_filename.c_str())) 
-    std::cout << "     sbml_filename = " << sbml_filename << std::endl;
+    //std::cout << "     sbml_filename = " << sbml_filename << std::endl;
 
     // TODO: don't hard-code name
     if ( !rrc::loadSBML(rrHandle, (sbml_filename).c_str() ) )
@@ -156,32 +156,34 @@ void RoadRunnerIntracellular::start()
     int p = rrc::getNumberOfGlobalParameters(rrHandle);
     int c = rrc::getNumberOfCompartments(rrHandle);
 
-    std::cerr << "Number of reactions = " << r << std::endl;
-    std::cerr << "Number of floating species = " << m << std::endl;  // 4
-    std::cerr << "Number of boundary species = " << b << std::endl;  // 0
-    std::cerr << "Number of compartments = " << c << std::endl;  // 1
 
-    std::cerr << "Floating species names:\n";
-    std::cerr << "-----------------------\n";
+    //std::cerr << "Number of reactions = " << r << std::endl;
+    //std::cerr << "Number of floating species = " << m << std::endl;  // 4
+    //std::cerr << "Number of boundary species = " << b << std::endl;  // 0
+    //std::cerr << "Number of compartments = " << c << std::endl;  // 1
+
+    //std::cerr << "Floating species names:\n";
+    //std::cerr << "-----------------------\n";
     std::string species_names_str = stringArrayToString(rrc::getFloatingSpeciesIds(rrHandle));
-    std::cerr <<  species_names_str <<"\n"<< std::endl;
+    //std::cerr <<  species_names_str <<"\n"<< std::endl;
     std::stringstream iss(species_names_str);
     std::string species_name;
     int idx = 0;
     while (iss >> species_name)
     {
         species_result_column_index[species_name] = idx;
-        std::cout << species_name << " -> " << idx << std::endl;
+        //std::cout << species_name << " -> " << idx << std::endl;
         idx++;
     }
 
     vptr = rrc::getFloatingSpeciesConcentrations(rrHandle);
     //std::cerr << vptr->Count << std::endl;
-    for (int kdx=0; kdx<vptr->Count; kdx++)
+/*     for (int kdx=0; kdx<vptr->Count; kdx++)
     {
         std::cerr << kdx << ") " << vptr->Data[kdx] << std::endl;
-    }
+    } */
     //std::cerr << "----------  end start() -------------\n";
+    
     rrc::freeVector(vptr);
     // return 0;
 }

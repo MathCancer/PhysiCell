@@ -79,6 +79,7 @@ void create_cell_types( void )
 	   This is a good place to set default functions. 
 	*/ 
 	
+	initialize_default_cell_definition(); 
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
