@@ -122,6 +122,7 @@ class PhysiCell_Settings
 	bool limits_substrate_plot = false;
 	double min_concentration = -1.0;
 	double max_concentration = -1.0;
+	std::string svg_substrate_colormap = "YlOrRd";
 
 	double intracellular_save_interval = 60; 
 	bool enable_intracellular_saves = false; 

@@ -272,7 +272,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 		return paint_by_number_cell_coloring(pCell);
 	}
 }
-std::vector<std::string> my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc )
+std::string my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc )
 { return paint_by_density_percentage( concentration,  max_conc,  min_conc); }
 
 void my_cellcount_function(char* string){
