@@ -911,8 +911,19 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	
 	// track internalized substrates in each agent? 
 	default_microenvironment_options.track_internalized_substrates_in_each_agent 
-		= xml_get_bool_value( node, "track_internalized_substrates_in_each_agent" ); 
-	
+		= xml_get_bool_value( node, "track_internalized_substrates_in_each_agent" );
+
+	node = xml_find_node(node, "initial_condition");
+	if (node)
+	{
+		default_microenvironment_options.initial_condition_from_file_enabled = node.attribute("enabled").as_bool();
+		if (default_microenvironment_options.initial_condition_from_file_enabled)
+		{
+			default_microenvironment_options.initial_condition_file_type = node.attribute("type").as_string();
+			default_microenvironment_options.initial_condition_file = xml_get_string_value(node, "filename");
+		}
+	}
+
 	// not yet supported : read initial conditions 
 	/*
 	// read in initial conditions from an external file 
