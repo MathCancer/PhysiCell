@@ -768,17 +768,17 @@ Hypothesis_Rule* Hypothesis_Ruleset::add_behavior( std::string behavior , double
 		// if not, add it 
 	if( search == rules_map.end() )
 	{
-		Hypothesis_Rule hr; 
+		Hypothesis_Rule *pHR = new Hypothesis_Rule;
 
-		hr.behavior = behavior; 
+		pHR->behavior = behavior; 
 
-		hr.sync_to_cell_definition( pCell_Definition ); 
+		pHR->sync_to_cell_definition( pCell_Definition ); 
 
-		hr.min_value = min_behavior; 
-		hr.max_value = max_behavior; 
+		pHR->min_value = min_behavior; 
+		pHR->max_value = max_behavior;
 
-		rules.push_back( hr ); 
-		Hypothesis_Rule* pHR = &(rules.back()); 
+		rules.push_back(*pHR);
+		// Hypothesis_Rule* pHR = &(rules.back()); 
 		rules_map[ behavior ] = pHR; 
 
 		return pHR; 
