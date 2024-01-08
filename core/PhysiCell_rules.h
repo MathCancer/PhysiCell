@@ -145,7 +145,7 @@ class Hypothesis_Ruleset
     std::string cell_type; 
     Cell_Definition* pCell_Definition; 
 
-    std::vector< Hypothesis_Rule > rules; 
+    std::vector< Hypothesis_Rule* > rules; 
 
     Hypothesis_Ruleset(); // done 
 
