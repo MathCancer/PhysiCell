@@ -46,6 +46,7 @@ LIBS := -L/usr/local/lib -L$(CLP_FOLDER)/lib -ldl -lm -lClp -lCoinUtils -lcoinas
 
 OSFLAG 	:=
 ifeq ($(OS),Windows_NT)
+	UNAME_S := Windows_NT
 	OSFLAG += -D WIN32
 	OMP_LIB := 
 #	LIBFBA_DIR := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m

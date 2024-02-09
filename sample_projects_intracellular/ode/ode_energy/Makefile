@@ -15,6 +15,7 @@ CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D AD
 
 OSFLAG 	:=
 ifeq ($(OS),Windows_NT)
+	UNAME_S := Windows_NT
 	OSFLAG += -D WIN32
 	OMP_LIB := 
 #	LIBRR_DIR := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m

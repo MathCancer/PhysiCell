@@ -33,6 +33,7 @@ LIBS     := -lClp-static -lCoinUtils-static -llapack -lsbml-static -lxml2 -lbz2 
 
 ifeq ($(OS),Windows_NT)
 	WIN_LD_FLAG := -LC:\msys64\mingw64\bin
+	UNAME_S := Windows_NT
 else
 	WIN_LD_FLAG := 
 	UNAME_S := $(shell uname -s)
