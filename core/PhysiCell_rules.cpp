@@ -1061,8 +1061,10 @@ void set_behavior_parameters( std::string cell_type, std::string behavior,
         exit(-1);              
     }
 
-	hypothesis_rulesets[pCD][behavior].min_value = min_value; 
-	hypothesis_rulesets[pCD][behavior].max_value = max_value; 
+	if ( min_value < hypothesis_rulesets[pCD][behavior].min_value )
+	{ hypothesis_rulesets[pCD][behavior].min_value = min_value; }
+	if ( max_value > hypothesis_rulesets[pCD][behavior].max_value )
+	{ hypothesis_rulesets[pCD][behavior].max_value = max_value; } 
 	hypothesis_rulesets[pCD][behavior].base_value = base_value; 
 	
 	return;
