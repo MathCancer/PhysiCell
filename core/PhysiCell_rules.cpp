@@ -1622,9 +1622,15 @@ void parse_csv_rule_v1( std::vector<std::string> input )
 	set_behavior_base_value(cell_type,behavior,base_value);
 
 	if( response == "increases")
-	{ set_behavior_max_value(cell_type,behavior,max_response); }
+	{ 
+		set_behavior_min_value(cell_type,behavior,ref_base_value); 
+		set_behavior_max_value(cell_type,behavior,max_response);
+	}
 	else
-	{ set_behavior_min_value(cell_type,behavior,max_response); }
+	{ 
+		set_behavior_min_value(cell_type,behavior,max_response); 
+		set_behavior_max_value(cell_type,behavior,ref_base_value);
+	}
 
 	return;  
 }
@@ -1750,10 +1756,15 @@ void parse_csv_rule_v2( std::vector<std::string> input )
 
 	set_behavior_base_value(cell_type,behavior,ref_base_value);
 	if( response == "increases")
-	{ set_behavior_max_value(cell_type,behavior,max_response); }
+	{ 
+		set_behavior_min_value(cell_type,behavior,ref_base_value); 
+		set_behavior_max_value(cell_type,behavior,max_response);
+	}
 	else
-	{ set_behavior_min_value(cell_type,behavior,max_response); }
-
+	{ 
+		set_behavior_min_value(cell_type,behavior,max_response); 
+		set_behavior_max_value(cell_type,behavior,ref_base_value);
+	}
 	return;  
 }
 
