@@ -449,7 +449,8 @@ void MaBoSSIntracellular::display(std::ostream& os)
 	os	<< "\t\t " << listOfOutputs.size() << " output mapping defined" << std::endl;
 	for (const auto& output : listOfOutputs)
 		os 	<< "\t\t\t" << output.first << " = " << output.second.intracellular_name 
-			<< "(" << output.second.value << ", " << output.second.base_value << ", " << output.second.smoothing << ")"
+			<< "(" << output.second.value << ", " << output.second.base_value 
+			<< ", " << output.second.smoothing << ", " << output.second.steepness << ")"
 			<< std::endl;
 
 	os 	<< "\t\t global inheritance = " << inherit_state << std::endl;
