@@ -68,12 +68,10 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	}
 
 	void update(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt) {
-		if (!cell->phenotype.death.dead) {
-			this->update_inputs(cell, phenotype, dt);
-			this->maboss.run_simulation();
-			this->update_outputs(cell, phenotype, dt);
-			this->next_physiboss_run += this->maboss.get_time_to_update();
-		}
+		this->update_inputs(cell, phenotype, dt);
+		this->maboss.run_simulation();
+		this->update_outputs(cell, phenotype, dt);
+		this->next_physiboss_run += this->maboss.get_time_to_update();
 	}
 	
 	bool need_update() {

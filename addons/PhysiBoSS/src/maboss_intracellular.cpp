@@ -69,16 +69,19 @@ void MaBoSSIntracellular::update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenot
 	int i=0;
 	for (auto& input: listOfInputs) 
 	{
-		if (input.second.isNode()) {
-			maboss.set_node_value(
-				input.first,
-				input.second.updateNode(maboss.get_node_value(input.second.intracellular_name), signals[i])
-			);
-		} else if (input.second.isParameter()) {
-			maboss.set_parameter_value(
-				input.first,
-				input.second.updateParameter(signals[i])
-			);
+		if (cell->phenotype.death.dead == false || input.second.use_for_dead == true) {
+		
+			if (input.second.isNode()) {
+				maboss.set_node_value(
+					input.first,
+					input.second.updateNode(maboss.get_node_value(input.second.intracellular_name), signals[i])
+				);
+			} else if (input.second.isParameter()) {
+				maboss.set_parameter_value(
+					input.first,
+					input.second.updateParameter(signals[i])
+				);
+			}
 		}
 		i++;
 	}
@@ -86,15 +89,18 @@ void MaBoSSIntracellular::update_inputs(PhysiCell::Cell* cell, PhysiCell::Phenot
 
 void MaBoSSIntracellular::update_outputs(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt)
 {
-	std::vector<double> signals = std::vector<double>(listOfOutputs.size(), 0.0);
-	
 	int i=0;
+	
 	for (auto& output: listOfOutputs) 
 	{
-		signals[i] = output.second.update(maboss.get_node_value(output.second.intracellular_name));
+		if (cell->phenotype.death.dead == false || output.second.use_for_dead == true) {
+			PhysiCell::set_single_behavior(
+				cell, indicesOfOutputs[i], 
+				output.second.update(maboss.get_node_value(output.second.intracellular_name))
+			);
+		}
 		i++;
 	}
-	PhysiCell::set_selected_behaviors(cell, indicesOfOutputs, signals);
 }
 
 
@@ -366,7 +372,8 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 					node_input.attribute( "physicell_name" ).value(),
 					intracellular_name,
 					(settings && settings.child( "scaling" ) ? PhysiCell::xml_get_my_double_value( settings.child( "scaling" )) : 1.0),
-					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
+					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0),
+					(settings && settings.child( "use_for_dead" ) ? PhysiCell::xml_get_my_bool_value( settings.child( "use_for_dead" )) : false)
 				);
 
 				// This construct is a trick to avoid making inputs and outputs constructible and assignable, or using c++17 insert_or_assign
@@ -382,7 +389,8 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 					PhysiCell::xml_get_my_string_value(settings.child("action")),
 					PhysiCell::xml_get_my_double_value(settings.child("threshold")),
 					(settings && settings.child( "inact_threshold" ) ? PhysiCell::xml_get_my_double_value( settings.child( "inact_threshold" )) : PhysiCell::xml_get_my_double_value(settings.child("threshold"))),
-					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0)
+					(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0),
+					(settings && settings.child( "use_for_dead" ) ? PhysiCell::xml_get_my_bool_value( settings.child( "use_for_dead" )) : false)
 				);
 
 				auto const res = listOfInputs.insert(std::pair<std::string, MaBoSSInput>(intracellular_name, input));
@@ -404,7 +412,8 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 				PhysiCell::xml_get_my_double_value(settings.child("value")),
 				(settings && settings.child( "base_value" ) ? PhysiCell::xml_get_my_double_value( settings.child( "base_value" )) : PhysiCell::xml_get_my_double_value(settings.child("value"))),
 				(settings && settings.child( "smoothing" ) ? PhysiCell::xml_get_my_int_value( settings.child( "smoothing" )) : 0),
-				(settings && settings.child( "steepness" ) ? PhysiCell::xml_get_my_int_value( settings.child( "steepness" )) : 10)
+				(settings && settings.child( "steepness" ) ? PhysiCell::xml_get_my_int_value( settings.child( "steepness" )) : 10),
+				(settings && settings.child( "use_for_dead" ) ? PhysiCell::xml_get_my_bool_value( settings.child( "use_for_dead" )) : false)
 			);
 
 			auto const res = listOfOutputs.insert(std::pair<std::string, MaBoSSOutput>(physicell_name, output));
@@ -443,14 +452,16 @@ void MaBoSSIntracellular::display(std::ostream& os)
 	os	<< "\t\t " << listOfInputs.size() << " input mapping defined" << std::endl;
 	for (const auto& input : listOfInputs)
 		os 	<< "\t\t\t" << input.second.physicell_name << " = " << input.first
-			<< "(" << input.second.threshold << ", " << input.second.inact_threshold << ", " << input.second.smoothing << ")"
+			<< "(" << input.second.threshold << ", " << input.second.inact_threshold 
+			<< ", " << input.second.smoothing << ", " << input.second.use_for_dead << ")"
 			<< std::endl;
 
 	os	<< "\t\t " << listOfOutputs.size() << " output mapping defined" << std::endl;
 	for (const auto& output : listOfOutputs)
 		os 	<< "\t\t\t" << output.first << " = " << output.second.intracellular_name 
 			<< "(" << output.second.value << ", " << output.second.base_value 
-			<< ", " << output.second.smoothing << ", " << output.second.steepness << ")"
+			<< ", " << output.second.smoothing << ", " << output.second.steepness 
+			<< ", " << output.second.use_for_dead << ")"
 			<< std::endl;
 
 	os 	<< "\t\t global inheritance = " << inherit_state << std::endl;
