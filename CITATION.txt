@@ -23,12 +23,26 @@ with BioFVM [2] to solve the transport equations.
     llelized diffusive transport solver for 3-D biological simulations,     
     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730 
     
-If you use PhysiBoSS, please cite:
+If you use PhysiBoSS, please cite as below:
 
-    G. Letort, A. Montagud, G. Stoll, R. Heiland, E. Barillot, P. Macklin, 
+We implemented and solved the model using PhysiCell (Version 1.11.0) [1],    
+with PhysiBoSS[2,3] to simulate the intracellular mechanisms.                           
+
+[1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, 
+    PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  
+    lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   
+    DOI: 10.1371/journal.pcbi.1005991                                       
+        
+[2] G. Letort, A. Montagud, G. Stoll, R. Heiland, E. Barillot, P. Macklin, 
     A. Zinovyev, and L. Calzone. PhysiBoSS: a multi-scale agent based 
     modelling framework integrating physical dimension and cell signalling. 
     Bioinformatics 35(7):1188-96, 2019. DOI: 10.1093/bioinformatics/bty766.
+
+[3] M. Ponce-de-Leon, A. Montagud, V. Noël, A. Meert, G. Pradas, E. Barillot,
+    L. Calzone, and A. Valencia. PhysiBoSS 2.0: a sustainable integration of
+    stochastic Boolean and agent-based modelling frameworks. NPJ Systems 
+    Biology and Applications 9(1):54, 2023.
+    DOI: 10.1038/s41540-023-00314-4 
 
 If you use libRoadrunner, please cite:
 

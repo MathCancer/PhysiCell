@@ -1,4 +1,5 @@
 #include "maboss_network.h"
+#include <fstream>
 
 /* Default constructor */
 void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
@@ -19,6 +20,18 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 		
 		#pragma omp critical
 		{
+			std::ifstream f_bnd(networkFile.c_str());
+			if (!f_bnd.good()) {
+				std::cerr << "PhysiBoSS ERROR : Could not open the BND file " << networkFile.c_str() << std::endl;
+				exit(1);
+			}
+			
+			std::ifstream f_cfg(configFile.c_str());
+			if (!f_cfg.good()) {
+				std::cerr << "PhysiBoSS ERROR : Could not open the CFG file " << configFile.c_str() << std::endl;
+				exit(1);
+			}
+			
 			// Initialize MaBoSS Objects for a model
 			this->network = new Network();
 			this->network->parse(networkFile.c_str());

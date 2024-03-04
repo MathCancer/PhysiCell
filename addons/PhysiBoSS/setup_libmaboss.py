@@ -9,9 +9,8 @@ import urllib.request
 import os
 import sys
 import tarfile
-import zipfile
 
-if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "PhysiBoSS", "MaBoSS-env-2.0")):
+if os.path.exists(os.path.join(os.path.dirname(__file__), "MaBoSS-env-2.0")):
     print('libMaBoSS already installed')
 
 else:
@@ -21,35 +20,26 @@ else:
     # Assume Windows
     mb_file = ""
     url = ""
-    maboss_version = "v2.5.2"
+    maboss_version = "v2.5.4"
     if os_type.lower() == 'darwin':
         if "ARM64" in platform.uname().version:
             mb_file = "libMaBoSS-macos-arm64.tar.gz"
-            url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/boolean/libMaBoSS-macos-arm64.tar.gz"
         else:
             mb_file = "libMaBoSS-osx64.tar.gz"
-            url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/" + maboss_version + "/" + mb_file
     elif os_type.lower().startswith("win") or os_type.lower().startswith("msys_nt") or os_type.lower().startswith("mingw64_nt"):
         mb_file = "libMaBoSS-win64.tar.gz"
-        url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/" + maboss_version + "/" + mb_file
     elif os_type.lower().startswith("linux"):
         mb_file = "libMaBoSS-linux64.tar.gz"
-        url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/" + maboss_version + "/" + mb_file
     else:
         print("Your operating system seems to be unsupported. Please submit a ticket at https://sourceforge.net/p/physicell/tickets/ ")
         sys.exit(1)
 
-    # url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/v2.4.1/" + mb_file
+    url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/" + maboss_version + "/" + mb_file
 
-    fname = mb_file
-
-    home = os.path.expanduser("~")
     print('libMaBoSS will now be installed into the addon PhysiBoSS addon folder:')
-    dir_name = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'addons', 'PhysiBoSS')
+    dir_name = os.path.dirname(__file__)
     print(dir_name + '\n')
-    # print('   - Press ENTER to confirm the installation')
-    # print('   - Press CTL-C to abort the installation')
-
+    
     if not os.path.exists(dir_name):
                 try:
                     os.makedirs(dir_name)
@@ -59,14 +49,8 @@ else:
     print('Beginning download of libMaBoSS into ' + dir_name + ' ...')
     print(url)
 
-    my_file = os.path.join(dir_name, fname)
+    my_file = os.path.join(dir_name, mb_file)
     print('my_file = ',my_file)
-
-    # if os_type.lower().startswith("win"):
-    #     rrlib_dir = my_file[:-4]
-    # else:  # darwin or linux
-    #     rrlib_dir = my_file[:-7]
-    # print('rrlib_dir = ',rrlib_dir)
 
     def download_cb(blocknum, blocksize, totalsize):
         readsofar = blocknum * blocksize
