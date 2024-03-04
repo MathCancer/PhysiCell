@@ -23,27 +23,6 @@ jobs:
     - name: Run Virus Macrophage cell lines project
       run: |
         ./virus-sample
-
-
-  build_physiboss_cell_lines:
-
-    runs-on: macos-11
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install dependencies
-      run : brew install gcc@11
-      
-    - name: Build PhysiBoSS cell lines project
-      run: |
-        make physiboss-cell-lines-sample
-        make clean
-        make PHYSICELL_CPP=g++-11
-        
-    - name: Run PhysiBoSS cell lines project
-      run: |
-        ./PhysiBoSS_Cell_Lines
   
   build_physimess:
 
@@ -67,3 +46,145 @@ jobs:
         ./project config/Fibre_Initialisation/mymodel_initialisation.xml
         ./project config/Cell_Fibre_Mechanics/mymodel_rotating.xml
         
+  build_physiboss_celllines_macos:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run : brew install gcc@11
+      
+    - name: Build PhysiBoSS cell lines
+      run: |
+        export MACOSX_DEPLOYMENT_TARGET=11
+        make physiboss-cell-lines-sample
+        make clean
+        make Compile_MaBoSS PHYSICELL_CPP=g++-11
+        make PHYSICELL_CPP=g++-11 static
+        cp PhysiBoSS_Cell_Lines PhysiBoSS_Cell_Lines_macos13
+
+    - name: Caching produced project binary 
+      uses: actions/cache@v4
+      with:
+        path: |
+          /Users/runner/work/PhysiBoSS/PhysiBoSS/PhysiBoSS_Cell_Lines_macos13
+        key: ${{ runner.os }}-macos13-celllines-${{ github.run_id }}
+    
+    - name: Run PhysiBoSS model
+      run: |
+        ./PhysiBoSS_Cell_Lines
+        
+    - name: Look at the generated binary
+      run: |
+        otool -L PhysiBoSS_Cell_Lines
+        otool -l PhysiBoSS_Cell_Lines
+        lipo -archs PhysiBoSS_Cell_Lines      
+    
+    - name: Save artifacts
+      uses: actions/upload-artifact@v4
+      with: 
+        name: physiboss-cell-lines_macos13
+        path: PhysiBoSS_Cell_Lines
+
+  build_physiboss_celllines_m1:
+    runs-on: flyci-macos-large-latest-m1
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Downgrade XCODE to 14.3.1
+      run: sudo xcode-select -switch /Applications/Xcode_14.3.1.app   
+      
+    - name: Install dependencies
+      run : brew install gcc@11
+      
+    - name: Build PhysiBoSS cell lines
+      run: |
+        export MACOSX_DEPLOYMENT_TARGET=11
+        make physiboss-cell-lines-sample
+        make clean
+        make Compile_MaBoSS PHYSICELL_CPP=g++-11
+        make PHYSICELL_CPP=g++-11 static
+        cp PhysiBoSS_Cell_Lines PhysiBoSS_Cell_Lines_macosm1
+
+    - name: Run PhysiBoSS model
+      run: |
+        ./PhysiBoSS_Cell_Lines
+        
+    - name: Caching produced project binary 
+      uses: actions/cache@v4
+      with:
+        path: |
+          /opt/actions-runner/_work/PhysiBoSS/PhysiBoSS/PhysiBoSS_Cell_Lines_macosm1
+        key: ${{ runner.os }}-macosm1-celllines-${{ github.run_id }}
+      
+    - name: Look at the generated binary
+      run: |
+        otool -L PhysiBoSS_Cell_Lines
+        otool -l PhysiBoSS_Cell_Lines
+        lipo -archs PhysiBoSS_Cell_Lines 
+      
+    - name: Save artifacts
+      uses: actions/upload-artifact@v4
+      with: 
+        name: physiboss-cell-lines_binary_macos_m1
+        path: PhysiBoSS_Cell_Lines_macosm1
+        
+  build_physiboss_celllines_universal:
+    runs-on: macos-latest
+    needs: [build_physiboss_celllines_m1, build_physiboss_celllines_macos]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Caching produced project binary 
+      uses: actions/cache@v4
+      with:
+        path: |
+          /opt/actions-runner/_work/PhysiBoSS/PhysiBoSS/PhysiBoSS_Cell_Lines_macosm1
+        key: ${{ runner.os }}-macosm1-celllines-${{ github.run_id }}
+    
+    - name: Caching produced project binary 
+      uses: actions/cache@v4
+      with:
+        path: |
+          /Users/runner/work/PhysiBoSS/PhysiBoSS/PhysiBoSS_Cell_Lines_macos13
+        key: ${{ runner.os }}-macos13-celllines-${{ github.run_id }}
+    
+    - name: Creating universal binary
+      run: | 
+        lipo -create -output PhysiBoSS_Cell_Lines_macos_universal PhysiBoSS_Cell_Lines_macos13 PhysiBoSS_Cell_Lines_macosm1
+
+    - name: Checking universal binary
+      run: |
+        lipo -archs PhysiBoSS_Cell_Lines_macos_universal
+        otool -l PhysiBoSS_Cell_Lines_macos_universal
+        otool -L PhysiBoSS_Cell_Lines_macos_universal
+        
+    - name: Run PhysiBoSS model
+      run: |
+        make physiboss-cell-lines-sample
+        ./PhysiBoSS_Cell_Lines_macos_universal
+        
+    - name: Build project archive
+      run: |
+        rm -fr config/PhysiCell_settings-backup.xml
+        tar -zcvf physiboss-cell-lines-macos.tar.gz PhysiBoSS_Cell_Lines_macos_universal Makefile main.cpp config/ custom_modules/
+        
+    - name: Save artifacts
+      uses: actions/upload-artifact@v4
+      with: 
+        name: physiboss-cell-lines_macos_universal
+        path: PhysiBoSS_Cell_Lines_macos_universal
+        
+    - uses: actions/upload-release-asset@v1
+      if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_name: physiboss-cell-lines-macos.tar.gz
+        asset_path: /Users/runner/work/PhysiBoSS/PhysiBoSS/physiboss-cell-lines-macos.tar.gz
+        asset_content_type: application/gzip
