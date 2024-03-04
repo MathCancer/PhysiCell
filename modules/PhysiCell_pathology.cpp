@@ -712,7 +712,8 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	// draw a box around the plot window
 	Write_SVG_rect( os , 0 , top_margin, plot_width, plot_height , 0.002 * plot_height , "rgb(0,0,0)", "none" );
 
-	if(substrate_coloring_function != NULL){
+	if(PhysiCell_settings.enable_substrate_plot == true && (*substrate_coloring_function) != NULL)
+	{
 
 		// add legend for the substrate
 
