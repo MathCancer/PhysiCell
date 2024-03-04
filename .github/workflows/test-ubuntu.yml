@@ -24,17 +24,6 @@ jobs:
       run: |
         ./virus-sample
         
-    - name: Build PhysiBoSS cell lines project
-      run: |
-        make reset
-        make physiboss-cell-lines-sample
-        make clean
-        make
-        
-    - name: Run PhysiBoSS cell lines project
-      run: |
-        ./PhysiBoSS_Cell_Lines
-        
     - name: Build PhysiMeSS project
       run: |
         make reset
@@ -47,4 +36,43 @@ jobs:
         ./project
         ./project config/Fibre_Initialisation/mymodel_initialisation.xml
         ./project config/Cell_Fibre_Mechanics/mymodel_rotating.xml
+
+  build_physiboss_celllines_binary:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build PhysiBoSS Cell lines
+      run: |
+        make physiboss-cell-lines-sample
+        make clean
+        make Compile_MaBoSS
+        make static STATIC_OPENMP=/usr/lib/gcc/x86_64-linux-gnu/11/libgomp.a
+        ldd PhysiBoSS_Cell_Lines
         
+    - name: Run PhysiBoSS model
+      run: |
+        ./PhysiBoSS_Cell_Lines
+        
+    - name: Build project archive
+      run: |
+        rm -fr config/PhysiCell_settings-backup.xml
+        tar -zcvf physiboss-cell-lines-linux.tar.gz PhysiBoSS_Cell_Lines Makefile main.cpp config/ custom_modules/
+
+    - name: Save artifacts
+      uses: actions/upload-artifact@v4
+      with: 
+        name: physiboss_cell_lines_binary_linux
+        path: PhysiBoSS_Cell_Lines
+        
+    - uses: actions/upload-release-asset@v1
+      if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_name: physiboss-cell-lines-linux.tar.gz
+        asset_path: /home/runner/work/PhysiBoSS/PhysiBoSS/physiboss-cell-lines-linux.tar.gz
+        asset_content_type: application/gzip

@@ -30,17 +30,6 @@ jobs:
       run: |
         .\\virus-sample.exe
         
-    - name: Build PhysiBoSS cell lines project
-      run: |
-        make reset
-        make physiboss-cell-lines-sample
-        make clean
-        make 
-      
-    - name: Run PhysiBoSS cell lines project
-      run: |
-        .\\PhysiBoSS_Cell_Lines.exe
-        
     - name: Build PhysiMeSS project
       run: |
         make reset
@@ -54,3 +43,54 @@ jobs:
         .\\project config\\Fibre_Initialisation\\mymodel_initialisation.xml
         .\\project config\\Cell_Fibre_Mechanics\\mymodel_rotating.xml
         
+
+  build_physiboss_celllines:
+
+    runs-on: windows-latest
+    
+    defaults:
+      run:
+        shell: msys2 {0}
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 mingw-w64-x86_64-python mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-python-cffi make bison flex mingw-w64-x86_64-ca-certificates
+
+    - name: Build PhysiBoSS Cell Lines
+      run: |
+        make physiboss-cell-lines-sample
+        make clean
+        python beta/setup_windows_dep.py
+        make Compile_MaBoSS
+        make static
+        ldd .\\PhysiBoSS_Cell_Lines.exe
+    
+    - name: Run PhysiBoSS model
+      run: |
+        .\\PhysiBoSS_Cell_Lines.exe
+        
+    - name: Build project archive
+      run: |
+        rm -fr config/PhysiCell_settings-backup.xml
+        tar -zcvf physiboss-cell-lines-win.tar.gz PhysiBoSS_Cell_Lines.exe *.dll Makefile main.cpp config/ custom_modules/
+
+    - name: Save artifacts
+      uses: actions/upload-artifact@v4
+      with: 
+        name: physiboss-cell-lines_binary_windows
+        path: PhysiBoSS_Cell_Lines.exe
+        
+    - uses: actions/upload-release-asset@v1
+      if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_name: physiboss-cell-lines-win.tar.gz
+        asset_path: D:\a\PhysiBoSS\PhysiBoSS\physiboss-cell-lines-win.tar.gz
+        asset_content_type: application/gzip   
+  
