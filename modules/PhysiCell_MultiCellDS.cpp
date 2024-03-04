@@ -2035,7 +2035,55 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		node.first_child().set_value( filename_without_pathing ); // filename ); 
 	}	
 
-	write_attached_cells_graph( filename ); 
+	write_attached_cells_graph( filename );	
+
+	// spring attached cell graph 
+	node = root; 
+	node = node.parent().parent(); // root = cellular_information.cell_populations.cell_population.custom
+
+	root = node; 
+	node = node.child( "spring_attached_cells_graph" );  
+	if( !node )
+	{
+		node = root.append_child( "spring_attached_cells_graph" ); 
+
+		pugi::xml_attribute attrib = node.append_attribute( "type" ); 
+		attrib.set_value( "text" ); 		
+
+		attrib = node.append_attribute( "source" ); 
+		attrib.set_value( "PhysiCell" ); 		
+
+		attrib = node.append_attribute( "data_version" ); 
+		attrib.set_value( "2" ); 	
+	}
+	root = node; // root = cellular_information.cell_populations.cell_population.custom.spring_attached_cells_graph
+	node = root.child( "filename"); 
+	if( !node )
+	{ node = root.append_child( "filename" ); }
+	root = node; // root = cellular_information.cell_populations.cell_population.custom.spring_attached_cells_graph.filename 
+
+
+	// next, filename 
+	sprintf( filename , "%s_spring_attached_cells_graph.txt" , filename_base.c_str() ); 
+		
+	/* store filename without the relative pathing (if any) */ 
+	filename_start = strrchr( filename , '/' ); 
+	if( filename_start == NULL )
+	{ filename_start = filename; }
+	else	
+	{ filename_start++; } 
+	strcpy( filename_without_pathing , filename_start );  
+	
+	if( !node.first_child() )
+	{
+		node.append_child( pugi::node_pcdata ).set_value( filename_without_pathing ); // filename ); 
+	}
+	else
+	{
+		node.first_child().set_value( filename_without_pathing ); // filename ); 
+	}	
+
+	write_spring_attached_cells_graph( filename ); 
 
 	return; 
 }
@@ -2117,5 +2165,41 @@ void write_attached_cells_graph( std::string filename )
 	return; 
 }
  
+void write_spring_attached_cells_graph( std::string filename ) 
+{
+	/*
+	char filename [1024]; 
+	sprintf( filename , "%s_cell_attached_graph.txt" , filename_base.c_str() ); 
+	
+	// store filename without the relative pathing (if any) 
+	char filename_without_pathing [1024];
+	char* filename_start = strrchr( filename , '/' ); 
+	if( filename_start == NULL )
+	{ filename_start = filename; }
+	else	
+	{ filename_start++; } 
+	strcpy( filename_without_pathing , filename_start );  
+	*/
 
+	std::ofstream of( filename , std::ios::out ); 
+	std::stringstream buffer; 
+
+	for( int i=0 ; i < (*all_cells).size(); i++ )
+	{
+		buffer << (*all_cells)[i]->ID << ": " ; 
+		int size = (*all_cells)[i]->state.spring_attachments.size();
+		for( int j=0 ; j < size; j++ )
+		{
+			buffer << (*all_cells)[i]->state.spring_attachments[j]->ID; 
+			if( j != size-1 )
+			{ buffer << ","; }
+		}
+		if( i != (*all_cells).size()-1 )
+		{ buffer << std::endl; }
+		of << buffer.rdbuf(); 
+	}
+	of.close(); 
+
+	return; 
+}
 };
