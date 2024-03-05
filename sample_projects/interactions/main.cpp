@@ -151,7 +151,7 @@ int main( int argc, char* argv[] )
 	
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
 
-	std::vector<std::string> (*substrate_coloring_function)(double, double, double) = my_coloring_function_for_substrate; 
+	std::string (*substrate_coloring_function)(double, double, double) = my_coloring_function_for_substrate; 
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 

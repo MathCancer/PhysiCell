@@ -132,6 +132,7 @@ PhysiCell_Settings::PhysiCell_Settings()
 	limits_substrate_plot = false;
 	min_concentration = -1.0;
 	max_concentration = -1.0;
+	svg_substrate_colormap = "YlOrRd";
 
 	intracellular_save_interval = 60;  
 	enable_intracellular_saves = false; 
@@ -207,7 +208,13 @@ void PhysiCell_Settings::read_from_pugixml( void )
 			min_concentration = xml_get_double_value(node_plot_substrate, "min_conc");
 			max_concentration = xml_get_double_value(node_plot_substrate, "max_conc");
 		}
-	};
+		pugi::xml_node colormap_node = xml_find_node( node_plot_substrate, "colormap");
+		if (colormap_node)
+		{
+			svg_substrate_colormap = xml_get_my_string_value(colormap_node);
+		}
+	}
+
 	node = node.parent(); 
 
 	node = xml_find_node( node , "intracellular_data" ); 
