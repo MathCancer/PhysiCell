@@ -1,0 +1,7 @@
+epithelial_tumor,pressure,decreases,cycle entry,0,1.0,4,0
+epithelial_normal,contact with fibroblast,increases,transform to mesenchymal_normal,0.01,0.01,4,0
+epithelial_tumor,contact with fibroblast,increases,transform to mesenchymal_tumor,0.01,0.01,4,0
+mesenchymal_normal,ecm,decreases,migration speed,0,0.5,4,0
+mesenchymal_tumor,ecm,decreases,migration speed,0,0.5,4,0
+mesenchymal_tumor,inflammatory_signal,decreases,transform to epithelial_tumor,0.0,0.2,4,0
+mesenchymal_normal,inflammatory_signal,decreases,transform to epithelial_normal,0,0.2,4,0
