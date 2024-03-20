@@ -1,0 +1,678 @@
+<PhysiCell_settings version="devel-version">
+
+    <domain>
+        <x_min>-500</x_min>
+        <x_max>500</x_max>
+        <y_min>-500</y_min>
+        <y_max>500</y_max>
+        <z_min>-10</z_min>
+        <z_max>10</z_max>
+        <dx>20</dx>
+        <dy>20</dy>
+        <dz>20</dz>
+        <use_2D>true</use_2D>
+    </domain>
+
+    <overall>
+        <max_time units="min">7200</max_time>
+        <time_units>min</time_units>
+        <space_units>micron</space_units>
+        <dt_diffusion units="min">0.01</dt_diffusion>
+        <dt_mechanics units="min">0.1</dt_mechanics>
+        <dt_phenotype units="min">6</dt_phenotype>
+    </overall>
+
+    <parallel>
+        <omp_num_threads>1</omp_num_threads>
+    </parallel>
+
+    <save>
+        <folder>output</folder>
+        <full_data>
+            <interval units="min">60</interval>
+            <enable>true</enable>
+        </full_data>
+        <SVG>
+            <interval units="min">60</interval>
+            <enable>true</enable>
+        </SVG>
+        <legacy_data>
+            <enable>false</enable>
+        </legacy_data>
+    </save>
+
+    <options>
+        <legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+        <disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
+        <virtual_wall_at_domain_edge>false</virtual_wall_at_domain_edge>
+    </options>
+
+    <microenvironment_setup>
+        <variable name="resource" units="dimensionless" ID="0">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
+                <decay_rate units="1/min">0</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="none">1</initial_condition>
+            <Dirichlet_boundary_condition units="none" enabled="True">1</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="True">1</boundary_value>
+                <boundary_value ID="xmax" enabled="True">1</boundary_value>
+                <boundary_value ID="ymin" enabled="True">1</boundary_value>
+                <boundary_value ID="ymax" enabled="True">1</boundary_value>
+                <boundary_value ID="zmin" enabled="False">1</boundary_value>
+                <boundary_value ID="zmax" enabled="False">1</boundary_value>
+            </Dirichlet_options>
+        </variable>
+        <variable name="signal A" units="dimensionless" ID="1">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+                <decay_rate units="1/min">0.1</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="none">0</initial_condition>
+            <Dirichlet_boundary_condition units="none" enabled="True">0</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="True">0</boundary_value>
+                <boundary_value ID="xmax" enabled="True">0</boundary_value>
+                <boundary_value ID="ymin" enabled="True">0</boundary_value>
+                <boundary_value ID="ymax" enabled="True">0</boundary_value>
+                <boundary_value ID="zmin" enabled="False">0</boundary_value>
+                <boundary_value ID="zmax" enabled="False">0</boundary_value>
+            </Dirichlet_options>
+        </variable>
+        <variable name="signal B" units="dimensionless" ID="2">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+                <decay_rate units="1/min">.1</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="none">0</initial_condition>
+            <Dirichlet_boundary_condition units="none" enabled="True">0</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="True">0</boundary_value>
+                <boundary_value ID="xmax" enabled="True">0</boundary_value>
+                <boundary_value ID="ymin" enabled="True">0</boundary_value>
+                <boundary_value ID="ymax" enabled="True">0</boundary_value>
+                <boundary_value ID="zmin" enabled="False">0</boundary_value>
+                <boundary_value ID="zmax" enabled="False">0</boundary_value>
+            </Dirichlet_options>
+        </variable>
+        <variable name="signal C" units="dimensionless" ID="3">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+                <decay_rate units="1/min">.1</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="none">0</initial_condition>
+            <Dirichlet_boundary_condition units="none" enabled="True">0</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="True">0</boundary_value>
+                <boundary_value ID="xmax" enabled="True">0</boundary_value>
+                <boundary_value ID="ymin" enabled="True">0</boundary_value>
+                <boundary_value ID="ymax" enabled="True">0</boundary_value>
+                <boundary_value ID="zmin" enabled="False">0</boundary_value>
+                <boundary_value ID="zmax" enabled="False">0</boundary_value>
+            </Dirichlet_options>
+        </variable>
+        <options>
+            <calculate_gradients>true</calculate_gradients>
+            <track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+            <initial_condition type="matlab" enabled="false">
+                <filename>./config/initial.mat</filename>
+            </initial_condition>
+            <dirichlet_nodes type="matlab" enabled="false">
+                <filename>./config/dirichlet.mat</filename>
+            </dirichlet_nodes>
+        </options>
+    </microenvironment_setup>
+
+    <cell_definitions>
+        <cell_definition name="A" ID="0">
+            <phenotype>
+                <cycle code="5" name="live">
+                    <phase_transition_rates units="1/min">
+                        <rate start_index="0" end_index="0" fixed_duration="false">0.00072</rate>
+                    </phase_transition_rates>
+                </cycle>
+                <death>
+                    <model code="100" name="apoptosis">
+                        <death_rate units="1/min">0.00001</death_rate>
+                        <phase_durations units="min">
+                            <duration index="0" fixed_duration="true">516</duration>
+                        </phase_durations>
+                        <parameters>
+                            <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                        </parameters>
+                    </model>
+                    <model code="101" name="necrosis">
+                        <death_rate units="1/min">0.01</death_rate>
+                        <phase_durations units="min">
+                            <duration index="0" fixed_duration="true">0</duration>
+                            <duration index="1" fixed_duration="true">86400</duration>
+                        </phase_durations>
+                        <parameters>
+                            <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                        </parameters>
+                    </model>
+                </death>
+                <volume>
+                    <total units="micron^3">2494</total>
+                    <fluid_fraction units="dimensionless">0.75</fluid_fraction>
+                    <nuclear units="micron^3">540</nuclear>
+                    <fluid_change_rate units="1/min">0.05</fluid_change_rate>
+                    <cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+                    <nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+                    <calcified_fraction units="dimensionless">0</calcified_fraction>
+                    <calcification_rate units="1/min">0</calcification_rate>
+                    <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                </volume>
+                <mechanics>
+                    <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+                    <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+                    <relative_maximum_adhesion_distance units="dimensionless">1.5</relative_maximum_adhesion_distance>
+                    <cell_adhesion_affinities>
+                        <cell_adhesion_affinity name="A">1.0</cell_adhesion_affinity>
+                        <cell_adhesion_affinity name="B">1.0</cell_adhesion_affinity>
+                        <cell_adhesion_affinity name="C">1.0</cell_adhesion_affinity>
+                    </cell_adhesion_affinities>
+                    <options>
+                        <set_relative_equilibrium_distance enabled="true" units="dimensionless">1.8</set_relative_equilibrium_distance>
+                        <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+                    </options>
+                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
+                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
+                    <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
+                    <attachment_rate units="1/min">10.0</attachment_rate>
+                    <detachment_rate units="1/min">0.0</detachment_rate>
+                </mechanics>
+                <motility>
+                    <speed units="micron/min">0.25</speed>
+                    <persistence_time units="min">1</persistence_time>
+                    <migration_bias units="dimensionless">.5</migration_bias>
+                    <options>
+                        <enabled>false</enabled>
+                        <use_2D>true</use_2D>
+                        <chemotaxis>
+                            <enabled>true</enabled>
+                            <substrate>signal B</substrate>
+                            <direction>1</direction>
+                        </chemotaxis>
+                        <advanced_chemotaxis>
+                            <enabled>false</enabled>
+                            <normalize_each_gradient>false</normalize_each_gradient>
+                            <chemotactic_sensitivities>
+                                <chemotactic_sensitivity substrate="resource">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal A">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal B">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal C">0.0</chemotactic_sensitivity>
+                            </chemotactic_sensitivities>
+                        </advanced_chemotaxis>
+                    </options>
+                </motility>
+                <secretion>
+                    <substrate name="resource">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">10</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal A">
+                        <secretion_rate units="1/min">1</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal B">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal C">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                </secretion>
+                <cell_interactions>
+                    <dead_phagocytosis_rate units="1/min">0.0</dead_phagocytosis_rate>
+                    <live_phagocytosis_rates>
+                        <phagocytosis_rate name="A" units="1/min">0.0</phagocytosis_rate>
+                        <phagocytosis_rate name="B" units="1/min">0.0</phagocytosis_rate>
+                        <phagocytosis_rate name="C" units="1/min">0.0</phagocytosis_rate>
+                    </live_phagocytosis_rates>
+                    <attack_rates>
+                        <attack_rate name="A" units="1/min">0.0</attack_rate>
+                        <attack_rate name="B" units="1/min">0.0</attack_rate>
+                        <attack_rate name="C" units="1/min">0.0</attack_rate>
+                    </attack_rates>
+                    <damage_rate units="1/min">1.0</damage_rate>
+                    <fusion_rates>
+                        <fusion_rate name="A" units="1/min">0.0</fusion_rate>
+                        <fusion_rate name="B" units="1/min">0.0</fusion_rate>
+                        <fusion_rate name="C" units="1/min">0.0</fusion_rate>
+                    </fusion_rates>
+                </cell_interactions>
+                <cell_transformations>
+                    <transformation_rates>
+                        <transformation_rate name="A" units="1/min">0.0</transformation_rate>
+                        <transformation_rate name="B" units="1/min">0.0</transformation_rate>
+                        <transformation_rate name="C" units="1/min">0.0</transformation_rate>
+                    </transformation_rates>
+                </cell_transformations>
+            </phenotype>
+            <custom_data>
+                <relative_sated_volume conserved="false" units="dimensionless" description="">1.5</relative_sated_volume>
+            </custom_data>
+        </cell_definition>
+        <cell_definition name="B" ID="1">
+            <phenotype>
+                <cycle code="5" name="live">
+                    <phase_transition_rates units="1/min">
+                        <rate start_index="0" end_index="0" fixed_duration="false">0.00072</rate>
+                    </phase_transition_rates>
+                </cycle>
+                <death>
+                    <model code="100" name="apoptosis">
+                        <death_rate units="1/min">0.00001</death_rate>
+                        <phase_durations units="min">
+                            <duration index="0" fixed_duration="true">516</duration>
+                        </phase_durations>
+                        <parameters>
+                            <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                        </parameters>
+                    </model>
+                    <model code="101" name="necrosis">
+                        <death_rate units="1/min">0.01</death_rate>
+                        <phase_durations units="min">
+                            <duration index="0" fixed_duration="true">0</duration>
+                            <duration index="1" fixed_duration="true">86400</duration>
+                        </phase_durations>
+                        <parameters>
+                            <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                        </parameters>
+                    </model>
+                </death>
+                <volume>
+                    <total units="micron^3">2494</total>
+                    <fluid_fraction units="dimensionless">0.75</fluid_fraction>
+                    <nuclear units="micron^3">540</nuclear>
+                    <fluid_change_rate units="1/min">0.05</fluid_change_rate>
+                    <cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+                    <nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+                    <calcified_fraction units="dimensionless">0</calcified_fraction>
+                    <calcification_rate units="1/min">0</calcification_rate>
+                    <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                </volume>
+                <mechanics>
+                    <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+                    <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+                    <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+                    <cell_adhesion_affinities>
+                        <cell_adhesion_affinity name="A">1.0</cell_adhesion_affinity>
+                        <cell_adhesion_affinity name="B">1.0</cell_adhesion_affinity>
+                        <cell_adhesion_affinity name="C">1.0</cell_adhesion_affinity>
+                    </cell_adhesion_affinities>
+                    <options>
+                        <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+                        <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+                    </options>
+                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
+                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
+                    <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
+                    <attachment_rate units="1/min">10.0</attachment_rate>
+                    <detachment_rate units="1/min">0.0</detachment_rate>
+                </mechanics>
+                <motility>
+                    <speed units="micron/min">0.25</speed>
+                    <persistence_time units="min">1</persistence_time>
+                    <migration_bias units="dimensionless">.5</migration_bias>
+                    <options>
+                        <enabled>false</enabled>
+                        <use_2D>true</use_2D>
+                        <chemotaxis>
+                            <enabled>true</enabled>
+                            <substrate>signal C</substrate>
+                            <direction>1</direction>
+                        </chemotaxis>
+                        <advanced_chemotaxis>
+                            <enabled>false</enabled>
+                            <normalize_each_gradient>false</normalize_each_gradient>
+                            <chemotactic_sensitivities>
+                                <chemotactic_sensitivity substrate="resource">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal A">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal B">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal C">0.0</chemotactic_sensitivity>
+                            </chemotactic_sensitivities>
+                        </advanced_chemotaxis>
+                    </options>
+                </motility>
+                <secretion>
+                    <substrate name="resource">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">10</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal A">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal B">
+                        <secretion_rate units="1/min">1</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal C">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                </secretion>
+                <cell_interactions>
+                    <dead_phagocytosis_rate units="1/min">0.0</dead_phagocytosis_rate>
+                    <live_phagocytosis_rates>
+                        <phagocytosis_rate name="A" units="1/min">0.0</phagocytosis_rate>
+                        <phagocytosis_rate name="B" units="1/min">0.0</phagocytosis_rate>
+                        <phagocytosis_rate name="C" units="1/min">0.0</phagocytosis_rate>
+                    </live_phagocytosis_rates>
+                    <attack_rates>
+                        <attack_rate name="A" units="1/min">0.0</attack_rate>
+                        <attack_rate name="B" units="1/min">0.0</attack_rate>
+                        <attack_rate name="C" units="1/min">0.0</attack_rate>
+                    </attack_rates>
+                    <damage_rate units="1/min">1.0</damage_rate>
+                    <fusion_rates>
+                        <fusion_rate name="A" units="1/min">0.0</fusion_rate>
+                        <fusion_rate name="B" units="1/min">0.0</fusion_rate>
+                        <fusion_rate name="C" units="1/min">0.0</fusion_rate>
+                    </fusion_rates>
+                </cell_interactions>
+                <cell_transformations>
+                    <transformation_rates>
+                        <transformation_rate name="A" units="1/min">0.0</transformation_rate>
+                        <transformation_rate name="B" units="1/min">0.0</transformation_rate>
+                        <transformation_rate name="C" units="1/min">0.0</transformation_rate>
+                    </transformation_rates>
+                </cell_transformations>
+            </phenotype>
+            <custom_data>
+                <relative_sated_volume conserved="false" units="dimensionless" description="">1.5</relative_sated_volume>
+            </custom_data>
+        </cell_definition>
+        <cell_definition name="C" ID="2">
+            <phenotype>
+                <cycle code="5" name="live">
+                    <phase_transition_rates units="1/min">
+                        <rate start_index="0" end_index="0" fixed_duration="false">0.00072</rate>
+                    </phase_transition_rates>
+                </cycle>
+                <death>
+                    <model code="100" name="apoptosis">
+                        <death_rate units="1/min">0.00001</death_rate>
+                        <phase_durations units="min">
+                            <duration index="0" fixed_duration="true">516</duration>
+                        </phase_durations>
+                        <parameters>
+                            <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                        </parameters>
+                    </model>
+                    <model code="101" name="necrosis">
+                        <death_rate units="1/min">0.01</death_rate>
+                        <phase_durations units="min">
+                            <duration index="0" fixed_duration="true">0</duration>
+                            <duration index="1" fixed_duration="true">86400</duration>
+                        </phase_durations>
+                        <parameters>
+                            <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                        </parameters>
+                    </model>
+                </death>
+                <volume>
+                    <total units="micron^3">2494</total>
+                    <fluid_fraction units="dimensionless">0.75</fluid_fraction>
+                    <nuclear units="micron^3">540</nuclear>
+                    <fluid_change_rate units="1/min">0.05</fluid_change_rate>
+                    <cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+                    <nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+                    <calcified_fraction units="dimensionless">0</calcified_fraction>
+                    <calcification_rate units="1/min">0</calcification_rate>
+                    <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                </volume>
+                <mechanics>
+                    <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+                    <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+                    <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+                    <cell_adhesion_affinities>
+                        <cell_adhesion_affinity name="A">1.0</cell_adhesion_affinity>
+                        <cell_adhesion_affinity name="B">1.0</cell_adhesion_affinity>
+                        <cell_adhesion_affinity name="C">1.0</cell_adhesion_affinity>
+                    </cell_adhesion_affinities>
+                    <options>
+                        <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+                        <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+                    </options>
+                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
+                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
+                    <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
+                    <attachment_rate units="1/min">10.0</attachment_rate>
+                    <detachment_rate units="1/min">0.0</detachment_rate>
+                </mechanics>
+                <motility>
+                    <speed units="micron/min">0.225</speed>
+                    <persistence_time units="min">1</persistence_time>
+                    <migration_bias units="dimensionless">.5</migration_bias>
+                    <options>
+                        <enabled>false</enabled>
+                        <use_2D>true</use_2D>
+                        <chemotaxis>
+                            <enabled>true</enabled>
+                            <substrate>signal A</substrate>
+                            <direction>1</direction>
+                        </chemotaxis>
+                        <advanced_chemotaxis>
+                            <enabled>false</enabled>
+                            <normalize_each_gradient>false</normalize_each_gradient>
+                            <chemotactic_sensitivities>
+                                <chemotactic_sensitivity substrate="resource">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal A">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal B">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="signal C">0.0</chemotactic_sensitivity>
+                            </chemotactic_sensitivities>
+                        </advanced_chemotaxis>
+                    </options>
+                </motility>
+                <secretion>
+                    <substrate name="resource">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">10</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal A">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal B">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="signal C">
+                        <secretion_rate units="1/min">1</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                </secretion>
+                <cell_interactions>
+                    <dead_phagocytosis_rate units="1/min">0.0</dead_phagocytosis_rate>
+                    <live_phagocytosis_rates>
+                        <phagocytosis_rate name="A" units="1/min">0.0</phagocytosis_rate>
+                        <phagocytosis_rate name="B" units="1/min">0.0</phagocytosis_rate>
+                        <phagocytosis_rate name="C" units="1/min">0.0</phagocytosis_rate>
+                    </live_phagocytosis_rates>
+                    <attack_rates>
+                        <attack_rate name="A" units="1/min">0.0</attack_rate>
+                        <attack_rate name="B" units="1/min">0.0</attack_rate>
+                        <attack_rate name="C" units="1/min">0.0</attack_rate>
+                    </attack_rates>
+                    <damage_rate units="1/min">1.0</damage_rate>
+                    <fusion_rates>
+                        <fusion_rate name="A" units="1/min">0.0</fusion_rate>
+                        <fusion_rate name="B" units="1/min">0.0</fusion_rate>
+                        <fusion_rate name="C" units="1/min">0.0</fusion_rate>
+                    </fusion_rates>
+                </cell_interactions>
+                <cell_transformations>
+                    <transformation_rates>
+                        <transformation_rate name="A" units="1/min">0.0</transformation_rate>
+                        <transformation_rate name="B" units="1/min">0.0</transformation_rate>
+                        <transformation_rate name="C" units="1/min">0.0</transformation_rate>
+                    </transformation_rates>
+                </cell_transformations>
+            </phenotype>
+            <custom_data>
+                <relative_sated_volume conserved="false" units="dimensionless" description="">1.5</relative_sated_volume>
+            </custom_data>
+        </cell_definition>
+    </cell_definitions>
+
+    <initial_conditions>
+        <cell_positions type="csv" enabled="false">
+            <folder>./config</folder>
+            <filename>cells.csv</filename>
+        </cell_positions>
+    </initial_conditions>
+
+    <user_parameters>
+        <random_seed type="int" units="dimensionless" description="">0</random_seed>
+        <number_of_A type="int" units="none" description="initial number of A">25</number_of_A>
+        <number_of_B type="int" units="none" description="initial number of B">25</number_of_B>
+        <number_of_C type="int" units="none" description="initial number of C">25</number_of_C>
+        <max_distance_from_origin type="double" units="micron" description="max initial distance of cells from (0,0,0)">150</max_distance_from_origin>
+        <A_color type="string" units="" description="color for A cells">magenta</A_color>
+        <B_color type="string" units="" description="color for B cells">green</B_color>
+        <C_color type="string" units="" description="color for C cells">cyan</C_color>
+        <standard_plots type="bool" units="" description="Enable additional standard plots?">true</standard_plots>
+        <hill_power type="double" units="none" description="Hill power for signal responses">5</hill_power>
+        <half_max type="double" units="none" description="half max for signal responses">0.1</half_max>
+        <A_base_cycle type="double" units="1/min" description="base cell cycling rate for type A">0.00072</A_base_cycle>
+        <A_max_cycle type="double" units="1/min" description="maximum cell cycling rate for type A">0.0072</A_max_cycle>
+        <A_cycle_A type="string" units="" description="impact of signal A on A cycling (promote, inhibit, or neutral)">neutral</A_cycle_A>
+        <A_cycle_B type="string" units="" description="impact of signal B on A cycling (promote, inhibit, or neutral)">neutral</A_cycle_B>
+        <A_cycle_C type="string" units="" description="impact of signal C on A cycling (promote, inhibit, or neutral)">neutral</A_cycle_C>
+        <A_cycle_pressure_threshold type="double" units="" description="pressure above threshold inhibits A cycling">2.0</A_cycle_pressure_threshold>
+        <A_base_death type="double" units="1/min" description="base cell death rate for type A">5.31667e-05</A_base_death>
+        <A_max_death type="double" units="1/min" description="maximum cell death rate for type A">5.31667e-04</A_max_death>
+        <A_death_A type="string" units="" description="impact of signal A on A apoptosis (promote, inhibit, or neutral">neutral</A_death_A>
+        <A_death_B type="string" units="" description="impact of signal B on A apoptosis (promote, inhibit, or neutral">neutral</A_death_B>
+        <A_death_C type="string" units="" description="impact of signal C on A apoptosis (promote, inhibit, or neutral">neutral</A_death_C>
+        <A_death_R type="string" units="" description="impact of resource on A apoptosis (promote, inhibit, or neutral">neutral</A_death_R>
+        <A_apoptosis_pressure_threshold type="double" units="" description="pressure above threshold triggers apoptosis">100.0</A_apoptosis_pressure_threshold>
+        <A_necrosis_threshold type="double" units="" description="necrosis of A cells begins below this resource threshold">0.4</A_necrosis_threshold>
+        <A_base_speed type="double" units="micron/min" description="base speed for type A">0.1</A_base_speed>
+        <A_max_speed type="double" units="micron/min" description="maximum speed for type A">1</A_max_speed>
+        <A_speed_A type="string" units="" description="impact of signal A on A motility (promote, inhibit, or neutral">neutral</A_speed_A>
+        <A_speed_B type="string" units="" description="impact of signal B on A motility (promote, inhibit, or neutral">neutral</A_speed_B>
+        <A_speed_C type="string" units="" description="impact of signal C on A motility (promote, inhibit, or neutral">neutral</A_speed_C>
+        <A_speed_R type="string" units="" description="impact of resource on A motility (promote, inhibit, or neutral">neutral</A_speed_R>
+        <A_base_secretion type="double" units="1/min" description="base secretion rate of signal A by type A">1</A_base_secretion>
+        <A_max_secretion type="double" units="1/min" description="max secretion rate of signal A by type A">10</A_max_secretion>
+        <A_signal_A type="string" units="" description="impact of signal A on A secretion (promote, inhibit, or neutral">neutral</A_signal_A>
+        <A_signal_B type="string" units="" description="impact of signal B on A secretion (promote, inhibit, or neutral">neutral</A_signal_B>
+        <A_signal_C type="string" units="" description="impact of signal C on A secretion (promote, inhibit, or neutral">neutral</A_signal_C>
+        <A_signal_R type="string" units="" description="impact of resource on A secretion (promote, inhibit, or neutral">neutral</A_signal_R>
+        <B_base_cycle type="double" units="1/min" description="base cell cycling rate for type B">0.00072</B_base_cycle>
+        <B_max_cycle type="double" units="1/min" description="maximum cell cycling rate for type B">0.0072</B_max_cycle>
+        <B_cycle_A type="string" units="" description="impact of signal A on B cycling (promote, inhibit, or neutral)">neutral</B_cycle_A>
+        <B_cycle_B type="string" units="" description="impact of signal B on B cycling (promote, inhibit, or neutral)">neutral</B_cycle_B>
+        <B_cycle_C type="string" units="" description="impact of signal C on B cycling (promote, inhibit, or neutral)">neutral</B_cycle_C>
+        <B_cycle_pressure_threshold type="double" units="" description="pressure above threshold inhibits B cycling">2.0</B_cycle_pressure_threshold>
+        <B_base_death type="double" units="1/min" description="base cell death rate for type B">5.31667e-05</B_base_death>
+        <B_max_death type="double" units="1/min" description="maximum cell death rate for type B">5.31667e-04</B_max_death>
+        <B_death_A type="string" units="" description="impact of signal A on B apoptosis (promote, inhibit, or neutral">neutral</B_death_A>
+        <B_death_B type="string" units="" description="impact of signal B on B apoptosis (promote, inhibit, or neutral">neutral</B_death_B>
+        <B_death_C type="string" units="" description="impact of signal C on B apoptosis (promote, inhibit, or neutral">neutral</B_death_C>
+        <B_death_R type="string" units="" description="impact of resource on B apoptosis (promote, inhibit, or neutral">neutral</B_death_R>
+        <B_apoptosis_pressure_threshold type="double" units="" description="pressure above threshold triggers apoptosis">100.0</B_apoptosis_pressure_threshold>
+        <B_necrosis_threshold type="double" units="" description="necrosis of B cells begins below this resource threshold">0.4</B_necrosis_threshold>
+        <B_base_speed type="double" units="micron/min" description="base speed for type B">0.1</B_base_speed>
+        <B_max_speed type="double" units="micron/min" description="maximum speed for type B">1</B_max_speed>
+        <B_speed_A type="string" units="" description="impact of signal A on B motility (promote, inhibit, or neutral">neutral</B_speed_A>
+        <B_speed_B type="string" units="" description="impact of signal B on B motility (promote, inhibit, or neutral">neutral</B_speed_B>
+        <B_speed_C type="string" units="" description="impact of signal C on B motility (promote, inhibit, or neutral">neutral</B_speed_C>
+        <B_speed_R type="string" units="" description="impact of resource on B motility (promote, inhibit, or neutral">neutral</B_speed_R>
+        <B_base_secretion type="double" units="1/min" description="base secretion rate of signal B by type B">1</B_base_secretion>
+        <B_max_secretion type="double" units="1/min" description="max secretion rate of signal B by type B">10</B_max_secretion>
+        <B_signal_A type="string" units="" description="impact of signal A on B secretion (promote, inhibit, or neutral">neutral</B_signal_A>
+        <B_signal_B type="string" units="" description="impact of signal B on B secretion (promote, inhibit, or neutral">neutral</B_signal_B>
+        <B_signal_C type="string" units="" description="impact of signal C on B secretion (promote, inhibit, or neutral">neutral</B_signal_C>
+        <B_signal_R type="string" units="" description="impact of resource on B secretion (promote, inhibit, or neutral">neutral</B_signal_R>
+        <C_base_cycle type="double" units="1/min" description="base cell cycling rate for type C">0.00072</C_base_cycle>
+        <C_max_cycle type="double" units="1/min" description="maximum cell cycling rate for type C">0.0072</C_max_cycle>
+        <C_cycle_A type="string" units="" description="impact of signal A on C cycling (promote, inhibit, or neutral)">neutral</C_cycle_A>
+        <C_cycle_B type="string" units="" description="impact of signal B on C cycling (promote, inhibit, or neutral)">neutral</C_cycle_B>
+        <C_cycle_C type="string" units="" description="impact of signal C on C cycling (promote, inhibit, or neutral)">neutral</C_cycle_C>
+        <C_cycle_pressure_threshold type="double" units="" description="pressure above threshold inhibits C cycling">2.0</C_cycle_pressure_threshold>
+        <C_base_death type="double" units="1/min" description="base cell death rate for type C">5.31667e-05</C_base_death>
+        <C_max_death type="double" units="1/min" description="maximum cell death rate for type C">5.31667e-04</C_max_death>
+        <C_death_A type="string" units="" description="impact of signal A on C apoptosis (promote, inhibit, or neutral">neutral</C_death_A>
+        <C_death_B type="string" units="" description="impact of signal B on C apoptosis (promote, inhibit, or neutral">neutral</C_death_B>
+        <C_death_C type="string" units="" description="impact of signal C on C apoptosis (promote, inhibit, or neutral">neutral</C_death_C>
+        <C_death_R type="string" units="" description="impact of resource on C apoptosis (promote, inhibit, or neutral">neutral</C_death_R>
+        <C_apoptosis_pressure_threshold type="double" units="" description="pressure above threshold triggers apoptosis">100.0</C_apoptosis_pressure_threshold>
+        <C_necrosis_threshold type="double" units="" description="necrosis of C cells begins below this resource threshold">0.4</C_necrosis_threshold>
+        <C_base_speed type="double" units="micron/min" description="base speed for type C">0.1</C_base_speed>
+        <C_max_speed type="double" units="micron/min" description="maximum speed for type C">1</C_max_speed>
+        <C_speed_A type="string" units="" description="impact of signal A on C motility (promote, inhibit, or neutral">neutral</C_speed_A>
+        <C_speed_B type="string" units="" description="impact of signal B on C motility (promote, inhibit, or neutral">neutral</C_speed_B>
+        <C_speed_C type="string" units="" description="impact of signal C on C motility (promote, inhibit, or neutral">neutral</C_speed_C>
+        <C_speed_R type="string" units="" description="impact of resource on C motility (promote, inhibit, or neutral">neutral</C_speed_R>
+        <C_base_secretion type="double" units="1/min" description="base secretion rate of signal C by type C">1</C_base_secretion>
+        <C_max_secretion type="double" units="1/min" description="max secretion rate of signal C by type C">10</C_max_secretion>
+        <C_signal_A type="string" units="" description="impact of signal A on C secretion (promote, inhibit, or neutral">neutral</C_signal_A>
+        <C_signal_B type="string" units="" description="impact of signal B on C secretion (promote, inhibit, or neutral">neutral</C_signal_B>
+        <C_signal_C type="string" units="" description="impact of signal C on C secretion (promote, inhibit, or neutral">neutral</C_signal_C>
+        <C_signal_R type="string" units="" description="impact of resource on C secretion (promote, inhibit, or neutral">neutral</C_signal_R>
+        <dt_diffusion type="double" units="min" description="diffusion time step size">0.01</dt_diffusion>
+        <dt_mechanics type="double" units="min" description="mechanics time step size">0.1</dt_mechanics>
+        <dt_phenotype type="double" units="min" description="phenotype time step size">6</dt_phenotype>
+    </user_parameters>
+</PhysiCell_settings>

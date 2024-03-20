@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+###############################################################################
+# If you use PhysiCell in your project, please cite PhysiCell and the version #
+# number, such as below:                                                      #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
+# Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
+#     as below:                                                               #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
+# with BioFVM [2] to solve the transport equations.                           #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
+#                                                                             #
+###############################################################################
+#                                                                             #
+# BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
+#                                                                             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# All rights reserved.                                                        #
+#                                                                             #
+# Redistribution and use in source and binary forms, with or without          #
+# modification, are permitted provided that the following conditions are met: #
+#                                                                             #
+# 1. Redistributions of source code must retain the above copyright notice,   #
+# this list of conditions and the following disclaimer.                       #
+#                                                                             #
+# 2. Redistributions in binary form must reproduce the above copyright        #
+# notice, this list of conditions and the following disclaimer in the         #
+# documentation and/or other materials provided with the distribution.        #
+#                                                                             #
+# 3. Neither the name of the copyright holder nor the names of its            #
+# contributors may be used to endorse or promote products derived from this   #
+# software without specific prior written permission.                         #
+#                                                                             #
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" #
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE   #
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE  #
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE   #
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR         #
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF        #
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS    #
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN     #
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)     #
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE  #
+# POSSIBILITY OF SUCH DAMAGE.                                                 #
+#                                                                             #
+###############################################################################
+*/
+--> 
+
+<!--
+<user_details />
+-->
+
+<PhysiCell_settings version="devel-version">
+	<domain>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
+		<z_min>-10</z_min>
+		<z_max>10</z_max>
+		<dx>20</dx>
+		<dy>20</dy>
+		<dz>20</dz>
+		<use_2D>true</use_2D>
+	</domain>
+	
+	<overall>
+		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
+		<time_units>min</time_units>
+		<space_units>micron</space_units>
+	
+		<dt_diffusion units="min">0.01</dt_diffusion>
+		<dt_mechanics units="min">0.1</dt_mechanics>
+		<dt_phenotype units="min">6</dt_phenotype>	
+	</overall>
+	
+	<parallel>
+		<omp_num_threads>4</omp_num_threads>
+	</parallel> 
+	
+	<save>
+		<folder>output</folder> <!-- use . for root --> 
+
+		<full_data>
+			<interval units="min">60</interval>
+			<enable>true</enable>
+		</full_data>
+		
+		<SVG>
+			<interval units="min">30</interval>
+			<enable>true</enable>
+		</SVG>
+		
+		<legacy_data>
+			<enable>false</enable>
+		</legacy_data>
+	</save>
+	
+	<options>
+		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+        <disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
+	</options>	
+
+	<microenvironment_setup>
+		<variable name="resource" units="none" ID="0">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
+				<decay_rate units="1/min">0</decay_rate>  <!-- 0.1 --> 
+			</physical_parameter_set>
+			<initial_condition units="none">1</initial_condition>
+			<Dirichlet_boundary_condition units="none" enabled="true">1</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+		</variable>
+		
+		<variable name="signal A" units="none" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">0.1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="none">0</initial_condition>
+			<Dirichlet_boundary_condition units="none" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>
+		
+		<variable name="signal B" units="none" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="none">0</initial_condition>
+			<Dirichlet_boundary_condition units="none" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>
+
+		<variable name="signal C" units="none" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="none">0</initial_condition>
+			<Dirichlet_boundary_condition units="none" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>
+
+		<options>
+			<calculate_gradients>true</calculate_gradients>
+			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+			<!-- not yet supported --> 
+			<initial_condition type="matlab" enabled="false">
+				<filename>./config/initial.mat</filename>
+			</initial_condition>
+			<!-- not yet supported --> 
+			<dirichlet_nodes type="matlab" enabled="false">
+				<filename>./config/dirichlet.mat</filename>
+			</dirichlet_nodes>
+		</options>
+	</microenvironment_setup>	
+	
+	<cell_definitions>
+		<cell_definition name="default" ID="0">
+			<phenotype>
+				<cycle code="5" name="live">
+					<!-- phases are:live --> 
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<!-- use phase_transition_rates OR phase_durations -->
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.00072</rate>
+					</phase_transition_rates>					
+					<!-- use phase_transition_rates OR phase_durations -->
+					<!--
+					<phase_durations units="min"> 
+						<duration index="0" fixed_duration="false">1389</duration>
+					</phase_durations>
+					-->
+				</cycle>
+				
+				<death>
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">5.31667e-05</death_rate>
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">516</duration>
+						</phase_durations>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.0</death_rate>
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">0</duration>
+							<duration index="1" fixed_duration="true">86400</duration>
+						</phase_durations>
+						
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>					
+
+				<volume>  
+					<total units="micron^3">2494</total>
+					<fluid_fraction units="dimensionless">0.75</fluid_fraction>
+					<nuclear units="micron^3">540</nuclear>
+					
+					<fluid_change_rate units="1/min">0.05</fluid_change_rate>
+					<cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+					<nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+					
+					<calcified_fraction units="dimensionless">0</calcified_fraction>
+					<calcification_rate units="1/min">0</calcification_rate>
+					
+					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+				</volume> 				
+				
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+					
+					<options>
+						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
+				<motility>  
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
+					
+					<options>
+						<enabled>false</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>false</enabled>
+							<substrate>resource</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				
+				<secretion>
+					<substrate name="resource">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">10</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+
+					<substrate name="signal A">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+						
+					<substrate name="signal B">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 	
+
+					<substrate name="signal C">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 	
+				</secretion>
+
+				<molecular />
+			</phenotype>
+			<custom_data>  
+				<relative_sated_volume units="dimensionless">1.5</relative_sated_volume>
+			</custom_data>
+		</cell_definition>
+		
+		<cell_definition name="A" ID="1" parent_type="default">
+			<phenotype>
+				<cycle code="5" name="live">
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.00072</rate>
+					</phase_transition_rates>					
+				</cycle>
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">0.00001</death_rate>
+					</model> 
+	
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.01</death_rate>
+					</model> 
+				</death>					
+				<volume>  
+				</volume> 				
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.5</relative_maximum_adhesion_distance>
+					<options>
+						<set_relative_equilibrium_distance enabled="true" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
+				<motility>  
+					<speed units="micron/min">0.25</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
+					
+					<options>
+						<enabled>false</enabled>
+						<chemotaxis>
+							<enabled>true</enabled>
+							<substrate>signal B</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				
+				<secretion>
+					<substrate name="signal A">
+						<secretion_rate units="1/min">1</secretion_rate>
+					</substrate> 
+				</secretion>
+
+				<molecular />
+			</phenotype>
+			<custom_data>  
+			</custom_data>
+		</cell_definition>
+
+		<cell_definition name="B" ID="2" parent_type="default">
+			<phenotype>
+				<cycle code="5" name="live">
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.00072</rate>
+					</phase_transition_rates>					
+				</cycle>
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">0.00001</death_rate>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.01</death_rate>
+					</model> 
+				</death>					
+				<volume>  
+				</volume> 				
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+					<options>
+						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
+				<motility>  
+					<speed units="micron/min">0.25</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
+					
+					<options>
+						<enabled>false</enabled>
+						<chemotaxis>
+							<enabled>true</enabled>
+							<substrate>signal C</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				
+				<secretion>
+					<substrate name="signal B">
+						<secretion_rate units="1/min">1</secretion_rate>
+					</substrate> 	
+				</secretion>
+
+				<molecular />
+			</phenotype>
+			<custom_data>  
+			</custom_data>
+		</cell_definition>
+
+		<cell_definition name="C" ID="3" parent_type="default">
+			<phenotype>
+				<cycle code="5" name="live">
+					<phase_transition_rates units="1/min"> 
+						<rate start_index="0" end_index="0" fixed_duration="false">0.00072</rate>
+					</phase_transition_rates>					
+				</cycle>
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">0.00001</death_rate>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.01</death_rate>
+					</model> 
+				</death>					
+				<volume>  
+				</volume> 				
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+					<options>
+						<set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+						<set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+					</options>
+				</mechanics>
+				
+				<motility>  
+					<speed units="micron/min">0.25</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">.5</migration_bias>
+					
+					<options>
+						<enabled>false</enabled>
+						<chemotaxis>
+							<enabled>true</enabled>
+							<substrate>signal A</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				
+				<secretion>
+					<substrate name="signal C">
+						<secretion_rate units="1/min">1</secretion_rate>
+					</substrate> 
+				</secretion>
+
+				<molecular />
+			</phenotype>
+			<custom_data>  
+			</custom_data>
+		</cell_definition>
+		
+	</cell_definitions>
+	
+	
+	
+	<user_parameters>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<!-- example parameters from the template --> 
+		
+		<div_initialization type="divider" description="---Initialization settings---"/>
+		
+		<number_of_A type="int" units="none" description="initial number of A">25</number_of_A> <!-- 400 --> 
+		<number_of_B type="int" units="none" description="initial number of B">25</number_of_B>
+		<number_of_C type="int" units="none" description="initial number of C">25</number_of_C>
+		<max_distance_from_origin type="double" units="micron" description="max initial distance of cells from (0,0,0)">150</max_distance_from_origin>
+		
+		<div_coloring type="divider" description="---Coloring settings---"/>
+
+		<A_color type="string" description="color for A cells">magenta</A_color>  
+		<B_color type="string" description="color for B cells">green</B_color>
+		<C_color type="string" description="color for C cells">cyan</C_color>
+		
+		<standard_plots type="bool" description="Enable additional standard plots?">true</standard_plots>
+	
+		<div_signaling type="divider" description="---Overall signaling settings---"/>
+		<hill_power type="double" units="none" description="Hill power for signal responses">5</hill_power> <!-- 2 --> 
+		<half_max type="double" units="none" description="half max for signal responses">0.1</half_max> <!-- .25 --> 
+		
+		<div_A type="divider" description="---cell type A settings---"/>
+		<!-- cycling --> 
+		<A_base_cycle type="double" description="base cell cycling rate for type A" units="1/min">0.00072</A_base_cycle>
+		<A_max_cycle type="double" description="maximum cell cycling rate for type A" units="1/min">0.0072</A_max_cycle>
+		<A_cycle_A type="string" description="impact of signal A on A cycling (promote, inhibit, or neutral)">neutral</A_cycle_A>
+		<A_cycle_B type="string" description="impact of signal B on A cycling (promote, inhibit, or neutral)">neutral</A_cycle_B>
+		<A_cycle_C type="string" description="impact of signal C on A cycling (promote, inhibit, or neutral)">neutral</A_cycle_C>
+		<A_cycle_pressure_threshold type="double" description="pressure above threshold inhibits A cycling">2.0</A_cycle_pressure_threshold>
+
+		<!-- death --> 
+		<A_base_death type="double" description="base cell death rate for type A" units="1/min">5.31667e-05</A_base_death>
+		<A_max_death type="double" description="maximum cell death rate for type A" units="1/min">5.31667e-04</A_max_death>
+		<A_death_A type="string" description="impact of signal A on A apoptosis (promote, inhibit, or neutral">neutral</A_death_A>
+		<A_death_B type="string" description="impact of signal B on A apoptosis (promote, inhibit, or neutral">neutral</A_death_B>
+		<A_death_C type="string" description="impact of signal C on A apoptosis (promote, inhibit, or neutral">neutral</A_death_C>
+		<A_death_R type="string" description="impact of resource on A apoptosis (promote, inhibit, or neutral">neutral</A_death_R>
+		<A_apoptosis_pressure_threshold type="double" description="pressure above threshold triggers apoptosis">100.0</A_apoptosis_pressure_threshold>
+
+		<A_necrosis_threshold type="double" description="necrosis of A cells begins below this resource threshold">0.4</A_necrosis_threshold>
+
+		<!-- speed --> 
+		<A_base_speed type="double" description="base speed for type A" units="micron/min">0.1</A_base_speed>
+		<A_max_speed type="double" description="maximum speed for type A" units="micron/min">1</A_max_speed>
+		<A_speed_A type="string" description="impact of signal A on A motility (promote, inhibit, or neutral">neutral</A_speed_A>
+		<A_speed_B type="string" description="impact of signal B on A motility (promote, inhibit, or neutral">neutral</A_speed_B>
+		<A_speed_C type="string" description="impact of signal C on A motility (promote, inhibit, or neutral">neutral</A_speed_C>
+		<A_speed_R type="string" description="impact of resource on A motility (promote, inhibit, or neutral">neutral</A_speed_R>
+
+		<!-- secretion --> 
+		<A_base_secretion type="double" description="base secretion rate of signal A by type A" units="1/min">1</A_base_secretion>
+		<A_max_secretion type="double" description="max secretion rate of signal A by type A" units="1/min">10</A_max_secretion>
+		<A_signal_A type="string" description="impact of signal A on A secretion (promote, inhibit, or neutral">neutral</A_signal_A>
+		<A_signal_B type="string" description="impact of signal B on A secretion (promote, inhibit, or neutral">neutral</A_signal_B>
+		<A_signal_C type="string" description="impact of signal C on A secretion (promote, inhibit, or neutral">neutral</A_signal_C>
+		<A_signal_R type="string" description="impact of resource on A secretion (promote, inhibit, or neutral">neutral</A_signal_R>
+
+
+		<div_B type="divider" description="---cell type B settings---"/>
+		<B_base_cycle type="double" description="base cell cycling rate for type B" units="1/min">0.00072</B_base_cycle>
+		<B_max_cycle type="double" description="maximum cell cycling rate for type B" units="1/min">0.0072</B_max_cycle>
+		<B_cycle_A type="string" description="impact of signal A on B cycling (promote, inhibit, or neutral)">neutral</B_cycle_A>
+		<B_cycle_B type="string" description="impact of signal B on B cycling (promote, inhibit, or neutral)">neutral</B_cycle_B>
+		<B_cycle_C type="string" description="impact of signal C on B cycling (promote, inhibit, or neutral)">neutral</B_cycle_C>
+		<B_cycle_pressure_threshold type="double" description="pressure above threshold inhibits B cycling">2.0</B_cycle_pressure_threshold>
+
+		<B_base_death type="double" description="base cell death rate for type B" units="1/min">5.31667e-05</B_base_death>
+		<B_max_death type="double" description="maximum cell death rate for type B" units="1/min">5.31667e-04</B_max_death>
+		<B_death_A type="string" description="impact of signal A on B apoptosis (promote, inhibit, or neutral">neutral</B_death_A>
+		<B_death_B type="string" description="impact of signal B on B apoptosis (promote, inhibit, or neutral">neutral</B_death_B>
+		<B_death_C type="string" description="impact of signal C on B apoptosis (promote, inhibit, or neutral">neutral</B_death_C>
+		<B_death_R type="string" description="impact of resource on B apoptosis (promote, inhibit, or neutral">neutral</B_death_R>
+		<B_apoptosis_pressure_threshold type="double" description="pressure above threshold triggers apoptosis">100.0</B_apoptosis_pressure_threshold>
+
+		<B_necrosis_threshold type="double" description="necrosis of B cells begins below this resource threshold">0.4</B_necrosis_threshold>
+
+		<B_base_speed type="double" description="base speed for type B" units="micron/min">0.1</B_base_speed>
+		<B_max_speed type="double" description="maximum speed for type B" units="micron/min">1</B_max_speed>
+		<B_speed_A type="string" description="impact of signal A on B motility (promote, inhibit, or neutral">neutral</B_speed_A>
+		<B_speed_B type="string" description="impact of signal B on B motility (promote, inhibit, or neutral">neutral</B_speed_B>
+		<B_speed_C type="string" description="impact of signal C on B motility (promote, inhibit, or neutral">neutral</B_speed_C>
+		<B_speed_R type="string" description="impact of resource on B motility (promote, inhibit, or neutral">neutral</B_speed_R>
+
+		<!-- secretion --> 
+		<B_base_secretion type="double" description="base secretion rate of signal B by type B" units="1/min">1</B_base_secretion>
+		<B_max_secretion type="double" description="max secretion rate of signal B by type B" units="1/min">10</B_max_secretion>
+		<B_signal_A type="string" description="impact of signal A on B secretion (promote, inhibit, or neutral">neutral</B_signal_A>
+		<B_signal_B type="string" description="impact of signal B on B secretion (promote, inhibit, or neutral">neutral</B_signal_B>
+		<B_signal_C type="string" description="impact of signal C on B secretion (promote, inhibit, or neutral">neutral</B_signal_C>
+		<B_signal_R type="string" description="impact of resource on B secretion (promote, inhibit, or neutral">neutral</B_signal_R>
+
+		<div_C type="divider" description="---cell type C settings---"/>
+		<C_base_cycle type="double" description="base cell cycling rate for type C" units="1/min">0.00072</C_base_cycle>
+		<C_max_cycle type="double" description="maximum cell cycling rate for type C" units="1/min">0.0072</C_max_cycle>
+		<C_cycle_A type="string" description="impact of signal A on C cycling (promote, inhibit, or neutral)">neutral</C_cycle_A>
+		<C_cycle_B type="string" description="impact of signal B on C cycling (promote, inhibit, or neutral)">neutral</C_cycle_B>
+		<C_cycle_C type="string" description="impact of signal C on C cycling (promote, inhibit, or neutral)">neutral</C_cycle_C>
+		<C_cycle_pressure_threshold type="double" description="pressure above threshold inhibits C cycling">2.0</C_cycle_pressure_threshold>
+
+		<C_base_death type="double" description="base cell death rate for type C" units="1/min">5.31667e-05</C_base_death>
+		<C_max_death type="double" description="maximum cell death rate for type C" units="1/min">5.31667e-04</C_max_death>
+		<C_death_A type="string" description="impact of signal A on C apoptosis (promote, inhibit, or neutral">neutral</C_death_A>
+		<C_death_B type="string" description="impact of signal B on C apoptosis (promote, inhibit, or neutral">neutral</C_death_B>
+		<C_death_C type="string" description="impact of signal C on C apoptosis (promote, inhibit, or neutral">neutral</C_death_C>
+		<C_death_R type="string" description="impact of resource on C apoptosis (promote, inhibit, or neutral">neutral</C_death_R>
+		<C_apoptosis_pressure_threshold type="double" description="pressure above threshold triggers apoptosis">100.0</C_apoptosis_pressure_threshold>
+		
+		<C_necrosis_threshold type="double" description="necrosis of C cells begins below this resource threshold">0.4</C_necrosis_threshold>
+
+		<C_base_speed type="double" description="base speed for type C" units="micron/min">0.1</C_base_speed>
+		<C_max_speed type="double" description="maximum speed for type C" units="micron/min">1</C_max_speed>
+		<C_speed_A type="string" description="impact of signal A on C motility (promote, inhibit, or neutral">neutral</C_speed_A>
+		<C_speed_B type="string" description="impact of signal B on C motility (promote, inhibit, or neutral">neutral</C_speed_B>
+		<C_speed_C type="string" description="impact of signal C on C motility (promote, inhibit, or neutral">neutral</C_speed_C>
+		<C_speed_R type="string" description="impact of resource on C motility (promote, inhibit, or neutral">neutral</C_speed_R>
+
+		<!-- secretion --> 
+		<C_base_secretion type="double" description="base secretion rate of signal C by type C" units="1/min">1</C_base_secretion>
+		<C_max_secretion type="double" description="max secretion rate of signal C by type C" units="1/min">10</C_max_secretion>
+		<C_signal_A type="string" description="impact of signal A on C secretion (promote, inhibit, or neutral">neutral</C_signal_A>
+		<C_signal_B type="string" description="impact of signal B on C secretion (promote, inhibit, or neutral">neutral</C_signal_B>
+		<C_signal_C type="string" description="impact of signal C on C secretion (promote, inhibit, or neutral">neutral</C_signal_C>
+		<C_signal_R type="string" description="impact of resource on C secretion (promote, inhibit, or neutral">neutral</C_signal_R>
+		
+		<!--- danger zone -->
+		<div_danger type="divider" description="---Danger Zone (Advanced Settings)---"/>
+		<dt_diffusion type="double" units="min" description="diffusion time step size">0.01</dt_diffusion>
+		<dt_mechanics type="double" units="min" description="mechanics time step size">0.1</dt_mechanics>
+		<dt_phenotype type="double" units="min" description="phenotype time step size">6</dt_phenotype>	
+
+	</user_parameters>
+	
+</PhysiCell_settings>

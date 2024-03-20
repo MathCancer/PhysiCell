@@ -1,0 +1,17 @@
+Node A {
+  logic = A;
+  rate_up  = @logic ? $time_scale : 0;
+  rate_down  = @logic ? 0 : $time_scale;
+}
+
+Node B {
+  logic = B;
+  rate_up  = @logic ? $time_scale : 0;
+  rate_down  = @logic ? 0 : $time_scale;
+}
+
+Node C {
+  logic = A & B;
+  rate_up  = @logic ? $time_scale : 0;
+  rate_down  = @logic ? 0 : $time_scale;
+}

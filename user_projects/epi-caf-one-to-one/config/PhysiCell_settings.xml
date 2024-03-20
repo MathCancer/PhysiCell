@@ -14,7 +14,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">7200.0</max_time>
+        <max_time units="min">21600.0</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -27,7 +27,7 @@
     </parallel>
 
     <save>
-        <folder>/Users/jeanettejohnson/PhysiCell/user_projects/epi-caf/output</folder>
+        <folder>/Users/jeanettejohnson/PhysiCell/user_projects/epi-caf-one-to-one/output</folder>
         <full_data>
             <interval units="min">60</interval>
             <enable>true</enable>
@@ -816,7 +816,7 @@
     </cell_definitions>
 
     <initial_conditions>
-        <cell_positions type="csv" enabled="true">
+        <cell_positions type="csv" enabled="false">
             <folder>./config</folder>
             <filename>epicafFIXED.csv</filename>
         </cell_positions>
