@@ -139,7 +139,8 @@ void physimess_mechanics( double dt )
     {
         last_update_time = PhysiCell_globals.current_time;
         
-        #pragma omp parallel for
+        //#pragma omp parallel for
+        // This is not parallel because we are modifying the agend grid
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
@@ -165,7 +166,8 @@ void physimess_mechanics( double dt )
             }
         }
 
-        #pragma omp parallel for
+        // #pragma omp parallel for
+        // This is not parallel because we are modifying the agend grid
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
