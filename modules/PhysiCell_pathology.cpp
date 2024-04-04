@@ -1670,7 +1670,7 @@ void setup_svg_substrate_colormap(std::vector<std::string> &colormap)
 		PhysiCell_settings.svg_substrate_colormap = "YlOrRd";
 		setup_svg_substrate_colormap(colormap);
 	}
-	std::cout << "CM  = " << &colormap << std::endl;
+	
 	if (is_reversed)
 	{
 		for (unsigned int i = 0; i<colormap.size(); i++)
