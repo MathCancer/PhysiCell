@@ -1404,7 +1404,7 @@ void Cell::attack_cell( Cell* pCell_to_attack , double dt )
 	{ 
 		// std::cout << this->type_name << " attacks " << pCell_to_attack->type_name << std::endl;
 		// 
-		pCell_to_attack->state.damage += phenotype.cell_interactions.damage_rate * dt; 
+		pCell_to_attack->state.damage += phenotype.cell_interactions.damage_rate; 
 		pCell_to_attack->state.total_attack_time += dt; 
 	}
 	return; 
