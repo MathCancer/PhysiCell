@@ -762,6 +762,10 @@ void SVG_plot(std::string filename, Microenvironment &M, double z_slice, double 
 					   PhysiCell_SVG_options.font_color.c_str(), PhysiCell_SVG_options.font.c_str()); // misterious values set with a trial and error approach due to OCD. But now the legend is coherent at pixel level
 
 		delete[] szString;
+
+		// add a label to the right of the colorbar defined by above Write_SVG_rect calls
+		Write_SVG_text(os, PhysiCell_settings.substrate_to_monitor.c_str(), upper_left_x + 35, top_margin + plot_height / 2, font_size,
+					   PhysiCell_SVG_options.font_color.c_str(), PhysiCell_SVG_options.font.c_str(), 90.0);
 	}
 
 	Write_SVG_rect(os, 25.0 + plot_width, top_margin, 25.0, plot_height - 25, 0.002 * plot_height, "black", "none"); // nice black contour around the legend
