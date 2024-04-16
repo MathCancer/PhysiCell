@@ -115,6 +115,12 @@ class Cell_Container : public BioFVM::Agent_Container
 	void flag_cell_for_division( Cell* pCell ); 
 	void flag_cell_for_removal( Cell* pCell ); 
 	bool contain_any_cell(int voxel_index);
+
+  const std::vector<Cell*> &get_dividing_cells_in_container();
+  const std::vector<Cell*> &get_dying_cells_in_container();
+
+  const std::vector<Cell*> &get_all_dividing();
+  const std::vector<Cell*> &get_all_dying();
 };
 
 int find_escaping_face_index(Cell* agent);

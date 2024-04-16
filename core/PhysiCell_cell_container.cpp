@@ -370,6 +370,20 @@ bool Cell_Container::contain_any_cell(int voxel_index)
 	return agent_grid[voxel_index].size()==0?false:true;
 }
 
+const std::vector<Cell*>& Cell_Container::get_dividing_cells_in_container(){
+  return this-> cells_ready_to_divide;
+}
+const std::vector<Cell*>& Cell_Container::get_dying_cells_in_container(){
+  return this-> cells_ready_to_die;
+}
+const std::vector<Cell*>& Cell_Container::get_all_dividing(){
+  return (((Cell_Container *)microenvironment.agent_container)->get_dividing_cells_in_container());
+}
+const std::vector<Cell*>& Cell_Container::get_all_dying(){
+  return (((Cell_Container *)microenvironment.agent_container)->get_dying_cells_in_container());
+}
+
+
 int find_escaping_face_index(Cell* agent)
 {
 	if(agent->position[0] <= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_min_x_index])
