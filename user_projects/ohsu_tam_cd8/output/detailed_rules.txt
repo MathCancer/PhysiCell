@@ -1,0 +1,44 @@
+Cell Hypothesis Rules (detailed)
+
+In tumor cells:
+oxygen increases cycle entry from 0 towards 0.00072 with a Hill response, with half-max 21.5 and Hill power 4.
+pressure decreases cycle entry from 0 towards 0 with a Hill response, with half-max 1 and Hill power 4.
+oxygen decreases necrosis from 0.0028 towards 0 with a Hill response, with half-max 3.75 and Hill power 8.
+damage increases apoptosis from 7.2e-05 towards 0.072 with a Hill response, with half-max 180 and Hill power 2.
+dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.
+IFN-gamma decreases migration speed from 0.5 towards 0 with a Hill response, with half-max 0.25 and Hill power 2.
+
+In M0 macrophage cells:
+contact with dead cell increases transform to M1 macrophage from 0 towards 0.05 with a Hill response, with half-max 0.1 and Hill power 10.
+contact with dead cell decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.1 and Hill power 4.
+dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.
+
+In M1 macrophage cells:
+contact with dead cell decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.1 and Hill power 4.
+oxygen decreases transform to M2 macrophage from 0.01 towards 0 with a Hill response, with half-max 5 and Hill power 4.
+IFN-gamma increases cycle entry from 7.2e-05 towards 0.00036 with a Hill response, with half-max 0.25 and Hill power 2.
+IFN-gamma increases phagocytose dead cell from 0.01 towards 0.05 with a Hill response, with half-max 0.25 and Hill power 2.
+dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.
+
+In M2 macrophage cells:
+contact with dead cell decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.1 and Hill power 4.
+IFN-gamma decreases cycle entry from 7.2e-05 towards 0 with a Hill response, with half-max 0.25 and Hill power 2.
+IFN-gamma increases phagocytose dead cell from 0.01 towards 0.05 with a Hill response, with half-max 0.25 and Hill power 2.
+dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.
+
+In naive T cell cells:
+IL-10 decreases transform to CD8 T cell from 0.001 towards 0 with a Hill response, with half-max 0.25 and Hill power 2.
+IFN-gamma increases transform to CD8 T cell from 0.001 towards 0.01 with a Hill response, with half-max 0.25 and Hill power 2.
+dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.
+
+In CD8 T cell cells:
+IFN-gamma increases cycle entry from 7.2e-05 towards 0.00093 with a Hill response, with half-max 0.25 and Hill power 2.
+IL-10 decreases attack tumor from 0.01 towards 0 with a Hill response, with half-max 0.25 and Hill power 2.
+IL-10 decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.25 and Hill power 2.
+contact with tumor decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.1 and Hill power 2.
+IL-10 increases transform to exhausted T cell from 0 towards 0.005 with a Hill response, with half-max 0.25 and Hill power 4.
+dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.
+
+In exhausted T cell cells:
+dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.
+

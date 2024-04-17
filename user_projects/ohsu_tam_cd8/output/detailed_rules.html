@@ -1,0 +1,60 @@
+<html>
+<body><h1>Cell Hypothesis Rules (detailed)</h1>
+<p>In tumor cells:
+<ul>
+<li>oxygen increases cycle entry from 0 towards 0.00072 with a Hill response, with half-max 21.5 and Hill power 4.</li>
+<li>pressure decreases cycle entry from 0 towards 0 with a Hill response, with half-max 1 and Hill power 4.</li>
+<li>oxygen decreases necrosis from 0.0028 towards 0 with a Hill response, with half-max 3.75 and Hill power 8.</li>
+<li>damage increases apoptosis from 7.2e-05 towards 0.072 with a Hill response, with half-max 180 and Hill power 2.</li>
+<li>dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.</li>
+<li>IFN-gamma decreases migration speed from 0.5 towards 0 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+</ul>
+</p>
+<p>In M0 macrophage cells:
+<ul>
+<li>contact with dead cell increases transform to M1 macrophage from 0 towards 0.05 with a Hill response, with half-max 0.1 and Hill power 10.</li>
+<li>contact with dead cell decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.1 and Hill power 4.</li>
+<li>dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.</li>
+</ul>
+</p>
+<p>In M1 macrophage cells:
+<ul>
+<li>contact with dead cell decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.1 and Hill power 4.</li>
+<li>oxygen decreases transform to M2 macrophage from 0.01 towards 0 with a Hill response, with half-max 5 and Hill power 4.</li>
+<li>IFN-gamma increases cycle entry from 7.2e-05 towards 0.00036 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>IFN-gamma increases phagocytose dead cell from 0.01 towards 0.05 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.</li>
+</ul>
+</p>
+<p>In M2 macrophage cells:
+<ul>
+<li>contact with dead cell decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.1 and Hill power 4.</li>
+<li>IFN-gamma decreases cycle entry from 7.2e-05 towards 0 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>IFN-gamma increases phagocytose dead cell from 0.01 towards 0.05 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.</li>
+</ul>
+</p>
+<p>In naive T cell cells:
+<ul>
+<li>IL-10 decreases transform to CD8 T cell from 0.001 towards 0 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>IFN-gamma increases transform to CD8 T cell from 0.001 towards 0.01 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.</li>
+</ul>
+</p>
+<p>In CD8 T cell cells:
+<ul>
+<li>IFN-gamma increases cycle entry from 7.2e-05 towards 0.00093 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>IL-10 decreases attack tumor from 0.01 towards 0 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>IL-10 decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.25 and Hill power 2.</li>
+<li>contact with tumor decreases migration speed from 1 towards 0.1 with a Hill response, with half-max 0.1 and Hill power 2.</li>
+<li>IL-10 increases transform to exhausted T cell from 0 towards 0.005 with a Hill response, with half-max 0.25 and Hill power 4.</li>
+<li>dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.</li>
+</ul>
+</p>
+<p>In exhausted T cell cells:
+<ul>
+<li>dead increases debris secretion from 0 towards 0.017 with a Hill response, with half-max 0.1 and Hill power 10. Rule applies to dead cells.</li>
+</ul>
+</p>
+</body>
+</html>
