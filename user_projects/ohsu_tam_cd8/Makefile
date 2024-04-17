@@ -222,7 +222,7 @@ untar:
 # easier animation
 
 FRAMERATE := 24
-OUTPUT := output
+OUTPUT := outputs/output_tam_tumor
 
 jpeg:
 	@magick identify -format "%h" $(OUTPUT)/initial.svg > __H.txt
