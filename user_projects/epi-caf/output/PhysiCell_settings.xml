@@ -14,7 +14,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">7560.0</max_time>
+        <max_time units="min">7200.0</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -27,13 +27,13 @@
     </parallel>
 
     <save>
-        <folder>outputs/output_hypothesis2</folder>
+        <folder>/Users/jeanettejohnson/PhysiCell/user_projects/epi-caf/output</folder>
         <full_data>
-            <interval units="min">5</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">5</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
             <plot_substrate enabled="true" limits="false">
                 <substrate>ecm</substrate>
@@ -310,11 +310,11 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">2</speed>
+                    <speed units="micron/min">0</speed>
                     <persistence_time units="min">10</persistence_time>
                     <migration_bias units="dimensionless">.5</migration_bias>
                     <options>
-                        <enabled>true</enabled>
+                        <enabled>false</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
                             <enabled>false</enabled>
@@ -453,11 +453,11 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">1</speed>
+                    <speed units="micron/min">0</speed>
                     <persistence_time units="min">10</persistence_time>
                     <migration_bias units="dimensionless">.5</migration_bias>
                     <options>
-                        <enabled>true</enabled>
+                        <enabled>false</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
                             <enabled>false</enabled>
@@ -739,11 +739,11 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">2</speed>
+                    <speed units="micron/min">0</speed>
                     <persistence_time units="min">10</persistence_time>
                     <migration_bias units="dimensionless">.5</migration_bias>
                     <options>
-                        <enabled>true</enabled>
+                        <enabled>false</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
                             <enabled>false</enabled>
@@ -825,7 +825,7 @@
     <cell_rules>
         <rulesets>
             <ruleset protocol="CBHG" version="2.0" format="csv" enabled="true">
-                <folder>./config</folder>
+                <folder>/Users/jeanettejohnson/PhysiCell/user_projects/epi-caf/config</folder>
                 <filename>cell_rules.csv</filename>
             </ruleset>
         </rulesets>

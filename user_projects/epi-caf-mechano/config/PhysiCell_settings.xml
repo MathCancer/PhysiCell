@@ -1,10 +1,10 @@
 <PhysiCell_settings version="devel-version">
 
     <domain>
-        <x_min>-800</x_min>
-        <x_max>800</x_max>
-        <y_min>-800</y_min>
-        <y_max>800</y_max>
+        <x_min>-500</x_min>
+        <x_max>500</x_max>
+        <y_min>-500</y_min>
+        <y_max>500</y_max>
         <z_min>-10</z_min>
         <z_max>10</z_max>
         <dx>20</dx>
@@ -14,7 +14,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">7560.0</max_time>
+        <max_time units="min">14400</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -23,23 +23,18 @@
     </overall>
 
     <parallel>
-        <omp_num_threads>8</omp_num_threads>
+        <omp_num_threads>6</omp_num_threads>
     </parallel>
 
     <save>
-        <folder>outputs/output_hypothesis2</folder>
+        <folder>output</folder>
         <full_data>
-            <interval units="min">5</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">5</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
-            <plot_substrate enabled="true" limits="false">
-                <substrate>ecm</substrate>
-                <min_conc />
-                <max_conc />
-            </plot_substrate>
         </SVG>
         <legacy_data>
             <enable>false</enable>
@@ -52,7 +47,7 @@
         <disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
     </options>
 
-    <microenvironment_setup>
+     <microenvironment_setup>
         <variable name="inflammatory_signal" units="dimensionless" ID="0">
             <physical_parameter_set>
                 <diffusion_coefficient units="micron^2/min">100.0</diffusion_coefficient>
@@ -97,7 +92,8 @@
         </options>
     </microenvironment_setup>
 
-    <cell_definitions>
+
+     <cell_definitions>
         <cell_definition name="epithelial_normal" ID="0">
             <phenotype>
                 <cycle code="5" name="live">
@@ -310,11 +306,11 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">2</speed>
+                    <speed units="micron/min">0</speed>
                     <persistence_time units="min">10</persistence_time>
                     <migration_bias units="dimensionless">.5</migration_bias>
                     <options>
-                        <enabled>true</enabled>
+                        <enabled>false</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
                             <enabled>false</enabled>
@@ -453,11 +449,11 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">1</speed>
+                    <speed units="micron/min">0</speed>
                     <persistence_time units="min">10</persistence_time>
                     <migration_bias units="dimensionless">.5</migration_bias>
                     <options>
-                        <enabled>true</enabled>
+                        <enabled>false</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
                             <enabled>false</enabled>
@@ -739,11 +735,11 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">2</speed>
+                    <speed units="micron/min">0</speed>
                     <persistence_time units="min">10</persistence_time>
                     <migration_bias units="dimensionless">.5</migration_bias>
                     <options>
-                        <enabled>true</enabled>
+                        <enabled>false</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
                             <enabled>false</enabled>
@@ -815,22 +811,13 @@
         </cell_definition>
     </cell_definitions>
 
+
     <initial_conditions>
         <cell_positions type="csv" enabled="true">
-            <folder>./config</folder>
-            <filename>epicafFIXED.csv</filename>
+            <folder>config</folder>
+            <filename>cells.csv</filename>
         </cell_positions>
     </initial_conditions>
-
-    <cell_rules>
-        <rulesets>
-            <ruleset protocol="CBHG" version="2.0" format="csv" enabled="true">
-                <folder>./config</folder>
-                <filename>cell_rules.csv</filename>
-            </ruleset>
-        </rulesets>
-        <settings />
-    </cell_rules>
 
     <user_parameters>
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
