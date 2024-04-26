@@ -253,30 +253,29 @@ void Hypothesis_Rule::add_signal( std::string signal , double half_max , double 
     // check: is this a valid signal? (is it in the dictionary?)
     if( find_signal_index(signal) < 0 )
     {
-        std::cout << "Warning! Attempted to add signal " << signal << " which is not in the dictionary." << std::endl; 
+        std::cout << "Error! Attempted to add signal " << signal << " which is not in the dictionary." << std::endl; 
         std::cout << "Either fix your model or add the missing signal to the simulation." << std::endl; 
 
         exit(-1); 
     }
 
-	// check to see if it's already there 
+	// check to see if the signal and response already there 
 	int n = find_signal(signal); 
+	bool bResponse = false; // true if up-regulate, false if down
+	if( response == "increase" || response == "increases" || response == "promotes" )
+	{ bResponse = true; }
 
 	// if so, then just warn and exit.  
-	if( n > -1 )
+	if( n > -1 && responses[n] == bResponse)
 	{
-		std::cout << "Warning! Signal " << signal << " was already part of the rule. Ignoring input." << 
+		std::cout << "Error! Signal " << signal << " and Response " << response << " were already part of the rule." << 
 		std::endl; 
 
-		return; 
+		exit(-1); 
 	}
 
 	// add the signal; 
 	signals_map[signal] = signals_map.size(); 
-
-	bool bResponse = false; // true if up-regulate, false if down
-	if( response == "increase" || response == "increases" || response == "promotes" )
-	{ bResponse = true; }
 
 	signals.push_back( signal ); 
 	half_maxes.push_back( half_max ); 
