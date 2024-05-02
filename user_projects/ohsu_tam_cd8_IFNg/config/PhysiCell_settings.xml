@@ -44,8 +44,8 @@
         <SVG>
             <interval units="min">5</interval>
             <enable>true</enable>
-            <plot_substrate enabled="false" limits="false">
-                <substrate>debris</substrate>
+            <plot_substrate enabled="true" limits="false">
+                <substrate>IFN-gamma</substrate>
                 <min_conc />
                 <max_conc />
             </plot_substrate>

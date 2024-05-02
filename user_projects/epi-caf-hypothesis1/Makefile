@@ -223,6 +223,7 @@ untar:
 
 FRAMERATE := 24
 OUTPUT := outputs/output_hypothesis1
+MOVIENAME := out
 
 jpeg:
 	@magick identify -format "%h" $(OUTPUT)/initial.svg > __H.txt
@@ -234,10 +235,10 @@ jpeg:
 	rm -f __H*.txt __W*.txt __resize.txt
 
 gif:
-	magick convert $(OUTPUT)/s*.svg $(OUTPUT)/out.gif
+	magick convert $(OUTPUT)/s*.svg $(OUTPUT)/$(MOVIENAME).gif
 
 movie:
-	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/out.mp4
+	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/$(MOVIENAME).mp4
 
 # upgrade rules
 
