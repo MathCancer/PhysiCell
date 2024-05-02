@@ -253,30 +253,29 @@ void Hypothesis_Rule::add_signal( std::string signal , double half_max , double 
     // check: is this a valid signal? (is it in the dictionary?)
     if( find_signal_index(signal) < 0 )
     {
-        std::cout << "Warning! Attempted to add signal " << signal << " which is not in the dictionary." << std::endl; 
+        std::cout << "Error! Attempted to add signal " << signal << " which is not in the dictionary." << std::endl; 
         std::cout << "Either fix your model or add the missing signal to the simulation." << std::endl; 
 
         exit(-1); 
     }
 
-	// check to see if it's already there 
+	// check to see if the signal and response already there 
 	int n = find_signal(signal); 
+	bool bResponse = false; // true if up-regulate, false if down
+	if( response == "increase" || response == "increases" || response == "promotes" )
+	{ bResponse = true; }
 
 	// if so, then just warn and exit.  
-	if( n > -1 )
+	if( n > -1 && responses[n] == bResponse)
 	{
-		std::cout << "Warning! Signal " << signal << " was already part of the rule. Ignoring input." << 
+		std::cout << "Error! Signal " << signal << " and Response " << response << " were already part of the rule." << 
 		std::endl; 
 
-		return; 
+		exit(-1); 
 	}
 
 	// add the signal; 
 	signals_map[signal] = signals_map.size(); 
-
-	bool bResponse = false; // true if up-regulate, false if down
-	if( response == "increase" || response == "increases" || response == "promotes" )
-	{ bResponse = true; }
 
 	signals.push_back( signal ); 
 	half_maxes.push_back( half_max ); 
@@ -798,8 +797,8 @@ Hypothesis_Rule* Hypothesis_Ruleset::add_behavior( std::string behavior , double
 
 Hypothesis_Rule* Hypothesis_Ruleset::add_behavior( std::string behavior )
 { 
-	double min_behavior = 0.1; 
-	double max_behavior = 1.0; 
+	double min_behavior = 9e99; // Min behaviour high value
+	double max_behavior = -9e99; // Max behaviour low value
 	return Hypothesis_Ruleset::add_behavior( behavior, min_behavior, max_behavior );
 }
 
@@ -1061,8 +1060,10 @@ void set_behavior_parameters( std::string cell_type, std::string behavior,
         exit(-1);              
     }
 
-	hypothesis_rulesets[pCD][behavior].min_value = min_value; 
-	hypothesis_rulesets[pCD][behavior].max_value = max_value; 
+	if ( min_value < hypothesis_rulesets[pCD][behavior].min_value )
+	{ hypothesis_rulesets[pCD][behavior].min_value = min_value; }
+	if ( max_value > hypothesis_rulesets[pCD][behavior].max_value )
+	{ hypothesis_rulesets[pCD][behavior].max_value = max_value; } 
 	hypothesis_rulesets[pCD][behavior].base_value = base_value; 
 	
 	return;
@@ -1127,8 +1128,9 @@ void set_behavior_min_value( std::string cell_type, std::string behavior, double
             << ", but no rule for this behavior found for this cell type." << std::endl; 
         exit(-1);         
     }
-
-	hypothesis_rulesets[pCD][behavior].min_value = min_value; 
+	
+	if ( min_value < hypothesis_rulesets[pCD][behavior].min_value )
+	{ hypothesis_rulesets[pCD][behavior].min_value = min_value; }
 
 	return;
 }
@@ -1160,7 +1162,8 @@ void set_behavior_max_value( std::string cell_type, std::string behavior, double
         exit(-1);         
     }
 
-	hypothesis_rulesets[pCD][behavior].max_value = max_value;
+	if ( max_value > hypothesis_rulesets[pCD][behavior].max_value )
+	{ hypothesis_rulesets[pCD][behavior].max_value = max_value; }
 	
 	return;
 }
@@ -1620,9 +1623,15 @@ void parse_csv_rule_v1( std::vector<std::string> input )
 	set_behavior_base_value(cell_type,behavior,base_value);
 
 	if( response == "increases")
-	{ set_behavior_max_value(cell_type,behavior,max_response); }
+	{ 
+		set_behavior_min_value(cell_type,behavior,ref_base_value); 
+		set_behavior_max_value(cell_type,behavior,max_response);
+	}
 	else
-	{ set_behavior_min_value(cell_type,behavior,max_response); }
+	{ 
+		set_behavior_min_value(cell_type,behavior,max_response); 
+		set_behavior_max_value(cell_type,behavior,ref_base_value);
+	}
 
 	return;  
 }
@@ -1748,10 +1757,15 @@ void parse_csv_rule_v2( std::vector<std::string> input )
 
 	set_behavior_base_value(cell_type,behavior,ref_base_value);
 	if( response == "increases")
-	{ set_behavior_max_value(cell_type,behavior,max_response); }
+	{ 
+		set_behavior_min_value(cell_type,behavior,ref_base_value); 
+		set_behavior_max_value(cell_type,behavior,max_response);
+	}
 	else
-	{ set_behavior_min_value(cell_type,behavior,max_response); }
-
+	{ 
+		set_behavior_min_value(cell_type,behavior,max_response); 
+		set_behavior_max_value(cell_type,behavior,ref_base_value);
+	}
 	return;  
 }
 
