@@ -65,7 +65,7 @@
 ###############################################################################
 */
  
-#include "./PhysiCell_settings.h"
+#include "PhysiCell_settings.h"
 
 using namespace BioFVM; 
 
@@ -442,84 +442,115 @@ Parameters<T>::Parameters()
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+
+        // check if parameter with this name already exist
+        auto it = name_to_index_map.find(my_name);
+
+        if (it == name_to_index_map.end()) {
+            // generate new variable
+	    Parameter<T>* pNew;
+	    pNew = new Parameter<T>;
+	    pNew->name = my_name;
+
+	    int n = parameters.size();
+
+	    parameters.push_back( *pNew );
+
+	    name_to_index_map[ my_name ] = n;
+        }
+	return;
 }
 
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+        // check if parameter with this name already exist
+        auto it = name_to_index_map.find(my_name);
+
+        if (it == name_to_index_map.end()) {
+            // generate new variable
+            Parameter<T>* pNew;
+	    pNew = new Parameter<T>;
+	    pNew->name = my_name;
+	    pNew->value = my_value;
+
+	    int n = parameters.size();
+
+	    parameters.push_back( *pNew );
+
+	    name_to_index_map[ my_name ] = n;
+
+        } else {
+            // change value
+            int index = it->second;
+            parameters[index].value = my_value;
+        }
+	return;
 }
+
 /*
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+	Parameter<T>* pNew;
+	pNew = new Parameter<T>;
+	pNew->name = my_name;
+	pNew->value = my_value;
+
+	int n = parameters.size();
+
+	parameters.push_back( *pNew );
+
+	name_to_index_map[ my_name ] = n;
+	return;
 }
 */
 
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	pNew->units = my_units; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+        // check if parameter with this name already exist
+        auto it = name_to_index_map.find(my_name);
+
+        if (it == name_to_index_map.end()) {
+            // generate new variable
+            Parameter<T>* pNew;
+	    pNew = new Parameter<T>;
+	    pNew->name = my_name;
+	    pNew->value = my_value;
+	    pNew->units = my_units;
+
+	    int n = parameters.size();
+
+	    parameters.push_back( *pNew );
+
+	    name_to_index_map[ my_name ] = n;
+
+        } else {
+            // change value and unit
+            int index = it->second;
+            parameters[index].value = my_value;
+            parameters[index].units = my_units;
+        }
+	return;
 }
 
 /*
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	pNew->units = my_units; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+	Parameter<T>* pNew;
+	pNew = new Parameter<T>;
+	pNew->name = my_name;
+	pNew->value = my_value;
+	pNew->units = my_units;
+
+	int n = parameters.size();
+
+	parameters.push_back( *pNew );
+
+	name_to_index_map[ my_name ] = n;
+	return;
 }
 */
 
