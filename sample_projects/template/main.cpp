@@ -72,6 +72,7 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
+#include <sys/stat.h>
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
@@ -92,11 +93,13 @@ int main( int argc, char* argv[] )
 	if( argc > 1 )
 	{
 		XML_status = load_PhysiCell_config_file( argv[1] ); 
+		mkdir( PhysiCell_settings.folder.c_str(), 0775 );
 		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
 	}
 	else
 	{
 		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
+		mkdir( PhysiCell_settings.folder.c_str(), 0775 );
 		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
 	}
 	if( !XML_status )
@@ -247,7 +250,8 @@ int main( int argc, char* argv[] )
 	// timer 
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
-	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
+	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() );
+	std::cout << std::endl;
 
 	return 0; 
 }
