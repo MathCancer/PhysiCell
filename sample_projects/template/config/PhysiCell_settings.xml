@@ -266,6 +266,7 @@
                     <attachment_elastic_constant type="double" units="1/min">0.01</attachment_elastic_constant> 
                     <attachment_rate type="double" units="1/min">0.0</attachment_rate> 
                     <detachment_rate type="double" units="1/min">0.0</detachment_rate> 
+					<maximum_number_of_attachments>12</maximum_number_of_attachments>
 				</mechanics>
 				
 				<motility>  
