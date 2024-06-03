@@ -724,7 +724,7 @@ void Hypothesis_Ruleset::display( std::ostream& os )
 	os << "Behavioral rules for cell type " << cell_type << ":" << std::endl; 
 	os << "===================================================" << std::endl; 
 	for( int i=0; i < rules.size() ; i++ )
-	{ rules[i].reduced_display(os); }
+	{ rules[i]->reduced_display(os); }
 	os << std::endl; 
 	return; 
 }
@@ -734,7 +734,7 @@ void Hypothesis_Ruleset::detailed_display( std::ostream& os )
 	os << "Behavioral rules for cell type " << cell_type << ":" << std::endl; 
 	os << "===================================================" << std::endl; 
 	for( int i=0; i < rules.size() ; i++ )
-	{ rules[i].detailed_display(os); }
+	{ rules[i]->detailed_display(os); }
 	os << std::endl; 
 	return; 
 }
@@ -746,7 +746,7 @@ void Hypothesis_Ruleset::sync_to_cell_definition( Cell_Definition* pCD )
 	cell_type = pCD->name; 
 
 	for( int i=0; i < rules.size(); i++ )
-	{ rules[i].sync_to_cell_definition(pCD); }
+	{ rules[i]->sync_to_cell_definition(pCD); }
 
 	return; 
 }
@@ -768,17 +768,16 @@ Hypothesis_Rule* Hypothesis_Ruleset::add_behavior( std::string behavior , double
 		// if not, add it 
 	if( search == rules_map.end() )
 	{
-		Hypothesis_Rule hr; 
+		Hypothesis_Rule *pHR = new Hypothesis_Rule;
 
-		hr.behavior = behavior; 
+		pHR->behavior = behavior; 
 
-		hr.sync_to_cell_definition( pCell_Definition ); 
+		pHR->sync_to_cell_definition( pCell_Definition ); 
 
-		hr.min_value = min_behavior; 
-		hr.max_value = max_behavior; 
+		pHR->min_value = min_behavior; 
+		pHR->max_value = max_behavior;
 
-		rules.push_back( hr ); 
-		Hypothesis_Rule* pHR = &(rules.back()); 
+		rules.push_back(pHR);
 		rules_map[ behavior ] = pHR; 
 
 		return pHR; 
@@ -828,7 +827,7 @@ Hypothesis_Rule& Hypothesis_Ruleset::operator[]( std::string name )
 void Hypothesis_Ruleset::apply( Cell* pCell )
 {
 	for( int n=0; n < rules.size() ; n++ )
-	{ rules[n].apply( pCell );  }
+	{ rules[n]->apply( pCell );  }
 	return; 
 }
 
@@ -1984,7 +1983,7 @@ void stream_annotated_English_rules( std::ostream& os )
 		os << "In " << pHRS->cell_type << " cells:" << std::endl; 
 
 		for( int k=0 ; k < pHRS->rules.size(); k++ ) 
-		{ pHRS->rules[k].English_display(os); }
+		{ pHRS->rules[k]->English_display(os); }
 		os << std::endl; 
 	}
 	return; 
@@ -2001,7 +2000,7 @@ void stream_annotated_English_rules_HTML( std::ostream& os )
 		os << "In " << pHRS->cell_type << " cells:" << std::endl; 
 		os << "<ul>" << std::endl; 
 		for( int k=0 ; k < pHRS->rules.size(); k++ ) 
-		{ pHRS->rules[k].English_display_HTML(os); }
+		{ pHRS->rules[k]->English_display_HTML(os); }
 		os << "</ul>\n</p>" << std::endl; 
 	}
 	os << "</body>\n</html>" << std::endl; 
@@ -2026,7 +2025,7 @@ void stream_annotated_detailed_English_rules( std::ostream& os )
 		Hypothesis_Ruleset* pHRS = find_ruleset( pCD ); 
 		os << "In " << pHRS->cell_type << " cells:" << std::endl; 
 		for( int k=0 ; k < pHRS->rules.size(); k++ ) 
-		{ pHRS->rules[k].English_detailed_display(os); }
+		{ pHRS->rules[k]->English_detailed_display(os); }
 		os << std::endl; 
 	}
 	return; 
@@ -2043,7 +2042,7 @@ void stream_annotated_detailed_English_rules_HTML( std::ostream& os )
 		os << "In " << pHRS->cell_type << " cells:" << std::endl; 
 		os << "<ul>" << std::endl; 
 		for( int k=0 ; k < pHRS->rules.size(); k++ ) 
-		{ pHRS->rules[k].English_detailed_display_HTML(os); }
+		{ pHRS->rules[k]->English_detailed_display_HTML(os); }
 		os << "</ul>\n</p>" << std::endl; 
 	}
 	os << "</body>\n</html>" << std::endl; 
@@ -2097,23 +2096,23 @@ void export_rules_csv_v0( std::string filename )
 		std::cout << cell_type << " :: "; 
 		for( int k=0 ; k < pHRS->rules.size(); k++ ) 
 		{
-			std::string behavior = pHRS->rules[k].behavior; 
+			std::string behavior = pHRS->rules[k]->behavior; 
 			std::cout << behavior << " : "; 
 
-			double min_value = pHRS->rules[k].min_value; 
-			double max_value = pHRS->rules[k].max_value; 
-			double base_value = pHRS->rules[k].base_value; 
-			for( int i=0; i < pHRS->rules[k].signals.size() ; i++ )
+			double min_value = pHRS->rules[k]->min_value; 
+			double max_value = pHRS->rules[k]->max_value; 
+			double base_value = pHRS->rules[k]->base_value; 
+			for( int i=0; i < pHRS->rules[k]->signals.size() ; i++ )
 			{
-				std::string signal = pHRS->rules[k].signals[i]; 
+				std::string signal = pHRS->rules[k]->signals[i]; 
 				std::cout << signal << " "; 
 				std::string response; 
-				if( pHRS->rules[k].responses[i] == true )
+				if( pHRS->rules[k]->responses[i] == true )
 				{ response = "increases"; }
 				else
 				{ response = "decreases"; }
-				double half_max = pHRS->rules[k].half_maxes[i];
-				double hill_power = pHRS->rules[k].hill_powers[i];
+				double half_max = pHRS->rules[k]->half_maxes[i];
+				double hill_power = pHRS->rules[k]->hill_powers[i];
 				bool use_for_dead = false; 
 
 				// output the rule 
@@ -2160,22 +2159,22 @@ void export_rules_csv_v1( std::string filename )
 
 		for( int k=0 ; k < pHRS->rules.size(); k++ ) 
 		{
-			std::string behavior = pHRS->rules[k].behavior; 
+			std::string behavior = pHRS->rules[k]->behavior; 
 
-			double min_value = pHRS->rules[k].min_value; 
-			double max_value = pHRS->rules[k].max_value; 
-			double base_value = pHRS->rules[k].base_value; 
-			for( int i=0; i < pHRS->rules[k].signals.size() ; i++ )
+			double min_value = pHRS->rules[k]->min_value; 
+			double max_value = pHRS->rules[k]->max_value; 
+			double base_value = pHRS->rules[k]->base_value; 
+			for( int i=0; i < pHRS->rules[k]->signals.size() ; i++ )
 			{
-				std::string signal = pHRS->rules[k].signals[i]; 
+				std::string signal = pHRS->rules[k]->signals[i]; 
 				std::string response; 
 				double max_response = -9e99; 
-				if( pHRS->rules[k].responses[i] == true )
+				if( pHRS->rules[k]->responses[i] == true )
 				{ response = "increases"; max_response = max_value; }
 				else
 				{ response = "decreases"; max_response = min_value; }
-				double half_max = pHRS->rules[k].half_maxes[i];
-				double hill_power = pHRS->rules[k].hill_powers[i];
+				double half_max = pHRS->rules[k]->half_maxes[i];
+				double hill_power = pHRS->rules[k]->hill_powers[i];
 				bool use_for_dead = false; 
 
 				// output the rule 
@@ -2216,22 +2215,22 @@ void export_rules_csv_v2( std::string filename )
 
 		for( int k=0 ; k < pHRS->rules.size(); k++ ) 
 		{
-			std::string behavior = pHRS->rules[k].behavior; 
+			std::string behavior = pHRS->rules[k]->behavior; 
 
-			double min_value = pHRS->rules[k].min_value; 
-			double max_value = pHRS->rules[k].max_value; 
-			double base_value = pHRS->rules[k].base_value; 
-			for( int i=0; i < pHRS->rules[k].signals.size() ; i++ )
+			double min_value = pHRS->rules[k]->min_value; 
+			double max_value = pHRS->rules[k]->max_value; 
+			double base_value = pHRS->rules[k]->base_value; 
+			for( int i=0; i < pHRS->rules[k]->signals.size() ; i++ )
 			{
-				std::string signal = pHRS->rules[k].signals[i]; 
+				std::string signal = pHRS->rules[k]->signals[i]; 
 				std::string response; 
 				double max_response = -9e99; 
-				if( pHRS->rules[k].responses[i] == true )
+				if( pHRS->rules[k]->responses[i] == true )
 				{ response = "increases"; max_response = max_value; }
 				else
 				{ response = "decreases"; max_response = min_value; }
-				double half_max = pHRS->rules[k].half_maxes[i];
-				double hill_power = pHRS->rules[k].hill_powers[i];
+				double half_max = pHRS->rules[k]->half_maxes[i];
+				double hill_power = pHRS->rules[k]->hill_powers[i];
 				bool use_for_dead = false; 
 
 				// output the rule 
