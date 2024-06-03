@@ -192,7 +192,8 @@ void setup_tissue( void )
 	std::cout << std::endl; 
 	
 	// load cells from your CSV file (if enabled)
-	load_cells_from_pugixml(); 	
+	load_cells_from_pugixml();
+	set_parameters_from_distributions();
 	
 	return; 
 }
