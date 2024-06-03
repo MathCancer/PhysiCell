@@ -202,9 +202,9 @@ Compile_MaBoSS: ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src/BooleanNetwork.h
 
 $(MaBoSS): 
 ifeq ($(OS), Windows_NT)
-	python beta/setup_libmaboss.py
+	python addons/PhysiBoSS/setup_libmaboss.py
 else
-	python3 beta/setup_libmaboss.py
+	python3 addons/PhysiBoSS/setup_libmaboss.py
 endif
 
 maboss_network.o: ./addons/PhysiBoSS/src/maboss_network.cpp $(MaBoSS)
