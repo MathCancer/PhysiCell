@@ -2582,6 +2582,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if( node_mech )
 		{ pM->detachment_rate = xml_get_my_double_value( node_mech ); }	
 
+		node_mech = node.child( "maximum_number_of_attachments" );
+		if ( node_mech )
+		{ pM->maximum_number_of_attachments = xml_get_my_int_value( node_mech ); }
+
 	}
 	
 	// motility 
