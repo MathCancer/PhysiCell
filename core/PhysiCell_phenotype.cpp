@@ -302,7 +302,7 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 			bool continue_transition = false; 
 			if( phase_links[i][k].fixed_duration )
 			{
-				if( phenotype.cycle.data.elapsed_time_in_phase >= ((1.0/phenotype.cycle.data.transition_rates[i][k]) - 0.5 * dt) )
+				if( phenotype.cycle.data.elapsed_time_in_phase > ((1.0/phenotype.cycle.data.transition_rates[i][k]) - 0.5 * dt) )
 				{
 					continue_transition = true; 
 				}
