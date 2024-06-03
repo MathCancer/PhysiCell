@@ -470,54 +470,28 @@ Parameters<T>::Parameters()
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+	// this function is not currently (2024-06-03) called in the code, so these defaults largely do not matter; very unlikely others are directly calling this function, let alone this implementation
+	T my_value = T(); // for {int, double, bool, string} this will be {0, 0.0, false, ""} (this would technically change the behavior for strings since it is hardcoded above to default to "none", but nobody should rely on the default value of a string being "none")
+	return add_parameter( my_name , my_value );
 }
 
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+	// this function is not currently (2024-06-03) called in the code, so these defaults largely do not matter; very unlikely others are directly calling this function, let alone this implementation
+	std::string my_units = "dimensionless"; // technically this would change the behavior for strings since it is hardcoded above to default to "none", but nobody should be using units on strings; also, if the xml does not have units, then "dimensionless" is used even for strings
+	return add_parameter( my_name , my_value , my_units );
 }
-/*
-template <class T>
-void Parameters<T>::add_parameter( std::string my_name , T my_value )
-{
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
-}
-*/
 
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
 {
+	if (exists(my_name))
+	{
+		std::cout << "ERROR: Parameter " << my_name << " already exists. Make sure all parameters (of a given type) have unique names." << std::endl;
+		exit(-1);
+	}
+
 	Parameter<T>* pNew; 
 	pNew = new Parameter<T> ;
 	pNew->name = my_name ; 
@@ -531,33 +505,26 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value , std::strin
 	name_to_index_map[ my_name ] = n; 
 	return; 
 }
-
-/*
-template <class T>
-void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
-{
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	pNew->units = my_units; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
-}
-*/
 
 template <class T>
 void Parameters<T>::add_parameter( Parameter<T> param )
 {
+	if (exists(param.name))
+	{ exit(-1);}
+
 	int n = parameters.size(); 
 	parameters.push_back( param); 
 	name_to_index_map[ param.name ] = n; 
 	return; 
+}
+
+template <class T>
+bool Parameters<T>::exists( std::string search_name )
+{
+	if( find_index( search_name ) == -1 )
+	{ return false; }
+	std::cout << "ERROR: Parameter " << search_name << " already exists. Make sure all parameters (of a given type) have unique names." << std::endl;
+	return true;
 }
 
 std::ostream& operator<<( std::ostream& os , const User_Parameters up )
@@ -583,44 +550,33 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
 		{ units = "dimensionless"; } 
 		
 		std::string type = node1.attribute( "type" ).value();
-		
-		bool done = false ; 
-		if( type == "bool" && done == false )
+
+		if (type == "bool")
 		{
-			bool value = xml_get_my_bool_value( node1 ); 
-			bools.add_parameter( name , value, units ); 
-			done = true; 
+			bool value = xml_get_my_bool_value(node1);
+			bools.add_parameter(name, value, units);
 		}
-		
-		if( type == "int" && done == false )
+		else if (type == "int")
 		{
-			int value = xml_get_my_int_value( node1 ); 
-			ints.add_parameter( name , value, units ); 
-			done = true; 
+			int value = xml_get_my_int_value(node1);
+			ints.add_parameter(name, value, units);
 		}
-		
-		if( type == "double" && done == false )
+		else if (type == "double")
 		{
-			double value = xml_get_my_double_value( node1 ); 
-			doubles.add_parameter( name , value, units ); 
-			done = true; 
+			double value = xml_get_my_double_value(node1);
+			doubles.add_parameter(name, value, units);
 		}
-				
-		if( done == false && type == "string" )
+		else if (type == "string")
 		{
-			std::string value = xml_get_my_string_value( node1 ); 
-			strings.add_parameter( name, value , units ); 
-			done = true; 
+			std::string value = xml_get_my_string_value(node1);
+			strings.add_parameter(name, value, units);
 		}
-		
-		/* default if no type specified: */
-		if( done == false )
+		else // default if no type specified
 		{
-			double value = xml_get_my_double_value( node1 ); 
-			doubles.add_parameter( name , value, units ); 
-			done = true; 
+			double value = xml_get_my_double_value(node1);
+			doubles.add_parameter(name, value, units);
 		}
-		
+
 		node1 = node1.next_sibling(); 
 		i++; 
 	}
