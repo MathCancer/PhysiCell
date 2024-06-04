@@ -225,6 +225,7 @@ reset:
 	touch ./core/PhysiCell_cell.cpp
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
+	rm -fr ./config/cells.csv ./config/cell_rules.csv
 	rm -rf ./scripts
 
 MaBoSS-clean:
@@ -325,15 +326,15 @@ save:
 	cp main.cpp ./user_projects/$(PROJ)
 	cp Makefile ./user_projects/$(PROJ)
 	cp VERSION.txt ./user_projects/$(PROJ)
-	cp ./config/* ./user_projects/$(PROJ)/config
-	cp ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
+	cp -r ./config/* ./user_projects/$(PROJ)/config
+	cp -r ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
 
 load: 
 	echo "Loading project from $(PROJ) ... "
 	cp ./user_projects/$(PROJ)/main.cpp .
 	cp ./user_projects/$(PROJ)/Makefile .
-	cp ./user_projects/$(PROJ)/config/* ./config/ 
-	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
+	cp -r ./user_projects/$(PROJ)/config/* ./config/ 
+	cp -r ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
 
 pack:
 	@echo " "
