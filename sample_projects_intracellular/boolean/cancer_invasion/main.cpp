@@ -150,9 +150,6 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
-	sprintf( filename , "%s/states_initial.csv", PhysiCell_settings.folder.c_str());
-	MaBoSSIntracellular::save( filename, *PhysiCell::all_cells);
-	
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
 
@@ -207,10 +204,6 @@ int main( int argc, char* argv[] )
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
-
-					sprintf( filename , "%s/states_%08u.csv", PhysiCell_settings.folder.c_str(), PhysiCell_globals.full_output_index);
-					
-					MaBoSSIntracellular::save( filename, *PhysiCell::all_cells );
 				}
 				
 				PhysiCell_globals.full_output_index++; 
@@ -258,9 +251,6 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
 	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
-	
-	sprintf( filename , "%s/states_final.csv", PhysiCell_settings.folder.c_str());
-	MaBoSSIntracellular::save( filename, *PhysiCell::all_cells );
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, ECM_coloring_function);

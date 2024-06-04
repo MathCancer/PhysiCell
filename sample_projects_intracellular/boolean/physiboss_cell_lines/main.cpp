@@ -256,7 +256,6 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 
-	
 	// timer 
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
