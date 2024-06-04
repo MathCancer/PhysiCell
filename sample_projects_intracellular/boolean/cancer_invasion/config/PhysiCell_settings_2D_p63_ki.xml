@@ -1,0 +1,667 @@
+<PhysiCell_settings version="devel-version">
+	<domain>
+		<x_min>-300</x_min>
+		<x_max>300</x_max>
+		<y_min>-300</y_min>
+		<y_max>300</y_max>
+		<z_min>-10</z_min>
+		<z_max>10</z_max>
+		<dx>20</dx>
+		<dy>20</dy>
+		<dz>20</dz>
+		<use_2D>true</use_2D>
+	</domain>
+	
+	<overall>
+		<max_time units="min">5000</max_time> 
+		<time_units>min</time_units>
+		<space_units>micron</space_units>
+	
+		<dt_diffusion units="min">0.01</dt_diffusion>
+		<dt_mechanics units="min">0.1</dt_mechanics>
+		<dt_phenotype units="min">6</dt_phenotype>	
+	</overall>
+	
+	<parallel>
+		<omp_num_threads>10</omp_num_threads>
+	</parallel> 
+	
+	<save>
+		<folder>output</folder>  
+
+		<full_data>
+			<interval units="min">10</interval>
+			<enable>false</enable>
+		</full_data>
+		
+		<SVG>
+			<interval units="min">30</interval>
+			<enable>true</enable>
+      <legend enabled="true">
+        <cell_phase>false</cell_phase>
+        <cell_type>true</cell_type>
+      </legend>
+      <plot_substrate enabled="true" limits="true">
+        <substrate>ecm</substrate>
+        <min_conc>0.0</min_conc>
+        <max_conc>1.0</max_conc>
+        <colormap>viridis</colormap>
+      </plot_substrate>
+		</SVG>
+		
+		<legacy_data>
+			<enable>false</enable>
+		</legacy_data>
+	</save>
+	
+	<options>
+		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+        <virtual_wall_at_domain_edge>false</virtual_wall_at_domain_edge>
+	</options>	
+
+	<microenvironment_setup>
+		<variable ID="0" name="oxygen" units="mmHg">
+        <physical_parameter_set>
+          <diffusion_coefficient units="micron^2/min">6000.0</diffusion_coefficient>
+          <decay_rate units="1/min">.1</decay_rate>
+        </physical_parameter_set>
+        <initial_condition units="mmHg">38.0</initial_condition>
+        <Dirichlet_boundary_condition enabled="True" units="mmHg">38.0</Dirichlet_boundary_condition>
+      </variable>
+
+    <variable ID="1" name="ecm" units="dimensionless">
+        <physical_parameter_set>
+          <diffusion_coefficient units="micron^2/min">0.0</diffusion_coefficient>
+          <decay_rate units="1/min">0.0</decay_rate>
+        </physical_parameter_set>
+        <initial_condition units="mmHg">0.0</initial_condition>
+        <Dirichlet_boundary_condition enabled="False" units="mmHg">0.0</Dirichlet_boundary_condition>
+        <Dirichlet_options>
+          <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
+          <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
+          <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        </Dirichlet_options>
+      </variable>
+
+    <variable ID="2" name="tgfbeta" units="dimensionless">
+        <physical_parameter_set>
+          <diffusion_coefficient units="micron^2/min">0.0</diffusion_coefficient>
+          <decay_rate units="1/min">0.0</decay_rate>
+        </physical_parameter_set>
+        <initial_condition units="mmHg">0.0</initial_condition>
+        <Dirichlet_boundary_condition enabled="False" units="mmHg">0.0</Dirichlet_boundary_condition>
+        <Dirichlet_options>
+          <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
+          <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
+          <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        </Dirichlet_options>
+      </variable>
+
+    <variable ID="3" name="light" units="dimensionless">
+        <physical_parameter_set>
+          <diffusion_coefficient units="micron^2/min">0.0</diffusion_coefficient>
+          <decay_rate units="1/min">0.0</decay_rate>
+        </physical_parameter_set>
+        <initial_condition units="mmHg">0.0</initial_condition>
+        <Dirichlet_boundary_condition enabled="False" units="mmHg">0.0</Dirichlet_boundary_condition>
+        <Dirichlet_options>
+          <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
+          <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
+          <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
+          <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        </Dirichlet_options>
+      </variable>
+
+      <options>
+			<calculate_gradients>true</calculate_gradients>
+			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+			 
+			<initial_condition enabled="false" type="matlab">
+				<filename>./config/initial.mat</filename>
+			</initial_condition>
+			 
+			<dirichlet_nodes enabled="false" type="matlab">
+				<filename>./config/dirichlet.mat</filename>
+			</dirichlet_nodes>
+		</options>
+	</microenvironment_setup>	
+	
+	<cell_definitions>
+		<cell_definition ID="0" name="epithelial">
+        <phenotype>
+          <cycle code="0" name="advanced_Ki67_cycle_model"> 
+            <phase_transition_rates units="1/min"> 
+						<!-- - to + -->
+						<!--rate start_index="0" end_index="1" fixed_duration="true">1e30</rate-->
+						<!-- + (pre-mitotic) to + (post-mitotic)  -->
+<!-- 						<rate start_index="1" end_index="2" fixed_duration="true">1e30</rate> -->
+						<!-- + (post-mitotic) to - -->
+						<rate start_index="2" end_index="0" fixed_duration="true">0.006666667</rate>
+					  </phase_transition_rates>
+          </cycle>
+
+          <death>
+            <model code="100" name="apoptosis">
+              <death_rate units="1/min">0.0</death_rate>
+              <phase_durations units="min">
+                <duration fixed_duration="true" index="0">516</duration>
+              </phase_durations>
+              <parameters>
+                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                <calcification_rate units="1/min">0</calcification_rate>
+                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+              </parameters>
+            </model>
+            <model code="101" name="necrosis">
+              <death_rate units="1/min">0.0</death_rate>
+              <phase_durations units="min">
+                <duration fixed_duration="true" index="0">0</duration>
+              <duration fixed_duration="true" index="1">86400</duration>
+              </phase_durations>
+              <parameters>
+                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                <calcification_rate units="1/min">0</calcification_rate>
+                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+              </parameters>
+            </model>
+          </death>
+
+          <volume>
+            <total units="micron^3">2494</total>
+            <fluid_fraction units="dimensionless">0.75</fluid_fraction>
+            <nuclear units="micron^3">540</nuclear>
+            <fluid_change_rate units="1/min">0.05</fluid_change_rate>
+            <cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+            <nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+            <calcified_fraction units="dimensionless">0</calcified_fraction>
+            <calcification_rate units="1/min">0</calcification_rate>
+            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+          </volume>
+
+          <mechanics>
+            <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+            <cell_adhesion_affinities>
+              <cell_adhesion_affinity name="epithelial">1.0</cell_adhesion_affinity>
+              <cell_adhesion_affinity name="mesenchymal">0.8</cell_adhesion_affinity>
+            </cell_adhesion_affinities>
+            <options>
+              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+            </options>
+            <attachment_elastic_constant units="1/min">0.0</attachment_elastic_constant>
+            <attachment_rate units="1/min">0.0</attachment_rate>
+            <detachment_rate units="1/min">0.0</detachment_rate>
+          </mechanics>
+
+          <motility>
+            <speed units="micron/min">0.0</speed>
+            <persistence_time units="min">1</persistence_time>
+            <migration_bias units="dimensionless">0.0</migration_bias>
+            <options>
+              <enabled>true</enabled>
+              <use_2D>true</use_2D>
+            </options>
+          </motility>
+
+          <secretion>
+            <substrate name="ecm">
+              <secretion_rate units="1/min">0</secretion_rate>
+              <secretion_target units="substrate density">0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            <substrate name="tgfbeta">
+              <secretion_rate units="1/min">0</secretion_rate>
+              <secretion_target units="substrate density">0</secretion_target>
+              <uptake_rate units="1/min">0.002</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            <substrate name="oxygen">
+              <secretion_rate units="1/min">0</secretion_rate>
+              <secretion_target units="substrate density">0</secretion_target>
+              <uptake_rate units="1/min">10</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            </secretion>
+
+          <!-- <cell_transformations>
+            <transformation_rates>
+                <transformation_rate name="mesenchymal" units="1/min">0.0</transformation_rate>
+            </transformation_rates>
+          </cell_transformations> -->
+
+			<intracellular type="maboss">
+            <bnd_filename>config/boolean_network/intracellular_model.bnd</bnd_filename>
+            <cfg_filename>config/boolean_network/intracellular_model.cfg</cfg_filename>
+            <settings>
+              <intracellular_dt>10.0</intracellular_dt>
+              <time_stochasticity>0.2</time_stochasticity>
+              <scaling>60.0</scaling>
+              <inheritance global="True"/>
+              <mutations>
+                <mutation intracellular_name="p63">1</mutation>
+              </mutations>
+            </settings>
+            <mapping>
+              <input intracellular_name="Oxy" physicell_name="oxygen">
+                <settings>
+                  <action>activation</action>
+                  <threshold>5.0</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="Pressure" physicell_name="pressure">
+                <settings>
+                  <action>activation</action>
+                  <threshold>1.0</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="Neigh" physicell_name="custom:cell_contact">
+                <settings>
+                  <action>activation</action>
+                  <threshold>0.3</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="ECM" physicell_name="custom:ecm_contact">
+                <settings>
+                  <action>activation</action>
+                  <threshold>0.05</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="TGFbeta" physicell_name="tgfbeta">
+                <settings>
+                  <action>activation</action>
+                  <threshold>0.02</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="DNAdamage" physicell_name="custom:nucleus_deform">
+                <settings>
+                  <action>activation</action>
+                  <threshold>0.5</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <output intracellular_name="Apoptosis" physicell_name="apoptosis">
+                <settings>
+                  <action>activation</action>
+                  <value>1000000</value>
+                  <base_value>0</base_value>
+                  <smoothing>0</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="EMT" physicell_name="transform to mesenchymal">
+                <settings>
+                  <action>activation</action>
+                  <value>1</value>
+                  <base_value>0</base_value>
+                  <smoothing>5</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="EMT" physicell_name="adhesive affinity to epithelial">
+                <settings>
+                  <action>activation</action>
+                  <value>0</value>
+                  <base_value>1</base_value>
+                  <smoothing>5</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="ECM_adh" physicell_name="custom:pintegrin">
+                <settings>
+                  <action>activation</action>
+                  <value>1</value>
+                  <base_value>0</base_value>
+                  <smoothing>10</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="ECM_degrad" physicell_name="ecm uptake">
+                <settings>
+                  <action>activation</action>
+                  <value>1</value>
+                  <base_value>0</base_value>
+                  <smoothing>0</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="Cell_growth" physicell_name="exit from cycle phase 0">
+                <settings>
+                  <action>activation</action>
+                  <value>1</value>
+                  <base_value>0</base_value>
+                  <smoothing>20</smoothing>
+                </settings>
+              </output>
+            </mapping>
+          </intracellular>
+          </phenotype>
+        <custom_data>
+          <pintegrin type="double" units="">0.1</pintegrin>
+          <padhesion type="double" units="">0.9</padhesion>
+          <nucleus_deform type="double" units="">0</nucleus_deform>
+          <ecm_contact type="double" units="">0.0</ecm_contact>
+          <TGFbeta_contact type="double" units="">0</TGFbeta_contact>
+          <cell_contact type="double" units="">0.5</cell_contact>
+          <somedata conserved="false" description="" units="dimensionless">1.0</somedata>
+        </custom_data>
+      </cell_definition>
+
+      <cell_definition ID="1" name="mesenchymal">
+        <phenotype>
+          <cycle code="0" name="advanced_Ki67_cycle_model"> 
+            <phase_transition_rates units="1/min"> 
+						<!-- - to + -->
+						<!--rate start_index="0" end_index="1" fixed_duration="true">1e30</rate-->
+						<!-- + (pre-mitotic) to + (post-mitotic)  -->
+						<rate start_index="1" end_index="2" fixed_duration="true">1e30</rate>
+						<!-- + (post-mitotic) to - -->
+						<rate start_index="2" end_index="0" fixed_duration="true">0.006666667</rate>
+					  </phase_transition_rates>
+          </cycle>
+
+          <death>
+            <model code="100" name="apoptosis">
+              <death_rate units="1/min">0</death_rate>
+              <phase_durations units="min">
+                <duration fixed_duration="true" index="0">516</duration>
+              </phase_durations>
+              <parameters>
+                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                <calcification_rate units="1/min">0</calcification_rate>
+                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+              </parameters>
+            </model>
+            <model code="101" name="necrosis">
+              <death_rate units="1/min">0.0</death_rate>
+              <phase_durations units="min">
+                <duration fixed_duration="true" index="0">0</duration>
+              <duration fixed_duration="true" index="1">86400</duration>
+              </phase_durations>
+              <parameters>
+                <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                <calcification_rate units="1/min">0</calcification_rate>
+                <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+              </parameters>
+            </model>
+          </death>
+
+          <volume>
+            <total units="micron^3">2494</total>
+            <fluid_fraction units="dimensionless">0.75</fluid_fraction>
+            <nuclear units="micron^3">540</nuclear>
+            <fluid_change_rate units="1/min">0.05</fluid_change_rate>
+            <cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+            <nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+            <calcified_fraction units="dimensionless">0</calcified_fraction>
+            <calcification_rate units="1/min">0</calcification_rate>
+            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+          </volume>
+
+          <mechanics>
+            <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+            <cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+            <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+            <cell_adhesion_affinities>
+                <cell_adhesion_affinity name="mesenchymal">0.0</cell_adhesion_affinity>
+                <cell_adhesion_affinity name="epithelial">0.2</cell_adhesion_affinity>
+                </cell_adhesion_affinities>
+            <options>
+              <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+              <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+            </options>
+            <attachment_elastic_constant units="1/min">0.0</attachment_elastic_constant>
+            <attachment_rate units="1/min">0.0</attachment_rate>
+            <detachment_rate units="1/min">0.0</detachment_rate>
+          </mechanics>
+
+          <motility>
+            <speed units="micron/min">0.5</speed>
+            <persistence_time units="min">1</persistence_time>
+            <migration_bias units="dimensionless">0.5</migration_bias>
+            <options>
+              <enabled>true</enabled>
+              <use_2D>true</use_2D>
+              <chemotaxis>
+                <enabled>false</enabled>
+                <substrate>oxygen</substrate>
+                <direction>1</direction>
+              </chemotaxis>
+            </options>
+          </motility>
+
+          <secretion>
+            <substrate name="ecm">
+              <secretion_rate units="1/min">0</secretion_rate>
+              <secretion_target units="substrate density">0</secretion_target>
+              <uptake_rate units="1/min">0.0</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            <substrate name="tgfbeta">
+              <secretion_rate units="1/min">0</secretion_rate>
+              <secretion_target units="substrate density">0</secretion_target>
+              <uptake_rate units="1/min">0.002</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            <substrate name="oxygen">
+              <secretion_rate units="1/min">0</secretion_rate>
+              <secretion_target units="substrate density">0</secretion_target>
+              <uptake_rate units="1/min">10</uptake_rate>
+              <net_export_rate units="total substrate/min">0</net_export_rate>
+            </substrate>
+            </secretion>
+
+          <!-- <cell_transformations>
+            <transformation_rates>
+                <transformation_rate name="epithelial" units="1/min">0.0</transformation_rate>
+                </transformation_rates>
+            </cell_transformations> -->
+
+			<intracellular type="maboss">
+            <bnd_filename>config/boolean_network/intracellular_model.bnd</bnd_filename>
+            <cfg_filename>config/boolean_network/intracellular_model.cfg</cfg_filename>
+            <settings>
+              <intracellular_dt>10.0</intracellular_dt>
+              <time_stochasticity>0.2</time_stochasticity>
+              <scaling>60.0</scaling>
+              <inheritance global="False"/>
+              <mutations>
+                <mutation intracellular_name="p63">1</mutation>
+              </mutations>
+            </settings>
+            <mapping>
+              <input intracellular_name="Oxy" physicell_name="oxygen">
+                <settings>
+                  <action>activation</action>
+                  <threshold>5.0</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="Pressure" physicell_name="pressure">
+                <settings>
+                  <action>activation</action>
+                  <threshold>1.0</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="Neigh" physicell_name="custom:cell_contact">
+                <settings>
+                  <action>activation</action>
+                  <threshold>0.3</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="ECM" physicell_name="custom:ecm_contact">
+                <settings>
+                  <action>activation</action>
+                  <threshold>0.05</threshold>
+                </settings>
+              </input>
+              <input intracellular_name="TGFbeta" physicell_name="tgfbeta">
+                <settings>
+                  <action>activation</action>
+                  <threshold>0.02</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <input intracellular_name="DNAdamage" physicell_name="custom:nucleus_deform">
+                <settings>
+                  <action>activation</action>
+                  <threshold>0.3</threshold>
+                  <smoothing>0</smoothing>
+                </settings>
+              </input>
+              <output intracellular_name="Apoptosis" physicell_name="apoptosis">
+                <settings>
+                  <action>activation</action>
+                  <value>1000000</value>
+                  <base_value>0</base_value>
+                  <smoothing>0</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="Migration" physicell_name="migration speed">
+                <settings>
+                  <action>activation</action>
+                  <value>1</value>
+                  <base_value>0.5</base_value>
+                  <smoothing>1</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="Migration" physicell_name="migration bias">
+                <settings>
+                  <action>activation</action>
+                  <value>0.85</value>
+                  <base_value>0.5</base_value>
+                  <smoothing>1</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="Migration" physicell_name="migration persistence time">
+                <settings>
+                  <action>activation</action>
+                  <value>5</value>
+                  <base_value>0</base_value>
+                  <smoothing>1</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="Migration" physicell_name="chemotactic response to oxygen">
+                <settings>
+                  <action>activation</action>
+                  <value>1</value>
+                  <base_value>0.5</base_value>
+                  <smoothing>1</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="EMT" physicell_name="transform to epithelial">
+                <settings>
+                  <action>inhibition</action>
+                  <value>1</value>
+                  <base_value>0</base_value>
+                  <smoothing>50</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="EMT" physicell_name="adhesive affinity to epithelial">
+                <settings>
+                  <action>activation</action>
+                  <value>0</value>
+                  <base_value>1</base_value>
+                  <smoothing>20</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="ECM_adh" physicell_name="custom:pintegrin">
+                <settings>
+                  <action>activation</action>
+                  <value>1</value>
+                  <base_value>0</base_value>
+                  <smoothing>5</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="ECM_degrad" physicell_name="ecm uptake">
+                <settings>
+                  <action>activation</action>
+                  <value>1</value>
+                  <base_value>0</base_value>
+                  <smoothing>0</smoothing>
+                </settings>
+              </output>
+              <output intracellular_name="Cell_growth" physicell_name="exit from cycle phase 1">
+                <settings>
+                  <action>activation</action>
+                  <value>0.05</value>
+                  <base_value>0</base_value>
+                  <smoothing>20</smoothing>
+                </settings>
+              </output>
+            </mapping>
+          </intracellular>
+          </phenotype>
+        <custom_data>
+        <pintegrin type="double" units="">0.1</pintegrin>
+				<padhesion type="double" units="">0.9</padhesion>
+				<nucleus_deform type="double" units="">0</nucleus_deform>
+				<ecm_contact type="double" units="">0.0</ecm_contact>
+				<TGFbeta_contact type="double" units="">0</TGFbeta_contact>
+				<cell_contact type="double" units="">0.0</cell_contact>
+        <somedata conserved="false" description="" units="dimensionless">1.0</somedata>
+        </custom_data>
+      </cell_definition>
+      </cell_definitions>
+	
+	<initial_conditions>
+		<cell_positions enabled="false" type="csv">
+			<folder>./config</folder>
+			<filename>cells.csv</filename>
+		</cell_positions>
+	</initial_conditions>	
+	
+	<user_parameters>
+    <random_seed description="" type="int" units="dimensionless">0</random_seed>
+    <tumor_radius description="" type="double" units="micron">30.0</tumor_radius>
+
+    <!-- substrates parameters -->
+		<config_radius type="double" units="" description="change the initial radius of the tumor">30</config_radius>
+		<tgfbeta_radius type="double" units="" description="change radius of the tgfbeta substrate">20</tgfbeta_radius>
+		<density_tgfbeta_max type="double" units="" description="change initial density of the tgfbeta substrate">0.0</density_tgfbeta_max>
+		<density_tgfbeta_min type="double" units="" description="change initial density of the tgfbeta substrate">0.0</density_tgfbeta_min>
+		<density_ECM_max type="double" units="" description="change initial density of the ECM substrate">0.5</density_ECM_max>
+		<density_ECM_min type="double" units="" description="change initial density of the ECM substrate">0.5</density_ECM_min>
+		<ecm_degradation type="double" units="" description="chenage the amount of ECM degraded by the cells with Matrix_modifcation ON"> 0.05 </ecm_degradation>
+		<TGFbeta_degradation type="double" units="" description="chenage the amount of TGFbeta degraded by the cells"> 0.002 </TGFbeta_degradation>
+		<ECM_TGFbeta_ratio type="double" units="" description="change the threshold needed to start sensing TGFbeta inside a voxel with ECM (cell must degrades a certain amount of ECM before sensing TGFbeta)">0.75</ECM_TGFbeta_ratio>
+    <ecm_adhesion_min type="double" units="" description="used to set the min adhesion between cells and ECM"> 1 </ecm_adhesion_min>
+		<ecm_adhesion_max type="double" units="" description="used to set the min adhesion between cells and ECM"> 2 </ecm_adhesion_max>
+    <cell_ecm_repulsion type="double" units="" description="change the value of ECM repulsion"> 15 </cell_ecm_repulsion>
+    <cell_junctions_attach_threshold type="double" units="" description="change the threshold needed to attach cells in cluster with cell junction">0.6</cell_junctions_attach_threshold>
+		<cell_junctions_detach_threshold type="double" units="" description="change the threshold needed to detach cells in cluster with cell junction">0.003</cell_junctions_detach_threshold>
+    <!-- motility parameters -->
+		<migration_bias type='double' units="" description="change value of migration bias for cells with migration node active">0.85</migration_bias>
+		<migration_speed type='double' units="micron/min" description="change value of migration speed for cells with migration node active">0.8</migration_speed>
+		<persistence type="double" units="min" description="change value of persistence for cells with migration node active">1</persistence>
+    <motility_amplitude_min type="double" units="" description="change the min value of motility amplitude"> 0.1 </motility_amplitude_min>
+    <motility_amplitude_max type="double" units="" description="change the max value of motility amplitude"> 0.8 </motility_amplitude_max>
+    <cell_radius type="double" units="" description="initial radius of the cells"> 8.413 </cell_radius>
+		<max_interaction_factor type="double" units="" description="used to set the max distance of interaction"> 1.3 </max_interaction_factor>
+  </user_parameters>
+	
+</PhysiCell_settings>
