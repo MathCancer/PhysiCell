@@ -228,7 +228,7 @@ reset:
 	rm ALL_CITATIONS.txt 
 	rm ./config/PhysiCell_settings_*.xml
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
-	rm -rf ./config/boolean_network/
+	rm -rf ./config/boolean_network/ ./config/cells.csv ./config/rules.csv ./config/init.tsv
 	rm -rf ./scripts
 
 MaBoSS-clean:
