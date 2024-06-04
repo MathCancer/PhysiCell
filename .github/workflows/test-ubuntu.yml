@@ -47,4 +47,23 @@ jobs:
         ./project
         ./project config/Fibre_Initialisation/mymodel_initialisation.xml
         ./project config/Cell_Fibre_Mechanics/mymodel_rotating.xml
+
+  build_template:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install dependencies
+      run: sudo apt-get install flex bison
+      
+    - name: Build template project
+      run: |
+        make template
+        make clean
+        make
+        
+    - name: Run template project
+      run: |
+        ./project config/PhysiCell_settings.xml
         
