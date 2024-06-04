@@ -3,67 +3,32 @@ name: Tests MacOSX
 on:
   push:
   pull_request:
+  workflow_dispatch:
     
 jobs:
-  build_virus_macrophage:
+  build_and_run:
 
-    runs-on: macos-11
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install dependencies
-      run : brew install gcc@10
-
-    - name: Build Virus Macrophage project
-      run: |
-        make virus-macrophage-sample
-        make PHYSICELL_CPP=g++-10
+    runs-on: macos-12
+    strategy:
+      matrix:
+        projects: [
+          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample"},
+          {project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines"},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: ""},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Initialisation/mymodel_initialisation.xml"},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Cell_Fibre_Mechanics/mymodel_rotating.xml"},
+          {project: "template", name: "PhysiCell Template", binary: "project"}
+        ]
         
-    - name: Run Virus Macrophage cell lines project
-      run: |
-        ./virus-sample
-
-
-  build_physiboss_cell_lines:
-
-    runs-on: macos-11
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run : brew install gcc@11
-      
-    - name: Build PhysiBoSS cell lines project
+    - name: Build ${{ matrix.projects.name }} project
       run: |
-        make physiboss-cell-lines-sample
-        make clean
-        make PHYSICELL_CPP=g++-11
+        make ${{ matrix.projects.project }}
+        make PHYSICELL_CPP=g++-12
         
-    - name: Run PhysiBoSS cell lines project
+    - name: Run ${{ matrix.projects.name }} project
       run: |
-        ./PhysiBoSS_Cell_Lines
-  
-  build_physimess:
-
-    runs-on: macos-11
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install dependencies
-      run : brew install gcc@11
-      
-    - name: Build PhysiMeSS project
-      run: |
-        make physimess-sample
-        make clean
-        make PHYSICELL_CPP=g++-11
-        
-    - name: Run PhysiMeSS project
-      run: |
-        ./project
-        ./project config/Fibre_Initialisation/mymodel_initialisation.xml
-        ./project config/Cell_Fibre_Mechanics/mymodel_rotating.xml
+        ./${{ matrix.projects.binary }} ${{ matrix.projects.config }}
         

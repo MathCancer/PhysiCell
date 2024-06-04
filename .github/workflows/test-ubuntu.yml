@@ -3,48 +3,31 @@ name: Tests Ubuntu
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  build:
+  build_and_run:
 
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        projects: [
+          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample"},
+          {project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines"},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: ""},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Initialisation/mymodel_initialisation.xml"},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Cell_Fibre_Mechanics/mymodel_rotating.xml"},
+          {project: "template", name: "PhysiCell Template", binary: "project"}
+        ]
+        
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     
-    - name: Install dependencies
-      run: sudo apt-get install flex bison
-      
-    - name: Build Virus Macrophage project
+    - name: Build ${{ matrix.projects.name }} project 
       run: |
-        make virus-macrophage-sample
+        make ${{ matrix.projects.project }}
         make
         
-    - name: Run Virus Macrophage cell lines project
+    - name: Run ${{ matrix.projects.name }} project
       run: |
-        ./virus-sample
-        
-    - name: Build PhysiBoSS cell lines project
-      run: |
-        make reset
-        make physiboss-cell-lines-sample
-        make clean
-        make
-        
-    - name: Run PhysiBoSS cell lines project
-      run: |
-        ./PhysiBoSS_Cell_Lines
-        
-    - name: Build PhysiMeSS project
-      run: |
-        make reset
-        make physimess-sample
-        make clean
-        make
-        
-    - name: Run PhysiMeSS project
-      run: |
-        ./project
-        ./project config/Fibre_Initialisation/mymodel_initialisation.xml
-        ./project config/Cell_Fibre_Mechanics/mymodel_rotating.xml
-        
+        ./${{ matrix.projects.binary }} ${{ matrix.projects.config }}
