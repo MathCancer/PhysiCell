@@ -66,7 +66,9 @@
 */
  
 #include "PhysiCell_MultiCellDS.h"
-
+#ifdef ADDON_PHYSIBOSS
+#include "../addons/PhysiBoSS/src/maboss_intracellular.h"	
+#endif
 namespace PhysiCell{
 
 void add_PhysiCell_cell_to_open_xml_pugi(  pugi::xml_document& xml_dom, Cell& C ); // not implemented -- future edition 
@@ -1937,6 +1939,60 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 	}
 
 	fclose( fp ); 
+
+#ifdef ADDON_PHYSIBOSS
+
+	// PhysiBoSS Intracellular Data
+	node = node.parent().parent();  // custom 
+
+	root = node; 
+	node = node.child( "boolean_intracellular_data" );  
+	if( !node )
+	{
+		node = root.append_child( "boolean_intracellular_data" ); 
+
+		pugi::xml_attribute attrib = node.append_attribute( "type" ); 
+		attrib.set_value( "text" ); 		
+
+		attrib = node.append_attribute( "source" ); 
+		attrib.set_value( "PhysiBoSS" ); 		
+
+		attrib = node.append_attribute( "data_version" ); 
+		attrib.set_value( "2" ); 	
+	}
+	root = node; // root = cellular_information.cell_populations.cell_population.custom.intracellular_data
+	node = root.child( "filename"); 
+	if( !node )
+	{
+		node = root.append_child( "filename" ); 
+
+	}
+	root = node; // root = cellular_information.cell_populations.cell_population.custom.intracellular_data.filename
+
+
+	// next, filename 
+	sprintf( filename , "%s_boolean_intracellular.csv" , filename_base.c_str() ); 
+		
+	/* store filename without the relative pathing (if any) */ 
+	filename_start = strrchr( filename , '/' ); 
+	if( filename_start == NULL )
+	{ filename_start = filename; }
+	else	
+	{ filename_start++; } 
+	strcpy( filename_without_pathing , filename_start );  
+	
+	if( !node.first_child() )
+	{
+		node.append_child( pugi::node_pcdata ).set_value( filename_without_pathing ); // filename ); 
+	}
+	else
+	{
+		node.first_child().set_value( filename_without_pathing ); // filename ); 
+	}	
+
+	MaBoSSIntracellular::save( filename );
+
+#endif
 
 	// neighbor graph 
 	node = node.parent().parent();  // custom 
