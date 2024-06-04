@@ -72,6 +72,7 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
+#include <sys/stat.h>
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
@@ -91,13 +92,15 @@ int main( int argc, char* argv[] )
 	char copy_command [1024]; 
 	if( argc > 1 )
 	{
-		XML_status = load_PhysiCell_config_file( argv[1] ); 
-		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+		XML_status = load_PhysiCell_config_file( argv[1] );
+		mkdir( PhysiCell_settings.folder.c_str() );
+		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() );
 	}
 	else
 	{
 		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
-		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
+		mkdir( PhysiCell_settings.folder.c_str() );
+		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() );
 	}
 	if( !XML_status )
 	{ exit(-1); }
@@ -244,10 +247,11 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
-	// timer 
+	// timer
 	
-	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
-	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
+	std::cout << std::endl << "Total simulation runtime: " << std::endl;
+	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() );
+	std::cout << std::endl;
 
 	return 0; 
 }
