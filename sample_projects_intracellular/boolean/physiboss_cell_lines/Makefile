@@ -90,14 +90,12 @@ PhysiCell_custom_module_OBJECTS := custom.o
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSS_OBJECTS) $(PhysiBoSS_module_OBJECTS) 
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSS_OBJECTS)
 
 # compile the project 
 
 all: main.cpp $(ALL_OBJECTS) $(MaBoSS)
 	$(COMPILE_COMMAND) $(INC)  -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB)
-	@echo ""
-	@echo "check for $(PROGRAM_NAME)"
 	make name
 
 name:
@@ -198,7 +196,7 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 # user-defined PhysiCell modules
 
 Compile_MaBoSS: ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src/BooleanNetwork.h
-	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make CXX=$(CC) install_alib;make clean; cd ../../../../..
+	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make CXX=$(CC) MAXNODES=$(MABOSS_MAX_NODES) install_alib;make clean; cd ../../../../..
 
 $(MaBoSS): 
 ifeq ($(OS), Windows_NT)

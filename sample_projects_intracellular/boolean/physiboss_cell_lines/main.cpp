@@ -167,6 +167,8 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
 	create_plot_legend( filename , cell_coloring_function ); 
 	
+	add_software_citation( "PhysiBoSS" , PhysiBoSS_Version , PhysiBoSS_DOI, PhysiBoSS_URL); 
+	
 	display_citations(); 
 	
 	// set the performance timers 
