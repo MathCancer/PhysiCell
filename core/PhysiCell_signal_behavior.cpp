@@ -1260,7 +1260,7 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 
 	// cycle entry (exit from phase 0) and exit from up to 5 more phases 
 	static int first_cycle_index = find_behavior_index("exit from cycle phase 0" ); //  4*m; 
-	if( index >= first_cycle_index && index < first_cycle_index+6 )
+	if( index >= first_cycle_index && index < first_cycle_index+6 && !pCell->phenotype.death.dead )
 	{
 		int max_cycle_index = pCell->phenotype.cycle.model().phases.size(); 
 		if( index < first_cycle_index + max_cycle_index )

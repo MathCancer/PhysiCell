@@ -1950,7 +1950,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pugi::xml_node node_options = xml_find_node( physicell_config_root , "options" ); 
 		bool disable_bugfix = false; 
 		if( node_options )
-		{ xml_get_bool_value( node_options, "legacy_cell_defaults_copy" ); }
+		{ disable_bugfix = xml_get_bool_value( node_options, "legacy_cell_defaults_copy" ); }
 
 		if( disable_bugfix == false )
 		{
@@ -2581,6 +2581,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
         node_mech = node.child( "detachment_rate" );
 		if( node_mech )
 		{ pM->detachment_rate = xml_get_my_double_value( node_mech ); }	
+
+		node_mech = node.child( "maximum_number_of_attachments" );
+		if ( node_mech )
+		{ pM->maximum_number_of_attachments = xml_get_my_int_value( node_mech ); }
 
 	}
 	
