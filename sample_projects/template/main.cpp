@@ -96,7 +96,7 @@ int main( int argc, char* argv[] )
 		#if defined(__MINGW32__) || defined(__MINGW64__)
 		mkdir( PhysiCell_settings.folder.c_str() );
 		#else
-		mkdir( PhysiCell_settings.folder.c_str(), 775 );
+		mkdir( PhysiCell_settings.folder.c_str(), 0775 );
 		#endif
 		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() );
 	}
@@ -106,7 +106,7 @@ int main( int argc, char* argv[] )
 		#if defined(__MINGW32__) || defined(__MINGW64__)
 		mkdir( PhysiCell_settings.folder.c_str() );
 		#else
-		mkdir( PhysiCell_settings.folder.c_str(), 775 );
+		mkdir( PhysiCell_settings.folder.c_str(), 0775 );
 		#endif
 		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() );
 	}
