@@ -93,13 +93,15 @@ int main( int argc, char* argv[] )
 	if( argc > 1 )
 	{
 		XML_status = load_PhysiCell_config_file( argv[1] );
-		mkdir( PhysiCell_settings.folder.c_str() );
+		try { mkdir( PhysiCell_settings.folder.c_str(), 775 ); }
+		catch (const std::runtime_error& e) { mkdir( PhysiCell_settings.folder.c_str() ); }
 		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() );
 	}
 	else
 	{
 		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
-		mkdir( PhysiCell_settings.folder.c_str() );
+		try { mkdir( PhysiCell_settings.folder.c_str(), 775 ); }
+		catch (const std::runtime_error& e) { mkdir( PhysiCell_settings.folder.c_str() ); }
 		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() );
 	}
 	if( !XML_status )
