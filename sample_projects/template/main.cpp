@@ -89,20 +89,20 @@ int main( int argc, char* argv[] )
 	
 	bool XML_status = false; 
 	char copy_command [1024]; 
+	std::string path_to_config_file = "./config/PhysiCell_settings.xml";
 	if( argc > 1 )
 	{
-		XML_status = load_PhysiCell_config_file( argv[1] ); 
-		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+		path_to_config_file = argv[1];
 	}
-	else
-	{
-		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
-		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
-	}
+	XML_status = load_PhysiCell_config_file( path_to_config_file );
 	if( !XML_status )
 	{ exit(-1); }
-	
+
+	// make sure the output folder exists
+	create_output_directory();
+
 	// copy config file to output directry 
+	sprintf(copy_command, "cp %s %s", path_to_config_file.c_str(), PhysiCell_settings.folder.c_str()); // get the copy command ready
 	system( copy_command ); 
 	
 	// OpenMP setup

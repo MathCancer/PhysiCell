@@ -64,7 +64,8 @@
 #                                                                             #
 ###############################################################################
 */
- 
+
+#include <sys/stat.h>
 #include "./PhysiCell_settings.h"
 
 using namespace BioFVM; 
@@ -297,6 +298,21 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	// random seed options 
 	
 	return; 
+}
+
+void create_output_directory(std::string folder)
+{
+	// if the directory doesn't exist, create it
+#if defined(__MINGW32__) || defined(__MINGW64__)
+	mkdir(folder.c_str());
+#else
+	mkdir(folder.c_str(), 0755);
+#endif
+}
+
+void create_output_directory(void)
+{
+	create_output_directory(PhysiCell_settings.folder);
 }
 
 PhysiCell_Globals PhysiCell_globals; 
