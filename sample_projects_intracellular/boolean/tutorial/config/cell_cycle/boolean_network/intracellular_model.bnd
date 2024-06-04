@@ -1,0 +1,633 @@
+Node G0G1_entry {
+
+	logic = (CyclinD1 & !CyclinA) & !(G2M_entry & S_entry) & !S_entry;
+	rate_up = @logic ? $u_G0G1_entry : 0;
+	rate_down = @logic ? 0 : $d_G0G1_entry;
+
+}
+
+Node S_entry {
+
+	logic = ((CyclinE & G0G1_entry) | (CyclinA & G0G1_entry ) | (CyclinE & S_entry) | (CyclinA & S_entry)) & !(G0G1_entry & G2M_entry) & !G2M_entry ;
+	rate_up = @logic ? $u_S_entry : 0;
+	rate_down = @logic ? 0 : $d_S_entry;
+
+}
+
+Node G2M_entry {
+
+	logic = ((CyclinB & S_entry) | (CyclinB & G2M_entry)) & !(G0G1_entry & S_entry) & !G0G1_entry;
+	rate_up = @logic ? $u_G2M_entry : 0;
+	rate_down = @logic ? 0 : $d_G2M_entry;
+
+}
+
+Node GF {
+
+	logic = (!GF & GF_High) | (GF);
+	rate_up = @logic ? $u_GF : 0;
+	rate_down = @logic ? 0 : $d_GF;
+}
+
+Node Casp9 {
+
+	logic = (!Cyto_C & Casp3) | (Cyto_C & !IAPs) | (Cyto_C & IAPs & Casp3);
+	rate_up = @logic ? $u_Casp9 : 0;
+	rate_down = @logic ? 0 : $d_Casp9;
+}
+
+Node Casp3 {
+
+	logic = (!Casp8 & !IAPs & !Casp9 & Casp3) | (!Casp8 & !IAPs & Casp9) | (!Casp8 & IAPs & Casp9 & Casp3) | (Casp8 & !IAPs) | (Casp8 & IAPs & !Casp9 & Casp3) | (Casp8 & IAPs & Casp9);
+	rate_up = @logic ? $u_Casp3 : 0;
+	rate_down = @logic ? 0 : $d_Casp3;
+}
+
+Node Casp8 {
+
+	logic = (!Casp3 & DR4_5) | (Casp3);
+	rate_up = @logic ? $u_Casp8 : 0;
+	rate_down = @logic ? 0 : $d_Casp8;
+}
+
+Node Cdc6 {
+
+	logic = (!E2F1 & ORC & Cdc6 & Cdt1 & Pre_RC & !CyclinA & !Casp3) | (!E2F1 & ORC & Cdc6 & Cdt1 & Pre_RC & CyclinA & !f4N_DNA & !Casp3) | (E2F1 & ORC & !Cdc6 & !CyclinA & !Plk1 & !Casp3) | (E2F1 & ORC & !Cdc6 & CyclinA & !Plk1 & !f4N_DNA & !Casp3) | (E2F1 & ORC & Cdc6 & !Cdt1 & !CyclinA & !Plk1 & !Casp3) | (E2F1 & ORC & Cdc6 & !Cdt1 & CyclinA & !Plk1 & !f4N_DNA & !Casp3) | (E2F1 & ORC & Cdc6 & Cdt1 & !Pre_RC & !CyclinA & !Plk1 & !Casp3) | (E2F1 & ORC & Cdc6 & Cdt1 & !Pre_RC & CyclinA & !Plk1 & !f4N_DNA & !Casp3) | (E2F1 & ORC & Cdc6 & Cdt1 & Pre_RC & !CyclinA & !Casp3) | (E2F1 & ORC & Cdc6 & Cdt1 & Pre_RC & CyclinA & !f4N_DNA & !Casp3);
+	rate_up = @logic ? $u_Cdc6 : 0;
+	rate_down = @logic ? 0 : $d_Cdc6;
+}
+
+Node Cdt1 {
+
+	logic = (!pRB & !Myc & E2F1 & !CyclinE & ORC & Cdc6 & !geminin) | (!pRB & !Myc & E2F1 & CyclinE & ORC & Cdc6 & !geminin & !Cdc25A) | (!pRB & !Myc & E2F1 & CyclinE & ORC & Cdc6 & !geminin & Cdc25A & !CyclinA) | (!pRB & Myc & !E2F1 & !CyclinE & ORC & Cdc6 & Pre_RC & !geminin) | (!pRB & Myc & !E2F1 & CyclinE & ORC & Cdc6 & Pre_RC & !geminin & !Cdc25A) | (!pRB & Myc & !E2F1 & CyclinE & ORC & Cdc6 & Pre_RC & !geminin & Cdc25A & !CyclinA) | (!pRB & Myc & E2F1 & !CyclinE & ORC & Cdc6 & !geminin) | (!pRB & Myc & E2F1 & CyclinE & ORC & Cdc6 & !geminin & !Cdc25A) | (!pRB & Myc & E2F1 & CyclinE & ORC & Cdc6 & !geminin & Cdc25A & !CyclinA) | (pRB & !Myc & E2F1 & !CyclinE & ORC & Cdc6 & Pre_RC & !geminin) | (pRB & !Myc & E2F1 & CyclinE & ORC & Cdc6 & Pre_RC & !geminin & !Cdc25A) | (pRB & !Myc & E2F1 & CyclinE & ORC & Cdc6 & Pre_RC & !geminin & Cdc25A & !CyclinA) | (pRB & Myc & !E2F1 & !CyclinE & ORC & Cdc6 & Pre_RC & !geminin) | (pRB & Myc & !E2F1 & CyclinE & ORC & Cdc6 & Pre_RC & !geminin & !Cdc25A) | (pRB & Myc & !E2F1 & CyclinE & ORC & Cdc6 & Pre_RC & !geminin & Cdc25A & !CyclinA) | (pRB & Myc & E2F1 & !CyclinE & ORC & Cdc6 & !geminin) | (pRB & Myc & E2F1 & CyclinE & ORC & Cdc6 & !geminin & !Cdc25A) | (pRB & Myc & E2F1 & CyclinE & ORC & Cdc6 & !geminin & Cdc25A & !CyclinA);
+	rate_up = @logic ? $u_Cdt1 : 0;
+	rate_down = @logic ? 0 : $d_Cdt1;
+}
+
+Node Cdc25A {
+
+	logic = (!GSK3 & !pRB & !E2F1 & !CyclinE & FoxM1 & !CyclinA & !CyclinB & !Cdh1 & !CHK1) | (!GSK3 & !pRB & !E2F1 & !CyclinE & FoxM1 & !CyclinA & CyclinB & !Cdk1 & !Cdh1 & !CHK1) | (!GSK3 & !pRB & !E2F1 & !CyclinE & FoxM1 & !CyclinA & CyclinB & Cdk1 & !Cdh1) | (!GSK3 & !pRB & !E2F1 & !CyclinE & FoxM1 & CyclinA & !Cdh1) | (!GSK3 & !pRB & !E2F1 & CyclinE & FoxM1 & !Cdh1) | (!GSK3 & !pRB & E2F1 & !CyclinE & !FoxM1 & !CyclinA & !CyclinB & !Cdh1 & !CHK1) | (!GSK3 & !pRB & E2F1 & !CyclinE & !FoxM1 & !CyclinA & CyclinB & !Cdk1 & !Cdh1 & !CHK1) | (!GSK3 & !pRB & E2F1 & !CyclinE & !FoxM1 & !CyclinA & CyclinB & Cdk1 & !Cdh1) | (!GSK3 & !pRB & E2F1 & !CyclinE & !FoxM1 & CyclinA & !Cdh1) | (!GSK3 & !pRB & E2F1 & !CyclinE & FoxM1 & !CyclinA & !CyclinB & !CHK1) | (!GSK3 & !pRB & E2F1 & !CyclinE & FoxM1 & !CyclinA & CyclinB & !Cdk1 & !CHK1) | (!GSK3 & !pRB & E2F1 & !CyclinE & FoxM1 & !CyclinA & CyclinB & Cdk1) | (!GSK3 & !pRB & E2F1 & !CyclinE & FoxM1 & CyclinA) | (!GSK3 & !pRB & E2F1 & CyclinE & !FoxM1 & !Cdh1) | (!GSK3 & !pRB & E2F1 & CyclinE & FoxM1) | (!GSK3 & pRB & !CyclinE & FoxM1 & !CyclinA & !CyclinB & !Cdh1 & !CHK1) | (!GSK3 & pRB & !CyclinE & FoxM1 & !CyclinA & CyclinB & !Cdk1 & !Cdh1 & !CHK1) | (!GSK3 & pRB & !CyclinE & FoxM1 & !CyclinA & CyclinB & Cdk1 & !Cdh1) | (!GSK3 & pRB & !CyclinE & FoxM1 & CyclinA & !Cdh1) | (!GSK3 & pRB & CyclinE & FoxM1 & !Cdh1) | (GSK3 & !pRB & !E2F1 & !CyclinE & FoxM1 & !CyclinA & CyclinB & Cdk1 & !Cdh1) | (GSK3 & !pRB & !E2F1 & !CyclinE & FoxM1 & CyclinA & !Cdh1) | (GSK3 & !pRB & !E2F1 & CyclinE & FoxM1 & !Cdh1) | (GSK3 & !pRB & E2F1 & !CyclinE & !FoxM1 & !CyclinA & CyclinB & Cdk1 & !Cdh1) | (GSK3 & !pRB & E2F1 & !CyclinE & !FoxM1 & CyclinA & !Cdh1) | (GSK3 & !pRB & E2F1 & !CyclinE & FoxM1 & !CyclinA & CyclinB & Cdk1) | (GSK3 & !pRB & E2F1 & !CyclinE & FoxM1 & CyclinA) | (GSK3 & !pRB & E2F1 & CyclinE & !FoxM1 & !Cdh1) | (GSK3 & !pRB & E2F1 & CyclinE & FoxM1) | (GSK3 & pRB & !CyclinE & FoxM1 & !CyclinA & CyclinB & Cdk1 & !Cdh1) | (GSK3 & pRB & !CyclinE & FoxM1 & CyclinA & !Cdh1) | (GSK3 & pRB & CyclinE & FoxM1 & !Cdh1);
+	rate_up = @logic ? $u_Cdc25A : 0;
+	rate_down = @logic ? 0 : $d_Cdc25A;
+}
+
+Node Cdk1 {
+
+	logic = (!Wee1 & CyclinB & Cdc25C & !Cdk1 & !CHK1) | (!Wee1 & CyclinB & Cdc25C & Cdk1) | (Wee1 & CyclinB & Cdc25C & !CHK1);
+	rate_up = @logic ? $u_Cdk1 : 0;
+	rate_down = @logic ? 0 : $d_Cdk1;
+}
+
+Node Cdc25B {
+
+	logic = (FoxM1 & f4N_DNA);
+	rate_up = @logic ? $u_Cdc25B : 0;
+	rate_down = @logic ? 0 : $d_Cdc25B;
+}
+
+Node CHK1 {
+
+	logic = (ATR);
+	rate_up = @logic ? $u_CHK1 : 0;
+	rate_down = @logic ? 0 : $d_CHK1;
+}
+
+Node Ca2 {
+
+	logic = (IP3);
+	rate_up = @logic ? $u_Ca2 : 0;
+	rate_down = @logic ? 0 : $d_Ca2;
+}
+
+Node Cdc25C {
+
+	logic = (!CyclinB & Cdc25B & Plk1 & f4N_DNA & !CHK1) | (CyclinB & !Cdc25B & Plk1 & Cdk1 & f4N_DNA) | (CyclinB & Cdc25B & Plk1 & !Cdk1 & f4N_DNA & !CHK1) | (CyclinB & Cdc25B & Plk1 & Cdk1 & f4N_DNA);
+	rate_up = @logic ? $u_Cdc25C : 0;
+	rate_down = @logic ? 0 : $d_Cdc25C;
+}
+
+
+Node ATR {
+
+	logic = (Replication);
+	rate_up = @logic ? $u_ATR : 0;
+	rate_down = @logic ? 0 : $d_ATR;
+}
+
+Node RTK {
+
+	logic = (!GF & !CAD & GF_High) | (GF & !CAD);
+	rate_up = @logic ? $u_RTK : 0;
+	rate_down = @logic ? 0 : $d_RTK;
+}
+
+Node Grb2 {
+
+	logic = (RTK & GF_High);
+	rate_up = @logic ? $u_Grb2 : 0;
+	rate_down = @logic ? 0 : $d_Grb2;
+}
+
+Node Ras {
+
+	logic = (Grb2 & SOS);
+	rate_up = @logic ? $u_Ras : 0;
+	rate_down = @logic ? 0 : $d_Ras;
+}
+
+Node RAF {
+
+	logic = (Ras & !Casp3);
+	rate_up = @logic ? $u_RAF : 0;
+	rate_down = @logic ? 0 : $d_RAF;
+}
+
+Node mTORC2 {
+
+	logic = (!PIP3 & !S6K) | (PIP3);
+	rate_up = @logic ? $u_mTORC2 : 0;
+	rate_down = @logic ? 0 : $d_mTORC2;
+}
+
+Node PI3K {
+
+	logic = (!RTK & Ras) | (RTK);
+	rate_up = @logic ? $u_PI3K : 0;
+	rate_down = @logic ? 0 : $d_PI3K;
+}
+
+Node PIP3 {
+
+	logic = (!PI3K & PI3K_H) | (PI3K);
+	rate_up = @logic ? $u_PIP3 : 0;
+	rate_down = @logic ? 0 : $d_PIP3;
+}
+
+Node PDK1 {
+
+	logic = (PI3K & PIP3);
+	rate_up = @logic ? $u_PDK1 : 0;
+	rate_down = @logic ? 0 : $d_PDK1;
+}
+
+Node AKT_B {
+
+	logic = (!mTORC2 & PIP3 & PDK1 & !Casp3) | (mTORC2 & PIP3 & !Casp3);
+	rate_up = @logic ? $u_AKT_B : 0;
+	rate_down = @logic ? 0 : $d_AKT_B;
+}
+
+Node p110_H {
+
+	logic = (!p110_H & FoxO3 & !NeddL4) | (p110_H & !FoxO3 & !NeddL4) | (p110_H & FoxO3);
+	rate_up = @logic ? $u_p110_H : 0;
+	rate_down = @logic ? 0 : $d_p110_H;
+}
+
+Node PI3K_H {
+
+	logic = (RTK & Ras & PI3K & p110_H);
+	rate_up = @logic ? $u_PI3K_H : 0;
+	rate_down = @logic ? 0 : $d_PI3K_H;
+}
+
+Node AKT_H {
+
+	logic = (Ras & mTORC2 & PIP3 & PDK1 & AKT_B & p110_H & PI3K_H);
+	rate_up = @logic ? $u_AKT_H : 0;
+	rate_down = @logic ? 0 : $d_AKT_H;
+}
+
+Node FoxO3 {
+
+	logic = (!AKT_B & !AKT_H & !Plk1) | (!AKT_B & !AKT_H & Plk1 & !Plk1_H) | (!AKT_B & !AKT_H & Plk1 & Plk1_H & !ERK) | (!AKT_B & AKT_H & !Plk1 & !Plk1_H & !ERK) | (AKT_B & !AKT_H & !Plk1) | (AKT_B & !AKT_H & Plk1 & !Plk1_H) | (AKT_B & !AKT_H & Plk1 & Plk1_H & !ERK);
+	rate_up = @logic ? $u_FoxO3 : 0;
+	rate_down = @logic ? 0 : $d_FoxO3;
+}
+
+Node PLCgamma {
+
+	logic = (RTK & Grb2 & PIP3 & p110_H & PI3K_H);
+	rate_up = @logic ? $u_PLCgamma : 0;
+	rate_down = @logic ? 0 : $d_PLCgamma;
+}
+
+Node NeddL4 {
+
+	logic = (Ca2 & IP3);
+	rate_up = @logic ? $u_NeddL4 : 0;
+	rate_down = @logic ? 0 : $d_NeddL4;
+}
+
+Node FoxO1 {
+
+	logic = (!AKT_H & !Plk1);
+	rate_up = @logic ? $u_FoxO1 : 0;
+	rate_down = @logic ? 0 : $d_FoxO1;
+}
+
+Node p21_mRNA {
+
+	logic = (!FoxO3 & FoxO1 & !Myc) | (FoxO3 & !FoxO1 & !Myc) | (FoxO3 & FoxO1);
+	rate_up = @logic ? $u_p21_mRNA : 0;
+	rate_down = @logic ? 0 : $d_p21_mRNA;
+}
+
+Node TSC2 {
+
+	logic = (!AKT_B & !AKT_H) | (!AKT_B & AKT_H & !ERK) | (AKT_B & !AKT_H);
+	rate_up = @logic ? $u_TSC2 : 0;
+	rate_down = @logic ? 0 : $d_TSC2;
+}
+
+Node PRAS40 {
+
+	logic = (!AKT_B & !AKT_H) | (AKT_B & !AKT_H & !mTORC1);
+	rate_up = @logic ? $u_PRAS40 : 0;
+	rate_down = @logic ? 0 : $d_PRAS40;
+}
+
+Node Rheb {
+
+	logic = (!TSC2 & DAG);
+	rate_up = @logic ? $u_Rheb : 0;
+	rate_down = @logic ? 0 : $d_Rheb;
+}
+
+Node mTORC1 {
+
+	logic = (!PRAS40 & !Rheb & !GSK3 & E2F1 & !Casp3) | (!PRAS40 & !Rheb & GSK3 & !E2F1 & CyclinB & Cdk1 & !Casp3) | (!PRAS40 & !Rheb & GSK3 & E2F1 & !Casp3) | (!PRAS40 & Rheb & !Casp3) | (PRAS40 & !GSK3 & E2F1 & !Casp3) | (PRAS40 & GSK3 & !E2F1 & CyclinB & Cdk1 & !Casp3) | (PRAS40 & GSK3 & E2F1 & !Casp3);
+	rate_up = @logic ? $u_mTORC1 : 0;
+	rate_down = @logic ? 0 : $d_mTORC1;
+}
+
+Node S6K {
+
+	logic = (mTORC1 & !Casp3);
+	rate_up = @logic ? $u_S6K : 0;
+	rate_down = @logic ? 0 : $d_S6K;
+}
+
+Node eIF4E {
+
+	logic = (mTORC1 & !Casp3);
+	rate_up = @logic ? $u_eIF4E : 0;
+	rate_down = @logic ? 0 : $d_eIF4E;
+}
+
+Node GSK3 {
+
+	logic = (!AKT_H & !S6K) | (!AKT_H & S6K & !ERK);
+	rate_up = @logic ? $u_GSK3 : 0;
+	rate_down = @logic ? 0 : $d_GSK3;
+}
+
+Node p21 {
+
+	logic = (p21_mRNA & !CyclinE & !Casp3);
+	rate_up = @logic ? $u_p21 : 0;
+	rate_down = @logic ? 0 : $d_p21;
+}
+
+Node pRB {
+
+	logic = (!p27Kip1 & !CyclinD1 & !CyclinE & !CyclinA & !Casp3) | (p27Kip1 & !CyclinD1 & !CyclinA & !Casp3);
+	rate_up = @logic ? $u_pRB : 0;
+	rate_down = @logic ? 0 : $d_pRB;
+}
+
+Node p27Kip1 {
+
+	logic = (!FoxO3 & !FoxO1 & !CyclinD1 & !CyclinE & !CyclinA & !CyclinB & !Casp3) | (!FoxO3 & !FoxO1 & !CyclinD1 & !CyclinE & !CyclinA & CyclinB & !Cdk1 & !Casp3) | (!FoxO3 & FoxO1 & !CyclinD1 & !CyclinA & !CyclinB & !Casp3) | (!FoxO3 & FoxO1 & !CyclinD1 & !CyclinA & CyclinB & !Cdk1 & !Casp3) | (FoxO3 & !FoxO1 & !CyclinD1 & !CyclinA & !CyclinB & !Casp3) | (FoxO3 & !FoxO1 & !CyclinD1 & !CyclinA & CyclinB & !Cdk1 & !Casp3) | (FoxO3 & FoxO1 & !CyclinD1 & !CyclinE & !CyclinB & !Casp3) | (FoxO3 & FoxO1 & !CyclinD1 & !CyclinE & CyclinB & !Cdk1 & !Casp3) | (FoxO3 & FoxO1 & !CyclinD1 & CyclinE & !CyclinA & !CyclinB & !Casp3) | (FoxO3 & FoxO1 & !CyclinD1 & CyclinE & !CyclinA & CyclinB & !Cdk1 & !Casp3);
+	rate_up = @logic ? $u_p27Kip1 : 0;
+	rate_down = @logic ? 0 : $d_p27Kip1;
+}
+
+Node Myc {
+
+	logic = (!eIF4E & !GSK3 & !pRB & !E2F1 & ERK) | (!eIF4E & !GSK3 & !pRB & E2F1) | (!eIF4E & !GSK3 & pRB & ERK) | (!eIF4E & GSK3 & !pRB & E2F1 & ERK) | (eIF4E & !pRB & !E2F1 & ERK) | (eIF4E & !pRB & E2F1) | (eIF4E & pRB & ERK);
+	rate_up = @logic ? $u_Myc : 0;
+	rate_down = @logic ? 0 : $d_Myc;
+}
+
+Node CyclinD1 {
+
+	logic = (!GSK3 & !p21 & !Myc & E2F1 & !CHK1) | (!GSK3 & !p21 & Myc & !CHK1) | (!GSK3 & p21 & !pRB & !Myc & CyclinD1 & E2F1 & !CHK1) | (!GSK3 & p21 & !pRB & Myc & E2F1 & !CHK1) | (GSK3 & !p21 & !Myc & CyclinD1 & E2F1 & !CHK1) | (GSK3 & !p21 & Myc & !CyclinD1 & E2F1 & !CHK1) | (GSK3 & !p21 & Myc & CyclinD1 & !CHK1) | (GSK3 & p21 & !pRB & Myc & CyclinD1 & E2F1 & !CHK1);
+	rate_up = @logic ? $u_CyclinD1 : 0;
+	rate_down = @logic ? 0 : $d_CyclinD1;
+}
+
+Node E2F1 {
+
+	logic = (!pRB & !Myc & E2F1 & !CyclinA & !CAD) | (!pRB & Myc & !CyclinA & !CAD);
+	rate_up = @logic ? $u_E2F1 : 0;
+	rate_down = @logic ? 0 : $d_E2F1;
+}
+
+Node CyclinE {
+
+	logic = (!pRB & !p27Kip1 & E2F1 & Cdc6 & Pre_RC & !Casp3 & !CHK1);
+	rate_up = @logic ? $u_CyclinE : 0;
+	rate_down = @logic ? 0 : $d_CyclinE;
+}
+
+Node ORC {
+
+	logic = (!E2F1 & Cdc6 & Cdt1 & Pre_RC) | (E2F1);
+	rate_up = @logic ? $u_ORC : 0;
+	rate_down = @logic ? 0 : $d_ORC;
+}
+
+Node Pre_RC {
+
+	logic = (ORC & Cdc6 & Cdt1 & !Replication) | (ORC & Cdc6 & Cdt1 & Replication & !f4N_DNA);
+	rate_up = @logic ? $u_Pre_RC : 0;
+	rate_down = @logic ? 0 : $d_Pre_RC;
+}
+
+Node geminin {
+
+	logic = (E2F1 & !pAPC & !Cdh1) | (E2F1 & pAPC & !Cdc20 & !Cdh1);
+	rate_up = @logic ? $u_geminin : 0;
+	rate_down = @logic ? 0 : $d_geminin;
+}
+
+Node CyclinA_mRNA {
+
+	logic = (!pRB & !E2F1 & FoxM1 & !CAD) | (!pRB & E2F1 & !CAD) | (pRB & FoxM1 & !CAD);
+	rate_up = @logic ? $u_CyclinA_mRNA : 0;
+	rate_down = @logic ? 0 : $d_CyclinA_mRNA;
+}
+
+Node Emi1 {
+
+	logic = (!p21 & !CyclinB) | (!p21 & CyclinB & !Plk1) | (!p21 & CyclinB & Plk1 & !Cdk1) | (!p21 & CyclinB & Plk1 & Cdk1 & !U_Kinetochores & !A_Kinetochores) | (p21 & !pRB & !CyclinB) | (p21 & !pRB & CyclinB & !Plk1) | (p21 & !pRB & CyclinB & Plk1 & !Cdk1) | (p21 & !pRB & CyclinB & Plk1 & Cdk1 & !U_Kinetochores & !A_Kinetochores) | (p21 & pRB & E2F1 & !CyclinB) | (p21 & pRB & E2F1 & CyclinB & !Plk1) | (p21 & pRB & E2F1 & CyclinB & Plk1 & !Cdk1) | (p21 & pRB & E2F1 & CyclinB & Plk1 & Cdk1 & !U_Kinetochores & !A_Kinetochores);
+	rate_up = @logic ? $u_Emi1 : 0;
+	rate_down = @logic ? 0 : $d_Emi1;
+}
+
+Node FoxM1 {
+
+	logic = (!Myc & !Cdc25A & CyclinB & Plk1 & Cdk1) | (!Myc & Cdc25A & !CyclinA & CyclinB & Plk1 & Cdk1) | (!Myc & Cdc25A & CyclinA & !CyclinB & Cdc25B) | (!Myc & Cdc25A & CyclinA & CyclinB & !Cdc25B & Plk1 & Cdk1) | (!Myc & Cdc25A & CyclinA & CyclinB & Cdc25B) | (Myc & !CyclinE & !Cdc25A & CyclinB & Plk1 & Cdk1) | (Myc & !CyclinE & Cdc25A & !CyclinA & CyclinB & Plk1 & Cdk1) | (Myc & !CyclinE & Cdc25A & CyclinA & !CyclinB & Cdc25B) | (Myc & !CyclinE & Cdc25A & CyclinA & CyclinB & !Cdc25B & Plk1 & Cdk1) | (Myc & !CyclinE & Cdc25A & CyclinA & CyclinB & Cdc25B) | (Myc & CyclinE);
+	rate_up = @logic ? $u_FoxM1 : 0;
+	rate_down = @logic ? 0 : $d_FoxM1;
+}
+
+Node CyclinA {
+
+	logic = (CyclinA_mRNA & !Emi1 & !Cdc25A & CyclinA & !UbcH10 & !pAPC & !Cdh1) | (CyclinA_mRNA & !Emi1 & Cdc25A & !pAPC & !Cdh1) | (CyclinA_mRNA & Emi1 & !Cdc25A & CyclinA & !UbcH10 & !pAPC) | (CyclinA_mRNA & Emi1 & !Cdc25A & CyclinA & UbcH10 & !pAPC & !Cdh1) | (CyclinA_mRNA & Emi1 & Cdc25A & !pAPC);
+	rate_up = @logic ? $u_CyclinA : 0;
+	rate_down = @logic ? 0 : $d_CyclinA;
+}
+
+Node Wee1 {
+
+	logic = (!CyclinA & !CyclinB & !Replication & !Casp3 & CHK1) | (!CyclinA & !CyclinB & Replication & !Casp3) | (!CyclinA & CyclinB & !Cdk1 & !Replication & !Casp3 & CHK1) | (!CyclinA & CyclinB & !Cdk1 & Replication & !Casp3) | (CyclinA & !CyclinB & !Plk1 & !Replication & !Casp3 & CHK1) | (CyclinA & !CyclinB & !Plk1 & Replication & !Casp3) | (CyclinA & !CyclinB & Plk1 & !Cdk1 & !Replication & !Casp3 & CHK1) | (CyclinA & !CyclinB & Plk1 & !Cdk1 & Replication & !Casp3) | (CyclinA & !CyclinB & Plk1 & Cdk1 & !Casp3 & CHK1) | (CyclinA & CyclinB & !Cdk1 & !Replication & !Casp3 & CHK1) | (CyclinA & CyclinB & !Cdk1 & Replication & !Casp3);
+	rate_up = @logic ? $u_Wee1 : 0;
+	rate_down = @logic ? 0 : $d_Wee1;
+}
+
+Node UbcH10 {
+
+	logic = (!CyclinA & !UbcH10 & !Cdh1) | (!CyclinA & UbcH10 & !CyclinB & !Cdc20 & !Cdh1) | (!CyclinA & UbcH10 & !CyclinB & Cdc20) | (!CyclinA & UbcH10 & CyclinB) | (CyclinA & !UbcH10 & !Cdh1) | (CyclinA & UbcH10);
+	rate_up = @logic ? $u_UbcH10 : 0;
+	rate_down = @logic ? 0 : $d_UbcH10;
+}
+
+Node CyclinB {
+
+	logic = (!FoxO3 & FoxM1 & !pAPC & !Cdh1) | (!FoxO3 & FoxM1 & pAPC & !Cdc20 & !Cdh1) | (FoxO3 & !FoxM1 & CyclinB & !pAPC & !Cdh1) | (FoxO3 & !FoxM1 & CyclinB & pAPC & !Cdc20 & !Cdh1) | (FoxO3 & FoxM1 & !pAPC & !Cdh1) | (FoxO3 & FoxM1 & pAPC & !Cdc20 & !Cdh1);
+	rate_up = @logic ? $u_CyclinB : 0;
+	rate_down = @logic ? 0 : $d_CyclinB;
+}
+
+Node Plk1 {
+
+	logic = (!FoxM1 & !Cdc25A & CyclinB & Cdk1 & !Cdh1 & Plk1_H) | (!FoxM1 & Cdc25A & !CyclinA & CyclinB & Cdk1 & !Cdh1 & Plk1_H) | (!FoxM1 & Cdc25A & CyclinA & !Wee1 & !Cdh1 & Plk1_H) | (!FoxM1 & Cdc25A & CyclinA & Wee1 & CyclinB & Cdk1 & !Cdh1 & Plk1_H) | (FoxM1 & !Cdc25A & CyclinB & Cdk1 & !Cdh1) | (FoxM1 & Cdc25A & !CyclinA & CyclinB & Cdk1 & !Cdh1) | (FoxM1 & Cdc25A & CyclinA & !Wee1 & !Cdh1) | (FoxM1 & Cdc25A & CyclinA & Wee1 & CyclinB & Cdk1 & !Cdh1);
+	rate_up = @logic ? $u_Plk1 : 0;
+	rate_down = @logic ? 0 : $d_Plk1;
+}
+
+Node pAPC {
+
+	logic = (!CyclinB & pAPC & Cdc20) | (CyclinB & !Plk1 & !Cdk1 & pAPC & Cdc20) | (CyclinB & !Plk1 & Cdk1 & pAPC) | (CyclinB & Plk1 & !Cdk1 & pAPC & Cdc20) | (CyclinB & Plk1 & Cdk1);
+	rate_up = @logic ? $u_pAPC : 0;
+	rate_down = @logic ? 0 : $d_pAPC;
+}
+
+Node Cdc20 {
+
+	logic = (!Emi1 & !CyclinA & !CyclinB & pAPC & !Cdh1) | (!Emi1 & !CyclinA & CyclinB & !Cdk1 & pAPC & !Cdh1) | (!Emi1 & !CyclinA & CyclinB & Cdk1 & pAPC & !Cdh1 & !Mad2) | (!Emi1 & CyclinA & pAPC & !Cdh1 & !Mad2);
+	rate_up = @logic ? $u_Cdc20 : 0;
+	rate_down = @logic ? 0 : $d_Cdc20;
+}
+
+Node Cdh1 {
+
+	logic = (!Emi1 & !Cdc25A & !CyclinB) | (!Emi1 & !Cdc25A & CyclinB & !Cdk1) | (!Emi1 & Cdc25A & !CyclinA & !CyclinB) | (!Emi1 & Cdc25A & !CyclinA & CyclinB & !Cdk1) | (Emi1 & !CyclinA & !CyclinB) | (Emi1 & !CyclinA & CyclinB & !Cdk1);
+	rate_up = @logic ? $u_Cdh1 : 0;
+	rate_down = @logic ? 0 : $d_Cdh1;
+}
+
+Node Replication {
+
+	logic = (!E2F1 & Pre_RC & Cdc25A & CyclinA & Replication & !f4N_DNA & !CAD) | (E2F1 & !CyclinE & Pre_RC & Cdc25A & CyclinA & Replication & !CAD) | (E2F1 & CyclinE & Pre_RC & Cdc25A & !CAD);
+	rate_up = @logic ? $u_Replication : 0;
+	rate_down = @logic ? 0 : $d_Replication;
+}
+
+Node f4N_DNA {
+
+	logic = (!Pre_RC & !Replication & f4N_DNA & !Ect2 & !CAD) | (!Pre_RC & Replication & f4N_DNA & !CAD) | (Pre_RC & !CyclinA & !Replication & f4N_DNA & !Ect2 & !CAD) | (Pre_RC & !CyclinA & Replication & f4N_DNA & !CAD) | (Pre_RC & CyclinA & !Replication & f4N_DNA & !Ect2 & !CAD) | (Pre_RC & CyclinA & Replication & !CAD);
+	rate_up = @logic ? $u_f4N_DNA : 0;
+	rate_down = @logic ? 0 : $d_f4N_DNA;
+}
+
+Node U_Kinetochores {
+
+	logic = (!CyclinB & !Cdh1 & f4N_DNA & U_Kinetochores & !A_Kinetochores) | (CyclinB & !Cdk1 & !Cdh1 & f4N_DNA & U_Kinetochores & !A_Kinetochores) | (CyclinB & Cdk1 & !Cdh1 & f4N_DNA & !A_Kinetochores);
+	rate_up = @logic ? $u_U_Kinetochores : 0;
+	rate_down = @logic ? 0 : $d_U_Kinetochores;
+}
+
+Node Mad2 {
+
+	logic = (U_Kinetochores & !A_Kinetochores);
+	rate_up = @logic ? $u_Mad2 : 0;
+	rate_down = @logic ? 0 : $d_Mad2;
+}
+
+Node A_Kinetochores {
+
+	logic = (!CyclinB & !pAPC & !Cdh1 & f4N_DNA & A_Kinetochores) | (!CyclinB & pAPC & !Cdc20 & !Cdh1 & f4N_DNA & A_Kinetochores) | (CyclinB & !Plk1 & !pAPC & !Cdh1 & f4N_DNA & A_Kinetochores) | (CyclinB & !Plk1 & pAPC & !Cdc20 & !Cdh1 & f4N_DNA & A_Kinetochores) | (CyclinB & Plk1 & !Cdk1 & !pAPC & !Cdh1 & f4N_DNA & A_Kinetochores) | (CyclinB & Plk1 & !Cdk1 & pAPC & !Cdc20 & !Cdh1 & f4N_DNA & A_Kinetochores) | (CyclinB & Plk1 & Cdk1 & !pAPC & !Cdh1 & f4N_DNA & !U_Kinetochores & A_Kinetochores) | (CyclinB & Plk1 & Cdk1 & !pAPC & !Cdh1 & f4N_DNA & U_Kinetochores) | (CyclinB & Plk1 & Cdk1 & pAPC & !Cdc20 & !Cdh1 & f4N_DNA & !U_Kinetochores & A_Kinetochores) | (CyclinB & Plk1 & Cdk1 & pAPC & !Cdc20 & !Cdh1 & f4N_DNA & U_Kinetochores);
+	rate_up = @logic ? $u_A_Kinetochores : 0;
+	rate_down = @logic ? 0 : $d_A_Kinetochores;
+}
+
+Node Plk1_H {
+
+	logic = (!FoxO3 & !FoxO1 & FoxM1 & Plk1 & Plk1_H) | (!FoxO3 & FoxO1 & FoxM1 & Plk1) | (FoxO3 & FoxM1 & Plk1);
+	rate_up = @logic ? $u_Plk1_H : 0;
+	rate_down = @logic ? 0 : $d_Plk1_H;
+}
+
+Node Ect2 {
+
+	logic = (Cdh1 & f4N_DNA & !U_Kinetochores & !A_Kinetochores & Plk1_H);
+	rate_up = @logic ? $u_Ect2 : 0;
+	rate_down = @logic ? 0 : $d_Ect2;
+}
+
+Node Casp2 {
+
+	logic = (!CyclinB & !U_Kinetochores & Casp3) | (!CyclinB & U_Kinetochores & !Mad2 & Casp3) | (!CyclinB & U_Kinetochores & Mad2) | (CyclinB & !Cdk1 & !U_Kinetochores & Casp3) | (CyclinB & !Cdk1 & U_Kinetochores & !Mad2 & Casp3) | (CyclinB & !Cdk1 & U_Kinetochores & Mad2) | (CyclinB & Cdk1 & Casp3);
+	rate_up = @logic ? $u_Casp2 : 0;
+	rate_down = @logic ? 0 : $d_Casp2;
+}
+
+Node MCL_1 {
+
+	logic = (!AKT_B & !GSK3 & !CyclinB & !Casp2 & !Casp3) | (!AKT_B & !GSK3 & CyclinB & !Cdk1 & !Casp2 & !Casp3) | (!AKT_B & !GSK3 & CyclinB & Cdk1 & !U_Kinetochores & !Casp2 & !Casp3) | (AKT_B & !GSK3 & !CyclinB & !Casp2 & !Casp3) | (AKT_B & !GSK3 & CyclinB & !Cdk1 & !Casp2 & !Casp3) | (AKT_B & !GSK3 & CyclinB & Cdk1 & !U_Kinetochores & !Casp2 & !Casp3) | (AKT_B & GSK3 & !E2F1 & !CyclinB & !Casp2 & !Casp3) | (AKT_B & GSK3 & !E2F1 & CyclinB & !Cdk1 & !Casp2 & !Casp3) | (AKT_B & GSK3 & !E2F1 & CyclinB & Cdk1 & !U_Kinetochores & !Casp2 & !Casp3) | (AKT_B & GSK3 & E2F1 & !CyclinB & !Casp2 & !Casp3 & ERK) | (AKT_B & GSK3 & E2F1 & CyclinB & !Cdk1 & !Casp2 & !Casp3 & ERK) | (AKT_B & GSK3 & E2F1 & CyclinB & Cdk1 & !U_Kinetochores & !Casp2 & !Casp3 & ERK);
+	rate_up = @logic ? $u_MCL_1 : 0;
+	rate_down = @logic ? 0 : $d_MCL_1;
+}
+
+Node BCLXL {
+
+	logic = (!CyclinB & !Plk1 & !U_Kinetochores & !BCL2 & !BAD & !Casp3) | (!CyclinB & !Plk1 & !U_Kinetochores & BCL2 & !Casp3) | (!CyclinB & !Plk1 & U_Kinetochores & MCL_1 & BCL2 & !Casp3) | (!CyclinB & Plk1 & !BCL2 & !BAD & !Casp3) | (!CyclinB & Plk1 & BCL2 & !Casp3) | (CyclinB & !Plk1 & !Cdk1 & !U_Kinetochores & !BCL2 & !BAD & !Casp3) | (CyclinB & !Plk1 & !Cdk1 & !U_Kinetochores & BCL2 & !Casp3) | (CyclinB & !Plk1 & !Cdk1 & U_Kinetochores & MCL_1 & BCL2 & !Casp3) | (CyclinB & !Plk1 & Cdk1 & !U_Kinetochores & !BCL2 & !BAD & !Casp3) | (CyclinB & !Plk1 & Cdk1 & !U_Kinetochores & BCL2 & !Casp3) | (CyclinB & Plk1 & !Cdk1 & !BCL2 & !BAD & !Casp3) | (CyclinB & Plk1 & !Cdk1 & BCL2 & !Casp3) | (CyclinB & Plk1 & Cdk1 & !U_Kinetochores & !BCL2 & !BAD & !Casp3) | (CyclinB & Plk1 & Cdk1 & !U_Kinetochores & BCL2 & !Casp3) | (CyclinB & Plk1 & Cdk1 & U_Kinetochores & MCL_1 & BCL2 & !Casp3);
+	rate_up = @logic ? $u_BCLXL : 0;
+	rate_down = @logic ? 0 : $d_BCLXL;
+}
+
+Node BCL2 {
+
+	logic = (!CyclinB & !Plk1 & !U_Kinetochores & !BAD & !BIK & !BIM & !Casp3) | (!CyclinB & !Plk1 & U_Kinetochores & MCL_1 & BCLXL & !BAD & !BIK & !BIM & !Casp3) | (!CyclinB & Plk1 & !BAD & !BIK & !BIM & !Casp3) | (CyclinB & !Plk1 & !U_Kinetochores & !BAD & !BIK & !BIM & !Casp3) | (CyclinB & !Plk1 & U_Kinetochores & MCL_1 & BCLXL & !BAD & !BIK & !BIM & !Casp3) | (CyclinB & Plk1 & !Cdk1 & !BAD & !BIK & !BIM & !Casp3) | (CyclinB & Plk1 & Cdk1 & !U_Kinetochores & !BAD & !BIK & !BIM & !Casp3) | (CyclinB & Plk1 & Cdk1 & U_Kinetochores & !MCL_1 & BCLXL & !BAD & !BIK & !BIM & !Casp3) | (CyclinB & Plk1 & Cdk1 & U_Kinetochores & MCL_1 & !BAD & !BIK & !BIM & !Casp3);
+	rate_up = @logic ? $u_BCL2 : 0;
+	rate_down = @logic ? 0 : $d_BCL2;
+}
+
+Node BAD {
+
+	logic = (!AKT_B & !AKT_H & !S6K & !Casp8 & !Casp3 & !ERK) | (!AKT_B & !AKT_H & !S6K & !Casp8 & Casp3) | (!AKT_B & !AKT_H & !S6K & Casp8) | (!AKT_B & !AKT_H & S6K & !Casp8 & Casp3) | (!AKT_B & !AKT_H & S6K & Casp8) | (!AKT_B & AKT_H & !Casp8 & Casp3) | (!AKT_B & AKT_H & Casp8 & !Casp3 & !ERK) | (!AKT_B & AKT_H & Casp8 & Casp3) | (AKT_B & !AKT_H & !S6K & !Casp8 & Casp3) | (AKT_B & !AKT_H & !S6K & Casp8) | (AKT_B & !AKT_H & S6K & !Casp8 & Casp3) | (AKT_B & !AKT_H & S6K & Casp8 & !Casp3 & !ERK) | (AKT_B & !AKT_H & S6K & Casp8 & Casp3) | (AKT_B & AKT_H & Casp3);
+	rate_up = @logic ? $u_BAD : 0;
+	rate_down = @logic ? 0 : $d_BAD;
+}
+
+Node BIK {
+
+	logic = (!MCL_1 & !BCLXL & !BCL2);
+	rate_up = @logic ? $u_BIK : 0;
+	rate_down = @logic ? 0 : $d_BIK;
+}
+
+Node BIM {
+
+	logic = (FoxO3 & GSK3 & !MCL_1 & !BCLXL & !BCL2 & !ERK);
+	rate_up = @logic ? $u_BIM : 0;
+	rate_down = @logic ? 0 : $d_BIM;
+}
+
+Node BID {
+
+	logic = (!Casp8 & Casp2 & !MCL_1 & !BCLXL & !BCL2) | (Casp8);
+	rate_up = @logic ? $u_BID : 0;
+	rate_down = @logic ? 0 : $d_BID;
+}
+
+Node BAK {
+
+	logic = (!MCL_1 & !BCLXL & !BIK & !BIM & BID) | (!MCL_1 & !BCLXL & !BIK & BIM) | (!MCL_1 & !BCLXL & BIK) | (!MCL_1 & BCLXL & BID) | (MCL_1 & !BCLXL & BID) | (MCL_1 & BCLXL & !BCL2 & BID) | (MCL_1 & BCLXL & BCL2 & !BIK & BIM & BID) | (MCL_1 & BCLXL & BCL2 & BIK & BID);
+	rate_up = @logic ? $u_BAK : 0;
+	rate_down = @logic ? 0 : $d_BAK;
+}
+
+Node BAX {
+
+	logic = (!MCL_1 & !BCLXL & !BCL2 & !BIK & !BIM & BID) | (!MCL_1 & !BCLXL & !BCL2 & !BIK & BIM) | (!MCL_1 & !BCLXL & !BCL2 & BIK) | (!MCL_1 & !BCLXL & BCL2 & BIM) | (!MCL_1 & BCLXL & BIM) | (MCL_1 & !BCLXL & !BCL2 & !BIK & !BIM & BID) | (MCL_1 & !BCLXL & !BCL2 & !BIK & BIM) | (MCL_1 & !BCLXL & !BCL2 & BIK) | (MCL_1 & !BCLXL & BCL2 & BIM) | (MCL_1 & BCLXL & !BCL2 & BIM) | (MCL_1 & BCLXL & BCL2 & !BIK & BIM & BID) | (MCL_1 & BCLXL & BCL2 & BIK & BIM);
+	rate_up = @logic ? $u_BAX : 0;
+	rate_down = @logic ? 0 : $d_BAX;
+}
+
+Node Cyto_C {
+
+	logic = (!BAK & BAX) | (BAK);
+	rate_up = @logic ? $u_Cyto_C : 0;
+	rate_down = @logic ? 0 : $d_Cyto_C;
+}
+
+Node SMAC {
+
+	logic = (!BAK & BAX) | (BAK);
+	rate_up = @logic ? $u_SMAC : 0;
+	rate_down = @logic ? 0 : $d_SMAC;
+}
+
+Node IAPs {
+
+	logic = (!AKT_H & !SMAC) | (AKT_H);
+	rate_up = @logic ? $u_IAPs : 0;
+	rate_down = @logic ? 0 : $d_IAPs;
+}
+
+Node CAD {
+
+	logic = (Casp9 & Casp3);
+	rate_up = @logic ? $u_CAD : 0;
+	rate_down = @logic ? 0 : $d_CAD;
+}
+
+Node DAG {
+
+	logic = (PLCgamma);
+	rate_up = @logic ? $u_DAG : 0;
+	rate_down = @logic ? 0 : $d_DAG;
+}
+
+Node DR4_5 {
+
+	logic = (Trail);
+	rate_up = @logic ? $u_DR4_5 : 0;
+	rate_down = @logic ? 0 : $d_DR4_5;
+}
+
+Node ERK {
+
+	logic = (!BIK & MEK);
+	rate_up = @logic ? $u_ERK : 0;
+	rate_down = @logic ? 0 : $d_ERK;
+}
+
+Node GF_High {
+
+	logic = (GF_High);
+	rate_up = @logic ? $u_GF_High : 0;
+	rate_down = @logic ? 0 : $d_GF_High;
+}
+
+Node IP3 {
+
+	logic = (PLCgamma);
+	rate_up = @logic ? $u_IP3 : 0;
+	rate_down = @logic ? 0 : $d_IP3;
+}
+
+Node MEK {
+
+	logic = (RAF);
+	rate_up = @logic ? $u_MEK : 0;
+	rate_down = @logic ? 0 : $d_MEK;
+}
+
+Node SOS {
+
+	logic = (Grb2);
+	rate_up = @logic ? $u_SOS : 0;
+	rate_down = @logic ? 0 : $d_SOS;
+}
+
+Node Trail {
+
+	logic = (Trail);
+	rate_up = @logic ? $u_Trail : 0;
+	rate_down = @logic ? 0 : $d_Trail;
+}

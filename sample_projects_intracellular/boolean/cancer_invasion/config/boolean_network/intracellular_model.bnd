@@ -1,0 +1,306 @@
+// 1) "The Hippo Pathway, YAP/TAZ, and the Plasma Membrane" Rausch, Hansen
+// 2) "Nuclear FAK promotes cell proliferation and survival through FERM-enhanced p53 degradation"
+// 3) "Hypoxia-inducible factor 1α promotes primary tumor growth and tumor-initiating cell activity in breast cancer"
+
+Node Pressure {
+  logic = (Pressure);
+  rate_up = @logic ? $u_Pressure : 0.0;
+  rate_down = @logic ? 0.0 : $d_Pressure;
+}
+
+Node Oxy {
+  logic = (Oxy);
+  rate_up = @logic ? $u_Oxy : 0.0;
+  rate_down = @logic ? 0.0 : $d_Oxy;
+}
+
+Node HIF1A {
+  logic = (!Oxy);
+  rate_up = @logic ? $u_HIF1A : 0.0;
+  rate_down = @logic ? 0.0 : $d_HIF1A;
+}
+
+// 1) 2)
+Node FAK {
+  logic = (ECM | (SRC)) & !p53; // FAK is also activated by changes in stiffness in the ECM 
+  rate_up = @logic ? $u_FAK : 0.0;
+  rate_down = @logic ? 0.0 : $d_FAK;
+}
+
+// 1)
+Node YAP1 {
+  logic = ((!AKT1 | ! AKT2) & SRC); // AKT1, AKT2 interactions come from signor database
+  rate_up = @logic ? $u_YAP1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_YAP1;
+}
+
+// Directed interactions from Signor/Adhesome
+//Node RHOA {
+  //logic = (! RAC1 | ! SRC) & TGFbetaR;
+  //rate_up = @logic ? $u_RHOA : 0.0;
+  //rate_down = @logic ? 0.0 : $d_RHOA;
+//}
+
+// Directed interactions from Signor/Adhesome + fak inhibites small gtpases that inhibites RAC and CDC42 activities, this is translated in FAK activates RAC
+Node RAC1 {
+  logic = ( SRC | FAK) & !(AKT1 | AKT2 );
+  rate_up = @logic ? $u_RAC1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_RAC1;
+}
+
+// Cell can't move in presence of neighbor and once formed solid cell-cell junctions
+Node Cell_freeze {
+  logic = (Neigh & !CDH2 & CDH1);
+  rate_up = @logic ? $u_Cell_freeze : 0.0;
+  rate_down = @logic ? 0.0 : $d_Cell_freeze;
+}
+
+Node Cell_growth {
+  logic = ((ERK & !p21) | (AKT1 & AKT2 & PIK3CA)) & !(HIF1A | Pressure); // Tumor in hypoxia condition has more aggressive phenotype
+  rate_up = @logic ? $u_Cell_growth : 0.0;
+  rate_down = @logic ? 0.0 : $d_Cell_growth;
+}
+
+Node PIK3CA {
+  logic = (GF | RAC1);
+  rate_up = @logic ? $u_PIK3CA : 0.0;
+  rate_down = @logic ? 0.0 : $d_PIK3CA;
+}
+
+// Cell develop adhesion at CDH2 activation (which means CDH1 OFF and EMT ON), when in contact with the ECM
+Node ECM_adh {
+  logic = (NICD & !CDH1 & SMAD) | RAC1;
+  rate_up = @logic ? $u_ECM_adh : 0.0;
+  rate_down = @logic ? 0.0 : $d_ECM_adh;
+}
+
+Node ECM_degrad {
+  logic = (MMPs);
+  rate_up = @logic ? $u_ECM_degrad : 0.0;
+  rate_down = @logic ? 0.0 : $d_ECM_degrad;
+}
+
+// MMP activation requires physical contat with the ECM and EMT activation + p63 comes from Chavrier's experiments
+
+Node MMPs {
+  logic = ( MMPs & (((NICD & SMAD)| RAC1) & !p73) ) | p63 ;
+  rate_up = @logic ? $u_MMPs : 0.0;
+  rate_down = @logic ? 0.0 : $d_MMPs;
+}
+
+Node optoSRC {
+  logic = (optoSRC);
+  rate_up = @logic ? $u_optoSRC : 0.0;
+  rate_down = @logic ? 0.0 : $d_optoSRC;
+}
+
+// Directed interactions from Signor Adhesome
+Node SRC {
+  logic = FAK | optoSRC | (FAK & optoSRC);
+  rate_up = @logic ? $u_SRC : 0.0;
+  rate_down = @logic ? 0.0 : $d_SRC;
+}
+Node Neigh {
+  logic = (Neigh);
+  rate_up = @logic ? $u_Neigh : 0.0;
+  rate_down = @logic ? 0.0 : $d_Neigh;
+}
+
+Node NICD {
+  logic = (!p73 & !p53 & !miR34 & !miR200 & (ECM | FAK));
+  rate_up = @logic ? $u_NICD : 0.0;
+  rate_down = @logic ? 0.0 : $d_NICD;
+}
+
+Node CTNNB1 {
+  logic = (!DKK1 & !p53 & !AKT1 & !p63 & !miR34 & !miR200 & !CDH1 & CDH2 & !SRC);
+  rate_up = @logic ? $u_CTNNB1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_CTNNB1;
+}
+
+Node DKK1 {
+  logic = (!NICD & CTNNB1) | (NICD);
+  rate_up = @logic ? $u_DKK1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_DKK1;
+}
+
+Node AKT2 {
+  logic = TWIST1 & (TGFbeta | GF | CDH2) & !(miR203 | miR34 | p53);
+  rate_up = @logic ? $u_AKT2 : 0.0;
+  rate_down = @logic ? 0.0 : $d_AKT2;
+}
+
+Node ZEB1 {
+  logic = ((TWIST1 & SNAI1) | CTNNB1 | SNAI2 | NICD) & ! miR200;
+  rate_up = @logic ? $u_ZEB1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_ZEB1;
+}
+
+Node ZEB2 {
+  logic = (SNAI1 | (SNAI2 & TWIST1) | NICD) & ! miR200 & ! miR203;
+  rate_up = @logic ? $u_ZEB2 : 0.0;
+  rate_down = @logic ? 0.0 : $d_ZEB2;
+}
+
+Node SNAI1 {
+  logic = (NICD | TWIST1) & ! miR203 & ! miR34 & ! p53 & ! CTNNB1;
+  rate_up = @logic ? $u_SNAI1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_SNAI1;
+}
+
+Node p73 {
+  logic = (!AKT2 & !ZEB1 & !p53 & !AKT1 & DNAdamage & !YAP1);
+  rate_up = @logic ? $u_p73 : 0.0;
+  rate_down = @logic ? 0.0 : $d_p73;
+}
+
+Node p53 {
+  logic = (DNAdamage | CTNNB1 | NICD | miR34) & ! SNAI2 & ! p73 & ! AKT1 & ! AKT2;
+  rate_up = @logic ? $u_p53 : 0.0;
+  rate_down = @logic ? 0.0 : $d_p53;
+}
+
+Node AKT1 {
+  logic = (CTNNB1 & (NICD | TGFbetaR | GF | CDH2) & ! p53 & ! miR34 & ! CDH1);  
+  rate_up = @logic ? $u_AKT1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_AKT1;
+}
+
+Node p63 {
+  logic = (!AKT2 & !p53 & !AKT1 & DNAdamage & !miR203);
+  rate_up = @logic ? $u_p63 : 0.0;
+  rate_down = @logic ? 0.0 : $d_p63;
+}
+
+Node miR34 {
+  logic = !(SNAI1 | ZEB1 | ZEB2) & (p53 | p73) & AKT2 & ! p63 & ! AKT1;
+  rate_up = @logic ? $u_miR34 : 0.0;
+  rate_down = @logic ? 0.0 : $d_miR34;
+}
+
+Node SNAI2 {
+  logic = (TWIST1 | CTNNB1 | NICD) & ! miR200 & ! p53 & ! miR203;
+  rate_up = @logic ? $u_SNAI2 : 0.0;
+  rate_down = @logic ? 0.0 : $d_SNAI2;
+}
+
+Node DNAdamage {
+  logic = (DNAdamage);
+  rate_up = @logic ? $u_DNAdamage : 0.0;
+  rate_down = @logic ? 0.0 : $d_DNAdamage;
+}
+
+Node miR200 {
+  logic = (p63 | p53 | p73) & !(AKT2 | SNAI1 | SNAI2 | ZEB1 | ZEB2);
+  rate_up = @logic ? $u_miR200 : 0.0;
+  rate_down = @logic ? 0.0 : $d_miR200;
+}
+
+Node TWIST1 {
+  logic = CTNNB1 | NICD | SNAI1;
+  rate_up = @logic ? $u_TWIST1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_TWIST1;
+}
+
+//E-Cadherin  --> accroding to Olivier, SRC disrupt Ecadh and fortifies the production of VIM
+Node CDH1 {
+  logic = (!AKT2 & !ZEB1 & !ZEB2 & !SNAI1 & !SNAI2 & !TWIST1 & !SRC & Neigh);
+  rate_up = @logic ? $u_CDH1 : 0.0;
+  rate_down = @logic ? 0.0 : $d_CDH1;
+}
+
+//N-Cadherin
+Node CDH2 {
+  logic = (TWIST1 | SRC);
+  rate_up = @logic ? $u_CDH2 : 0.0;
+  rate_down = @logic ? 0.0 : $d_CDH2;
+}
+
+Node TGFbeta {
+  logic = (TGFbeta);
+  rate_up = @logic ? $u_TGFbeta : 0.0;
+  rate_down = @logic ? 0.0 : $d_TGFbeta;
+}
+
+Node TGFbetaR {
+  logic = (NICD & !CTNNB1 & TGFbeta);
+  rate_up = @logic ? $u_TGFbetaR : 0.0;
+  rate_down = @logic ? 0.0 : $d_TGFbetaR;
+}
+
+Node GF {
+  logic = GF;
+  rate_up = @logic ? $u_GF : 0.0;
+  rate_down = @logic ? 0.0 : $d_GF;
+}
+
+Node miR203 {
+  logic = (!ZEB1 & !ZEB2 & !SNAI1 & p53);
+  rate_up = @logic ? $u_miR203 : 0.0;
+  rate_down = @logic ? 0.0 : $d_miR203;
+}
+
+
+// "Src-mediated phosphorylation of FAK at Tyr-925creates a SH2 binding site for the Grb2 adapter protein and has been connected to the activation of the extracellular signal regulated (ERK)/mitogen-activated protein (MAP) kinase pathway" from Christof R. Hauck et Al.
+Node ERK {
+  logic = ((SMAD | CDH2 | GF | NICD) & !AKT1);
+  rate_up = @logic ? $u_ERK : 0.0;
+  rate_down = @logic ? 0.0 : $d_ERK;
+}
+
+// added yap1, why? 2 reasons: first, from interaction found on signaLink3 and also on Selvaggio et al.
+Node SMAD {
+  logic = (!miR200 | !miR203) & (TGFbetaR | YAP1);
+  rate_up = @logic ? $u_SMAD : 0.0;
+  rate_down = @logic ? 0.0 : $d_SMAD;
+}
+
+Node p21 {
+  logic = ((SMAD & NICD) | p63 | p53 | p73 | AKT2) & !(AKT1 | ERK);
+  rate_up = @logic ? $u_p21 : 0.0;
+  rate_down = @logic ? 0.0 : $d_p21;
+}
+
+Node CellCycleArrest {
+  logic = (miR203 | miR200 | miR34 | ZEB2 | p21) & !AKT1;
+  rate_up = @logic ? $u_CellCycleArrest : 0.0;
+  rate_down = @logic ? 0.0 : $d_CellCycleArrest;
+}
+
+Node VIM {
+  logic = CTNNB1 | ZEB2 | SRC;
+  rate_up = @logic ? $u_VIM : 0.0;
+  rate_down = @logic ? 0.0 : $d_VIM;
+}
+
+Node EMT {
+  logic = (!CDH1 & CDH2) | EMT & (!CDH1 & CDH2) ;
+  rate_up = @logic ? $u_EMT : 0.0;
+  rate_down = @logic ? 0.0 : $d_EMT;
+}
+
+Node Migration {
+  logic = (AKT2 & !AKT1 & !miR200 & ERK & VIM & EMT & ((CDH2 & SMAD) | (CTNNB1)) & !p63);
+  rate_up = @logic ? $u_Migration : 0.0;
+  rate_down = @logic ? 0.0 : $d_Migration;
+}
+
+Node Metastasis {
+  logic = (Migration);
+  rate_up = @logic ? $u_Metastasis : 0.0;
+  rate_down = @logic ? 0.0 : $d_Metastasis;
+}
+
+Node ECM {
+  logic = (ECM);
+  rate_up = @logic ? $u_ECM : 0.0;
+  rate_down = @logic ? 0.0 : $d_ECM;
+}
+
+Node Apoptosis {
+  logic = (p53 | p63 | p73 | miR200 | miR34) & ! ZEB2 & ! AKT1 & ! ERK;
+  rate_up = @logic ? $u_Apoptosis : 0.0;
+  rate_down = @logic ? 0.0 : $d_Apoptosis;
+}
+
+

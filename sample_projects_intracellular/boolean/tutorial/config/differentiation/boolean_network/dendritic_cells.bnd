@@ -1,0 +1,23 @@
+Node CCL21 {
+  logic = (CCL21);
+  rate_up = @logic ? $u_CCL21 : 0;
+  rate_down = @logic ? 0 : $d_CCL21;
+}
+
+Node Contact {
+  logic = (Contact);
+  rate_up = @logic ? $u_Contact : 0;
+  rate_down = @logic ? 0 : $u_Contact;
+}
+
+Node Maturation {
+  logic = (Maturation);
+  rate_up = @logic ? $u_Maturation : 0;
+  rate_down = @logic ? 0 : $u_Maturation;
+}
+
+Node Migration {
+  logic = (Maturation & CCL21 & !Contact);
+  rate_up = @logic ? $u_Migration : 0;
+  rate_down = @logic ? 0 : $d_Migration;
+}
