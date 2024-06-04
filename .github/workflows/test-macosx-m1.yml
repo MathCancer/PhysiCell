@@ -1,43 +1,34 @@
-name: Tests Windows
+name: Tests MacOSX M1
 
 on:
   push:
   pull_request:
   workflow_dispatch:
-   
+    
 jobs:
   build_and_run:
 
-    runs-on: windows-latest
+    runs-on: macos-14
     strategy:
       matrix:
         projects: [
           {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample"},
           {project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines"},
-          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: ""},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project"},
           {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Initialisation/mymodel_initialisation.xml"},
           {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Cell_Fibre_Mechanics/mymodel_rotating.xml"},
           {project: "template", name: "PhysiCell Template", binary: "project"}
         ]
         
-    defaults:
-      run:
-        shell: msys2 {0}
-        
     steps:
     - uses: actions/checkout@v4
-    
-    - uses: msys2/setup-msys2@v2
-      with:
-        update: true
-        install: base-devel flex bison gcc make diffutils mingw-w64-x86_64-toolchain mingw-w64-x86_64-ca-certificates
-    
+
     - name: Build ${{ matrix.projects.name }} project
       run: |
         make ${{ matrix.projects.project }}
-        make
+        make PHYSICELL_CPP=g++-12
         
     - name: Run ${{ matrix.projects.name }} project
       run: |
-        .\\${{ matrix.projects.binary }}.exe ${{ matrix.projects.config }}
-      
+        ./${{ matrix.projects.binary }} ${{ matrix.projects.config }}
+        
