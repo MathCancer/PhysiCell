@@ -161,7 +161,7 @@ int main( int argc, char* argv[] )
 	// for simplicity, set a pathology coloring function 
 	
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = paint_by_number_cell_coloring; 
-	std::vector<std::string> (*ECM_coloring_function)(double, double, double) = my_coloring_function_for_stroma; 
+	std::string (*ECM_coloring_function)(double, double, double) = my_coloring_function_for_stroma; 
 
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, ECM_coloring_function);

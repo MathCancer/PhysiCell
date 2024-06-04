@@ -391,7 +391,7 @@ void set_substrate_density(int density_index, double max, double min)
 
 	// FUNCTIONS TO PLOT CELLS
 
-std::vector<std::string> my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc )
+std::string my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc )
 {
 	 return paint_by_density_percentage( concentration,  max_conc,  min_conc); 
 
