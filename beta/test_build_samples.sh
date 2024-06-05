@@ -15,10 +15,13 @@
 #                  cancer-metabolism-sample physiboss-tutorial physiboss-tutorial-invasion
 #
 #
-#  After running the script, you can clean up with:
-# $ rm template biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus-sample worm interaction_demo mechano rules-sample physimess-sample 
+#  After running the script, you can :
+#    1) confirm all executables were created
+# $ ls -l template biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus-sample worm interaction_demo mechano rules-sample physimess-sample 
 #   and then:
+#    2) confirm the user_projects were created; delete them
 # $ cd user_projects
+# $ ls
 # $ rm -rf template biorobots cancer_biorobots cancer_immune celltypes3 hetero pred_prey virus_mac worm interaction mechano rules physimess
 
 make reset
@@ -27,63 +30,75 @@ make
 mv project template
 make save PROJ=template
 #
+echo "\n-----------------------------------------"
 make reset
 make biorobots-sample 
 make
 make save PROJ=biorobots
 #
+echo "\n-----------------------------------------"
 make reset
 make cancer-biorobots-sample
 make
 make save PROJ=cancer_biorobots
 #
+echo "\n-----------------------------------------"
 make reset
 make cancer-immune-sample
 make
 make save PROJ=cancer_immune
 #
+echo "\n-----------------------------------------"
 make reset
 make celltypes3-sample
 make
 make save PROJ=celltypes3
 #
+echo "\n-----------------------------------------"
 make reset
 make heterogeneity-sample
 make
 make save PROJ=hetero
 #
+echo "\n-----------------------------------------"
 make reset
 make  pred-prey-farmer
 make
 make save PROJ=pred_prey
 #
+echo "\n-----------------------------------------"
 make reset
 make  virus-macrophage-sample
 make
 make save PROJ=virus_mac
 #
+echo "\n-----------------------------------------"
 make reset
 make worm-sample
 make
 make save PROJ=worm
 #
+echo "\n-----------------------------------------"
 make reset
 make interaction-sample
 make
 make save PROJ=interaction
 #
+echo "\n-----------------------------------------"
 make reset
 make mechano-sample
 make
 mv project mechano-sample
 make save PROJ=mechano
 #
+echo "\n-----------------------------------------"
 make reset
 make rules-sample
 make
 mv project rules-sample
 make save PROJ=rules
 #
+echo "\n-----------------------------------------"
 make reset
 make physimess-sample
 make
