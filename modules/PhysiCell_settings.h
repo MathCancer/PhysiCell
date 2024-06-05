@@ -272,7 +272,8 @@ public:
 		// std::string usage = "Usage: " + std::string(argv[0]) + " [-c path_to_config_file] [-i path_to_ic_cells_file] [-s path_to_ic_substrate_file] [-e path_to_ic_ecm_file] [-o path_to_output_folder]\n"
 		// 							  + "   Or: " + std::string(argv[0]) + " path_to_config_file [-i path_to_ic_cells_file] [-s path_to_ic_substrate_file] [-e path_to_ic_ecm_file] [-o path_to_output_folder]";
 
-		while ((opt = getopt_long(argc, argv, "c:i:s:e:r:o:", long_options, NULL)) != -1) {
+		// while ((opt = getopt_long(argc, argv, "c:o:i:s:e:r:", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "c:o:", long_options, NULL)) != -1) {
             switch (opt) {
             case 'c':
                 config_file_flagged = true;
@@ -288,9 +289,9 @@ public:
 			case 's':
 				path_to_ic_substrate_file = optarg;
 				break;
-			// case 'e':
-			// 	path_to_ic_ecm_file = optarg;
-			// 	break;
+			case 'e':
+				path_to_ic_ecm_file = optarg;
+				break;
             case 'r':
                 path_to_rules_file = optarg;
                 break;
