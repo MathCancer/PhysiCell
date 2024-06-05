@@ -76,6 +76,7 @@
 #include <random>
 #include <chrono>
 #include <unordered_map>
+#include <getopt.h>
 
 #include "./PhysiCell_pugixml.h"
 #include "../BioFVM/BioFVM.h"
