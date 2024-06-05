@@ -281,15 +281,15 @@ save:
 	cp main.cpp ./user_projects/$(PROJ)
 	cp Makefile ./user_projects/$(PROJ)
 	cp VERSION.txt ./user_projects/$(PROJ)
-	cp ./config/* ./user_projects/$(PROJ)/config
-	cp ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
+	cp -r ./config/* ./user_projects/$(PROJ)/config
+	cp -r ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
 
 load: 
 	echo "Loading project from $(PROJ) ... "
 	cp ./user_projects/$(PROJ)/main.cpp .
 	cp ./user_projects/$(PROJ)/Makefile .
-	cp ./user_projects/$(PROJ)/config/* ./config/ 
-	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
+	cp -r ./user_projects/$(PROJ)/config/* ./config/
+	cp -r ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/
 
 pack:
 	@echo " "
