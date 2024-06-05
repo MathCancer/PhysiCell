@@ -237,32 +237,44 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	
 	pugi::xml_node node_options; 
 	
-	node_options = xml_find_node( physicell_config_root , "options" ); 
-	if( node_options )
+	node_options = xml_find_node( physicell_config_root , "options" );
+	if (node_options)
 	{
-		bool settings; 
-		
-		// look for legacy_random_points_on_sphere_in_divide 
-		settings = 
-			xml_get_bool_value( node_options, "legacy_random_points_on_sphere_in_divide" ); 
-		if( settings )
+		bool settings;
+
+		// look for legacy_random_points_on_sphere_in_divide
+		settings = xml_get_bool_value(node_options, "legacy_random_points_on_sphere_in_divide");
+		if (settings)
 		{
-			std::cout << "setting legacy unif" << std::endl; 
-			extern std::vector<double> (*cell_division_orientation)(void); 
-			cell_division_orientation = LegacyRandomOnUnitSphere; 
-		}
-	
-		settings = xml_get_bool_value( node_options, "disable_automated_spring_adhesions" ); 
-		if( settings )
-		{
-			std::cout << "Disabling automated spring adhesions and detachments!" << std::endl; 
-			PhysiCell_settings.disable_automated_spring_adhesions = true; 
+			std::cout << "setting legacy unif" << std::endl;
+			extern std::vector<double> (*cell_division_orientation)(void);
+			cell_division_orientation = LegacyRandomOnUnitSphere;
 		}
 
-		// other options can go here, eventually 
+		settings = xml_get_bool_value(node_options, "disable_automated_spring_adhesions");
+		if (settings)
+		{
+			std::cout << "Disabling automated spring adhesions and detachments!" << std::endl;
+			PhysiCell_settings.disable_automated_spring_adhesions = true;
+		}
 
+		pugi::xml_node random_seed_node = xml_find_node(node_options, "random_seed");
+		std::string random_seed = "";
+		if (random_seed_node)
+		{ random_seed = xml_get_my_string_value(random_seed_node); }
+		if (random_seed == "" || random_seed == "random" || random_seed == "system_clock")
+		{
+			std::cout << "Using system clock for random seed" << std::endl;
+			SeedRandom();
+		}
+		else
+		{
+			SeedRandom(std::stoi(random_seed));
+		}
+
+		// other options can go here, eventually
 	}
-	
+
 	// domain options 
 	
 	node = xml_find_node( physicell_config_root , "domain" );
