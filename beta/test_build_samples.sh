@@ -17,7 +17,7 @@
 #
 #  After running the script, you can :
 #    1) confirm all executables were created
-# $ ls -l template biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus-sample worm interaction_demo mechano rules-sample physimess-sample 
+# $ ls -l template biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus-sample worm interaction_demo mechano-sample rules-sample physimess-sample 
 #   and then:
 #    2) confirm the user_projects were created; delete them
 # $ cd user_projects
