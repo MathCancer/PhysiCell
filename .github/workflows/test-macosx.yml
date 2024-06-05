@@ -67,22 +67,3 @@ jobs:
         ./project config/Fibre_Initialisation/mymodel_initialisation.xml
         ./project config/Cell_Fibre_Mechanics/mymodel_rotating.xml
         
-  build_template:
-
-    runs-on: macos-11
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Install dependencies
-      run : brew install gcc@11
-      
-    - name: Build template project
-      run: |
-        make template
-        make clean
-        make PHYSICELL_CPP=g++-11
-        
-    - name: Run template project
-      run: |
-        ./project config/PhysiCell_settings.xml

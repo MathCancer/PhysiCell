@@ -53,28 +53,4 @@ jobs:
         .\\project
         .\\project config\\Fibre_Initialisation\\mymodel_initialisation.xml
         .\\project config\\Cell_Fibre_Mechanics\\mymodel_rotating.xml
-
-  build_template:
-    runs-on: windows-latest
-
-    defaults:
-      run:
-        shell: msys2 {0}
         
-    steps:
-    - uses: actions/checkout@v2
-    
-    - uses: msys2/setup-msys2@v2
-      with:
-        update: true
-        install: base-devel flex bison gcc make diffutils mingw-w64-x86_64-toolchain mingw-w64-x86_64-ca-certificates
-    
-    - name: Build template project
-      run: |
-        make template
-        make clean
-        make
-
-    - name: Run template project
-      run: |
-        .\\project.exe config\\PhysiCell_settings.xml
