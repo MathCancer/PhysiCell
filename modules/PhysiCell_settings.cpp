@@ -300,14 +300,38 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	return; 
 }
 
-void create_output_directory(std::string folder)
+bool create_directories(const std::string &path)
 {
-	// if the directory doesn't exist, create it
+	std::vector<std::string> directories;
+	size_t pos = 0;
+    std::string currentPath;
+
+    while ((pos = path.find_first_of("/\\", pos)) != std::string::npos) {
+        currentPath = path.substr(0, pos++);
+        if (!create_directory(currentPath)) {
+            return false;
+        }
+    }
+    return create_directory(path);
+}
+
+bool create_directory(const std::string &path)
+{
 #if defined(__MINGW32__) || defined(__MINGW64__)
-	mkdir(folder.c_str());
+	bool success = mkdir(path.c_str()) == 0;
 #else
-	mkdir(folder.c_str(), 0755);
+	bool success = mkdir(path.c_str(), 0755) == 0;
 #endif
+	return success || errno == EEXIST;
+}
+
+void create_output_directory(const std::string& path)
+{
+	if (!create_directories(path))
+	{
+		std::cout << "ERROR: Could not create output directory " << path << " ! Quitting." << std::endl;
+		exit(-1);
+	}
 }
 
 void create_output_directory(void)
