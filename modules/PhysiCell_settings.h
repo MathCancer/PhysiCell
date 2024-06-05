@@ -240,7 +240,7 @@ bool setup_microenvironment_from_XML( void );
 
 class ArgumentParser {
 public:
-	bool config_file_flagged;
+	bool config_file_flagged = false;
 	std::string path_to_config_file = "./config/PhysiCell_settings.xml";
 	std::string path_to_output_folder;
 	/* potential future features
