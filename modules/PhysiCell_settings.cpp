@@ -269,7 +269,15 @@ void PhysiCell_Settings::read_from_pugixml( void )
 		}
 		else
 		{
-			SeedRandom(std::stoi(random_seed));
+			int seed;
+			try
+			{ seed = std::stoi(random_seed); }
+			catch(const std::exception& e)
+			{
+				std::cout << "ERROR: " << random_seed << " is not a valid random seed. It must be an integer. Fix this within <options>." << std::endl;
+				exit(-1);
+			}
+			SeedRandom(seed);
 		}
 
 		// other options can go here, eventually
