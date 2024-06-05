@@ -83,7 +83,7 @@ namespace PhysiCell{
 
 	extern std::vector<unsigned int> physicell_random_seeds; 
 
-
+void setup_rng( void );
 void SeedRandom( unsigned int input );
 void SeedRandom( void );
 
