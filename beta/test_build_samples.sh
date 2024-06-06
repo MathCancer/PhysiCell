@@ -17,7 +17,7 @@
 #
 #  After running the script, you can :
 #    1) confirm all executables were created
-# $ ls -l template biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus-sample worm interaction_demo mechano-sample rules-sample physimess-sample 
+# $ ls -l template_sample biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus_sample worm interaction_demo mechano_sample rules_sample physimess_sample 
 #   and then:
 #    2) confirm the user_projects were created; delete them
 # $ cd user_projects
@@ -27,7 +27,7 @@
 make reset
 make template
 make 
-mv project template
+mv project template_sample
 make save PROJ=template
 #
 echo "\n-----------------------------------------"
@@ -88,19 +88,19 @@ echo "\n-----------------------------------------"
 make reset
 make mechano-sample
 make
-mv project mechano-sample
+mv project mechano_sample
 make save PROJ=mechano
 #
 echo "\n-----------------------------------------"
 make reset
 make rules-sample
 make
-mv project rules-sample
+mv project rules_sample
 make save PROJ=rules
 #
 echo "\n-----------------------------------------"
 make reset
 make physimess-sample
 make
-mv project physimess-sample
+mv project physimess_sample
 make save PROJ=physimess
