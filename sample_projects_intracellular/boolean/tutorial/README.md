@@ -2,6 +2,10 @@
 
 In this folder we provide the models presented in the PhysiBoSS tutorials
 
+## Manuscript
+
+The manuscript of the paper is available <a href="paper/PhysiBoSS_tutorial_main_text.pdf">here</a>, and the supplementary materials (containing the detailed instructions to build the model) is available <a href="paper/PhysiBoSS_tutorial_supp_mat.pdf">here</a>
+
 ## Binary file
 
 To obtain the tutorial binary file, you either need to download the pre-compiled binary using : 
@@ -53,8 +57,3 @@ from the PhysiCell root folder, after obtaining the binary file as described abo
 ## Scripts
 
 For reproducing our analysis of the Boolean models or the PhysiBoSS models, we are providing a collection of Jupyter notebooks available in the **scripts** folder.
-
-
-## Manuscript
-
-Our manuscript is also available in the **paper** folder.
