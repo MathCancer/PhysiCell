@@ -108,7 +108,9 @@ void Write_SVG_text(std::ostream& os, const char* str , double position_x, doubl
     double center_x = position_x + text_width / 2.0;
     double center_y = position_y + text_height / 2.0;
 
-    os << "<text x=\"" << position_x << "\" y=\"" << position_y << "\" font-size=\"" << font_size << "\" fill=\"" << color << "\" font-family=\"" << font << "\" transform=\"rotate(" << rotation << " " << center_x << " " << center_y << ")\">" << str << "</text>\n";
+    os << "  <g transform=\"rotate(" << rotation << " " << center_x << " " << center_y << ")\">" << std::endl;
+    os << "    <text x=\"" << position_x << "\" y=\"" << position_y << "\" font-size=\"" << font_size << "\" fill=\"" << color << "\" font-family=\"" << font << "\">" << str << "</text>\n";
+    os << "  </g>" << std::endl;
 }
 
 bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, 
