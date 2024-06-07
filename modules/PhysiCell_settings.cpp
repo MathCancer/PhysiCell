@@ -259,9 +259,10 @@ void PhysiCell_Settings::read_from_pugixml( void )
 		}
 
 		pugi::xml_node random_seed_node = xml_find_node(node_options, "random_seed");
-		std::string random_seed = "";
+		std::string random_seed = ""; // default is system clock, even if this element is not present
 		if (random_seed_node)
 		{ random_seed = xml_get_my_string_value(random_seed_node); }
+
 		if (random_seed == "" || random_seed == "random" || random_seed == "system_clock")
 		{
 			std::cout << "Using system clock for random seed" << std::endl;
