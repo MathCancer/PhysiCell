@@ -210,9 +210,8 @@ reset:
 	touch ./custom_modules/empty.txt
 	touch ALL_CITATIONS.txt
 	rm ALL_CITATIONS.txt
-	mv ./config/PhysiCell_settings-backup.xml .
 	rm -fr ./config/*
-	mv PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
+	cp ./sample_projects/PhysiCell_settings.xml-default ./config/PhysiCell_settings.xml
 
 clean:
 	rm -f *.o
