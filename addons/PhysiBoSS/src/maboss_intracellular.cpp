@@ -473,14 +473,14 @@ void MaBoSSIntracellular::display(std::ostream& os)
 	std::cout << std::endl;
 }
 
-void MaBoSSIntracellular::save(std::string filename, std::vector<PhysiCell::Cell*>& cells)
+void MaBoSSIntracellular::save(std::string filename)
 {
 	std::ofstream state_file( filename );
 	
 	state_file << "ID,state" << std::endl;
 
-	for( auto cell : cells )
-		if (cell->phenotype.intracellular != NULL)
+	for( auto cell : *PhysiCell::all_cells )
+		if (cell->phenotype.intracellular != NULL && cell->phenotype.intracellular->intracellular_type == "maboss")
 			state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
 	
 	state_file.close();
