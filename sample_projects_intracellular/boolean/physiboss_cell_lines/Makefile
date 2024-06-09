@@ -312,6 +312,7 @@ save:
 	mkdir -p ./user_projects/$(PROJ)/config 
 	cp main.cpp ./user_projects/$(PROJ)
 	cp Makefile ./user_projects/$(PROJ)
+	sed -i "0,/PROJ := /{s/PROJ := .*/PROJ := $(PROJ)/}" ./user_projects/$(PROJ)/Makefile
 	cp VERSION.txt ./user_projects/$(PROJ)
 	cp -r ./config/* ./user_projects/$(PROJ)/config
 	cp -r ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
