@@ -217,40 +217,42 @@ custom.o: ./custom_modules/custom.cpp $(MaBoSS)
 # cleanup
 
 reset:
-	rm -f *.cpp 
-	cp ./sample_projects/Makefile-default Makefile 
-	rm -f ./custom_modules/*
-	touch ./custom_modules/empty.txt 
-	touch ALL_CITATIONS.txt 
-	touch ./core/PhysiCell_cell.cpp
-	rm ALL_CITATIONS.txt 
-	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
-	rm -fr ./config/cells.csv ./config/cell_rules.csv
+	make MaBoSS-clean
+	make clean
+	rm -f *.cpp
+	cp ./sample_projects/Makefile-default Makefile
+	rm -fr ./custom_modules/*
+	touch ./custom_modules/empty.txt
+	touch ALL_CITATIONS.txt
+	rm ALL_CITATIONS.txt
+	mv ./config/PhysiCell_settings-backup.xml .
+	rm -fr ./config/*
+	mv PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
 	rm -rf ./scripts
 
 MaBoSS-clean:
 	rm -fr addons/PhysiBoSS/MaBoSS-env-2.0
-	
+
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
-	
+
 data-cleanup:
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
-	
+
 # archival 
-	
+
 checkpoint: 
 	zip -r $$(date +%b_%d_%Y_%H%M).zip Makefile *.cpp *.h config/*.xml custom_modules/* 
-	
+
 zip:
 	zip -r latest.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* sample_projects/* 
 	cp latest.zip $$(date +%b_%d_%Y_%H%M).zip
 	cp latest.zip VERSION_$(VERSION).zip 
 	mv *.zip archives/
-	
+
 tar:
 	tar --ignore-failed-read -czf latest.tar Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* sample_projects/* 
 	cp latest.tar $$(date +%b_%d_%Y_%H%M).tar
@@ -260,7 +262,7 @@ tar:
 unzip: 
 	cp ./archives/latest.zip . 
 	unzip latest.zip 
-	
+
 untar: 
 	cp ./archives/latest.tar .
 	tar -xzf latest.tar

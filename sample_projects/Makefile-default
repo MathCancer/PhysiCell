@@ -388,8 +388,7 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 
 reset:
 	make clean
-	rm -f *.cpp PhysiCell_cell.o
-	touch ./core/PhysiCell_cell.cpp
+	rm -f *.cpp
 	cp ./sample_projects/Makefile-default Makefile
 	rm -fr ./custom_modules/*
 	touch ./custom_modules/empty.txt
@@ -398,8 +397,7 @@ reset:
 	mv ./config/PhysiCell_settings-backup.xml .
 	rm -fr ./config/*
 	mv PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
-	touch ./config/empty.csv
-	
+
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*

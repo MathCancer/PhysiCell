@@ -251,15 +251,16 @@ ecoli_acetic_switch.o: ./custom_modules/ecoli_acetic_switch.cpp
 # cleanup
 
 reset:
+	make clean
 	rm -f *.cpp
 	cp ./sample_projects/Makefile-default Makefile
-	rm -f ./custom_modules/*
+	rm -fr ./custom_modules/*
 	touch ./custom_modules/empty.txt
 	touch ALL_CITATIONS.txt
-	touch ./core/PhysiCell_cell.cpp
 	rm ALL_CITATIONS.txt
-	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
-	touch ./config/empty.txt
+	mv ./config/PhysiCell_settings-backup.xml .
+	rm -fr ./config/*
+	mv PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
 
 clean:
 	rm -f *.o
