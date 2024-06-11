@@ -1,7 +1,7 @@
-#  Copy this file to the root dir and run it to:
+#  Copy this Python script to the root dir and run it to:
 #     - load each sample project (from user_projects)
 #     - compile it
-#     - modify each one's .xml:  max_time, # threads, output folder
+#     - modify each project's .xml:  max_time, # threads, output folder
 #     - run it
 #
 #  WARNING: this is primarily intended to be used by core developers when testing a new release.
@@ -31,10 +31,11 @@ import xml.etree.ElementTree as ET
 import os
 import time
 
+# skip over the 3D cancer_immune_sample for now
 user_proj = ["template", "biorobots", "cancer_biorobots", "celltypes3", "hetero", "pred_prey", "virus_mac", "worm", "interaction", "mechano", "rules", "physimess"]  # 
 model_execs = ["project", "biorobots", "cancer_biorobots", "celltypes3", "heterogeneity", "pred_prey", "virus-sample", "worm", "interaction_demo", "project", "project", "project"]
 
-# $ rm -rf template biorobots cancer_biorobotscancer_immune celltypes3 hetero pred_prey virus_mac worm interaction mechano rules physimess 
+# using dummy values of 99; users can change
 max_times = [120, 10, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99]
 
 for (uproj, myexec, max_time) in zip(user_proj, model_execs, max_times):
@@ -61,78 +62,3 @@ for (uproj, myexec, max_time) in zip(user_proj, model_execs, max_times):
     time.sleep(1)
 
     subprocess.run([myexec])
-
-# 
-# echo "\n-----------------------------------------"
-# make reset
-# make load PROJ=biorobots
-# make
-#
-# echo "\n-----------------------------------------"
-# make reset
-# make cancer-biorobots-sample
-# make
-# make save PROJ=cancer_biorobots
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make cancer-immune-sample
-# make
-# make save PROJ=cancer_immune
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make celltypes3-sample
-# make
-# make save PROJ=celltypes3
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make heterogeneity-sample
-# make
-# make save PROJ=hetero
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make  pred-prey-farmer
-# make
-# make save PROJ=pred_prey
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make  virus-macrophage-sample
-# make
-# make save PROJ=virus_mac
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make worm-sample
-# make
-# make save PROJ=worm
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make interaction-sample
-# make
-# make save PROJ=interaction
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make mechano-sample
-# make
-# mv project mechano_sample
-# make save PROJ=mechano
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make rules-sample
-# make
-# mv project rules_sample
-# make save PROJ=rules
-# #
-# echo "\n-----------------------------------------"
-# make reset
-# make physimess-sample
-# make
-# mv project physimess_sample
-# make save PROJ=physimess
