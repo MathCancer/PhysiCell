@@ -1,11 +1,24 @@
-#  Copy this Python script to the root dir and run it to:
-#     - load each sample project (from user_projects)
+#
+#  This Python script assumes you have run the beta/test_build_sample.sh script first.
+#  See its header for instructions.
+#
+#  Copy this Python script from /beta to the root dir (in case you want to edit it), then run it
+#  It will do the following:
+#     - load each sample project (from user_projects; created by test_build_sample.sh)
 #     - compile it
 #     - modify each project's .xml:  max_time, # threads, output folder
 #     - run it
 #
 #  WARNING: this is primarily intended to be used by core developers when testing a new release.
 #            It will create new output directories  ("output_<proj>")
+#
+#    Run via:
+#  $ python beta/test_run_samples.py 
+#    or, pipe the terminal output to a file:
+#  $ python beta/test_run_samples.py > test_run_samples.out
+#
+#  Any serious error should show up in your terminal output. Some "errors" may be benign, e.g.,
+#   "Error: Could not find <cell_rules> section of XML config file"
 #
 #  Reminder:
 # $ ls user_projects/
@@ -24,19 +37,20 @@
 #
 #
 #   If you want to cleanup the created execs:
-# $ rm -rf template biorobots cancer_biorobots cancer_immune celltypes3 hetero pred_prey virus_mac worm interaction mechano rules physimess
+# $ rm -rf template biorobots cancer_biorobots cancer_immune_3D celltypes3 hetero pred_prey virus_mac worm interaction mechano rules physimess
 
 import subprocess
 import xml.etree.ElementTree as ET
 import os
 import time
 
-# skip over the 3D cancer_immune_sample for now
-user_proj = ["template", "biorobots", "cancer_biorobots", "celltypes3", "hetero", "pred_prey", "virus_mac", "worm", "interaction", "mechano", "rules", "physimess"]  # 
-model_execs = ["project", "biorobots", "cancer_biorobots", "celltypes3", "heterogeneity", "pred_prey", "virus-sample", "worm", "interaction_demo", "project", "project", "project"]
+user_proj = ["template", "biorobots", "cancer_biorobots", "celltypes3", "hetero", "pred_prey", "virus_mac", "worm", "interaction", "mechano", "rules", "physimess", "cancer_immune"] 
 
-# using dummy values of 99; users can change
-max_times = [120, 10, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99]
+model_execs = ["project", "biorobots", "cancer_biorobots", "celltypes3", "heterogeneity", "pred_prey", "virus-sample", "worm", "interaction_demo", "project", "project", "project", "cancer_immune_3D"]
+
+# Using dummy max_time values of 99 for many projects; 61 for the more time-consuming cancer_immune_3D. 
+# Users can change them as they wish.
+max_times = [120, 10, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 61]
 
 for (uproj, myexec, max_time) in zip(user_proj, model_execs, max_times):
     print("\n\n------------   ",uproj,myexec, "   ----------------------------------")

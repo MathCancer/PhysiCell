@@ -3,7 +3,11 @@
 #  WARNING: this is primarily intended to be used by core developers when testing a new release.
 #            It will create new directories in /user_projects
 #
-#  Based on the following:
+#  This script is intended to serve as a first step in a two-step process. The second step is
+#  to run the beta/test_run_samples.py Python script (see its header for instructions).
+#
+#
+#  This test_build_samples.sh script is based on the following:
 #
 # $ make list-projects
 # Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample
@@ -14,8 +18,7 @@
 # Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample
 #                  cancer-metabolism-sample physiboss-tutorial physiboss-tutorial-invasion
 #
-#
-#  After running the script, you can :
+#  After running the script, you can:
 #    1) confirm all executables were created
 # $ ls -l template_sample biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus_sample worm interaction_demo mechano_sample rules_sample physimess_sample 
 #   and then:
