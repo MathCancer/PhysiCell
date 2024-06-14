@@ -465,11 +465,7 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value )
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
 {
-	if (exists(my_name))
-	{
-		std::cout << "ERROR: Parameter " << my_name << " already exists. Make sure all parameters (of a given type) have unique names." << std::endl;
-		exit(-1);
-	}
+	assert_not_exists(my_name);
 
 	Parameter<T>* pNew; 
 	pNew = new Parameter<T> ;
@@ -488,8 +484,7 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value , std::strin
 template <class T>
 void Parameters<T>::add_parameter( Parameter<T> param )
 {
-	if (exists(param.name))
-	{ exit(-1);}
+	assert_not_exists(param.name);
 
 	int n = parameters.size(); 
 	parameters.push_back( param); 
@@ -498,12 +493,13 @@ void Parameters<T>::add_parameter( Parameter<T> param )
 }
 
 template <class T>
-bool Parameters<T>::exists( std::string search_name )
+void Parameters<T>::assert_not_exists( std::string search_name )
 {
 	if( find_index( search_name ) == -1 )
-	{ return false; }
+	{ return; }
+
 	std::cout << "ERROR: Parameter " << search_name << " already exists. Make sure all parameters (of a given type) have unique names." << std::endl;
-	return true;
+	exit(-1);
 }
 
 std::ostream& operator<<( std::ostream& os , const User_Parameters up )

@@ -200,10 +200,9 @@ class Parameters
 	Parameter<T>& operator[]( int i );
 	Parameter<T>& operator[]( std::string str ); 
 	
-	int size( void ) const; 
+	int size( void ) const;
 
-	bool exists( std::string search_name );
-
+	void assert_not_exists(std::string search_name);
 };
 
 class User_Parameters
