@@ -731,7 +731,7 @@ class Integrity
 
 	Integrity(); 
 
-	void advance_damage_models( double dt ); 
+	void advance_damage( double dt ); 
 };
 
 class Phenotype
