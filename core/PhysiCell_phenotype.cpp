@@ -1265,10 +1265,20 @@ void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
 Cell_Interactions::Cell_Interactions()
 {
 	dead_phagocytosis_rate = 0.0; 
+	apoptotic_phagocytosis_rate = 0.0; 
+	necrotic_phagocytosis_rate = 0.0; 
+
 	live_phagocytosis_rates = {0.0}; 
+
 	attack_damage_rate = 1.0; 
 	attack_rates = {0.0}; 
 	immunogenicities = {1}; 
+
+	pAttackTarget = NULL; 
+	total_damage_delivered = 0.0; 
+
+	attack_duration = 0.1; // get from cell constants instead?? 
+
 	fusion_rates = {0.0}; 
 	
 	return; 

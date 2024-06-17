@@ -658,6 +658,9 @@ class Cell_Interactions
  public: 
 	// phagocytosis parameters (e.g., macrophages)
 	double dead_phagocytosis_rate; 
+	double apoptotic_phagocytosis_rate;
+	double necrotic_phagocytosis_rate;
+
 	std::vector<double> live_phagocytosis_rates; 
 	// attack parameters (e.g., T cells)
 
@@ -668,6 +671,12 @@ class Cell_Interactions
 		// how immnogenic am I to cell type j? 
 
 	double attack_damage_rate;  
+
+	Cell* pAttackTarget; 
+	double total_damage_delivered; 
+
+	double attack_duration; 
+
 	// cell fusion parameters 
 	std::vector<double> fusion_rates;
 	
