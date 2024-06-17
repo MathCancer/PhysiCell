@@ -1,0 +1,32 @@
+// malignant epithelial cells
+malignant epithelial cell,oxygen,decreases,necrosis,0,3.75,8,0
+malignant epithelial cell,oxygen,increases,cycle entry,0.003333,21.5,4,0
+malignant epithelial cell,pressure,decreases,cycle entry,0,1,4,0
+malignant epithelial cell,apoptotic,increases,apoptotic debris secretion,0.017,0.1,10,1
+malignant epithelial cell,necrotic,increases,necrotic debris secretion,0.017,0.1,10,1
+malignant epithelial cell,oxygen,decreases,migration speed,0,5,4,0
+malignant epithelial cell,damage,increases,apoptosis,0.1,5,8,0
+// 
+// M0 macrophages
+M0 macrophage,necrotic debris,increases,transform to M1 macrophage,0.05,0.005,4,0
+M0 macrophage,apoptotic debris,decreases,migration speed,0.1,0.005,4,0
+M0 macrophage,necrotic debris,decreases,migration speed,0.1,0.005,4,0
+M0 macrophage,volume,decreases,phagocytose dead cell,0,6000,4,0
+// M1 macrophages 
+// M1 macrophage,oxygen,decreases,transform to M2 macrophage,0.0,5,8,0
+M1 macrophage,oxygen,decreases,transform to M2 macrophage,0.0001,5,8,0
+M1 macrophage,apoptotic debris,decreases,migration speed,0.1,0.005,4,0
+M1 macrophage,necrotic debris,decreases,migration speed,0.1,0.005,4,0
+M1 macrophage,volume,decreases,phagocytose dead cell,0.0,6000,4,0
+// M2 macrophages
+M2 macrophage,apoptotic debris,decreases,migration speed,0.1,0.005,4,0
+M2 macrophage,necrotic debris,decreases,migration speed,0.1,0.005,4,0
+M2 macrophage,volume,decreases,phagocytose dead cell,0.0,6000,4,0
+// effector cells 
+effector T cell,pro-inflammatory factor,increases,attack malignant epithelial cell,0.01,1,4,0
+effector T cell,contact with malignant epithelial cell,decreases,migration speed,0.01,0.1,10,0
+effector T cell,pro-inflammatory factor,increases,migration speed,1,0.01,4,0
+effector T cell,anti-inflammatory factor,increases,transform to exhausted T cell,0.001,0.5,4,0
+// exhausted cells 
+exhausted T cell,anti-inflammatory factor,decreases,migration speed,0.001,0.5,4,0
+exhausted T cell,contact with malignant epithelial cell,decreases,migration speed,0.01,0.1,10,0
