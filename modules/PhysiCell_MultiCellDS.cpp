@@ -429,10 +429,10 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 			node_temp1 = node_temp1.parent(); 
 			index += size; 			
 			
-			// damage_rate
+			// attack_damage_rate
 			size = 1; 
 			node_temp1 = node_temp1.append_child( "label" );
-			node_temp1.append_child( pugi::node_pcdata ).set_value( "damage_rate" ); 
+			node_temp1.append_child( pugi::node_pcdata ).set_value( "attack_damage_rate" ); 
 			attrib = node_temp1.append_attribute( "index" ); 
 			attrib.set_value( index ); 
 			attrib = node_temp1.append_attribute( "size" ); 
@@ -648,7 +648,7 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 			fwrite( (char*) &( pCell->phenotype.cell_interactions.dead_phagocytosis_rate ) , sizeof(double) , 1 , fp ); // dead_phagocytosis_rate 
 			fwrite( (char*) &( pCell->phenotype.cell_interactions.live_phagocytosis_rates ) , sizeof(double) , number_of_cell_defs , fp ); // live_phagocytosis_rates 
 			fwrite( (char*) &( pCell->phenotype.cell_interactions.attack_rates ) , sizeof(double) , number_of_cell_defs , fp ); // attack_rates 
-			fwrite( (char*) &( pCell->phenotype.cell_interactions.damage_rate ) , sizeof(double) , 1 , fp ); // damage_rate 
+			fwrite( (char*) &( pCell->phenotype.cell_interactions.attack_damage_rate ) , sizeof(double) , 1 , fp ); // attack_damage_rate 
 			fwrite( (char*) &( pCell->phenotype.cell_interactions.fusion_rates ) , sizeof(double) , number_of_cell_defs , fp ); // fusion_rates 
 			fwrite( (char*) &( pCell->phenotype.cell_transformations.transformation_rates ) , sizeof(double) , number_of_cell_defs , fp ); // transformation_rates 
 			
@@ -1792,7 +1792,7 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		dTemp = (double) pCell->state.number_of_nuclei; 
 		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "damage"; 
-		std::fwrite( &( pCell->state.damage ) , sizeof(double) , 1 , fp ); 
+		std::fwrite( &( pCell->phenotype.integrity.damage ) , sizeof(double) , 1 , fp ); 
 		// name = "total_attack_time"; 
 		std::fwrite( &( pCell->state.total_attack_time ) , sizeof(double) , 1 , fp ); 
 		// name = "contact_with_basement_membrane"; 
@@ -1916,8 +1916,8 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		std::fwrite( pCell->phenotype.cell_interactions.live_phagocytosis_rates.data() , sizeof(double) , n , fp ); 
  		// name = "attack_rates"; 
 		std::fwrite( pCell->phenotype.cell_interactions.attack_rates.data() , sizeof(double) , n , fp ); 
- 		// name = "damage_rate"; 
-		std::fwrite( &( pCell->phenotype.cell_interactions.damage_rate ) , sizeof(double) , 1 , fp ); 
+ 		// name = "attack_damage_rate"; 
+		std::fwrite( &( pCell->phenotype.cell_interactions.attack_damage_rate ) , sizeof(double) , 1 , fp ); 
  		// name = "fusion_rates"; 
 		std::fwrite( pCell->phenotype.cell_interactions.fusion_rates.data() , sizeof(double) , n , fp ); 
 
