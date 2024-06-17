@@ -154,7 +154,7 @@ class Cell_State
 
 	int number_of_nuclei; 
 	
-	double damage; 
+	// double damage; 
 	double total_attack_time; 
 	bool contact_with_basement_membrane; // not implemented yet 
 	

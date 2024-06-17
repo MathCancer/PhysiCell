@@ -1264,7 +1264,7 @@ Cell_Interactions::Cell_Interactions()
 {
 	dead_phagocytosis_rate = 0.0; 
 	live_phagocytosis_rates = {0.0}; 
-	damage_rate = 1.0; 
+	attack_damage_rate = 1.0; 
 	attack_rates = {0.0}; 
 	immunogenicities = {1}; 
 	fusion_rates = {0.0}; 
@@ -1351,6 +1351,7 @@ Integrity::Integrity()
 	damage_rate = 0.0; 
 	damage_repair_rate = 0.0; 
 
+/*
 	lipid_damage = 0.0; 
 	lipid_damage_rate = 0.0; 
 	lipid_damage_repair_rate = 0.0; 
@@ -1359,6 +1360,7 @@ Integrity::Integrity()
 	DNA_damage = 0.0; 
 	DNA_damage_rate = 0.0; 
 	DNA_damage_repair_rate = 0.0; 
+*/
 
 	return; 
 }
@@ -1381,7 +1383,7 @@ void Integrity::advance_damage_models( double dt )
 		damage += temp1; 
 		damage /= temp2; 
 	}
-
+/*
 	// lipid damage 
 	if( lipid_damage_rate > tol || lipid_damage_repair_rate > tol )
 	{
@@ -1407,6 +1409,7 @@ void Integrity::advance_damage_models( double dt )
 		DNA_damage += temp1; 
 		DNA_damage /= temp2; 
 	}
+*/	
 
 	return; 
 }
