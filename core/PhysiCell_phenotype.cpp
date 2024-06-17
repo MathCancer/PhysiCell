@@ -1210,6 +1210,8 @@ Phenotype& Phenotype::operator=(const Phenotype &p ) {
 	secretion = p.secretion;
 	
 	molecular = p.molecular;
+
+	integrity = p.integrity; 
 	
 	delete intracellular;
 	
@@ -1347,7 +1349,7 @@ double& Cell_Transformations::transformation_rate( std::string type_name )
 // beta functionality in 1.10.3 
 Integrity::Integrity()
 {
- 	damage = 0.0; 
+ 	damage = 0;  
 	damage_rate = 0.0; 
 	damage_repair_rate = 0.0; 
 
@@ -1365,7 +1367,7 @@ Integrity::Integrity()
 	return; 
 }
 
-void Integrity::advance_damage_models( double dt )
+void Integrity::advance_damage( double dt )
 {
 	double temp1;
 	double temp2; 
@@ -1410,6 +1412,8 @@ void Integrity::advance_damage_models( double dt )
 		DNA_damage /= temp2; 
 	}
 */	
+
+	std::cout << "damage: " << damage << std::endl; 
 
 	return; 
 }
