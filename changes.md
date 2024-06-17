@@ -4,7 +4,16 @@
 **Release dates:** ?? June 2024 - 
 * 1.14.0 : ?? June 2024
 
+changes: 
+* Add `Integrity` to `Phenotype`
+* rename `Phenotype.Interactions.damage_rate` to `Phenotype.Interactions.attack_damage_rate`
+* move `Cell.Cell_State.damage` to `Phenotype.Integrity.damage` 
 
+
+to do: 
+* seprate necrotic and apoptotic phagocytosis rates
+* new signals: necrotic, apoptotic neighbors (as well as dead neighbors)
+* new signals: necrotid, apoptotic (as well as dead)
 
 ## .. need to fill the rest in here. 
 

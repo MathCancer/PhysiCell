@@ -246,7 +246,7 @@ Cell_State::Cell_State()
 	
 	number_of_nuclei = 1; 
 	
-	damage = 0.0; 
+	// damage = 0.0; 
 	total_attack_time = 0.0; 
 	
 	contact_with_basement_membrane = false; 
@@ -644,9 +644,9 @@ Cell* Cell::divide( )
 
 
 	// changes for new phenotyp March 2022
-	state.damage = 0.0; 
+	// state.damage = 0.0; 
 	state.total_attack_time = 0; 
-	child->state.damage = 0.0; 
+	// child->state.damage = 0.0; 
 	child->state.total_attack_time = 0.0; 
 
 	return child;
@@ -1400,11 +1400,12 @@ void Cell::attack_cell( Cell* pCell_to_attack , double dt )
 	{ return; } 
 	
 	// make this thread safe 
+	// WORK HERE June 2024 
 	#pragma omp critical
 	{ 
 		// std::cout << this->type_name << " attacks " << pCell_to_attack->type_name << std::endl;
 		// 
-		pCell_to_attack->state.damage += phenotype.cell_interactions.damage_rate * dt; 
+		pCell_to_attack->phenotype.integrity.damage += phenotype.cell_interactions.attack_damage_rate * dt; 
 		pCell_to_attack->state.total_attack_time += dt; 
 	}
 	return; 
@@ -1972,7 +1973,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.0; 
 			pCD->phenotype.cell_interactions.live_phagocytosis_rates.assign(number_of_cell_defs,0.0); 
 			pCD->phenotype.cell_interactions.attack_rates.assign(number_of_cell_defs,0.0); 
-			pCD->phenotype.cell_interactions.damage_rate = 1.0; 
+			pCD->phenotype.cell_interactions.attack_damage_rate = 1.0; 
 			pCD->phenotype.cell_interactions.fusion_rates.assign(number_of_cell_defs,0.0); 
 
 			// transformation 
@@ -2887,8 +2888,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 
 		// damage_rate
-		pugi::xml_node node_dr = node.child("damage_rate");
-		pCI->damage_rate = xml_get_my_double_value(node_dr); 
+		pugi::xml_node node_dr = node.child("attack_damage_rate");
+		pCI->attack_damage_rate = xml_get_my_double_value(node_dr); 
 
 		// fusion_rates 
 		pugi::xml_node node_fr = node.child( "fusion_rates");
