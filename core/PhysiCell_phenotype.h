@@ -667,7 +667,7 @@ class Cell_Interactions
 	std::vector<double> immunogenicities; // new! 
 		// how immnogenic am I to cell type j? 
 
-	double damage_rate;  
+	double attack_damage_rate;  
 	// cell fusion parameters 
 	std::vector<double> fusion_rates;
 	
@@ -713,6 +713,8 @@ class Integrity
 	double damage_rate; 
 	double damage_repair_rate; 
 
+
+/*
 	// lipid damage (e.g, cell membrane, organelles)
 	double lipid_damage; 
 	double lipid_damage_rate; 
@@ -725,6 +727,7 @@ class Integrity
 
 	// other damages?
 	// mitochondrial? spindle? other? 
+*/	
 
 	Integrity(); 
 
@@ -747,6 +750,8 @@ class Phenotype
 	Secretion secretion; 
 	
 	Molecular molecular; 
+
+	Integrity integrity; 
 
     // We need it to be a pointer to allow polymorphism
 	// then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
