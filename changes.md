@@ -8,7 +8,7 @@ changes:
 * Add `Integrity` to `Phenotype`
 * rename `Phenotype.Interactions.damage_rate` to `Phenotype.Interactions.attack_damage_rate`
 * move `Cell.Cell_State.damage` to `Phenotype.Integrity.damage` 
-
+* added standardized (self-)damage and self repair to `Phenotype.Integrity` as part of built-in phenotype 
 
 to do: 
 * seprate necrotic and apoptotic phagocytosis rates

@@ -355,6 +355,9 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	
 	// update geometry
 	phenotype.geometry.update( this, phenotype, dt_ );
+
+	// update integrity 
+	phenotype.integrity.advance_damage( dt_ );  
 	
 	// check for new death events 
 	if( phenotype.death.check_for_death( dt_ ) == true )
