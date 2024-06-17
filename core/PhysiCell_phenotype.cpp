@@ -1277,7 +1277,7 @@ Cell_Interactions::Cell_Interactions()
 	pAttackTarget = NULL; 
 	total_damage_delivered = 0.0; 
 
-	attack_duration = 0.1; // get from cell constants instead?? 
+	attack_duration = 120.0; // 0.1; // get from cell constants instead?? 
 
 	fusion_rates = {0.0}; 
 	
@@ -1423,7 +1423,7 @@ void Integrity::advance_damage( double dt )
 	}
 */	
 
-	std::cout << "damage: " << damage << std::endl; 
+//	std::cout << "damage: " << damage << std::endl; 
 
 	return; 
 }

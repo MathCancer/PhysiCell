@@ -1235,23 +1235,31 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 
 			// probability of STARTING an attack 
 			probability = attack_ij * immunogenicity_ji * dt; 
-			if( UniformRandom() < probability && attacked == false && pCell->phenotype.cell_interactions.pAttackTarget == NULL ) 
-			{				
-				pCell->phenotype.cell_interactions.pAttackTarget = pTarget; 
-				attacked = true; 
-			} 
+			if( attacked == false && pCell->phenotype.cell_interactions.pAttackTarget == NULL )
+			{
+				if( UniformRandom() < probability ) 
+				{				
+					pCell->phenotype.cell_interactions.pAttackTarget = pTarget; 
+					std::cout << "*********   *********  ********  start atack **** " << probability << std::endl; 
+					attacked = true; 
+				} 
+			}
 
 			// perform attack 
 			if( pCell->phenotype.cell_interactions.pAttackTarget != NULL ) 
 			{
-				pCell->attack_cell(pTarget,dt); 
+				pCell->attack_cell(pCell->phenotype.cell_interactions.pAttackTarget,dt); 
 				attacked = true; // attacked at least one cell in this time step 
 
 				// probability of ending attack 
 				// end attack if target is dead 
 				probability = dt / (1e-15 + pCell->phenotype.cell_interactions.attack_duration); 
-				if( UniformRandom() < probability && attacked == false && pCell->phenotype.death.dead  ) 
+
+				if( UniformRandom() < probability || pCell->phenotype.cell_interactions.pAttackTarget->phenotype.death.dead ) 
 				{
+					std::cout << "*********   *********  ********  attack done **** " << probability << " " << 
+					pCell->phenotype.cell_interactions.pAttackTarget->state.total_attack_time << " " 		
+					<< (int) pCell->phenotype.cell_interactions.pAttackTarget->phenotype.death.dead << std::endl; 
 					pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
 				} 
 			} 
