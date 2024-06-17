@@ -10,10 +10,17 @@ changes:
 * move `Cell.Cell_State.damage` to `Phenotype.Integrity.damage` 
 * added standardized (self-)damage and self repair to `Phenotype.Integrity` as part of built-in phenotype 
 
+
+updating ... phagocytosis models 
+updating .. effector atack models 
+
+to do: 
+* How to communicate to attacking cells that their target is dead. Fix for now: 
+
+
 to do: 
 * seprate necrotic and apoptotic phagocytosis rates
 * new signals: necrotic, apoptotic neighbors (as well as dead neighbors)
-* new signals: necrotid, apoptotic (as well as dead)
 
 ## .. need to fill the rest in here. 
 
