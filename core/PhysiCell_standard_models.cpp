@@ -1208,6 +1208,8 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 		
 		if( pTarget->phenotype.death.dead == true )
 		{
+			// ADD SPECIFIC PHAGOCYTOSIS HERE JUNE 2024 
+
 			// dead phagocytosis 
 			probability = phenotype.cell_interactions.dead_phagocytosis_rate * dt; 
 			if( UniformRandom() < probability ) 
@@ -1231,13 +1233,29 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			double attack_ij = phenotype.cell_interactions.attack_rate(type_name); 
 			double immunogenicity_ji = pTarget->phenotype.cell_interactions.immunogenicity(pCell->type_name); 
 
+			// probability of STARTING an attack 
 			probability = attack_ij * immunogenicity_ji * dt; 
-			
-			if( UniformRandom() < probability && attacked == false ) 
+			if( UniformRandom() < probability && attacked == false && pCell->phenotype.cell_interactions.pAttackTarget == NULL ) 
+			{				
+				pCell->phenotype.cell_interactions.pAttackTarget = pTarget; 
+				attacked = true; 
+			} 
+
+			// perform attack 
+			if( pCell->phenotype.cell_interactions.pAttackTarget != NULL ) 
 			{
 				pCell->attack_cell(pTarget,dt); 
-				attacked = true;
+				attacked = true; // attacked at least one cell in this time step 
+
+				// probability of ending attack 
+				// end attack if target is dead 
+				probability = dt / (1e-15 + pCell->phenotype.cell_interactions.attack_duration); 
+				if( UniformRandom() < probability && attacked == false && pCell->phenotype.death.dead  ) 
+				{
+					pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
+				} 
 			} 
+
 			
 			// fusion 
 			// assume you can only fuse once cell at a time 

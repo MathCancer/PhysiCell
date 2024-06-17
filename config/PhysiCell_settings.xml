@@ -290,7 +290,7 @@
                         <attack_rate name="effector T cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1</damage_rate>
+                    <attack_damage_rate units="1/min">1</attack_damage_rate>
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -461,7 +461,7 @@
                         <attack_rate name="effector T cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1.0</damage_rate>
+                    <attack_damage_rate units="1/min">1.0</attack_damage_rate>
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -632,7 +632,7 @@
                         <attack_rate name="effector T cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1.0</damage_rate>
+                    <attack_damage_rate units="1/min">1.0</attack_damage_rate>
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -803,7 +803,7 @@
                         <attack_rate name="effector T cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1.0</damage_rate>
+                    <attack_damage_rate units="1/min">1.0</attack_damage_rate>
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -974,7 +974,7 @@
                         <attack_rate name="effector T cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1.0</damage_rate>
+                    <attack_damage_rate units="1/min">1.0</attack_damage_rate>
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -1145,7 +1145,7 @@
                         <attack_rate name="effector T cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1.0</damage_rate>
+                    <attack_damage_rate units="1/min">1.0</attack_damage_rate>
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
