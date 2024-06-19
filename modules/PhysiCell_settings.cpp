@@ -917,7 +917,11 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	default_microenvironment_options.calculate_gradients = xml_get_bool_value( node, "calculate_gradients" ); 
 	
 	// solve diffusion_decay equation?
-	default_microenvironment_options.solve_diffusion_decay = xml_get_bool_value( node, "solve_diffusion_decay" ); 
+	if ( xml_find_node( node , "solve_diffusion_decay" ) )
+	{ default_microenvironment_options.solve_diffusion_decay = xml_get_bool_value( node, "solve_diffusion_decay" ); }
+	else{
+	  default_microenvironment_options.solve_diffusion_decay = 1; // If this variable is not in the xml then set true
+	}  
 	
 	// track internalized substrates in each agent? 
 	default_microenvironment_options.track_internalized_substrates_in_each_agent 
