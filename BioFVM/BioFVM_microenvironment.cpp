@@ -93,18 +93,6 @@ void one_function( Microenvironment* pMicroenvironment, int voxel_index, std::ve
 	return; 
 }
 
-void empty_diffusion_solver( Microenvironment& S, double dt )
-{
-	static bool setup_done = false; 
-	if( !setup_done )
-	{
-		std::cout << "Using the empty diffusion solver ... " << std::endl; 
-		setup_done = true; 
-	}
-
-	return; 
-}
-
 Microenvironment::Microenvironment()
 {	
 	name = "unnamed"; 
@@ -1233,6 +1221,7 @@ Microenvironment_Options::Microenvironment_Options()
 	Dirichlet_condition_vector[0] = 38.0; 
 	
 	simulate_2D = false; 
+	solve_diffusion_decay = true;
 	
 	X_range.resize(2,500.0); 
 	X_range[0] *= -1.0;
@@ -1272,16 +1261,21 @@ void initialize_microenvironment( void )
 {
 	// create and name a microenvironment; 
 	microenvironment.name = default_microenvironment_options.name;
-	// register the diffusion solver 
-	if( default_microenvironment_options.simulate_2D == true )
+	if ( default_microenvironment_options.solve_diffusion_decay == false )
 	{
-		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
+		microenvironment.diffusion_decay_solver = empty_diffusion_solver;
 	}
-	else
-	{
-		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D; 
+	else{
+		// register the diffusion solver 
+		if( default_microenvironment_options.simulate_2D == true )
+		{
+			microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
+		}
+		else
+		{
+			microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D; 
+		}
 	}
-	
 	// set the default substrate to oxygen (with typical units of mmHg)
 	if( default_microenvironment_options.use_oxygen_as_first_field == true )
 	{

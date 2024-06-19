@@ -93,6 +93,23 @@ void diffusion_decay_solver__constant_coefficients_explicit_uniform_mesh( Microe
 	return; 
 }
 
+void empty_diffusion_solver( Microenvironment& M, double dt )
+{
+	if( !M.diffusion_solver_setup_done )
+	{
+		std::cout << "Using the empty diffusion solver ... " << std::endl;
+
+		// This is necessary for compute the gradient using a regular mesh from BIOFVM for 3D, 2D, and 1D. Default is defining the thomas_jumps in the solver function.
+		M.thomas_i_jump = 1; 
+		M.thomas_j_jump = M.mesh.x_coordinates.size(); 
+		M.thomas_k_jump = M.thomas_j_jump * M.mesh.y_coordinates.size(); 
+
+		M.diffusion_solver_setup_done = true; 
+	}
+
+	return; 
+}
+
 void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, double dt )
 {
 	if( M.mesh.regular_mesh == false || M.mesh.Cartesian_mesh == false )

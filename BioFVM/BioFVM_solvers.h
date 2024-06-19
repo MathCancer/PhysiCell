@@ -60,6 +60,8 @@ void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, 
 void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& M, double dt ); // done
 void diffusion_decay_solver__constant_coefficients_LOD_1D( Microenvironment& M, double dt ); // done
 
+void empty_diffusion_solver( Microenvironment& M, double dt );
+
 /*! This solves for constant diffusion coefficients on a general mesh using the 
     explicit stepping for the diffusion operator, and implicit stepping for all 
     other terms to increase stability. It is suitable for a general mesh. */ 

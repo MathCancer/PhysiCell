@@ -264,6 +264,8 @@ class Microenvironment
 	friend void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& S, double dt ); 
 	friend void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& S, double dt ); 
 	friend void diffusion_decay_solver__constant_coefficients_LOD_1D( Microenvironment& S, double dt ); 
+
+	friend void empty_diffusion_solver( Microenvironment& S, double dt ); 
 	
 	friend void diffusion_decay_explicit_uniform_rates( Microenvironment& M, double dt );
 	
@@ -286,6 +288,8 @@ extern void diffusion_decay_solver__variable_coefficients_explicit_uniform_mesh(
 extern void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& S, double dt ); 
 extern void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& S, double dt ); 
 extern void diffusion_decay_solver__constant_coefficients_LOD_1D( Microenvironment& S, double dt ); 
+
+extern void empty_diffusion_solver( Microenvironment& S, double dt ); 
 
 
 extern void diffusion_decay_solver__variable_coefficients_LOD_3D( Microenvironment& S, double dt ); 
@@ -346,6 +350,7 @@ class Microenvironment_Options
 	std::string initial_condition_file;
 	
 	bool simulate_2D; 
+	bool solve_diffusion_decay;
 	std::vector<double> X_range; 
 	std::vector<double> Y_range; 
 	std::vector<double> Z_range; 
