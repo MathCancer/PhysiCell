@@ -81,4 +81,6 @@
 
 #include "./PhysiCell_geometry.h" 
 
+#include "./PhysiCell_log.h"
+
 #endif

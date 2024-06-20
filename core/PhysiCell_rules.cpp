@@ -1536,9 +1536,6 @@ void parse_csv_rules_v0( std::string filename )
 	}
 
 	fs.close(); 
-
-	std::cout << "Done!" << std::endl << std::endl; 
-
 	return; 
 }
 
@@ -1672,9 +1669,6 @@ void parse_csv_rules_v1( std::string filename )
 	}
 
 	fs.close(); 
-
-	std::cout << "Done!" << std::endl << std::endl; 
-
 	return; 
 }
 
@@ -1805,9 +1799,6 @@ void parse_csv_rules_v2( std::string filename )
 	}
 
 	fs.close(); 
-
-	std::cout << "Done!" << std::endl << std::endl; 
-
 	return; 
 }
 
@@ -1850,7 +1841,6 @@ void parse_rules_from_pugixml( void )
 
 	while( node )
 	{
-		std::cout << node.name() << std::endl;
 		if( node.attribute("enabled").as_bool() == true )
 		{ 
 			std::string folder = xml_get_string_value( node, "folder" ); 
@@ -1901,41 +1891,45 @@ void parse_rules_from_pugixml( void )
 
 			}  
 
+			log_output( "Done!\n" );
+
 
 			if( done == false )
 			{ std::cout << "\tWarning: Ruleset had unknown format (" << format << "). Skipping!" << std::endl; }
 
 		}
 		else
-		{ std::cout << "\tRuleset disabled ... " << std::endl; }
+		{
+			log_warning( "Ruleset disabled ... ", "PhysiCell_settings.xml" );
+		}
 		node = node.next_sibling( "ruleset"); 		
 	}
 	return; 
 
-	exit(0); 
+	// exit(0); 
 	
-	// enabled? 
-	if( node.attribute("enabled").as_bool() == false )
-	{ return; }
+	// // enabled? 
+	// if( node.attribute("enabled").as_bool() == false )
+	// { return; }
 
-	// get filename 
+	// // get filename 
 
-	std::string folder = xml_get_string_value( node, "folder" ); 
-	std::string filename = xml_get_string_value( node, "filename" ); 
-	std::string input_filename = folder + "/" + filename; 
+	// std::string folder = xml_get_string_value( node, "folder" ); 
+	// std::string filename = xml_get_string_value( node, "filename" ); 
+	// std::string input_filename = folder + "/" + filename; 
 
-	std::string filetype = node.attribute("type").value() ; 
+	// std::string filetype = node.attribute("type").value() ; 
 
-	// what kind? 
-	if( filetype == "csv" || filetype == "CSV" )
-	{
-		std::cout << "Loading rules from CSV file " << input_filename << " ... " << std::endl; 
-		// load_cells_csv( input_filename );
-		parse_csv_rules_v0( input_filename ); 
-		return; 
-	}
+	// // what kind? 
+	// if( filetype == "csv" || filetype == "CSV" )
+	// {
+	// 	std::cout << "Loading rules from CSV file " << input_filename << " ... " << std::endl; 
+	// 	// load_cells_csv( input_filename );
+	// 	parse_csv_rules_v0( input_filename ); 
+	// 	return; 
+	// }
 
-	return; 
+	// return; 
 }
 
 void parse_rules_from_parameters_v0( void )
@@ -2098,7 +2092,7 @@ void export_rules_csv_v0( std::string filename )
 		return; 
 	}
 
-	std::cout << "Exporting rules to file " << filename << " (v0 format) ... " << std::endl; 
+	log_output( "Exporting rules to file " + filename + " (v0 format) ... " );
 
 	for( int n=0; n < cell_definitions_by_index.size(); n++ )
 	{
@@ -2145,9 +2139,6 @@ void export_rules_csv_v0( std::string filename )
  Cell type, behavior, min value, base value, max value,   signal, direction, half-max, Hill power, dead
 */ 
 	fs.close(); 
-
-	std::cout << "Done!" << std::endl << std::endl; 
-
 	return; 
 }
 
@@ -2162,7 +2153,7 @@ void export_rules_csv_v1( std::string filename )
 		return; 
 	}
 
-	std::cout << "Exporting rules to file " << filename << " (v1 format) ... " << std::endl; 
+	log_output( "Exporting rules to file " + filename + " (v1 format) ... " );
 
 	for( int n=0; n < cell_definitions_by_index.size(); n++ )
 	{
@@ -2203,9 +2194,6 @@ void export_rules_csv_v1( std::string filename )
  Cell type, signal, direcxtion, behavior, base, max_response, half-max, hill , dead 
 */ 
 	fs.close(); 
-
-	std::cout << "Done!" << std::endl << std::endl; 
-
 	return; 
 }
 
@@ -2218,7 +2206,7 @@ void export_rules_csv_v2( std::string filename )
 		return; 
 	}
 
-	std::cout << "Exporting rules to file " << filename << " (v2 format) ... " << std::endl; 
+	log_output( "Exporting rules to file " + filename + " (v2 format) ... " );
 
 	for( int n=0; n < cell_definitions_by_index.size(); n++ )
 	{
@@ -2260,9 +2248,6 @@ void export_rules_csv_v2( std::string filename )
  Cell type, signal, direcxtion, behavior, base, max_response, half-max, hill , dead 
 */ 
 	fs.close(); 
-
-	std::cout << "Done!" << std::endl << std::endl; 
-
 	return; 
 }
 
@@ -2348,7 +2333,7 @@ void setup_cell_rules( void )
 	parse_rules_from_pugixml(); 
 
 	// display rules to screen
-	display_hypothesis_rulesets( std::cout );
+	display_hypothesis_rulesets( log_file );
 
 	// save annotations 
 	save_annotated_detailed_English_rules(); 
@@ -2367,7 +2352,7 @@ void setup_cell_rules( void )
 	// save rules (v1)
 	std::string rules_file = PhysiCell_settings.folder + "/cell_rules.csv"; 
 	export_rules_csv_v1( rules_file ); 
-
+	log_output("Done!\n");
 
 	return; 
 }

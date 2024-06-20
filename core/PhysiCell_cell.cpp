@@ -1609,7 +1609,7 @@ void prebuild_cell_definition_index_maps( void )
 		int ID = node.attribute( "ID" ).as_int();  
 		std::string type_name = node.attribute( "name" ).value();   
 
-		std::cout << "Pre-processing type " << ID << " named " << type_name << std::endl; 
+		log_output( "Pre-processing type " + std::to_string(ID) + " named " + type_name );
 		
 //		cell_definitions_by_name[ type_name ] = pCD; 
 //		cell_definitions_by_type[ pCD->type ] = pCD; 
@@ -1731,17 +1731,17 @@ void display_cell_definitions( std::ostream& os )
 		// summarize functions 
 		Cell_Functions* pCF = &(pCD->functions); 
 		os << "\t key functions: " << std::endl; 
-		os << "\t\t migration bias rule: "; display_ptr_as_bool( pCF->update_migration_bias , std::cout ); 
+		os << "\t\t migration bias rule: "; display_ptr_as_bool( pCF->update_migration_bias , os ); 
 		os << std::endl; 
-		os << "\t\t custom rule: "; display_ptr_as_bool( pCF->custom_cell_rule , std::cout ); 
+		os << "\t\t custom rule: "; display_ptr_as_bool( pCF->custom_cell_rule , os ); 
 		os << std::endl; 
-		os << "\t\t phenotype rule: "; display_ptr_as_bool( pCF->update_phenotype , std::cout ); 
+		os << "\t\t phenotype rule: "; display_ptr_as_bool( pCF->update_phenotype , os ); 
 		os << std::endl; 
-		os << "\t\t volume update function: "; display_ptr_as_bool( pCF->volume_update_function , std::cout ); 
+		os << "\t\t volume update function: "; display_ptr_as_bool( pCF->volume_update_function , os ); 
 		os << std::endl; 
-		os << "\t\t mechanics function: "; display_ptr_as_bool( pCF->update_velocity , std::cout ); 
+		os << "\t\t mechanics function: "; display_ptr_as_bool( pCF->update_velocity , os ); 
 		os << std::endl;
-		os << "\t\t contact function: "; display_ptr_as_bool( pCF->contact_function , std::cout ); 
+		os << "\t\t contact function: "; display_ptr_as_bool( pCF->contact_function , os ); 
 		os << std::endl; 
 		
 		// summarize motility 
@@ -1998,8 +1998,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// figure out if this ought to be 2D
 	if( default_microenvironment_options.simulate_2D )
 	{
-		std::cout << "Note: setting cell definition to 2D based on microenvironment domain settings ... "
-		<< std::endl; 
+		log_output( "Note: setting cell definition to 2D based on microenvironment domain settings ... " );
 		pCD->functions.set_orientation = up_orientation; 
 		pCD->phenotype.geometry.polarity = 1.0; 
 		pCD->phenotype.motility.restrict_to_2D = true; 
@@ -2572,7 +2571,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
         node_mech = node.child( "attachment_elastic_constant" );
 		if( node_mech )
 		{ pM->attachment_elastic_constant = xml_get_my_double_value( node_mech ); }
-		std::cout << "  --------- attachment_elastic_constant = " << pM->attachment_elastic_constant << std::endl;
+		log_file << "  --------- attachment_elastic_constant = " << pM->attachment_elastic_constant << std::endl;
 
         node_mech = node.child( "attachment_rate" );
 		if( node_mech )
@@ -3111,7 +3110,7 @@ void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
 	
 	while( node )
 	{
-		std::cout << "Processing " << node.attribute( "name" ).value() << " ... " << std::endl; 
+		log_file << "Processing " << node.attribute( "name" ).value() << " ... " << std::endl;
 		
 		initialize_cell_definition_from_pugixml( node );	
 		build_cell_definitions_maps(); 

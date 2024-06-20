@@ -101,6 +101,10 @@ int main( int argc, char* argv[] )
 	}
 	if( !XML_status )
 	{ exit(-1); }
+
+	// set up a file called output.log to record the output from the program
+	std::string output_log_filename = PhysiCell_settings.folder + "/output.log";
+	open_log_file(output_log_filename);
 	
 	// copy config file to output directry 
 	system( copy_command ); 
@@ -183,7 +187,7 @@ int main( int argc, char* argv[] )
 			// save data if it's time. 
 			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
 			{
-				display_simulation_status( std::cout ); 
+				display_simulation_status( log_file ); 
 				if( PhysiCell_settings.enable_legacy_saves == true )
 				{	
 					log_output( PhysiCell_globals.current_time , PhysiCell_globals.full_output_index, microenvironment, report_file);
@@ -250,5 +254,6 @@ int main( int argc, char* argv[] )
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
 
+	close_log_file();
 	return 0; 
 }

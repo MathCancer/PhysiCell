@@ -77,7 +77,7 @@ User_Parameters parameters;
 bool physicell_config_dom_initialized = false; 
 pugi::xml_document physicell_config_doc; 	
 pugi::xml_node physicell_config_root; 
-	
+
 bool load_PhysiCell_config_file( std::string filename )
 {
 	std::cout << "Using config file " << filename << " ... " << std::endl ; 

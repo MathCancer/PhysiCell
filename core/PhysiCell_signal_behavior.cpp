@@ -542,8 +542,8 @@ void setup_signal_behavior_dictionaries( void )
     // resize scales; 
     signal_scales.resize( int_to_signal.size() , 1.0 ); 
 
-    display_signal_dictionary(); 
-    display_behavior_dictionary(); 
+    display_signal_dictionary( log_file ); 
+    display_behavior_dictionary( log_file ); 
 /*
 	// now create empty SR models for each cell definition 
 

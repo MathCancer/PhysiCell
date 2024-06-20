@@ -787,7 +787,6 @@ void load_cells_csv_v2( std::string filename )
 	// close the file 
 
 	file.close(); 
-	std::cout << "Done! " << std::endl << std::endl; 
 
 	return; 
 }
