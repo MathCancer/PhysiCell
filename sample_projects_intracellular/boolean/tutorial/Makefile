@@ -18,7 +18,7 @@ MABOSS_MAX_NODES = 128
 endif
 
 # MaBoSS directory
-MABOSS_DIR = addons/PhysiBoSS/MaBoSS-env-2.0/engine
+MABOSS_DIR = addons/PhysiBoSS/MaBoSS/engine
 CUR_DIR = $(shell pwd)
 CUSTOM_DIR = sample_projects/Arnau_model/custom_modules
 
@@ -85,7 +85,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-MaBoSS := ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src/BooleanNetwork.h
+MaBoSS := ./addons/PhysiBoSS/MaBoSS/engine/src/BooleanNetwork.h
 
 PhysiBoSS_OBJECTS := maboss_network.o maboss_intracellular.o
 
@@ -198,8 +198,8 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 	
 
 # user-defined PhysiCell modules
-Compile_MaBoSS: ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src/BooleanNetwork.h
-	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make CXX=$(CC) MAXNODES=$(MABOSS_MAX_NODES) install_alib;make clean; cd ../../../../..
+Compile_MaBoSS: ./addons/PhysiBoSS/MaBoSS/engine/src/BooleanNetwork.h
+	cd ./addons/PhysiBoSS/MaBoSS/engine/src;make CXX=$(CC) MAXNODES=$(MABOSS_MAX_NODES) install_alib;make clean; cd ../../../../..
 
 $(MaBoSS): 
 ifeq ($(OS), Windows_NT)
@@ -233,7 +233,7 @@ reset:
 	rm -rf ./scripts
 
 MaBoSS-clean:
-	rm -fr addons/PhysiBoSS/MaBoSS-env-2.0
+	rm -fr addons/PhysiBoSS/MaBoSS
 	
 clean:
 	rm -f *.o
