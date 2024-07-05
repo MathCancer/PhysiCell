@@ -1210,6 +1210,9 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 		{
 			// ADD SPECIFIC PHAGOCYTOSIS HERE JUNE 2024 
 
+			bool apoptotic = (bool) get_single_signal( pTarget , "apoptotic" ); 
+			bool necrotic = (bool) get_single_signal( pTarget , "necrotic" ); 
+
 			// dead phagocytosis 
 			probability = phenotype.cell_interactions.dead_phagocytosis_rate * dt; 
 			if( UniformRandom() < probability ) 
