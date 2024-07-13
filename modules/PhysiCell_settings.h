@@ -89,7 +89,7 @@ namespace PhysiCell{
  	
 extern pugi::xml_node physicell_config_root; 
 
-bool load_PhysiCell_config_file( std::string filename );
+bool load_PhysiCell_config_file( std::string filename, bool update_variables = false );
 
 class PhysiCell_Settings
 {
@@ -183,15 +183,16 @@ class Parameters
 	Parameters(); 
  
 	std::vector< Parameter<T> > parameters; 
-	
-	void add_parameter( std::string my_name ); 
-	void add_parameter( std::string my_name , T my_value ); 
-//	void add_parameter( std::string my_name , T my_value ); 
-	void add_parameter( std::string my_name , T my_value , std::string my_units ); 
-//	void add_parameter( std::string my_name , T my_value , std::string my_units ); 
-	
+
+	void add_parameter( std::string my_name );
+	void add_parameter( std::string my_name , T my_value );
+	void add_parameter( std::string my_name , T my_value , std::string my_units );
 	void add_parameter( Parameter<T> param );
-	
+
+	void update_parameter( std::string my_name , T my_value );
+	void update_parameter( std::string my_name , T my_value , std::string my_units );
+	void update_parameter( Parameter<T> param );
+
 	int find_index( std::string search_name ); 
 	
 	// these access the values 
@@ -215,8 +216,8 @@ class User_Parameters
 	Parameters<int> ints; 
 	Parameters<double> doubles; 
 	Parameters<std::string> strings; 
-	
-	void read_from_pugixml( pugi::xml_node parent_node );
+
+	void read_from_pugixml( pugi::xml_node parent_node, bool update_parameter = false );
 }; 
 
 extern PhysiCell_Globals PhysiCell_globals; 
@@ -225,8 +226,8 @@ extern PhysiCell_Settings PhysiCell_settings;
 
 extern User_Parameters parameters; 
 
-bool setup_microenvironment_from_XML( pugi::xml_node root_node );
-bool setup_microenvironment_from_XML( void );
+bool setup_microenvironment_from_XML( pugi::xml_node root_node, bool update_density = false );
+bool setup_microenvironment_from_XML( bool update_density = false );
 
 }
 

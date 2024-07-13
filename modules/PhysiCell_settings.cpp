@@ -78,7 +78,7 @@ bool physicell_config_dom_initialized = false;
 pugi::xml_document physicell_config_doc; 	
 pugi::xml_node physicell_config_root; 
 	
-bool load_PhysiCell_config_file( std::string filename )
+bool load_PhysiCell_config_file( std::string filename, bool update_variables )
 {
 	std::cout << "Using config file " << filename << " ... " << std::endl ; 
 	pugi::xml_parse_result result = physicell_config_doc.load_file( filename.c_str()  );
@@ -96,7 +96,7 @@ bool load_PhysiCell_config_file( std::string filename )
 	
 	// now read the microenvironment (optional) 
 	
-	if( !setup_microenvironment_from_XML( physicell_config_root ) )
+	if( !setup_microenvironment_from_XML( physicell_config_root, update_variables ) )
 	{
 		std::cout << std::endl 
 				  << "Warning: microenvironment_setup not found in " << filename << std::endl 
@@ -106,7 +106,7 @@ bool load_PhysiCell_config_file( std::string filename )
 	
 	// now read user parameters
 	
-	parameters.read_from_pugixml( physicell_config_root ); 
+	parameters.read_from_pugixml( physicell_config_root, update_variables );
 
 	return true; 	
 }
@@ -449,94 +449,149 @@ Parameters<T>::Parameters()
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+	// check if variable already exist
+	int parameter_index = -1;
+	auto it = name_to_index_map.find(my_name);
+
+	if (it == name_to_index_map.end())
+	{
+		std::cout << "Error: parameter named " << my_name << " already exists!" << std::endl;
+		exit(-1);
+	}
+
+	// generate new variable
+	Parameter<T>* pNew;
+	pNew = new Parameter<T>;
+	pNew->name = my_name;
+
+	int n = parameters.size();
+	parameters.push_back( *pNew );
+	name_to_index_map[ my_name ] = n;
+
+	return;
 }
 
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
+	// check if variable already exist
+	int parameter_index = -1;
+	auto it = name_to_index_map.find(my_name);
+
+	if (it == name_to_index_map.end())
+	{
+		std::cout << "Error: parameter named " << my_name << " already exists!" << std::endl;
+		exit(-1);
+	}
+
+	// generate new variable
+	Parameter<T>* pNew;
+	pNew = new Parameter<T>;
+	pNew->name = my_name;
+	pNew->value = my_value;
+
+	int n = parameters.size();
+	parameters.push_back( *pNew );
+	name_to_index_map[ my_name ] = n;
+
+	return;
 }
-/*
-template <class T>
-void Parameters<T>::add_parameter( std::string my_name , T my_value )
-{
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
-}
-*/
 
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
 {
-	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	pNew->units = my_units; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
-	return; 
-}
+	// check if variable already exist
+	int parameter_index = -1;
+	auto it = name_to_index_map.find(my_name);
 
-/*
-template <class T>
-void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
-{
+	if (it == name_to_index_map.end())
+	{
+		std::cout << "Error: parameter named " << my_name << " already exists!" << std::endl;
+		exit(-1);
+	}
+
+	// generate new variable
 	Parameter<T>* pNew; 
-	pNew = new Parameter<T> ;
-	pNew->name = my_name ; 
-	pNew->value = my_value; 
-	pNew->units = my_units; 
-	
-	int n = parameters.size(); 
-	
-	parameters.push_back( *pNew ); 
-	
-	name_to_index_map[ my_name ] = n; 
+	pNew = new Parameter<T>;
+	pNew->name = my_name;
+	pNew->value = my_value;
+	pNew->units = my_units;
+
+	int n = parameters.size();
+	parameters.push_back( *pNew );
+	name_to_index_map[ my_name ] = n;
+
 	return; 
 }
-*/
 
 template <class T>
 void Parameters<T>::add_parameter( Parameter<T> param )
 {
-	int n = parameters.size(); 
-	parameters.push_back( param); 
-	name_to_index_map[ param.name ] = n; 
-	return; 
+	// generate new variable
+	int n = parameters.size();
+	parameters.push_back( param);
+	name_to_index_map[ param.name ] = n;
+
+	return;
+}
+
+template <class T>
+void Parameters<T>::update_parameter( std::string my_name , T my_value )
+{
+	// check if variable already exist
+	int parameter_index = -1;
+	auto it = name_to_index_map.find(my_name);
+
+	if (it == name_to_index_map.end()) {
+	        // generate new variable
+	        return Parameters::add_parameter(my_name, my_value);
+	}
+
+	// change value
+	parameter_index = it->second;
+	parameters[parameter_index].value = my_value;
+
+	return;
+}
+
+template <class T>
+void Parameters<T>::update_parameter( std::string my_name , T my_value , std::string my_units )
+{
+	// check if variable already exist
+	int parameter_index = -1;
+	auto it = name_to_index_map.find(my_name);
+
+	if (it == name_to_index_map.end()) {
+	        // generate new variable
+	        return Parameters::add_parameter(my_name, my_value, my_units);
+	}
+
+	// change value and unit
+	parameter_index = it->second;
+	parameters[parameter_index].value = my_value;
+	parameters[parameter_index].units = my_units;
+
+	return;
+}
+
+template <class T>
+void Parameters<T>::update_parameter( Parameter<T> param )
+{
+	// check if variable already exist
+	int parameter_index = -1;
+	auto it = name_to_index_map.find(param.name);
+
+	if (it == name_to_index_map.end()) {
+	        // generate new variable
+	        return Parameters::add_parameter(param);
+	}
+
+	// change value and unit
+	parameter_index = it->second;
+	parameters[parameter_index].value = param.value;
+	parameters[parameter_index].units = param.units;
+
+	return;
 }
 
 std::ostream& operator<<( std::ostream& os , const User_Parameters up )
@@ -548,7 +603,7 @@ std::ostream& operator<<( std::ostream& os , const User_Parameters up )
 	return os; 
 }
 
-void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
+void User_Parameters::read_from_pugixml( pugi::xml_node parent_node , bool update_parameter )
 {
 	pugi::xml_node node = xml_find_node( parent_node , "user_parameters" ); 
 	
@@ -566,38 +621,53 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
 		bool done = false ; 
 		if( type == "bool" && done == false )
 		{
-			bool value = xml_get_my_bool_value( node1 ); 
-			bools.add_parameter( name , value, units ); 
-			done = true; 
+			bool value = xml_get_my_bool_value( node1 );
+			if ( update_parameter )
+			{ bools.update_parameter( name , value, units ); }
+			else
+			{ bools.add_parameter( name , value, units ); }
+			done = true;
 		}
 		
 		if( type == "int" && done == false )
 		{
-			int value = xml_get_my_int_value( node1 ); 
-			ints.add_parameter( name , value, units ); 
-			done = true; 
+			int value = xml_get_my_int_value( node1 );
+			if ( update_parameter )
+			{ ints.update_parameter( name , value, units ); }
+			else
+			{ ints.add_parameter( name , value, units ); }
+			done = true;
 		}
 		
 		if( type == "double" && done == false )
 		{
-			double value = xml_get_my_double_value( node1 ); 
-			doubles.add_parameter( name , value, units ); 
-			done = true; 
+			double value = xml_get_my_double_value( node1 );
+			if ( update_parameter )
+			{ doubles.update_parameter( name , value, units ); }
+			else
+			{ doubles.add_parameter( name , value, units ); }
+			done = true;
 		}
 				
 		if( done == false && type == "string" )
 		{
-			std::string value = xml_get_my_string_value( node1 ); 
-			strings.add_parameter( name, value , units ); 
-			done = true; 
+			std::string value = xml_get_my_string_value( node1 );
+			if ( update_parameter )
+			{ strings.update_parameter( name , value, units ); }
+			else
+			{ strings.add_parameter( name, value , units ); }
+			done = true;
 		}
 		
 		/* default if no type specified: */
 		if( done == false )
 		{
-			double value = xml_get_my_double_value( node1 ); 
-			doubles.add_parameter( name , value, units ); 
-			done = true; 
+			double value = xml_get_my_double_value( node1 );
+			if ( update_parameter )
+			{ doubles.update_parameter( name , value, units ); }
+			else
+			{ doubles.add_parameter( name , value, units ); }
+			done = true;
 		}
 		
 		node1 = node1.next_sibling(); 
@@ -627,7 +697,7 @@ template std::ostream& operator<<(std::ostream& os, const Parameter<int>& param)
 template std::ostream& operator<<(std::ostream& os, const Parameter<double>& param);
 template std::ostream& operator<<(std::ostream& os, const Parameter<std::string>& param);
 
-bool setup_microenvironment_from_XML( pugi::xml_node root_node )
+bool setup_microenvironment_from_XML( pugi::xml_node root_node, bool update_density )
 {
 	pugi::xml_node node; 
 
@@ -685,6 +755,8 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 		// add the substrate 
 		if( i == 0 )
 		{ microenvironment.set_density( 0, name, units ); }
+		else if( update_density )
+		{ microenvironment.update_density( name, units ); }
 		else
 		{ microenvironment.add_density( name, units ); }
 		
@@ -957,7 +1029,7 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 	return true;  
 }
 
-bool setup_microenvironment_from_XML( void )
-{ return setup_microenvironment_from_XML( physicell_config_root ); }
+bool setup_microenvironment_from_XML( bool update_density )
+{ return setup_microenvironment_from_XML( physicell_config_root, update_density ); }
 
 }; 
