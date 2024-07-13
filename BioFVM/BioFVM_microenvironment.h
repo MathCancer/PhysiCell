@@ -186,6 +186,9 @@ class Microenvironment
 	void add_density( std::string name , std::string units );
 	void add_density( std::string name , std::string units, double diffusion_constant, double decay_rate ); 
 
+	void update_density( std::string name , std::string units );
+	void update_density( std::string name , std::string units, double diffusion_constant, double decay_rate );
+
 	void set_density( int index , std::string name , std::string units ); 
 	void set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate ); 
 
