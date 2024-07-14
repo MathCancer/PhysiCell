@@ -453,7 +453,7 @@ void Parameters<T>::add_parameter( std::string my_name )
 	int parameter_index = -1;
 	auto it = name_to_index_map.find(my_name);
 
-	if (it == name_to_index_map.end())
+	if (it != name_to_index_map.end())
 	{
 		std::cout << "Error: parameter named " << my_name << " already exists!" << std::endl;
 		exit(-1);
@@ -478,7 +478,7 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value )
 	int parameter_index = -1;
 	auto it = name_to_index_map.find(my_name);
 
-	if (it == name_to_index_map.end())
+	if (it != name_to_index_map.end())
 	{
 		std::cout << "Error: parameter named " << my_name << " already exists!" << std::endl;
 		exit(-1);
@@ -504,7 +504,7 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value , std::strin
 	int parameter_index = -1;
 	auto it = name_to_index_map.find(my_name);
 
-	if (it == name_to_index_map.end())
+	if (it != name_to_index_map.end())
 	{
 		std::cout << "Error: parameter named " << my_name << " already exists!" << std::endl;
 		exit(-1);
