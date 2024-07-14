@@ -419,6 +419,7 @@ Cell::Cell()
 	is_movable = true;
 	is_out_of_domain = false;
     generation = 0;
+    parentID = -1;   // overridden in create_cell() and divide()
 	displacement.resize(3,0.0); // state? 
 	
 	assign_orientation();
@@ -565,8 +566,12 @@ Cell* Cell::divide( )
 	Cell* child = create_cell(functions.instantiate_cell);
 	child->copy_data( this );	
     // lineage tracking
-    generation = generation + 1;     // this (parent) cell has its generation incremented
-    child->generation = generation;  // its daughter cell has the same generation
+    // generation = generation + 1;     // this (parent) cell has its generation incremented
+    // child->generation = generation;  // daughter cell has the same generation
+    child->generation = generation + 1;
+    // child->parentID = parentID;
+    parentID = ID;
+    child->parentID = ID;
 	child->copy_function_pointers(this);
 	child->parameters = parameters;
 	
@@ -1075,6 +1080,7 @@ Cell* create_cell( Cell* (*custom_instantiate)())
 	} else {
 		pNew = standard_instantiate_cell();
 	}
+    pNew->parentID = pNew->ID;
 	
 	(*all_cells).push_back( pNew ); 
 	pNew->index=(*all_cells).size()-1;

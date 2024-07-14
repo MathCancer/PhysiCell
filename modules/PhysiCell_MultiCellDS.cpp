@@ -902,6 +902,17 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		cell_data_size += size; 
 		index += size; 
 
+        // parentID
+		name = "parentID"; 
+		size = 1; 
+		units="none";
+		data_names.push_back( name ); 
+		data_units.push_back(units); 
+		data_sizes.push_back( size ); 
+		data_start_indices.push_back( index ); 
+		cell_data_size += size; 
+		index += size; 
+
 		//					<label index="1" size="3">position</label>
 		name = "position"; 
 		size = 3; 
@@ -1768,6 +1779,9 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
         // name = "generation"; 
 		dTemp = (double) pCell->generation;
+		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
+        // name = "parentID"; 
+		dTemp = (double) pCell->parentID;
 		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "position";    NOTE very different syntax for writing vectors!
         std::fwrite( pCell->position.data() , sizeof(double) , 3 , fp );
