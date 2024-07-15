@@ -566,9 +566,9 @@ Cell* Cell::divide( )
 	Cell* child = create_cell(functions.instantiate_cell);
 	child->copy_data( this );	
     // lineage tracking
-    // generation = generation + 1;     // this (parent) cell has its generation incremented
-    // child->generation = generation;  // daughter cell has the same generation
-    child->generation = generation + 1;
+    generation = generation + 1;     // this (parent) cell has its generation incremented
+    child->generation = generation;  // daughter cell has the same generation
+    // child->generation = generation + 1;
     // child->parentID = parentID;
     parentID = ID;
     child->parentID = ID;
