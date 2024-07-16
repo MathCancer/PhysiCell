@@ -1264,9 +1264,11 @@ void Phenotype::sync_to_microenvironment( Microenvironment* pMicroenvironment )
 
 Cell_Interactions::Cell_Interactions()
 {
-	dead_phagocytosis_rate = 0.0; 
+	// dead_phagocytosis_rate = 0.0; 
+
 	apoptotic_phagocytosis_rate = 0.0; 
 	necrotic_phagocytosis_rate = 0.0; 
+	other_dead_phagocytosis_rate = 0.0; 
 
 	live_phagocytosis_rates = {0.0}; 
 
