@@ -1975,7 +1975,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			pCD->phenotype.secretion.saturation_densities.assign(number_of_substrates,0.0); 
 
 			// interaction 
-			pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.0; 
+			pCD->phenotype.cell_interactions.apoptotic_phagocytosis_rate = 0.0; 
+			pCD->phenotype.cell_interactions.necrotic_phagocytosis_rate = 0.0; 
+			pCD->phenotype.cell_interactions.other_dead_phagocytosis_rate = 0.0; 
 			pCD->phenotype.cell_interactions.live_phagocytosis_rates.assign(number_of_cell_defs,0.0); 
 			pCD->phenotype.cell_interactions.attack_rates.assign(number_of_cell_defs,0.0); 
 			pCD->phenotype.cell_interactions.attack_damage_rate = 1.0; 
@@ -2835,10 +2837,20 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 		// dead_phagocytosis_rate
 		pugi::xml_node node_dpr = node.child("dead_phagocytosis_rate");
-		pCI->dead_phagocytosis_rate = xml_get_my_double_value(node_dpr); 
-
+		double dead_phagocytosis_rate = 0.0; 
+		if( node_dpr )
+		{
+			// pCI->dead_phagocytosis_rate = xml_get_my_double_value(node_dpr); 
+			dead_phagocytosis_rate = xml_get_my_double_value(node_dpr); 
+		}
+/*
 		pCI->apoptotic_phagocytosis_rate = pCI->dead_phagocytosis_rate; 
 		pCI->necrotic_phagocytosis_rate = pCI->dead_phagocytosis_rate; 
+		pCI->other_dead_phagocytosis_rate = pCI->dead_phagocytosis_rate; 
+*/
+		pCI->apoptotic_phagocytosis_rate = dead_phagocytosis_rate; 
+		pCI->necrotic_phagocytosis_rate = dead_phagocytosis_rate; 
+		pCI->other_dead_phagocytosis_rate = dead_phagocytosis_rate; 
 
 		// if specific apoptotic rate is specified, overwrite 
 		pugi::xml_node node_apr = node.child("apoptotic_phagocytosis_rate"); 
@@ -2849,6 +2861,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pugi::xml_node node_npr = node.child("necrotic_phagocytosis_rate"); 
 		if( node_npr )
 		{ pCI->necrotic_phagocytosis_rate = xml_get_my_double_value(node_npr);  }
+
+		// if specific necrotic rate is specified, overwrite 
+		pugi::xml_node node_odpr = node.child("other_dead_phagocytosis_rate"); 
+		if( node_odpr )
+		{ pCI->other_dead_phagocytosis_rate = xml_get_my_double_value(node_odpr);  }
 
 		// live phagocytosis rates 
 		pugi::xml_node node_lpcr = node.child( "live_phagocytosis_rates");

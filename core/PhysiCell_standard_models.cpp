@@ -1230,7 +1230,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			} 
 
 			// general dead phagocytosis 
-			probability = phenotype.cell_interactions.dead_phagocytosis_rate * dt; 
+			probability = phenotype.cell_interactions.other_dead_phagocytosis_rate * dt; 
 			if( UniformRandom() < probability && phagocytosed == false )  
 			{
 				pCell->ingest_cell(pTarget); 
