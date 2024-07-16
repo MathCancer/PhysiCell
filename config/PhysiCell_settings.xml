@@ -214,6 +214,7 @@
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments units="none">6</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">0.1</speed>
@@ -274,6 +275,9 @@
                 </secretion>
                 <cell_interactions>
                     <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>
+
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="malignant epithelial cell" units="1/min">0</phagocytosis_rate>
                         <phagocytosis_rate name="M0 macrophage" units="1/min">0.0</phagocytosis_rate>
@@ -291,6 +295,8 @@
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
                     <attack_damage_rate units="1/min">1</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
+
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -310,6 +316,10 @@
                         <transformation_rate name="exhausted T cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>
             </phenotype>
             <custom_data>
                 <sample conserved="false" units="dimensionless" description="">1.0</sample>
@@ -385,6 +395,7 @@
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments units="none">6</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">1.0</speed>
@@ -445,6 +456,8 @@
                 </secretion>
                 <cell_interactions>
                     <dead_phagocytosis_rate units="1/min">0.01</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="malignant epithelial cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="M0 macrophage" units="1/min">0.0</phagocytosis_rate>
@@ -462,6 +475,7 @@
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
                     <attack_damage_rate units="1/min">1.0</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -481,6 +495,10 @@
                         <transformation_rate name="exhausted T cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>                
             </phenotype>
             <custom_data>
                 <sample conserved="false" units="dimensionless" description="">0.0</sample>
@@ -556,6 +574,7 @@
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments units="none">6</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">1.0</speed>
@@ -616,6 +635,8 @@
                 </secretion>
                 <cell_interactions>
                     <dead_phagocytosis_rate units="1/min">0.01</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="malignant epithelial cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="M0 macrophage" units="1/min">0.0</phagocytosis_rate>
@@ -633,6 +654,8 @@
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
                     <attack_damage_rate units="1/min">1.0</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
+
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -652,6 +675,10 @@
                         <transformation_rate name="exhausted T cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>                
             </phenotype>
             <custom_data>
                 <sample conserved="false" units="dimensionless" description="">0.0</sample>
@@ -727,6 +754,7 @@
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments units="none">6</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">1.0</speed>
@@ -787,6 +815,8 @@
                 </secretion>
                 <cell_interactions>
                     <dead_phagocytosis_rate units="1/min">0.01</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="malignant epithelial cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="M0 macrophage" units="1/min">0.0</phagocytosis_rate>
@@ -804,6 +834,8 @@
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
                     <attack_damage_rate units="1/min">1.0</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
+
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -823,6 +855,10 @@
                         <transformation_rate name="exhausted T cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>                
             </phenotype>
             <custom_data>
                 <sample conserved="false" units="dimensionless" description="">0.0</sample>
@@ -898,6 +934,7 @@
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments units="none">6</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">0.1</speed>
@@ -958,6 +995,8 @@
                 </secretion>
                 <cell_interactions>
                     <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="malignant epithelial cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="M0 macrophage" units="1/min">0.0</phagocytosis_rate>
@@ -975,6 +1014,8 @@
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
                     <attack_damage_rate units="1/min">1.0</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
+
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -994,6 +1035,10 @@
                         <transformation_rate name="exhausted T cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>                
             </phenotype>
             <custom_data>
                 <sample conserved="false" units="dimensionless" description="">0.0</sample>
@@ -1069,6 +1114,7 @@
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments units="none">6</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">0.01</speed>
@@ -1129,6 +1175,8 @@
                 </secretion>
                 <cell_interactions>
                     <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>                    
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="malignant epithelial cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="M0 macrophage" units="1/min">0.0</phagocytosis_rate>
@@ -1146,6 +1194,8 @@
                         <attack_rate name="exhausted T cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
                     <attack_damage_rate units="1/min">1.0</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
+
                     <fusion_rates>
                         <fusion_rate name="malignant epithelial cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="M0 macrophage" units="1/min">0.0</fusion_rate>
@@ -1165,6 +1215,10 @@
                         <transformation_rate name="exhausted T cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>
             </phenotype>
             <custom_data>
                 <sample conserved="false" units="dimensionless" description="">0.0</sample>

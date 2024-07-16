@@ -713,7 +713,7 @@ class Cell_Transformations
 };
 
 // pre-beta functionality in 1.10.3 
-class Integrity
+class Cell_Integrity
 {
  private:
  public: 
@@ -738,7 +738,7 @@ class Integrity
 	// mitochondrial? spindle? other? 
 */	
 
-	Integrity(); 
+	Cell_Integrity(); 
 
 	void advance_damage( double dt ); 
 };
@@ -760,7 +760,7 @@ class Phenotype
 	
 	Molecular molecular; 
 
-	Integrity integrity; 
+	Cell_Integrity cell_integrity; 
 
     // We need it to be a pointer to allow polymorphism
 	// then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
