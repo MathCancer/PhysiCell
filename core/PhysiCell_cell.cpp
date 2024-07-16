@@ -247,7 +247,7 @@ Cell_State::Cell_State()
 	number_of_nuclei = 1; 
 	
 	// damage = 0.0; 
-	total_attack_time = 0.0; 
+	// total_attack_time = 0.0; 
 	
 	contact_with_basement_membrane = false; 
 
@@ -357,7 +357,7 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	phenotype.geometry.update( this, phenotype, dt_ );
 
 	// update integrity 
-	phenotype.integrity.advance_damage( dt_ );  
+	phenotype.cell_integrity.advance_damage( dt_ );  
 	
 	// check for new death events 
 	if( phenotype.death.check_for_death( dt_ ) == true )
@@ -648,8 +648,10 @@ Cell* Cell::divide( )
 
 	// changes for new phenotyp March 2022
 	// state.damage = 0.0; 
+	// phenotype.integrity.damage = 0.0; // leave alone - damage is heritable
 	state.total_attack_time = 0; 
 	// child->state.damage = 0.0; 
+	// child->phenotype.integrity.damage = 0.0; // leave alone - damage is heritable 
 	child->state.total_attack_time = 0.0; 
 
 	return child;
@@ -1408,7 +1410,7 @@ void Cell::attack_cell( Cell* pCell_to_attack , double dt )
 	{ 
 		// std::cout << this->type_name << " attacks " << pCell_to_attack->type_name << std::endl;
 		// 
-		pCell_to_attack->phenotype.integrity.damage += phenotype.cell_interactions.attack_damage_rate * dt; 
+		pCell_to_attack->phenotype.cell_integrity.damage += phenotype.cell_interactions.attack_damage_rate * dt; 
 		pCell_to_attack->state.total_attack_time += dt; 
 	}
 	return; 
@@ -2589,7 +2591,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		node_mech = node.child( "maximum_number_of_attachments" );
 		if ( node_mech )
 		{ pM->maximum_number_of_attachments = xml_get_my_int_value( node_mech ); }
-
 	}
 	
 	// motility 
@@ -2836,6 +2837,19 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pugi::xml_node node_dpr = node.child("dead_phagocytosis_rate");
 		pCI->dead_phagocytosis_rate = xml_get_my_double_value(node_dpr); 
 
+		pCI->apoptotic_phagocytosis_rate = pCI->dead_phagocytosis_rate; 
+		pCI->necrotic_phagocytosis_rate = pCI->dead_phagocytosis_rate; 
+
+		// if specific apoptotic rate is specified, overwrite 
+		pugi::xml_node node_apr = node.child("apoptotic_phagocytosis_rate"); 
+		if( node_apr )
+		{ pCI->apoptotic_phagocytosis_rate = xml_get_my_double_value(node_apr);  }
+
+		// if specific necrotic rate is specified, overwrite 
+		pugi::xml_node node_npr = node.child("necrotic_phagocytosis_rate"); 
+		if( node_npr )
+		{ pCI->necrotic_phagocytosis_rate = xml_get_my_double_value(node_npr);  }
+
 		// live phagocytosis rates 
 		pugi::xml_node node_lpcr = node.child( "live_phagocytosis_rates");
 		if( node_lpcr )
@@ -2967,7 +2981,23 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			node_tr = node_tr.next_sibling( "transformation_rate" ); 
 		}
 
-	}	
+	}
+
+	// cell integrity 
+	node = cd_node.child( "phenotype" );
+	node = node.child( "cell_integrity" ); 
+	if( node )
+	{
+		Cell_Integrity *pCI = &(pCD->phenotype.cell_integrity);
+
+		pugi::xml_node node_dr = node.child("damage_rate");
+		if( node_dr )
+		{ pCI->damage_rate = xml_get_my_double_value( node_dr ); }
+
+		pugi::xml_node node_drr = node.child("damage_repair_rate");
+		if( node_drr )
+		{ pCI->damage_repair_rate = xml_get_my_double_value( node_drr ); }
+	}
 
     	// intracellular
 	node = cd_node.child( "phenotype" );

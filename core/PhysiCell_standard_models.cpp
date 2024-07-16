@@ -1213,10 +1213,29 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			bool apoptotic = (bool) get_single_signal( pTarget , "apoptotic" ); 
 			bool necrotic = (bool) get_single_signal( pTarget , "necrotic" ); 
 
-			// dead phagocytosis 
+			// apoptotic phagocytosis 
+			probability = phenotype.cell_interactions.apoptotic_phagocytosis_rate * dt; 
+			if( UniformRandom() < probability && phagocytosed == false && apoptotic == true ) // add the prior phago check in July 2024  
+			{
+				pCell->ingest_cell(pTarget); 
+				phagocytosed = true; // was missing : bugfix 
+			} 
+
+			// necrotic phagocytosis 
+			probability = phenotype.cell_interactions.necrotic_phagocytosis_rate * dt; 
+			if( UniformRandom() < probability && phagocytosed == false && necrotic == true ) // add the prior phago check in July 2024  
+			{
+				pCell->ingest_cell(pTarget); 
+				phagocytosed = true; // was missing : bugfix 
+			} 
+
+			// general dead phagocytosis 
 			probability = phenotype.cell_interactions.dead_phagocytosis_rate * dt; 
-			if( UniformRandom() < probability ) 
-			{ pCell->ingest_cell(pTarget); } 
+			if( UniformRandom() < probability && phagocytosed == false )  
+			{
+				pCell->ingest_cell(pTarget); 
+				phagocytosed = true; // was missing : bugfix 
+			} 
 		}
 		else
 		{
@@ -1245,11 +1264,19 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 					pCell->phenotype.cell_interactions.pAttackTarget = pTarget; 
 					std::cout << "*********   *********  ********  start atack **** " << probability << std::endl; 
 					attacked = true; 
+
+					// spring-link these cells 
+					attach_cells_as_spring(pCell,pTarget); 
 				} 
 			}
 
-			// perform attack 
-			if( pCell->phenotype.cell_interactions.pAttackTarget != NULL ) 
+/*
+			// perform attack. be careful to not overcount it! 
+			// make sure that (1) I have a non-null pAttackTarget, and that (2) we are talking about pTarget 
+			// easiest way to do this is to check if the pAttackTarget = pTarget. IF pAttackTarget = NULL, it 
+			// won't be true. If pAttackTarget is non-null, but we're looking ata different cell, also not true. 
+			// if pAttackTarget = pTarget, then we're "looking" at the right cell, so do the attack. 
+			if( pCell->phenotype.cell_interactions.pAttackTarget == pTarget ) 
 			{
 				pCell->attack_cell(pCell->phenotype.cell_interactions.pAttackTarget,dt); 
 				attacked = true; // attacked at least one cell in this time step 
@@ -1266,7 +1293,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 					pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
 				} 
 			} 
-
+*/
 			
 			// fusion 
 			// assume you can only fuse once cell at a time 
@@ -1277,7 +1304,37 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 				fused = true; 
 			} 
 		}
-	}	
+	}
+
+	// move effector attack here. 
+
+		if( pCell->phenotype.cell_interactions.pAttackTarget != NULL ) 
+		{
+			pCell->attack_cell(pCell->phenotype.cell_interactions.pAttackTarget,dt); 
+			attacked = true; // attacked at least one cell in this time step 
+
+			// attack_cell
+
+			// probability of ending attack 
+			// end attack if target is dead 
+			probability = dt / (1e-15 + pCell->phenotype.cell_interactions.attack_duration); 
+
+			if( UniformRandom() < probability || pCell->phenotype.cell_interactions.pAttackTarget->phenotype.death.dead ) 
+			{
+				std::cout << "*********   *********  ********  attack done **** " << probability << " " << 
+				pCell->phenotype.cell_interactions.pAttackTarget->state.total_attack_time << " " 		
+				<< (int) pCell->phenotype.cell_interactions.pAttackTarget->phenotype.death.dead << std::endl; 
+
+				detach_cells_as_spring(pCell,pCell->phenotype.cell_interactions.pAttackTarget); 
+
+				pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
+			} 
+		} 
+
+
+	// move decision if to end attack here. 
+
+
 }
 
 void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt )
