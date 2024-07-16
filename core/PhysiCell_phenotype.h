@@ -657,9 +657,13 @@ class Cell_Interactions
  private:
  public: 
 	// phagocytosis parameters (e.g., macrophages)
-	double dead_phagocytosis_rate; 
+	// generic dead phagocytosis rate
+	// double dead_phagocytosis_rate; // deprecated 
+
+	// specific dead phagocytosis rates
 	double apoptotic_phagocytosis_rate;
 	double necrotic_phagocytosis_rate;
+	double other_dead_phagocytosis_rate; 
 
 	std::vector<double> live_phagocytosis_rates; 
 	// attack parameters (e.g., T cells)

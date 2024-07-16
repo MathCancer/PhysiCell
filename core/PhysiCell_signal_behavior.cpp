@@ -724,7 +724,7 @@ std::vector<double> get_signals( Cell* pCell )
 
 	// damage
 	static int damage_ind = find_signal_index( "damage"); 
-	signals[damage_ind] = pCell->phenotype.integrity.damage; 
+	signals[damage_ind] = pCell->phenotype.cell_integrity.damage; 
 
 	// live / dead state 
 	static int dead_ind = find_signal_index( "dead" ); 
@@ -953,7 +953,7 @@ double get_single_signal( Cell* pCell, int index )
 	static int damage_ind = find_signal_index( "damage"); 
 	if( index == damage_ind )
 	{
-		out = pCell->phenotype.integrity.damage; 
+		out = pCell->phenotype.cell_integrity.damage; 
 		out /= signal_scales[index]; 
 		return out; 
 	} 
