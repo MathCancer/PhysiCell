@@ -207,6 +207,8 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 		double damage = get_single_signal( pCell , "damage"); 
 		double max_damage = 30; 
 		int color = (int) round( 255.0 * damage / max_damage ); 
+		if( color > 255 )
+		{ color = 255; }
 
 		if( get_single_signal(pCell,"dead") < 0.5 )
 		{
@@ -214,6 +216,11 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 			out[0] = blah; 
 			out[2] = blah; 
 			out[3] = blah; 
+
+			if( damage > 30 )
+			{
+				std::cout << "\t" << damage << " " << get_single_behavior( pCell , "apoptosis" ) << std::endl; 
+			}
 		}
 		return out; 
 	}
