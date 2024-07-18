@@ -5,14 +5,40 @@
 * 1.14.0 : ?? June 2024
 
 changes: 
-* Add `Integrity` to `Phenotype`
+* Add `Cell_Integrity` to `Phenotype`
 * rename `Phenotype.Interactions.damage_rate` to `Phenotype.Interactions.attack_damage_rate`
-* move `Cell.Cell_State.damage` to `Phenotype.Integrity.damage` 
-* added standardized (self-)damage and self repair to `Phenotype.Integrity` as part of built-in phenotype 
+* move `Cell.Cell_State.damage` to `Phenotype.Cell_Integrity.damage` 
+* added standardized (self-)damage and self repair to `Phenotype.Cell_Integrity` as part of built-in phenotype 
 
 
 updating ... phagocytosis models 
 updating .. effector atack models 
+
+* new (or modified) signals: 
+damage (now in cell integrity)
+damage delivered 
+attacking (as a boolean)
+
+* deprecated signals: 
+
+* new (or modified) behaviors: 
+phagocytose apoptotic cells
+phagocytose necrotic cells
+phagocytose other dead cells
+attack damage rate (renamed)
+damage rate (moved)
+damage repair rate 
+
+attack duration
+
+* deprecated behaviors: 
+phagocytose dead cells 
+
+rules: 
+give a warning on dead cell phago rules?
+
+
+
 
 to do: 
 * How to communicate to attacking cells that their target is dead. Fix for now: 
