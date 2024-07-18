@@ -198,7 +198,42 @@ void setup_tissue( void )
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{ return paint_by_number_cell_coloring(pCell); }
+{ 
+	
+	std::vector<std::string> out = paint_by_number_cell_coloring(pCell); 
+
+	if( pCell->type_name == "tumor cell")
+	{
+		double damage = get_single_signal( pCell , "damage"); 
+		double max_damage = 30; 
+		int color = (int) round( 255.0 * damage / max_damage ); 
+
+		if( get_single_signal(pCell,"dead") < 0.5 )
+		{
+			std::string blah  = "rgb(" + std::to_string(color) + "," + std::to_string(color) + "," + std::to_string(255-color) + ")";
+			out[0] = blah; 
+			out[2] = blah; 
+			out[3] = blah; 
+		}
+		return out; 
+	}
+
+	if( pCell->type_name == "macrophage" ) 
+	{ out[0] = "maroon"; out[2] = "maroon" ; out[3] = "maroon"; return out; }
+
+
+	if( pCell->type_name == "fast T cell" ) 
+	{
+		std::string blah = "grey"; 
+		if( get_single_signal(pCell, "attacking") > 0.5 )
+		{ blah = "red"; }
+		out[0] = blah; out[2] = blah; out[3] = blah; 
+		return out; 
+	}
+
+
+	return out; 
+}
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
