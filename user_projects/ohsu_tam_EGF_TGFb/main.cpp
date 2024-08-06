@@ -436,8 +436,8 @@ int main(int argc, char *argv[])
 			/*
 			  Custom add-ons could potentially go here.
 			*/
-
-			// turn_on_systemic_therapy("IL-4", 0, 7200, 10);
+			turn_on_systemic_therapy("IFN-gamma", 0, 7200, 5);
+			// turn_on_systemic_therapy("IL-4", 0, 7200, 5);
 			// turn_on_injected_therapy("IL-4", {0, 0, 0}, 0, 7200, 5);
 
 			PhysiCell_globals.current_time += diffusion_dt;

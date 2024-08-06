@@ -1,11 +1,12 @@
 tumor,pressure,decreases,cycle entry,0,1,4,0
-tumor,EGF,increases,cycle entry,1e-3,1,4,0
+tumor,EGF,increases,cycle entry,1e-3,2,4,0
 tumor,oxygen,decreases,necrosis,0.00E+00,3.75,8,0
 tumor,damage,increases,apoptosis,0.072,180,2,0
 tumor,dead,increases,debris secretion,0.017,0.1,10,1
 tumor,IFN-gamma,decreases,migration speed,0,0.25,2,0
-tumor,EGF,increases,migration speed,0.5,0.25,4,0
-tumor,EGF,decreases,cell-cell adhesion,0,0.1,4,0
+tumor,EGF,increases,migration speed,0.5,2,4,0
+tumor,EGF,increases,migration persistence time,10,2,4,0
+tumor,EGF,decreases,cell-cell adhesion,0.2,2,4,0
 M0 macrophage,contact with dead cell,increases,transform to M1 macrophage,0.05,0.1,10,0
 M0 macrophage,contact with dead cell,decreases,migration speed,0,0.01,4,0
 M0 macrophage,dead,increases,debris secretion,0.017,0.1,10,1
@@ -14,8 +15,8 @@ M1 macrophage,oxygen,decreases,transform to M2 macrophage,0,5,4,0
 M1 macrophage,IFN-gamma,increases,cycle entry,3.6e-4,0.25,2,0
 M1 macrophage,IFN-gamma,increases,phagocytose dead cell,0.05,0.25,2,0
 M1 macrophage,dead,increases,debris secretion,0.017,0.1,10,1
-M1 macrophage,IL-4,increases,transform to M2 macrophage,0.01,0.01,4,0
-M2 macrophage,IFN-gamma,increases,transform to M1 macrophage,0.01,0.01,4,0
+M1 macrophage,IL-4,increases,transform to M2 macrophage,0.01,1,4,0
+M2 macrophage,IFN-gamma,increases,transform to M1 macrophage,0.01,0.5,4,0
 M2 macrophage,contact with dead cell,decreases,migration speed,0,0.01,4,0
 M2 macrophage,IFN-gamma,decreases,cycle entry,0,0.25,2,0
 M2 macrophage,IL-4,increases,cycle entry,1e-3,0.25,2,0
