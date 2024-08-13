@@ -50,7 +50,7 @@ jobs:
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_name: ${{ matrix.projects.short_name }}-linux.tar.gz
-        asset_path: ${{ github.workspace }}/${{ matrix.projects.short_name }}.tar.gz
+        asset_path: ${{ github.workspace }}/${{ matrix.projects.short_name }}-linux.tar.gz
         asset_content_type: application/gzip   
         
         
