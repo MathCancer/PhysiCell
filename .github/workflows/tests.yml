@@ -17,58 +17,6 @@ jobs:
           {name: "Windows", os: "windows-latest", shell: "msys2", compiler: "g++"},
         ]
         projects: [
-          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample"},
-          {project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines"},
-          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: ""},
-          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Initialisation/mymodel_initialisation.xml"},
-          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Cell_Fibre_Mechanics/mymodel_rotating.xml"},
-          {project: "template", name: "PhysiCell Template", binary: "project"},
-          {project: "template_BM", name: "PhysiBoSS Template", binary: "project"},
-          {project: "physiboss-tutorial", name: "PhysiBoSS Tutorial", binary: "project", config: "config/cell_cycle/PhysiCell_settings.xml"},
-          {project: "physiboss-tutorial", name: "PhysiBoSS Tutorial", binary: "project", config: "config/differentiation/PhysiCell_settings.xml"},
-          {project: "physiboss-tutorial-invasion", name: "PhysiBoSS Cancer Invasion", binary: "invasion_model", config: "config/PhysiCell_settings_2D.xml"}
-        ]
-        
-    name: Testing ${{ matrix.projects.name }} on ${{ matrix.os.name }}
-        
-    runs-on: ${{ matrix.os.os }}
-    
-    defaults:
-      run:
-        shell: ${{ matrix.os.shell }} {0}
-        
-    steps:
-    - uses: actions/checkout@v4
-    
-    - if: matrix.os.name == 'Windows'
-      uses: msys2/setup-msys2@v2
-      with:
-        update: true
-        install: mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 mingw-w64-x86_64-python mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-python-cffi make bison flex mingw-w64-x86_64-ca-certificates
-    
-    - name: Build ${{ matrix.projects.name }} project 
-      run: |
-        make ${{ matrix.projects.project }}
-        make PHYSICELL_CPP=${{ matrix.os.compiler }}
-        
-    - name: Run ${{ matrix.projects.name }} project
-      run: |
-        if [ "${{ matrix.os.name }}" = "windows" ]; then
-          .\\${{ matrix.projects.binary }}.exe ${{ matrix.projects.config }}
-        else
-          ./${{ matrix.projects.binary }} ${{ matrix.projects.config }}
-        fi
-
-  randy_tests:
-    strategy:
-      matrix:
-        os: [
-          {name: "Ubuntu", os: "ubuntu-latest", shell: "bash", compiler: "g++"},
-          {name: "MacOS 12", os: "macos-12", shell: "bash", compiler: "g++-12"},
-          {name: "MacOS 14 (M1)", os: "macos-14", shell: "bash", compiler: "g++-13"},
-          {name: "Windows", os: "windows-latest", shell: "msys2", compiler: "g++"},
-        ]
-        projects: [
           {project: "template", name: "PhysiCell Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
           {project: "heterogeneity-sample", name: "PhysiCell Heterogeneity", binary: "heterogeneity", max_time: 99, config: "config/PhysiCell_settings.xml", output_folder: "output"},
           {project: "template_BM", name: "PhysiBoSS Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
