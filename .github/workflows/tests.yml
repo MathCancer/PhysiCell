@@ -73,6 +73,14 @@ jobs:
           {project: "heterogeneity-sample", name: "PhysiCell Heterogeneity", binary: "heterogeneity", max_time: 99, config: "config/PhysiCell_settings.xml", output_folder: "output"},
           {project: "template_BM", name: "PhysiBoSS Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
           {project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Degradation/mymodel_matrix_degradation.xml", max_time: 360, output_folder: "output"},
+          {project: "interaction-sample", name: "PhysiCell Interactions", binary: "interaction_demo", config: "config/PhysiCell_settings.xml", max_time: 99, output_folder: "output"},
+          {project: "physiboss-tutorial", name: "PhysiBoSS Tutorial", binary: "project", config: "config/cell_cycle/PhysiCell_settings.xml", max_time: 600, output_folder: "output"},
+          {project: "worm-sample", name: "PhysiCell worm", binary: "worm", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "mechano-sample", name: "PhysiCell Mechano", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "rules-sample", name: "PhysiCell Rules", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "physiboss-tutorial-invasion", name: "PhysiBoSS Cancer Invasion", binary: "invasion_model", config: "config/PhysiCell_settings_2D.xml", max_time: 120, output_folder: "output"},
         ]
         
     name: Testing ${{ matrix.projects.name }} on ${{ matrix.os.name }}
