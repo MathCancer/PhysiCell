@@ -658,8 +658,6 @@ Cell* Cell::divide( )
 	child->state.damage = 0.0; 
 	child->state.total_attack_time = 0.0; 
 
-    //rwh
-    // if( this->functions.cell_division_function && pC->is_out_of_domain == false )
     if( this->functions.cell_division_function )
         { this->functions.cell_division_function( this, child); }
 
