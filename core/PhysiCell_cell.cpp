@@ -1676,7 +1676,7 @@ void display_ptr_as_bool( void (*ptr)(Cell*,Phenotype&,Cell*,Phenotype&,double),
 	return;
 }
 
-void display_ptr_as_bool( void (*ptr)(Cell*,Cell*), std::ostream& os )  //rwh
+void display_ptr_as_bool( void (*ptr)(Cell*,Cell*), std::ostream& os )
 {
 	if( ptr )
 	{ os << "true"; return; }
