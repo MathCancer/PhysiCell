@@ -1220,7 +1220,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			{
 				pCell->ingest_cell(pTarget); 
 				phagocytosed = true; // was missing : bugfix 
-				std::cout << "chomp apop " << PhysiCell_globals.current_time << " " << probability <<  std::endl;
+				// std::cout << "chomp apop " << PhysiCell_globals.current_time << " " << probability <<  std::endl;
 			} 
 
 			// necrotic phagocytosis 
@@ -1229,7 +1229,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			{
 				pCell->ingest_cell(pTarget); 
 				phagocytosed = true; // was missing : bugfix 
-				std::cout << "chomp necro " << PhysiCell_globals.current_time << " " << probability <<  std::endl;
+				// std::cout << "chomp necro " << PhysiCell_globals.current_time << " " << probability <<  std::endl;
 			} 
 
 			// other dead phagocytosis 
@@ -1238,7 +1238,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			{
 				pCell->ingest_cell(pTarget); 
 				phagocytosed = true; // was missing : bugfix 
-				std::cout << "chomp other " << PhysiCell_globals.current_time << " " << probability <<  std::endl;
+				// std::cout << "chomp other " << PhysiCell_globals.current_time << " " << probability <<  std::endl;
 			} 
 		}
 		else
@@ -1266,13 +1266,13 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 				if( UniformRandom() < probability ) 
 				{				
 					pCell->phenotype.cell_interactions.pAttackTarget = pTarget; 
-					std::cout << "*********   *********  ********  start atack **** " << PhysiCell_globals.current_time << std::endl; 
 					attacked = true; 
-
+					/*					
+					std::cout << "*********   *********  ********  start atack **** " << PhysiCell_globals.current_time << std::endl; 
 					std::cout 
 					<< "attack duration: " << pCell->phenotype.cell_interactions.attack_duration << " "  
 					<< "attack damage rate: " << pCell->phenotype.cell_interactions.attack_damage_rate <<  std::endl; 
-
+					*/
 					// spring-link these cells 
 					attach_cells_as_spring(pCell,pTarget); 
 				} 
@@ -1332,12 +1332,14 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 
 			if( UniformRandom() < probability || pTarget->phenotype.death.dead ) 
 			{
+				/*
 				std::cout << "*********   *********  ********  attack done **** " << PhysiCell_globals.current_time << " " 
 				<< probability << " "
 				<< "attack time: " << pTarget->state.total_attack_time << " " 		
 				<< "damage: " << pTarget->phenotype.cell_integrity.damage <<  " " 		
 				<< "dead? " << (int) pTarget->phenotype.death.dead << " " 
 				<< "damage delivered: " << pCell->phenotype.cell_interactions.total_damage_delivered << std::endl; 
+				*/
 
 				detach_cells_as_spring(pCell,pTarget); 
 
