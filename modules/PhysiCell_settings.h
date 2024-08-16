@@ -186,9 +186,7 @@ class Parameters
 	
 	void add_parameter( std::string my_name ); 
 	void add_parameter( std::string my_name , T my_value ); 
-//	void add_parameter( std::string my_name , T my_value ); 
 	void add_parameter( std::string my_name , T my_value , std::string my_units ); 
-//	void add_parameter( std::string my_name , T my_value , std::string my_units ); 
 	
 	void add_parameter( Parameter<T> param );
 	
@@ -202,7 +200,9 @@ class Parameters
 	Parameter<T>& operator[]( int i );
 	Parameter<T>& operator[]( std::string str ); 
 	
-	int size( void ) const; 
+	int size( void ) const;
+
+	void assert_not_exists(std::string search_name);
 };
 
 class User_Parameters
