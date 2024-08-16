@@ -256,6 +256,8 @@ void Hypothesis_Rule::add_signal( std::string signal , double half_max , double 
         std::cout << "Error! Attempted to add signal " << signal << " which is not in the dictionary." << std::endl; 
         std::cout << "Either fix your model or add the missing signal to the simulation." << std::endl; 
 
+		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n."; 
+
         exit(-1); 
     }
 
@@ -270,6 +272,8 @@ void Hypothesis_Rule::add_signal( std::string signal , double half_max , double 
 	{
 		std::cout << "Error! Signal " << signal << " and Response " << response << " were already part of the rule." << 
 		std::endl; 
+
+		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n."
 
 		exit(-1); 
 	}
@@ -757,6 +761,8 @@ Hypothesis_Rule* Hypothesis_Ruleset::add_behavior( std::string behavior , double
     {
         std::cout << "Warning! Attempted to add behavior " << behavior << " which is not in the dictionary." << std::endl; 
         std::cout << "Either fix your model or add the missing behavior to the simulation." << std::endl; 
+
+		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n.";
 
         exit(-1); 
     }
