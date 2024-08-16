@@ -6,4 +6,5 @@ tumor cell,damage,increases,apoptosis,9e9,30,100,0
 tumor cell,apoptotic,increases,apoptotic debris secretion,1,0.5,10,1
 tumor cell,necrotic,increases,necrotic debris secretion,1,0.5,10,1
 // tumor cell,doxorubicin,increases,damage rate,1,0.5,4,0
-tumor cell,time,decreases,damage repair rate,0,100,10,0
+tumor cell,time,decreases,damage repair rate,0,15,10,0
+fast T cell,damage delivered,increases,transformation to exhausted T cell,...

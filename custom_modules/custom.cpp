@@ -216,27 +216,31 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 			out[0] = blah; 
 			out[2] = blah; 
 			out[3] = blah; 
-
-			if( damage > 30 )
-			{
-				std::cout << "\t" << damage << " " << get_single_behavior( pCell , "apoptosis" ) << std::endl; 
-			}
 		}
 		return out; 
 	}
 
 	if( pCell->type_name == "macrophage" ) 
-	{ out[0] = "maroon"; out[2] = "maroon" ; out[3] = "maroon"; return out; }
+	{ out[0] = "orange"; out[2] = "orange" ; out[3] = "orange"; return out; }
 
 
 	if( pCell->type_name == "fast T cell" ) 
 	{
-		std::string blah = "grey"; 
+		std::string blah = "rgb(255,164,164)";
 		if( get_single_signal(pCell, "attacking") > 0.5 )
-		{ blah = "red"; }
+		{ blah = "rgb(196,0,0)"; }
 		out[0] = blah; out[2] = blah; out[3] = blah; 
 		return out; 
 	}
+
+	if( pCell->type_name == "slow T cell" ) 
+	{
+		std::string blah = "rgb(164,255,164)";
+		if( get_single_signal(pCell, "attacking") > 0.5 )
+		{ blah = "rgb(0,128,0)"; }
+		out[0] = blah; out[2] = blah; out[3] = blah; 
+		return out; 
+	}	
 
 
 	return out; 
