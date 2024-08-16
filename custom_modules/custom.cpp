@@ -111,12 +111,6 @@ void create_cell_types( void )
 
 	setup_signal_behavior_dictionaries(); 	
 
-	/*
-       Cell rule definitions 
-	*/
-
-	setup_cell_rules(); 
-
 	/* 
 	   Put any modifications to individual cell definitions here. 
 	   
@@ -126,7 +120,13 @@ void create_cell_types( void )
 	cell_defaults.functions.update_phenotype = phenotype_function; 
 	cell_defaults.functions.custom_cell_rule = custom_function; 
 	cell_defaults.functions.contact_function = contact_function; 
-	
+
+	Cell_Definition* pCD = find_cell_definition( "cancer cell"); 
+	pCD->functions.update_phenotype = tumor_cell_phenotype_with_oncoprotein; 
+
+	pCD->parameters.o2_proliferation_saturation = 38; 
+	pCD->parameters.o2_reference = 38; 
+
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -190,6 +190,120 @@ void setup_tissue( void )
 		}
 	}
 	std::cout << std::endl; 
+
+	// custom placement 
+
+	Cell_Definition* pCD = find_cell_definition( "cancer cell"); 
+	double cell_radius = pCD->phenotype.geometry.radius; 
+	double cell_spacing = 0.95 * 2.0 * cell_radius; 
+	
+	double tumor_radius = parameters.doubles( "tumor_radius" ); // 250.0; 
+	
+	// Parameter<double> temp; 
+	
+	int i = parameters.doubles.find_index( "tumor_radius" ); 
+	
+	Cell* pCell = NULL; 
+	
+	double x = 0.0; 
+	double x_outer = tumor_radius; 
+	double y = 0.0; 
+	
+	double p_mean = parameters.doubles( "oncoprotein_mean" ); 
+	double p_sd = parameters.doubles( "oncoprotein_sd" ); 
+	double p_min = parameters.doubles( "oncoprotein_min" ); 
+	double p_max = parameters.doubles( "oncoprotein_max" ); 
+	
+	int n = 0; 
+	while( y < tumor_radius )
+	{
+		x = 0.0; 
+		if( n % 2 == 1 )
+		{ x = 0.5*cell_spacing; }
+		x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
+		
+		while( x < x_outer )
+		{
+			pCell = create_cell( *pCD ); // tumor cell 
+			pCell->assign_position( x , y , 0.0 );
+			double p = NormalRandom( p_mean, p_sd );
+			if( p < p_min )
+			{ p = p_min; }
+			if( p > p_max )
+			{ p = p_max; }
+			set_single_behavior( pCell, "custom:oncoprotein" , p ); 
+			
+			if( fabs( y ) > 0.01 )
+			{
+				pCell = create_cell(*pCD); // tumor cell 
+				pCell->assign_position( x , -y , 0.0 );
+				double p = NormalRandom( p_mean, p_sd );
+				if( p < p_min )
+				{ p = p_min; }
+				if( p > p_max )
+				{ p = p_max; }
+				set_single_behavior( pCell, "custom:oncoprotein" , p ); 
+			}
+			
+			if( fabs( x ) > 0.01 )
+			{ 
+				pCell = create_cell(*pCD); // tumor cell 
+				pCell->assign_position( -x , y , 0.0 );
+				double p = NormalRandom( p_mean, p_sd );
+				if( p < p_min )
+				{ p = p_min; }
+				if( p > p_max )
+				{ p = p_max; }
+				set_single_behavior( pCell, "custom:oncoprotein" , p ); 
+		
+				if( fabs( y ) > 0.01 )
+				{
+					pCell = create_cell(*pCD); // tumor cell 
+					pCell->assign_position( -x , -y , 0.0 );
+					double p = NormalRandom( p_mean, p_sd );
+					if( p < p_min )
+					{ p = p_min; }
+					if( p > p_max )
+					{ p = p_max; }
+					set_single_behavior( pCell, "custom:oncoprotein" , p ); 
+
+				}
+			}
+			x += cell_spacing; 
+			
+		}
+		
+		y += cell_spacing * sqrt(3.0)/2.0; 
+		n++; 
+	}
+	
+	double sum = 0.0; 
+	double min = 9e9; 
+	double max = -9e9; 
+	for( int i=0; i < all_cells->size() ; i++ )
+	{
+		double r = get_single_signal( (*all_cells)[i] , "custom:oncoprotein" ); 
+		sum += r;
+		if( r < min )
+		{ min = r; } 
+		if( r > max )
+		{ max = r; }
+	}
+	double mean = sum / ( all_cells->size() + 1e-15 ); 
+	// compute standard deviation 
+	sum = 0.0; 
+	for( int i=0; i < all_cells->size(); i++ )
+	{
+		double r = get_single_signal( (*all_cells)[i] , "custom:oncoprotein" ); 
+		sum +=  ( r - mean )*( r - mean ); 
+	}
+	double standard_deviation = sqrt( sum / ( all_cells->size() - 1.0 + 1e-15 ) ); 
+	
+	std::cout << std::endl << "Oncoprotein summary: " << std::endl
+			  << "===================" << std::endl; 
+	std::cout << "mean: " << mean << std::endl; 
+	std::cout << "standard deviation: " << standard_deviation << std::endl; 
+	std::cout << "[min max]: [" << min << " " << max << "]" << std::endl << std::endl; 	
 	
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 	
@@ -198,53 +312,7 @@ void setup_tissue( void )
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
-{ 
-	
-	std::vector<std::string> out = paint_by_number_cell_coloring(pCell); 
-
-	if( pCell->type_name == "tumor cell")
-	{
-		double damage = get_single_signal( pCell , "damage"); 
-		double max_damage = 30; 
-		int color = (int) round( 255.0 * damage / max_damage ); 
-		if( color > 255 )
-		{ color = 255; }
-
-		if( get_single_signal(pCell,"dead") < 0.5 )
-		{
-			std::string blah  = "rgb(" + std::to_string(color) + "," + std::to_string(color) + "," + std::to_string(255-color) + ")";
-			out[0] = blah; 
-			out[2] = blah; 
-			out[3] = blah; 
-		}
-		return out; 
-	}
-
-	if( pCell->type_name == "macrophage" ) 
-	{ out[0] = "orange"; out[2] = "orange" ; out[3] = "orange"; return out; }
-
-
-	if( pCell->type_name == "fast T cell" ) 
-	{
-		std::string blah = "rgb(255,164,164)";
-		if( get_single_signal(pCell, "attacking") > 0.5 )
-		{ blah = "rgb(196,0,0)"; }
-		out[0] = blah; out[2] = blah; out[3] = blah; 
-		return out; 
-	}
-
-	if( pCell->type_name == "slow T cell" ) 
-	{
-		std::string blah = "rgb(164,255,164)";
-		if( get_single_signal(pCell, "attacking") > 0.5 )
-		{ blah = "rgb(0,128,0)"; }
-		out[0] = blah; out[2] = blah; out[3] = blah; 
-		return out; 
-	}	
-
-
-	return out; 
-}
+{ return paint_by_number_cell_coloring(pCell); }
 
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
@@ -254,3 +322,69 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
 { return; } 
+
+std::vector<std::string> heterogeneity_coloring_function( Cell* pCell )
+{
+	double p = get_single_signal( pCell, "custom:oncoprotein"); 
+	
+	static double p_min = parameters.doubles( "oncoprotein_min" ); 
+	static double p_max = parameters.doubles( "oncoprotein_max" ); 
+	
+	// immune are black
+	std::vector< std::string > output( 4, "black" ); 
+	
+	if( pCell->type == 1 )
+	{ return output; } 
+	
+	// live cells are green, but shaded by oncoprotein value 
+	if( pCell->phenotype.death.dead == false )
+	{
+		int oncoprotein = (int) round( (1.0/(p_max-p_min)) * (p-p_min) * 255.0 ); 
+		char szTempString [128];
+		sprintf( szTempString , "rgb(%u,%u,%u)", oncoprotein, oncoprotein, 255-oncoprotein );
+		output[0].assign( szTempString );
+		output[1].assign( szTempString );
+
+		sprintf( szTempString , "rgb(%u,%u,%u)", (int)round(output[0][0]/p_max) , (int)round(output[0][1]/p_max) , (int)round(output[0][2]/p_max) );
+		output[2].assign( szTempString );
+		
+		return output; 
+	}
+
+	// if not, dead colors 
+	
+	if( get_single_signal( pCell, "apoptotic") > 0.5 )
+	{
+		output[0] = "rgb(255,0,0)";
+		output[2] = "rgb(125,0,0)";
+	}
+	
+	// Necrotic - Brown
+	if( get_single_signal(pCell, "necrotic") > 0.5 )
+	{
+		output[0] = "rgb(250,138,38)";
+		output[2] = "rgb(139,69,19)";
+	}	
+	
+	return output; 
+}
+
+void tumor_cell_phenotype_with_oncoprotein( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
+	
+	// if cell is dead, don't bother with future phenotype changes. 
+	if( get_single_signal( pCell, "dead") > 0.5 )
+	{
+		pCell->functions.update_phenotype = NULL; 		
+		return; 
+	}
+
+	// multiply proliferation rate by the oncoprotein 
+
+	double cycle_rate = get_single_behavior( pCell, "cycle entry"); 
+	cycle_rate *= get_single_signal( pCell , "custom:oncoprotein"); 
+	set_single_behavior( pCell, "cycle entry" , cycle_rate ); 
+	
+	return; 
+}
