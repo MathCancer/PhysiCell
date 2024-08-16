@@ -256,7 +256,7 @@ void Hypothesis_Rule::add_signal( std::string signal , double half_max , double 
         std::cout << "Error! Attempted to add signal " << signal << " which is not in the dictionary." << std::endl; 
         std::cout << "Either fix your model or add the missing signal to the simulation." << std::endl; 
 
-		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n."; 
+		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n"; 
 
         exit(-1); 
     }
@@ -273,7 +273,7 @@ void Hypothesis_Rule::add_signal( std::string signal , double half_max , double 
 		std::cout << "Error! Signal " << signal << " and Response " << response << " were already part of the rule." << 
 		std::endl; 
 
-		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n."; 
+		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n"; 
 
 		exit(-1); 
 	}
@@ -762,7 +762,7 @@ Hypothesis_Rule* Hypothesis_Ruleset::add_behavior( std::string behavior , double
         std::cout << "Warning! Attempted to add behavior " << behavior << " which is not in the dictionary." << std::endl; 
         std::cout << "Either fix your model or add the missing behavior to the simulation." << std::endl; 
 
-		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n.";
+		std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n";
 
         exit(-1); 
     }
@@ -1876,12 +1876,12 @@ void parse_rules_from_pugixml( void )
 				{
 					std::cout << "\tFormat: CSV (prototype version)" << std::endl; 
 
-					parse_csv_rules_v0( input_filename ); // parse all rules in a CSV file 
+					// parse_csv_rules_v0( input_filename ); // parse all rules in a CSV file 
 
 					PhysiCell_settings.rules_enabled = true; 
 
 					std::cout << "\t\t**Error: Version < 3 no longer supported.\n\n"; 
-					std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n."; 
+					std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n"; 
 					exit(-1); 
 
 					done = true; 
@@ -1891,12 +1891,12 @@ void parse_rules_from_pugixml( void )
 				{
 					std::cout << "\tFormat: CSV (version " << version << ")" << std::endl; 
 
-					parse_csv_rules_v1( input_filename ); // parse all rules in a CSV file 
+					// parse_csv_rules_v1( input_filename ); // parse all rules in a CSV file 
 
 					PhysiCell_settings.rules_enabled = true; 
 
 					std::cout << "\t\t**Error: Version < 3 no longer supported.\n\n"; 
-					std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n."; 
+					std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n"; 
 					exit(-1); 
 
 					done = true; 
@@ -1906,12 +1906,12 @@ void parse_rules_from_pugixml( void )
 				{
 					std::cout << "\tFormat: CSV (preprint version " << version << ")" << std::endl; 
 
-					parse_csv_rules_v1( input_filename ); // parse all rules in a CSV file 
+					// parse_csv_rules_v2( input_filename ); // parse all rules in a CSV file 
 
 					PhysiCell_settings.rules_enabled = true; 
 
 					std::cout << "\t\t**Error: Version < 3 no longer supported.\n\n"; 
-					std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n."; 
+					std::cout << "\t\tSee possible fixes at https://github.com/physicell-training/PhysiCell_common_errors\n\n"; 
 					exit(-1); 
 
 					done = true; 
