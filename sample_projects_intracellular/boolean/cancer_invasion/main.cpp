@@ -105,6 +105,9 @@ int main( int argc, char* argv[] )
 	if( !XML_status )
 	{ exit(-1); }
 	
+	// make sure the output folder exists
+	create_output_directory();
+	
 	// copy config file to output directry 
 	system( copy_command ); 
 	
