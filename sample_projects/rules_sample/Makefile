@@ -176,7 +176,7 @@ custom.o: ./custom_modules/custom.cpp
 reset:
 	rm -f *.cpp 
 	cp ./sample_projects/Makefile-default Makefile 
-	rm -f ./custom_modules/*
+	rm -rf ./custom_modules/*
 	touch ./custom_modules/empty.txt 
 	touch ALL_CITATIONS.txt 
 	touch ./core/PhysiCell_cell.cpp
