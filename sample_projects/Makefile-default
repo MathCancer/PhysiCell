@@ -80,13 +80,12 @@ list-projects:
 	@echo ""
 	
 template:
-	cp ./sample_projects/template/custom_modules/* ./custom_modules/
+	cp -r ./sample_projects/template/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/template/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/template/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/template/config/* ./config/
+	cp -r ./sample_projects/template/config/* ./config 
 	
 # sample projects 
 
@@ -389,7 +388,7 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 reset:
 	rm -f *.cpp PhysiCell_cell.o
 	cp ./sample_projects/Makefile-default Makefile 
-	rm -f ./custom_modules/*
+	rm -rf ./custom_modules/*
 	touch ./custom_modules/empty.txt 
 	touch ALL_CITATIONS.txt 
 	touch ./core/PhysiCell_cell.cpp
@@ -493,15 +492,15 @@ save:
 	cp main.cpp ./user_projects/$(PROJ)
 	cp Makefile ./user_projects/$(PROJ)
 	cp VERSION.txt ./user_projects/$(PROJ)
-	cp ./config/* ./user_projects/$(PROJ)/config
-	cp ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
+	cp -r ./config/* ./user_projects/$(PROJ)/config
+	cp -r ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
 
 load: 
 	echo "Loading project from $(PROJ) ... "
 	cp ./user_projects/$(PROJ)/main.cpp .
 	cp ./user_projects/$(PROJ)/Makefile .
-	cp ./user_projects/$(PROJ)/config/* ./config/ 
-	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
+	cp -r ./user_projects/$(PROJ)/config/* ./config/ 
+	cp -r ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
 
 pack:
 	@echo " "
