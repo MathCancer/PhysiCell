@@ -980,7 +980,7 @@ void Cell::add_potentials(Cell* other_agent)
 	//Repulsive
 	double R = phenotype.geometry.radius+ (*other_agent).phenotype.geometry.radius; 
 	
-	double RN = phenotype.geometry.nuclear_radius + (*other_agent).phenotype.geometry.nuclear_radius;	
+	// double RN = phenotype.geometry.nuclear_radius + (*other_agent).phenotype.geometry.nuclear_radius;	
 	double temp_r, c;
 	if( distance > R ) 
 	{
