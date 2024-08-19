@@ -9,6 +9,7 @@ jobs:
 
   tests:
     strategy:
+      fail-fast: false
       matrix:
         os: [
           {name: "Ubuntu", os: "ubuntu-latest", shell: "bash", compiler: "g++"},
