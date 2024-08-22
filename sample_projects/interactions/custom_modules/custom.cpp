@@ -427,7 +427,7 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// damage increases death 
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
-	signal = pCell->state.damage; 
+	signal = pCell->phenotype.cell_integrity.damage;
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
 
 	static double damage_halfmax = pCD->custom_data["damage_halfmax"]; 
