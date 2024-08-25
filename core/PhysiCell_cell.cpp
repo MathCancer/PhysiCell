@@ -1130,7 +1130,7 @@ Cell* create_cell( Cell_Definition& cd )
 
 void Cell::convert_to_cell_definition( Cell_Definition& cd )
 {	
-	double cell_volume = phenotype.volume.total;
+	Volume cell_volume = phenotype.volume;
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
@@ -1140,6 +1140,7 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	functions = cd.functions; 
 	
 	phenotype = cd.phenotype; 
+	phenotype.volume = cell_volume;
 	// is_movable = true;
 	// is_out_of_domain = false;
 	
@@ -1147,7 +1148,7 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	
 	assign_orientation();	
 
-	set_total_volume( cell_volume ); 
+	Basic_Agent::set_total_volume( phenotype.volume.total );
 
 	return; 
 }
