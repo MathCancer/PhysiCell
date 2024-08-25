@@ -779,6 +779,7 @@ void initialize_default_cell_definition( void )
 	//					these for the cell_defaults 
 	cell_defaults.phenotype.cell_interactions.sync_to_cell_definitions(); 
 	cell_defaults.phenotype.cell_transformations.sync_to_cell_definitions(); 
+	cell_defaults.phenotype.cell_asymmetric_divisions.sync_to_cell_definitions();
 	cell_defaults.phenotype.motility.sync_to_current_microenvironment(); 
 	cell_defaults.phenotype.mechanics.sync_to_cell_definitions(); 
 	
@@ -1267,7 +1268,26 @@ void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt
 			return; 
 		} 
 	}
-	
+
+}
+
+void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daughter )
+{
+	Cell_Definition* pCD_parent = cell_definitions_by_name[pCell_parent->type_name];
+	double asym_weight_total = pCell_parent->phenotype.cell_asymmetric_divisions.weights_total();
+	double r = asym_weight_total * UniformRandom();
+	int cell_def_index = -1;
+	for( int i=0; i < pCD_parent->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.size(); i++ )
+	{
+		if( r <= pCell_parent->phenotype.cell_asymmetric_divisions.asymmetric_division_weights[i] )
+		{
+			pCell_daughter->convert_to_cell_definition( *cell_definitions_by_index[i] );
+			return;
+		}
+		r -= pCell_parent->phenotype.cell_asymmetric_divisions.asymmetric_division_weights[i];
+	}
+	// if we're here, then do not do asym div
+	return;
 }
 
 void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt )

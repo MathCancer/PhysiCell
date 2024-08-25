@@ -173,6 +173,7 @@ Cell_Definition::Cell_Definition()
 	// 					are appropriately sized. Same on motiltiy. 
 	phenotype.cell_interactions.sync_to_cell_definitions(); 
 	phenotype.cell_transformations.sync_to_cell_definitions(); 
+	phenotype.cell_asymmetric_divisions.sync_to_cell_definitions();
 	phenotype.motility.sync_to_current_microenvironment(); 
 	phenotype.mechanics.sync_to_cell_definitions(); 
 	
@@ -1129,6 +1130,7 @@ Cell* create_cell( Cell_Definition& cd )
 
 void Cell::convert_to_cell_definition( Cell_Definition& cd )
 {	
+	double cell_volume = phenotype.volume.total;
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
@@ -1144,9 +1146,9 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	// displacement.resize(3,0.0); // state? 
 	
 	assign_orientation();	
-	
-	set_total_volume( phenotype.volume.total ); 
-	
+
+	set_total_volume( cell_volume ); 
+
 	return; 
 }
 
@@ -2003,6 +2005,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 			// transformation 
 			pCD->phenotype.cell_transformations.transformation_rates.assign(number_of_cell_defs,0.0); 
+
+			// asymmetric division
+			pCD->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.assign(number_of_cell_defs,0.0);
 		}
 		else 
 		{
@@ -2041,6 +2046,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// this requires that prebuild_cell_definition_index_maps was already run 
 	pCD->phenotype.cell_interactions.sync_to_cell_definitions(); 
 	pCD->phenotype.cell_transformations.sync_to_cell_definitions(); 
+	pCD->phenotype.cell_asymmetric_divisions.sync_to_cell_definitions();
 	pCD->phenotype.mechanics.sync_to_cell_definitions(); 
 	
 	// set the reference phenotype 
@@ -2988,10 +2994,51 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			}
 			node_tr = node_tr.next_sibling( "transformation_rate" ); 
 		}
-
 	}	
 
-    	// intracellular
+	node = cd_node.child( "phenotype" );
+	node = node.child( "cell_asymmetric_divisions" );
+	if( node )
+	{
+		Cell_Asymmetric_Divisions * pCAD = &(pCD->phenotype.cell_asymmetric_divisions);
+
+		// asymmetric division rates
+		pugi::xml_node node_cad = node.child( "asymmetric_division_weights");
+		if( node_cad )
+		{ node_cad = node_cad.child( "asymmetric_division_weight"); }
+		while (node_cad)
+		{
+			// get the name of the target cell type
+			std::string target_name = node_cad.attribute("name").value();
+			// now find its index
+			auto search = cell_definition_indices_by_name.find(target_name);
+			// safety first!
+			if( search != cell_definition_indices_by_name.end() )
+			{
+				// if the target is found, set the appropriate rate
+				int target_index = search->second;
+
+				double asymmetric_division_weight = xml_get_my_double_value(node_cad);
+				pCAD->asymmetric_division_weights[target_index] = asymmetric_division_weight;
+			}
+			else
+			{
+				std::cout << "Error: When processing the " << pCD->name << " cell definition: " << std::endl
+					<< "\tCould not find cell type " << target_name << " for asymmetric division." << std::endl
+					<< "\tRemove this cell type from the asymmetric division weights!" << std::endl << std::endl;
+				exit(-1);
+			}
+			node_cad = node_cad.next_sibling("asymmetric_division_weight");
+		}
+		for (int i = 0; i < pCAD->asymmetric_division_weights.size(); i++)
+		{
+			std::cout << pCAD->asymmetric_division_weights[i] << " ";
+		}
+		std::cout << std::endl;
+		pCD->functions.cell_division_function = standard_asymmetric_division_function;
+	}
+
+		// intracellular
 	node = cd_node.child( "phenotype" );
 	node = node.child( "intracellular" ); 
 	if( node )

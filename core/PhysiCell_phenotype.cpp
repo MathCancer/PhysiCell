@@ -1220,6 +1220,7 @@ Phenotype& Phenotype::operator=(const Phenotype &p ) {
 	
 	cell_interactions = p.cell_interactions; 
 	cell_transformations = p.cell_transformations; 
+	cell_asymmetric_divisions = p.cell_asymmetric_divisions;
 	
 	return *this;
 }
@@ -1342,6 +1343,38 @@ double& Cell_Transformations::transformation_rate( std::string type_name )
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 	int n = cell_definition_indices_by_name[type_name]; 
 	return transformation_rates[n]; 
+}
+
+Cell_Asymmetric_Divisions::Cell_Asymmetric_Divisions()
+{
+	asymmetric_division_weights = {0.0};
+}
+
+void Cell_Asymmetric_Divisions::sync_to_cell_definitions()
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int number_of_cell_defs = cell_definition_indices_by_name.size(); 
+	
+	if( asymmetric_division_weights.size() != number_of_cell_defs )
+	{ asymmetric_division_weights.resize( number_of_cell_defs, 0.0); }
+	
+	return; 
+}
+
+double Cell_Asymmetric_Divisions::weights_total( void )
+{
+	double total = 0.0; 
+	for( int i=0; i < asymmetric_division_weights.size(); i++ )
+	{ total += asymmetric_division_weights[i]; }
+	return total; 
+}
+
+// ease of access
+double& Cell_Asymmetric_Divisions::asymmetric_division_weight( std::string type_name )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name]; 
+	return asymmetric_division_weights[n]; 
 }
 
 // beta functionality in 1.10.3 

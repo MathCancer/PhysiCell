@@ -705,6 +705,23 @@ class Cell_Transformations
 	// void perform_transformations( Cell* pCell, Phenotype& phenotype, double dt ); 
 };
 
+class Cell_Asymmetric_Divisions
+{
+private:
+public:
+	// rates of asymmetric division into different cell types 
+	std::vector<double> asymmetric_division_weights; 
+
+	// initialization
+	Cell_Asymmetric_Divisions(); // done 
+	void sync_to_cell_definitions(); // done 
+
+	double weights_total();
+
+	// ease of access 
+	double& asymmetric_division_weight( std::string type_name ); // done
+};
+
 // pre-beta functionality in 1.10.3 
 class Integrity
 {
@@ -756,6 +773,7 @@ class Phenotype
 	
 	Cell_Interactions cell_interactions; 
 	Cell_Transformations cell_transformations; 
+	Cell_Asymmetric_Divisions cell_asymmetric_divisions;
 	
 	Phenotype(); // done 
 	Phenotype(const Phenotype &p);

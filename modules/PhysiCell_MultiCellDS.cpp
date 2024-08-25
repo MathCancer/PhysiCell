@@ -460,7 +460,19 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 			attrib = node_temp1.append_attribute( "size" ); 
 			attrib.set_value( size ); 
 			node_temp1 = node_temp1.parent(); 
-			index += size; 			
+			index += size; 	
+
+			// new in 2024: asymmetric divisions:
+			size = number_of_cell_defs;
+			node_temp1 = node_temp1.append_child( "label" );
+			node_temp1.append_child( pugi::node_pcdata ).set_value( "asymmetric_division_weights" );
+			attrib = node_temp1.append_attribute( "index" );
+			attrib.set_value( index );
+			attrib = node_temp1.append_attribute( "size" );
+			attrib.set_value( size );
+			node_temp1 = node_temp1.parent();
+			index += size;
+
 
 			// custom variables 
 			for( int i=0; i < (*all_cells)[0]->custom_data.variables.size(); i++ )
@@ -651,6 +663,7 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 			fwrite( (char*) &( pCell->phenotype.cell_interactions.damage_rate ) , sizeof(double) , 1 , fp ); // damage_rate 
 			fwrite( (char*) &( pCell->phenotype.cell_interactions.fusion_rates ) , sizeof(double) , number_of_cell_defs , fp ); // fusion_rates 
 			fwrite( (char*) &( pCell->phenotype.cell_transformations.transformation_rates ) , sizeof(double) , number_of_cell_defs , fp ); // transformation_rates 
+			fwrite( (char*) &( pCell->phenotype.cell_asymmetric_divisions.asymmetric_division_weights ) , sizeof(double) , number_of_cell_defs , fp ); // asymmetric_division_weights
 			
 			// custom variables 
 			for( int j=0 ; j < pCell->custom_data.variables.size(); j++ )
@@ -1590,6 +1603,17 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		data_start_indices.push_back( index ); 
 		cell_data_size += size; 
 		index += size;  
+// asymmetric divisions
+	// std::vector<double> asymmetric_division_weights // n
+		name = "asymmetric_division_weights";
+		units = "none";
+		size = n;
+		data_names.push_back( name );
+		data_units.push_back(units);
+		data_sizes.push_back( size );
+		data_start_indices.push_back( index );
+		cell_data_size += size;
+		index += size;
  
 // custom 
 		for( int j=0 ; j < (*all_cells)[0]->custom_data.variables.size(); j++ )
@@ -1953,6 +1977,10 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 // transformations 
   		// name = "transformation_rates"; 
 		std::fwrite( pCell->phenotype.cell_transformations.transformation_rates.data() , sizeof(double) , n , fp ); 
+
+// asymmetric division
+		// name = "asymmetric_division_rate"; 
+		std::fwrite( pCell->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.data() , sizeof(double) , n, fp );
 
 // custom 
 		// custom scalar variables 
