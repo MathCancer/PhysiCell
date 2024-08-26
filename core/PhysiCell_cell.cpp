@@ -1121,24 +1121,48 @@ Cell* create_cell( Cell_Definition& cd )
 
 void Cell::convert_to_cell_definition( Cell_Definition& cd )
 {	
+	Volume cell_volume = phenotype.volume;
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
 	
-	custom_data = cd.custom_data; 
+	custom_data = cd.custom_data; // this is kinda risky since users may want to be updating custom_data throughout
 	parameters = cd.parameters; 
 	functions = cd.functions; 
 	
 	phenotype = cd.phenotype; 
-	// is_movable = true;
-	// is_out_of_domain = false;
+	phenotype.volume = cell_volume; // leave the cell volume alone..
+	// ..except for the following target values
+	// phenotype.volume.target_solid_cytoplasmic = cd.phenotype.volume.target_solid_cytoplasmic; // gets set by standard_volume_update_function anyways
+	phenotype.volume.target_solid_nuclear = cd.phenotype.volume.target_solid_nuclear;
+	phenotype.volume.target_fluid_fraction = cd.phenotype.volume.target_fluid_fraction;
+	phenotype.volume.target_cytoplasmic_to_nuclear_ratio = cd.phenotype.volume.target_cytoplasmic_to_nuclear_ratio;
+	phenotype.volume.relative_rupture_volume = cd.phenotype.volume.relative_rupture_volume;
 	
-	// displacement.resize(3,0.0); // state? 
+	/* things no longer done here:
+	// assign_orientation(); // not necesary since the this->state is unchanged
+	// Basic_Agent::set_total_volume(volume); // not necessary since the volume is unchanged
 	
-	assign_orientation();	
-	
-	set_total_volume( phenotype.volume.total ); 
-	
+	// not necessary since the volume is unchanged
+	// if( fabs( phenotype.volume.total - volume ) > 1e-16 )
+	// {
+	// 	double ratio= volume/ (phenotype.volume.total + 1e-16);  
+	// 	phenotype.volume.multiply_by_ratio(ratio);
+	// }
+
+	// phenotype.geometry.update( this, phenotype, 0.0 ); // not necessary since the volume is unchanged
+	*/
+
+	// Here the current mechanics voxel index may not be initialized, when position is still unknown. 
+	if (get_current_mechanics_voxel_index() >= 0)
+    {
+        if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
+            phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+        {
+            get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
+                * phenotype.mechanics.relative_maximum_adhesion_distance;
+        }
+	}
 	return; 
 }
 
