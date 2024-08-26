@@ -1117,6 +1117,7 @@ Cell* create_cell( Cell_Definition& cd )
 void Cell::convert_to_cell_definition( Cell_Definition& cd )
 {	
 	Volume cell_volume = phenotype.volume;
+	Geometry cell_geometry = phenotype.geometry;
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
@@ -1134,6 +1135,7 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	phenotype.volume.target_cytoplasmic_to_nuclear_ratio = cd.phenotype.volume.target_cytoplasmic_to_nuclear_ratio;
 	phenotype.volume.relative_rupture_volume = cd.phenotype.volume.relative_rupture_volume;
 	
+	phenotype.geometry = cell_geometry; // leave the geometry alone
 	/* things no longer done here:
 	// assign_orientation(); // not necesary since the this->state is unchanged
 	// Basic_Agent::set_total_volume(volume); // not necessary since the volume is unchanged
@@ -1145,7 +1147,7 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	// 	phenotype.volume.multiply_by_ratio(ratio);
 	// }
 
-	// phenotype.geometry.update( this, phenotype, 0.0 ); // not necessary since the volume is unchanged
+	// phenotype.geometry.update( this, phenotype, 0.0 ); // not necessary since we copy geometry above
 	*/
 
 	// Here the current mechanics voxel index may not be initialized, when position is still unknown. 
