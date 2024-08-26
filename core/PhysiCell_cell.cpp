@@ -1141,6 +1141,30 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	
 	phenotype = cd.phenotype; 
 	phenotype.volume = cell_volume;
+	// phenotype.volume.target_solid_cytoplasmic = cd.phenotype.volume.target_solid_cytoplasmic; // gets set by standard_volume_update_function anyways
+	phenotype.volume.target_solid_nuclear = cd.phenotype.volume.target_solid_nuclear;
+	phenotype.volume.target_fluid_fraction = cd.phenotype.volume.target_fluid_fraction;
+	phenotype.volume.target_cytoplasmic_to_nuclear_ratio = cd.phenotype.volume.target_cytoplasmic_to_nuclear_ratio;
+	phenotype.volume.relative_rupture_volume = cd.phenotype.volume.relative_rupture_volume;
+	
+	phenotype.geometry.update( this, phenotype, 0.0 ); 
+	// phenotype.update_radius();
+	//if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
+	//	phenotype.geometry.radius * parameters.max_interaction_distance_factor )
+
+    	
+	// Here the current mechanics voxel index may not be initialized, when position is still unknown. 
+	if (get_current_mechanics_voxel_index() >= 0)
+    {
+        if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
+            phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+        {
+            // get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()]= phenotype.geometry.radius*parameters.max_interaction_distance_factor;
+            get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
+                * phenotype.mechanics.relative_maximum_adhesion_distance;
+        }
+	}
+	
 	// is_movable = true;
 	// is_out_of_domain = false;
 	
