@@ -649,6 +649,9 @@ Cell* Cell::divide( )
 	child->state.damage = 0.0; 
 	child->state.total_attack_time = 0.0; 
 
+    if( this->functions.cell_division_function )
+        { this->functions.cell_division_function( this, child); }
+
 	return child;
 }
 
@@ -1306,6 +1309,8 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		pCell_to_eat->functions.custom_cell_rule = NULL; 
 		pCell_to_eat->functions.update_phenotype = NULL; 
 		pCell_to_eat->functions.contact_function = NULL; 
+		pCell_to_eat->functions.cell_division_function = NULL; 
+
 		
 		// should set volume fuction to NULL too! 
 		pCell_to_eat->functions.volume_update_function = NULL; 
@@ -1531,6 +1536,7 @@ void Cell::fuse_cell( Cell* pCell_to_fuse )
 		pCell_to_fuse->functions.custom_cell_rule = NULL; 
 		pCell_to_fuse->functions.update_phenotype = NULL; 
 		pCell_to_fuse->functions.contact_function = NULL; 
+		pCell_to_fuse->functions.cell_division_function = NULL; 
 		pCell_to_fuse->functions.volume_update_function = NULL; 
 
 		// remove all adhesions 
@@ -1570,6 +1576,7 @@ void Cell::lyse_cell( void )
 	functions.custom_cell_rule = NULL; 
 	functions.update_phenotype = NULL; 
 	functions.contact_function = NULL; 
+	functions.cell_division_function = NULL; 
 	
 	// remove all adhesions 
 	
@@ -1660,6 +1667,14 @@ void display_ptr_as_bool( void (*ptr)(Cell*,Phenotype&,Cell*,Phenotype&,double),
 	return;
 }
 
+void display_ptr_as_bool( void (*ptr)(Cell*,Cell*), std::ostream& os )
+{
+	if( ptr )
+	{ os << "true"; return; }
+	os << "false"; 
+	return;
+}
+
 void display_cell_definitions( std::ostream& os )
 {
 	for( int n=0; n < cell_definitions_by_index.size() ; n++ )
@@ -1742,6 +1757,8 @@ void display_cell_definitions( std::ostream& os )
 		os << "\t\t mechanics function: "; display_ptr_as_bool( pCF->update_velocity , std::cout ); 
 		os << std::endl;
 		os << "\t\t contact function: "; display_ptr_as_bool( pCF->contact_function , std::cout ); 
+		os << std::endl; 
+        os << "\t\t cell division function: "; display_ptr_as_bool( pCF->cell_division_function , std::cout ); 
 		os << std::endl; 
 		
 		// summarize motility 
