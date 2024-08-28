@@ -78,7 +78,11 @@ void create_cell_types( void )
 	// that future division and other events are still not identical 
 	// for all runs 
 	
-	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
+	// set the random seed 
+	if (parameters.ints.find_index("random_seed") != -1)
+	{
+		SeedRandom(parameters.ints("random_seed"));
+	}// or specify a seed here 
 	
 	// housekeeping 
 	
