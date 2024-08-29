@@ -27,6 +27,11 @@ jobs:
           {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
           {project: "mechano-sample", name: "PhysiCell Mechano", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
           {project: "cancer-biorobots-sample", name: "PhysiCell Cancer Biorobots", binary: "cancer_biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "biorobots-sample", name: "PhysiCell Biorobots", binary: "biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "celltypes3-sample", name: "PhysiCell Celltypes3", binary: "celltypes3", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "custom-division-sample", name: "PhysiCell custom division", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "interaction-sample", name: "PhysiCell interactions", binary: "interaction_demo", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "pred-prey-farmer", name: "PhysiCell prey predator", binary: "pred_prey", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
         ]
         
     name: Testing ${{ matrix.projects.name }} on ${{ matrix.os.name }}
