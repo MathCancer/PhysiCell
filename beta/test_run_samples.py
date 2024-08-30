@@ -51,7 +51,7 @@ model_execs = ["project", "biorobots", "cancer_biorobots", "celltypes3", "hetero
 
 # Using dummy max_time values of 99 for many projects; 61 for the more time-consuming cancer_immune_3D. 
 # Users can change them as they wish.
-max_times = [120, 10, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99]
+max_times = [1440, 10, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 3600]
 
 # if you want to include the 3D cancer_immune sample, uncomment these 3 lines
 user_proj.append("cancer_immune") 
