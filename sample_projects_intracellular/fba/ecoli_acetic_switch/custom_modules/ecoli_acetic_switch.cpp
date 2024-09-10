@@ -135,7 +135,11 @@ void create_bacteria_cell ( void )
 void create_cell_types( void )
 {
 
-	SeedRandom( parameters.ints("random_seed") ); 
+	// set the random seed 
+	if (parameters.ints.find_index("random_seed") != -1)
+	{
+		SeedRandom(parameters.ints("random_seed"));
+	}
 	
 	// housekeeping 
 	initialize_default_cell_definition();

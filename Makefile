@@ -73,21 +73,20 @@ name:
 list-projects:
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
-	@echo "                 worm-sample interaction-sample mechano-sample rules-sample physimess-sample"
-	@echo "					custom-division-sample asymmetric-division-sample"
+	@echo "                 worm-sample interaction-sample mechano-sample rules-sample physimess-sample custom-division-sample"
+	@echo "					asymmetric-division-sample"
 	@echo ""
 	@echo "Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample"
 	@echo "                 cancer-metabolism-sample physiboss-tutorial physiboss-tutorial-invasion"
 	@echo ""
 	
 template:
-	cp ./sample_projects/template/custom_modules/* ./custom_modules/
+	cp -r ./sample_projects/template/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/template/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/template/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/template/config/* ./config/
+	cp -r ./sample_projects/template/config/* ./config 
 	
 # sample projects 
 
@@ -200,7 +199,7 @@ physimess-sample:
 	cp -r ./sample_projects/physimess/config/* ./config/
 
 custom-division-sample:
-	cp ./sample_projects/custom_division/custom_modules/* ./custom_modules/
+	cp -r ./sample_projects/custom_division/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/custom_division/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
@@ -209,7 +208,7 @@ custom-division-sample:
 	cp -r ./sample_projects/custom_division/config/* ./config/
 
 asymmetric-division-sample:
-	cp ./sample_projects/asymmetric_division/custom_modules/* ./custom_modules/
+	cp -r ./sample_projects/asymmetric_division/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/asymmetric_division/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
@@ -408,7 +407,7 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 reset:
 	rm -f *.cpp PhysiCell_cell.o
 	cp ./sample_projects/Makefile-default Makefile 
-	rm -f ./custom_modules/*
+	rm -rf ./custom_modules/*
 	touch ./custom_modules/empty.txt 
 	touch ALL_CITATIONS.txt 
 	touch ./core/PhysiCell_cell.cpp
@@ -512,15 +511,15 @@ save:
 	cp main.cpp ./user_projects/$(PROJ)
 	cp Makefile ./user_projects/$(PROJ)
 	cp VERSION.txt ./user_projects/$(PROJ)
-	cp ./config/* ./user_projects/$(PROJ)/config
-	cp ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
+	cp -r ./config/* ./user_projects/$(PROJ)/config
+	cp -r ./custom_modules/* ./user_projects/$(PROJ)/custom_modules
 
 load: 
 	echo "Loading project from $(PROJ) ... "
 	cp ./user_projects/$(PROJ)/main.cpp .
 	cp ./user_projects/$(PROJ)/Makefile .
-	cp ./user_projects/$(PROJ)/config/* ./config/ 
-	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
+	cp -r ./user_projects/$(PROJ)/config/* ./config/ 
+	cp -r ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/ 
 
 pack:
 	@echo " "

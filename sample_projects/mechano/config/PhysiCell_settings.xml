@@ -178,25 +178,21 @@
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="cancer" units="1/min">0</phagocytosis_rate>
                         <phagocytosis_rate name="BM" units="1/min">0.0</phagocytosis_rate>
-                        <phagocytosis_rate name="default" units="1/min">0</phagocytosis_rate>
                     </live_phagocytosis_rates>
                     <attack_rates>
                         <attack_rate name="cancer" units="1/min">0</attack_rate>
                         <attack_rate name="BM" units="1/min">0.0</attack_rate>
-                        <attack_rate name="default" units="1/min">0</attack_rate>
                     </attack_rates>
                     <damage_rate units="1/min">1</damage_rate>
                     <fusion_rates>
                         <fusion_rate name="cancer" units="1/min">0</fusion_rate>
                         <fusion_rate name="BM" units="1/min">0.0</fusion_rate>
-                        <fusion_rate name="default" units="1/min">0</fusion_rate>
                     </fusion_rates>
                 </cell_interactions>
                 <cell_transformations>
                     <transformation_rates>
                         <transformation_rate name="cancer" units="1/min">0</transformation_rate>
                         <transformation_rate name="BM" units="1/min">0.0</transformation_rate>
-                        <transformation_rate name="default" units="1/min">0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
             </phenotype>

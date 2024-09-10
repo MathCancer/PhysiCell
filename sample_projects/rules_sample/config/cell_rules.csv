@@ -11,17 +11,20 @@ malignant epithelial cell,damage,increases,apoptosis,0.1,5,8,0
 M0 macrophage,necrotic debris,increases,transform to M1 macrophage,0.05,0.005,4,0
 M0 macrophage,apoptotic debris,decreases,migration speed,0.1,0.005,4,0
 M0 macrophage,necrotic debris,decreases,migration speed,0.1,0.005,4,0
-M0 macrophage,volume,decreases,phagocytose dead cell,0,6000,4,0
+M0 macrophage,volume,decreases,phagocytose apoptotic cell,0,6000,4,0
+M0 macrophage,volume,decreases,phagocytose necrotic cell,0,6000,4,0
 // M1 macrophages 
 // M1 macrophage,oxygen,decreases,transform to M2 macrophage,0.0,5,8,0
 M1 macrophage,oxygen,decreases,transform to M2 macrophage,0.0001,5,8,0
 M1 macrophage,apoptotic debris,decreases,migration speed,0.1,0.005,4,0
 M1 macrophage,necrotic debris,decreases,migration speed,0.1,0.005,4,0
-M1 macrophage,volume,decreases,phagocytose dead cell,0.0,6000,4,0
+M1 macrophage,volume,decreases,phagocytose apoptotic cell,0.0,6000,4,0
+M1 macrophage,volume,decreases,phagocytose necrotic cell,0.0,6000,4,0
 // M2 macrophages
 M2 macrophage,apoptotic debris,decreases,migration speed,0.1,0.005,4,0
 M2 macrophage,necrotic debris,decreases,migration speed,0.1,0.005,4,0
-M2 macrophage,volume,decreases,phagocytose dead cell,0.0,6000,4,0
+M2 macrophage,volume,decreases,phagocytose apoptotic cell,0.0,6000,4,0
+M2 macrophage,volume,decreases,phagocytose necrotic cell,0.0,6000,4,0
 // effector cells 
 effector T cell,pro-inflammatory factor,increases,attack malignant epithelial cell,0.01,1,4,0
 effector T cell,contact with malignant epithelial cell,decreases,migration speed,0.01,0.1,10,0

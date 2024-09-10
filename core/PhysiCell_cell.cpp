@@ -247,8 +247,8 @@ Cell_State::Cell_State()
 	
 	number_of_nuclei = 1; 
 	
-	damage = 0.0; 
-	total_attack_time = 0.0; 
+	// damage = 0.0; 
+	// total_attack_time = 0.0; 
 	
 	contact_with_basement_membrane = false; 
 
@@ -356,6 +356,9 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	
 	// update geometry
 	phenotype.geometry.update( this, phenotype, dt_ );
+
+	// update integrity 
+	phenotype.cell_integrity.advance_damage( dt_ );  
 	
 	// check for new death events 
 	if( phenotype.death.check_for_death( dt_ ) == true )
@@ -654,9 +657,11 @@ Cell* Cell::divide( )
 
 
 	// changes for new phenotyp March 2022
-	state.damage = 0.0; 
+	// state.damage = 0.0; 
+	// phenotype.integrity.damage = 0.0; // leave alone - damage is heritable
 	state.total_attack_time = 0; 
-	child->state.damage = 0.0; 
+	// child->state.damage = 0.0; 
+	// child->phenotype.integrity.damage = 0.0; // leave alone - damage is heritable 
 	child->state.total_attack_time = 0.0; 
 
 	if( this->functions.cell_division_function )
@@ -988,7 +993,7 @@ void Cell::add_potentials(Cell* other_agent)
 	//Repulsive
 	double R = phenotype.geometry.radius+ (*other_agent).phenotype.geometry.radius; 
 	
-	double RN = phenotype.geometry.nuclear_radius + (*other_agent).phenotype.geometry.nuclear_radius;	
+	// double RN = phenotype.geometry.nuclear_radius + (*other_agent).phenotype.geometry.nuclear_radius;	
 	double temp_r, c;
 	if( distance > R ) 
 	{
@@ -1441,12 +1446,17 @@ void Cell::attack_cell( Cell* pCell_to_attack , double dt )
 	{ return; } 
 	
 	// make this thread safe 
+	// WORK HERE June 2024 
 	#pragma omp critical
 	{ 
 		// std::cout << this->type_name << " attacks " << pCell_to_attack->type_name << std::endl;
 		// 
-		pCell_to_attack->state.damage += phenotype.cell_interactions.damage_rate * dt; 
+		double new_damage = phenotype.cell_interactions.attack_damage_rate * dt; 
+
+		pCell_to_attack->phenotype.cell_integrity.damage += new_damage; 
 		pCell_to_attack->state.total_attack_time += dt; 
+
+		phenotype.cell_interactions.total_damage_delivered += new_damage; 
 	}
 	return; 
 }
@@ -2022,10 +2032,12 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			pCD->phenotype.secretion.saturation_densities.assign(number_of_substrates,0.0); 
 
 			// interaction 
-			pCD->phenotype.cell_interactions.dead_phagocytosis_rate = 0.0; 
+			pCD->phenotype.cell_interactions.apoptotic_phagocytosis_rate = 0.0; 
+			pCD->phenotype.cell_interactions.necrotic_phagocytosis_rate = 0.0; 
+			pCD->phenotype.cell_interactions.other_dead_phagocytosis_rate = 0.0; 
 			pCD->phenotype.cell_interactions.live_phagocytosis_rates.assign(number_of_cell_defs,0.0); 
 			pCD->phenotype.cell_interactions.attack_rates.assign(number_of_cell_defs,0.0); 
-			pCD->phenotype.cell_interactions.damage_rate = 1.0; 
+			pCD->phenotype.cell_interactions.attack_damage_rate = 1.0; 
 			pCD->phenotype.cell_interactions.fusion_rates.assign(number_of_cell_defs,0.0); 
 
 			// transformation 
@@ -2642,7 +2654,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		node_mech = node.child( "maximum_number_of_attachments" );
 		if ( node_mech )
 		{ pM->maximum_number_of_attachments = xml_get_my_int_value( node_mech ); }
-
 	}
 	
 	// motility 
@@ -2887,7 +2898,35 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 		// dead_phagocytosis_rate
 		pugi::xml_node node_dpr = node.child("dead_phagocytosis_rate");
-		pCI->dead_phagocytosis_rate = xml_get_my_double_value(node_dpr); 
+		double dead_phagocytosis_rate = 0.0; 
+		if( node_dpr )
+		{
+			// pCI->dead_phagocytosis_rate = xml_get_my_double_value(node_dpr); 
+			dead_phagocytosis_rate = xml_get_my_double_value(node_dpr); 
+		}
+/*
+		pCI->apoptotic_phagocytosis_rate = pCI->dead_phagocytosis_rate; 
+		pCI->necrotic_phagocytosis_rate = pCI->dead_phagocytosis_rate; 
+		pCI->other_dead_phagocytosis_rate = pCI->dead_phagocytosis_rate; 
+*/
+		pCI->apoptotic_phagocytosis_rate = dead_phagocytosis_rate; 
+		pCI->necrotic_phagocytosis_rate = dead_phagocytosis_rate; 
+		pCI->other_dead_phagocytosis_rate = dead_phagocytosis_rate; 
+
+		// if specific apoptotic rate is specified, overwrite 
+		pugi::xml_node node_apr = node.child("apoptotic_phagocytosis_rate"); 
+		if( node_apr )
+		{ pCI->apoptotic_phagocytosis_rate = xml_get_my_double_value(node_apr);  }
+
+		// if specific necrotic rate is specified, overwrite 
+		pugi::xml_node node_npr = node.child("necrotic_phagocytosis_rate"); 
+		if( node_npr )
+		{ pCI->necrotic_phagocytosis_rate = xml_get_my_double_value(node_npr);  }
+
+		// if specific necrotic rate is specified, overwrite 
+		pugi::xml_node node_odpr = node.child("other_dead_phagocytosis_rate"); 
+		if( node_odpr )
+		{ pCI->other_dead_phagocytosis_rate = xml_get_my_double_value(node_odpr);  }
 
 		// live phagocytosis rates 
 		pugi::xml_node node_lpcr = node.child( "live_phagocytosis_rates");
@@ -2944,8 +2983,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 
 		// damage_rate
-		pugi::xml_node node_dr = node.child("damage_rate");
-		pCI->damage_rate = xml_get_my_double_value(node_dr); 
+		pugi::xml_node node_dr = node.child("attack_damage_rate");
+		pCI->attack_damage_rate = xml_get_my_double_value(node_dr); 
 
 		// fusion_rates 
 		pugi::xml_node node_fr = node.child( "fusion_rates");
@@ -3019,7 +3058,24 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			}
 			node_tr = node_tr.next_sibling( "transformation_rate" ); 
 		}
-	}	
+
+	}
+
+	// cell integrity 
+	node = cd_node.child( "phenotype" );
+	node = node.child( "cell_integrity" ); 
+	if( node )
+	{
+		Cell_Integrity *pCI = &(pCD->phenotype.cell_integrity);
+
+		pugi::xml_node node_dr = node.child("damage_rate");
+		if( node_dr )
+		{ pCI->damage_rate = xml_get_my_double_value( node_dr ); }
+
+		pugi::xml_node node_drr = node.child("damage_repair_rate");
+		if( node_drr )
+		{ pCI->damage_repair_rate = xml_get_my_double_value( node_drr ); }
+	}
 
 	node = cd_node.child( "phenotype" );
 	node = node.child( "cell_asymmetric_divisions" );

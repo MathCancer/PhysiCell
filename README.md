@@ -12,8 +12,20 @@ PhysiCell is a flexible open source framework for building agent-based multicell
 
 Visit http://MathCancer.org/blog for the latest tutorials and help. 
 
-**Notable recognition:**
-+ [2019 PLoS Computational Biology Research Prize for Public Impact](https://blogs.plos.org/biologue/2019/05/31/announcing-the-winners-of-the-2019-plos-computational-biology-research-prize/)
+A tutorial, explaining the new functionalities of PhysiBoSS, including the automated input/output mapping, and more, is available as a preprint. Check it out !
+
+**Tutorial paper**: [https://arxiv.org/abs/2406.18371](https://arxiv.org/abs/2406.18371)
+
+**Tutorial project folder**: [here](https://github.com/PhysiBoSS/PhysiBoSS/tree/master/sample_projects_intracellular/boolean/tutorial)
+
+### How to run a PhysiBoSS sample_project inside PhysiCell:
+~~~bash
+git clone https://github.com/PhysiBoSS/PhysiBoSS.git
+cd PhysiBoSS
+make physiboss-tnf-model
+make
+./spheroid_TNF_model
+~~~
 
 ### Key makefile rules:
 
