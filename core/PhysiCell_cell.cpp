@@ -1170,6 +1170,9 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
                 * phenotype.mechanics.relative_maximum_adhesion_distance;
         }
 	}
+
+	if( PhysiCell_settings.rules_enabled )
+	{ apply_ruleset( this ); } // don't wait for the start of the next phenotype update to apply the rules to this cell
 	return; 
 }
 
