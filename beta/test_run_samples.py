@@ -1,8 +1,8 @@
 #
-#  This Python script assumes you have run the beta/test_build_sample.sh script first.
-#  See its header for instructions.
+#  This Python script assumes you have run the beta/test_build_samples.sh script first.
+#  See its header for instructions. That script will create folders in /user_projects.
 #
-#  Copy this Python script from /beta to the root dir (in case you want to edit it), then run it
+#  Copy this Python script from /beta to the root dir if you want to edit it, then run it.
 #  It will do the following:
 #     - load each sample project (from user_projects; created by test_build_sample.sh)
 #     - compile it
@@ -12,7 +12,7 @@
 #  WARNING: this is primarily intended to be used by core developers when testing a new release.
 #            It will create new output directories  ("output_<proj>")
 #
-#    Run via:
+#    Run via (if you didn't copy it to the root dir and edit it):
 #  $ python beta/test_run_samples.py 
 #    or, pipe the terminal output to a file:
 #  $ python beta/test_run_samples.py > test_run_samples.out
@@ -24,12 +24,12 @@
 # $ ls user_projects/
 # biorobots/		hetero/			pred_prey/		worm/
 # cancer_biorobots/	interaction/		rules/
-# cancer_immune/		mechano/		template/
+# cancer_immune/		custom_division/  mechano/		template/
 # celltypes3/		physimess/		virus_mac/
 
 # Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample
 #                  celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample
-#                  worm-sample interaction-sample mechano-sample rules-sample physimess-sample
+#                  worm-sample interaction-sample mechano-sample rules-sample physimess-sample custom-division-sample
 #
 #  It does not currently test running the intracellular projects:
 # Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample
@@ -37,20 +37,26 @@
 #
 #
 #   If you want to cleanup the created execs:
-# $ rm -rf template biorobots cancer_biorobots cancer_immune_3D celltypes3 hetero pred_prey virus_mac worm interaction mechano rules physimess
+# $ rm -rf template biorobots cancer_biorobots cancer_immune_3D celltypes3 hetero pred_prey virus_mac worm interaction mechano rules physimess custom_division
 
 import subprocess
 import xml.etree.ElementTree as ET
 import os
 import time
 
-user_proj = ["template", "biorobots", "cancer_biorobots", "celltypes3", "hetero", "pred_prey", "virus_mac", "worm", "interaction", "mechano", "rules", "physimess", "cancer_immune"] 
+user_proj = ["template", "biorobots", "cancer_biorobots", "celltypes3", "hetero", "pred_prey", "virus_mac", "worm", "interaction", "mechano", "rules", "physimess", "custom_division"] 
 
-model_execs = ["project", "biorobots", "cancer_biorobots", "celltypes3", "heterogeneity", "pred_prey", "virus-sample", "worm", "interaction_demo", "project", "project", "project", "cancer_immune_3D"]
+model_execs = ["project", "biorobots", "cancer_biorobots", "celltypes3", "heterogeneity", "pred_prey", "virus-sample", "worm", "interaction_demo", "project", "project", "project", "project"]
+
 
 # Using dummy max_time values of 99 for many projects; 61 for the more time-consuming cancer_immune_3D. 
 # Users can change them as they wish.
-max_times = [120, 10, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 61]
+max_times = [1440, 10, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 3600]
+
+# if you want to include the 3D cancer_immune sample, uncomment these 3 lines
+user_proj.append("cancer_immune") 
+model_execs.append("cancer_immune_3D") 
+max_times.append(61)
 
 for (uproj, myexec, max_time) in zip(user_proj, model_execs, max_times):
     print("\n\n------------   ",uproj,myexec, "   ----------------------------------")

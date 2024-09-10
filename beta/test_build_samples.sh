@@ -12,7 +12,7 @@
 # $ make list-projects
 # Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample
 #                  celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample
-#                  worm-sample interaction-sample mechano-sample rules-sample physimess-sample
+#                  worm-sample interaction-sample mechano-sample rules-sample physimess-sample custom-division-sample
 #
 #  Note that it does not currently test building the intracellular projects:
 # Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample
@@ -20,12 +20,12 @@
 #
 #  After running the script, you can:
 #    1) confirm all executables were created
-# $ ls -l template_sample biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus_sample worm interaction_demo mechano_sample rules_sample physimess_sample 
+# $ ls -l template_sample biorobots cancer_biorobots cancer_immune_3D celltypes3 heterogeneity pred_prey virus-sample worm interaction_demo mechano_sample rules_sample physimess_sample custom_division_sample
 #   and then:
 #    2) confirm the user_projects were created; delete them
 # $ cd user_projects
 # $ ls
-# $ rm -rf template biorobots cancer_biorobots cancer_immune celltypes3 hetero pred_prey virus_mac worm interaction mechano rules physimess
+# $ rm -rf template biorobots cancer_biorobots cancer_immune celltypes3 hetero pred_prey virus_mac worm interaction mechano rules physimess custom_division
 
 make reset
 make template
@@ -107,3 +107,10 @@ make physimess-sample
 make
 mv project physimess_sample
 make save PROJ=physimess
+#
+echo "\n-----------------------------------------"
+make reset
+make custom-division-sample
+make
+mv project custom_division_sample
+make save PROJ=custom_division

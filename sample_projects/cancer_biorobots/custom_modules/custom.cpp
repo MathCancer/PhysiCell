@@ -553,7 +553,7 @@ void tumor_cell_phenotype_with_therapy( Cell* pCell, Phenotype& phenotype, doubl
 	temp /= max_damage; // dt*(damage/max_damage)*death_rate 
 
 	// make sure we write the damage (not current a behavior)
-	pCell->state.damage = damage; 
+	pCell->phenotype.cell_integrity.damage = damage; 
 
 	if( UniformRandom() <= temp )
 	{
