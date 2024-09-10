@@ -1377,6 +1377,10 @@ void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daug
 {
 	Cell_Definition* pCD_parent = cell_definitions_by_name[pCell_parent->type_name];
 	double asym_weight_total = pCell_parent->phenotype.cell_asymmetric_divisions.weights_total();
+	
+	if (asym_weight_total == 0)
+	{ return; } // if all are zeros, below will convert to the first cell type by default. don't let that happen. keep it the same type
+
 	double r = asym_weight_total * UniformRandom();
 	int cell_def_index = -1;
 	for( int i=0; i < pCD_parent->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.size(); i++ )
