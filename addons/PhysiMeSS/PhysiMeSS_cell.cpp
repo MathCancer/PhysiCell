@@ -95,10 +95,10 @@ void PhysiMeSS_Cell::add_potentials_from_fibre(PhysiMeSS_Fibre* pFibre)
         double xip = pow(xi, p_exponent);
         double xiq = pow((1 - xi * xi), q_exponent);
 
-        fibre_adhesion = PhysiCell::parameters.doubles("vel_adhesion") * xip *
-                            (1 - cell_velocity / PhysiCell::parameters.doubles("cell_velocity_max"));
+        fibre_adhesion = this->custom_data["vel_adhesion"] * xip *
+                            (1 - cell_velocity / this->custom_data["cell_velocity_max"]);
 
-        fibre_repulsion = PhysiCell::parameters.doubles("vel_contact") * xiq;
+        fibre_repulsion = this->custom_data["vel_contact"] * xiq;
 
         axpy(&(velocity), fibre_adhesion, pFibre->state.orientation);
         naxpy(&(velocity), fibre_repulsion, previous_velocity);
@@ -119,8 +119,8 @@ void PhysiMeSS_Cell::degrade_fibre(PhysiMeSS_Fibre* pFibre)
     distance = std::max(sqrt(distance), 0.00001);
     
     // Fibre degradation by cell - switched on by flag fibre_degradation
-    double stuck_threshold = PhysiCell::parameters.doubles("fibre_stuck_time");
-    if (PhysiCell::parameters.bools("fibre_degradation") && stuck_counter >= stuck_threshold) {
+    double stuck_threshold = this->custom_data["fibre_stuck_time"];
+    if (this->custom_data["fibre_degradation"] > 0.5 && stuck_counter >= stuck_threshold) {
         // if (stuck_counter >= stuck_threshold){
         //     std::cout << "Cell " << ID << " is stuck at time " << PhysiCell::PhysiCell_globals.current_time
         //                 << " near fibre " << pFibre->ID  << std::endl;;
@@ -129,7 +129,7 @@ void PhysiMeSS_Cell::degrade_fibre(PhysiMeSS_Fibre* pFibre)
         double dotproduct = dot_product(displacement, phenotype.motility.motility_vector);
         if (dotproduct >= 0) {
             double rand_degradation = PhysiCell::UniformRandom();
-            double prob_degradation = PhysiCell::parameters.doubles("fibre_degradation_rate");
+            double prob_degradation = this->custom_data["fibre_degradation_rate"];
             if (rand_degradation <= prob_degradation) {
                 //std::cout << " --------> fibre " << (*other_agent).ID << " is flagged for degradation " << std::endl;
                 // (*other_agent).parameters.degradation_flag = true;

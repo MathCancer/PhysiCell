@@ -177,9 +177,22 @@
 
           </phenotype>
         <custom_data>
-          <sample>1.0</sample>
-          </custom_data>
-          </cell_definition>
+          <fibre_degradation units="none" description="flag for fibre degradation">0.0</fibre_degradation>
+          <fibre_degradation_rate units="1/min" description="fibre degradation rate">0.01</fibre_degradation_rate>
+          <fibre_custom_degradation units="none" description="flag for having degradation depends on pressure">0.0</fibre_custom_degradation>
+          <fibre_stuck_time units="1/min" description="time before stuck cell can degrade fibre">10.0</fibre_stuck_time>
+          <fibre_stuck_threshold units="none" description="movement threshold to declare a cell stuck">0.05</fibre_stuck_threshold>
+          <fibre_pressure_threshold units="1/min" description="time before stuck cell can degrade fibre">10.0</fibre_pressure_threshold>
+          
+          <fibre_pushing units="none" description="flag for fibre pushing">0.0</fibre_pushing>
+          <fibre_sticky units="none" description="measure of how easy it is to move a fibre">1.0</fibre_sticky>
+          <fibre_rotation units="none" description="flag for fibre rotation">0.0</fibre_rotation>
+          
+          <vel_adhesion units="none" description="cell velocity parallel to fibres">0.6</vel_adhesion>
+          <vel_contact units="none" description="cell velocity orthongonal to fibres">0.1</vel_contact>
+          <cell_velocity_max units="none" description="used in cell-fibre adhesion">1.0</cell_velocity_max>
+        </custom_data>
+      </cell_definition>
 
       <cell_definition name="fibre" ID="1">
         <phenotype>
@@ -275,9 +288,16 @@
 
           </phenotype>
         <custom_data>
-          <sample>1.0</sample>
-          </custom_data>
-          </cell_definition>
+          <anisotropic_fibres units="none" description="flag for whether we want anisotropic fibres">0.0</anisotropic_fibres>
+          <fibre_length units="none" description="fibre length">40.0</fibre_length>
+          <length_normdist_sd units="none" description="standard deviation of fibre length">0.0</length_normdist_sd>
+          <fibre_radius units="none" description="fibre radius">2.0</fibre_radius>
+          <radius_normdist_sd units="microns" description="standard deviation of fibre radius">0.0</radius_normdist_sd>
+          <fibre_angle units="none" desctription="angle of fibre direction">0.2</fibre_angle>
+          <angle_normdist_sd units="none" description="standard deviation of fibre angle">0.0</angle_normdist_sd>
+          
+        </custom_data>
+      </cell_definition>
 
       <cell_definition name="attractant" ID="2">
         <phenotype>
@@ -387,34 +407,10 @@
 	</initial_conditions>	
 	
 	<user_parameters>
-	<random_seed type="int" units="dimensionless" description="">0</random_seed>
-		
-        <number_of_cells type="int" units="none" description="initial number of cells">1</number_of_cells>
-        <number_of_fibres type="int" units="none" description="initial number of fibres">10000</number_of_fibres>
-        
-       <anisotropic_fibres type="bool" units="none" description="flag for whether we want anisotropic fibres">false</anisotropic_fibres>
-        <fibre_length type="double" units="none" description="fibre length">40.0</fibre_length>
-        <length_normdist_sd type="double" units="none" description="standard deviation of fibre length">0.0</length_normdist_sd>
-        <fibre_radius type="double" units="none" description="fibre radius">2.0</fibre_radius>
-        <radius_normdist_sd type="double" units="microns" description="standard deviation of fibre radius">0.0</radius_normdist_sd>
-        <fibre_angle type="double" units="none" desctription="angle of fibre direction">0.2</fibre_angle>
-        <angle_normdist_sd type="double" units="none" description="standard deviation of fibre angle">0.0</angle_normdist_sd>
-        
-        <fibre_degradation type="bool" units="none" description="flag for fibre degradation">false</fibre_degradation>
-        <fibre_degradation_rate type="double" units="1/min" description="fibre degradation rate">0.01</fibre_degradation_rate>
-        <fibre_custom_degradation type="bool" units="none" description="flag for having degradation depends on pressure">false</fibre_custom_degradation>
-        <fibre_stuck_time type="double" units="1/min" description="time before stuck cell can degrade fibre">10.0</fibre_stuck_time>
-        <fibre_stuck_threshold type="double" units="none" description="movement threshold to declare a cell stuck">0.05</fibre_stuck_threshold>
-        <fibre_pressure_threshold type="double" units="1/min" description="time before stuck cell can degrade fibre">10.0</fibre_pressure_threshold>
-        <color_cells_by_pressure type="bool" units="" description="flag for coloring cells by pressure">false</color_cells_by_pressure>
-        
-        <fibre_pushing type="bool" units="none" description="flag for fibre pushing">false</fibre_pushing>
-        <fibre_sticky type="double" units="none" description="measure of how easy it is to move a fibre">1.0</fibre_sticky>
-        <fibre_rotation type="bool" units="none" description="flag for fibre rotation">false</fibre_rotation>
-        
-        <vel_adhesion type="double" units="none" description="cell velocity parallel to fibres">0.6</vel_adhesion>
-        <vel_contact type="double" units="none" description="cell velocity orthongonal to fibres">0.1</vel_contact>
-         <cell_velocity_max type="double" units="none" description="used in cell-fibre adhesion">1.0</cell_velocity_max>
-        </user_parameters>
+	  <random_seed type="int" units="dimensionless" description="">0</random_seed>
+    <number_of_cells type="int" units="none" description="initial number of cells">1</number_of_cells>
+    <number_of_fibres type="int" units="none" description="initial number of fibres">10000</number_of_fibres>
+    <color_cells_by_pressure type="bool" units="" description="flag for coloring cells by pressure">false</color_cells_by_pressure>    
+  </user_parameters>
 	
 </PhysiCell_settings>
