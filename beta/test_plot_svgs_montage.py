@@ -25,7 +25,7 @@ output_dirs = ["output_template", "output_biorobots", "output_cancer_biorobots",
 # output_dirs = ["output_template"] 
 
 # optionally the 3D model
-# output_dirs.append("output_cancer_immunne")
+output_dirs.append("output_cancer_immune")
 
 all_svgs = []
 count = 0
