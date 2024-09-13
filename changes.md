@@ -1,60 +1,9 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
+
 **Versions:** 1.14.0 - 
 
-**Release dates:** ?? June 2024 - 
-* 1.14.0 : ?? June 2024
-
-changes: 
-* Add `Cell_Integrity` to `Phenotype`
-* rename `Phenotype.Interactions.damage_rate` to `Phenotype.Interactions.attack_damage_rate`
-* move `Cell.Cell_State.damage` to `Phenotype.Cell_Integrity.damage` 
-* added standardized (self-)damage and self repair to `Phenotype.Cell_Integrity` as part of built-in phenotype 
-
-
-updating ... phagocytosis models 
-updating .. effector atack models 
-
-* new (or modified) signals: 
-damage (now in cell integrity)
-damage delivered 
-attacking (as a boolean)
-
-* deprecated signals: 
-
-* new (or modified) behaviors: 
-phagocytose apoptotic cells
-phagocytose necrotic cells
-phagocytose other dead cells
-attack damage rate (renamed)
-damage rate (moved)
-damage repair rate 
-
-attack duration
-
-* deprecated behaviors: 
-phagocytose dead cells 
-
-rules: 
-give a warning on dead cell phago rules?
-
-
-
-
-to do: 
-* How to communicate to attacking cells that their target is dead. Fix for now: 
-
-
-to do: 
-* seprate necrotic and apoptotic phagocytosis rates
-* new signals: necrotic, apoptotic neighbors (as well as dead neighbors)
-
-## .. need to fill the rest in here. 
-
-
-**Versions:** 1.13.0 - 1.13.1 
-**Release dates:** 29 July 2023 - ?? June 2024 
-* 1.13.0 : 29 July 2023
-* 1.13.1 : 6 August 2023
+**Release dates:** 14 September 2024 - 
+* 1.14.0 : 14 September 2024
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -93,6 +42,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
       * mechano-sample
       * rules-sample
       * physimess-sample
+      * custom-division-sample
 
 **`make list-projects`** : list all available sample projects 
 
@@ -115,9 +65,9 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 **`make upgrade`**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
 
 ### Key Links 
-**Homepage:**     http://PhysiCell.MathCancer.org 
+**Homepage:**     http://PhysiCell.MathCancer.org (<-- TODO: dead link?)
 
-**Downloads:**    http://PhysiCell.sf.net
+**Downloads:**    https://PhysiCell.sf.net
 
 **Support:**      https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA 
 
@@ -132,6 +82,99 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 **Latest info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
 
 See changes.md for the full change log. 
+
+* * * 
+
+## Release summary: 
+Version 1.14.0  Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new Cell_Integrity class and refined phagocytosis behaviors, now splitting into apoptotic and necrotic. New behaviors such as attack damage rate and attack duration have been introduced to improve the modeling of attack and damage/integrity processes. This release also includes an option to set the random number generator seed value and a new user-defined custom function for cell division. Additionally, a systematic testing package has been added, utilizing scripts and GitHub Actions for automated testing.
+
+### Version 1.14.0 (14 Sept 2024):
+TODO - do we need anything here?
+
+We are grateful for contributions by TODO... Vincent Noël, Randy Heiland, Daniel Bergman, Heber Rocha, and Elmar Bucher in this release. 
+
+**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
+
+**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
+
+### Major new features and changes in the 1.14.0 version
+#### 1.14.0 
++ Introduced changes to Rules:
+  + `damage rate` now refers to damage accumulation over time by the cell
+  + `attack damage rate` means what `damage rate` used to mean: how fast the cell deals damage to another cell it is attacking
+  + `phagocytose dead cell` is replaced by death-model-specific rates:
+    + `phagocytose apoptotic cell`
+    + `phagocytose necrotic cell`
+    + `phagocytose other dead cell`
++ New `Cell_Integrity` class in PhysiCell_phenotype.h. `damage` was moved from Cell_State into Cell_Integrity 
+  + the cancer-biorobots-sample `custom.cpp` was updated to reflect this change.
++ "contact with dead" now split into "contact with apoptotic" and "contact with necrotic"
++ Seed for random numbers: in the top most <options> tag of a config file (for options that apply to the overall simulation), there is now a <random_seed>. Traditionally, this has been provided in <user_parameters> and if it is still present there, it will override the one in <options>. Users are encouraged to migrate away from its use in <user_parameters> as this will likely be removed from sample projects in a future release.
+  + Setting as an integer will have the same behavior as the `user_parameter`
+      + <random_seed>0</random_seed>
+  + Setting as “”, “random”, or “system_clock” will use the system clock to set the random seed
+      + <random_seed />
+      + <random_seed></random_seed>
+      + <random_seed>random</random_seed>
+      + <random_seed>system_clock</random_seed>
++ New option for a user-defined custom function for cell division. If provided, the custom function will receive pointers to the two daughter cells. A new sample project, `custom-division-sample`, is provided.
++ Initial parameter distributions
+  + Users can now start cells with heterogeneity in any behavior or also the total volume
+  + For ease of access, in studio navigate to Cell Types > Misc > Parameter Distributions
+  + Five distributions supported:
+    + Uniform
+      + Set min and max; behavior ~ U(min, max)
+    + Log uniform
+      + Set min and max; z ~ U(log(min), log(max)); behavior ~ exp(z)
+      + Note: min and max are on the behavior scale, not the logarithmic scale
+    + Normal
+      + Set μ and σ; behavior ~ N(μ, σ)
+      + Optionally set lb, ub to impose lb <= behavior <= ub
+    + Log normal
+      + Set μ and σ; z ~ N(μ, σ); behavior ~ exp(z)
+      + Optionally set lb, ub to impose lb <= behavior <= ub
+      + Note: μ and σ are on the logarithmic scale
+      + Note: lb and ub are on the behavior scale
+    + Log10 normal
+      + Same as log normal, except behavior ~ 10^z
+      + Implemented because log10 values are more human-interpretable
+  + Can enforce that the base value is within the distribution to help constrain parameter sweeps
+  + “Enable” attributes make it easy to toggle on/off individual distributions or for an entire cell type
++ Scripts in `/beta` to help with testing, both manually and via GitHub Actions: `test_build_samples.sh` and `test*.py`
++ The Makefiles for all sample projects now do a recursive copy (`cp -r`) for files in the /config directory
++ MultiCellDS update:
+  + PhysiBoSS intracellular data is now part of data export
+  + Spring attachments are now part of data export
++ Update to PhysiBoSS 2.2.3
+  + Added steepness parameter to output mapping, controlling the Hill coefficient used.
+  + Added use_for_dead parameter to input and output mapping, to define if this mapping should be used on dead cells.
+  + Added three new sample projects: 
+    + template_BM: adaptation of the template project of PhysiCell, with PhysiBoSS support
+    + physiboss-tutorial: three toy models presented in the PhysiBoSS tutorial ([10.48550/arXiv.2406.18371](https://doi.org/10.48550/arXiv.2406.18371)).
+    + physiboss-tutorial-invasion: update of the cancer invasion model by Ruscone et al., also presented in the PhysiBoSS tutorial.
++ Update to PhysiMeSS 1.0.1
+  + Most parameters are now defined in custom_data, to make them specific to a cell definition. This introduces the possibility to have multiple types of fibers.
++ Introducing experimental pre-compiled binaries, available via python beta/download_binary.py.
++ Non-monotonic rules: a single signal can now both cause an increase *and* a decrease in a behavior for a cell type
++ Initialize substrate initial conditions using a .mat or .csv file
+  + implemented in PhysiCell Studio; see output there for formatting of the csv
++ Substrate heatmaps on SVGs improvements:
+  + set colormaps in the config file
+  + set the svg substrate color function by default for config-only based implementation
++ throw error if duplicate substrate or user_parameter name found
+ 
+### Bugfixes: 
+#### 1.14.0 
++ `sample_projects_intracellular/ode/ode_energy/main.cpp` was updated to use `save_PhysiCell_to_MultiCellDS_v2`
++ `Cell::convert_to_cell_definition` now retains the cell volume
++ fix bug in storing rules that occasionally resulted in seg faults
+
+### Notices for intended changes that may affect backwards compatibility:
++ TODO
+
+### Planned future improvements: 
+
++ TODO
 
 * * * 
 
