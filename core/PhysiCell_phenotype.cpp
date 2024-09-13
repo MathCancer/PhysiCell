@@ -1279,7 +1279,7 @@ Cell_Interactions::Cell_Interactions()
 	pAttackTarget = NULL; 
 	total_damage_delivered = 0.0; 
 
-	attack_duration = 120.0; // 0.1; // get from cell constants instead?? 
+	attack_duration = 30.0; // a typical attack duration for a T cell using perforin/granzyme is ~30 minutes
 
 	fusion_rates = {0.0}; 
 	
