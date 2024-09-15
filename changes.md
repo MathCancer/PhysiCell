@@ -2,8 +2,8 @@
 
 **Versions:** 1.14.0 - 
 
-**Release dates:** 14 September 2024 - 
-* 1.14.0 : 14 September 2024
+**Release dates:** 15 September 2024 - 
+* 1.14.0 : 15 September 2024
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -86,10 +86,14 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.14.0  Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new Cell_Integrity class and refined phagocytosis behaviors, now splitting into apoptotic and necrotic. New behaviors such as attack damage rate and attack duration have been introduced to improve the modeling of attack and damage/integrity processes. This release also includes an option to set the random number generator seed value and a new user-defined custom function for cell division. Additionally, a systematic testing package has been added, utilizing scripts and GitHub Actions for automated testing.
+Version 1.14 upgrades to the Cell Beheavior Hypothesis Grammar (upgrading to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing. 
 
 ### Version 1.14.0 (14 Sept 2024):
-TODO - do we need anything here?
+TODO - do we need anything here
+?
+
+Version 1.14.0 Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new `Cell_Integrity` class and refined phagocytosis behaviors (now split into separate rates for apoptotic, necrotic, and other dead cells). New behaviors such as `attack_damage_rate` and `attack_duration` have been introduced to improve the modeling of attack and damage/integrity processes, as well as additions of a general `damage_rate` (a non-attack rate of damage of self, which for example could be increased in response to drug and toxin exposures, or used for a cell cycle damage checkpoint), and a `damage_repair_rate` which can be used for built-in damage repair. This release also includes an option to set the random number generator seed value and a new user-defined custom function for cell division that may be particualrly useful for . Additionally, a systematic testing package has been added, utilizing scripts and GitHub Actions for automated testing.
+
 
 We are grateful for contributions by TODO... Vincent Noël, Randy Heiland, Daniel Bergman, Heber Rocha, and Elmar Bucher in this release. 
 
