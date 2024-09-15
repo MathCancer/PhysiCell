@@ -65,9 +65,9 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 **`make upgrade`**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
 
 ### Key Links 
-**Homepage:**     http://PhysiCell.MathCancer.org (<-- TODO: dead link?)
+**Homepage:**     http://PhysiCell.org
 
-**Downloads:**    https://PhysiCell.sf.net
+**Downloads:**    https://PhysiCell.sf.net AND https://github.com/MathCancer/PhysiCell/releases 
 
 **Support:**      https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA 
 
@@ -86,9 +86,9 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
+Version 1.14.x upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
 
-### Version 1.14.0 (14 Sept 2024):
+### Version 1.14.0 (15 Sept 2024):
 Version 1.14.0 Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new `Cell_Integrity` class and refined phagocytosis behaviors (now split into separate rates for apoptotic, necrotic, and other dead cells). The built-in "attack" model has been refined to include formation of a persistent synapse (with a spring adhesion) throughout the attack (which is tunable via the `attack_duration` parameter), and a clarified `attack_damage_rate` to denote the rate at which an attacker damages its target cell. The attacking cell also tracks how long it has attacked (may be useful for exhaustion modeling), whether it is or is not attacking, and the identity (cell pointer) of the cell it is attacking. 
 
 The new `Cell_Integrity` class (within `Phenotype`) allows more control over cell damage. Attacking cells (see above) can increase damage, as well as a new generalized `damage_rate` that can (for example) be used to model damage from other sources such as cytotoxic drugs or toxins. A built-in model for damage repair (wiht default rate `damage_repair_rate` = 0) can be used for simple modeling of damage repair (e.g., DDR during a cycle damage checkpoint). 
@@ -205,6 +205,95 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 + Major refresh of documentation.
 
 * * * 
+
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
+**Versions:** 1.13.0 - 
+
+**Release dates:** 29 July 2023 - 15 September 2024
+* 1.13.0 : 29 July 2023
+* 1.13.1 : 6 August 2023
+
+## Overview: 
+PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
+
+**Reference:** A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
+
+Visit http://MathCancer.org/blog for the latest tutorials and help. 
+
+**Notable recognition:**
++ [2019 PLoS Computational Biology Research Prize for Public Impact](https://blogs.plos.org/biologue/2019/05/31/announcing-the-winners-of-the-2019-plos-computational-biology-research-prize/)
+
+### Key makefile rules:
+
+**`make`**: compiles the current project. If no 
+                     project has been defined, it first 
+                     populates the cancer heterogeneity 2D 
+                     sample project and compiles it 
+   
+**`make project-name`**: populates the indicated sample project. 
+                     Use "make" to compile it. 
+
+   * **`project-name`** choices:
+      * template 
+      * biorobots-sample 
+      * cancer-biorobots-sample 
+      * cancer-immune-sample
+      * celltypes3-sample 
+      * heterogeneity-sample 
+      * pred-prey-farmer 
+      * virus-macrophage-sample 
+      * worm-sample
+      * ode-energy-sample 
+      * physiboss-cell-lines-sample 
+      * cancer-metabolism-sample
+      * interaction-sample
+      * mechano-sample
+      * rules-sample
+      * physimess-sample
+
+**`make list-projects`** : list all available sample projects 
+
+**`make clean`**         : removes all .o files and the executable, so that the next "make" recompiles the entire project 
+
+**`make data-cleanup`**  : clears out all simulation data 
+
+**`make reset`**         : de-populates the sample project and returns to the original PhysiCell state. Use this when switching to a new PhysiCell sample project. 
+
+**`make save PROJ=name`**: save the current project (including the `Makefile`, `main.cpp`, and everything in `./config` and `./custom_modules/`) in `./user_projects/name`, where `name` is your choice for the project. If the project already exists, overwrite it. 
+
+**`make load PROJ=name`**: load the user project `name` from `./user_projects/name` (including the `Makefile`, `main.cpp`, and everything in `./config` and `./custom_modules/`).  
+
+**`make list-user-projects`**: list all user projects in `./user_projects/`. (Use these names without the trailing `/` in `make load PROJ=name`.)
+
+**`make jpeg`**          : uses ImageMagick to convert the SVG files in the output directory to JPG (with appropriate sizing to make movies). Supply `OUTPUT=foldername` to select a different folder. 
+
+**`make movie`**         : uses ffmpeg to convert the JPG files in the output directory an mp4 movie. Supply `OUTPUT=foldername` to select a different folder, or `FRAMERATE=framerate` to override the frame rate.
+
+**`make upgrade`**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
+
+### Key Links 
+**Homepage:**     http://PhysiCell.MathCancer.org 
+
+**Downloads:**    http://PhysiCell.sf.net
+
+**Support:**      https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA 
+
+**Quick Start:**  Look at QuickStart.md in the documentation folder. 
+
+**User Guide:**   Look at UserGuide.pdf in the documentation folder. 
+ 
+**Setup and Training:**	See this year's workshop and hackathon at https://github.com/PhysiCell-Training/ws2023  
+ 
+**Older Tutorials:**    http://www.mathcancer.org/blog/physicell-tutorials/
+
+**Latest info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
+
+See changes.md for the full change log. 
+
+* * * 
+
+## Release summary: 
+Version 1.13.x  \introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created to model rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. These releases also introduce numerous bug fixes, particularly to handling of Dirichlet boundary conditions, while introducing numerous minor feature enhancements such as packing and unpacking user projects (to facilitate code sharing). 
 
 ## Release summary: 
 Version 1.13.x  introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created to model rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. These releases also introduce numerous bug fixes, particularly to handling of Dirichlet boundary conditions, while introducing numerous minor feature enhancements such as packing and unpacking user projects (to facilitate code sharing). 
