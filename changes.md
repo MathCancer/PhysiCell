@@ -37,7 +37,9 @@ phagocytose dead cells
 rules: 
 give a warning on dead cell phago rules?
 
+1 - r*D --> D = 1/r 
 
+1/30 
 
 
 to do: 
