@@ -86,7 +86,7 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.14.x upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
+Version 1.14.z upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
 
 ### Version 1.14.0 (15 Sept 2024):
 Version 1.14.0 Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new `Cell_Integrity` class and refined phagocytosis behaviors (now split into separate rates for apoptotic, necrotic, and other dead cells). The built-in "attack" model has been refined to include formation of a persistent synapse (with a spring adhesion) throughout the attack (which is tunable via the `attack_duration` parameter), and a clarified `attack_damage_rate` to denote the rate at which an attacker damages its target cell. The attacking cell also tracks how long it has attacked (may be useful for exhaustion modeling), whether it is or is not attacking, and the identity (cell pointer) of the cell it is attacking. 
@@ -101,7 +101,7 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
 
-### Major new features and changes in the 1.14.0 version
+### Major new features and changes in the 1.14.z versions
 #### 1.14.0 
 + Introduced changes to Rules:
   + `damage rate` (a part of `Cell_Integrity`) is now a generalized term for a rate of damage caused by non-attack means 
@@ -144,11 +144,10 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
       + Implemented because log10 values are more human-interpretable
   + Can enforce that the base value is within the distribution to help constrain parameter sweeps
   + “Enable” attributes make it easy to toggle on/off individual distributions or for an entire cell type
-+ Scripts in `/beta` to help with testing, both manually and via GitHub Actions: `test_build_samples.sh` and `test*.py`
-+ The Makefiles for all sample projects now do a recursive copy (`cp -r`) for files in the /config directory
 + MultiCellDS update:
   + PhysiBoSS intracellular data is now part of data export
   + Spring attachments are now part of data export
+  + Streamlined MultiCellDS with incorporation of more single-cell parameters/state variables
 + Update to PhysiBoSS 2.2.3
   + Added steepness parameter to output mapping, controlling the Hill coefficient used.
   + Added use_for_dead parameter to input and output mapping, to define if this mapping should be used on dead cells.
@@ -159,13 +158,19 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 + Update to PhysiMeSS 1.0.1
   + Most parameters are now defined in custom_data, to make them specific to a cell definition. This introduces the possibility to have multiple types of fibers.
 + Introducing experimental pre-compiled binaries, available via python beta/download_binary.py.
-+ Non-monotonic rules: a single signal can now both cause an increase *and* a decrease in a behavior for a cell type
++ Non-monotonic rules: a single signal can now both cause an increase *and* a decrease in a behavior for a cell type (bringing the implementation in better compliance with the specification at https://www.biorxiv.org/content/10.1101/2023.09.17.557982) 
 + Initialize substrate initial conditions using a .mat or .csv file
   + implemented in PhysiCell Studio; see output there for formatting of the csv
 + Substrate heatmaps on SVGs improvements:
   + set colormaps in the config file
   + set the svg substrate color function by default for config-only based implementation
+
+### Minor new features and changes: 
+#### 1.14.0 
++ Scripts in `/beta` to help with testing, both manually and via GitHub Actions: `test_build_samples.sh` and `test*.py`
++ The Makefiles for all sample projects now do a recursive copy (`cp -r`) for files in the /config directory
 + throw error if duplicate substrate or user_parameter name found
+
  
 ### Bugfixes: 
 #### 1.14.0 
