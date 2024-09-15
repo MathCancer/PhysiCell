@@ -86,7 +86,7 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing. 
+Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
 
 ### Version 1.14.0 (14 Sept 2024):
 Version 1.14.0 Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new `Cell_Integrity` class and refined phagocytosis behaviors (now split into separate rates for apoptotic, necrotic, and other dead cells). The built-in "attack" model has been refined to include formation of a persistent synapse (with a spring adhesion) throughout the attack (which is tunable via the `attack_duration` parameter), and a clarified `attack_damage_rate` to denote the rate at which an attacker damages its target cell. The attacking cell also tracks how long it has attacked (may be useful for exhaustion modeling), whether it is or is not attacking, and the identity (cell pointer) of the cell it is attacking. 
@@ -104,15 +104,15 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 ### Major new features and changes in the 1.14.0 version
 #### 1.14.0 
 + Introduced changes to Rules:
-  + `damage rate` now refers to damage accumulation over time by the cell
-  + `attack damage rate` means what `damage rate` used to mean: how fast the cell deals damage to another cell it is attacking
+  + `damage rate` (a part of `Cell_Integrity`) is now a generalized term for a rate of damage caused by non-attack means 
+  + `attack damage rate` means what `damage rate` used to mean: how fast an attacking cell deals damage to a target cell throughout the duration of the atttack
   + `phagocytose dead cell` is replaced by death-model-specific rates:
     + `phagocytose apoptotic cell`
     + `phagocytose necrotic cell`
     + `phagocytose other dead cell`
 + New `Cell_Integrity` class in PhysiCell_phenotype.h. `damage` was moved from Cell_State into Cell_Integrity 
   + the cancer-biorobots-sample `custom.cpp` was updated to reflect this change.
-+ "contact with dead" now split into "contact with apoptotic" and "contact with necrotic"
++ `contact with dead cell` has been supplemented with additional (refined) signals `contact with apoptotic cell`, `contact with necrotic cell`, and `contact with other dead cell`
 + Seed for random numbers: in the top most <options> tag of a config file (for options that apply to the overall simulation), there is now a <random_seed>. Traditionally, this has been provided in <user_parameters> and if it is still present there, it will override the one in <options>. Users are encouraged to migrate away from its use in <user_parameters> as this will likely be removed from sample projects in a future release.
   + Setting as an integer will have the same behavior as the `user_parameter`
       + <random_seed>0</random_seed>
@@ -174,16 +174,40 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 + fix bug in storing rules that occasionally resulted in seg faults
 
 ### Notices for intended changes that may affect backwards compatibility:
-+ TODO
++ Future releases may further refine `Cell_Integrity` with more specific forms of damage (and accompanying damage and repair rates).
+
++ We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
+
++ We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the future.  
+
++ We may change the role of `operator()` and `operator[]` in `Custom_Variable` to more closely mirror the functionality in `Parameters<T>`. 
+
++ Additional search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+ 
++ We will change the timing of when `entry_function`s are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather than both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to execute the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
+
++ We might make `trigger_death` clear out all the cell's functions, or at least add an option to do this. 
+
++ We might change the behavior of copied Custom Data when a cell changes type (changes to a new cell definition). Currently, all custom data elements in a cell are overwritten based on those in the new cell definition. This is not the best behavior for custom data elements that represent state variables instead of type-dependent parameters. 
 
 ### Planned future improvements: 
 
-+ TODO
++ Further XML-based simulation setup. 
+
++ Read saved simulation states (as MultiCellDS digital snapshots)
+  
++ Create an angiogenesis sample project 
+ 
++ Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
+
++ Further update sample projects to make use of more efficient interaction testing available
+
++ Major refresh of documentation.
 
 * * * 
 
 ## Release summary: 
-Version 1.13.x  \introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created to model rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. These releases also introduce numerous bug fixes, particularly to handling of Dirichlet boundary conditions, while introducing numerous minor feature enhancements such as packing and unpacking user projects (to facilitate code sharing). 
+Version 1.13.x  introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created to model rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. These releases also introduce numerous bug fixes, particularly to handling of Dirichlet boundary conditions, while introducing numerous minor feature enhancements such as packing and unpacking user projects (to facilitate code sharing). 
 
 ### Version 1.13.1 (6 August 2023): 
 Version 1.13.1 primarily introduces bug fixes for smoother addon support, as well as new makefile rules to pack a user project for sharing (`make pack PROJ=name`) and to unpack a shared project (`make unpack PROJ=name`). These will create (pack) or expand (unpack) zipped projects in the `./user_projects` folder. To share, send the zipped file and encourage the recipient to store it in their own `./user_projects` folder. 
