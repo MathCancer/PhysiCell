@@ -207,7 +207,7 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 * * * 
 
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
-**Versions:** 1.13.0 - 
+**Versions:** 1.13.0 - 1.13.1
 
 **Release dates:** 29 July 2023 - 15 September 2024
 * 1.13.0 : 29 July 2023
