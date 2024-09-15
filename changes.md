@@ -86,16 +86,16 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.14 upgrades to the Cell Beheavior Hypothesis Grammar (upgrading to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing. 
+Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing. 
 
 ### Version 1.14.0 (14 Sept 2024):
-TODO - do we need anything here
-?
+Version 1.14.0 Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new `Cell_Integrity` class and refined phagocytosis behaviors (now split into separate rates for apoptotic, necrotic, and other dead cells). The built-in "attack" model has been refined to include formation of a persistent synapse (with a spring adhesion) throughout the attack (which is tunable via the `attack_duration` parameter), and a clarified `attack_damage_rate` to denote the rate at which an attacker damages its target cell. The attacking cell also tracks how long it has attacked (may be useful for exhaustion modeling), whether it is or is not attacking, and the identity (cell pointer) of the cell it is attacking. 
 
-Version 1.14.0 Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new `Cell_Integrity` class and refined phagocytosis behaviors (now split into separate rates for apoptotic, necrotic, and other dead cells). New behaviors such as `attack_damage_rate` and `attack_duration` have been introduced to improve the modeling of attack and damage/integrity processes, as well as additions of a general `damage_rate` (a non-attack rate of damage of self, which for example could be increased in response to drug and toxin exposures, or used for a cell cycle damage checkpoint), and a `damage_repair_rate` which can be used for built-in damage repair. This release also includes an option to set the random number generator seed value and a new user-defined custom function for cell division that may be particualrly useful for . Additionally, a systematic testing package has been added, utilizing scripts and GitHub Actions for automated testing.
+The new `Cell_Integrity` class (within `Phenotype`) allows more control over cell damage. Attacking cells (see above) can increase damage, as well as a new generalized `damage_rate` that can (for example) be used to model damage from other sources such as cytotoxic drugs or toxins. A built-in model for damage repair (wiht default rate `damage_repair_rate` = 0) can be used for simple modeling of damage repair (e.g., DDR during a cycle damage checkpoint). 
 
+This release also includes an option to set the random number generator seed value, new capabilities to draw initial parameters from a random distribution, and support for user-defined custom functions the evaluated during cell division (which allow users to individually set properties of daughter cells, such as during asymmetric division). Beyond bug fixes, the release includes a systematic testing package has been added, utilizing scripts and GitHub Actions for automated testing.
 
-We are grateful for contributions by TODO... Vincent Noël, Randy Heiland, Daniel Bergman, Heber Rocha, and Elmar Bucher in this release. 
+We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergman, Heber Rocha, and Elmar Bucher in this release. 
 
 **NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
 
