@@ -67,11 +67,11 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 ### Key Links 
 **Homepage:**     http://PhysiCell.org
 
+**Setup Guide:**  https://github.com/physicell-training/ws2023/blob/main/agenda.md#set-up-physicell 
+
 **Downloads:**    https://PhysiCell.sf.net AND https://github.com/MathCancer/PhysiCell/releases 
 
 **Support:**      https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA 
-
-**Quick Start:**  Look at QuickStart.md in the documentation folder. 
 
 **User Guide:**   Look at UserGuide.pdf in the documentation folder. 
  
@@ -97,9 +97,9 @@ This release also includes an option to set the random number generator seed val
 
 We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergman, Heber Rocha, and Elmar Bucher in this release. 
 
-**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
+**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Setup Guides](https://github.com/physicell-training/ws2023/blob/main/agenda.md#set-up-physicell) for details.
 
-**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
+**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Setup Guides](https://github.com/physicell-training/ws2023/blob/main/agenda.md#set-up-physicell) for details.
 
 ### Major new features and changes in the 1.14.z versions
 #### 1.14.0 
