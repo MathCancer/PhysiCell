@@ -15,7 +15,8 @@
 (See static std::string PhysiCell_version.) 
 
 2) Update VERSION.txt with a string only containing the version 
-number. There should be no spaces in this file. 
+number. There should be no linebreaks, spaces, or other whitespace
+in this file. 
 
 3) update CITATION.txt to reflect the new version 
 number. 
