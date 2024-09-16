@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2024, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -102,54 +102,54 @@ class PhysiCell_constants
 	static const int mesh_uz_face_index=5;
 	
 	// currently recognized cell cycle models 
-	static const int advanced_Ki67_cycle_model= 0;
-	static const int basic_Ki67_cycle_model=1;
-	static const int flow_cytometry_cycle_model=2;
-	static const int live_apoptotic_cycle_model=3;
-	static const int total_cells_cycle_model=4;
-	static const int live_cells_cycle_model = 5; 
-	static const int flow_cytometry_separated_cycle_model = 6; 
-	static const int cycling_quiescent_model = 7; 
+	static const int advanced_Ki67_cycle_model;
+	static const int basic_Ki67_cycle_model;
+	static const int flow_cytometry_cycle_model;
+	static const int live_apoptotic_cycle_model;
+	static const int total_cells_cycle_model;
+	static const int live_cells_cycle_model ; 
+	static const int flow_cytometry_separated_cycle_model ; 
+	static const int cycling_quiescent_model ; 
 	
 	// currently recognized death models 
-	static const int apoptosis_death_model = 100; 
-	static const int necrosis_death_model = 101; 
-	static const int autophagy_death_model = 102; 
+	static const int apoptosis_death_model ; 
+	static const int necrosis_death_model ; 
+	static const int autophagy_death_model ; 
 	
-	static const int custom_cycle_model=9999; 
+	static const int custom_cycle_model; 
 	
 	// currently recognized cell cycle and death phases 
 	// cycle phases
-	static const int Ki67_positive_premitotic=0; 
-	static const int Ki67_positive_postmitotic=1; 
-	static const int Ki67_positive=2; 
-	static const int Ki67_negative=3; 
-	static const int G0G1_phase=4;
-	static const int G0_phase=5;
-	static const int G1_phase=6; 
-	static const int G1a_phase=7; 
-	static const int G1b_phase=8;
-	static const int G1c_phase=9;
-	static const int S_phase=10;
-	static const int G2M_phase=11;
-	static const int G2_phase=12;
-	static const int M_phase=13;
-	static const int live=14;
+	static const int Ki67_positive_premitotic; 
+	static const int Ki67_positive_postmitotic; 
+	static const int Ki67_positive; 
+	static const int Ki67_negative; 
+	static const int G0G1_phase;
+	static const int G0_phase;
+	static const int G1_phase; 
+	static const int G1a_phase; 
+	static const int G1b_phase;
+	static const int G1c_phase;
+	static const int S_phase;
+	static const int G2M_phase;
+	static const int G2_phase;
+	static const int M_phase;
+	static const int live;
 	
-	static const int G1pm_phase = 15;
-	static const int G1ps_phase = 16; 
+	static const int G1pm_phase ;
+	static const int G1ps_phase ; 
 	
-	static const int cycling = 17; 
-	static const int quiescent = 18; 
+	static const int cycling ; 
+	static const int quiescent ; 
 	
 	
-	static const int custom_phase = 9999;
+	static const int custom_phase ;
 	// death phases
-	static const int apoptotic=100;
-	static const int necrotic_swelling=101;
-	static const int necrotic_lysed=102;
-	static const int necrotic=103; 
-	static const int debris=104; 
+	static const int apoptotic;
+	static const int necrotic_swelling;
+	static const int necrotic_lysed;
+	static const int necrotic; 
+	static const int debris; 
 };
 extern std::string time_units;
 extern std::string space_units;

@@ -111,6 +111,12 @@
 		<SVG>
 			<interval units="min">60</interval>
 			<enable>true</enable>
+			<plot_substrate enabled="false" limits="true">
+                <substrate>substrate</substrate>
+                <colormap>YlOrRd</colormap>
+                <min_conc>0</min_conc>
+                <max_conc>1</max_conc>
+            </plot_substrate>
 		</SVG>
 		
 		<legacy_data>
@@ -122,6 +128,7 @@
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
 		<virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
         <disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
+		<random_seed />
 	</options>	
 
 	<microenvironment_setup>
@@ -266,6 +273,7 @@
                     <attachment_elastic_constant type="double" units="1/min">0.01</attachment_elastic_constant> 
                     <attachment_rate type="double" units="1/min">0.0</attachment_rate> 
                     <detachment_rate type="double" units="1/min">0.0</detachment_rate> 
+					<maximum_number_of_attachments>12</maximum_number_of_attachments>
 				</mechanics>
 				
 				<motility>  
@@ -318,6 +326,21 @@
 			<custom_data>  
 				<sample units="dimensionless" conserved="false">1.0</sample>
 			</custom_data>
+
+			<initial_parameter_distributions enabled="false">
+				<distribution enabled="false" type="Log10Normal" check_base="true">
+					<behavior>Volume</behavior> 
+					<mu>4</mu>
+					<sigma>2</sigma>
+					<upper_bound>100000</upper_bound>
+				</distribution>
+				<distribution enabled="false" type="LogUniform" check_base="true">
+					<behavior>apoptosis</behavior>
+					<min>1e-6</min>
+					<max>1e-2</max>
+				</distribution>
+			</initial_parameter_distributions>
+			
 		</cell_definition>
 	</cell_definitions>
 	
@@ -330,7 +353,7 @@
 	
     <cell_rules>
         <rulesets>
-            <ruleset protocol="CBHG" version="2.0" format="csv" enabled="false">
+            <ruleset protocol="CBHG" version="3.0" format="csv" enabled="false">
                 <folder>./config</folder>
                 <filename>cell_rules.csv</filename>
             </ruleset>

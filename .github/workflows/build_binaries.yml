@@ -1,0 +1,259 @@
+name: Build binaries
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [created]
+    
+jobs:
+         
+  ubuntu:
+    strategy:
+      matrix:
+        projects: [
+          {short_name: "physiboss-tutorial", project: "physiboss-tutorial", name: "PhysiBoSS tutorial", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-tutorial-invasion", project: "physiboss-tutorial-invasion", name: "PhysiBoSS Cancer Invasion", binary: "invasion_model", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-cell-lines", project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template_BM", project: "template_BM", name: "PhysiBoSS Template", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template", project: "template", name: "PhysiCell Template", binary: "project", extra_run: ""},
+          {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
+          {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
+          {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+        ]
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build ${{ matrix.projects.name }}
+      run: |
+        make ${{ matrix.projects.project }}
+        make clean
+        ${{ matrix.projects.extra_run }}
+        make static STATIC_OPENMP=/usr/lib/gcc/x86_64-linux-gnu/11/libgomp.a
+      
+    - name: Checking binary for ${{ matrix.projects.name }}
+      run: |
+        ldd ${{ matrix.projects.binary }}
+            
+    - name: Build ${{ matrix.projects.name }} project archive
+      run: |
+        rm -fr config/PhysiCell_settings-backup.xml
+        tar -zcvf ${{ matrix.projects.short_name }}-linux.tar.gz ${{ matrix.projects.binary }} Makefile main.cpp config/ custom_modules/
+         
+    - uses: actions/upload-release-asset@v1
+      if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_name: ${{ matrix.projects.short_name }}-linux.tar.gz
+        asset_path: ${{ github.workspace }}/${{ matrix.projects.short_name }}-linux.tar.gz
+        asset_content_type: application/gzip   
+        
+        
+  windows:
+    strategy:
+      matrix:
+        projects: [
+          {short_name: "physiboss-tutorial", project: "physiboss-tutorial", name: "PhysiBoSS tutorial", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-tutorial-invasion", project: "physiboss-tutorial-invasion", name: "PhysiBoSS Cancer Invasion", binary: "invasion_model", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-cell-lines", project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template_BM", project: "template_BM", name: "PhysiBoSS Template", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template", project: "template", name: "PhysiCell Template", binary: "project", extra_run: ""},
+          {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
+          {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
+          {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+        ]
+    
+    runs-on: windows-latest
+    
+    defaults:
+      run:
+        shell: msys2 {0}
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 mingw-w64-x86_64-python mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-python-cffi make bison flex mingw-w64-x86_64-ca-certificates
+
+    - name: Build ${{ matrix.projects.name }} project
+      run: |
+        make ${{ matrix.projects.project }}
+        make clean
+        python beta/setup_windows_dep.py
+        ${{ matrix.projects.extra_run }}
+        make static
+        
+    - name: Checking binary for ${{ matrix.projects.name }}
+      run: |
+        ldd .\\${{ matrix.projects.binary }}.exe
+      
+    - name: Build ${{ matrix.projects.name }} project archive
+      run: |
+        rm -fr config/PhysiCell_settings-backup.xml
+        tar -zcvf ${{ matrix.projects.short_name }}-win.tar.gz ${{ matrix.projects.binary }}.exe *.dll Makefile main.cpp config/ custom_modules/
+        
+    - uses: actions/upload-release-asset@v1
+      if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_name: ${{ matrix.projects.short_name }}-win.tar.gz
+        asset_path: ${{ github.workspace }}\${{ matrix.projects.short_name }}-win.tar.gz
+        asset_content_type: application/gzip
+        
+  
+  macos_step0a:
+    strategy:
+      matrix:
+        projects: [
+          {short_name: "physiboss-tutorial", project: "physiboss-tutorial", name: "PhysiBoSS tutorial", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-tutorial-invasion", project: "physiboss-tutorial-invasion", name: "PhysiBoSS Cancer Invasion", binary: "invasion_model", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-cell-lines", project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template_BM", project: "template_BM", name: "PhysiBoSS Template", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template", project: "template", name: "PhysiCell Template", binary: "project", extra_run: ""},
+          {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
+          {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
+          {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+       ]
+    
+    runs-on: macos-12
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run : brew install gcc@13
+      
+    - name: Build ${{ matrix.projects.name }} project
+      run: |
+        export MACOSX_DEPLOYMENT_TARGET=12
+        make ${{ matrix.projects.project }}
+        make clean
+        ${{ matrix.projects.extra_run }}
+        make PHYSICELL_CPP=g++-13 static
+        cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos12
+
+    - name: Caching produced project binary 
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/${{ matrix.projects.binary }}_macos12
+        key: ${{ runner.os }}-macos12-${{ github.run_id }}
+    
+    - name: Look at the generated binary
+      run: |
+        otool -L ${{ matrix.projects.binary }}
+        otool -l ${{ matrix.projects.binary }}
+        lipo -archs ${{ matrix.projects.binary }}
+    
+  macos_step0b:
+    strategy:
+      matrix:
+        projects: [
+          {short_name: "physiboss-tutorial", project: "physiboss-tutorial", name: "PhysiBoSS tutorial", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-tutorial-invasion", project: "physiboss-tutorial-invasion", name: "PhysiBoSS Cancer Invasion", binary: "invasion_model", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-cell-lines", project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template_BM", project: "template_BM", name: "PhysiBoSS Template", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template", project: "template", name: "PhysiCell Template", binary: "project", extra_run: ""},
+          {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
+          {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
+          {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+        ]
+    
+    runs-on: macos-14
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run : brew install gcc@13
+      
+    - name: Build ${{ matrix.projects.name }} project
+      run: |
+        export MACOSX_DEPLOYMENT_TARGET=12
+        make ${{ matrix.projects.project }}
+        make clean
+        ${{ matrix.projects.extra_run }}
+        make PHYSICELL_CPP=g++-13 static
+        cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macosm1
+   
+    - name: Caching produced project binary 
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/${{ matrix.projects.binary }}_macosm1
+        key: ${{ runner.os }}-macosm1-${{ github.run_id }}
+      
+    - name: Look at the generated binary
+      run: |
+        otool -L ${{ matrix.projects.binary }}
+        otool -l ${{ matrix.projects.binary }}
+        lipo -archs ${{ matrix.projects.binary }} 
+        
+  macos_step1:
+    strategy:
+      matrix:
+        projects: [
+          {short_name: "physiboss-tutorial", project: "physiboss-tutorial", name: "PhysiBoSS tutorial", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-tutorial-invasion", project: "physiboss-tutorial-invasion", name: "PhysiBoSS Cancer Invasion", binary: "invasion_model", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "physiboss-cell-lines", project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template_BM", project: "template_BM", name: "PhysiBoSS Template", binary: "project", extra_run: "make Compile_MaBoSS PHYSICELL_CPP=g++-11"},
+          {short_name: "template", project: "template", name: "PhysiCell Template", binary: "project", extra_run: ""},
+          {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
+          {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
+          {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+        ]
+        
+    runs-on: macos-12
+    needs: [macos_step0a, macos_step0b]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Caching produced project binary 
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/${{ matrix.projects.binary }}_macosm1
+        key: ${{ runner.os }}-macosm1-${{ github.run_id }}
+    
+    - name: Caching produced project binary 
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/${{ matrix.projects.binary }}_macos12
+        key: ${{ runner.os }}-macos12-${{ github.run_id }}
+    
+    - name: Creating universal binary
+      run: | 
+        lipo -create -output ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos12 ${{ matrix.projects.binary }}_macosm1
+
+    - name: Checking universal binary
+      run: |
+        lipo -archs ${{ matrix.projects.binary }}
+        otool -l ${{ matrix.projects.binary }}
+        otool -L ${{ matrix.projects.binary }}
+        
+    - name: Build project archive
+      run: |
+        make ${{ matrix.projects.project }}
+        rm -fr config/PhysiCell_settings-backup.xml
+        tar -zcvf ${{ matrix.projects.short_name }}-macos.tar.gz ${{ matrix.projects.binary }} Makefile main.cpp config/ custom_modules/
+        
+    - uses: actions/upload-release-asset@v1
+      if: github.event_name == 'release'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_name: ${{ matrix.projects.short_name }}-macos.tar.gz
+        asset_path: ${{ github.workspace }}/${{ matrix.projects.short_name }}-macos.tar.gz
+        asset_content_type: application/gzip

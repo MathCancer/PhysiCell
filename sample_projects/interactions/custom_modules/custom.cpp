@@ -70,7 +70,10 @@
 void create_cell_types( void )
 {
 	// set the random seed 
-	SeedRandom( parameters.ints("random_seed") );  
+	if (parameters.ints.find_index("random_seed") != -1)
+	{
+		SeedRandom(parameters.ints("random_seed"));
+	}
 	
 	/* 
 	   Put any modifications to default cell definition here if you 
@@ -342,7 +345,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	 
 }
 
-std::vector<std::string> my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc )
+std::string my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc )
 {
 	 return paint_by_density_percentage( concentration,  max_conc,  min_conc); 
 	 
@@ -424,7 +427,7 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// damage increases death 
 	static int nApoptosis = phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
 
-	signal = pCell->state.damage; 
+	signal = pCell->phenotype.cell_integrity.damage;
 	base_val = pCD->phenotype.death.rates[nApoptosis]; 
 
 	static double damage_halfmax = pCD->custom_data["damage_halfmax"]; 

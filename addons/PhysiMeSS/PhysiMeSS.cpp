@@ -22,7 +22,7 @@ void remove_physimess_out_of_bounds_fibres()
 void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 {
     
-    double movement_threshold = PhysiCell::parameters.doubles("fibre_stuck_threshold");
+    double movement_threshold = pCell->custom_data["fibre_stuck_threshold"];
     if (!isFibre(pCell) && phenotype.motility.is_motile) {
 	
         // Here I changed this, because here we don't have access to the old position, and I didn't want to track the old position
@@ -139,7 +139,8 @@ void physimess_mechanics( double dt )
     {
         last_update_time = PhysiCell_globals.current_time;
         
-        #pragma omp parallel for
+        //#pragma omp parallel for
+        // This is not parallel because we are modifying the agend grid
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];
@@ -165,7 +166,8 @@ void physimess_mechanics( double dt )
             }
         }
 
-        #pragma omp parallel for
+        // #pragma omp parallel for
+        // This is not parallel because we are modifying the agend grid
         for( int i=0; i < (*all_cells).size(); i++ )
         {
             Cell* pC = (*all_cells)[i];

@@ -83,7 +83,7 @@ void setup_microenvironment( void );
 // custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
-std::vector<std::string> my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc );
+std::string my_coloring_function_for_substrate( double concentration, double max_conc, double min_conc );
 void my_cellcount_function(char* string);
 
 // custom functions can go here 
@@ -101,4 +101,3 @@ class PhysiMeSS_Cell_Custom_Degrade : public PhysiMeSS_Cell
   public:  
   void degrade_fibre(PhysiMeSS_Fibre* pFibre);
 };
-// void PhysiMeSS_Cell::other_degrade_fibre(PhysiMeSS_Fibre* pFibre);

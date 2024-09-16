@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2024, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,6 +70,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <cstring>
 
 #ifndef _PhysiCell_SVG_h_
 #define _PhysiCell_SVG_h_
@@ -78,6 +79,8 @@ bool Write_SVG_start( std::ostream& os, double width, double height );
 bool Write_SVG_end( std::ostream& os );
 
 bool Write_SVG_text( std::ostream& os, const char* str , double position_x, double position_y, double font_size , const char* color , const char* font);
+void Write_SVG_text(std::ostream& os, const char* str , double position_x, double position_y, double font_size , const char* color , const char* font, double rotation);
+
 bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, std::string stroke_color , std::string fill_color );
 
 bool Write_SVG_rect( std::ostream& os , double UL_corner_x, double UL_corner_y, double width, double height,

@@ -10,7 +10,9 @@
 #include "maboss_network.h"
 #include "utils.h"
 
-static std::string PhysiBoSS_Version = "2.2.2"; 
+static std::string PhysiBoSS_Version = "2.2.3"; 
+static std::string PhysiBoSS_DOI = "10.1038/s41540-023-00314-4"; 
+static std::string PhysiBoSS_URL = "https://github.com/PhysiBoSS/PhysiBoSS"; 
 
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
@@ -68,12 +70,10 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	}
 
 	void update(PhysiCell::Cell * cell, PhysiCell::Phenotype& phenotype, double dt) {
-		if (!cell->phenotype.death.dead) {
-			this->update_inputs(cell, phenotype, dt);
-			this->maboss.run_simulation();
-			this->update_outputs(cell, phenotype, dt);
-			this->next_physiboss_run += this->maboss.get_time_to_update();
-		}
+		this->update_inputs(cell, phenotype, dt);
+		this->maboss.run_simulation();
+		this->update_outputs(cell, phenotype, dt);
+		this->next_physiboss_run += this->maboss.get_time_to_update();
 	}
 	
 	bool need_update() {
@@ -120,7 +120,7 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 
 	void display(std::ostream& os);
 	
-	static void save(std::string filename, std::vector<PhysiCell::Cell*>& cells);
+	static void save(std::string filename);
 
     // unneeded for this type
     int update_phenotype_parameters(PhysiCell::Phenotype& phenotype) {return 0;}

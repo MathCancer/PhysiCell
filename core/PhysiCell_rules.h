@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2024, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -145,7 +145,7 @@ class Hypothesis_Ruleset
     std::string cell_type; 
     Cell_Definition* pCell_Definition; 
 
-    std::vector< Hypothesis_Rule > rules; 
+    std::vector< Hypothesis_Rule* > rules; 
 
     Hypothesis_Ruleset(); // done 
 
@@ -218,10 +218,9 @@ void parse_csv_rule_v1( std::vector<std::string> input ); // parse a tokenized s
 void parse_csv_rule_v1( std::string input ); // parse a single string (a single line from CSV)
 void parse_csv_rules_v1( std::string filename ); // parse all rules in a CSV file 
 
-// experimental -- removes need for base value 
-void parse_csv_rule_v2( std::vector<std::string> input ); // parse a tokenized string (vector of strings)
-void parse_csv_rule_v2( std::string input ); // parse a single string (a single line from CSV)
-void parse_csv_rules_v2( std::string filename ); // parse all rules in a CSV file 
+void parse_csv_rule_v3( std::vector<std::string> input ); // parse a tokenized string (vector of strings)
+void parse_csv_rule_v3( std::string input ); // parse a single string (a single line from CSV)
+void parse_csv_rules_v3( std::string filename ); // parse all rules in a CSV file 
 
 void parse_rules_from_pugixml( void );
 
@@ -230,14 +229,14 @@ void parse_rules_from_parameters_v0( void );
 
 std::string csv_strings_to_English( std::vector<std::string> strings , bool include_cell_header ); 
 std::string csv_strings_to_English_v1( std::vector<std::string> strings , bool include_cell_header );
-std::string csv_strings_to_English_v2( std::vector<std::string> strings , bool include_cell_header );
+std::string csv_strings_to_English_v3( std::vector<std::string> strings , bool include_cell_header );
 
 std::string csv_strings_to_English_HTML( std::vector<std::string> strings , bool include_cell_header ); 
 
 // v1, v2, and v0? 
 void export_rules_csv_v0( std::string filename ); 
 void export_rules_csv_v1( std::string filename ); 
-void export_rules_csv_v2( std::string filename ); 
+void export_rules_csv_v3( std::string filename ); 
 
 // streamed outputs in human-readable format
 

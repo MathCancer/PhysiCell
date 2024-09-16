@@ -475,146 +475,24 @@ void Microenvironment::add_density( void )
 {
 	// fix in PhysiCell preview November 2017 
 	// default_microenvironment_options.use_oxygen_as_first_field = false; 
-	
-	// update 1, 0 
-	zero.push_back( 0.0 ); 
-	one.push_back( 1.0 );
-	
-	// update units
-	density_names.push_back( "unnamed" ); 
-	density_units.push_back( "none" ); 
-
-	// update coefficients 
-	diffusion_coefficients.push_back( 0.0 ); 
-	decay_rates.push_back( 0.0 ); 
-	
-	// update sources and such 
-	for( unsigned int i=0; i < temporary_density_vectors1.size() ; i++ )
-	{
-		temporary_density_vectors1[i].push_back( 0.0 ); 
-		temporary_density_vectors2[i].push_back( 0.0 ); 
-	}
-
-	// resize the gradient data structures 
-	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
-	{
-		gradient_vectors[k].resize( number_of_densities() ); 
-		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
-		{
-			(gradient_vectors[k])[i].resize( 3, 0.0 );
-		}
-	}
-
-	gradient_vector_computed.resize( mesh.voxels.size() , false ); 	
-	
-	one_half = one; 
-	one_half *= 0.5; 
-	
-	one_third = one; 
-	one_third /= 3.0; 
-	
-	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.push_back( true ); 
-	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
-	
-	// Fixes in PhysiCell preview November 2017
-	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.push_back( false );
-	
-	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
-
-	default_microenvironment_options.Dirichlet_all.push_back( true ); 
-//	default_microenvironment_options.Dirichlet_interior.push_back( true );
-	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
-	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
-	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
-	
-	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 
-	
-	return; 
+	return add_density( "unnamed" , "none" );
 }
 
 void Microenvironment::add_density( std::string name , std::string units )
 {
 	// fix in PhysiCell preview November 2017 
 	// default_microenvironment_options.use_oxygen_as_first_field = false; 
-	
-	// update 1, 0 
-	zero.push_back( 0.0 ); 
-	one.push_back( 1.0 );
-
-	// update units
-	density_names.push_back( name ); 
-	density_units.push_back( units ); 
-
-	// update coefficients 
-	diffusion_coefficients.push_back( 0.0 ); 
-	decay_rates.push_back( 0.0 ); 
-	
-	// update sources and such 
-	for( unsigned int i=0; i < temporary_density_vectors1.size() ; i++ )
-	{
-		temporary_density_vectors1[i].push_back( 0.0 ); 
-		temporary_density_vectors2[i].push_back( 0.0 ); 
-	}
-
-	// resize the gradient data structures, 
-	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
-	{
-		gradient_vectors[k].resize( number_of_densities() ); 
-		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
-		{
-			(gradient_vectors[k])[i].resize( 3, 0.0 );
-		}
-	}
-	gradient_vector_computed.resize( mesh.voxels.size() , false ); 	
-
-	one_half = one; 
-	one_half *= 0.5; 
-	
-	one_third = one; 
-	one_third /= 3.0; 
-	
-	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.push_back( false );
-	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
-	
-	// fix in PhysiCell preview November 2017 
-	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.push_back( false ); // assign( number_of_densities(), false ); 
-
-	default_microenvironment_options.Dirichlet_all.push_back( false );
-	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
-	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
-	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
-	
-	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 	
-
-	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
-	
-	return; 
+	return add_density( name , units , 0.0 , 0.0 );
 }
 
 void Microenvironment::add_density( std::string name , std::string units, double diffusion_constant, double decay_rate )
 {
 	// fix in PhysiCell preview November 2017 
-	// default_microenvironment_options.use_oxygen_as_first_field = false; 
+	if ( find_density_index( name ) != -1 )
+	{
+		std::cout << "ERROR: density named " << name << " already exists. You probably want your substrates all have unique names!" << std::endl;
+		exit(-1); 
+	}
 	
 	// update 1, 0 
 	zero.push_back( 0.0 ); 
@@ -1319,9 +1197,29 @@ void initialize_microenvironment( void )
 		default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector; 
 	}
 
-	// set the initial condition 
-	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
-	{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
+	// set the initial condition
+
+	if (default_microenvironment_options.initial_condition_from_file_enabled)
+	{
+		if (default_microenvironment_options.initial_condition_file_type=="matlab")
+		{
+			load_initial_conditions_from_matlab(default_microenvironment_options.initial_condition_file);
+		}
+		else if (default_microenvironment_options.initial_condition_file_type=="csv" || default_microenvironment_options.initial_condition_file_type=="CSV")
+		{
+			load_initial_conditions_from_csv(default_microenvironment_options.initial_condition_file);
+		}
+		else // eventually can add other file types
+		{
+			std::cout << "ERROR : Load BioFVM initial conditions from " << default_microenvironment_options.initial_condition_file_type << " not yet supported." << std::endl;
+			exit(-1);
+		}
+	}
+	else // do what was done before
+	{
+		for (unsigned int n = 0; n < microenvironment.number_of_voxels(); n++)
+		{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
+	}
 
 	// now, figure out which sides have BCs (for at least one substrate): 
 
@@ -1531,14 +1429,188 @@ void initialize_microenvironment( void )
 	
     // April 2023: no longer necessary after flipping our approach and doing an "additive" instead of "subtractive" DCs handling. I.e., we assume DC activation is false by default; make true on-demand.
 
-	// // set the Dirichlet condition activation vector to match the microenvironment options 
+	// // set the Dirichlet condition activation vector to match the microenvironment options
 	// for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
 	// {
-	// 	microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
+	// 	microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] );
 	// }
-	
-	microenvironment.display_information( std::cout );
+
+	microenvironment.display_information(std::cout);
 	return;
 }
 
+void load_initial_conditions_from_matlab(std::string filename)
+{
+	// The .mat file needs to contain exactly one matrix where each row corresponds to a single voxel.
+	// Each row is a vector of values as follows: [x coord, y coord, z coord, substrate id 0 value, substrate id 1 value, ...]
+	// Thus, your matrix should be of size #voxels x (3 + #densities) (rows x columns)
+	// M will be read in such that each element of M is one of these rows
+	std::vector< std::vector<double> > M = read_matlab( filename );
+	int num_mat_voxels = M.size();
+	int num_mat_features = M[1].size();
+	if (num_mat_voxels != microenvironment.number_of_voxels())
+	{
+		std::cout << "ERROR : Wrong number of voxels supplied in the .mat file specifying BioFVM initial conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_voxels() << std::endl
+				  << "\tFound: " << num_mat_voxels << std::endl
+				  << "\tRemember, save your matrix as a #voxels x (3 + #densities) matrix." << std::endl;
+		exit(-1);
+	}
+	if (num_mat_features != (microenvironment.number_of_densities() + 3))
+	{
+		std::cout << "ERROR : Wrong number of density values supplied in the .mat file specifying BioFVM initial conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_densities() << std::endl
+				  << "\tFound: " << num_mat_features - 3 << std::endl
+				  << "\tRemember, save your matrix as a #voxels x (3 + #densities) matrix." << std::endl;
+		exit(-1);
+	}
+	std::vector<int> voxel_set = {}; // set to check that no voxel value is set twice
+	int voxel_ind;
+	std::vector<double> position;
+	for (unsigned int i = 0; i < num_mat_voxels; i++)
+	{
+		position = {M[i][0], M[i][1], M[i][2]};
+		voxel_ind = microenvironment.mesh.nearest_voxel_index(position);
+		for (unsigned int ci = 0; ci < microenvironment.number_of_densities(); ci++)
+		{
+			microenvironment.density_vector(voxel_ind)[ci] = M[i][ci+3];
+		}
+		for (unsigned int j = 0; j < i; j++)
+		{
+			if (voxel_ind==voxel_set[j])
+			{
+				std::cout << "ERROR : the matlab-supplied initial conditions for BioFVM repeat the same voxel. Fix the .mat file and try again." << std::endl
+						  << "\tPosition that was repeated: " << position << std::endl;
+				exit(-1);
+			}
+		}
+		voxel_set.push_back(voxel_ind);
+	}
+
+	return;
+}
+
+void load_initial_conditions_from_csv(std::string filename)
+{
+	// The .csv file needs to contain one row per voxel.
+	// Each row is a vector of values as follows: [x coord, y coord, z coord, substrate id 0 value, substrate id 1 value, ...]
+	// Thus, your table should be of size #voxels x (3 + #densities) (rows x columns)
+	// Do not include a header row.
+
+	// open file 
+	std::ifstream file( filename, std::ios::in );
+	if( !file )
+	{ 
+		std::cout << "ERROR: " << filename << " not found during cell loading. Quitting." << std::endl; 
+		exit(-1);
+	}
+
+	// determine if header row exists 
+	std::string line; 
+	std::getline( file , line );
+	char c = line.c_str()[0];
+	std::vector<int> substrate_indices;
+	bool header_provided = false;
+	if( c == 'X' || c == 'x' )
+	{ 
+		// do not support this with a header yet
+		if ((line.c_str()[2] != 'Y' && line.c_str()[2] != 'y') || (line.c_str()[4] != 'Z' && line.c_str()[4] != 'z'))
+		{
+			std::cout << "ERROR: Header row starts with x but then not y,z? What is this? Exiting now." << std::endl;
+			file.close();
+			exit(-1);
+		}
+		std::vector< std::string> column_names; // this will include x,y,z (so make sure to skip those below)
+		std::stringstream stream(line);
+		std::string field;
+
+		while (std::getline(stream, field, ','))
+		{
+			column_names.push_back(field);
+		}
+		for (int i = 3; i<column_names.size(); i++) // skip x,y,z by starting at 3, not 0
+		{
+			int substrate_index = microenvironment.find_density_index(column_names[i]);
+			if (substrate_index == -1)
+			{
+				std::cout << "ERROR: Substrate " << column_names[i] << " not found in the BioFVM microenvironment. Exiting now." << std::endl;
+				file.close();
+				exit(-1);
+			}
+			substrate_indices.push_back(microenvironment.find_density_index(column_names[i]));
+		}
+		header_provided = true;
+	}
+	else // no column labels given; just assume that the first n substrates are supplied (n = # columns after x,y,z)
+	{
+		std::stringstream stream(line);
+		std::string field;
+		int i = 0;
+		while (std::getline(stream, field, ','))
+		{
+			if (i<3) {continue;} // skip (x,y,z)
+			substrate_indices.push_back(i-3); // the substrate index is the column index - 3 (since x,y,z are the first 3 columns)
+			i++;
+		}
+		// in this case, we want to read this first line, so close the file and re-open so that we start with this line
+		file.close();
+		std::ifstream file(filename, std::ios::in);
+		std::getline(file, line);
+	}
+
+	std::cout << "Loading substrate initial conditions from CSV file " << filename << " ... " << std::endl;
+	std::vector<int> voxel_set = {}; // set to check that no voxel value is set twice
+	
+	while (std::getline(file, line))
+	{
+		get_row_from_substrate_initial_condition_csv(voxel_set, line, substrate_indices, header_provided);
+	}
+	
+	if (voxel_set.size() != microenvironment.number_of_voxels())
+	{
+		std::cout << "ERROR : Wrong number of voxels supplied in the .csv file specifying BioFVM initial conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_voxels() << std::endl
+				  << "\tFound: " << voxel_set.size() << std::endl
+				  << "\tRemember, your table should have dimensions #voxels x (3 + #densities)." << std::endl;
+		exit(-1);
+	}
+
+	file.close(); 	
+	
+	return;
+}
+
+void get_row_from_substrate_initial_condition_csv(std::vector<int> &voxel_set, const std::string line, const std::vector<int> substrate_indices, const bool header_provided)
+{
+	static bool warning_issued = false;
+	std::vector<double> data;
+	csv_to_vector(line.c_str(), data);
+
+	if (!(warning_issued) && !(header_provided) && (data.size() != (microenvironment.number_of_densities() + 3)))
+	{
+		std::cout << "WARNING: Wrong number of density values supplied in the .csv file specifying BioFVM initial conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_voxels() << std::endl
+				  << "\tFound: " << data.size() - 3 << std::endl
+				  << "\tRemember, save your csv with columns as: x, y, z, substrate_0, substrate_1,...." << std::endl
+				  << "\tThis could also be resolved by including a header row \"x,y,z,[substrate_i0,substrate_i1]\"" << std::endl;
+		warning_issued = true;
+	}
+
+	std::vector<double> position = {data[0], data[1], data[2]};
+	int voxel_ind = microenvironment.mesh.nearest_voxel_index(position);
+	for (unsigned int ci = 0; ci < substrate_indices.size(); ci++) // column index, counting from the first substrate (or just the index of the vector substrate_indices)
+	{
+		microenvironment.density_vector(voxel_ind)[substrate_indices[ci]] = data[ci + 3];
+	}
+	for (unsigned int j = 0; j < voxel_set.size(); j++)
+	{
+		if (voxel_ind == voxel_set[j])
+		{
+			std::cout << "ERROR : the csv-supplied initial conditions for BioFVM repeat the same voxel. Fix the .csv file and try again." << std::endl
+					  << "\tPosition that was repeated: " << position << std::endl;
+			exit(-1);
+		}
+	}
+	voxel_set.push_back(voxel_ind);
+}
 };
