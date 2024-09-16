@@ -21,11 +21,12 @@ in this file.
 3) update CITATION.txt to reflect the new version 
 number. 
 
-4) Append most recent changes in README.md. Copy everything after 
-   "Release summary" in changes.md (the most recent version x.y.z only) 
-   to overwrite everything after "* * * " in README.md 
+4) Copy most recent changes in README.md. Copy everything from top of 
+   CHANGES.md to the end of the series of releases 1.x.0 to ... 1.x.y 
+   (ending in "* * *") to overwrite everything in README.md
 
-6) Make appropriate changes to ./documentation/User_Guide.tex, and 
+6) [[ outdated ]] 
+   Make appropriate changes to ./documentation/User_Guide.tex, and 
    recompile the LaTeX document. Don't forget to set \Version to x.y.z 
    at the top of the document. Set the \ReleaseDate to today (manually). 
 
