@@ -1,9 +1,9 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems
-**Versions:** 1.13.0 - 
 
-**Release dates:** 29 July 2023 - 
-* 1.13.0 : 29 July 2023
-* 1.13.1 : 6 August 2023
+**Versions:** 1.14.0 - 
+
+**Release dates:** 15 September 2024 - 
+* 1.14.0 : 15 September 2024
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -42,6 +42,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
       * mechano-sample
       * rules-sample
       * physimess-sample
+      * custom-division-sample
 
 **`make list-projects`** : list all available sample projects 
 
@@ -64,13 +65,13 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 **`make upgrade`**       : fetch the latest release of PhysiCell and overwrite the core library and sample projects. 
 
 ### Key Links 
-**Homepage:**     http://PhysiCell.MathCancer.org 
+**Homepage:**     http://PhysiCell.org
 
-**Downloads:**    http://PhysiCell.sf.net
+**Setup Guide:**  https://github.com/physicell-training/ws2023/blob/main/agenda.md#set-up-physicell 
+
+**Downloads:**    https://PhysiCell.sf.net AND https://github.com/MathCancer/PhysiCell/releases 
 
 **Support:**      https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA 
-
-**Quick Start:**  Look at QuickStart.md in the documentation folder. 
 
 **User Guide:**   Look at UserGuide.pdf in the documentation folder. 
  
@@ -85,76 +86,101 @@ See changes.md for the full change log.
 * * * 
 
 ## Release summary: 
-Version 1.13.x  \introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created to model rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. These releases also introduce numerous bug fixes, particularly to handling of Dirichlet boundary conditions, while introducing numerous minor feature enhancements such as packing and unpacking user projects (to facilitate code sharing). 
+Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
 
-### Version 1.13.1 (6 August 2023): 
-Version 1.13.1 primarily introduces bug fixes for smoother addon support, as well as new makefile rules to pack a user project for sharing (`make pack PROJ=name`) and to unpack a shared project (`make unpack PROJ=name`). These will create (pack) or expand (unpack) zipped projects in the `./user_projects` folder. To share, send the zipped file and encourage the recipient to store it in their own `./user_projects` folder. 
+### Version 1.14.0 (15 Sep 2024):
+Version 1.14.0 Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new `Cell_Integrity` class and refined phagocytosis behaviors (now split into separate rates for apoptotic, necrotic, and other dead cells). The built-in "attack" model has been refined to include formation of a persistent synapse (with a spring adhesion) throughout the attack (which is tunable via the `attack_duration` parameter), and a clarified `attack_damage_rate` to denote the rate at which an attacker damages its target cell. The attacking cell also tracks how long it has attacked (may be useful for exhaustion modeling), whether it is or is not attacking, and the identity (cell pointer) of the cell it is attacking. 
 
-### Version 1.13.0 (29 July 2023):
-Version 1.13.0 introduces PhysiMeSS (MicroEnvironment Structures Simulation) as a PhysiCell add-on created by Cicely Macnamara, Vincent Noël and collaborators, which allows the user to specify rod-shaped microenvironment elements such as the matrix fibres (e.g. collagen) of the ECM. This allows the PhysiCell user the ability to investigate fine-grained processes between cellular and fibrous ECM agents. We are providing an sample project together with this addon to demonstrate, via many examples, the possibilities of PhysiMeSS. For more information, consult the PhysiMeSS README available in [./addons/PhysiMeSS/README.md](./addons/PhysiMeSS/README.md). Version 1.13.0 also updates the bundled PhysiBoSS addon, introduces a variety of bug fixes (particularly in handling of Dirichlet boundary conditions), and improves SVG plots. 
+The new `Cell_Integrity` class (within `Phenotype`) allows more control over cell damage. Attacking cells (see above) can increase damage, as well as a new generalized `damage_rate` that can (for example) be used to model damage from other sources such as cytotoxic drugs or toxins. A built-in model for damage repair (with default rate `damage_repair_rate` = 0) can be used for simple modeling of damage repair (e.g., DNA damage response during a cycle damage checkpoint). 
 
-We are grateful for immense contributions by Cicely Macnamara, Vincent Noël, Randy Heiland, Daniel Bergman, Marco Ruscone, Furkan Kurtoglu, and Elmar Bucher in this release. 
+This release also includes an option to set the random number generator seed value, new capabilities to draw initial parameters from a random distribution, and support for user-defined custom functions the evaluated during cell division (which allow users to individually set properties of daughter cells, such as during asymmetric division). Beyond bug fixes, the release includes a systematic testing package, utilizing scripts and GitHub Actions for automated testing.
 
-**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Quickstart](documentation/Quickstart.md) for details.
+We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergman, Heber Rocha, and Elmar Bucher in this release. 
 
-**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Quickstart](documentation/Quickstart.md) for details.
+**NOTE 1:** MacOS users need to define a PHYSICELL_CPP environment variable to specify their OpenMP-enabled g++. See the [Setup Guides](https://github.com/physicell-training/ws2023/blob/main/agenda.md#set-up-physicell) for details.
 
-### Major new features and changes in the 1.13.z versions
-#### 1.13.1 
-+ None in this release
-#### 1.13.0
-+ Introduced PhysiMeSS, a major addon for modeling fibers of the extracellular matrix. Major thanks to Cicely Macnamara, Vincent Noël, and team!
+**NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Setup Guides](https://github.com/physicell-training/ws2023/blob/main/agenda.md#set-up-physicell) for details.
+
+### Major new features and changes in the 1.14.z versions
+#### 1.14.0 
++ Introduced changes to Rules:
+  + `damage rate` (a part of `Cell_Integrity`) is now a generalized term for a rate of damage caused by non-attack means 
+  + `attack damage rate` means what `damage rate` used to mean: how fast an attacking cell deals damage to a target cell throughout the duration of the atttack
+  + `phagocytose dead cell` is replaced by death-model-specific rates:
+    + `phagocytose apoptotic cell`
+    + `phagocytose necrotic cell`
+    + `phagocytose other dead cell`
++ New `Cell_Integrity` class in PhysiCell_phenotype.h. `damage` was moved from Cell_State into Cell_Integrity 
+  + the cancer-biorobots-sample `custom.cpp` was updated to reflect this change.
++ `contact with dead cell` has been supplemented with additional (refined) signals `contact with apoptotic cell`, `contact with necrotic cell`, and `contact with other dead cell`
++ Seed for random numbers: in the top most <options> tag of a config file (for options that apply to the overall simulation), there is now a <random_seed>. Traditionally, this has been provided in <user_parameters> and if it is still present there, it will override the one in <options>. Users are encouraged to migrate away from its use in <user_parameters> as this will likely be removed from sample projects in a future release.
+  + Setting as an integer will have the same behavior as the `user_parameter`
+      + <random_seed>0</random_seed>
+  + Setting as “”, “random”, or “system_clock” will use the system clock to set the random seed
+      + <random_seed />
+      + <random_seed></random_seed>
+      + <random_seed>random</random_seed>
+      + <random_seed>system_clock</random_seed>
++ New option for a user-defined custom function for cell division. If provided, the custom function will receive pointers to the two daughter cells. A new sample project, `custom-division-sample`, is provided.
++ Initial parameter distributions
+  + Users can now start cells with heterogeneity in any behavior or also the total volume
+  + For ease of access, in studio navigate to Cell Types > Misc > Parameter Distributions
+  + Five distributions supported:
+    + Uniform
+      + Set min and max; behavior ~ U(min, max)
+    + Log uniform
+      + Set min and max; z ~ U(log(min), log(max)); behavior ~ exp(z)
+      + Note: min and max are on the behavior scale, not the logarithmic scale
+    + Normal
+      + Set μ and σ; behavior ~ N(μ, σ)
+      + Optionally set lb, ub to impose lb <= behavior <= ub
+    + Log normal
+      + Set μ and σ; z ~ N(μ, σ); behavior ~ exp(z)
+      + Optionally set lb, ub to impose lb <= behavior <= ub
+      + Note: μ and σ are on the logarithmic scale
+      + Note: lb and ub are on the behavior scale
+    + Log10 normal
+      + Same as log normal, except behavior ~ 10^z
+      + Implemented because log10 values are more human-interpretable
+  + Can enforce that the base value is within the distribution to help constrain parameter sweeps
+  + “Enable” attributes make it easy to toggle on/off individual distributions or for an entire cell type
++ MultiCellDS update:
+  + PhysiBoSS intracellular data is now part of data export
+  + Spring attachments are now part of data export
+  + Streamlined MultiCellDS with incorporation of more single-cell parameters/state variables
++ Update to PhysiBoSS 2.2.3
+  + Added steepness parameter to output mapping, controlling the Hill coefficient used.
+  + Added use_for_dead parameter to input and output mapping, to define if this mapping should be used on dead cells.
+  + Added three new sample projects: 
+    + template_BM: adaptation of the template project of PhysiCell, with PhysiBoSS support
+    + physiboss-tutorial: three toy models presented in the PhysiBoSS tutorial ([10.48550/arXiv.2406.18371](https://doi.org/10.48550/arXiv.2406.18371)).
+    + physiboss-tutorial-invasion: update of the cancer invasion model by Ruscone et al., also presented in the PhysiBoSS tutorial.
++ Update to PhysiMeSS 1.0.1
+  + Most parameters are now defined in custom_data, to make them specific to a cell definition. This introduces the possibility to have multiple types of fibers.
++ Introducing experimental pre-compiled binaries, available via python beta/download_binary.py.
++ Non-monotonic rules: a single signal can now both cause an increase *and* a decrease in a behavior for a cell type (bringing the implementation in better compliance with the specification at https://www.biorxiv.org/content/10.1101/2023.09.17.557982) 
++ Initialize substrate initial conditions using a .mat or .csv file
+  + implemented in PhysiCell Studio; see output there for formatting of the csv
++ Substrate heatmaps on SVGs improvements:
+  + set colormaps in the config file
+  + set the svg substrate color function by default for config-only based implementation
 
 ### Minor new features and changes: 
-#### 1.13.1 
-+ Continued modernization of sample projects for PhysiCell Studio compatibiltiy. See [PR 198](https://github.com/MathCancer/PhysiCell/pull/198).
-+ Updated inhibitor behaviors in PhysiBoSS, and further code cleanup.  See [PR 194](https://github.com/MathCancer/PhysiCell/pull/194). Thanks, Marco Ruscone! 
-+ PhysiBoSS cell line example migrated to newer MultiCellDS output. See [PR 193](https://github.com/MathCancer/PhysiCell/pull/193). Thanks, Vincent Noël!
-+ Added a new makefile rule to simplify sharing user projects: `make pack PROJ=name` will zip all of the `name` user project in `./user_projects/name.zip`. Send this zip file for sharing your project, and have your recipient: 
-  1. Place `name.zip` in thier `./user_projects/` folder (preferably PhysiCell version 1.13.1 or later)
-  2. Have them run the new rule `make unpack PROJ=name` to expand the project.
-  3. After this, the usual rules apply. `make load PROJ=name` to load the project, and a subsequent `make` to compile it. 
-+ Added a new makefile rule to simplify use of shared  user projects: `make unpack PROJ=name` will unzip the contents of `./user_projects/name.zip` into a new user project called `name`. Type `make load PROJ=name` to load this project, and `make` to compile it.  
-#### 1.13.0
-+ Preparations for a new derived `Cell` class for use in PhysiBoSS, including a new `instantiate_cell` function in `Cell_Functions` to help facilitate this. See [PR 153](https://github.com/MathCancer/PhysiCell/pull/153) (Thanks, Vincent Noël!)
-+ Various safety refinements (`const` accessors) in vector operations ([PR 160](https://github.com/MathCancer/PhysiCell/pull/160)). Thanks, Vincent Noël! 
-+ Made changes to cell SVG plotting to support broader types of plotting in advance of PhysiMeSS [PR 162](https://github.com/MathCancer/PhysiCell/pull/162). Thanks, Vincent Noēl!
-+ Added a safe way to query the current velocity via `Basic_Agent::get_previous_velocity()` in preparation for PhysiMeSS. [PR 163](https://github.com/MathCancer/PhysiCell/pull/163). Thanks, Vincent Noël!
-+ Refined control of object counts in SVG for upcoming PhysiMeSS release. [PR 164](https://github.com/MathCancer/PhysiCell/pull/164). Thanks, Vincent!
-+ Refined SVG plot options to incorporate substrates. [PR 181](https://github.com/MathCancer/PhysiCell/pull/181). Thanks, Marco Ruscone!
-+ Updated PhysiBoSS to Version 2.2.1. See [PR 188](https://github.com/MathCancer/PhysiCell/pull/188). Thanks, Vincent Noël! 
-+ Updated unit tests (including `custom_DCs_2substrates`)
-+ Added `damage rate` (from effector attack) to supported behaviors in the modeling gramamr 
-+ minor cleanup 
+#### 1.14.0 
++ Scripts in `/beta` to help with testing, both manually and via GitHub Actions: `test_build_samples.sh` and `test*.py`
++ The Makefiles for all sample projects now do a recursive copy (`cp -r`) for files in the /config directory
++ throw error if duplicate substrate or user_parameter name found
 
-### Beta features (not fully supported):
-#### 1.13.1 
-+ The dFBA addon is considered "beta" and unsupported at this time. Compatability work is underway. Thank you, Miguel Ponce de Leon and team! 
-#### 1.13.0
-+ None in this release. 
  
 ### Bugfixes: 
-#### 1.13.1 
-+ Bugfixes to and refinements to the libRoadrunner setup scripts. See [PR 196](https://github.com/MathCancer/PhysiCell/pull/196). Thanks to Randy Heiland and Furkan Kurtoglu. 
-+ Updated PHysiBoSS cell line example project to remove “default phenotype” function. See [PR 195](https://github.com/MathCancer/PhysiCell/pull/195). Thanks, Vincent Noël!
-+ Fixed default cell constructor to improve backwards compatibility by including new SVG plot function pointers. See [PR 200](https://github.com/MathCancer/PhysiCell/pull/200). Thanks to John Metzcar for catching this and for careful detective work to isolate the cause!
-+ Numerous bugfixes to PhysiCell zip distribution, including a better release protocol. Major thanks to Furkan Kurtoglu, Elmar Bucher, John Metzcar, and Randy Heiland for help! 
-#### 1.13.0 
-+ Fix typographical errors in Makefiles in sample projects.
-+ Set correct value (100) of `cell_BM_repulsion_strength` in `PhysiCell_phenotype.cpp` (Thanks, Elmar Bucher!)
-+ Improved handling of `voxel_index` in `remove_agent_from_voxel` in preparation for voxel-spanning objects such as PhysiMeSS. [PR 159](https://github.com/MathCancer/PhysiCell/pull/159). Thanks, Vincent Noël!
-+ Fixed bug to ensure cell definitions without `intracellular` defined get a `NULL` intracellular model function. [PR 182](and [PR 182](https://github.com/MathCancer/PhysiCell/pull/182). THanks, Marco Ruscone!
-+ Fixed a whitespaced bug in SVG output. [PR 179](https://github.com/MathCancer/PhysiCell/pull/179). Thanks, Vincent Noël!
-+ Fixed a PhysiBoSS bug where dead cells could execute models. [PR 180](https://github.com/MathCancer/PhysiCell/pull/180) Thanks, Vincent Noël!
-+ Fixed bugs involving Dirichlet conditions and multiple substrates (thanks to Daniel Bergman for pointing it out!) See [Issue 124](rf. https://github.com/MathCancer/PhysiCell/issues/124) and [PR 149](https://github.com/MathCancer/PhysiCell/pull/180). Thank you, Daniel Bergman and Randy Heiland! 
-+ `cancer_biorobots` Makefille PROGRAM_NAME is now `cancer_biorobots` instead of `project`
-+ Deleted a meaningless line `dt;` in PhysiCell_standard_models.cpp
-+ Added missing commas to cell_rules.csv in rules_sample project
-+ Fixed typo: `PhyisiCell_rules.o` to `PhysiCell_rules.o` in Makefile-default (thanks to Joseph Abrams for pointing it out!)
-+ Fixed errors in SBML ODE models. See [PR 185](https://github.com/MathCancer/PhysiCell/pull/185) and [PR 186](https://github.com/MathCancer/PhysiCell/pull/186). Thanks, Furkan Kurtoglu and Vincent Noël!
-+ Fixed errors the PhysiBoSS readme. See [PR 187](https://github.com/MathCancer/PhysiCell/pull/187). Thanks, Vincent Noël!
+#### 1.14.0 
++ `sample_projects_intracellular/ode/ode_energy/main.cpp` was updated to use `save_PhysiCell_to_MultiCellDS_v2`
++ `Cell::convert_to_cell_definition` now retains the cell volume
++ fix bug in storing rules that occasionally resulted in seg faults
 
 ### Notices for intended changes that may affect backwards compatibility:
++ Future releases may further refine `Cell_Integrity` with more specific forms of damage (and accompanying damage and repair rates).
+
 + We intend to deprecate the unused phenotype variables `relative_maximum_attachment_distance`, `relative_detachment_distance`, and `maximum_attachment_rate` from `phenotype.mechanics.` 
 
 + We intend to merge `Custom_Variable` and `Custom_Vector_Variable` in the future.  
@@ -174,14 +200,10 @@ We are grateful for immense contributions by Cicely Macnamara, Vincent Noël, Ra
 + Further XML-based simulation setup. 
 
 + Read saved simulation states (as MultiCellDS digital snapshots)
- 
-+ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
   
 + Create an angiogenesis sample project 
  
 + Create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
-
-+ Improved plotting options in SVG 
 
 + Further update sample projects to make use of more efficient interaction testing available
 

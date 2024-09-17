@@ -70,7 +70,10 @@
 void create_cell_types( void )
 {
 	// set the random seed 
-	SeedRandom( parameters.ints("random_seed") );  
+	if (parameters.ints.find_index("random_seed") != -1)
+	{
+		SeedRandom(parameters.ints("random_seed"));
+	}
 	
 	/* 
 	   Put any modifications to default cell definition here if you 
@@ -550,7 +553,7 @@ void tumor_cell_phenotype_with_therapy( Cell* pCell, Phenotype& phenotype, doubl
 	temp /= max_damage; // dt*(damage/max_damage)*death_rate 
 
 	// make sure we write the damage (not current a behavior)
-	pCell->state.damage = damage; 
+	pCell->phenotype.cell_integrity.damage = damage; 
 
 	if( UniformRandom() <= temp )
 	{

@@ -72,7 +72,10 @@
 void create_cell_types( void )
 {
 	// set the random seed 
-	SeedRandom( parameters.ints("random_seed") );  
+	if (parameters.ints.find_index("random_seed") != -1)
+	{
+		SeedRandom(parameters.ints("random_seed"));
+	}
 	
 	/* 
 	   Put any modifications to default cell definition here if you 
@@ -84,10 +87,7 @@ void create_cell_types( void )
 	initialize_default_cell_definition(); 
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 
-	if (PhysiCell::parameters.bools("fibre_custom_degradation"))
-		cell_defaults.functions.instantiate_cell = instantiate_physimess_cell_custom_degrade;	
-	else
-		cell_defaults.functions.instantiate_cell = instantiate_physimess_cell;	
+	cell_defaults.functions.instantiate_cell = instantiate_physimess_cell;	
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = physimess_update_cell_velocity;
@@ -138,7 +138,13 @@ void create_cell_types( void )
 		pCD->functions.plot_agent_legend = fibre_agent_legend;
 	
 	}
-	
+
+	for (auto* pCD: cell_definitions_by_index){
+		if (!isFibre(pCD) && pCD->custom_data.find_variable_index("fibre_custom_degradation") > 0){	
+			if (pCD->custom_data["fibre_custom_degradation"] > 0.5)
+				pCD->functions.instantiate_cell = instantiate_physimess_cell_custom_degrade;	
+		}
+	}
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -311,9 +317,9 @@ void PhysiMeSS_Cell_Custom_Degrade::degrade_fibre(PhysiMeSS_Fibre* pFibre)
     
     
         // Fibre degradation by cell - switched on by flag fibre_degradation
-        double stuck_threshold = PhysiCell::parameters.doubles("fibre_stuck_time");
-        double pressure_threshold = PhysiCell::parameters.doubles("fibre_pressure_threshold");
-        if (PhysiCell::parameters.bools("fibre_degradation") && (stuck_counter >= stuck_threshold
+        double stuck_threshold = this->custom_data["fibre_stuck_time"];
+        double pressure_threshold = this->custom_data["fibre_pressure_threshold"];
+        if (this->custom_data["fibre_degradation"] > 0.5 && (stuck_counter >= stuck_threshold
                                                         || state.simple_pressure > pressure_threshold)) {
             // if (stuck_counter >= stuck_threshold){
             //     std::cout << "Cell " << ID << " is stuck at time " << PhysiCell::PhysiCell_globals.current_time
@@ -327,7 +333,7 @@ void PhysiMeSS_Cell_Custom_Degrade::degrade_fibre(PhysiMeSS_Fibre* pFibre)
             double dotproduct = dot_product(displacement, phenotype.motility.motility_vector);
             if (dotproduct >= 0) {
                 double rand_degradation = PhysiCell::UniformRandom();
-                double prob_degradation = PhysiCell::parameters.doubles("fibre_degradation_rate");
+                double prob_degradation = this->custom_data["fibre_degradation_rate"];
                 if (state.simple_pressure > pressure_threshold){
                     prob_degradation *= state.simple_pressure;
                 }

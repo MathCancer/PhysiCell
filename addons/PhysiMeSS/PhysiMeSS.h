@@ -10,7 +10,7 @@
 
 using namespace PhysiCell;
 
-static std::string PhysiMeSS_Version = "1.0.0"; 
+static std::string PhysiMeSS_Version = "1.0.1"; 
 
 void remove_physimess_out_of_bounds_fibres();
 

@@ -1,0 +1,65 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [
+          {name: "Ubuntu", os: "ubuntu-latest", shell: "bash", compiler: "g++"},
+          {name: "MacOS 12", os: "macos-12", shell: "bash", compiler: "g++-12"},
+          {name: "MacOS 14 (M1)", os: "macos-14", shell: "bash", compiler: "g++-13"},
+          {name: "Windows", os: "windows-latest", shell: "msys2", compiler: "g++"},
+        ]
+        projects: [
+          {project: "template", name: "PhysiCell Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
+          {project: "template_BM", name: "PhysiBoSS Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
+          {project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Degradation/mymodel_matrix_degradation.xml", max_time: 120, output_folder: ""},
+          {project: "physiboss-tutorial", name: "PhysiBoSS Tutorial", binary: "project", config: "config/cell_cycle/PhysiCell_settings.xml", max_time: 300, output_folder: "output"},
+          {project: "worm-sample", name: "PhysiCell worm", binary: "worm", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "mechano-sample", name: "PhysiCell Mechano", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "cancer-biorobots-sample", name: "PhysiCell Cancer Biorobots", binary: "cancer_biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "biorobots-sample", name: "PhysiCell Biorobots", binary: "biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "celltypes3-sample", name: "PhysiCell Celltypes3", binary: "celltypes3", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "custom-division-sample", name: "PhysiCell custom division", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "interaction-sample", name: "PhysiCell interactions", binary: "interaction_demo", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "pred-prey-farmer", name: "PhysiCell prey predator", binary: "pred_prey", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+        ]
+        
+    name: Testing ${{ matrix.projects.name }} on ${{ matrix.os.name }}
+        
+    runs-on: ${{ matrix.os.os }}
+    
+    defaults:
+      run:
+        shell: ${{ matrix.os.shell }} {0}
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - if: matrix.os.name == 'Windows'
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 mingw-w64-x86_64-python mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-python-cffi make bison flex mingw-w64-x86_64-ca-certificates mingw-w64-x86_64-diffutils
+    
+    - name: Build ${{ matrix.projects.name }} project 
+      run: |
+        make data-cleanup && make ${{ matrix.projects.project }} && make PHYSICELL_CPP=${{ matrix.os.compiler }}
+        
+    - name: Run ${{ matrix.projects.name }} project
+      run: |
+        python beta/test_run_sample.py ${{ matrix.projects.binary }} ${{ matrix.projects.config }} ${{ matrix.projects.max_time }}
+    
+    - name: Check ${{ matrix.projects.name }} project simulation results
+      if: matrix.projects.output_folder != ''
+      run: |
+        python beta/test_diff_svg.py ${{ matrix.projects.output_folder }} tests/cases/output_${{ matrix.projects.project }}

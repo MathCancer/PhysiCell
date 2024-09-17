@@ -18,7 +18,7 @@ MABOSS_MAX_NODES = 64
 endif
 
 # MaBoSS directory
-MABOSS_DIR = addons/PhysiBoSS/MaBoSS-env-2.0/engine
+MABOSS_DIR = addons/PhysiBoSS/MaBoSS/engine
 CUR_DIR = $(shell pwd)
 CUSTOM_DIR = sample_projects/Arnau_model/custom_modules
 
@@ -33,6 +33,10 @@ INC := -DADDON_PHYSIBOSS -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_
 # If max nodes > 64, change lib path 
 ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
 LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_$(MABOSS_MAX_NODES)n-static $(LDL_FLAG)
+endif
+
+ifndef STATIC_OPENMP
+	STATIC_OPENMP = -fopenmp
 endif
 
 ARCH := native # best auto-tuning
@@ -68,7 +72,9 @@ else
 	endif
 endif
 
-COMPILE_COMMAND := $(CC) $(CFLAGS) 
+CFLAGS_LINK := $(shell echo $(CFLAGS) | sed -e "s/-fopenmp//g")
+COMPILE_COMMAND := $(CC) $(CFLAGS)  $(EXTRA_FLAGS)
+LINK_COMMAND := $(CC) $(CFLAGS_LINK) $(EXTRA_FLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o 
@@ -81,7 +87,7 @@ PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_Mult
 PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)  
-MaBoSS := ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src/BooleanNetwork.h
+MaBoSS := ./addons/PhysiBoSS/MaBoSS/engine/src/BooleanNetwork.h
 
 PhysiBoSS_OBJECTS := maboss_network.o maboss_intracellular.o
 
@@ -95,8 +101,11 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBo
 # compile the project 
 
 all: main.cpp $(ALL_OBJECTS) $(MaBoSS)
-	$(COMPILE_COMMAND) $(INC)  -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB)
+	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB)
 	make name
+
+static: main.cpp $(ALL_OBJECTS) $(MaBoSS)
+	$(LINK_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB) -static-libgcc -static-libstdc++ $(STATIC_OPENMP)
 
 name:
 	@echo ""
@@ -195,8 +204,8 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 
 # user-defined PhysiCell modules
 
-Compile_MaBoSS: ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src/BooleanNetwork.h
-	cd ./addons/PhysiBoSS/MaBoSS-env-2.0/engine/src;make CXX=$(CC) MAXNODES=$(MABOSS_MAX_NODES) install_alib;make clean; cd ../../../../..
+Compile_MaBoSS: ./addons/PhysiBoSS/MaBoSS/engine/src/BooleanNetwork.h
+	cd ./addons/PhysiBoSS/MaBoSS/engine/src;make CXX=$(CC) MAXNODES=$(MABOSS_MAX_NODES) install_alib;make clean; cd ../../../../..
 
 $(MaBoSS): 
 ifeq ($(OS), Windows_NT)
@@ -229,7 +238,7 @@ reset:
 	rm -rf ./scripts
 
 MaBoSS-clean:
-	rm -fr addons/PhysiBoSS/MaBoSS-env-2.0
+	rm -fr addons/PhysiBoSS/MaBoSS
 	
 clean:
 	rm -f *.o

@@ -10,7 +10,7 @@ import os
 import sys
 import tarfile
 
-if os.path.exists(os.path.join(os.path.dirname(__file__), "MaBoSS-env-2.0")):
+if os.path.exists(os.path.join(os.path.dirname(__file__), "MaBoSS")):
     print('libMaBoSS already installed')
 
 else:
@@ -20,7 +20,7 @@ else:
     # Assume Windows
     mb_file = ""
     url = ""
-    maboss_version = "v2.5.4"
+    maboss_version = "v2.5.6"
     if os_type.lower() == 'darwin':
         if "ARM64" in platform.uname().version:
             mb_file = "libMaBoSS-macos-arm64.tar.gz"
@@ -34,7 +34,7 @@ else:
         print("Your operating system seems to be unsupported. Please submit a ticket at https://sourceforge.net/p/physicell/tickets/ ")
         sys.exit(1)
 
-    url = "https://github.com/sysbio-curie/MaBoSS-env-2.0/releases/download/" + maboss_version + "/" + mb_file
+    url = "https://github.com/sysbio-curie/MaBoSS/releases/download/" + maboss_version + "/" + mb_file
 
     print('libMaBoSS will now be installed into the addon PhysiBoSS addon folder:')
     dir_name = os.path.dirname(__file__)
