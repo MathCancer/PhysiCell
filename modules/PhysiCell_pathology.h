@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2024, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -122,7 +122,7 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell ); // done
 
 std::string formatted_minutes_to_DDHHMM( double minutes ); 
 
-void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string (*substrate_coloring_function)(double, double, double) = NULL, void (*cell_counts_function) (char*) = NULL); // done
+void SVG_plot( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string (*substrate_coloring_function)(double, double, double) = paint_by_density_percentage, void (*cell_counts_function) (char*) = NULL); // done
 
 void SVG_plot_with_stroma( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) , 
 	int ECM_index, std::vector<std::string> (*ECM_coloring_function)(double) ); // planned

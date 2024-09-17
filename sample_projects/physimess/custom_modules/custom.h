@@ -101,4 +101,3 @@ class PhysiMeSS_Cell_Custom_Degrade : public PhysiMeSS_Cell
   public:  
   void degrade_fibre(PhysiMeSS_Fibre* pFibre);
 };
-// void PhysiMeSS_Cell::other_degrade_fibre(PhysiMeSS_Fibre* pFibre);
