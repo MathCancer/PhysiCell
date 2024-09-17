@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2024, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -85,11 +85,10 @@ void setup_rng( void )
 	if (!warned && setup_done)
 	{
 		std::cout << "WARNING: Setting the random seed again." << std::endl
-				  << "\tYou probably have..." << std::endl
-				  << "\t\t1. added a random seed element to options in the config file AND" << std::endl
-				  << "\t\t2. set a user parameter called random seed." << std::endl
+				  << "\tYou probably have set a user parameter called random_seed." << std::endl
+				  << "\tHere, we will use the random seed set in user parameters." << std::endl	
+				  << "\tHOWEVER, as of PhysiCell 1.14.0, you should set the random seed in the <options><random_seed> element in the config file." << std::endl
 				  << "\tFuture versions of PhysiCell may throw an error here. Kindly remove the user parameter and just use the <options><random_seed> element." << std::endl;
-		// exit(-1);
 		warned = true;
 	}
 	std::cout << "Setting up RNG with seed " << physicell_random_seed << std::endl;

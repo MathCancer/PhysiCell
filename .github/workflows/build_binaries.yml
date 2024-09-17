@@ -130,7 +130,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install dependencies
-      run : brew install gcc@11
+      run : brew install gcc@13
       
     - name: Build ${{ matrix.projects.name }} project
       run: |
@@ -138,7 +138,7 @@ jobs:
         make ${{ matrix.projects.project }}
         make clean
         ${{ matrix.projects.extra_run }}
-        make PHYSICELL_CPP=g++-11 static
+        make PHYSICELL_CPP=g++-13 static
         cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos12
 
     - name: Caching produced project binary 
@@ -173,11 +173,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Downgrade XCODE to 14.3.1
-      run: sudo xcode-select -switch /Applications/Xcode_14.3.1.app   
-      
     - name: Install dependencies
-      run : brew install gcc@11
+      run : brew install gcc@13
       
     - name: Build ${{ matrix.projects.name }} project
       run: |
@@ -185,7 +182,7 @@ jobs:
         make ${{ matrix.projects.project }}
         make clean
         ${{ matrix.projects.extra_run }}
-        make PHYSICELL_CPP=g++-11 static
+        make PHYSICELL_CPP=g++-13 static
         cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macosm1
    
     - name: Caching produced project binary 
