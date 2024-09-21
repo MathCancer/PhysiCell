@@ -219,7 +219,7 @@ class User_Parameters
 	Parameters<double> doubles;
 	Parameters<std::string> strings;
 
-	void read_from_pugixml( pugi::xml_node parent_node , bool update_parameter = false);
+	void read_from_pugixml( pugi::xml_node parent_node , bool update_parameter = false );
 }; 
 
 extern PhysiCell_Globals PhysiCell_globals;
