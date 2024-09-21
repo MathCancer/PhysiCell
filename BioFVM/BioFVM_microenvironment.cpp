@@ -253,7 +253,7 @@ bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index )
 // TODO? fix confusing swapped usage of args
 double Microenvironment::get_substrate_dirichlet_value( int substrate_index, int index )
 { 
-    return dirichlet_value_vectors[index][substrate_index]; 
+	return dirichlet_value_vectors[index][substrate_index]; 
 }  
 
 // new functions for finer-grained control of Dirichlet conditions -- 1.7.0
@@ -487,76 +487,112 @@ void Microenvironment::add_density( std::string name , std::string units )
 
 void Microenvironment::add_density( std::string name , std::string units, double diffusion_constant, double decay_rate )
 {
-	// fix in PhysiCell preview November 2017 
-	if ( find_density_index( name ) != -1 )
-	{
-		std::cout << "ERROR: density named " << name << " already exists. You probably want your substrates all have unique names!" << std::endl;
-		exit(-1); 
-	}
-	
-	// update 1, 0 
-	zero.push_back( 0.0 ); 
-	one.push_back( 1.0 );
-	
-	// update units
-	density_names.push_back( name ); 
-	density_units.push_back( units ); 
+	// fix in PhysiCell preview November 2017
+	// default_microenvironment_options.use_oxygen_as_first_field = false;
 
-	// update coefficients 
-	diffusion_coefficients.push_back( diffusion_constant ); 
-	decay_rates.push_back( decay_rate ); 
-	
-	// update sources and such 
+	// check if density exist
+	if (find_density_index( name ) != -1)
+	{
+		std::cout << "Error: density named " << name << " already exists!" << std::endl;
+		exit(-1);
+	}
+
+	// update 1, 0
+	zero.push_back( 0.0 );
+	one.push_back( 1.0 );
+
+	// update units
+	density_names.push_back( name );
+	density_units.push_back( units );
+
+	// update coefficients
+	diffusion_coefficients.push_back( diffusion_constant );
+	decay_rates.push_back( decay_rate );
+
+	// update sources and such
 	for( unsigned int i=0; i < temporary_density_vectors1.size() ; i++ )
 	{
-		temporary_density_vectors1[i].push_back( 0.0 ); 
-		temporary_density_vectors2[i].push_back( 0.0 ); 
+		temporary_density_vectors1[i].push_back( 0.0 );
+		temporary_density_vectors2[i].push_back( 0.0 );
 	}
 
-	// resize the gradient data structures 
+	// resize the gradient data structures
 	for( unsigned int k=0 ; k < mesh.voxels.size() ; k++ )
 	{
-		gradient_vectors[k].resize( number_of_densities() ); 
+		gradient_vectors[k].resize( number_of_densities() );
 		for( unsigned int i=0 ; i < number_of_densities() ; i++ )
 		{
 			(gradient_vectors[k])[i].resize( 3, 0.0 );
 		}
 	}
-	gradient_vector_computed.resize( mesh.voxels.size() , false ); 	
+	gradient_vector_computed.resize( mesh.voxels.size() , false );
 
-	one_half = one; 
-	one_half *= 0.5; 
-	
-	one_third = one; 
-	one_third /= 3.0; 
-	
-	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.push_back( false ); 
-	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
-	
-	// fix in PhysiCell preview November 2017 
-	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); // = one; 
-	default_microenvironment_options.Dirichlet_activation_vector.push_back( false ); // assign( number_of_densities(), false ); 
-	
-	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
-	
-	default_microenvironment_options.Dirichlet_all.push_back( true ); 
-//	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
-	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
-	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
-	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
-	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
-	
-	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
-	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 	
+	one_half = one;
+	one_half *= 0.5;
 
-	return; 
+	one_third = one;
+	one_third /= 3.0;
+
+	dirichlet_value_vectors.assign( mesh.voxels.size(), one );
+	dirichlet_activation_vector.push_back( false );
+	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector );
+
+	// fix in PhysiCell preview November 2017
+	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 );  // = one;
+	default_microenvironment_options.Dirichlet_activation_vector.push_back( false ); // assign( number_of_densities(), false );
+
+	default_microenvironment_options.initial_condition_vector.push_back( 1.0 );
+
+	default_microenvironment_options.Dirichlet_all.push_back( true );
+//	default_microenvironment_options.Dirichlet_interior.push_back( true );
+	default_microenvironment_options.Dirichlet_xmin.push_back( false );
+	default_microenvironment_options.Dirichlet_xmax.push_back( false );
+	default_microenvironment_options.Dirichlet_ymin.push_back( false );
+	default_microenvironment_options.Dirichlet_ymax.push_back( false );
+	default_microenvironment_options.Dirichlet_zmin.push_back( false );
+	default_microenvironment_options.Dirichlet_zmax.push_back( false );
+
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 );
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 );
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 );
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 );
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 );
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 );
+
+	return;
+}
+
+void Microenvironment::update_density( std::string name , std::string units )
+{
+	// density exist?
+	int density_index = find_density_index( name );
+	if ( density_index == -1 )
+	{
+		// add density
+		return Microenvironment::add_density( name , units );
+	}
+
+	// update units
+	density_units[density_index] = units;
+	return;
+}
+
+void Microenvironment::update_density( std::string name , std::string units, double diffusion_constant, double decay_rate )
+{
+	// density exist?
+	int density_index = find_density_index( name );
+	if ( density_index == -1 )
+	{
+		// add density
+		return Microenvironment::add_density( name , units, diffusion_constant, decay_rate );
+	}
+
+	// update units
+	density_units[density_index] = units;
+	// update coefficients
+	diffusion_coefficients[density_index] = diffusion_constant;
+	decay_rates[density_index] = decay_rate;
+	return;
 }
 
 int Microenvironment::find_density_index( std::string name )
@@ -1427,7 +1463,7 @@ void initialize_microenvironment( void )
 	}
 */
 	
-    // April 2023: no longer necessary after flipping our approach and doing an "additive" instead of "subtractive" DCs handling. I.e., we assume DC activation is false by default; make true on-demand.
+	// April 2023: no longer necessary after flipping our approach and doing an "additive" instead of "subtractive" DCs handling. I.e., we assume DC activation is false by default; make true on-demand.
 
 	// // set the Dirichlet condition activation vector to match the microenvironment options
 	// for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )

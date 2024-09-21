@@ -181,16 +181,20 @@ class Microenvironment
 	void resize_space( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx_new , double dy_new , double dz_new ); 
 	void resize_space_uniform( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx_new ); 
 
-	void resize_densities( int new_size );  
-	void add_density( void ); 
+	void resize_densities( int new_size );
+
+	void add_density( void );
 	void add_density( std::string name , std::string units );
-	void add_density( std::string name , std::string units, double diffusion_constant, double decay_rate ); 
+	void add_density( std::string name , std::string units, double diffusion_constant, double decay_rate );
 
-	void set_density( int index , std::string name , std::string units ); 
-	void set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate ); 
+	void update_density( std::string name , std::string units );
+	void update_density( std::string name , std::string units, double diffusion_constant, double decay_rate );
 
-	int find_density_index( std::string name ); 
-	
+	void set_density( int index , std::string name , std::string units );
+	void set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate );
+
+	int find_density_index( std::string name );
+
 	int voxel_index( int i, int j, int k ); 
 	std::vector<unsigned int> cartesian_indices( int n ); 
 	
