@@ -523,6 +523,7 @@ void Parameters<T>::assert_not_exists( std::string search_name )
 	exit(-1);
 }
 
+template <class T>
 void Parameters<T>::update_parameter( std::string my_name , T my_value )
 {
 	// check if variable already exist
@@ -541,6 +542,7 @@ void Parameters<T>::update_parameter( std::string my_name , T my_value )
 	return;
 }
 
+template <class T>
 void Parameters<T>::update_parameter( std::string my_name , T my_value , std::string my_units )
 {
 	// check if variable already exist

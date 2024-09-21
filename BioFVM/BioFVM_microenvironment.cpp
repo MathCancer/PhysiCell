@@ -493,7 +493,7 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	// check if density exist
 	if (find_density_index( name ) != -1)
 	{
-		std::cout << "Error: density named " << name << " already exists!" << std::endl;
+		std::cout << "Error: density named " << name << " already exists. You probably want your substrates all have unique names!" << std::endl;
 		exit(-1);
 	}
 
