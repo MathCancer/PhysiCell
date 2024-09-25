@@ -568,8 +568,8 @@ void Microenvironment::update_density( std::string name , std::string units )
 	int density_index = find_density_index( name );
 	if ( density_index == -1 )
 	{
-		// add density
-		return Microenvironment::add_density( name , units );
+		std::cout << "Error: density named " << name << " does not exist. Cannot update density!" << std::endl;
+		exit(-1);
 	}
 
 	// update units
@@ -583,8 +583,8 @@ void Microenvironment::update_density( std::string name , std::string units, dou
 	int density_index = find_density_index( name );
 	if ( density_index == -1 )
 	{
-		// add density
-		return Microenvironment::add_density( name , units, diffusion_constant, decay_rate );
+		std::cout << "Error: density named " << name << " does not exist. Cannot update density!" << std::endl;
+		exit(-1);
 	}
 
 	// update units

@@ -531,8 +531,8 @@ void Parameters<T>::update_parameter( std::string my_name , T my_value )
 	auto it = name_to_index_map.find(my_name);
 
 	if (it == name_to_index_map.end()) {
-	        // generate new variable
-	        return Parameters::add_parameter(my_name, my_value);
+		std::cout << "Error: parameter named " << my_name << " does not exist. Cannot update the parameter!" << std::endl;
+		exit(-1);
 	}
 
 	// change value
@@ -550,8 +550,8 @@ void Parameters<T>::update_parameter( std::string my_name , T my_value , std::st
 	auto it = name_to_index_map.find(my_name);
 
 	if (it == name_to_index_map.end()) {
-	        // generate new variable
-	        return Parameters::add_parameter(my_name, my_value, my_units);
+		std::cout << "Error: parameter named " << my_name << " does not exist. Cannot update the parameter!" << std::endl;
+		exit(-1);
 	}
 
 	// change value and unit
@@ -570,8 +570,8 @@ void Parameters<T>::update_parameter( Parameter<T> param )
 	auto it = name_to_index_map.find(param.name);
 
 	if (it == name_to_index_map.end()) {
-	        // generate new variable
-	        return Parameters::add_parameter(param);
+		std::cout << "Error: parameter named " << my_name << " does not exist. Cannot update the parameter!" << std::endl;
+		exit(-1);
 	}
 
 	// change value and unit
