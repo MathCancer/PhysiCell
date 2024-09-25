@@ -90,8 +90,6 @@
 
 namespace PhysiCell{
 
-bool cell_definitions_by_name_constructed;
-
 std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name; 
 std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
 std::vector<Cell_Definition*> cell_definitions_by_index;
@@ -1630,11 +1628,10 @@ void Cell::lyse_cell( void )
 	return; 
 }
 
+bool cell_definitions_by_name_constructed = false; 
+
 void prebuild_cell_definition_index_maps( void )
 {
-	// reset variable to force build_cell_definitions_maps from scratch
-	cell_definitions_by_name_constructed = false;
-
 	// look in config file 
 	extern pugi::xml_node physicell_config_root; 
 	// find the start of cell definitions 
