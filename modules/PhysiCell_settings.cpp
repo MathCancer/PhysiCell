@@ -570,7 +570,7 @@ void Parameters<T>::update_parameter( Parameter<T> param )
 	auto it = name_to_index_map.find(param.name);
 
 	if (it == name_to_index_map.end()) {
-		std::cout << "Error: parameter named " << my_name << " does not exist. Cannot update the parameter!" << std::endl;
+		std::cout << "Error: parameter named " << param.name << " does not exist. Cannot update the parameter!" << std::endl;
 		exit(-1);
 	}
 
