@@ -134,7 +134,7 @@ void create_cell_types( void )
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
 		
-	display_cell_definitions( std::cout ); 
+	display_cell_definitions( log_file ); 
 	
 	return; 
 }

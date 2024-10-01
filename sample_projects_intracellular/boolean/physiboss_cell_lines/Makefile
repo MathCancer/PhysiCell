@@ -84,7 +84,7 @@ PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o 
 PhysiCell_signal_behavior.o PhysiCell_rules.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
-PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
+PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o PhysiCell_log.o
 
 # put your custom objects here (they should be in the custom_modules directory)  
 MaBoSS := ./addons/PhysiBoSS/MaBoSS/engine/src/BooleanNetwork.h
@@ -201,6 +201,9 @@ PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
 	
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
+	
+PhysiCell_log.o: ./modules/PhysiCell_log.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_log.cpp 
 
 # user-defined PhysiCell modules
 
