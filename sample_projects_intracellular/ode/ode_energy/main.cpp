@@ -86,15 +86,27 @@ using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
+	// read arguments
+	ArgumentParser ap = ArgumentParser(argc, argv);
+
 	// load and parse settings file(s)
 	
-	bool XML_status = false; 
-	if( argc > 1 )
-	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
-	else
-	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
-	if( !XML_status )
-	{ exit(-1); }
+	bool XML_status = load_PhysiCell_config_file( ap.path_to_config_file );
+	if (!XML_status) {
+		std::cerr << "Error: failed to load settings file " << ap.path_to_config_file << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	if (ap.path_to_output_folder != "") {
+		PhysiCell_settings.folder = ap.path_to_output_folder; // overwrite output folder if supplied by flag
+	}
+
+	// make sure the output folder exists
+	create_output_directory();
+
+	// copy config file to output directry 
+	char copy_command [1024]; 
+	sprintf( copy_command , "cp %s %s/PhysiCell_settings.xml" , ap.path_to_config_file.c_str(), PhysiCell_settings.folder.c_str() ); //, PhysiCell_settings.folder.c_str() ); 
+	system( copy_command ); 
 	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
