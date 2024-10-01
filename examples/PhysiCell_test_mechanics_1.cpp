@@ -209,7 +209,7 @@ int main( int argc, char* argv[] )
 		while( t < t_max )
 		{
 			
-			if(  fabs( t - t_next_output_time ) < dt/10.0 )
+			if( t > t_next_output_time - 0.5 * dt )
 			{
 				report_file<<t<<"\t"<<dist(pCell1->position,pCell2->position)<<"\n";
 				t_next_output_time += t_output_interval; 

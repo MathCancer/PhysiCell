@@ -222,7 +222,7 @@ int main( int argc, char* argv[] )
 	{		
 		while( t < t_max )
 		{
-			if(  fabs( t - t_next_output_time ) < 0.001 )
+			if( t > t_next_output_time - 0.5 * dt )
 			{
 				vol_report<<t<<"\t"<<pCell1->get_total_volume()<<"\t"<<pCell1->phenotype.volume.fluid<<"\t"<<pCell1->phenotype.volume.nuclear_solid<<"\t"<<pCell1->phenotype.volume.cytoplasmic_solid<<"\n";
 				t_next_output_time += t_output_interval;
