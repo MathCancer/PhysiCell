@@ -54,10 +54,16 @@ namespace BioFVM{
 
 std::vector<Basic_Agent*> all_basic_agents(0); 
 
+static int max_basic_agent_ID = 0;
+
+void reset_max_basic_agent_ID( void )
+{
+	max_basic_agent_ID = 0;
+}
+
 Basic_Agent::Basic_Agent()
 {
 	//give the agent a unique ID  
-	static int max_basic_agent_ID = 0; 
 	ID = max_basic_agent_ID; // 
 	max_basic_agent_ID++; 
 	// initialize position and velocity

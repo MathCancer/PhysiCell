@@ -55,7 +55,9 @@
 #include "BioFVM_vector.h"
 
 namespace BioFVM{
-	
+
+void reset_max_basic_agent_ID( void );
+
 class Basic_Agent
 {
  private:

@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2024, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -1280,7 +1280,7 @@ Cell_Interactions::Cell_Interactions()
 	pAttackTarget = NULL; 
 	total_damage_delivered = 0.0; 
 
-	attack_duration = 120.0; // 0.1; // get from cell constants instead?? 
+	attack_duration = 30.0; // a typical attack duration for a T cell using perforin/granzyme is ~30 minutes
 
 	fusion_rates = {0.0}; 
 	
