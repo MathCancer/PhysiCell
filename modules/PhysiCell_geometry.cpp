@@ -373,31 +373,30 @@ bool load_cells_from_pugixml( pugi::xml_node root )
 		std::cout << "Loading cells from CSV file " << input_filename << " ... " << std::endl; 
 		load_cells_csv( input_filename );
 		system("sleep 1");
-		return true; 
 	}
-	if( filetype == "matlab" || filetype == "mat" || filetype == "MAT" )
+	else if( filetype == "matlab" || filetype == "mat" || filetype == "MAT" )
 	{
 		std::cout << "Error: Load cell positions from matlab not yet supported. Try CSV." << std::endl; 
 		exit(-1); 
-		std::cout << "Loading cells from matlab file " << input_filename << " ... " << std::endl; 
-		return false; 
 	}
-	if( filetype == "scene" )
+	else if( filetype == "scene" )
 	{
 		std::cout << "Error: load cell positions from scene not yet supported. Try CSV." << std::endl; 
 		exit(-1); 
-		std::cout << "Loading cells from scene file " << input_filename << " ... " << std::endl; 
-		return false; 
 	}
-	if( filetype == "physicell" || filetype == "PhysiCell" )
+	else if( filetype == "physicell" || filetype == "PhysiCell" )
 	{
 		std::cout << "Error: load cell positions from PhysiCell snapshot not yet supported. Try CSV." << std::endl; 
 		exit(-1); 
-		std::cout << "Loading cells from PhysiCell file " << input_filename << " ... " << std::endl; 
-		return false; 
+	}
+	else
+	{
+		std::cout << "Error: Unknown cell position filetype " << filetype << " in XML. Try CSV." << std::endl; 
+		exit(-1);
 	}
 
-	return false; 
+	copy_file_to_output(input_filename);
+	return true; 
 }
 
 bool load_cells_from_pugixml( void )

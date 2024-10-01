@@ -359,4 +359,24 @@ int choose_event( std::vector<double>& probabilities )
 	return probabilities.size(); 
 }
 
+void copy_file_to_output(std::string filename)
+{
+	std::cout << "Copying " << filename << " to output folder." << std::endl;
+	// copy the file to the output folder
+	std::string basename = filename;
+	size_t found = basename.find_last_of("/"); // find the end of the path
+	if (found != std::string::npos)
+	{
+		basename = basename.substr(found + 1);
+	}
+
+	std::string output_filename = PhysiCell_settings.folder + "/" + basename;
+
+	// copy filename to output_filename
+	char copy_command[1024];
+	sprintf(copy_command, "cp %s %s", filename.c_str(), output_filename.c_str());
+	std::cout << "Copy command: " << copy_command << std::endl;
+	system(copy_command);
+}
+
 };
