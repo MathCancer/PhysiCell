@@ -88,12 +88,12 @@
             <phenotype>
                 <cycle code="5" name="live">
                     <phase_durations units="min">
-                        <duration index="0" fixed_duration="false">1</duration>
+                        <duration index="0" fixed_duration="false">1440</duration>
                     </phase_durations>
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
-                        <death_rate units="1/min">5.31667e-05</death_rate>
+                        <death_rate units="1/min">0</death_rate>
                         <phase_durations units="min">
                             <duration index="0" fixed_duration="true">516</duration>
                         </phase_durations>
@@ -247,7 +247,7 @@
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
-                        <death_rate units="1/min">5.31667e-05</death_rate>
+                        <death_rate units="1/min">0</death_rate>
                         <phase_transition_rates units="1/min">
                             <rate start_index="0" end_index="1" fixed_duration="false">0.001938</rate>
                         </phase_transition_rates>
@@ -383,7 +383,7 @@
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
-                        <death_rate units="1/min">5.31667e-05</death_rate>
+                        <death_rate units="1/min">0</death_rate>
                         <phase_transition_rates units="1/min">
                             <rate start_index="0" end_index="1" fixed_duration="false">0.001938</rate>
                         </phase_transition_rates>
