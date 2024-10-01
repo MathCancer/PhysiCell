@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2024, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -108,6 +108,8 @@ bool load_PhysiCell_config_file( std::string filename )
 	// now read user parameters
 	
 	parameters.read_from_pugixml( physicell_config_root ); 
+
+	create_output_directory( PhysiCell_settings.folder );
 
 	return true; 	
 }

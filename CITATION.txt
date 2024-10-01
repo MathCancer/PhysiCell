@@ -1,7 +1,7 @@
 If you use PhysiCell in your project, please cite PhysiCell and the version 
 number, such as below:                                                      
                                                                              
-We implemented and solved the model using PhysiCell (Version 1.13.1) [1].    
+We implemented and solved the model using PhysiCell (Version 1.14.0) [1].    
                                                                              
 [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, 
     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  
@@ -11,7 +11,7 @@ We implemented and solved the model using PhysiCell (Version 1.13.1) [1].
 Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  
     as below:                                                               
                                                                              
-We implemented and solved the model using PhysiCell (Version 1.13.1) [1],    
+We implemented and solved the model using PhysiCell (Version 1.14.0) [1],    
 with BioFVM [2] to solve the transport equations.                           
                                                                              
 [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, 
@@ -25,7 +25,7 @@ with BioFVM [2] to solve the transport equations.
     
 If you use PhysiBoSS, please cite as below:
 
-We implemented and solved the model using PhysiCell (Version 1.11.0) [1],    
+We implemented and solved the model using PhysiCell (Version 1.14.0) [1],    
 with PhysiBoSS[2,3] to simulate the intracellular mechanisms.                           
 
 [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, 
@@ -50,3 +50,9 @@ If you use libRoadrunner, please cite:
     König, J. Kyle Medley, Maciej H. Swat, Herbert M. Sauro, libRoadRunner: 
     a high performance SBML simulation and analysis library, 
     Bioinformatics 31(20): 3315–21, 2015: DOI: 10.1093/bioinformatics/btv363
+
+If you use PhysiMeSS, please cite: 
+
+    V. Noël, M. Ruscone, R. Shuttle-worth, and C.K. Macnamara. PhysiMeSS--
+    A New PhysiCell Addon for Extracellular Matrix Modelling, bioRxiv [preprint] 
+    2023.10.27.564365, 2023. DOI: 10.1101/2023.10.27.564365. 
