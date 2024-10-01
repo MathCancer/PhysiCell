@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
 	}
 	if( !XML_status )
 	{ exit(-1); }
-	
+		
 	// copy config file to output directry 
 	system( copy_command ); 
 	

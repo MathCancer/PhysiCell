@@ -29,7 +29,12 @@ def disable_automated_spring_adhesions(root):
     if spring_adhesion is not None:
         spring_adhesion.text = "true"
 
-def run_sample(myexec, xml_file, max_time):
+def set_output_folder(root, folder):
+    if folder == "":
+        return
+    root.find(".//save//folder").text = folder
+
+def run_sample(myexec, xml_file, max_time, output_folder):
 
     print("\n\n------------   ",myexec, "   ----------------------------------")
     # update max_time and omp_num_threads (=1)
@@ -42,6 +47,7 @@ def run_sample(myexec, xml_file, max_time):
     make_deathmodel_deterministic(root)
     make_chemotaxis_deterministic(root)   
     disable_automated_spring_adhesions(root)
+    set_output_folder(root, output_folder)
     
     tree.write(xml_file)
     subprocess.run(["cat", xml_file])
