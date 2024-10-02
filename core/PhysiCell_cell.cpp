@@ -3071,7 +3071,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	node = node.child( "cell_asymmetric_divisions" );
 	if( node )
 	{
-		Cell_Asymmetric_Divisions * pCAD = &(pCD->phenotype.cell_asymmetric_divisions);
+		Cell_Asymmetric_Divisions *pCAD = &(pCD->phenotype.cell_asymmetric_divisions);
 
 		// asymmetric division rates
 		pugi::xml_node node_cad = node.child( "asymmetric_division_weights");

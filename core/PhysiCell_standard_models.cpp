@@ -1382,7 +1382,6 @@ void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daug
 	{ return; } // if all are zeros, below will convert to the first cell type by default. don't let that happen. keep it the same type
 
 	double r = asym_weight_total * UniformRandom();
-	int cell_def_index = -1;
 	for( int i=0; i < pCD_parent->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.size(); i++ )
 	{
 		if( r <= pCell_parent->phenotype.cell_asymmetric_divisions.asymmetric_division_weights[i] )
@@ -1395,6 +1394,27 @@ void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daug
 	// if we're here, then do not do asym div
 	return;
 }
+
+/* alternative way to select the index from weights that could be faster (is faster as # cell types --> infinity)
+int select_by_weights( std::vector<double>& weights, double total_weight )
+{
+	if( total_weight == 0 )
+	{ return -1; }
+	
+	double r = total_weight * UniformRandom();
+
+	std::vector<double> cumulative_weights(weights.size());
+	std::partial_sum(weights.begin(), weights.end(), cumulative_weights.begin());
+
+	// Use binary search to find the index
+	auto it = std::upper_bound(cumulative_weights.begin(), cumulative_weights.end(), r);
+	int index = std::distance(cumulative_weights.begin(), it);
+	if (index >= weights.size())
+	{ return -1; }
+	
+	return index;
+}
+*/
 
 void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 {
