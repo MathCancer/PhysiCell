@@ -524,61 +524,36 @@ void Parameters<T>::assert_not_exists( std::string search_name )
 }
 
 template <class T>
+void Parameters<T>::assert_exists( std::string search_name )
+{
+	if( find_index( search_name ) != -1 )
+	{ return; }
+
+	std::cout << "Error: parameter named " << search_name << " does not exist. Cannot update the parameter!" << std::endl;
+	exit(-1);
+}
+
+template <class T>
 void Parameters<T>::update_parameter( std::string my_name , T my_value )
 {
-	// check if variable already exist
-	int parameter_index = -1;
-	auto it = name_to_index_map.find(my_name);
-
-	if (it == name_to_index_map.end()) {
-		std::cout << "Error: parameter named " << my_name << " does not exist. Cannot update the parameter!" << std::endl;
-		exit(-1);
-	}
-
-	// change value
-	parameter_index = it->second;
-	parameters[parameter_index].value = my_value;
-
+	assert_exists( my_name );
+	parameters[ find_index( my_name ) ].value = my_value;
 	return;
 }
 
 template <class T>
 void Parameters<T>::update_parameter( std::string my_name , T my_value , std::string my_units )
 {
-	// check if variable already exist
-	int parameter_index = -1;
-	auto it = name_to_index_map.find(my_name);
-
-	if (it == name_to_index_map.end()) {
-		std::cout << "Error: parameter named " << my_name << " does not exist. Cannot update the parameter!" << std::endl;
-		exit(-1);
-	}
-
-	// change value and unit
-	parameter_index = it->second;
-	parameters[parameter_index].value = my_value;
-	parameters[parameter_index].units = my_units;
-
+	update_parameter( my_name, my_value );
+	parameters[ find_index( my_name ) ].units = my_units;
 	return;
 }
 
 template <class T>
 void Parameters<T>::update_parameter( Parameter<T> param )
 {
-	// check if variable already exist
-	int parameter_index = -1;
-	auto it = name_to_index_map.find(param.name);
-
-	if (it == name_to_index_map.end()) {
-		std::cout << "Error: parameter named " << param.name << " does not exist. Cannot update the parameter!" << std::endl;
-		exit(-1);
-	}
-
-	// change value and unit
-	parameter_index = it->second;
-	parameters[parameter_index].value = param.value;
-	parameters[parameter_index].units = param.units;
-
+	update_parameter( param.name, param.value );
+	parameters[ find_index( param.name ) ].units = param.units;
 	return;
 }
 

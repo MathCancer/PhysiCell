@@ -562,36 +562,27 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	return;
 }
 
+void Microenvironment::assert_exists( std::string search_name )
+{
+	if( find_density_index( search_name ) != -1 )
+	{ return; }
+
+	std::cout << "Error: density named " << search_name << " does not exist. Cannot update density!" << std::endl;
+	exit(-1);
+}
+
 void Microenvironment::update_density( std::string name , std::string units )
 {
-	// density exist?
-	int density_index = find_density_index( name );
-	if ( density_index == -1 )
-	{
-		std::cout << "Error: density named " << name << " does not exist. Cannot update density!" << std::endl;
-		exit(-1);
-	}
-
-	// update units
-	density_units[density_index] = units;
+	assert_exists( name );
+	density_units[ find_density_index( name ) ] = units;
 	return;
 }
 
 void Microenvironment::update_density( std::string name , std::string units, double diffusion_constant, double decay_rate )
 {
-	// density exist?
-	int density_index = find_density_index( name );
-	if ( density_index == -1 )
-	{
-		std::cout << "Error: density named " << name << " does not exist. Cannot update density!" << std::endl;
-		exit(-1);
-	}
-
-	// update units
-	density_units[density_index] = units;
-	// update coefficients
-	diffusion_coefficients[density_index] = diffusion_constant;
-	decay_rates[density_index] = decay_rate;
+	update_density( name, units );
+	diffusion_coefficients[ find_density_index( name ) ] = diffusion_constant;
+	decay_rates[ find_density_index( name ) ] = decay_rate;
 	return;
 }
 
