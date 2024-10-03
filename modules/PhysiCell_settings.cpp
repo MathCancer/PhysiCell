@@ -486,7 +486,7 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value )
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
 {
-	assert_not_exists(my_name);
+	assert_parameter_not_exists(my_name);
 
 	Parameter<T>* pNew; 
 	pNew = new Parameter<T> ;
@@ -505,7 +505,7 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value , std::strin
 template <class T>
 void Parameters<T>::add_parameter( Parameter<T> param )
 {
-	assert_not_exists(param.name);
+	assert_parameter_not_exists(param.name);
 
 	int n = parameters.size(); 
 	parameters.push_back( param); 
@@ -514,7 +514,7 @@ void Parameters<T>::add_parameter( Parameter<T> param )
 }
 
 template <class T>
-void Parameters<T>::assert_not_exists( std::string search_name )
+void Parameters<T>::assert_parameter_not_exists( std::string search_name )
 {
 	if( find_index( search_name ) == -1 )
 	{ return; }
@@ -524,10 +524,12 @@ void Parameters<T>::assert_not_exists( std::string search_name )
 }
 
 template <class T>
-void Parameters<T>::assert_exists( std::string search_name )
+int Parameters<T>::assert_parameter_exists( std::string search_name )
 {
-	if( find_index( search_name ) != -1 )
-	{ return; }
+
+	int parameter_index = find_index( search_name );
+	if( parameter_index != -1 )
+	{ return parameter_index; }
 
 	std::cout << "Error: parameter named " << search_name << " does not exist. Cannot update the parameter!" << std::endl;
 	exit(-1);
@@ -536,24 +538,26 @@ void Parameters<T>::assert_exists( std::string search_name )
 template <class T>
 void Parameters<T>::update_parameter( std::string my_name , T my_value )
 {
-	assert_exists( my_name );
-	parameters[ find_index( my_name ) ].value = my_value;
+	int parameter_index = assert_parameter_exists( my_name );
+	parameters[ parameter_index ].value = my_value;
 	return;
 }
 
 template <class T>
 void Parameters<T>::update_parameter( std::string my_name , T my_value , std::string my_units )
 {
-	update_parameter( my_name, my_value );
-	parameters[ find_index( my_name ) ].units = my_units;
+	int parameter_index = assert_parameter_exists( my_name );
+	parameters[ parameter_index ].value = my_value;
+	parameters[ parameter_index ].units = my_units;
 	return;
 }
 
 template <class T>
 void Parameters<T>::update_parameter( Parameter<T> param )
 {
-	update_parameter( param.name, param.value );
-	parameters[ find_index( param.name ) ].units = param.units;
+	int parameter_index = assert_parameter_exists( param.name );
+	parameters[ parameter_index ].value = param.value;
+	parameters[ parameter_index ].units = param.units;
 	return;
 }
 

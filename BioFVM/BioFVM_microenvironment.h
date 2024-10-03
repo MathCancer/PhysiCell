@@ -187,8 +187,6 @@ class Microenvironment
 	void add_density( std::string name , std::string units );
 	void add_density( std::string name , std::string units, double diffusion_constant, double decay_rate );
 
-	void assert_exists( std::string search_name );
-
 	void update_density( std::string name , std::string units );
 	void update_density( std::string name , std::string units, double diffusion_constant, double decay_rate );
 
@@ -196,6 +194,7 @@ class Microenvironment
 	void set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate );
 
 	int find_density_index( std::string name );
+	int assert_density_exists( std::string search_name );
 
 	int voxel_index( int i, int j, int k ); 
 	std::vector<unsigned int> cartesian_indices( int n ); 

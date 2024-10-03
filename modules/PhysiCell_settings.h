@@ -205,8 +205,8 @@ class Parameters
 
 	int size( void ) const;
 
-	void assert_not_exists(std::string search_name);
-	void assert_exists(std::string search_name);
+	void assert_parameter_not_exists(std::string search_name);
+	int assert_parameter_exists(std::string search_name);
 };
 
 class User_Parameters
