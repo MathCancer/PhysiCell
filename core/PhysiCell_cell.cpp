@@ -2980,6 +2980,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pugi::xml_node node_dr = node.child("attack_damage_rate");
 		pCI->attack_damage_rate = xml_get_my_double_value(node_dr); 
 
+		// attack_duration
+		pugi::xml_node node_ad = node.child("attack_duration");
+		pCI->attack_duration = xml_get_my_double_value(node_ad);
+
 		// fusion_rates 
 		pugi::xml_node node_fr = node.child( "fusion_rates");
 		if( node_fr )
