@@ -943,6 +943,8 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 		{
 			default_microenvironment_options.initial_condition_file_type = node.attribute("type").as_string();
 			default_microenvironment_options.initial_condition_file = xml_get_string_value(node, "filename");
+
+			copy_file_to_output(default_microenvironment_options.initial_condition_file);
 		}
 	}
 

@@ -1940,31 +1940,6 @@ void parse_rules_from_pugixml( void )
 		node = node.next_sibling( "ruleset"); 		
 	}
 	return; 
-
-	exit(0); 
-	
-	// enabled? 
-	if( node.attribute("enabled").as_bool() == false )
-	{ return; }
-
-	// get filename 
-
-	std::string folder = xml_get_string_value( node, "folder" ); 
-	std::string filename = xml_get_string_value( node, "filename" ); 
-	std::string input_filename = folder + "/" + filename; 
-
-	std::string filetype = node.attribute("type").value() ; 
-
-	// what kind? 
-	if( filetype == "csv" || filetype == "CSV" )
-	{
-		std::cout << "Loading rules from CSV file " << input_filename << " ... " << std::endl; 
-		// load_cells_csv( input_filename );
-		parse_csv_rules_v0( input_filename ); 
-		return; 
-	}
-
-	return; 
 }
 
 void parse_rules_from_parameters_v0( void )

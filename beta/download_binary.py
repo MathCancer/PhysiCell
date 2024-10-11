@@ -12,10 +12,10 @@ import tarfile
 import stat
 import shutil
 
-physicell_version = "1.14.0"
+physicell_version = "1.14.1"
 repo_physicell = "MathCancer/PhysiCell"
 physiboss_version = "v2.2.3"
-repo_physiboss = "sysbio-curie/PhysiBoSS"
+repo_physiboss = "PhysiBoSS/PhysiBoSS"
 list_models = {
     "physiboss-tutorial": "https://github.com/" + repo_physiboss + "/releases/download/" + physiboss_version + "/", 
     "physiboss-tutorial-invasion": "https://github.com/" + repo_physiboss + "/releases/download/" + physiboss_version + "/", 

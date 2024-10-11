@@ -18,21 +18,22 @@ jobs:
           {name: "Windows", os: "windows-latest", shell: "msys2", compiler: "g++"},
         ]
         projects: [
-          {project: "template", name: "PhysiCell Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", compare_svgs: true, output_folder: "output"},
-          {project: "template_BM", name: "PhysiBoSS Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", compare_svgs: true, output_folder: "output"},
-          {project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", max_time: 120, config: "config/PhysiCell_settings.xml", compare_svgs: true, output_folder: "output"},
-          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Degradation/mymodel_matrix_degradation.xml", max_time: 120, compare_svgs: false, output_folder: "output"},
-          {project: "physiboss-tutorial", name: "PhysiBoSS Tutorial", binary: "project", config: "config/cell_cycle/PhysiCell_settings.xml", max_time: 300, compare_svgs: true, output_folder: "output"},
-          {project: "worm-sample", name: "PhysiCell worm", binary: "worm", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: true, output_folder: "output"},
-          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: true, output_folder: "output"},
-          {project: "mechano-sample", name: "PhysiCell Mechano", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: true, output_folder: "output"},
-          {project: "cancer-biorobots-sample", name: "PhysiCell Cancer Biorobots", binary: "cancer_biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: false, output_folder: "output"},
-          {project: "biorobots-sample", name: "PhysiCell Biorobots", binary: "biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: false, output_folder: "output"},
-          {project: "celltypes3-sample", name: "PhysiCell Celltypes3", binary: "celltypes3", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: false, output_folder: "output"},
-          {project: "custom-division-sample", name: "PhysiCell custom division", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: false, output_folder: "output"},
-          {project: "interaction-sample", name: "PhysiCell interactions", binary: "interaction_demo", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: false, output_folder: "output"},
-          {project: "pred-prey-farmer", name: "PhysiCell prey predator", binary: "pred_prey", config: "config/PhysiCell_settings.xml", max_time: 120, compare_svgs: false, output_folder: "output"},
-          {project: "template", name: "PhysiCell Template - make output folder", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", compare_svgs: false, "output_folder": "test/create/output/folder"}
+          {project: "template", name: "PhysiCell Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
+          {project: "template_BM", name: "PhysiBoSS Template", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
+          {project: "physiboss-cell-lines-sample", name: "PhysiBoSS Cell Lines", binary: "PhysiBoSS_Cell_Lines", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output"},
+          {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Degradation/mymodel_matrix_degradation.xml", max_time: 120, output_folder: ""},
+          {project: "physiboss-tutorial", name: "PhysiBoSS Tutorial", binary: "project", config: "config/cell_cycle/PhysiCell_settings.xml", max_time: 300, output_folder: "output"},
+          {project: "worm-sample", name: "PhysiCell worm", binary: "worm", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "mechano-sample", name: "PhysiCell Mechano", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "cancer-biorobots-sample", name: "PhysiCell Cancer Biorobots", binary: "cancer_biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "biorobots-sample", name: "PhysiCell Biorobots", binary: "biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "celltypes3-sample", name: "PhysiCell Celltypes3", binary: "celltypes3", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "custom-division-sample", name: "PhysiCell custom division", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "interaction-sample", name: "PhysiCell interactions", binary: "interaction_demo", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "pred-prey-farmer", name: "PhysiCell prey predator", binary: "pred_prey", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "rules-sample", name: "PhysiCell rules sample", binary: "rules_sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "asymmetric-division-sample", name: "PhysiCell asymmetric division", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""}
         ]
         
     name: Testing ${{ matrix.projects.name }} on ${{ matrix.os.name }}
@@ -54,7 +55,7 @@ jobs:
     
     - name: Build ${{ matrix.projects.name }} project 
       run: |
-        make data-cleanup && make ${{ matrix.projects.project }} && make PHYSICELL_CPP=${{ matrix.os.compiler }}
+        make data-cleanup && make ${{ matrix.projects.project }} && make PHYSICELL_CPP=${{ matrix.os.compiler }} PROGRAM_NAME=${{ matrix.projects.binary }}
         
     - name: Run ${{ matrix.projects.name }} project
       run: |
