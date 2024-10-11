@@ -1126,6 +1126,8 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 {	
 	Volume cell_volume = phenotype.volume;
 	Geometry cell_geometry = phenotype.geometry;
+	Molecular cell_molecular = phenotype.molecular;
+	Custom_Cell_Data cell_custom_data = custom_data;
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
@@ -1144,6 +1146,18 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	phenotype.volume.relative_rupture_volume = cd.phenotype.volume.relative_rupture_volume;
 	
 	phenotype.geometry = cell_geometry; // leave the geometry alone
+	phenotype.molecular.internalized_total_substrates = cell_molecular.internalized_total_substrates;
+	
+	for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
+	{
+		if( custom_data.variables[nn].conserved_quantity == true )
+		{ custom_data.variables[nn].value = cell_custom_data.variables[nn].value; }
+	}
+	for( int nn = 0 ; nn < custom_data.vector_variables.size() ; nn++ )
+	{
+		if( custom_data.vector_variables[nn].conserved_quantity == true )
+		{ custom_data.vector_variables[nn].value = cell_custom_data.vector_variables[nn].value; }
+	}
 	/* things no longer done here:
 	// assign_orientation(); // not necesary since the this->state is unchanged
 	// Basic_Agent::set_total_volume(volume); // not necessary since the volume is unchanged
@@ -1984,7 +1998,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// if we found something to inherit from, then do it! 
 	if( pParent != NULL )
 	{
-		std::cout << "\tCopying from type " << pParent->name << " ... " << std::endl; 
+		// this is where we copy data from the first cell definition, including custom_data
 		*pCD = *pParent; 
 		
 		// but recover the name and ID (type)
@@ -2044,7 +2058,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 	}
 
-	
 	// sync to microenvironment
 	pCD->pMicroenvironment = NULL;
 	if( BioFVM::get_default_microenvironment() != NULL )
@@ -3159,6 +3172,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			{ pCD->custom_data.add_variable( name, units, values[0] ); }
 
 			n = pCD->custom_data.find_variable_index( name ); 
+			pCD->custom_data.variables[n].conserved_quantity = conserved;
 		}
 		// or vector 
 		else
@@ -3173,10 +3187,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			{ pCD->custom_data.add_vector_variable( name, units, values ); }
 
 			n = pCD->custom_data.find_vector_variable_index( name ); 
+			pCD->custom_data.vector_variables[n].conserved_quantity = conserved;
 		}
 
 		// set conserved attribute 
-		
 		node1 = node1.next_sibling(); 
 	}
 	
@@ -3480,4 +3494,3 @@ int find_cell_definition_index( int search_type )
 
 
 };
-
