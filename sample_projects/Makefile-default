@@ -74,6 +74,7 @@ list-projects:
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
 	@echo "                 worm-sample interaction-sample mechano-sample rules-sample physimess-sample custom-division-sample"
+	@echo "					asymmetric-division-sample"
 	@echo ""
 	@echo "Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample"
 	@echo "                 cancer-metabolism-sample physiboss-tutorial physiboss-tutorial-invasion"
@@ -197,15 +198,23 @@ physimess-sample:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp -r ./sample_projects/physimess/config/* ./config/
 
-
 custom-division-sample:
-	cp ./sample_projects/custom_division/custom_modules/* ./custom_modules/
+	cp -r ./sample_projects/custom_division/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/custom_division/main.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/custom_division/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/custom_division/config/* ./config/
+	cp -r ./sample_projects/custom_division/config/* ./config/
+
+asymmetric-division-sample:
+	cp -r ./sample_projects/asymmetric_division/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/asymmetric_division/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/asymmetric_division/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/asymmetric_division/config/* ./config/
 
 # ---- intracellular projects 
 ode-energy-sample:
