@@ -173,6 +173,7 @@ Cell_Definition::Cell_Definition()
 	// 					are appropriately sized. Same on motiltiy. 
 	phenotype.cell_interactions.sync_to_cell_definitions(); 
 	phenotype.cell_transformations.sync_to_cell_definitions(); 
+	phenotype.cycle.asymmetric_division.sync_to_cell_definitions();
 	phenotype.motility.sync_to_current_microenvironment(); 
 	phenotype.mechanics.sync_to_cell_definitions(); 
 	
@@ -654,8 +655,8 @@ Cell* Cell::divide( )
 	// child->phenotype.integrity.damage = 0.0; // leave alone - damage is heritable 
 	child->state.total_attack_time = 0.0; 
 
-    if( this->functions.cell_division_function )
-        { this->functions.cell_division_function( this, child); }
+	if( this->functions.cell_division_function )
+	{ this->functions.cell_division_function( this, child); }
 
 	return child;
 }
@@ -1341,7 +1342,6 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		pCell_to_eat->functions.update_phenotype = NULL; 
 		pCell_to_eat->functions.contact_function = NULL; 
 		pCell_to_eat->functions.cell_division_function = NULL; 
-
 		
 		// should set volume fuction to NULL too! 
 		pCell_to_eat->functions.volume_update_function = NULL; 
@@ -1794,7 +1794,7 @@ void display_cell_definitions( std::ostream& os )
 		os << std::endl;
 		os << "\t\t contact function: "; display_ptr_as_bool( pCF->contact_function , std::cout ); 
 		os << std::endl; 
-        os << "\t\t cell division function: "; display_ptr_as_bool( pCF->cell_division_function , std::cout ); 
+		os << "\t\t cell division function: "; display_ptr_as_bool( pCF->cell_division_function , std::cout ); 
 		os << std::endl; 
 		
 		// summarize motility 
@@ -2032,6 +2032,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 			// transformation 
 			pCD->phenotype.cell_transformations.transformation_rates.assign(number_of_cell_defs,0.0); 
+
+			// asymmetric division
+			pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.assign(number_of_cell_defs,0.0);
 		}
 		else 
 		{
@@ -2070,6 +2073,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// this requires that prebuild_cell_definition_index_maps was already run 
 	pCD->phenotype.cell_interactions.sync_to_cell_definitions(); 
 	pCD->phenotype.cell_transformations.sync_to_cell_definitions(); 
+	pCD->phenotype.cycle.asymmetric_division.sync_to_cell_definitions();
 	pCD->phenotype.mechanics.sync_to_cell_definitions(); 
 	
 	// set the reference phenotype 
@@ -2218,11 +2222,49 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				
 				node = node.next_sibling( "duration" ); 
 			}
-			
 		}
 
-		
-		
+		node = cd_node.child( "phenotype" );
+		node = node.child( "cycle" );
+		node = node.child( "standard_asymmetric_division" );
+		if( node && node.attribute("enabled").as_bool() )
+		{
+			Asymmetric_Division *pAD = &(pCD->phenotype.cycle.asymmetric_division);
+
+			// asymmetric division rates
+			pugi::xml_node node_adp = node.child( "asymmetric_division_probability");
+			while (node_adp)
+			{
+				// get the name of the target cell type
+				std::string target_name = node_adp.attribute("name").value();
+				// now find its index
+				auto search = cell_definition_indices_by_name.find(target_name);
+				// safety first!
+				if( search != cell_definition_indices_by_name.end() )
+				{
+					// if the target is found, set the appropriate rate
+					int target_index = search->second;
+
+					double asymmetric_division_probability = xml_get_my_double_value(node_adp);
+					pAD->asymmetric_division_probabilities[target_index] = asymmetric_division_probability;
+				}
+				else
+				{
+					std::cout << "Error: When processing the " << pCD->name << " cell definition: " << std::endl
+						<< "\tCould not find cell type " << target_name << " for asymmetric division." << std::endl
+						<< "\tRemove this cell type from the asymmetric division probabilities!" << std::endl << std::endl;
+					exit(-1);
+				}
+				node_adp = node_adp.next_sibling("asymmetric_division_probability");
+			}
+			std::cout << "Asymmetric division probabilities for " << pCD->name << ": ";
+			for (int i = 0; i < pAD->asymmetric_division_probabilities.size(); i++)
+			{
+				std::cout << pAD->asymmetric_division_probabilities[i] << " ";
+			}
+			std::cout << std::endl;
+			pCD->functions.cell_division_function = standard_asymmetric_division_function;
+		}
 	}
 	
 	// here's what it ***should*** do: 
@@ -2438,45 +2480,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					node = node.next_sibling( "duration" ); 
 				}
 				
-				
-/*
-		if( node.child( "phase_durations" ) )
-		{ node = node.child( "phase_durations" ); }
-		if( node )
-		{
-			node = node.child( "duration");
-			while( node )
-			{
-				// which duration? 
-				int start = node.attribute("index").as_int(); 
-				// fixed duration? 
-				bool fixed = false; 
-				if( node.attribute( "fixed_duration" ) )
-				{ fixed = node.attribute("fixed_duration").as_bool(); }
-				// actual value of the duration 
-				double value = xml_get_my_double_value( node ); 
-				
-				// set the transition rate 
-				pCD->phenotype.cycle.data.exit_rate(start) = 1.0 / (value+1e-16); 
-				// set it to fixed / non-fixed 
-				pCD->phenotype.cycle.model().phase_links[start][0].fixed_duration = fixed; 
-				
-				node = node.next_sibling( "duration" ); 
-			}
-			
-		}
-
-*/				
-				
-				
 				node = node.parent(); // phase_durations 
 				node = node.parent(); // model 
 			}				
 			
-			// node = node.parent(); 
-			
 			model_node = model_node.next_sibling( "model" ); 
-//			death_model_index++; 
 		}
 		
 	}
@@ -2821,7 +2829,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			}
 			std::cout << std::endl; 
 		}		
-	}	
+	}
 
 	// secretion
 	
@@ -2972,6 +2980,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		pugi::xml_node node_dr = node.child("attack_damage_rate");
 		pCI->attack_damage_rate = xml_get_my_double_value(node_dr); 
 
+		// attack_duration
+		pugi::xml_node node_ad = node.child("attack_duration");
+		pCI->attack_duration = xml_get_my_double_value(node_ad);
+
 		// fusion_rates 
 		pugi::xml_node node_fr = node.child( "fusion_rates");
 		if( node_fr )
@@ -3063,7 +3075,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		{ pCI->damage_repair_rate = xml_get_my_double_value( node_drr ); }
 	}
 
-    	// intracellular
+	node = cd_node.child( "phenotype" );
+
+		// intracellular
 	node = cd_node.child( "phenotype" );
 	node = node.child( "intracellular" ); 
 	if( node )

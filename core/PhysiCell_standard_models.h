@@ -143,6 +143,7 @@ void evaluate_interactions( Cell* pCell, Phenotype& phenotype, double dt );
 // automated cell phagocytosis, attack, and fusion 
 void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
 void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt ); 
+void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daughter );
 
 void advanced_chemotaxis_function_normalized( Cell* pCell, Phenotype& phenotype , double dt ); 
 void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
