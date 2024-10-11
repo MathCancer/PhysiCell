@@ -535,13 +535,6 @@ void setup_signal_behavior_dictionaries( void )
 		std::string temp =  "asymmetric division to " + pCD->name;
 		behavior_to_int[temp] = map_index;
 		int_to_behavior[map_index] = temp;
-		// synonym
-		temp = "asymmetric division to cell type " + std::to_string(pCD->type);
-		behavior_to_int[temp] = map_index;
-		temp = "divide asymmetrically to " + pCD->name;
-		behavior_to_int[temp] = map_index;
-		temp = "divide asymmetrically to cell type " + std::to_string(pCD->type);
-		behavior_to_int[temp] = map_index;
 	}
 
 	// custom behaviors
@@ -1390,10 +1383,10 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 				pCell->phenotype.cell_transformations.transformation_rates.begin() ); 	
 
 	// asymmetric division
-	static int first_asymmetric_division_index = find_behavior_index( "divide asymmetrically to " + cell_definitions_by_type[0]->name );
+	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	std::copy(  parameters.begin()+first_asymmetric_division_index , 
 				parameters.begin()+first_asymmetric_division_index+n , 
-				pCell->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.begin() );
+				pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.begin() );
 
 	// custom behaviors
 	static int first_custom_ind = find_behavior_index( "custom 0"); 
@@ -1598,9 +1591,9 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	{ pCell->phenotype.cell_transformations.transformation_rates[index-first_transformation_index] = parameter; return; } 
 
 	// asymmetric division
-	static int first_asymmetric_division_index = find_behavior_index( "divide asymmetrically to " + cell_definitions_by_type[0]->name );
+	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-	{ pCell->phenotype.cell_asymmetric_divisions.asymmetric_division_weights[index-first_asymmetric_division_index] = parameter; return; }
+	{ pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[index-first_asymmetric_division_index] = parameter; return; }
 
 	// custom behavior
 	static int first_custom_ind = find_behavior_index( "custom 0"); 
@@ -1810,9 +1803,9 @@ std::vector<double> get_behaviors( Cell* pCell )
 				parameters.begin()+first_transformation_index ); 	
 
 	// asymmetric division
-	static int first_asymmetric_division_index = find_behavior_index( "divide asymmetrically to " + cell_definitions_by_type[0]->name );
-	std::copy(  pCell->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.begin(), 
-				pCell->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.end(), 
+	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
+	std::copy(  pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.begin(), 
+				pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.end(), 
 				parameters.begin()+first_asymmetric_division_index );
 
 	// custom behavior
@@ -2024,9 +2017,9 @@ double get_single_behavior( Cell* pCell , int index )
 	{ return pCell->phenotype.cell_transformations.transformation_rates[index-first_transformation_index]; } 
 
 	// asymmetric division
-	static int first_asymmetric_division_index = find_behavior_index( "divide asymmetrically to " + cell_definitions_by_type[0]->name );
+	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index+n )
-	{ return pCell->phenotype.cell_asymmetric_divisions.asymmetric_division_weights[index-first_asymmetric_division_index]; }
+	{ return pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[index-first_asymmetric_division_index]; }
 
 	// custom behavior
 	static int first_custom_ind = find_behavior_index( "custom 0"); 
@@ -2266,9 +2259,9 @@ std::vector<double> get_base_behaviors( Cell* pCell )
 				parameters.begin()+first_transformation_index ); 	
 
 	// asymmetric division
-	static int first_asymmetric_division_index = find_behavior_index( "divide asymmetrically to " + cell_definitions_by_type[0]->name );
-	std::copy(  pCD->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.begin(), 
-				pCD->phenotype.cell_asymmetric_divisions.asymmetric_division_weights.end(), 
+	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
+	std::copy(  pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.begin(), 
+				pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.end(), 
 				parameters.begin()+first_asymmetric_division_index );
 
 	// custom behavior
@@ -2483,9 +2476,9 @@ double get_single_base_behavior( Cell* pCell , int index )
 	{ return pCD->phenotype.cell_transformations.transformation_rates[index-first_transformation_index]; } 
 
 	// asymmetric division
-	static int first_asymmetric_division_index = find_behavior_index( "divide asymmetrically to " + cell_definitions_by_type[0]->name );
+	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-	{ return pCD->phenotype.cell_asymmetric_divisions.asymmetric_division_weights[index-first_asymmetric_division_index]; }
+	{ return pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[index-first_asymmetric_division_index]; }
 
 	// custom behavior
 	static int first_custom_ind = find_behavior_index( "custom 0"); 
@@ -2705,9 +2698,9 @@ double get_single_base_behavior( Cell_Definition* pCD , int index )
 	{ return pCD->phenotype.cell_transformations.transformation_rates[index-first_transformation_index]; } 
 
 	// asymmetric division
-	static int first_asymmetric_division_index = find_behavior_index( "divide asymmetrically to " + cell_definitions_by_type[0]->name );
+	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-	{ return pCD->phenotype.cell_asymmetric_divisions.asymmetric_division_weights[index-first_asymmetric_division_index]; }
+	{ return pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[index-first_asymmetric_division_index]; }
 
 	// custom behavior
 	static int first_custom_ind = find_behavior_index( "custom 0"); 
