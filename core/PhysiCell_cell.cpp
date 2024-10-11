@@ -1126,6 +1126,7 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 {	
 	Volume cell_volume = phenotype.volume;
 	Geometry cell_geometry = phenotype.geometry;
+	Molecular cell_molecular = phenotype.molecular;
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
@@ -1144,6 +1145,7 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	phenotype.volume.relative_rupture_volume = cd.phenotype.volume.relative_rupture_volume;
 	
 	phenotype.geometry = cell_geometry; // leave the geometry alone
+	phenotype.molecular.internalized_total_substrates = cell_molecular.internalized_total_substrates;
 	/* things no longer done here:
 	// assign_orientation(); // not necesary since the this->state is unchanged
 	// Basic_Agent::set_total_volume(volume); // not necessary since the volume is unchanged
@@ -3480,4 +3482,3 @@ int find_cell_definition_index( int search_type )
 
 
 };
-
