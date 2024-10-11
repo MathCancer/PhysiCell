@@ -208,8 +208,7 @@ int main( int argc, char* argv[] )
 	{		
 		while( t < t_max )
 		{
-			// std::cout<<"time: "<<t<<" diff:"<<fabs( t - t_next_output_time )<<" next output time:"<<t_next_output_time<<std::endl;
-			if(  fabs( t - t_next_output_time ) < 0.001 )
+			if( t > t_next_output_time - 0.5 * dt )
 			{
 				std::cout<<"time: "<<t<<std::endl;
 				writeCellReport(*all_cells, t);
