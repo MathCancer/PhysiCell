@@ -1399,9 +1399,10 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		// absorb the internalized substrates 
 		
 		// multiply by the fraction that is supposed to be ingested (for each substrate) 
+
 		*(pCell_to_eat->internalized_substrates) *= 
 			*(pCell_to_eat->fraction_transferred_when_ingested); // 
-		
+
 		*internalized_substrates += *(pCell_to_eat->internalized_substrates); 
 		static int n_substrates = internalized_substrates->size(); 
 		pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
@@ -1410,6 +1411,7 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		// so that each daughter cell gets half of the original ;
 		for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
 		{
+			custom_data.variables[nn].conserved_quantity = true; 
 			if( custom_data.variables[nn].conserved_quantity == true )
 			{
 				custom_data.variables[nn].value += 
