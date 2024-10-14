@@ -1424,7 +1424,6 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 				pCell_to_eat->custom_data.vector_variables[nn].value; 
 			}
 		}
-
 		
 		// trigger removal from the simulation 
 		// pCell_to_eat->die(); // I don't think this is safe if it's in an OpenMP loop 
