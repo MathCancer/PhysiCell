@@ -137,6 +137,12 @@ class PhysiCell_Settings
 	void read_from_pugixml( void ); 
 };
 
+bool create_directories(const std::string &path);
+bool create_directory(const std::string &path);
+
+void create_output_directory(const std::string& path);
+void create_output_directory(void);
+
 class PhysiCell_Globals
 {
  private:
