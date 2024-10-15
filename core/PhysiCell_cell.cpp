@@ -630,8 +630,8 @@ Cell* Cell::divide( )
 	}	
 	 
 	update_voxel_in_container();
-	phenotype.volume.divide(); 
-	child->phenotype.volume.divide();
+	phenotype.volume.(); 
+	child->phenotype.volume.();
 	child->set_total_volume(child->phenotype.volume.total);
 	set_total_volume(phenotype.volume.total);
 	
@@ -1407,8 +1407,8 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		static int n_substrates = internalized_substrates->size(); 
 		pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
 
-		// conserved quantitites in custom data aer divided in half
-		// so that each daughter cell gets half of the original ;
+		// conserved quantitites in custom data during phagocytosis
+		// so that phagocyte cell absorbs the full amount from the engulfed cell;
 		for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
 		{
 			if( custom_data.variables[nn].conserved_quantity == true )
