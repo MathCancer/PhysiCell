@@ -1049,7 +1049,7 @@ void Molecular::sync_to_current_microenvironment( void )
 	{
 		internalized_total_substrates.resize( 0 , 0.0 ); 
 		fraction_released_at_death.resize( 0 , 0.0 ); 
-		fraction_transferred_when_ingested.resize( 0, 0.0 ); 
+		fraction_transferred_when_ingested.resize( 0, 1.0 ); 
 	}
 	return; 
 }
@@ -1062,7 +1062,7 @@ void Molecular::sync_to_microenvironment( Microenvironment* pNew_Microenvironmen
 
 	internalized_total_substrates.resize( number_of_densities , 0.0 ); 
 	fraction_released_at_death.resize( number_of_densities , 0.0 ); 
-	fraction_transferred_when_ingested.resize( number_of_densities , 0.0 ); 
+	fraction_transferred_when_ingested.resize( number_of_densities , 1.0 ); 
 	
 	return; 
 }
