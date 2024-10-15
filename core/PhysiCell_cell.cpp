@@ -630,8 +630,8 @@ Cell* Cell::divide( )
 	}	
 	 
 	update_voxel_in_container();
-	phenotype.volume.(); 
-	child->phenotype.volume.();
+	phenotype.volume.divide(); 
+	child->phenotype.volume.divide();
 	child->set_total_volume(child->phenotype.volume.total);
 	set_total_volume(phenotype.volume.total);
 	
