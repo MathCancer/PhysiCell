@@ -1411,7 +1411,6 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		// so that each daughter cell gets half of the original ;
 		for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
 		{
-			custom_data.variables[nn].conserved_quantity = true; 
 			if( custom_data.variables[nn].conserved_quantity == true )
 			{
 				custom_data.variables[nn].value += 
