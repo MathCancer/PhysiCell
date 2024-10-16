@@ -1,6 +1,11 @@
 # PhysiMeSS
 PhysiMeSS (PhysiCell Microenvironment Structure Simulation) is a PhysiCell add-on which allows users to simulate ECM components as agents. 
 
+## Paper
+PhysiMeSS paper is available on Gigabyte : [https://gigabytejournal.com/articles/136](https://gigabytejournal.com/articles/136). 
+
+DOI: [10.46471/gigabyte.136](https://doi.org/10.46471/gigabyte.136).
+
 ## Dedicated sample project
 PhysiMeSS comes with a dedicated sample project, called **physimess-sample**. To build it, go to the root directory and use : 
 
