@@ -329,15 +329,14 @@ bool create_directories(const std::string &path)
     std::string currentPath;
 
 	// Check for Unix-like absolute path or Windows absolute path with drive letter
-#if defined(__MINGW32__) || defined(__MINGW64__)
-	if (path[0] == '\\')
-	{ pos = 1; } // Windows absolute path starting with backslash
-	else if (path.length() > 2 && isalpha(path[0]) && path[1] == ':' && path[2] == '\\')
-	{ pos = 3; } // Windows absolute path with drive letter
-#else
-	if (path[0] == '/')
-	{ pos = 1; } // Unix-like absolute path
-#endif
+	if (path[0] == '\\' || path[0] == '/')
+	{
+		pos = 1; // Unix-like or Windows absolute path starting with backslash or forward slash
+	}
+	else if (path.length() > 2 && isalpha(path[0]) && path[1] == ':' && (path[2] == '\\' || path[2] == '/'))
+	{
+		pos = 3; // Windows absolute path with drive letter
+	}
 
 	while ((pos = path.find_first_of("/\\", pos)) != std::string::npos) {
         currentPath = path.substr(0, pos++);
