@@ -2193,7 +2193,7 @@ void export_rules_csv_v1( std::string filename )
 				{ response = "decreases"; max_response = min_value; }
 				double half_max = pHRS->rules[k]->half_maxes[i];
 				double hill_power = pHRS->rules[k]->hill_powers[i];
-				bool use_for_dead = false; 
+				bool use_for_dead = pHRS->rules[k]->applies_to_dead_cells[i];
 
 				// output the rule 
 				fs << cell_type << "," << signal << "," << response << "," << behavior << "," // 0,1,2,3
@@ -2222,7 +2222,7 @@ void export_rules_csv_v3( std::string filename )
 		return; 
 	}
 
-	std::cout << "Exporting rules to file " << filename << " (v2 format) ... " << std::endl; 
+	std::cout << "Exporting rules to file " << filename << " (v3 format) ... " << std::endl; 
 
 	for( int n=0; n < cell_definitions_by_index.size(); n++ )
 	{
@@ -2249,7 +2249,7 @@ void export_rules_csv_v3( std::string filename )
 				{ response = "decreases"; max_response = min_value; }
 				double half_max = pHRS->rules[k]->half_maxes[i];
 				double hill_power = pHRS->rules[k]->hill_powers[i];
-				bool use_for_dead = false; 
+				bool use_for_dead = pHRS->rules[k]->applies_to_dead_cells[i];
 
 				// output the rule 
 				fs << cell_type << "," << signal << "," << response << "," << behavior << "," // 0,1,2,3
@@ -2370,7 +2370,7 @@ void setup_cell_rules( void )
 
 	// save rules (v1)
 	std::string rules_file = PhysiCell_settings.folder + "/cell_rules.csv"; 
-	export_rules_csv_v1( rules_file ); 
+	export_rules_csv_v3( rules_file ); 
 
 
 	return; 
