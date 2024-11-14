@@ -187,6 +187,8 @@ void add_BioFVM_basic_agent_to_open_xml_pugi(  pugi::xml_document& xml_dom, Basi
 void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M  ); 
 void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M );
 
+void write_coordinates_node(pugi::xml_node &node, const std::vector<double> &coordinates, std::string name);
+
 void save_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double current_simulation_time); 
 
 /* beta in PhysiCell 1.11.0 */
