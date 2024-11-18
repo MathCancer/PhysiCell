@@ -1,5 +1,14 @@
 <PhysiCell_settings version="devel-version">
 
+    <cell_rules>
+        <rulesets>
+            <ruleset protocol="CBHG" version="3.0" format="csv" enabled="false">
+                <folder>config</folder>
+                <filename>rules.csv</filename>
+            </ruleset>
+        </rulesets>
+    </cell_rules>
+
     <domain>
         <x_min>-750</x_min>
         <x_max>750</x_max>
@@ -35,6 +44,12 @@
         <SVG>
             <interval units="min">60</interval>
             <enable>true</enable>
+            <plot_substrate enabled="false" limits="false">
+                <substrate>oxygen</substrate>
+                <min_conc />
+                <max_conc />
+                <colormap />
+            </plot_substrate>
         </SVG>
         <legacy_data>
             <enable>false</enable>
@@ -45,6 +60,7 @@
         <legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
         <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
         <disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
+        <random_seed>0</random_seed>
     </options>
 
     <microenvironment_setup>
@@ -70,7 +86,7 @@
                 <decay_rate units="1/min">0.1</decay_rate>
             </physical_parameter_set>
             <initial_condition units="mmHg">0</initial_condition>
-            <Dirichlet_boundary_condition units="mmHg" enabled="True">0</Dirichlet_boundary_condition>
+            <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
             <Dirichlet_options>
                 <boundary_value ID="xmin" enabled="False">0</boundary_value>
                 <boundary_value ID="xmax" enabled="False">0</boundary_value>
@@ -86,7 +102,7 @@
                 <decay_rate units="1/min">.15625</decay_rate>
             </physical_parameter_set>
             <initial_condition units="mmHg">0</initial_condition>
-            <Dirichlet_boundary_condition units="mmHg" enabled="True">0</Dirichlet_boundary_condition>
+            <Dirichlet_boundary_condition units="mmHg" enabled="False">0</Dirichlet_boundary_condition>
             <Dirichlet_options>
                 <boundary_value ID="xmin" enabled="False">0</boundary_value>
                 <boundary_value ID="xmax" enabled="False">0</boundary_value>
@@ -138,12 +154,12 @@
                             <duration index="1" fixed_duration="true">86400</duration>
                         </phase_durations>
                         <parameters>
-							<unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
-							<lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
-							<cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
-							<nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
-							<calcification_rate units="1/min">0</calcification_rate>
-							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                            <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                         </parameters>
                     </model>
                 </death>
@@ -171,11 +187,10 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">10.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">1</speed>
@@ -221,7 +236,9 @@
                     </substrate>
                 </secretion>
                 <cell_interactions>
-                    <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>
+                    <other_dead_phagocytosis_rate units="1/min">0</other_dead_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="cancer cell" units="1/min">0</phagocytosis_rate>
                         <phagocytosis_rate name="cargo cell" units="1/min">0.0</phagocytosis_rate>
@@ -232,7 +249,8 @@
                         <attack_rate name="cargo cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="worker cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1</damage_rate>
+                    <attack_damage_rate units="1/min">1</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
                     <fusion_rates>
                         <fusion_rate name="cancer cell" units="1/min">0</fusion_rate>
                         <fusion_rate name="cargo cell" units="1/min">0.0</fusion_rate>
@@ -246,6 +264,10 @@
                         <transformation_rate name="worker cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>
             </phenotype>
             <custom_data>
                 <receptor conserved="false" units="dimensionless" description="">0</receptor>
@@ -262,6 +284,8 @@
                 <attached_worker_migration_bias conserved="false" units="" description="">0.0</attached_worker_migration_bias>
                 <unattached_worker_migration_bias conserved="false" units="" description="">0.0</unattached_worker_migration_bias>
             </custom_data>
+            <initial_parameter_distributions enabled="false">
+          </initial_parameter_distributions>
         </cell_definition>
         <cell_definition name="cargo cell" ID="1">
             <phenotype>
@@ -292,12 +316,12 @@
                             <duration index="1" fixed_duration="true">86400</duration>
                         </phase_durations>
                         <parameters>
-							<unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
-							<lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
-							<cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
-							<nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
-							<calcification_rate units="1/min">0</calcification_rate>
-							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                            <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                         </parameters>
                     </model>
                 </death>
@@ -325,11 +349,10 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">10.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">1</speed>
@@ -375,7 +398,9 @@
                     </substrate>
                 </secretion>
                 <cell_interactions>
-                    <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>
+                    <other_dead_phagocytosis_rate units="1/min">0</other_dead_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="cancer cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="cargo cell" units="1/min">0.0</phagocytosis_rate>
@@ -386,7 +411,8 @@
                         <attack_rate name="cargo cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="worker cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1</damage_rate>
+                    <attack_damage_rate units="1/min">1</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
                     <fusion_rates>
                         <fusion_rate name="cancer cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="cargo cell" units="1/min">0.0</fusion_rate>
@@ -400,6 +426,10 @@
                         <transformation_rate name="worker cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>
             </phenotype>
             <custom_data>
                 <receptor conserved="false" units="dimensionless" description="">1</receptor>
@@ -416,6 +446,8 @@
                 <attached_worker_migration_bias conserved="false" units="" description="">0.0</attached_worker_migration_bias>
                 <unattached_worker_migration_bias conserved="false" units="" description="">0.0</unattached_worker_migration_bias>
             </custom_data>
+            <initial_parameter_distributions enabled="false">
+          </initial_parameter_distributions>
         </cell_definition>
         <cell_definition name="worker cell" ID="2">
             <phenotype>
@@ -446,12 +478,12 @@
                             <duration index="1" fixed_duration="true">86400</duration>
                         </phase_durations>
                         <parameters>
-							<unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
-							<lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
-							<cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
-							<nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
-							<calcification_rate units="1/min">0</calcification_rate>
-							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                            <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                         </parameters>
                     </model>
                 </death>
@@ -479,11 +511,10 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">10.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">2</speed>
@@ -529,7 +560,9 @@
                     </substrate>
                 </secretion>
                 <cell_interactions>
-                    <dead_phagocytosis_rate units="1/min">0</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0</necrotic_phagocytosis_rate>
+                    <other_dead_phagocytosis_rate units="1/min">0</other_dead_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="cancer cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="cargo cell" units="1/min">0.0</phagocytosis_rate>
@@ -540,7 +573,8 @@
                         <attack_rate name="cargo cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="worker cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1</damage_rate>
+                    <attack_damage_rate units="1/min">1</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
                     <fusion_rates>
                         <fusion_rate name="cancer cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="cargo cell" units="1/min">0.0</fusion_rate>
@@ -554,6 +588,10 @@
                         <transformation_rate name="worker cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>
             </phenotype>
             <custom_data>
                 <receptor conserved="false" units="dimensionless" description="">0</receptor>
@@ -570,6 +608,8 @@
                 <attached_worker_migration_bias conserved="false" units="" description="">0.5</attached_worker_migration_bias>
                 <unattached_worker_migration_bias conserved="false" units="" description="">0.5</unattached_worker_migration_bias>
             </custom_data>
+            <initial_parameter_distributions enabled="false">
+          </initial_parameter_distributions>
         </cell_definition>
     </cell_definitions>
 
@@ -581,7 +621,6 @@
     </initial_conditions>
 
     <user_parameters>
-        <random_seed type="int" units="dimensionless" description="">0</random_seed>
         <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
         <therapy_activation_time type="double" units="min" description="10080">10080</therapy_activation_time>
         <save_interval_after_therapy_start type="double" units="min" description="">3</save_interval_after_therapy_start>
