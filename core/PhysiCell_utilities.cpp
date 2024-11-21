@@ -92,6 +92,12 @@ void setup_rng( void )
 		warned = true;
 	}
 	std::cout << "Setting up RNG with seed " << physicell_random_seed << std::endl;
+
+	// save the seed to random_seed.txt
+	std::ofstream out(PhysiCell_settings.folder + "/random_seed.txt");
+	out << physicell_random_seed << std::endl;
+	out.close();
+
 	physicell_PRNG_generator.seed( physicell_random_seed );
 
 	// now get number of threads and set up a seed for each thread 
