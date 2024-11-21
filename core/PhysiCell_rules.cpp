@@ -1933,6 +1933,8 @@ void parse_rules_from_pugixml( void )
 
 			if( done == false )
 			{ std::cout << "\tWarning: Ruleset had unknown format (" << format << "). Skipping!" << std::endl; }
+			else
+			{ copy_file_to_output( input_filename ); }
 
 		}
 		else
@@ -2367,11 +2369,6 @@ void setup_cell_rules( void )
 	display_signal_dictionary( dict_of ); // done 
 	display_behavior_dictionary( dict_of ); // done 
 	dict_of.close(); 
-
-	// save rules (v1)
-	std::string rules_file = PhysiCell_settings.folder + "/cell_rules.csv"; 
-	export_rules_csv_v3( rules_file ); 
-
 
 	return; 
 }
