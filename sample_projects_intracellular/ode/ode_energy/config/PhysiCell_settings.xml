@@ -337,7 +337,7 @@
 	
     <cell_rules>
         <rulesets>
-            <ruleset protocol="CBHG" version="2.0" format="csv" enabled="false">
+            <ruleset protocol="CBHG" version="3.0" format="csv" enabled="false">
                 <folder>./config</folder>
                 <filename>cell_rules.csv</filename>
             </ruleset>

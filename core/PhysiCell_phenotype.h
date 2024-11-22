@@ -225,6 +225,23 @@ class Cycle_Model
     void reset_data(std::istream& is );
 };
 
+class Asymmetric_Division
+{
+private:
+public:
+	// rates of asymmetric division into different cell types 
+	std::vector<double> asymmetric_division_probabilities; 
+
+	// initialization
+	Asymmetric_Division(); // done 
+	void sync_to_cell_definitions(); // done 
+
+	double probabilities_total();
+
+	// ease of access 
+	double& asymmetric_division_probability( std::string type_name ); // done
+};
+
 class Cycle
 {
  private:
@@ -244,6 +261,8 @@ class Cycle
 	void sync_to_cycle_model( Cycle_Model& cm ); // done 
 	friend std::ostream& operator<<(std::ostream& os, const Cycle& cycle_params);
     friend std::istream& operator>>(std::istream& is, Cycle& cycle_params);
+
+	Asymmetric_Division asymmetric_division;
 };
 
 class Death_Parameters

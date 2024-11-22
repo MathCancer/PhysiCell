@@ -134,8 +134,7 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
 
 void physimess_mechanics( double dt ) 
 {    
-    static double dt_tolerance = 0.001 * dt; 
-    if(fabs(((PhysiCell_globals.current_time - last_update_time)) - dt) < dt_tolerance)
+    if ( PhysiCell_globals.current_time >= last_update_time + dt - 0.5 * diffusion_dt) // last_update_time + dt = next update time; - 0.5 * diffusion_dt will give the time step closest to the desired next time (assumign diffusion_dt is the smallest time step)
     {
         last_update_time = PhysiCell_globals.current_time;
         

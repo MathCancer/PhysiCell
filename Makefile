@@ -98,7 +98,249 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBo
 all: main.cpp $(ALL_OBJECTS) $(MaBoSS)
 	$(COMPILE_COMMAND) $(INC)  -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB)
 	@echo ""
-	@echo "check for $(PROGRAM_NAME)"
+	@echo "Executable name is" $(PROGRAM_NAME)
+	@echo ""
+
+# sample projects 	
+list-projects:
+	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
+	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
+	@echo "                 worm-sample interaction-sample mechano-sample rules-sample physimess-sample custom-division-sample"
+	@echo "					asymmetric-division-sample"
+	@echo ""
+	@echo "Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample"
+	@echo "                 cancer-metabolism-sample physiboss-tutorial physiboss-tutorial-invasion"
+	@echo ""
+	
+template:
+	cp -r ./sample_projects/template/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template/Makefile .
+	cp -r ./sample_projects/template/config/* ./config 
+	
+# sample projects 
+
+# ---- non-intracellular projects 
+biorobots-sample:
+	cp ./sample_projects/biorobots/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/biorobots/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/biorobots/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/biorobots/config/* ./config/
+	
+cancer-biorobots-sample:
+	cp ./sample_projects/cancer_biorobots/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/cancer_biorobots/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/cancer_biorobots/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/cancer_biorobots/config/* ./config/
+	
+cancer-immune-sample:
+	cp ./sample_projects/cancer_immune/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/cancer_immune/main-cancer_immune_3D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/cancer_immune/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/cancer_immune/config/* ./config/
+
+celltypes3-sample:
+	cp ./sample_projects/celltypes3/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/celltypes3/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/celltypes3/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/celltypes3/config/* ./config/	
+	
+heterogeneity-sample:
+	cp ./sample_projects/heterogeneity/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/heterogeneity/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/heterogeneity/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/heterogeneity/config/* ./config/
+	
+pred-prey-farmer:
+	cp ./sample_projects/pred_prey_farmer/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/pred_prey_farmer/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/pred_prey_farmer/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/pred_prey_farmer/config/* ./config/	
+	
+virus-macrophage-sample:
+	cp ./sample_projects/virus_macrophage/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/virus_macrophage/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/virus_macrophage/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/virus_macrophage/config/* ./config/
+	
+worm-sample:
+	cp ./sample_projects/worm/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/worm/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/worm/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/worm/config/* ./config/
+	
+interaction-sample:
+	cp ./sample_projects/interactions/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/interactions/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/interactions/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/interactions/config/* ./config/
+
+mechano-sample:
+	cp ./sample_projects/mechano/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/mechano/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/mechano/Makefile .
+	cp ./sample_projects/mechano/config/* ./config/
+
+rules-sample:
+	cp ./sample_projects/rules_sample/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/rules_sample/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/rules_sample/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/rules_sample/config/* ./config/
+
+physimess-sample:
+	cp ./sample_projects/physimess/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/physimess/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/physimess/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/physimess/config/* ./config/
+
+custom-division-sample:
+	cp -r ./sample_projects/custom_division/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/custom_division/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/custom_division/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/custom_division/config/* ./config/
+
+asymmetric-division-sample:
+	cp -r ./sample_projects/asymmetric_division/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/asymmetric_division/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/asymmetric_division/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/asymmetric_division/config/* ./config/
+
+# ---- intracellular projects 
+ode-energy-sample:
+	cp ./sample_projects_intracellular/ode/ode_energy/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/ode/ode_energy/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/ode/ode_energy/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects_intracellular/ode/ode_energy/config/* ./config/	
+
+physiboss-cell-lines-sample:
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects_intracellular/boolean/physiboss_cell_lines/config/* ./config/
+
+physiboss-tutorial:
+	cp ./sample_projects_intracellular/boolean/tutorial/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/boolean/tutorial/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/boolean/tutorial/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects_intracellular/boolean/tutorial/config/* ./config/
+
+physiboss-tutorial-invasion:
+	cp ./sample_projects_intracellular/boolean/cancer_invasion/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/boolean/cancer_invasion/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/boolean/cancer_invasion/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects_intracellular/boolean/cancer_invasion/config/* ./config/
+
+ecoli-acetic-switch-sample:
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/main_ecoli_acetic_switch.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects_intracellular/fba/ecoli_acetic_switch/config/* ./config/
+
+cancer-metabolism-sample:
+	cp ./sample_projects_intracellular/fba/cancer_metabolism/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/fba/cancer_metabolism/main.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/fba/cancer_metabolism/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects_intracellular/fba/cancer_metabolism/config/* ./config/
+
+template_BM:
+	cp ./sample_projects_intracellular/boolean/template_BM/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/boolean/template_BM/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/boolean/template_BM/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects_intracellular/boolean/template_BM/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects_intracellular/boolean/template_BM/scripts/* ./scripts/
+
+# early examples for convergence testing 
+
+physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
+	$(COMPILE_COMMAND) -o test_mech1 $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp
+
+physicell_test_mech2: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_2.cpp 
+	$(COMPILE_COMMAND) -o test_mech2 $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_2.cpp
+	
+physicell_test_DCIS: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_DCIS.cpp 
+	$(COMPILE_COMMAND) -o test_DCIS $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_DCIS.cpp
+
+physicell_test_HDS: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_HDS.cpp 
+	$(COMPILE_COMMAND) -o test_HDS $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_HDS.cpp
+
+physicell_test_cell_cycle: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_cell_cycle.cpp 
+	$(COMPILE_COMMAND) -o test_cycle $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_cell_cycle.cpp
+
+PhysiCell_test_volume: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_volume.cpp 
+	$(COMPILE_COMMAND) -o test_volume $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_volume.cpp
+	
+examples: $(PhysiCell_OBJECTS) 
+	$(COMPILE_COMMAND) -o ./examples/test_mech1 ./examples/PhysiCell_test_mechanics_1.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_mech2 ./examples/PhysiCell_test_mechanics_2.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_DCIS ./examples/PhysiCell_test_DCIS.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_HDS ./examples/PhysiCell_test_HDS.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_cycle ./examples/PhysiCell_test_cell_cycle.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_volume ./examples/PhysiCell_test_volume.cpp $(PhysiCell_OBJECTS)
 
 # PhysiCell core components	
 

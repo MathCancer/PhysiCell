@@ -1049,7 +1049,7 @@ void Molecular::sync_to_current_microenvironment( void )
 	{
 		internalized_total_substrates.resize( 0 , 0.0 ); 
 		fraction_released_at_death.resize( 0 , 0.0 ); 
-		fraction_transferred_when_ingested.resize( 0, 0.0 ); 
+		fraction_transferred_when_ingested.resize( 0, 1.0 ); 
 	}
 	return; 
 }
@@ -1062,7 +1062,7 @@ void Molecular::sync_to_microenvironment( Microenvironment* pNew_Microenvironmen
 
 	internalized_total_substrates.resize( number_of_densities , 0.0 ); 
 	fraction_released_at_death.resize( number_of_densities , 0.0 ); 
-	fraction_transferred_when_ingested.resize( number_of_densities , 0.0 ); 
+	fraction_transferred_when_ingested.resize( number_of_densities , 1.0 ); 
 	
 	return; 
 }
@@ -1356,6 +1356,38 @@ double& Cell_Transformations::transformation_rate( std::string type_name )
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 	int n = cell_definition_indices_by_name[type_name]; 
 	return transformation_rates[n]; 
+}
+
+Asymmetric_Division::Asymmetric_Division()
+{
+	asymmetric_division_probabilities = {0.0};
+}
+
+void Asymmetric_Division::sync_to_cell_definitions()
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int number_of_cell_defs = cell_definition_indices_by_name.size(); 
+	
+	if( asymmetric_division_probabilities.size() != number_of_cell_defs )
+	{ asymmetric_division_probabilities.resize( number_of_cell_defs, 0.0); }
+	
+	return; 
+}
+
+double Asymmetric_Division::probabilities_total( void )
+{
+	double total = 0.0; 
+	for( int i=0; i < asymmetric_division_probabilities.size(); i++ )
+	{ total += asymmetric_division_probabilities[i]; }
+	return total; 
+}
+
+// ease of access
+double& Asymmetric_Division::asymmetric_division_probability( std::string type_name )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name]; 
+	return asymmetric_division_probabilities[n]; 
 }
 
 // beta functionality in 1.10.3 

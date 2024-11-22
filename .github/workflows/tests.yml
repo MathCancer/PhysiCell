@@ -32,6 +32,8 @@ jobs:
           {project: "custom-division-sample", name: "PhysiCell custom division", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "interaction-sample", name: "PhysiCell interactions", binary: "interaction_demo", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "pred-prey-farmer", name: "PhysiCell prey predator", binary: "pred_prey", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "rules-sample", name: "PhysiCell rules sample", binary: "rules_sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "asymmetric-division-sample", name: "PhysiCell asymmetric division", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""}
         ]
         
     name: Testing ${{ matrix.projects.name }} on ${{ matrix.os.name }}
@@ -53,7 +55,7 @@ jobs:
     
     - name: Build ${{ matrix.projects.name }} project 
       run: |
-        make data-cleanup && make ${{ matrix.projects.project }} && make PHYSICELL_CPP=${{ matrix.os.compiler }}
+        make data-cleanup && make ${{ matrix.projects.project }} && make PHYSICELL_CPP=${{ matrix.os.compiler }} PROGRAM_NAME=${{ matrix.projects.binary }}
         
     - name: Run ${{ matrix.projects.name }} project
       run: |
