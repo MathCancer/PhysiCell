@@ -5,6 +5,7 @@
 #include "BooleanNetwork.h"
 #include "RunConfig.h"
 #include "../../../core/PhysiCell_utilities.h"
+#include "../../../core/PhysiCell_phenotype.h"
 
 /**
  *	\class MaBoSSNetwork
@@ -111,6 +112,7 @@ class MaBoSSNetwork
 		bool has_node( std::string name );
 		void set_node_value(std::string name, bool value);
 		bool get_node_value(std::string name);
+		std::vector<Node*> get_nodes_number();
 		std::string get_state();
 		
 		/** \brief Return update time value */
@@ -140,6 +142,47 @@ class MaBoSSNetwork
 		 * \param node_values Boolean vector mapping a boolean network
 		 */
 		void print_nodes();
+
+		/** 
+		 * \brief Save current state of all the nodes of the network 
+		 * \param node_values Boolean vector mapping a boolean network
+		 * \param out_stream Output file used to save data
+		 */
+		void save_nodes(std::ostream& out_stream);
+
+		void save_current_parameters(std::ostream& out_stream){
+
+			out_stream << "maboss_network_parameters:" << std::endl;
+			//out_stream << "update_time_step: " << this->update_time_step << std::endl;
+			out_stream << "time_to_update: " << this->time_to_update << std::endl;
+			out_stream << "scaling: " << this->scaling << std::endl;
+			out_stream << "time_stochasticity: " << this->time_stochasticity << std::endl;
+			//out_stream << "seed: " << this->seed << std::endl;
+			out_stream << std::endl;
+		}
+
+		void read_current_parameter(std::ifstream& in_stream){
+			std::string dummy;
+
+			//skip header
+			std::getline(in_stream, dummy);
+
+			//time_to_update
+			std::getline(in_stream, dummy);
+			this->time_to_update = read_number_in_line(dummy);
+
+			//scaling
+			std::getline(in_stream, dummy);
+			this->scaling = read_number_in_line(dummy);
+
+			//time_stochasticity
+			std::getline(in_stream, dummy);
+			this->time_stochasticity = read_number_in_line(dummy);
+
+			// skip empty line
+			std::getline(in_stream, dummy);
+		
+		}
 
 		void set_state(NetworkState _state) { state = NetworkState(_state.getState()); }	
 		NetworkState get_maboss_state() { return state;}

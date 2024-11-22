@@ -237,6 +237,8 @@ class Microenvironment
 	void simulate_cell_sources_and_sinks( double dt ); 
 	
 	void display_information( std::ostream& os ); 
+	friend std::ostream& operator<<(std::ostream& os, Microenvironment& S); 
+	friend std::istream& operator>>(std::istream& is, Microenvironment& microenv); 
 	
 	void add_dirichlet_node( int voxel_index, std::vector<double>& value ); 
 	void update_dirichlet_node( int voxel_index , std::vector<double>& new_value ); 

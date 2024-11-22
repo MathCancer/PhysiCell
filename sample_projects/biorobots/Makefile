@@ -62,8 +62,10 @@ PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
+start_and_stop_OBJECTS := start_and_stop.o
+
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(start_and_stop_OBJECTS)
 
 # compile the project 
 
@@ -165,7 +167,11 @@ PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
 	
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
-	
+
+# start_and_stop
+start_and_stop.o: ./addons/start_and_stop/start_and_stop.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./addons/start_and_stop/start_and_stop.cpp
+
 # user-defined PhysiCell modules
 
 custom.o: ./custom_modules/custom.cpp 

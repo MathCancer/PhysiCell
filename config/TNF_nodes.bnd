@@ -1,0 +1,184 @@
+node FASL
+{
+  rate_up = 0.0;
+  rate_down = 0.0;
+}
+node TNF
+{
+  logic = TNF;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node TNFR
+{
+  logic = TNF;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node DISC_TNF
+{
+  logic = FADD & TNFR;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node DISC_FAS
+{
+  logic = FASL & FADD;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node FADD
+{
+  rate_up = 0.0;
+  rate_down = 0.0;
+}
+node RIP1
+{
+  logic = (DISC_FAS | TNFR) & (!CASP8);
+  rate_up = ($Low_RIP1 ? 0.0 : ( @logic ? 1.0: 0.0 ));
+  rate_down = ($Low_RIP1 ? 1E+100 : ( @logic ? 0.0 : 1.0 ));
+}
+node RIP1ub
+{
+  logic = cIAP & RIP1;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node RIP1K
+{
+  logic = RIP1;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node IKK
+{
+  logic = RIP1ub;
+  rate_up = ($High_IKK ? 1E+100 : (@logic ? 1.0 : 0.0) );
+  rate_down = ($High_IKK ? 0.0 : (@logic ? 0.0 : 1.0) );
+}
+node NFkB
+{
+  logic = IKK & (!CASP3);
+  rate_up = ($Low_NFkB ? 0.0 : ($High_NFkB ? 1E+100 : ( @logic ? 1.0 : 0.0) ));
+  rate_down = ($Low_NFkB ? 1E+100 : ($High_NFkB ? 0.0 : (@logic ? 0.0 : 1.0) ));
+}
+node CASP8
+{
+  logic = (DISC_TNF | (DISC_FAS | CASP3) ) & (!cFLIP);
+  rate_up = ($Low_CASP8 ? 0.0 : ( $High_CASP8 ? 1E+100 : ( @logic ? 1.0: 0.0 )) );
+  rate_down = ($Low_CASP8 ? 1E+100 : ( $High_CASP8 ? 0.0 : (@logic ? 0.0 : 1.0 )) );
+}
+node BAX
+{
+  logic = CASP8 & (!BCL2);
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node BCL2
+{
+  logic = NFkB;
+  rate_up = (@logic ? $TransRate : 0.0);
+  rate_down = @logic ? 0.0 : 1.0; 
+}
+node mROS
+{
+  logic = (!NFkB);
+  rate_up = ($High_mROS ? 1E+100 : (@logic ? $TransRate : 0.0) );
+  rate_down = ($High_mROS ? 0.0: (@logic ? 0.0 : 1.0) );
+}
+node ROS
+{
+  logic = (mROS) & (MPT | RIP1K );
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0; 
+}
+node ATP
+{
+  logic = !MPT;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0; 
+}
+node MPT
+{
+  logic = (!BCL2) & ROS;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0; 
+}
+node MOMP
+{
+  logic = BAX | MPT;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0; 
+}
+node SMAC 
+{
+  logic = MOMP;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0; 
+}
+node mcIAP
+{
+  logic = (NFkB);
+  rate_up = @logic ? $TransRate : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node cIAP
+{
+	logic = (mcIAP & (!SMAC));
+	rate_up = ($Low_cIAP ? 0.0 : ( @logic ? $TransRate: 0.0 ));
+	rate_down = ($Low_cIAP ? 1E+100 : ( (SMAC) ? 1.0 : 0.0 ));
+}
+node Cyt_c
+{
+  logic = MOMP;
+  rate_up = ($High_Cytc ? 1E+100 : (@logic ? 1.0 : 0.0) );
+  rate_down = ($High_Cytc ? 0.0 : (@logic ? 0.0 : 1.0) ); 
+}
+node mXIAP
+{
+  logic = (NFkB);
+  rate_up = @logic ? $TransRate : 0.0;
+  rate_down = @logic ? 0.0 : 1.0;
+}
+node XIAP
+{
+  logic = (!SMAC) & mXIAP;
+  rate_up = (@logic) ? 1.0 : 0.0;
+  rate_down = (@logic ? 0.0 : 1.0); 
+}
+node apoptosome
+{
+  logic = Cyt_c & (ATP & (!XIAP));
+  rate_up = (@logic) ? 1.0 : 0.0;
+  rate_down = (@logic ? 0.0 : 1.0);
+}
+node CASP3
+{
+  logic = apoptosome & (!XIAP);
+  rate_up = ( $Low_CASP3 ? 0.0 : ($High_CASP3 ? 1E+100 : ((@logic ? 1.0 : 0.0)) ) );
+  rate_down = ($Low_CASP3 ? 1E+100 : ($High_CASP3 ? 0.0 : ( @logic ? 0.0 : 1.0) ) );
+}
+node cFLIP
+{
+  logic = NFkB ;
+  rate_up = ($High_cFLIP ? 1E+100 : ((@logic)  ? $TransRate : 0.0) );
+  rate_down = ($High_cFLIP ? 0.0 : (@logic ? 0.0 : 1.0) ); 
+}
+node NonACD
+{
+  logic = !ATP;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0; 
+}
+node Apoptosis
+{
+  logic = CASP3;
+  rate_up = @logic ? 1.0 : 0.0;
+  rate_down = @logic ? 0.0 : 1.0; 
+}
+node Survival
+{
+  logic = NFkB;
+  rate_up = @logic ? $TransRate : 0.0;
+  rate_down = @logic ? 0.0 : 1.0; 
+}

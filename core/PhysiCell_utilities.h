@@ -111,6 +111,16 @@ void add_software_citation( std::string name , std::string version, std::string 
 
 int choose_event( std::vector<double>& probabilities ); 
 
+void save_counters(std::ostream& out_stream);
+
+void set_counter_double_random(int value);
+
+void set_counter_int_random(int value);
+
+void set_counter_normal_random(int value);
+
+void print_counters();
+
 };
 
 #endif

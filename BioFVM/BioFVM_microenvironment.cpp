@@ -50,6 +50,11 @@
 #include "BioFVM_solvers.h"
 #include "BioFVM_vector.h"
 #include <cmath>
+#include <cassert>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include "../core/PhysiCell_phenotype.h"
 
 #include "BioFVM_basic_agent.h"
 
@@ -1612,5 +1617,771 @@ void get_row_from_substrate_initial_condition_csv(std::vector<int> &voxel_set, c
 		}
 	}
 	voxel_set.push_back(voxel_ind);
+}
+
+std::ostream& operator<<(std::ostream& os, Microenvironment& S)
+{
+    os << std::endl << "Microenvironment summary: " << std::endl;
+	os << S.name << ": " << std::endl;
+    
+	os << "Microenvironment_private_data:" << std::endl;
+	//temporary_density_vectors1
+	os << "temporary_density_vectors1:" << std::endl;
+    for (const auto& temporary_density_vectors1_v : S.temporary_density_vectors1) {
+		for( const auto& temporary_density_vectors1 : temporary_density_vectors1_v){
+        os << temporary_density_vectors1 << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	//temporary_density_vectors
+	os << "temporary_density_vectors2:" << std::endl;
+    for (const auto& temporary_density_vectors2_v : S.temporary_density_vectors2) {
+		for( const auto& temporary_density_vectors2 : temporary_density_vectors2_v){
+        os << temporary_density_vectors2 << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	//bulk_source_sink_solver_temp1
+	os << "bulk_source_sink_solver_temp1:" << std::endl;
+    for (const auto& bulk_source_sink_solver_temp1_v : S.bulk_source_sink_solver_temp1) {
+		for( const auto& bulk_source_sink_solver_temp1 : bulk_source_sink_solver_temp1_v){
+        os << bulk_source_sink_solver_temp1 << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	//bulk_source_sink_solver_temp2
+	os << "bulk_source_sink_solver_temp2:" << std::endl;
+    for (const auto& bulk_source_sink_solver_temp2_v : S.bulk_source_sink_solver_temp2) {
+		for( const auto& bulk_source_sink_solver_temp2 : bulk_source_sink_solver_temp2_v){
+        os << bulk_source_sink_solver_temp2 << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	//bulk_source_sink_solver_tem3
+	os << "bulk_source_sink_solver_temp3:" << std::endl;
+    for (const auto& bulk_source_sink_solver_temp3_v : S.bulk_source_sink_solver_temp3) {
+		for( const auto& bulk_source_sink_solver_temp3 : bulk_source_sink_solver_temp3_v){
+        os << bulk_source_sink_solver_temp3 << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	//bulk_source_sink_solver_setup_done
+	os << "bulk_source_sink_solver_setup_done: " << (S.bulk_source_sink_solver_setup_done ? "true" : "false") << std::endl;
+
+	//gradient_vectors
+	os << "gradient_vectors:" << std::endl;
+    for (const auto& gradient_vectors_v : S.gradient_vectors) {
+		for( const auto& gradient_vectors_n : gradient_vectors_v){
+			for( const auto& gradient_vectors : gradient_vectors_n){
+        os << gradient_vectors << " ";}
+    }os << std::endl;}
+    os << std::endl;
+
+	//gradient_vector_computed
+	os << "gradient_vector_computed: ";
+    for (const auto& gradient_vector_computed : S.gradient_vector_computed) {
+        os << (gradient_vector_computed ? "true" : "false") << " ";
+    }
+    os << std::endl;
+
+	//one
+	os << "one: ";
+    for (const auto& one : S.one) {
+        os << one << " ";
+    }
+    os << std::endl;
+
+	//zero
+	os << "zero: ";
+    for (const auto& zero : S.zero) {
+        os << zero << " ";
+    }
+    os << std::endl;
+
+	//one_half
+	os << "one_half: ";
+    for (const auto& one_half : S.one_half) {
+        os << one_half << " ";
+    }
+    os << std::endl;
+
+	//one_third
+	os << "one_third: ";
+    for (const auto& one_third : S.one_third) {
+        os << one_third << " ";
+    }
+    os << std::endl;
+	
+	//thomas_temp1
+	os << "thomas_temp1:" << std::endl;
+    for (const auto& thomas_temp1_v : S.thomas_temp1) {
+		for( const auto& thomas_temp1 : thomas_temp1_v){
+        os << thomas_temp1 << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	//thomas_temp2
+	os << "thomas_temp2:" << std::endl;
+    for (const auto& thomas_temp2_v : S.thomas_temp2) {
+		for( const auto& thomas_temp2 : thomas_temp2_v){
+        os << thomas_temp2 << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	//thomas_constant1x
+	os << "thomas_constant1x: ";
+    for (const auto& thomas_constant1x : S.thomas_constant1x) {
+        os << thomas_constant1x << " ";
+    }
+    os << std::endl;
+
+	//thomas_constant1y
+	os << "thomas_constant1y: ";
+    for (const auto& thomas_constant1y : S.thomas_constant1y) {
+        os << thomas_constant1y << " ";
+    }
+    os << std::endl;
+
+	//thomas_constant1z
+	os << "thomas_constant1z: ";
+    for (const auto& thomas_constant1z : S.thomas_constant1z) {
+        os << thomas_constant1z << " ";
+    }
+    os << std::endl;
+
+	//thomas_neg_constant1x
+	os << "thomas_neg_constant1x: ";
+    for (const auto& thomas_neg_constant1x : S.thomas_neg_constant1x) {
+        os << thomas_neg_constant1x << " ";
+    }
+    os << std::endl;
+
+	//thomas_neg_constant1y
+	os << "thomas_neg_constant1y: ";
+    for (const auto& thomas_neg_constant1y : S.thomas_neg_constant1y) {
+        os << thomas_neg_constant1y << " ";
+    }
+    os << std::endl;
+
+	//thomas_neg_constant1z
+	os << "thomas_neg_constant1z: ";
+    for (const auto& thomas_neg_constant1z : S.thomas_neg_constant1z) {
+        os << thomas_neg_constant1z << " ";
+    }
+    os << std::endl;
+
+	//thomas_setup_done
+	os << "thomas_setup_done: " << (S.thomas_setup_done ? "true" : "false") << std::endl;
+
+	//thomas_i_jump
+	os << "thomas_i_jump: " << S.thomas_i_jump << std::endl;
+
+	//thomas_i_jump
+	os << "thomas_j_jump: " << S.thomas_j_jump << std::endl;
+
+	//thomas_i_jump
+	os << "thomas_k_jump: " << S.thomas_k_jump << std::endl;
+
+	//thomas_constant1
+	os << "thomas_constant1: ";
+    for (const auto& thomas_constant1 : S.thomas_constant1) {
+        os << thomas_constant1 << " ";
+    }
+    os << std::endl;
+
+	//thomas_constant1a
+	os << "thomas_constant1a: ";
+    for (const auto& thomas_constant1a : S.thomas_constant1a) {
+        os << thomas_constant1a << " ";
+    }
+    os << std::endl;
+
+	//thomas_constant2
+	os << "thomas_constant2: ";
+    for (const auto& thomas_constant2 : S.thomas_constant2) {
+        os << thomas_constant2 << " ";
+    }
+    os << std::endl;
+
+	//thomas_constant3
+	os << "thomas_constant3: ";
+    for (const auto& thomas_constant3 : S.thomas_constant3) {
+        os << thomas_constant3 << " ";
+    }
+    os << std::endl;
+
+	//thomas_constant3a
+	os << "thomas_constant3a: ";
+    for (const auto& thomas_constant3a : S.thomas_constant3a) {
+        os << thomas_constant3a << " ";
+    }
+    os << std::endl;
+
+	//name
+	os << "name: " << S.name << std::endl;
+
+	//supply_rates
+	os << "supply_rates:" << std::endl;
+    for (const auto& supply_rates_v : S.supply_rates) {
+		for( const auto& supply_rates : supply_rates_v){
+        os << supply_rates << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	//uptake_rates
+	os << "uptake_rates:" << std::endl;
+    for (const auto& uptake_rates_v : S.uptake_rates) {
+		for( const auto& uptake_rates : uptake_rates_v){
+        os << uptake_rates << " ";
+    }os << std::endl;}
+    os << std::endl;
+
+	os << "Densities: " << S.number_of_densities() << std::endl;
+    for (unsigned int i = 0; i < S.density_names.size(); i++)
+    {
+        os << S.density_names[i] << std::endl
+           << "units: " << S.density_units[i] << std::endl
+           << "diffusion_coefficient: " << S.diffusion_coefficients[i]
+           << " " << S.spatial_units << " " << S.time_units << std::endl
+           << "decay_rate: " << S.decay_rates[i]
+           << " " << S.time_units << std::endl;
+    }
+    os << "\n";
+    // Display all the densities for each voxel.
+    os << "Values for each voxel: " << std::endl;
+    for (unsigned int n = 0; n < S.number_of_voxels(); n++)
+    {
+        os << S.density_vector(n) << std::endl;
+    }
+    os << std::endl;
+
+	os << "centers of voxels: " << std::endl;
+    for (unsigned int n = 0; n < S.number_of_voxels(); n++)
+    {
+        os << S.voxels(n).center << std::endl;
+    }
+    os << std::endl;
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, Microenvironment& microenv){
+
+	std::string dummy;
+	double value;
+	int j = 0;
+	std::string value_2;
+
+	// read headers
+	std::getline(is, dummy);
+	std::getline(is, dummy);
+	std::getline(is, dummy);
+	std::getline(is, dummy);
+
+	//temporary_density_vectors1
+	std::getline(is, dummy);
+	
+	unsigned int n_lines = 0;
+	
+	for( unsigned int n=0; n < microenv.temporary_density_vectors1.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.temporary_density_vectors1[n][j] = value;
+			j = j+1;
+		}
+	}
+
+	
+	
+	assert(n_lines == microenv.temporary_density_vectors1.size());	
+	//read empty line
+	std::getline(is, dummy);
+
+	//temporary_density_vectors2
+	std::getline(is, dummy);
+
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.temporary_density_vectors2.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.temporary_density_vectors2[n][j] = value;
+			j = j+1;
+	}
+	}
+	
+	
+	assert(n_lines == microenv.temporary_density_vectors2.size());
+	//read empty line
+	std::getline(is, dummy);
+
+	//bulk_source_sink_solver_temp1
+	std::getline(is, dummy);
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.bulk_source_sink_solver_temp1.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.bulk_source_sink_solver_temp1[n][j] = value;
+			j = j+1;
+	}
+	}
+	
+	assert(n_lines == microenv.bulk_source_sink_solver_temp1.size());
+	//read empty line
+	std::getline(is, dummy);
+
+	//bulk_source_sink_solver_temp2
+	std::getline(is, dummy);
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.bulk_source_sink_solver_temp2.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.bulk_source_sink_solver_temp2[n][j] = value;
+			j = j+1;
+	}
+	}
+	assert(n_lines == microenv.bulk_source_sink_solver_temp2.size());
+	//read empty line
+	std::getline(is, dummy);
+
+	//bulk_source_sink_solver_temp3
+	std::getline(is, dummy);
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.bulk_source_sink_solver_temp3.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.bulk_source_sink_solver_temp3[n][j] = value;
+			j = j+1;
+	}
+	}
+	assert(n_lines == microenv.bulk_source_sink_solver_temp3.size());
+	
+	//read empty line
+	std::getline(is, dummy);
+
+	//bulk_source_sink_solver_setup_done
+	std::getline(is, dummy);
+	microenv.bulk_source_sink_solver_setup_done = read_number_in_line_bool(dummy);
+	
+
+	//gradient_vectors
+	std::getline(is, dummy);
+	
+	n_lines = 0;
+	for (unsigned int n = 0; n < microenv.gradient_vectors.size(); n++)
+	{	std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		for (unsigned int l = 0; l < microenv.gradient_vectors[n].size(); l++)
+		{	
+			
+			double value;
+			for (int j = 0; j < microenv.gradient_vectors[n][l].size(); j++)
+			{
+				stream4 >> value;
+				microenv.gradient_vectors[n][l][j] = value;
+			}
+		}
+	}
+	assert(n_lines == microenv.gradient_vectors.size());
+	
+
+	//skip empty line
+	std::getline(is, dummy);
+
+	//gradient_vector_computed
+	std::getline(is, dummy);
+	bool gradient_vector_computed;
+	std::istringstream stream_gradient_vector_computed(dummy);
+	std::string key_gradient_vector_computed;
+	stream_gradient_vector_computed >> key_gradient_vector_computed;
+	for (int i = 0; i < microenv.gradient_vector_computed.size(); i++){
+		stream_gradient_vector_computed >> value;
+		if(value_2 == "true"){
+			gradient_vector_computed = true;
+		}
+		else if(value_2 == "false"){
+			gradient_vector_computed = false;
+		}
+		microenv.gradient_vector_computed[i] = gradient_vector_computed;
+	}
+
+	// one
+	std::getline(is, dummy);
+	std::istringstream stream_one(dummy);
+	std::string key_one;
+	stream_one >> key_one;
+	std::vector<double> one;
+	while(stream_one >> value) {
+		one.push_back(value);
+	}
+	microenv.one.clear();
+	microenv.one = one;
+
+	// zero
+	std::getline(is, dummy);
+	std::istringstream stream_zero(dummy);
+	std::string key_zero;
+	stream_zero >> key_zero;
+	std::vector<double> zero;
+	while(stream_zero >> value) {
+		zero.push_back(value);
+	}
+	microenv.zero.clear();
+	microenv.zero = zero;
+
+	// one_half
+	std::getline(is, dummy);
+	std::istringstream stream_one_half(dummy);
+	std::string key_one_half;
+	stream_one_half >> key_one_half;
+	std::vector<double> one_half;
+	while(stream_one_half >> value) {
+		one_half.push_back(value);
+	}
+	microenv.one_half.clear();
+	microenv.one_half = one_half;
+
+	// one_third
+	std::getline(is, dummy);
+	std::istringstream stream_one_third(dummy);
+	std::string key_one_third;
+	stream_one_third >> key_one_third;
+	std::vector<double> one_third;
+	while(stream_one_third >> value) {
+		one_third.push_back(value);
+	}
+	microenv.one_third.clear();
+	microenv.one_third = one_third;
+
+	//thomas_temp1
+	std::getline(is, dummy);
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.thomas_temp1.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.thomas_temp1[n][j] = value;
+			j = j+1;
+	}
+	}
+
+	assert(n_lines == microenv.thomas_temp1.size());
+	//read empty line
+	std::getline(is, dummy);
+
+	//thomas_temp2
+	std::getline(is, dummy);
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.thomas_temp2.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.thomas_temp2[n][j] = value;
+			j = j+1;
+	}
+	}
+	assert(n_lines == microenv.thomas_temp2.size());
+	//read empty line
+	std::getline(is, dummy);
+
+	// thomas_constant1x
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_constant1x(dummy);
+	std::string key_thomas_constant1x;
+	stream_thomas_constant1x >> key_thomas_constant1x;
+	std::vector<double> thomas_constant1x;
+	while(stream_thomas_constant1x >> value) {
+		thomas_constant1x.push_back(value);
+	}
+	microenv.thomas_constant1x.clear();
+	microenv.thomas_constant1x = thomas_constant1x;
+
+	// thomas_constant1y
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_constant1y(dummy);
+	std::string key_thomas_constant1y;
+	stream_thomas_constant1y >> key_thomas_constant1y;
+	std::vector<double> thomas_constant1y;
+	while(stream_thomas_constant1y >> value) {
+		thomas_constant1y.push_back(value);
+	}
+	microenv.thomas_constant1y.clear();
+	microenv.thomas_constant1y = thomas_constant1y;
+
+	// thomas_constant1z
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_constant1z(dummy);
+	std::string key_thomas_constant1z;
+	stream_thomas_constant1z >> key_thomas_constant1z;
+	std::vector<double> thomas_constant1z;
+	while(stream_thomas_constant1z >> value) {
+		thomas_constant1z.push_back(value);
+	}
+	microenv.thomas_constant1z.clear();
+	microenv.thomas_constant1z = thomas_constant1z;
+
+	// thomas_neg_constant1x
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_neg_constant1x(dummy);
+	std::string key_thomas_neg_constant1x;
+	stream_thomas_neg_constant1x >> key_thomas_neg_constant1x;
+	std::vector<double> thomas_neg_constant1x;
+	while(stream_thomas_neg_constant1x >> value) {
+		thomas_neg_constant1x.push_back(value);
+	}
+	microenv.thomas_neg_constant1x.clear();
+	microenv.thomas_neg_constant1x = thomas_neg_constant1x;
+
+	// thomas_neg_constant1y
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_neg_constant1y(dummy);
+	std::string key_thomas_neg_constant1y;
+	stream_thomas_neg_constant1y >> key_thomas_neg_constant1y;
+	std::vector<double> thomas_neg_constant1y;
+	while(stream_thomas_neg_constant1y >> value) {
+		thomas_neg_constant1y.push_back(value);
+	}
+	microenv.thomas_neg_constant1y.clear();
+	microenv.thomas_neg_constant1y = thomas_neg_constant1y;
+
+	// thomas_neg_constant1y
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_neg_constant1z(dummy);
+	std::string key_thomas_neg_constant1z;
+	stream_thomas_neg_constant1z >> key_thomas_neg_constant1z;
+	std::vector<double> thomas_neg_constant1z;
+	while(stream_thomas_neg_constant1z >> value) {
+		thomas_neg_constant1z.push_back(value);
+	}
+	microenv.thomas_neg_constant1z.clear();
+	microenv.thomas_neg_constant1z = thomas_neg_constant1z;
+
+	//thomas_setup_done
+	std::getline(is, dummy);
+	microenv.thomas_setup_done = read_number_in_line_bool(dummy);
+
+	//thomas_i_jump
+	std::getline(is, dummy);
+	microenv.thomas_i_jump = read_number_in_line_int(dummy);
+
+	//thomas_j_jump
+	std::getline(is, dummy);
+	microenv.thomas_j_jump = read_number_in_line_int(dummy);
+
+	//thomas_k_jump
+	std::getline(is, dummy);
+	microenv.thomas_k_jump = read_number_in_line_int(dummy);
+
+	// thomas_constant1
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_constant1(dummy);
+	std::string key_thomas_constant1;
+	stream_thomas_constant1 >> key_thomas_constant1;
+	std::vector<double> thomas_constant1;
+	while(stream_thomas_constant1 >> value) {
+		thomas_constant1.push_back(value);
+	}
+	microenv.thomas_constant1.clear();
+	microenv.thomas_constant1 = thomas_constant1;
+
+	// thomas_constant1a
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_constant1a(dummy);
+	std::string key_thomas_constant1a;
+	stream_thomas_constant1a >> key_thomas_constant1a;
+	std::vector<double> thomas_constant1a;
+	while(stream_thomas_constant1a >> value) {
+		thomas_constant1a.push_back(value);
+	}
+	microenv.thomas_constant1a.clear();
+	microenv.thomas_constant1a = thomas_constant1a;
+
+	// thomas_constant2
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_constant2(dummy);
+	std::string key_thomas_constant2;
+	stream_thomas_constant2 >> key_thomas_constant2;
+	std::vector<double> thomas_constant2;
+	while(stream_thomas_constant2 >> value) {
+		thomas_constant2.push_back(value);
+	}
+	microenv.thomas_constant2.clear();
+	microenv.thomas_constant2 = thomas_constant2;
+
+	// thomas_constant3
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_constant3(dummy);
+	std::string key_thomas_constant3;
+	stream_thomas_constant3 >> key_thomas_constant3;
+	std::vector<double> thomas_constant3;
+	while(stream_thomas_constant3 >> value) {
+		thomas_constant3.push_back(value);
+	}
+	microenv.thomas_constant3.clear();
+	microenv.thomas_constant3 = thomas_constant3;
+
+	// thomas_constant3a
+	std::getline(is, dummy);
+	std::istringstream stream_thomas_constant3a(dummy);
+	std::string key_thomas_constant3a;
+	stream_thomas_constant3a >> key_thomas_constant3a;
+	std::vector<double> thomas_constant3a;
+	while(stream_thomas_constant3a >> value) {
+		thomas_constant3a.push_back(value);
+	}
+	microenv.thomas_constant3a.clear();
+	microenv.thomas_constant3a = thomas_constant3a;
+
+	//name
+	std::getline(is, dummy);
+	std::istringstream stream_name(dummy);
+	std::string key_name;
+	stream_name >> key_name >> value_2;
+	microenv.name = value_2;
+
+	//supply_rates
+	std::getline(is, dummy);
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.supply_rates.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.supply_rates[n][j] = value;
+			j = j+1;
+	}
+	}
+	assert(n_lines == microenv.supply_rates.size());
+	//read empty line
+	std::getline(is, dummy);
+
+	//uptake_rates
+	std::getline(is, dummy);
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.uptake_rates.size() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		j = 0;
+		while(stream4 >> value) {
+			microenv.uptake_rates[n][j] = value;
+			j = j+1;
+	}
+	}
+	assert(n_lines == microenv.uptake_rates.size());
+	//read empty line
+	std::getline(is, dummy);
+
+	//number_of_densities
+	std::getline(is, dummy);
+
+	double number_of_densities;
+	std::istringstream stream(dummy);
+	std::string key;
+	stream >> key;
+	double number;
+	while(stream >> number) {
+		number_of_densities = number;
+	}
+
+	for (size_t i = 0; i < number_of_densities; ++i) {
+		//get name
+		std::string name;
+		std::getline(is, name);
+		microenv.density_names[i] = name;
+
+
+		// get unit
+		std::getline(is, dummy);
+		std::istringstream stream(dummy);
+		std::string key;
+		std::string unit;
+		stream >> key;
+		stream >> unit;
+		microenv.density_units[i] = unit;
+
+		// get diffusion_coefficient
+		std::string spatial_unit;
+		std::string time_unit;
+		std::getline(is, dummy);
+		std::istringstream stream2(dummy);
+		double diffusion_coefficient;
+		stream2 >> key;
+		stream2 >> diffusion_coefficient;
+		stream2 >> spatial_unit;
+		stream2 >> time_unit;
+		microenv.diffusion_coefficients[i] = diffusion_coefficient;
+		microenv.spatial_units = spatial_unit;
+		microenv.time_units = time_unit;
+		
+
+		//get decay rate
+		std::getline(is, dummy);
+		std::istringstream stream3(dummy);
+		double decay_rate;
+		stream3 >> key;
+		stream3 >> decay_rate;
+		microenv.decay_rates[i] = decay_rate;
+		}
+	
+	// skip empty line
+	std::getline(is, dummy);
+
+	// skip header
+	std::getline(is, dummy);
+
+	n_lines = 0;
+	//reassign all values for all the voxels.
+	for( unsigned int n=0; n < microenv.number_of_voxels() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		double value;
+		int j = 0;
+		while(stream4 >> value) {
+		microenv.density_vector(n)[j] = value;
+		j = j+1;
+	}
+	}
+	assert(n_lines == microenv.number_of_voxels());
+
+	std::getline(is, dummy);
+	std::getline(is, dummy);
+
+	//reassign all values for all the voxels.
+	n_lines = 0;
+	for( unsigned int n=0; n < microenv.number_of_voxels() ; n++ )
+	{
+		std::getline(is, dummy); n_lines++;
+		std::istringstream stream4(dummy);
+		double value;
+		int j = 0;
+		while(stream4 >> value) {
+		microenv.voxels(n).center[j] = value;
+		j = j+1;
+	}
+	}
+	assert(n_lines == microenv.number_of_voxels());
+
+	
+	return is;
 }
 };

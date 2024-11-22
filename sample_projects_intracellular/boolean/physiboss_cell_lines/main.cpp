@@ -118,6 +118,13 @@ int main( int argc, char* argv[] )
 	
 	setup_microenvironment(); // modify this in the custom code 
 	
+	bool start_stop = parameters.bools("start_stop");
+	if( start_stop ){
+	
+		// reset microenvironment and cells as they were in the previous simulation
+		reset_microenv();
+	}
+	
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
@@ -128,7 +135,19 @@ int main( int argc, char* argv[] )
 	
 	create_cell_types();
 	
-	setup_tissue();
+	if( start_stop ){
+
+		// reset cells as they were in the previous simulation
+		setup_tissue();
+
+		reset_cell(cell_container->last_cell_cycle_time);
+		//exit(-1);
+
+		reset_global_parameters(cell_container);
+
+	} else{
+		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.
+	}
 
 
 	/* Users typically stop modifying here. END USERMODS */ 
@@ -182,6 +201,10 @@ int main( int argc, char* argv[] )
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
 	
+	//put here reset randomness
+	if( start_stop ){
+		reset_randomness();
+	}
 	// main loop 
 	
 	try 
@@ -199,6 +222,8 @@ int main( int argc, char* argv[] )
 				
 				if( PhysiCell_settings.enable_full_saves == true )
 				{	
+					save_cell_microenv_data(cell_container);
+					std::cout << "cells data saved succesfully" << std::endl;
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 

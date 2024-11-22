@@ -81,6 +81,7 @@ class Variable
 {
  private:
 	friend std::ostream& operator<<(std::ostream& os, const Variable& v); // done 
+	friend std::istream& operator>>(std::istream& is, Variable& v);
  public:
 	std::string name; 
 	double value; 
@@ -94,6 +95,7 @@ class Vector_Variable
 {
  private:
 	friend std::ostream& operator<<(std::ostream& os, const Vector_Variable& v); // done 
+	friend std::istream& operator>>(std::istream& is, Vector_Variable& v);
 	
  public:
 	std::string name; 
@@ -133,6 +135,10 @@ class Custom_Cell_Data
 	
 	Custom_Cell_Data(); // done 
 	Custom_Cell_Data( const Custom_Cell_Data& ccd ); 
+
+	//stream operator declaration
+	friend std::ostream& operator<<(std::ostream& os, const Custom_Cell_Data& ccd);
+	friend std::istream& operator>>(std::istream& is, Custom_Cell_Data& ccd);
 };
 
 }; 

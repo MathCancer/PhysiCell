@@ -72,6 +72,10 @@
 
 namespace PhysiCell{
 
+int counter_normal_random = 0;
+int counter_int_random = 0;
+int counter_double_random = 0;
+
 thread_local std::mt19937_64 physicell_PRNG_generator; 
 thread_local bool local_pnrg_setup_done = false; 
 
@@ -357,6 +361,53 @@ int choose_event( std::vector<double>& probabilities )
 	}
 	
 	return probabilities.size(); 
+}
+
+void save_counters(std::ostream& out_stream)
+{
+	out_stream << "counter_double_random: " << counter_double_random << std::endl;
+	out_stream << "counter_int_random: " << counter_int_random << std::endl;
+	out_stream << "counter_normal_random: " << counter_normal_random << std::endl;
+}
+
+void print_counters()
+{
+	std::cout << "counter_double_random: " << counter_double_random << std::endl;
+	std::cout << "counter_int_random: " << counter_int_random << std::endl;
+	std::cout << "counter_normal_random: " << counter_normal_random << std::endl;
+}
+
+void set_counter_double_random(int value)
+{
+    if (counter_double_random > value){
+		std::cout << "UniformRandom counter still greater than value" << std::endl;
+        return;
+    }
+    while (counter_double_random != value){
+        UniformRandom();
+    }
+}
+
+void set_counter_int_random(int value)
+{
+    if (counter_int_random > value){
+		std::cout << "UniformInt counter still greater than value" << std::endl;
+        return;
+    }
+    while (counter_int_random != value){
+        UniformInt();
+    }
+}
+
+void set_counter_normal_random(int value)
+{
+    if (counter_normal_random > value){
+		std::cout << "NormalRandom counter still greater than value" << std::endl;
+        return;
+    }
+    while (counter_normal_random != value){
+        NormalRandom(0.5, 1);
+    }
 }
 
 };

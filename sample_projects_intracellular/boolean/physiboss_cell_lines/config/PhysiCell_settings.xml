@@ -1062,6 +1062,7 @@
     </initial_conditions>
 
     <user_parameters>
+        <start_stop type="bool" units="">false</start_stop>
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
         <node_to_visualize type="string" units="" description="">C</node_to_visualize>
     </user_parameters>

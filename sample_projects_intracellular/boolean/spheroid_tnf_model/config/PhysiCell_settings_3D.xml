@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+###############################################################################
+# If you use PhysiCell in your project, please cite PhysiCell and the version #
+# number, such as below:                                                      #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
+# Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
+#     as below:                                                               #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
+# with BioFVM [2] to solve the transport equations.                           #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
+#                                                                             #
+###############################################################################
+#                                                                             #
+# BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
+#                                                                             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# All rights reserved.                                                        #
+#                                                                             #
+# Redistribution and use in source and binary forms, with or without          #
+# modification, are permitted provided that the following conditions are met: #
+#                                                                             #
+# 1. Redistributions of source code must retain the above copyright notice,   #
+# this list of conditions and the following disclaimer.                       #
+#                                                                             #
+# 2. Redistributions in binary form must reproduce the above copyright        #
+# notice, this list of conditions and the following disclaimer in the         #
+# documentation and/or other materials provided with the distribution.        #
+#                                                                             #
+# 3. Neither the name of the copyright holder nor the names of its            #
+# contributors may be used to endorse or promote products derived from this   #
+# software without specific prior written permission.                         #
+#                                                                             #
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" #
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE   #
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE  #
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE   #
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR         #
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF        #
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS    #
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN     #
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)     #
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE  #
+# POSSIBILITY OF SUCH DAMAGE.                                                 #
+#                                                                             #
+###############################################################################
+*/
+--> 
+
+<!--
+<user_details />
+-->
+
+<PhysiCell_settings version="devel-version">
+	<domain>
+		<x_min>-200</x_min>
+		<x_max>200</x_max>
+		<y_min>-200</y_min>
+		<y_max>200</y_max>
+		<z_min>-200</z_min>
+		<z_max>200</z_max>
+		<dx>20</dx>
+		<dy>20</dy>
+		<dz>20</dz>
+		<use_2D>false</use_2D>
+	</domain>
+	
+	<overall>
+		<max_time units="min">2160</max_time>
+		<time_units>min</time_units>
+		<space_units>micron</space_units>
+		<dt_diffusion units="min">0.02</dt_diffusion>
+		<dt_mechanics units="min">0.1</dt_mechanics>
+		<dt_phenotype units="min">2</dt_phenotype>	
+	</overall>
+	
+	<parallel>
+		<omp_num_threads>8</omp_num_threads>
+	</parallel> 
+	
+	<save>
+		<folder>output</folder> <!-- use . for root --> 
+		<full_data>
+			<interval units="min">30</interval>
+			<enable>true</enable>
+		</full_data>		
+		<SVG>
+			<interval units="min">30</interval>
+			<enable>true</enable>
+		</SVG>
+		<legacy_data>
+			<enable>false</enable>
+		</legacy_data>
+	</save>
+		
+	<microenvironment_setup>
+		<variable name="oxygen" units="mmHg" ID="0">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate> 
+			</physical_parameter_set>
+			<initial_condition units="mmHg">38.0</initial_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
+		</variable>
+		
+		<variable name="tnf" units="TNF/um^3" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient>
+				<decay_rate units="1/min">.0275</decay_rate> 
+			</physical_parameter_set>
+			<initial_condition units="molecules/voxel">0.0</initial_condition>
+			<Dirichlet_boundary_condition units="molecules/voxel" enabled="false">0.0</Dirichlet_boundary_condition>
+		</variable>
+
+		<options>
+			<calculate_gradients>false</calculate_gradients>
+			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+			<!-- not yet supported --> 
+			<initial_condition type="matlab" enabled="false">
+				<filename>./config/initial.mat</filename>
+			</initial_condition>
+			<!-- not yet supported --> 
+			<dirichlet_nodes type="matlab" enabled="false">
+				<filename>./config/dirichlet.mat</filename>
+			</dirichlet_nodes>
+		</options>
+	</microenvironment_setup>		
+	
+	<cell_definitions>
+		<cell_definition name="default" ID="0">
+			<phenotype>
+				<cycle code="5" name="live_cells_cycle_model">  
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<phase_transition_rates units="1/min"> 
+						<!-- Cycle duration -->
+						<rate start_index="0" end_index="0" fixed_duration="false">0.00075</rate>
+					</phase_transition_rates>
+				</cycle>
+				
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<death_rate units="1/min">5.31667e-05</death_rate>
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">516</duration>
+						</phase_durations>
+
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<death_rate units="1/min">0.0</death_rate>
+						<phase_durations units="min">
+							<duration index="0" fixed_duration="true">0</duration>
+							<duration index="1" fixed_duration="true">86400</duration>
+						</phase_durations>
+
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>
+				
+				<volume>  
+					<total units="micron^3">2494</total>
+					<fluid_fraction units="dimensionless">0.75</fluid_fraction>
+					<nuclear units="micron^3">540</nuclear>
+					
+					<fluid_change_rate units="1/min">0.05</fluid_change_rate>
+					<cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+					<nuclear_biomass_change_rate units="1/min">0.0055</nuclear_biomass_change_rate>
+					
+					<calcified_fraction units="dimensionless">0</calcified_fraction>
+					<calcification_rate units="1/min">0</calcification_rate>
+					
+					<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+				</volume> 				
+
+
+				<secretion>
+					<substrate name="oxygen">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">38</secretion_target>
+						<uptake_rate units="1/min">10</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+					<substrate name="tnf">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">0</secretion_target>
+						<uptake_rate units="1/min">0</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 	
+				</secretion>
+				<molecular />
+
+				<intracellular type="maboss">
+					<bnd_filename>./config/TNF_nodes.bnd</bnd_filename>
+					<cfg_filename>./config/TNF_conf.cfg</cfg_filename>
+					<settings>
+						<intracellular_dt>10</intracellular_dt>
+						<time_stochasticity>1</time_stochasticity>
+					</settings>
+				</intracellular>
+			</phenotype>
+			<custom_data>
+				<!-- Molecular model internal variables-->
+				<TNFR_binding_rate type="double" units="1/min" description="TNF receptor binding rate">0.243</TNFR_binding_rate>
+				<TNFR_endocytosis_rate type="double" units="1/min" description="TNF receptor-TNF endocytosis rate">0.128</TNFR_endocytosis_rate>
+				<TNFR_recycling_rate type="double" units="1/min" description="TNF receptor recycling">0.293</TNFR_recycling_rate>
+				
+				<TNFR_activation_threshold type="double" units="" description="TNFR threshold to update booleano model input">0.50</TNFR_activation_threshold>
+				<TNFR_receptors_per_cell type="double" units="dimensionless" description="number of TNFR receptors per cell">1.0</TNFR_receptors_per_cell>
+				<TNF_net_production_rate type="double" units="TNF/cell/min" description="The total TNF produced by the cell when NFkB is active">0</TNF_net_production_rate> <!-- 0.5 ng/mL -->
+
+				<!-- Auxiliary variables used to monitorize simulation-->
+				<tnf_node units="dimensionless">0</tnf_node>
+				<fadd_node units="dimensionless">0</fadd_node>
+				<nfkb_node units="dimensionless">0</nfkb_node>
+				<external_tnf units="TNF/um^3">0</external_tnf>
+				
+				<!-- Rates that are set when the corresponding node is active-->
+				<necrosis_rate type="double" units="1/min" description="Necrotic rate value when NonACD node becomes active">0.0027</necrosis_rate>
+                <apoptosis_rate type="double" units="1/min" description="Apoptotic rate value when Apoptosis node becomes active">0.0055</apoptosis_rate>
+				<death_commitment_decay type="double" units="1/min" description="Factor at wich death rates deacy when boolean deadout deactivate">1e-7</death_commitment_decay>
+			</custom_data>
+		</cell_definition>
+	</cell_definitions>
+
+	<user_parameters>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<init_cells_filename type="string" units="">./config/init.tsv</init_cells_filename>
+		<read_init type="bool">false</read_init>
+		<tumor_radius type="double" units="um">50.0</tumor_radius>
+		
+		<TNFR_binding_rate_std type="double" units="dimensionless" description="TNF receptor binding rate std">0.0</TNFR_binding_rate_std>
+		<TNFR_binding_rate_min type="double" units="dimensionless" description="TNF receptor binding rate min">0.05</TNFR_binding_rate_min>
+		<TNFR_binding_rate_max type="double" units="dimensionless" description="TNF receptor binding rate max">0.95</TNFR_binding_rate_max>
+
+		<TNFR_endocytosis_rate_std type="double" units="dimensionless" description="TNF receptor-TNF endocytosis rate std">0.0</TNFR_endocytosis_rate_std>
+		<TNFR_endocytosis_rate_min type="double" units="dimensionless" description="TNF receptor-TNF endocytosis rate min">0.05</TNFR_endocytosis_rate_min>
+		<TNFR_endocytosis_rate_max type="double" units="dimensionless" description="TNF receptor-TNF endocytosis rate max">0.95</TNFR_endocytosis_rate_max>
+
+		<TNFR_recycling_rate_std type="double" units="dimensionless" description="TNF receptor recycling std">0.0</TNFR_recycling_rate_std>
+		<TNFR_recycling_rate_min type="double" units="dimensionless" description="TNF receptor recycling min">0.05</TNFR_recycling_rate_min>
+		<TNFR_recycling_rate_max type="double" units="dimensionless" description="TNF receptor recycling max">0.95</TNFR_recycling_rate_max>
+
+		<tnf_pulse_period type="double" units="min">150.0</tnf_pulse_period> 
+		<tnf_pulse_duration type="double" units="min">10.0</tnf_pulse_duration> 
+		<tnf_pulse_concentration type="double" units="TNF/um^3">0.002</tnf_pulse_concentration> 
+		<time_remove_tnf type="double" units="min">999999</time_remove_tnf> 
+		<membrane_length type="double" units="">80</membrane_length>
+</user_parameters>
+	
+	
+</PhysiCell_settings>

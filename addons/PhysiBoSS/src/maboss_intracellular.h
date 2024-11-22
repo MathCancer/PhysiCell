@@ -117,6 +117,101 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	void print_current_nodes(){
 		this->maboss.print_nodes();
 	}
+	void save_current_nodes(std::ostream& out_stream){
+		this->maboss.save_nodes(out_stream); 
+	}
+
+	void save_current_parameters_maboss(std::ostream& out_stream){
+		this->maboss.save_current_parameters(out_stream); 
+	}
+	void read_current_parameter_maboss(std::ifstream& in_stream){
+		this->maboss.read_current_parameter(in_stream); 
+	}
+	int get_number_of_nodes(){
+		return this->maboss.get_nodes_number().size(); 
+	}
+
+	void reinit_maboss(std::string networkFile, std::string configFile){
+		this->maboss.init_maboss(networkFile, configFile);
+	}
+
+	void save_current_parameters(std::ostream& out_stream){
+
+		out_stream << "maboss_intracellular_parameters:" << std::endl;
+		out_stream << "time_step: " << this->time_step << std::endl;
+		out_stream << "discrete_time: " << (this->discrete_time ? "true" : "false") << std::endl;
+		out_stream << "time_tick: " << this->time_tick << std::endl;
+		out_stream << "scaling: " << this->scaling << std::endl;
+		out_stream << "time_stochasticity: " << this->time_stochasticity << std::endl;
+		out_stream << "inherit_state: " << (this->inherit_state ? "true" : "false") << std::endl;
+		out_stream << "start_time: " << this->start_time << std::endl;
+		out_stream << "next_physiboss_run: " << this->next_physiboss_run << std::endl;
+		/*
+		// Print the contents of the inherit_nodes map 
+		for(const auto& pair : inherit_nodes) {
+			out_stream << "Key: " << pair.first << " Value: " << (pair.second ? "true" : "false") << std::endl;
+		}
+		
+		// Print the contents of the initial_values map
+		for(const auto& pair : initial_values) {
+			out_stream << "Key: " << pair.first << " Value: " << pair.second << std::endl;
+		}
+
+		// Print the contents of the mutations map
+		for(const auto& pair : mutations) {
+			out_stream << "Key: " << pair.first << " Value: " << pair.second << std::endl;
+		}
+
+		// Print the contents of the parameters map
+		for(const auto& pair : parameters) {
+			out_stream << "Key: " << pair.first << " Value: " << pair.second << std::endl;
+		}*/
+		out_stream << std::endl;
+		
+	}
+
+	void read_current_parameter(std::ifstream& in_stream){
+		std::string dummy;
+
+		//skip header
+		std::getline(in_stream, dummy);
+
+		//time_step
+		std::getline(in_stream, dummy);
+		this->time_step = read_number_in_line(dummy);
+
+		//discrete_time
+		std::getline(in_stream, dummy);
+		this->discrete_time = read_number_in_line_bool(dummy);
+
+		//time_tick
+		std::getline(in_stream, dummy);
+		this->time_tick = read_number_in_line(dummy);
+
+		//scaling
+		std::getline(in_stream, dummy);
+		this->scaling = read_number_in_line(dummy);
+
+		//time_stochasticity
+		std::getline(in_stream, dummy);
+		this->time_stochasticity = read_number_in_line(dummy);
+
+		//inherit_state
+		std::getline(in_stream, dummy);
+		this->inherit_state = read_number_in_line_bool(dummy);
+
+		//start_time
+		std::getline(in_stream, dummy);
+		this->start_time = read_number_in_line(dummy);
+
+		//next_physiboss_run
+		std::getline(in_stream, dummy);
+		this->next_physiboss_run = read_number_in_line(dummy);
+
+		// skip empty line
+		std::getline(in_stream, dummy);
+	
+	}
 
 	void display(std::ostream& os);
 	

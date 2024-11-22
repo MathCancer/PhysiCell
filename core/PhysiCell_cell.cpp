@@ -3477,6 +3477,171 @@ int find_cell_definition_index( int search_type )
 	return -1; 
 }  
 
+// Definition of the output operator for parameters class for now i haven't included the pointer to phenotype.
+std::ostream& operator<<(std::ostream& os, const Cell_Parameters& params)
+{
+    os << "o2_hypoxic_threshold: " << params.o2_hypoxic_threshold << std::endl;
+    os << "o2_hypoxic_response: " << params.o2_hypoxic_response << std::endl;
+    os << "o2_hypoxic_saturation: " << params.o2_hypoxic_saturation << std::endl;
+    os << "o2_proliferation_saturation: " << params.o2_proliferation_saturation << std::endl;
+    os << "o2_proliferation_threshold: " << params.o2_proliferation_threshold << std::endl;
+    os << "o2_reference: " << params.o2_reference << std::endl;
+    os << "o2_necrosis_threshold: " << params.o2_necrosis_threshold << std::endl;
+    os << "o2_necrosis_max: " << params.o2_necrosis_max << std::endl;
+	os << "max_necrosis_rate: " << params.max_necrosis_rate << std::endl;
+	os << "necrosis_type: " << params.necrosis_type << std::endl;
+
+    // Add other class members if necessary
+
+    return os;
+}
+
+// Definition of the input operator for parameters class
+std::istream& operator>>(std::istream& is, Cell_Parameters& params)
+{	std::string dummy;
+	//o2_hypoxic_threshold
+    std::getline(is, dummy);
+	params.o2_hypoxic_threshold = read_number_in_line(dummy);
+
+	//o2_hypoxic_response
+    std::getline(is, dummy);
+	params.o2_hypoxic_response = read_number_in_line(dummy);
+
+	//o2_hypoxic_saturation
+    std::getline(is, dummy);
+	params.o2_hypoxic_saturation = read_number_in_line(dummy);
+
+	//o2_proliferation_saturation
+    std::getline(is, dummy);
+	params.o2_proliferation_saturation = read_number_in_line(dummy);
+
+	//o2_proliferation_threshold
+    std::getline(is, dummy);
+	params.o2_proliferation_threshold = read_number_in_line(dummy);
+
+	//o2_reference
+    std::getline(is, dummy);
+	params.o2_reference = read_number_in_line(dummy);
+
+	//o2_necrosis_threshold
+    std::getline(is, dummy);
+	params.o2_necrosis_threshold = read_number_in_line(dummy);
+
+	//o2_necrosis_max
+    std::getline(is, dummy);
+	params.o2_necrosis_max = read_number_in_line(dummy);
+
+	//max_necrosis_rate
+	std::getline(is, dummy);
+	params.max_necrosis_rate = read_number_in_line(dummy);
+
+	//necrosis_type
+	std::getline(is, dummy);
+	params.necrosis_type = read_number_in_line_int(dummy);
+
+    // skip empty rows
+	std::getline(is, dummy);
+    return is;
+}
+
+
+// Implementation of stream operator for cell_state class but no neighbors since not yet tracked (comment in the .h file)
+
+std::ostream& operator<<(std::ostream& os, const Cell_State& cellState)
+{
+ 
+    // Output orientation
+    os << "Orientation: ";
+    for (double angle : cellState.orientation)
+    {
+        os << angle << " ";
+    }
+    os << std::endl;
+
+    // Output simple pressure
+    os << "Simple_Pressure: " << cellState.simple_pressure << std::endl;
+
+	// number of nuclei
+	os << "number_of_nuclei: " << cellState.number_of_nuclei<< std::endl;
+
+	// total_attack_time
+	//added this if since sometimes the values were very low but not zero and they were creating problems
+	if (cellState.total_attack_time < std::numeric_limits<double>::min()) {
+		os << "total_attack_time: " << 0.0<< std::endl;
+    } else {
+		os << "total_attack_time: " << cellState.total_attack_time<< std::endl;
+	}
+
+	// contact_with_basement_membrane
+	os << "contact_with_basement_membrane: " << cellState.contact_with_basement_membrane;
+
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, Cell_State& cellState)
+{
+    // Input orientation
+    std::string dummy;
+    std::getline(is, dummy);
+
+    // Use a stringstream to parse the string
+    std::istringstream stream(dummy);
+
+    // Ignore the "Orientation:" part
+    std::string key_1;
+    stream >> key_1;  // Ignore the "Orientation:"
+
+    double number;
+
+    // Clear orientation
+    cellState.orientation.clear();
+
+    // Update orientation
+    while (stream >> number) {
+        cellState.orientation.push_back(number);
+    }
+	
+
+    //Simple_Pressure
+	std::getline(is, dummy);
+	cellState.simple_pressure = read_number_in_line(dummy);
+	
+
+	//number_of_nuclei
+	std::getline(is, dummy);
+	cellState.number_of_nuclei = read_number_in_line_int(dummy);
+	
+
+	//total_attack_time
+	std::getline(is, dummy);
+	cellState.total_attack_time = read_number_in_line(dummy);
+
+	//contact_with_basement_membrane
+	std::getline(is, dummy);
+	cellState.contact_with_basement_membrane = read_number_in_line(dummy);
+
+    return is;
+}
+
+
+// Implementation of the insertion operator for cell class
+std::ostream& operator<<(std::ostream& os, const Cell& cell) {
+	os << "Cell" << std::endl;
+    // Write the cell's attributes to 'os'
+	os << "ID: " << cell.ID << std::endl;
+	os << "index: " << cell.index << std::endl;
+	os << "type: " << cell.type << std::endl;
+	os << "is_active: " << (cell.is_active ? "true" : "false") << std::endl;
+    os << cell.type_name << "\n";
+	os << "is_out_of_domain: " << (cell.is_out_of_domain ? "true" : "false") << std::endl;
+	os << "is_movable: " << (cell.is_movable ? "true" : "false") << std::endl;
+	os << cell.state << "\n";
+	os << cell.parameters << "\n";
+	os << cell.phenotype << "\n";
+	os << cell.custom_data << "\n";
+
+    return os;
+}
 
 
 };

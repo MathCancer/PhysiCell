@@ -69,6 +69,7 @@
 #include <vector>
 #include <cstdio>
 #include <iostream>
+#include <sstream>
 #include <cstring>
 
 namespace PhysiCell
@@ -85,7 +86,13 @@ Variable::Variable()
 
 std::ostream& operator<<(std::ostream& os, const Variable& v)
 {
-	os << v.name << ": " << v.value << " " << v.units; 
+	if (v.units.empty()){
+		os << v.name << ": " << v.value << " no_dim";
+	}
+	else{
+		os << v.name << ": " << v.value << " " << v.units;
+	}
+	 
 	return os; 
 }
 
@@ -238,21 +245,137 @@ double& Custom_Cell_Data::operator[]( std::string name )
 	return variables[ name_to_index_map[name] ].value; 
 }
 
+//std::ostream& operator<<(std::ostream& os, const Custom_Cell_Data& ccd)
+//{
+//	os << "Custom data (scalar): " << std::endl; 
+//	for( int i=0 ; i < ccd.variables.size() ; i++ )
+//	{
+//		os << i << ": " << ccd.variables[i] << std::endl; 
+//	}
+//
+//	os << "Custom data (vector): " << std::endl; 
+//	for( int i=0 ; i < ccd.vector_variables.size() ; i++ )
+//	{
+//		os << i << ": " << ccd.vector_variables[i] << std::endl; 
+//	}
+//	
+//	return os;
+//}
+
+//Operators for variable class only is because os was already defined
+std::istream& operator>>(std::istream& is, PhysiCell::Variable& v)
+{
+    // Read name, value, and units directly from the line
+    is >> v.name >> v.value >> v.units;
+    //std::cout << "ayooo " << v.name << std::endl;
+    // Check if the input was successful
+    if (is.fail()) 
+    {
+        std::cerr << v.name << " Error: Unable to read variable data." << std::endl;
+    }
+
+    return is;
+}
+
+
+//Operators for Vector_variable class only is because os was already defined
+std::istream& operator>>(std::istream& is, PhysiCell::Vector_Variable& v)
+{
+    // Read name
+    is >> v.name;
+
+    // Read values until a non-numeric character is encountered
+    double value;
+    while (is >> value)
+    {
+        v.value.push_back(value);
+    }
+
+    // Clear the failbit if it was set due to encountering a non-numeric character
+    is.clear();
+
+    // Read units
+    is >> v.units;
+
+    return is;
+}
+
+
+//Operators for custom data class
 std::ostream& operator<<(std::ostream& os, const Custom_Cell_Data& ccd)
 {
-	os << "Custom data (scalar): " << std::endl; 
-	for( int i=0 ; i < ccd.variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.variables[i] << std::endl; 
-	}
+    for (int i = 0; i < ccd.variables.size(); i++)
+    {
 
-	os << "Custom data (vector): " << std::endl; 
-	for( int i=0 ; i < ccd.vector_variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.vector_variables[i] << std::endl; 
-	}
-	
-	return os;
+        os << ccd.variables[i] << std::endl;
+    }
+
+    for (int i = 0; i < ccd.vector_variables.size(); i++)
+    {
+        os << ccd.vector_variables[i] << std::endl;
+    }
+
+	os << "End of custom data" << std::endl;
+    return os;
 }
+
+std::istream& operator>>(std::istream& is, PhysiCell::Custom_Cell_Data& ccd)
+{
+    // Read scalar data until a line starts with a space
+
+	std::string line;
+    for (;;)
+    {
+        // Read the whole line
+        std::getline(is, line);
+
+
+        // Check if the first character is a space or the line is empty
+        if (line.find("End of custom data") != std::string::npos)
+        {
+            break;
+        }
+
+        // Use a stringstream to extract values from the line
+        std::istringstream line_stream(line);
+        PhysiCell::Variable v;
+        line_stream >> v;
+
+
+        // Add the variable to ccd in this version it is saving the : in name. i have to remove it
+		std::string correct_name = v.name.substr(0, v.name.size() - 1);
+
+        int index = ccd.find_variable_index(correct_name);
+		ccd[index] = v.value;
+    }
+
+    // Read vector data until a line starts with a space
+    //std::cout << "Enter Custom data (vector): " << std::endl;
+	/*
+    for (;;)
+    {
+        // Read the whole line
+        std::string line;
+        std::getline(is, line);
+
+        // Check if the first character is a space or the line is empty
+        if (line.empty() || std::isspace(line[0]))
+        {
+            // Break the loop if the first character is a space
+            break;
+        }
+
+        // Use a stringstream to extract values from the line
+        std::istringstream line_stream(line);
+        PhysiCell::Vector_Variable vv;
+        line_stream >> vv;
+
+        // Add the vector variable to ccd
+        ccd.add_vector_variable(vv);
+    }
+*/
+    return is;
+}
+
 
 };

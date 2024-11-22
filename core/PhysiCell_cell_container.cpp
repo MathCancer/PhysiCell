@@ -72,6 +72,7 @@
 
 #include <algorithm>
 #include <iterator> 
+#include <cassert>
 
 using namespace BioFVM;
 
@@ -425,4 +426,121 @@ Cell_Container* create_cell_container_for_microenvironment( BioFVM::Microenviron
 	return cell_container; 
 }
 
+void Cell_Container::save_data(std::ofstream& os){
+	os << "Cell_container:" << std::endl;
+
+	//Cells_ready_to_divide
+	os << "Cells_ready_to_divide: " << cells_ready_to_divide.size() << std::endl;
+
+	//cells_ready_to_die
+	os << "cells_ready_to_die: " << cells_ready_to_die.size() << std::endl;
+
+	//boundary_condition_for_pushed_out_agents
+	os << "boundary_condition_for_pushed_out_agents: " << boundary_condition_for_pushed_out_agents << std::endl;
+
+	//initialzed
+	os << "initialzed: " << (initialzed ? "true" : "false") << std::endl;
+	
+	//boundary_condition_for_pushed_out_agents
+	os << "num_divisions_in_current_step: " << num_divisions_in_current_step << std::endl;
+
+	//boundary_condition_for_pushed_out_agents
+	os << "num_deaths_in_current_step: " << num_deaths_in_current_step << std::endl;
+
+	//boundary_condition_for_pushed_out_agents
+	os << "last_diffusion_time: " << last_diffusion_time << std::endl;
+
+	//boundary_condition_for_pushed_out_agents
+	os << "last_cell_cycle_time: " << last_cell_cycle_time << std::endl;
+
+	//boundary_condition_for_pushed_out_agents
+	os << "last_mechanics_time: " << last_mechanics_time << std::endl;
+
+	//max_cell_interactive_distance_in_voxel
+	os << "max_cell_interactive_distance_in_voxel: ";
+	for (const auto& value : max_cell_interactive_distance_in_voxel) {
+        os << value << " ";
+    }
+    os << std::endl;
+	//cells_ready_to_die
+	os << "cells_ready_to_die: " << cells_ready_to_die.size() << std::endl;
+
+	os << "cells_ready_to_divide: " << cells_ready_to_divide.size() << std::endl;
+/*
+	//cells_ready_to_die
+	os << "cells_ready_to_die: ";
+	for (const auto& cell_ptr : cells_ready_to_die) {
+		os << cell_ptr << " ";
+	}
+	os << std::endl;
+
+	//cells_ready_to_divide
+	os << "cells_ready_to_divide: ";
+	for (const auto& cell_ptr : cells_ready_to_divide) {
+		os << cell_ptr << " ";
+	}
+	os << std::endl;*/
+}
+
+void Cell_Container::reset_data(std::ifstream& is){
+	std::string dummy;
+
+	//skip first 3 lines
+	std::getline(is, dummy);
+	std::getline(is, dummy);
+	std::getline(is, dummy);
+
+	//cell_cell_adhesion_strength
+	std::getline(is, dummy);
+	boundary_condition_for_pushed_out_agents = read_number_in_line(dummy);
+
+	//initialzed
+	std::getline(is, dummy);
+	initialzed = read_number_in_line_bool(dummy);
+
+	//num_divisions_in_current_step
+	std::getline(is, dummy);
+	num_divisions_in_current_step = read_number_in_line_int(dummy);
+
+	//num_deaths_in_current_step
+	std::getline(is, dummy);
+	num_deaths_in_current_step = read_number_in_line_int(dummy);
+
+	//last_diffusion_time
+	std::getline(is, dummy);
+	last_diffusion_time = read_number_in_line(dummy);
+
+	//last_cell_cycle_time
+	std::getline(is, dummy);
+	last_cell_cycle_time = read_number_in_line(dummy);
+
+	//last_mechanics_time
+	std::getline(is, dummy);
+	last_mechanics_time = read_number_in_line(dummy);
+
+	// max_cell_interactive_distance_in_voxel
+	static int n_line = 0;
+	std::getline(is, dummy);
+	std::istringstream stream_max_cell_interactive_distance_in_voxel(dummy);
+	std::string key_max_cell_interactive_distance_in_voxel;
+	stream_max_cell_interactive_distance_in_voxel >> key_max_cell_interactive_distance_in_voxel;
+	double number;
+	std::vector<double> max_cell_interactive_distance_in_voxel_new;
+	while(stream_max_cell_interactive_distance_in_voxel >> number) {
+		max_cell_interactive_distance_in_voxel_new.push_back(number);
+		n_line++;
+	}
+	assert(n_line == max_cell_interactive_distance_in_voxel.size());
+	max_cell_interactive_distance_in_voxel.clear();
+	max_cell_interactive_distance_in_voxel = max_cell_interactive_distance_in_voxel_new;
+	
+
+	// cells_ready_to_die
+	std::getline(is, dummy);
+
+	// cells_ready_to_divide
+	std::getline(is, dummy);
+
+
+}
 };

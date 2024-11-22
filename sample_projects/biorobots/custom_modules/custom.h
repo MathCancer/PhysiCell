@@ -67,6 +67,8 @@
 
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
+//include the start and stop add-on
+#include "../addons/start_and_stop/start_and_stop.h"
 
 using namespace BioFVM; 
 using namespace PhysiCell;

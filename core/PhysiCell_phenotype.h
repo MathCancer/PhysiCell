@@ -72,6 +72,7 @@
 #include <string>
 #include <unordered_map>
 #include <map> 
+#include <ostream>
 
 #include "../BioFVM/BioFVM.h" 
 
@@ -115,6 +116,9 @@ class Phase
 	void (*entry_function)( Cell* pCell, Phenotype& phenotype, double dt ); 
 	
 	Phase(); // done
+
+	friend std::ostream& operator<<(std::ostream& os, const Phase& phase);
+    friend std::istream& operator>>(std::istream& is, Phase& phase);
 };
 
 class Phase_Link
@@ -132,6 +136,9 @@ class Phase_Link
 		// function to be excecuted when completing the phase transition 
 	
 	Phase_Link(); // done
+
+	friend std::ostream& operator<<(std::ostream& os, const Phase_Link& phase_link);
+    friend std::istream& operator>>(std::istream& is, Phase_Link& phase_link);
 };
 
 class Cycle_Data
@@ -169,6 +176,8 @@ class Cycle_Data
 	double& exit_rate(int phase_index ); // This returns the first transition rate out of 
 		// phase # phase_index. It is only relevant if the phase has only one phase link 
 		// (true for many cycle models). 
+	friend std::ostream& operator<<(std::ostream& os, const Cycle_Data& cycleData);
+    friend std::istream& operator>>(std::istream& is, Cycle_Data& cycleData);
 };
 
 class Cycle_Model
@@ -211,6 +220,9 @@ class Cycle_Model
 	Phase_Link& phase_link(int start_index,int end_index ); // done 
 	
 	std::ostream& display( std::ostream& os ); // done 
+
+	void save_data(std::ostream& os );
+    void reset_data(std::istream& is );
 };
 
 class Cycle
@@ -230,6 +242,8 @@ class Cycle
 	int& current_phase_index( void ); // done 
 	
 	void sync_to_cycle_model( Cycle_Model& cm ); // done 
+	friend std::ostream& operator<<(std::ostream& os, const Cycle& cycle_params);
+    friend std::istream& operator>>(std::istream& is, Cycle& cycle_params);
 };
 
 class Death_Parameters
@@ -248,6 +262,9 @@ class Death_Parameters
 	double relative_rupture_volume; 
 	
 	Death_Parameters(); // done 
+
+	friend std::ostream& operator<<(std::ostream& os, const Death_Parameters& DParameters);
+    friend std::istream& operator>>(std::istream& is, Death_Parameters& DParameters);
 };
 
 class Death
@@ -278,6 +295,9 @@ class Death
 	// ease of access
 	double& apoptosis_rate(void); 
 	double& necrosis_rate(void); 
+
+	friend std::ostream& operator<<(std::ostream& os, const Death& deathparams);
+    friend std::istream& operator>>(std::istream& is, Death& deathparams);
 };
 
 class Volume
@@ -336,6 +356,8 @@ class Volume
 	
 	void divide( void ); // done 
 	void multiply_by_ratio(double); // done 
+	friend std::ostream& operator<<(std::ostream& os, const Volume& volumeparams);
+    friend std::istream& operator>>(std::istream& is, Volume& volumeparams);
 };
 
 class Geometry
@@ -354,6 +376,8 @@ class Geometry
 	void update_surface_area( Cell* pCell, Phenotype& phenotype, double dt ); // done 
 	
 	void update( Cell* pCell, Phenotype& phenotype, double dt ); // done 
+	friend std::ostream& operator<<(std::ostream& os, const Geometry& geometryparams);
+    friend std::istream& operator>>(std::istream& is, Geometry& geometryparams);
 };
 
 class Mechanics
@@ -397,7 +421,8 @@ class Mechanics
 	
 	void set_absolute_equilibrium_distance( Phenotype& phenotype, double new_value ); // done 
 	
-	
+	friend std::ostream& operator<<(std::ostream& os, const Mechanics& mechanicsparams);
+    friend std::istream& operator>>(std::istream& is, Mechanics& mechanicsparams);
 };
 
 class Motility
@@ -432,6 +457,9 @@ class Motility
 	
 		
 	Motility(); // done 
+
+	friend std::ostream& operator<<(std::ostream& os, const Motility& motilityparams);
+    friend std::istream& operator>>(std::istream& is, Motility& motilityparams);
 };
 
 class Secretion
@@ -467,7 +495,10 @@ class Secretion
 	double& secretion_rate( std::string name ); 
 	double& uptake_rate( std::string name ); 
 	double& saturation_density( std::string name ); 
-	double& net_export_rate( std::string name );  	
+	double& net_export_rate( std::string name );  
+
+	friend std::ostream& operator<<(std::ostream& os, const Secretion& secretionparams);
+    friend std::istream& operator>>(std::istream& is, Secretion& secretionparams);		
 };
 
 class Cell_Functions
@@ -509,7 +540,9 @@ class Cell_Functions
 	void (*plot_agent_SVG)(std::ofstream& os, Cell* pCell, double z_slice, std::vector<std::string> (*cell_coloring_function)(Cell*), double X_lower, double Y_lower);
 	void (*plot_agent_legend)(std::ofstream& os, Cell_Definition* cell_def, double& cursor_x, double& cursor_y, std::vector<std::string> (*cell_coloring_function)(Cell*), double temp_cell_radius);
 
-	
+	friend std::ostream& operator<<(std::ostream& os, const Cell_Functions& cellFunctions);
+    friend std::istream& operator>>(std::istream& is, Cell_Functions& cellFunctions);
+
 	Cell_Functions(); // done 
 };
 
@@ -591,7 +624,10 @@ class Molecular
 		void sync_to_cell( Basic_Agent* pCell ); 
 
 		// ease of access 
-		double&  internalized_total_substrate( std::string name ); 
+		double&  internalized_total_substrate( std::string name );
+
+		friend std::ostream& operator<<(std::ostream& os, const Molecular& molecular);
+    	friend std::istream& operator>>(std::istream& is, Molecular& molecular); 
 		
 };
 
@@ -642,9 +678,16 @@ class Intracellular
 	virtual bool has_variable(std::string name) = 0; 
 	virtual bool get_boolean_variable_value(std::string name) = 0;
 	virtual void set_boolean_variable_value(std::string name, bool value) = 0;
+	virtual int get_number_of_nodes() = 0;
 	// virtual bool get_double_variable_value(std::string name) = 0;
 	// virtual void set_double_variable_value(std::string name, bool value) = 0;
 	virtual void print_current_nodes() = 0;
+	virtual void save_current_nodes(std::ostream& out_stream) = 0;
+	virtual void save_current_parameters(std::ostream& out_stream) = 0;
+	virtual void read_current_parameter(std::ifstream& in_stream) = 0;
+	virtual void save_current_parameters_maboss(std::ostream& out_stream) = 0;
+	virtual void read_current_parameter_maboss(std::ifstream& in_stream) = 0;
+	virtual void reinit_maboss(std::string networkFile, std::string configFile) = 0;
 	
 
     // ================  specific to "roadrunner" ================
@@ -697,7 +740,10 @@ class Cell_Interactions
 	double& immunogenicity( std::string type_name ); // done 
 	
 	// automated cell phagocytosis, attack, and fusion 
-//	void perform_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
+//	void perform_interactions( Cell* pCell, Phenotype& phenotype, double dt );
+
+	friend std::ostream& operator<<(std::ostream& os, const Cell_Interactions& cell_interactions);
+    friend std::istream& operator>>(std::istream& is, Cell_Interactions& cell_interactions);
 };
 
 class Cell_Transformations
@@ -716,6 +762,9 @@ class Cell_Transformations
 	
 	// automated cell transformations
 	// void perform_transformations( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+	friend std::ostream& operator<<(std::ostream& os, const Cell_Transformations& cell_transformations);
+    friend std::istream& operator>>(std::istream& is, Cell_Transformations& cell_transformations); 
 };
 
 // pre-beta functionality in 1.10.3 
@@ -747,6 +796,9 @@ class Cell_Integrity
 	Cell_Integrity(); 
 
 	void advance_damage( double dt ); 
+
+	friend std::ostream& operator<<(std::ostream& os, const Cell_Integrity& integrity);
+    friend std::istream& operator>>(std::istream& is, Cell_Integrity& integrity);
 };
 
 class Phenotype
@@ -786,8 +838,13 @@ class Phenotype
 	
 	// make sure cycle, death, etc. are synced to the defaults. 
 	void sync_to_default_functions( void ); // done 
+
+	friend std::ostream& operator<<(std::ostream& os, const Phenotype& pheno_params);
 };
 
 };
 
 #endif
+double read_number_in_line(const std::string& line);
+int read_number_in_line_int(const std::string& line);
+bool read_number_in_line_bool(const std::string& line);

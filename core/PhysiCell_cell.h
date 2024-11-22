@@ -111,6 +111,10 @@ class Cell_Parameters
 	// necrosis parameters (may evenually be moved into a reference necrotic phenotype 
 	double max_necrosis_rate; // deprecate
 	int necrosis_type; // deprecate 
+
+	// Declaration of input/output operators
+    friend std::ostream& operator<<(std::ostream& os, const Cell_Parameters& params);
+    friend std::istream& operator>>(std::istream& is, Cell_Parameters& params);
 	
 	Cell_Parameters(); 
 }; 
@@ -159,6 +163,9 @@ class Cell_State
 	bool contact_with_basement_membrane; // not implemented yet 
 	
 	Cell_State(); 
+	friend std::ostream& operator<<(std::ostream& os, const Cell_State& cellState);
+    friend std::istream& operator>>(std::istream& is, Cell_State& cellState);
+
 };
 
 class Cell : public Basic_Agent 
@@ -249,6 +256,9 @@ class Cell : public Basic_Agent
 	std::vector<Cell*> nearby_interacting_cells( void ); // new in 1.8.0 
 	
 	void convert_to_cell_definition( Cell_Definition& cd ); 
+
+	// stream operator to save cells
+	friend std::ostream& operator<<(std::ostream& os, const Cell& cell);
 };
 
 Cell* create_cell( Cell* (*custom_instantiate)() = NULL );  
