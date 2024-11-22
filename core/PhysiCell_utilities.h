@@ -121,6 +121,8 @@ void set_counter_normal_random(int value);
 
 void print_counters();
 
+void copy_file_to_output(std::string filename);
+
 };
 
 #endif
