@@ -1317,36 +1317,36 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 
 	// move effector attack here. 
 
-		if( pCell->phenotype.cell_interactions.pAttackTarget != NULL ) 
+	if( pCell->phenotype.cell_interactions.pAttackTarget != NULL ) 
+	{
+		Cell* pTarget = pCell->phenotype.cell_interactions.pAttackTarget; 
+
+		pCell->attack_cell(pTarget,dt); 
+		attacked = true; // attacked at least one cell in this time step 
+
+		// attack_cell
+
+		// probability of ending attack 
+		// end attack if target is dead 
+		probability = dt / (1e-15 + pCell->phenotype.cell_interactions.attack_duration); 
+
+
+		if( UniformRandom() < probability || pTarget->phenotype.death.dead ) 
 		{
-			Cell* pTarget = pCell->phenotype.cell_interactions.pAttackTarget; 
+			/*
+			std::cout << "*********   *********  ********  attack done **** " << PhysiCell_globals.current_time << " " 
+			<< probability << " "
+			<< "attack time: " << pTarget->state.total_attack_time << " " 		
+			<< "damage: " << pTarget->phenotype.cell_integrity.damage <<  " " 		
+			<< "dead? " << (int) pTarget->phenotype.death.dead << " " 
+			<< "damage delivered: " << pCell->phenotype.cell_interactions.total_damage_delivered << std::endl; 
+			*/
 
-			pCell->attack_cell(pTarget,dt); 
-			attacked = true; // attacked at least one cell in this time step 
+			detach_cells_as_spring(pCell,pTarget); 
 
-			// attack_cell
-
-			// probability of ending attack 
-			// end attack if target is dead 
-			probability = dt / (1e-15 + pCell->phenotype.cell_interactions.attack_duration); 
-
-
-			if( UniformRandom() < probability || pTarget->phenotype.death.dead ) 
-			{
-				/*
-				std::cout << "*********   *********  ********  attack done **** " << PhysiCell_globals.current_time << " " 
-				<< probability << " "
-				<< "attack time: " << pTarget->state.total_attack_time << " " 		
-				<< "damage: " << pTarget->phenotype.cell_integrity.damage <<  " " 		
-				<< "dead? " << (int) pTarget->phenotype.death.dead << " " 
-				<< "damage delivered: " << pCell->phenotype.cell_interactions.total_damage_delivered << std::endl; 
-				*/
-
-				detach_cells_as_spring(pCell,pTarget); 
-
-				pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
-			} 
+			pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
 		} 
+	} 
 
 
 	// move decision if to end attack here. 
@@ -1468,6 +1468,8 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
     for( int j=0; j < pCell->state.spring_attachments.size(); j++ )
     {
         Cell* pTest = pCell->state.spring_attachments[j]; 
+		if (phenotype.cell_interactions.pAttackTarget==pTest || pTest->phenotype.cell_interactions.pAttackTarget==pCell) // do not let attackers detach randomly
+		{ continue; }
         if( UniformRandom() <= detachment_probability )
         { detach_cells_as_spring( pCell , pTest ); }
     }

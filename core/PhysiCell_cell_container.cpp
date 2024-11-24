@@ -124,6 +124,14 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 {
 	// secretions and uptakes. Syncing with BioFVM is automated. 
 
+	static double time_since_last_cycle = phenotype_dt_;
+	static double time_since_last_mechanics = mechanics_dt_;
+	static double phenotype_threshold = phenotype_dt_ - 0.5 * diffusion_dt_;
+	static double mechanics_threshold = mechanics_dt_ - 0.5 * diffusion_dt_;
+
+	bool time_for_phenotype = time_since_last_cycle > phenotype_threshold;
+	bool time_for_mechanics = time_since_last_mechanics > mechanics_threshold;
+
 	#pragma omp parallel for 
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
@@ -133,18 +141,12 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		}
 	}
 	
-	//if it is the time for running cell cycle, do it!
-	double time_since_last_cycle= t- last_cell_cycle_time;
-
-	static double phenotype_dt_tolerance = 0.001 * phenotype_dt_; 
-	static double mechanics_dt_tolerance = 0.001 * mechanics_dt_; 
-
 	// intracellular update. called for every diffusion_dt, but actually depends on the intracellular_dt of each cell (as it can be noisy)
 
 	#pragma omp parallel for 
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
-		if( (*all_cells)[i]->is_out_of_domain == false && initialzed ) {
+		if( (*all_cells)[i]->is_out_of_domain == false ) {
 
 			if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
 			{
@@ -159,16 +161,11 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		}
 	}
 	
-	if( time_since_last_cycle > phenotype_dt_ - 0.5 * diffusion_dt_ || !initialzed )
+	if( time_for_phenotype )
 	{
 		// Reset the max_radius in each voxel. It will be filled in set_total_volume
 		// It might be better if we calculate it before mechanics each time 
 		// std::fill(max_cell_interactive_distance_in_voxel.begin(), max_cell_interactive_distance_in_voxel.end(), 0.0);
-		
-		if(!initialzed)
-		{
-			time_since_last_cycle = phenotype_dt_;
-		}
 		
 		// new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
 		// checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
@@ -180,33 +177,46 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 				(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
 			}
 		}
-		
 		// process divides / removes 
 		for( int i=0; i < cells_ready_to_divide.size(); i++ )
 		{
 			cells_ready_to_divide[i]->divide();
 		}
+		// remove cells here (and not only below after interactions) in case phenotype and mechanics time steps don't line up
 		for( int i=0; i < cells_ready_to_die.size(); i++ )
 		{	
 			cells_ready_to_die[i]->die();	
 		}
-		num_divisions_in_current_step+=  cells_ready_to_divide.size();
 		num_deaths_in_current_step+=  cells_ready_to_die.size();
+		num_divisions_in_current_step+=  cells_ready_to_divide.size();
+		
 		
 		cells_ready_to_die.clear();
 		cells_ready_to_divide.clear();
-		last_cell_cycle_time= t;
-	}
 		
-	double time_since_last_mechanics= t- last_mechanics_time;
-	
-	// if( time_since_last_mechanics>= mechanics_dt || !initialzed)
-	if( time_since_last_mechanics > mechanics_dt_ - 0.5 * diffusion_dt_ || !initialzed )
+		time_since_last_cycle = 0.0;
+	}
+	else
+	{ time_since_last_cycle += diffusion_dt_; }
+
+	if( time_for_mechanics )
 	{
-		if(!initialzed)
+		// new March 2022: 
+		// run standard interactions (phagocytosis, attack, fusion) here 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
 		{
-			time_since_last_mechanics = mechanics_dt_;
+			Cell* pC = (*all_cells)[i]; 
+			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics); 
 		}
+
+		for( int i=0; i < cells_ready_to_die.size(); i++ )
+		{	
+			cells_ready_to_die[i]->die();	
+		}
+		num_deaths_in_current_step+=  cells_ready_to_die.size();
+		
+		cells_ready_to_die.clear();
 		
 		// new February 2018 
 		// if we need gradients, compute them
@@ -271,30 +281,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			}	
 		}
 
-		// new March 2022: 
-		// run standard interactions (phagocytosis, attack, fusion) here 
-		#pragma omp parallel for 
-		for( int i=0; i < (*all_cells).size(); i++ )
-		{
-			Cell* pC = (*all_cells)[i]; 
-			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics); 
-		}
-		// super-critical to performance! clear the "dummy" cells from phagocytosis / fusion
-		// otherwise, comptuational cost increases at polynomial rate VERY fast, as O(10,000) 
-		// dummy cells of size zero are left ot interact mechanically, etc. 
-		if( cells_ready_to_die.size() > 0 )
-		{
-			/*
-			std::cout << "\tClearing dummy cells from phagocytosis and fusion events ... " << std::endl; 
-			std::cout << "\t\tClearing " << cells_ready_to_die.size() << " cells ... " << std::endl; 
-			// there might be a lot of "dummy" cells ready for removal. Let's do it. 		
-			*/
-			for( int i=0; i < cells_ready_to_die.size(); i++ )
-			{ cells_ready_to_die[i]->die(); }
-			cells_ready_to_die.clear();
-		}
-		
-
 		// update positions 
 		
 		#pragma omp parallel for 
@@ -309,12 +295,17 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// Update cell indices in the container
 		for( int i=0; i < (*all_cells).size(); i++ )
+		{
 			if(!(*all_cells)[i]->is_out_of_domain && (*all_cells)[i]->is_movable)
+			{
 				(*all_cells)[i]->update_voxel_in_container();
-		last_mechanics_time=t;
+			}
+		}
+		time_since_last_mechanics = 0.0;
 	}
+	else
+	{ time_since_last_mechanics += diffusion_dt_; }
 	
-	initialzed=true;
 	return;
 }
 
