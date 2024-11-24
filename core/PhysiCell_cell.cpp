@@ -318,6 +318,9 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	// perform transformations 
 	standard_cell_transformations( this,this->phenotype,dt_ ); 
 
+	// make sure neighbors are updated
+	state.neighbors = nearby_cells();
+	
 	// New March 2023 in Version 1.12.0 
 	// call the rules-based code to update the phenotype 
 	if( PhysiCell_settings.rules_enabled )
