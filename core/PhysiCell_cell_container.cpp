@@ -194,7 +194,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		cells_ready_to_die.clear();
 		cells_ready_to_divide.clear();
 		
-		time_since_last_cycle = 0.0;
+		time_since_last_cycle = diffusion_dt_; // setting it for next cycle
 	}
 	else
 	{ time_since_last_cycle += diffusion_dt_; }
@@ -301,7 +301,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 				(*all_cells)[i]->update_voxel_in_container();
 			}
 		}
-		time_since_last_mechanics = 0.0;
+		time_since_last_mechanics = diffusion_dt_; // setting it for next cycle
 	}
 	else
 	{ time_since_last_mechanics += diffusion_dt_; }
