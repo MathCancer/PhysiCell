@@ -173,23 +173,16 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
 			if( (*all_cells)[i]->is_out_of_domain == false )
-			{
-				(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
-			}
+			{ (*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); }
 		}
 		// process divides / removes 
 		for( int i=0; i < cells_ready_to_divide.size(); i++ )
-		{
-			cells_ready_to_divide[i]->divide();
-		}
+		{ cells_ready_to_divide[i]->divide(); }
 		// remove cells here (and not only below after interactions) in case phenotype and mechanics time steps don't line up
 		for( int i=0; i < cells_ready_to_die.size(); i++ )
-		{	
-			cells_ready_to_die[i]->die();	
-		}
+		{ cells_ready_to_die[i]->die(); }
 		num_deaths_in_current_step+=  cells_ready_to_die.size();
 		num_divisions_in_current_step+=  cells_ready_to_divide.size();
-		
 		
 		cells_ready_to_die.clear();
 		cells_ready_to_divide.clear();
@@ -209,13 +202,8 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			Cell* pC = (*all_cells)[i]; 
 			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics); 
 		}
-
 		for( int i=0; i < cells_ready_to_die.size(); i++ )
-		{	
-			cells_ready_to_die[i]->die();	
-		}
-		num_deaths_in_current_step+=  cells_ready_to_die.size();
-		
+		{ cells_ready_to_die[i]->die(); }
 		cells_ready_to_die.clear();
 		
 		// new February 2018 

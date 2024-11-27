@@ -1468,8 +1468,6 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
     for( int j=0; j < pCell->state.spring_attachments.size(); j++ )
     {
         Cell* pTest = pCell->state.spring_attachments[j]; 
-		if (phenotype.cell_interactions.pAttackTarget==pTest || pTest->phenotype.cell_interactions.pAttackTarget==pCell) // do not let attackers detach randomly
-		{ continue; }
         if( UniformRandom() <= detachment_probability )
         { detach_cells_as_spring( pCell , pTest ); }
     }
