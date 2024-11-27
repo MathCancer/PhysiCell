@@ -1129,6 +1129,14 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	Geometry cell_geometry = phenotype.geometry;
 	Molecular cell_molecular = phenotype.molecular;
 	Custom_Cell_Data cell_custom_data = custom_data;
+
+	// if this cell is attacking, be safe and stop the attack
+	if ( phenotype.cell_interactions.pAttackTarget != NULL )
+	{
+		detach_cells_as_spring(this, phenotype.cell_interactions.pAttackTarget);
+		// phenotype.cell_interactions.pAttackTarget = NULL; // not needed since phenotype is overwritten below
+	}
+
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
