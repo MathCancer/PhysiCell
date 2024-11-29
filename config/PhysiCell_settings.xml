@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1440</max_time>
+		<max_time units="min">180</max_time>
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 		<dt_diffusion units="min">0.02</dt_diffusion>
@@ -191,7 +191,7 @@
 
 		<membrane_length type="double" units="">120</membrane_length>
 		
-		<start_stop type="bool" units="">true</start_stop>
+		<start_stop type="bool" units="">false</start_stop>
 		<auto_stop type="bool" units="">false</auto_stop>
 		<auto_stop_resistance type="bool" units="">false</auto_stop_resistance>
 
