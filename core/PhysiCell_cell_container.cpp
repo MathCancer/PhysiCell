@@ -124,12 +124,12 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 {
 	// secretions and uptakes. Syncing with BioFVM is automated. 
 
-	static double time_since_last_cycle = phenotype_dt_;
+	static double time_since_last_phenotype = phenotype_dt_;
 	static double time_since_last_mechanics = mechanics_dt_;
 	static double phenotype_threshold = phenotype_dt_ - 0.5 * diffusion_dt_;
 	static double mechanics_threshold = mechanics_dt_ - 0.5 * diffusion_dt_;
 
-	bool time_for_phenotype = time_since_last_cycle > phenotype_threshold;
+	bool time_for_phenotype = time_since_last_phenotype > phenotype_threshold;
 	bool time_for_mechanics = time_since_last_mechanics > mechanics_threshold;
 
 	#pragma omp parallel for 
@@ -174,7 +174,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{
 			if( (*all_cells)[i]->is_out_of_domain == false )
 			{
-				(*all_cells)[i]->advance_bundled_phenotype_functions(time_since_last_cycle);
+				(*all_cells)[i]->advance_bundled_phenotype_functions(time_since_last_phenotype);
 			}
 		}
 		// process divides / removes 
@@ -193,10 +193,10 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		cells_ready_to_die.clear();
 		cells_ready_to_divide.clear();
 		
-		time_since_last_cycle = diffusion_dt_; // setting it for next cycle
+		time_since_last_phenotype = diffusion_dt_; // setting it for next cycle
 	}
 	else
-	{ time_since_last_cycle += diffusion_dt_; }
+	{ time_since_last_phenotype += diffusion_dt_; }
 
 	if( time_for_mechanics )
 	{
