@@ -551,7 +551,7 @@
 	</initial_conditions>	
 	
 	<user_parameters>
-    <start_stop type="bool" units="">true</start_stop>
+    <start_stop type="bool" units="">false</start_stop>
 		<random_seed type="int" units="none" description="">0</random_seed>
         <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
         <worker_color type="string" units="none" description="">red</worker_color>
