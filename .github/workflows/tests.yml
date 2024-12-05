@@ -67,11 +67,11 @@ jobs:
         python beta/test_diff_svg.py ${{ matrix.projects.output_folder }} tests/cases/output_${{ matrix.projects.project }}
 
     start_and_stop_tests:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Run start and stop test
-      run: |
-        python beta/start_stop_tests.py
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run start and stop test
+        run: |
+          python beta/start_stop_tests.py
