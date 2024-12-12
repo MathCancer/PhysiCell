@@ -382,7 +382,7 @@ void copy_file_to_output(std::string filename)
 	char copy_command[1024];
 	sprintf(copy_command, "cp %s %s", filename.c_str(), output_filename.c_str());
 	std::cout << "Copy command: " << copy_command << std::endl;
-	system(copy_command);
+	(void)system(copy_command); // make it explicit that we are ignoring the return value
 }
 
 };
