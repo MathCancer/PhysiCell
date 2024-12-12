@@ -248,7 +248,7 @@ Cell_State::Cell_State()
 	number_of_nuclei = 1; 
 	
 	// damage = 0.0; 
-	// total_attack_time = 0.0; 
+	total_attack_time = 0.0;
 	
 	contact_with_basement_membrane = false; 
 
