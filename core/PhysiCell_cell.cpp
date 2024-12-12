@@ -459,6 +459,9 @@ Cell::~Cell()
 			this->remove_all_attached_cells(); 
 			// 1.11.0
 			this->remove_all_spring_attachments(); 
+
+			// new Dec 5, 2024: 
+			this->remove_self_from_all_neighbors(); 			
 			
 			// released internalized substrates (as of 1.5.x releases)
 			this->release_internalized_substrates(); 
@@ -1197,6 +1200,9 @@ void delete_cell( int index )
 	pDeleteMe->remove_all_attached_cells(); 
 	// 1.11.0 
 	pDeleteMe->remove_all_spring_attachments(); 
+
+	// new Dec 5, 2024: 
+	pDeleteMe->remove_self_from_all_neighbors(); 			
 	
 	// released internalized substrates (as of 1.5.x releases)
 	pDeleteMe->release_internalized_substrates(); 
@@ -3366,6 +3372,36 @@ void Cell::detach_cell_as_spring( Cell* pRemoveMe )
 			i++; 
 		}
 	}
+	return; 
+}
+
+void Cell::remove_self_from_all_neighbors( void )
+{
+	Cell* pCell = this; 
+	// go through all neighbors (pN) of this (pC)
+
+	for( int j = 0 ; j < pCell->state.neighbors.size(); j++ )
+	{
+	 	Cell* pN = pCell->state.neighbors[j]; 
+
+		// for each pN, remove pC from list of neighbors 
+			// find pC in neighbors 
+
+
+			auto SearchResult = std::find( 
+				pN->state.neighbors.begin(),pN->state.neighbors.end(),pCell );  		
+
+			// if pC is indeed found, remove it  
+			// erase pC from neighbors 
+			if( SearchResult != pN->state.neighbors.end() )
+			{
+				// if the target is found, set the appropriate rate 
+				pN->state.neighbors.erase( SearchResult ); 
+			}
+			else
+			{ /* future error message */  }
+	}
+
 	return; 
 }
 
