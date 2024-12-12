@@ -2370,6 +2370,10 @@ void setup_cell_rules( void )
 	display_behavior_dictionary( dict_of ); // done 
 	dict_of.close(); 
 
+	// save rules (v3)
+	std::string rules_file = PhysiCell_settings.folder + "/cell_rules_parsed.csv"; 
+	export_rules_csv_v3( rules_file ); 
+
 	return; 
 }
 
