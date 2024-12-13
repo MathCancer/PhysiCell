@@ -272,7 +272,7 @@ int main( int argc, char* argv[] )
 	{		
 		while( t < t_max )
 		{
-			if(  fabs( t - t_next_output_time ) < 0.0001 )
+			if( t > t_next_output_time - 0.5 * dt )
 			{
 				write_test_report(*all_cells,t);
 				t_next_output_time += t_output_interval;	

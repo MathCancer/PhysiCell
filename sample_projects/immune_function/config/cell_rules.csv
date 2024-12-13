@@ -1,0 +1,10 @@
+// comment line 
+//
+// 0          1       2          3         4                   5         6           7           
+// Cell type, signal, direction, behavior, max response value, half-max, Hill power, applies to dead?  
+tumor cell,damage,increases,apoptosis,9e9,30,100,0
+tumor cell,apoptotic,increases,apoptotic debris secretion,1,0.5,10,1
+tumor cell,necrotic,increases,necrotic debris secretion,1,0.5,10,1
+// tumor cell,doxorubicin,increases,damage rate,1,0.5,4,0
+tumor cell,time,decreases,damage repair rate,0,15,10,0
+fast T cell,damage delivered,increases,transform to exhausted T cell,0.01,30.0,8,0

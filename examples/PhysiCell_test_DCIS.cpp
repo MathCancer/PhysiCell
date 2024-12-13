@@ -311,7 +311,7 @@ int main( int argc, char* argv[] )
 	{		
 		while( t < t_max )
 		{
-			if(  fabs( t - t_next_output_time ) < 0.0001 )
+			if( t > t_next_output_time - 0.5 * dt )
 			{
 				log_output(t, output_index, microenvironment, report_file);
 				t_next_output_time += t_output_interval;						
