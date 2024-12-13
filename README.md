@@ -4,6 +4,7 @@
 
 **Release dates:** 15 September 2024 - 
 * 1.14.0 : 15 September 2024
+* 1.14.1 : 13 December 2024
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -88,6 +89,13 @@ See changes.md for the full change log.
 ## Release summary: 
 Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
 
+### Version 1.14.1 (13 Dec 2024): 
+Version 1.14.1 primarily introduces bug fixes as noted below, but also introduces the first implementation of asymmetric division. 
+
+Among the notable changes includes a more consistent handling of internalized substrates and conserved custom data on transformation and phagocytosis: they are now conserved in these processes. Several other features and changes are included (see below) as well as additional bug fixes (major and minor). Finally, the test suite will no test on MacOS 13 instead of the now-deprecated-in-GitHub-Actions MacOS 12.
+
+Please report any bugs or issues in Issues or in the PhysiCell community Slack workspace. Also, feel free to suggest new features in either location as well.
+
 ### Version 1.14.0 (15 Sep 2024):
 Version 1.14.0 Introduces Cell Behavior Hypothesis Grammar (CBHG) 3.0, enhancing the modeling of cellular behaviors with the addition of a new `Cell_Integrity` class and refined phagocytosis behaviors (now split into separate rates for apoptotic, necrotic, and other dead cells). The built-in "attack" model has been refined to include formation of a persistent synapse (with a spring adhesion) throughout the attack (which is tunable via the `attack_duration` parameter), and a clarified `attack_damage_rate` to denote the rate at which an attacker damages its target cell. The attacking cell also tracks how long it has attacked (may be useful for exhaustion modeling), whether it is or is not attacking, and the identity (cell pointer) of the cell it is attacking. 
 
@@ -102,6 +110,19 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Setup Guides](https://github.com/physicell-training/ws2023/blob/main/agenda.md#set-up-physicell) for details.
 
 ### Major new features and changes in the 1.14.z versions
+#### 1.14.1 
++ asymmetric division is now possible through the config file
+  + try the sample project with make `asymmetric-division-sample`
+  + on division, one (and only one) of the daughter cells can be assigned a new cell type
+  + set probabilities for each cell type in the config file
+  + control these probabilities with rules using the behavior `asymmetric division to [cell_type]`
++ create full path to output folder if it does not exist
++ write `random_seed` to `output/random_seed.txt` for reproducibility even when using `system_clock` for setting the seed
++ copy the rules file(s) to the output folder and write the parsed rules (v3) `to cell_rules_parsed.csv` in the output folder
++ preserve internalized substrates and conserved custom data on cell transformation
++ default to 100% (instead of 0%) of internalized substrates being transferred on phagocytosis
++ transfer `conserved` custom data on phagocytosis from eaten to eater cell
+
 #### 1.14.0 
 + Introduced changes to Rules:
   + `damage rate` (a part of `Cell_Integrity`) is now a generalized term for a rate of damage caused by non-attack means 
@@ -166,13 +187,37 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
   + set the svg substrate color function by default for config-only based implementation
 
 ### Minor new features and changes: 
+#### 1.14.1
+- PhysiBoSS PDFs removed from repo, links provided in tutorial README.md
+- build binaries on release `published` instead of `created`
+- `beta/download_binary.py` gets PhysiCell Version 1.14.1
+- add reference to PhysiMeSS article
+- `make immune-function-sample` to make sample project showing new (1.14.0) phagocytosis and attack modules
+- add `rules_sample` to tests
+- test and build on macos-13 instead of macos-12 as that is being deprecated by GitHub actions
+
 #### 1.14.0 
 + Scripts in `/beta` to help with testing, both manually and via GitHub Actions: `test_build_samples.sh` and `test*.py`
 + The Makefiles for all sample projects now do a recursive copy (`cp -r`) for files in the /config directory
 + throw error if duplicate substrate or user_parameter name found
-
  
 ### Bugfixes: 
+#### 1.14.1
+- store value of `attack_duration` when parsing config file
+- set rules to Version 3.0 for all projects
+- store the `conserved` boolean when parsing `custom_data` in the config
+- when a cell dies, make sure it is removed from `neighbors` lists for all neighboring cells
+- use `std::stoul` in place of `std::stoi` to properly read in large ints for random seeds
+- use `std::ostringstream` to write voxel coordinates to avoid overflowing the buffer
+- fix `custom_division` `sample_project` so it does not require `random_seed` as a `user_parameter`
+- actually record `applies_to_dead` boolean for exported rules
+- initialize `total_attack_time = 0.0;` to avoid random initial values
+- update all sample projects to 1.14.x
+  - update phagocytosis parameters
+  - update attack parameters
+- remove extraneous call to `SeedRandom()` in PhysiBoSS cell lines project
+- do not let random detachment occur when one cell is attacking another
+
 #### 1.14.0 
 + `sample_projects_intracellular/ode/ode_energy/main.cpp` was updated to use `save_PhysiCell_to_MultiCellDS_v2`
 + `Cell::convert_to_cell_definition` now retains the cell volume
