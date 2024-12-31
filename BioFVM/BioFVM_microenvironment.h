@@ -367,7 +367,7 @@ class Microenvironment_Options
 extern Microenvironment_Options default_microenvironment_options; 
 extern Microenvironment microenvironment;
 
-void initialize_microenvironment( void ); 
+void initialize_microenvironment( bool update_microenvironment = false );
 
 void load_initial_conditions_from_matlab( std::string filename );
 void load_initial_conditions_from_csv( std::string filename );
