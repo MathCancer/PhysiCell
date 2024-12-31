@@ -1933,37 +1933,14 @@ void parse_rules_from_pugixml( void )
 
 			if( done == false )
 			{ std::cout << "\tWarning: Ruleset had unknown format (" << format << "). Skipping!" << std::endl; }
+			else
+			{ copy_file_to_output( input_filename ); }
 
 		}
 		else
 		{ std::cout << "\tRuleset disabled ... " << std::endl; }
 		node = node.next_sibling( "ruleset"); 		
 	}
-	return; 
-
-	exit(0); 
-	
-	// enabled? 
-	if( node.attribute("enabled").as_bool() == false )
-	{ return; }
-
-	// get filename 
-
-	std::string folder = xml_get_string_value( node, "folder" ); 
-	std::string filename = xml_get_string_value( node, "filename" ); 
-	std::string input_filename = folder + "/" + filename; 
-
-	std::string filetype = node.attribute("type").value() ; 
-
-	// what kind? 
-	if( filetype == "csv" || filetype == "CSV" )
-	{
-		std::cout << "Loading rules from CSV file " << input_filename << " ... " << std::endl; 
-		// load_cells_csv( input_filename );
-		parse_csv_rules_v0( input_filename ); 
-		return; 
-	}
-
 	return; 
 }
 
@@ -2218,7 +2195,7 @@ void export_rules_csv_v1( std::string filename )
 				{ response = "decreases"; max_response = min_value; }
 				double half_max = pHRS->rules[k]->half_maxes[i];
 				double hill_power = pHRS->rules[k]->hill_powers[i];
-				bool use_for_dead = false; 
+				bool use_for_dead = pHRS->rules[k]->applies_to_dead_cells[i];
 
 				// output the rule 
 				fs << cell_type << "," << signal << "," << response << "," << behavior << "," // 0,1,2,3
@@ -2247,7 +2224,7 @@ void export_rules_csv_v3( std::string filename )
 		return; 
 	}
 
-	std::cout << "Exporting rules to file " << filename << " (v2 format) ... " << std::endl; 
+	std::cout << "Exporting rules to file " << filename << " (v3 format) ... " << std::endl; 
 
 	for( int n=0; n < cell_definitions_by_index.size(); n++ )
 	{
@@ -2274,7 +2251,7 @@ void export_rules_csv_v3( std::string filename )
 				{ response = "decreases"; max_response = min_value; }
 				double half_max = pHRS->rules[k]->half_maxes[i];
 				double hill_power = pHRS->rules[k]->hill_powers[i];
-				bool use_for_dead = false; 
+				bool use_for_dead = pHRS->rules[k]->applies_to_dead_cells[i];
 
 				// output the rule 
 				fs << cell_type << "," << signal << "," << response << "," << behavior << "," // 0,1,2,3
@@ -2393,10 +2370,9 @@ void setup_cell_rules( void )
 	display_behavior_dictionary( dict_of ); // done 
 	dict_of.close(); 
 
-	// save rules (v1)
-	std::string rules_file = PhysiCell_settings.folder + "/cell_rules.csv"; 
-	export_rules_csv_v1( rules_file ); 
-
+	// save rules (v3)
+	std::string rules_file = PhysiCell_settings.folder + "/cell_rules_parsed.csv"; 
+	export_rules_csv_v3( rules_file ); 
 
 	return; 
 }

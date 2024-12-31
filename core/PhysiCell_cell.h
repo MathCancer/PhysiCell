@@ -188,7 +188,7 @@ class Cell : public Basic_Agent
 	
 	bool is_out_of_domain;
 	bool is_movable;
-	
+
 	void flag_for_division( void ); // done 
 	void flag_for_removal( void ); // done 
 	
@@ -231,6 +231,8 @@ class Cell : public Basic_Agent
 
 	void attach_cell( Cell* pAddMe ); // done 
 	void detach_cell( Cell* pRemoveMe ); // done 
+
+	void remove_self_from_all_neighbors( void ); 
 	void remove_all_attached_cells( void ); // done 
 
 	void attach_cell_as_spring( Cell* pAddMe ); // done 

@@ -515,14 +515,20 @@ void set_save_biofvm_cell_data_as_custom_matlab( bool newvalue )
 
 /* writing parts of BioFVM to a MultiCellDS file */ 
 
+static bool BioFVM_substrates_initialized_in_dom = false;
+
+void reset_BioFVM_substrates_initialized_in_dom( void )
+{
+	BioFVM_substrates_initialized_in_dom = false;
+}
+
+
 void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, Microenvironment& M )
 {
 	add_MultiCellDS_main_structure_to_open_xml_pugi( xml_dom ); 
 	
 	pugi::xml_node root = biofvm_doc.child( "MultiCellDS" );
 	pugi::xml_node node = root.child( "microenvironment" ); 
-	
-	static bool BioFVM_substrates_initialized_in_dom = false; 
 	
 	// if the TME has not yet been initialized in the DOM, create all the 
 	// right data elements, and populate the meshes. 
@@ -564,36 +570,9 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		// if Cartesian, add the x, y, and z coordinates 
 		if( M.mesh.Cartesian_mesh == true )
 		{
-			char temp [10240];
-			int position = 0; 
-			for( unsigned int k=0 ; k < M.mesh.x_coordinates.size()-1 ; k++ )
-			{ position += sprintf( temp+position, "%f " , M.mesh.x_coordinates[k] ); }
-			sprintf( temp+position , "%f" , M.mesh.x_coordinates[ M.mesh.x_coordinates.size()-1] ); 
-			node = node.append_child( "x_coordinates" ); 
-			node.append_child( pugi::node_pcdata ).set_value( temp ); 
-			attrib = node.append_attribute("delimiter");
-			attrib.set_value( " " ); 
-			
-			node = node.parent();
-			position = 0; 
-			for( unsigned int k=0 ; k < M.mesh.y_coordinates.size()-1 ; k++ )
-			{ position += sprintf( temp+position, "%f " , M.mesh.y_coordinates[k] ); }
-			sprintf( temp+position , "%f" , M.mesh.y_coordinates[ M.mesh.y_coordinates.size()-1] ); 
-			node = node.append_child( "y_coordinates" ); 
-			node.append_child( pugi::node_pcdata ).set_value( temp ); 
-			attrib = node.append_attribute("delimiter");
-			attrib.set_value( " " ); 
-			
-			node = node.parent();
-			position = 0; 
-			for( unsigned int k=0 ; k < M.mesh.z_coordinates.size()-1 ; k++ )
-			{ position += sprintf( temp+position, "%f " , M.mesh.z_coordinates[k] ); }
-			sprintf( temp+position , "%f" , M.mesh.z_coordinates[ M.mesh.z_coordinates.size()-1] ); 
-			node = node.append_child( "z_coordinates" ); 
-			node.append_child( pugi::node_pcdata ).set_value( temp ); 
-			attrib = node.append_attribute("delimiter");
-			attrib.set_value( " " ); 
-			node = node.parent(); 
+			write_coordinates_node(node, M.mesh.x_coordinates, "x_coordinates");
+			write_coordinates_node(node, M.mesh.y_coordinates, "y_coordinates");
+			write_coordinates_node(node, M.mesh.z_coordinates, "z_coordinates");
 		}
 		// write out the voxels -- minimal data, even if redundant for cartesian 
 		if( save_mesh_as_matlab == false )
@@ -744,7 +723,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			{ filename_start++; } 
 			strcpy( filename_without_pathing , filename_start ); 
 			
-			node.append_child( pugi::node_pcdata ).set_value( filename_without_pathing ); // filename );				
+			node.append_child( pugi::node_pcdata ).set_value( filename_without_pathing ); // filename ); 
 			
 			node = node.parent(); 
 		}
@@ -810,6 +789,21 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 	}
 	
 	return; 
+}
+
+void write_coordinates_node(pugi::xml_node &node, const std::vector<double> &coordinates, std::string name)
+{
+    std::ostringstream oss;
+    for (size_t i = 0; i < coordinates.size(); ++i)
+    {
+        if (i != 0)
+        { oss << " "; }
+        oss << coordinates[i];
+    }
+    pugi::xml_node coord_node = node.append_child(name.c_str());
+    coord_node.append_child(pugi::node_pcdata).set_value(oss.str().c_str());
+    pugi::xml_attribute attrib = coord_node.append_attribute("delimiter");
+    attrib.set_value(" ");
 }
 
 // not yet implemented 

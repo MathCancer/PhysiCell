@@ -54,10 +54,16 @@ namespace BioFVM{
 
 std::vector<Basic_Agent*> all_basic_agents(0); 
 
+static int max_basic_agent_ID = 0;
+
+void reset_max_basic_agent_ID( void )
+{
+	max_basic_agent_ID = 0;
+}
+
 Basic_Agent::Basic_Agent()
 {
 	//give the agent a unique ID  
-	static int max_basic_agent_ID = 0; 
 	ID = max_basic_agent_ID; // 
 	max_basic_agent_ID++; 
 	// initialize position and velocity
@@ -78,7 +84,7 @@ Basic_Agent::Basic_Agent()
 
 	internalized_substrates = new std::vector<double>(0); // 
 	fraction_released_at_death = new std::vector<double>(0); 
-	fraction_transferred_when_ingested = new std::vector<double>(0); 
+	fraction_transferred_when_ingested = new std::vector<double>(1.0); 
 	register_microenvironment( get_default_microenvironment() );
 	
 	// these are done in register_microenvironment
@@ -190,7 +196,7 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	total_extracellular_substrate_change.resize( microenvironment->density_vector(0).size() , 1.0 );
 	
 	fraction_released_at_death->resize( microenvironment->density_vector(0).size() , 0.0 ); 
-	fraction_transferred_when_ingested->resize( microenvironment->density_vector(0).size() , 0.0 ); 
+	fraction_transferred_when_ingested->resize( microenvironment->density_vector(0).size() , 1.0 ); 
 
 	return; 
 }
