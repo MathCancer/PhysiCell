@@ -570,8 +570,7 @@ void Parameters<T>::assert_parameter_not_exists( std::string search_name )
 	if( find_index( search_name ) == -1 )
 	{ return; }
 
-	std::cout << "ERROR: Parameter " << search_name << " already exists. Make sure all parameters (of a given type) have unique names." << std::endl;
-	exit(-1);
+	throw std::domain_error { "ERROR: Parameter " + search_name + " already exists. Make sure all parameters (of a given type) have unique names." };
 }
 
 template <class T>
@@ -582,8 +581,7 @@ int Parameters<T>::assert_parameter_exists( std::string search_name )
 	if( parameter_index != -1 )
 	{ return parameter_index; }
 
-	std::cout << "Error: parameter named " << search_name << " does not exist. Cannot update the parameter!" << std::endl;
-	exit(-1);
+	throw std::domain_error { "Error: parameter named " + search_name + " does not exist. Cannot update the parameter!" };
 }
 
 template <class T>
@@ -640,7 +638,11 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node , bool updat
 		{
 			bool value = xml_get_my_bool_value(node1);
 			if ( update_parameter )
-			{ bools.update_parameter( name, value, units ); }
+			{
+				try { bools.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ bools.add_parameter( name , value, units ); }
+			}
 			else
 			{ bools.add_parameter( name , value, units ); }
 		}
@@ -648,7 +650,11 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node , bool updat
 		{
 			int value = xml_get_my_int_value(node1);
 			if ( update_parameter )
-			{ ints.update_parameter( name, value, units ); }
+			{
+				try { ints.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ ints.add_parameter( name, value, units ); }
+			}
 			else
 			{ ints.add_parameter( name , value, units ); }
 		}
@@ -656,7 +662,11 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node , bool updat
 		{
 			double value = xml_get_my_double_value(node1);
 			if ( update_parameter )
-			{ doubles.update_parameter( name, value, units ); }
+			{
+				try { doubles.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ doubles.add_parameter( name , value, units ); }
+			}
 			else
 			{ doubles.add_parameter( name , value, units ); }
 		}
@@ -664,7 +674,11 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node , bool updat
 		{
 			std::string value = xml_get_my_string_value(node1);
 			if ( update_parameter )
-			{ strings.update_parameter( name, value, units ); }
+			{
+				try { strings.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ strings.add_parameter( name, value , units ); }
+			}
 			else
 			{ strings.add_parameter( name, value , units ); }
 		}
@@ -672,7 +686,11 @@ void User_Parameters::read_from_pugixml( pugi::xml_node parent_node , bool updat
 		{
 			double value = xml_get_my_double_value(node1);
 			if ( update_parameter )
-			{ doubles.update_parameter( name, value, units ); }
+			{
+				try { doubles.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ doubles.add_parameter( name , value, units ); }
+			}
 			else
 			{ doubles.add_parameter( name , value, units ); }
 		}
@@ -763,7 +781,11 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node , bool update_den
 		if( i == 0 )
 		{ microenvironment.set_density( 0, name, units ); }
 		else if( update_density )
-		{ microenvironment.update_density( name, units ); }
+		{
+			try { microenvironment.update_density( name, units ); }
+			catch (const std::domain_error& e)
+			{ microenvironment.add_density( name, units ); }
+		}
 		else
 		{ microenvironment.add_density( name, units ); }
 		
