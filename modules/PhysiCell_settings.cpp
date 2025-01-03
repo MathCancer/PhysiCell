@@ -79,7 +79,7 @@ bool physicell_config_dom_initialized = false;
 pugi::xml_document physicell_config_doc; 	
 pugi::xml_node physicell_config_root; 
 	
-bool load_PhysiCell_config_file( std::string filename )
+bool load_PhysiCell_config_file( std::string filename , bool update_variables )
 {
 	std::cout << "Using config file " << filename << " ... " << std::endl ; 
 	pugi::xml_parse_result result = physicell_config_doc.load_file( filename.c_str()  );
@@ -96,21 +96,23 @@ bool load_PhysiCell_config_file( std::string filename )
 	PhysiCell_settings.read_from_pugixml(); 
 	
 	// now read the microenvironment (optional) 
-	
-	if( !setup_microenvironment_from_XML( physicell_config_root ) )
+	if( !update_variables )
 	{
-		std::cout << std::endl 
-				  << "Warning: microenvironment_setup not found in " << filename << std::endl 
-				  << "         Either manually setup microenvironment in setup_microenvironment() (custom.cpp)" << std::endl
-				  << "         or consult documentation to add microenvironment_setup to your configuration file." << std::endl << std::endl; 
+		if( !setup_microenvironment_from_XML( physicell_config_root ) )
+		{
+			std::cout << std::endl
+			<< "Warning: microenvironment_setup not found in " << filename << std::endl
+			<< "         Either manually setup microenvironment in setup_microenvironment() (custom.cpp)" << std::endl
+			<< "         or consult documentation to add microenvironment_setup to your configuration file." << std::endl << std::endl;
+		}
 	}
 	
 	// now read user parameters
 	
-	parameters.read_from_pugixml( physicell_config_root ); 
-
+	parameters.read_from_pugixml( physicell_config_root, update_variables );
+	
 	create_output_directory( PhysiCell_settings.folder );
-
+	
 	return true; 	
 }
 
@@ -325,8 +327,8 @@ void PhysiCell_Settings::read_from_pugixml( void )
 
 bool create_directories(const std::string &path)
 {
-    size_t pos = 0;
-    std::string currentPath;
+	size_t pos = 0;
+	std::string currentPath;
 
 	// Check for Unix-like absolute path or Windows absolute path with drive letter
 	if (path[0] == '\\' || path[0] == '/')
@@ -339,12 +341,12 @@ bool create_directories(const std::string &path)
 	}
 
 	while ((pos = path.find_first_of("/\\", pos)) != std::string::npos) {
-        currentPath = path.substr(0, pos++);
-        if (!create_directory(currentPath)) {
-            return false;
-        }
-    }
-    return create_directory(path);
+		currentPath = path.substr(0, pos++);
+		if (!create_directory(currentPath)) {
+			return false;
+		}
+	}
+	return create_directory(path);
 }
 
 bool create_directory(const std::string &path)
@@ -537,7 +539,7 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value )
 template <class T>
 void Parameters<T>::add_parameter( std::string my_name , T my_value , std::string my_units )
 {
-	assert_not_exists(my_name);
+	assert_parameter_not_exists(my_name);
 
 	Parameter<T>* pNew; 
 	pNew = new Parameter<T> ;
@@ -556,7 +558,7 @@ void Parameters<T>::add_parameter( std::string my_name , T my_value , std::strin
 template <class T>
 void Parameters<T>::add_parameter( Parameter<T> param )
 {
-	assert_not_exists(param.name);
+	assert_parameter_not_exists(param.name);
 
 	int n = parameters.size(); 
 	parameters.push_back( param); 
@@ -565,13 +567,49 @@ void Parameters<T>::add_parameter( Parameter<T> param )
 }
 
 template <class T>
-void Parameters<T>::assert_not_exists( std::string search_name )
+void Parameters<T>::assert_parameter_not_exists( std::string search_name )
 {
 	if( find_index( search_name ) == -1 )
 	{ return; }
 
-	std::cout << "ERROR: Parameter " << search_name << " already exists. Make sure all parameters (of a given type) have unique names." << std::endl;
-	exit(-1);
+	throw std::domain_error { "ERROR: Parameter " + search_name + " already exists. Make sure all parameters (of a given type) have unique names." };
+}
+
+template <class T>
+int Parameters<T>::assert_parameter_exists( std::string search_name )
+{
+
+	int parameter_index = find_index( search_name );
+	if( parameter_index != -1 )
+	{ return parameter_index; }
+
+	throw std::domain_error { "Error: parameter named " + search_name + " does not exist. Cannot update the parameter!" };
+}
+
+template <class T>
+void Parameters<T>::update_parameter( std::string my_name , T my_value )
+{
+	int parameter_index = assert_parameter_exists( my_name );
+	parameters[ parameter_index ].value = my_value;
+	return;
+}
+
+template <class T>
+void Parameters<T>::update_parameter( std::string my_name , T my_value , std::string my_units )
+{
+	int parameter_index = assert_parameter_exists( my_name );
+	parameters[ parameter_index ].value = my_value;
+	parameters[ parameter_index ].units = my_units;
+	return;
+}
+
+template <class T>
+void Parameters<T>::update_parameter( Parameter<T> param )
+{
+	int parameter_index = assert_parameter_exists( param.name );
+	parameters[ parameter_index ].value = param.value;
+	parameters[ parameter_index ].units = param.units;
+	return;
 }
 
 std::ostream& operator<<( std::ostream& os , const User_Parameters up )
@@ -583,48 +621,87 @@ std::ostream& operator<<( std::ostream& os , const User_Parameters up )
 	return os; 
 }
 
-void User_Parameters::read_from_pugixml( pugi::xml_node parent_node )
+void User_Parameters::read_from_pugixml( pugi::xml_node parent_node , bool update_parameter )
 {
-	pugi::xml_node node = xml_find_node( parent_node , "user_parameters" ); 
+	pugi::xml_node node = xml_find_node( parent_node , "user_parameters" );
 	
-	pugi::xml_node node1 = node.first_child(); 
-	int i = 0; 
+	pugi::xml_node node1 = node.first_child();
+	int i = 0;
 	while( node1 )
 	{
 		std::string name = xml_get_my_name( node1 );
-		std::string units = node1.attribute( "units" ).value(); 
+		std::string units = node1.attribute( "units" ).value();
 		if( units == "" )
-		{ units = "dimensionless"; } 
+		{ units = "dimensionless"; }
 		
 		std::string type = node1.attribute( "type" ).value();
 
 		if (type == "bool")
 		{
 			bool value = xml_get_my_bool_value(node1);
-			bools.add_parameter(name, value, units);
+			if ( update_parameter )
+			{
+				try { bools.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ bools.add_parameter( name , value, units ); }
+			}
+			else
+			{ bools.add_parameter( name , value, units ); }
 		}
+
 		else if (type == "int")
 		{
 			int value = xml_get_my_int_value(node1);
-			ints.add_parameter(name, value, units);
+			if ( update_parameter )
+			{
+				try { ints.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ ints.add_parameter( name, value, units ); }
+			}
+			else
+			{ ints.add_parameter( name , value, units ); }
 		}
+
 		else if (type == "double")
 		{
 			double value = xml_get_my_double_value(node1);
-			doubles.add_parameter(name, value, units);
+			if ( update_parameter )
+			{
+				try { doubles.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ doubles.add_parameter( name , value, units ); }
+			}
+			else
+			{ doubles.add_parameter( name , value, units ); }
 		}
+
 		else if (type == "string")
 		{
 			std::string value = xml_get_my_string_value(node1);
-			strings.add_parameter(name, value, units);
+			if ( update_parameter )
+			{
+				try { strings.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ strings.add_parameter( name, value , units ); }
+			}
+			else
+			{ strings.add_parameter( name, value , units ); }
 		}
+
 		else // default if no type specified
 		{
 			double value = xml_get_my_double_value(node1);
-			doubles.add_parameter(name, value, units);
+			if ( update_parameter )
+			{
+				try { doubles.update_parameter( name, value, units ); }
+				catch (const std::domain_error& e)
+				{ doubles.add_parameter( name , value, units ); }
+			}
+			else
+			{ doubles.add_parameter( name , value, units ); }
 		}
 
-		node1 = node1.next_sibling(); 
+		node1 = node1.next_sibling();
 		i++; 
 	}
 	
@@ -986,4 +1063,4 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 bool setup_microenvironment_from_XML( void )
 { return setup_microenvironment_from_XML( physicell_config_root ); }
 
-}; 
+};

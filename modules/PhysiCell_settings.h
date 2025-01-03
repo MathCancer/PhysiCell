@@ -89,7 +89,7 @@ namespace PhysiCell{
  	
 extern pugi::xml_node physicell_config_root; 
 
-bool load_PhysiCell_config_file( std::string filename );
+bool load_PhysiCell_config_file( std::string filename , bool update_variables = false );
 
 class PhysiCell_Settings
 {
@@ -186,17 +186,20 @@ class Parameters
 	friend std::ostream& operator<<( std::ostream& os , const Parameters<Y>& params ); 
 
  public: 
-	Parameters(); 
+	Parameters();
  
-	std::vector< Parameter<T> > parameters; 
+	std::vector< Parameter<T> > parameters;
 	
-	void add_parameter( std::string my_name ); 
-	void add_parameter( std::string my_name , T my_value ); 
-	void add_parameter( std::string my_name , T my_value , std::string my_units ); 
-	
+	void add_parameter( std::string my_name );
+	void add_parameter( std::string my_name , T my_value );
+	void add_parameter( std::string my_name , T my_value , std::string my_units );
 	void add_parameter( Parameter<T> param );
+
+	void update_parameter( std::string my_name , T my_value );
+	void update_parameter( std::string my_name , T my_value , std::string my_units );
+	void update_parameter( Parameter<T> param );
 	
-	int find_index( std::string search_name ); 
+	int find_index( std::string search_name );
 	
 	// these access the values 
 	T& operator()( int i );
@@ -208,7 +211,8 @@ class Parameters
 	
 	int size( void ) const;
 
-	void assert_not_exists(std::string search_name);
+	void assert_parameter_not_exists(std::string search_name);
+	int assert_parameter_exists(std::string search_name);
 };
 
 class User_Parameters
@@ -222,7 +226,7 @@ class User_Parameters
 	Parameters<double> doubles; 
 	Parameters<std::string> strings; 
 	
-	void read_from_pugixml( pugi::xml_node parent_node );
+	void read_from_pugixml( pugi::xml_node parent_node , bool update_parameter = false );
 }; 
 
 extern PhysiCell_Globals PhysiCell_globals; 
