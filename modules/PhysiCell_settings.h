@@ -89,7 +89,7 @@ namespace PhysiCell{
  	
 extern pugi::xml_node physicell_config_root; 
 
-bool load_PhysiCell_config_file( std::string filename );
+bool load_PhysiCell_config_file( std::string filename , bool reload = false );
 
 class PhysiCell_Settings
 {
