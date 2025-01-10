@@ -145,7 +145,8 @@ void save_PhysiCell_to_MultiCellDS_v2( std::string filename_base , Microenvironm
 	// now, add the PhysiCell data 
 
 	// add_PhysiCell_cells_to_open_xml_pugi( BioFVM::biofvm_doc , filename_base , M  ); 
-	add_PhysiCell_cells_to_open_xml_pugi_v2( BioFVM::biofvm_doc , filename_base , M  ); 
+	if (all_cells->size() > 0)
+		add_PhysiCell_cells_to_open_xml_pugi_v2( BioFVM::biofvm_doc , filename_base , M  ); 
 
 	// Lastly, save to the indicated filename 
 
