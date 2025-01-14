@@ -253,7 +253,7 @@ bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index )
 // TODO? fix confusing swapped usage of args
 double Microenvironment::get_substrate_dirichlet_value( int substrate_index, int index )
 { 
-    return dirichlet_value_vectors[index][substrate_index]; 
+	return dirichlet_value_vectors[index][substrate_index];
 }  
 
 // new functions for finer-grained control of Dirichlet conditions -- 1.7.0
@@ -487,7 +487,7 @@ void Microenvironment::add_density( std::string name , std::string units )
 
 void Microenvironment::add_density( std::string name , std::string units, double diffusion_constant, double decay_rate )
 {
-	// fix in PhysiCell preview November 2017 
+	// check if density exist
 	if ( find_density_index( name ) != -1 )
 	{
 		std::cout << "ERROR: density named " << name << " already exists. You probably want your substrates all have unique names!" << std::endl;
@@ -1146,55 +1146,58 @@ Microenvironment_Options::Microenvironment_Options()
 
 Microenvironment_Options default_microenvironment_options; 
 
-void initialize_microenvironment( void )
+void initialize_microenvironment( bool reload )
 {
-	// create and name a microenvironment; 
-	microenvironment.name = default_microenvironment_options.name;
-	// register the diffusion solver 
-	if( default_microenvironment_options.simulate_2D == true )
+	if ( ! reload )
 	{
-		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
-	}
-	else
-	{
-		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D; 
-	}
-	
-	// set the default substrate to oxygen (with typical units of mmHg)
-	if( default_microenvironment_options.use_oxygen_as_first_field == true )
-	{
-		microenvironment.set_density(0, "oxygen" , "mmHg" );
-		microenvironment.diffusion_coefficients[0] = 1e5; 
-		microenvironment.decay_rates[0] = 0.1; 
-	}
-	
-	// resize the microenvironment  
-	if( default_microenvironment_options.simulate_2D == true )
-	{
-		default_microenvironment_options.Z_range[0] = -default_microenvironment_options.dz/2.0; 
-		default_microenvironment_options.Z_range[1] = default_microenvironment_options.dz/2.0;
-	}
-	microenvironment.resize_space( default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
-		default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1], 
-		default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], 
-		default_microenvironment_options.dx,default_microenvironment_options.dy,default_microenvironment_options.dz );
+		// create and name a microenvironment;
+		microenvironment.name = default_microenvironment_options.name;
+		// register the diffusion solver
+		if( default_microenvironment_options.simulate_2D == true )
+		{
+			microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D;
+		}
+		else
+		{
+			microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D;
+		}
 		
-	// set units
-	microenvironment.spatial_units = default_microenvironment_options.spatial_units;
-	microenvironment.time_units = default_microenvironment_options.time_units;
-	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
-
-	// set the initial densities to the values set in the initial_condition_vector
-	
-	// if the initial condition vector has not been set, use the Dirichlet condition vector 
-	if( default_microenvironment_options.initial_condition_vector.size() != 
-		microenvironment.number_of_densities() )
-	{
-		std::cout << "BioFVM Warning: Initial conditions not set. " << std::endl 
-				  << "                Using Dirichlet condition vector to set initial substrate values!" << std::endl 
-				  << "                In the future, set default_microenvironment_options.initial_condition_vector." 
-				  << std::endl << std::endl;  
-		default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector; 
+		// set the default substrate to oxygen (with typical units of mmHg)
+		if( default_microenvironment_options.use_oxygen_as_first_field == true )
+		{
+			microenvironment.set_density( 0, "oxygen" , "mmHg" );
+			microenvironment.diffusion_coefficients[0] = 1e5;
+			microenvironment.decay_rates[0] = 0.1;
+		}
+		
+		// resize the microenvironment
+		if( default_microenvironment_options.simulate_2D == true )
+		{
+			default_microenvironment_options.Z_range[0] = -default_microenvironment_options.dz/2.0;
+			default_microenvironment_options.Z_range[1] = default_microenvironment_options.dz/2.0;
+		}
+		microenvironment.resize_space( default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1], 
+			default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1], 
+			default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], 
+			default_microenvironment_options.dx,default_microenvironment_options.dy,default_microenvironment_options.dz );
+		
+		// set units
+		microenvironment.spatial_units = default_microenvironment_options.spatial_units;
+		microenvironment.time_units = default_microenvironment_options.time_units;
+		microenvironment.mesh.units = default_microenvironment_options.spatial_units;
+		
+		// set the initial densities to the values set in the initial_condition_vector
+		
+		// if the initial condition vector has not been set, use the Dirichlet condition vector
+		if( default_microenvironment_options.initial_condition_vector.size() != 
+			microenvironment.number_of_densities() )
+		{
+			std::cout << "BioFVM Warning: Initial conditions not set. " << std::endl
+				<< "                Using Dirichlet condition vector to set initial substrate values!" << std::endl
+				<< "                In the future, set default_microenvironment_options.initial_condition_vector."
+				<< std::endl << std::endl;
+			default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector;
+		}
 	}
 
 	// set the initial condition

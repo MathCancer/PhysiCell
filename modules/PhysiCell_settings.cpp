@@ -79,7 +79,7 @@ bool physicell_config_dom_initialized = false;
 pugi::xml_document physicell_config_doc; 	
 pugi::xml_node physicell_config_root; 
 	
-bool load_PhysiCell_config_file( std::string filename )
+bool load_PhysiCell_config_file( std::string filename , bool reload )
 {
 	std::cout << "Using config file " << filename << " ... " << std::endl ; 
 	pugi::xml_parse_result result = physicell_config_doc.load_file( filename.c_str()  );
@@ -97,17 +97,22 @@ bool load_PhysiCell_config_file( std::string filename )
 	
 	// now read the microenvironment (optional) 
 	
-	if( !setup_microenvironment_from_XML( physicell_config_root ) )
+	if ( !reload )
 	{
-		std::cout << std::endl 
-				  << "Warning: microenvironment_setup not found in " << filename << std::endl 
-				  << "         Either manually setup microenvironment in setup_microenvironment() (custom.cpp)" << std::endl
-				  << "         or consult documentation to add microenvironment_setup to your configuration file." << std::endl << std::endl; 
+		if( !setup_microenvironment_from_XML( physicell_config_root ) )
+		{
+			std::cout << std::endl
+				<< "Warning: microenvironment_setup not found in " << filename << std::endl
+				<< "         Either manually setup microenvironment in setup_microenvironment() (custom.cpp)" << std::endl
+				<< "         or consult documentation to add microenvironment_setup to your configuration file." << std::endl << std::endl;
+		}
 	}
 	
 	// now read user parameters
-	
-	parameters.read_from_pugixml( physicell_config_root ); 
+	if( !reload )
+	{
+		parameters.read_from_pugixml( physicell_config_root );
+	}
 
 	create_output_directory( PhysiCell_settings.folder );
 
