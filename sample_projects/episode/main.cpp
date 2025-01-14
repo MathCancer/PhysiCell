@@ -116,7 +116,7 @@ int main( int argc, char* argv[] )
 		// generate output folder
 		std::string folder = "output" + std::to_string( i_episode );
 		#if defined(_WIN32)
-		_mkdir( folder.c_str() );
+		mkdir( folder.c_str() );
                 #else
 		mkdir( folder.c_str(), 0775 );
 		#endif
