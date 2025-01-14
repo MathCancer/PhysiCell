@@ -34,7 +34,7 @@ jobs:
           {project: "pred-prey-farmer", name: "PhysiCell prey predator", binary: "pred_prey", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "rules-sample", name: "PhysiCell rules sample", binary: "rules_sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "asymmetric-division-sample", name: "PhysiCell asymmetric division", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""}
-          {project: "episode", name: "PhysiCell Episode", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output003"},
+          {project: "episode", name: "PhysiCell Episode", binary: "project", max_time: 120, config: "config/PhysiCell_settings.xml", output_folder: "output3"},
         ]
         
     name: Testing ${{ matrix.projects.name }} on ${{ matrix.os.name }}

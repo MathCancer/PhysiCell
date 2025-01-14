@@ -95,7 +95,10 @@ int main( int argc, char* argv[] )
 	// EPISODE LOOP BEGIN //
 	////////////////////////
 
+	// densities and cell types have to be defined in the first episode
+	// and then reloaded in all following episodes!
 	bool reload = false;
+
 	for ( int i_episode = 0; i_episode < 4; i_episode++ )
 	{
 		///////////
@@ -111,7 +114,7 @@ int main( int argc, char* argv[] )
 		std::string ( *substrate_coloring_function )( double, double, double ) = paint_by_density_percentage;
 
 		// generate output folder
-		std::string folder = "output00" + std::to_string( i_episode % 4 );
+		std::string folder = "output" + std::to_string( i_episode );
 		mkdir( folder.c_str(), 0775 );
 
 		// handle settings file
@@ -131,13 +134,11 @@ int main( int argc, char* argv[] )
 		XML_status = load_PhysiCell_config_file( settingxml, reload );
 		if ( !XML_status ) { exit( -1 ); }
 		PhysiCell_settings.folder = folder;
-		//PhysiCell_settings.max_time = 1440 + ( std::rand() % ( 5040 - 1440 + 1 ) );
-		//PhysiCell_settings.max_time = 1440; //1440; //10080;
 
 		// OpenMP setup
 		omp_set_num_threads( PhysiCell_settings.omp_num_threads );
 
-		if ( !reload )
+		if ( !reload )  // defined densities and cell types
 		{
 			// setup microenviroment and mechanics voxel size and match the data structure to BioFVM
 			std::cout << "set densities ..." << std::endl;
@@ -149,6 +150,9 @@ int main( int argc, char* argv[] )
 			std::cout << "load cell type definition and setup tissue ..." << std::endl;
 			generate_cell_types();  // modify this in the custom code
 			setup_tissue();  // modify this in the custom code
+
+			// densities and cell types can only be defined in the first episode
+			// and have to be reloaded in all following episodes!
 			reload = true;
 
 			// set MultiCellDS save options
@@ -158,7 +162,7 @@ int main( int argc, char* argv[] )
 			set_save_biofvm_cell_data_as_custom_matlab( true );
 
 		}
-		else
+		else  // reload densities and cell types
 		{
 			// reset cells
 			std::cout << "reset cells ..." << std::endl;
@@ -178,16 +182,13 @@ int main( int argc, char* argv[] )
 			double mechanics_voxel_size = 30;
 			Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 
-			// load cell type definition and setup tisse
-			std::cout << "relaod cell type definition and setup tissue  ..." << std::endl;
+			// reset tissue
+			std::cout << "reset tissue ..." << std::endl;
 			display_cell_definitions( std::cout );
 			setup_tissue();  // modify this in the custom code
 
-			// set MultiCellDS save options
-			//set_save_biofvm_mesh_as_matlab( true );
-			//set_save_biofvm_data_as_matlab( true );
-			//set_save_biofvm_cell_data( true );
-			//set_save_biofvm_cell_data_as_custom_matlab( true );
+			// MultiCellDS save options
+			// have only to be set once per runtime
 		}
 
 		// copy config file to output directory
@@ -268,7 +269,7 @@ int main( int argc, char* argv[] )
 				}
 
 				// on custom time step
-				if ( custom_countdown < diffusion_dt / 3 )
+				if ( custom_countdown < 0.5 * diffusion_dt )
 				{
 					custom_countdown += custom_dt;
 
@@ -278,7 +279,7 @@ int main( int argc, char* argv[] )
 				}
 
 				// on phenotype time step
-				if ( phenotype_countdown < diffusion_dt / 3 )
+				if ( phenotype_countdown < 0.5 * diffusion_dt )
 				{
 					phenotype_countdown += phenotype_dt;
 
@@ -287,7 +288,7 @@ int main( int argc, char* argv[] )
 				}
 
 				// on mechanics time step
-				if ( mechanics_countdown < diffusion_dt / 3 )
+				if ( mechanics_countdown < 0.5 * diffusion_dt )
 				{
 					mechanics_countdown += mechanics_dt;
 
@@ -314,7 +315,7 @@ int main( int argc, char* argv[] )
 				PhysiCell_globals.current_time += diffusion_dt;
 
 				// save data if it's time.
-				if ( mcds_countdown < diffusion_dt / 3 )
+				if ( mcds_countdown < 0.5 * diffusion_dt )
 				{
 					mcds_countdown += PhysiCell_settings.full_save_interval;
 					PhysiCell_globals.full_output_index++;
@@ -337,7 +338,7 @@ int main( int argc, char* argv[] )
 				}
 
 				// save svg plot if it's time
-				if ( ( PhysiCell_settings.enable_SVG_saves == true ) and ( svg_countdown < diffusion_dt / 3 ) )
+				if ( ( PhysiCell_settings.enable_SVG_saves == true ) and ( svg_countdown < 0.5 * diffusion_dt ) )
 				{
 					svg_countdown += PhysiCell_settings.SVG_save_interval;
 					PhysiCell_globals.SVG_output_index++;
