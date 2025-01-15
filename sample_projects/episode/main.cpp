@@ -95,8 +95,6 @@ int main( int argc, char* argv[] )
 	// EPISODE LOOP BEGIN //
 	////////////////////////
 
-	// densities and cell types have to be defined in the first episode
-	// and then reloaded in all following episodes!
 	for ( int i_episode = 0; i_episode < 4; i_episode++ )
 	{
 		///////////
@@ -125,30 +123,20 @@ int main( int argc, char* argv[] )
 		// time setup
 		std::string time_units = "min";
 
-		// load xml file
-		std::cout << "load setting xml " << settingxml << " ..." << std::endl;
-		bool XML_status = false;
-		if ( i_episode ==0 )
+		// densities and cell types can only be defined in the first episode
+		// and have to be reloaded in all following episodes!
+		if ( i_episode == 0 )
 		{
+			// load xml file
+			std::cout << "load setting xml " << settingxml << " ..." << std::endl;
+			bool XML_status = false;
 			XML_status = load_PhysiCell_config_file( settingxml );
-		}
-		else
-		{
-			XML_status = read_PhysiCell_config_file( settingxml );
-			if (XML_status)
-			{
-				PhysiCell_settings.read_from_pugixml();
-			}
-		}
-		if ( !XML_status ) { exit( -1 ); }
-		PhysiCell_settings.folder = folder;
-		create_output_directory( PhysiCell_settings.folder );
+			PhysiCell_settings.folder = folder;
+			create_output_directory( PhysiCell_settings.folder );
 
-		// OpenMP setup
-		omp_set_num_threads( PhysiCell_settings.omp_num_threads );
+`			// OpenMP setup
+			omp_set_num_threads( PhysiCell_settings.omp_num_threads );
 
-		if ( i_episode==0 )  // defined densities and cell types
-		{
 			// setup microenviroment and mechanics voxel size and match the data structure to BioFVM
 			std::cout << "set densities ..." << std::endl;
 			setup_microenvironment();  // modify this in the custom code
@@ -167,8 +155,20 @@ int main( int argc, char* argv[] )
 			set_save_biofvm_cell_data_as_custom_matlab( true );
 
 		}
-		else  // reload densities and cell types
+		else
 		{
+			// load xml file
+			std::cout << "load setting xml " << settingxml << " ..." << std::endl;
+			bool XML_status = false;
+			XML_status = read_PhysiCell_config_file( settingxml );
+			if ( XML_status ) { PhysiCell_settings.read_from_pugixml(); }
+			if ( !XML_status ) { exit( -1 ); }
+			PhysiCell_settings.folder = folder;
+			create_output_directory( PhysiCell_settings.folder );
+
+			// OpenMP setup
+			omp_set_num_threads( PhysiCell_settings.omp_num_threads );
+
 			// reset cells
 			std::cout << "reset cells ..." << std::endl;
 			for ( Cell* pCell: (*all_cells) ) {
