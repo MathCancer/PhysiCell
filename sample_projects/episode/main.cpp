@@ -110,7 +110,8 @@ int main( int argc, char* argv[] )
 		std::string ( *substrate_coloring_function )( double, double, double ) = paint_by_density_percentage;
 
 		// generate output folder
-		std::string folder = "output" + std::to_string( i_episode );
+		std::string s_episode = std::to_string( i_episode );
+		std::string folder = "output/episode" + s_episode.insert( 0, 8 - s_episode.length(), '0');
 
 		// handle settings file
 		std::string settingxml = "config/PhysiCell_settings.xml";
@@ -208,7 +209,7 @@ int main( int argc, char* argv[] )
 		// save data simulation snapshot output00000000
 		if ( PhysiCell_settings.enable_full_saves == true )
 		{
-			sprintf( filename, "%s/output%08u", PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index );
+			sprintf( filename, "%s/output%08u", PhysiCell_settings.folder.c_str(), PhysiCell_globals.full_output_index );
 			save_PhysiCell_to_MultiCellDS_v2( filename, microenvironment, PhysiCell_globals.current_time );
 		}
 
