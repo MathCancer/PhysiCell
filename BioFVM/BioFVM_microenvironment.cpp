@@ -1146,62 +1146,63 @@ Microenvironment_Options::Microenvironment_Options()
 
 Microenvironment_Options default_microenvironment_options; 
 
-void initialize_microenvironment( bool reload )
+void initialize_microenvironment( void )
 {
-	if ( ! reload )
+	// create and name a microenvironment; 
+	microenvironment.name = default_microenvironment_options.name;
+	// register the diffusion solver 
+	if( default_microenvironment_options.simulate_2D == true )
 	{
-		// create and name a microenvironment;
-		microenvironment.name = default_microenvironment_options.name;
-		// register the diffusion solver
-		if( default_microenvironment_options.simulate_2D == true )
-		{
-			microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D;
-		}
-		else
-		{
-			microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D;
-		}
+		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_2D; 
+	}
+	else
+	{
+		microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_3D; 
+	}
+	
+	// set the default substrate to oxygen (with typical units of mmHg)
+	if( default_microenvironment_options.use_oxygen_as_first_field == true )
+	{
+		microenvironment.set_density(0, "oxygen" , "mmHg" );
+		microenvironment.diffusion_coefficients[0] = 1e5; 
+		microenvironment.decay_rates[0] = 0.1; 
+	}
+	
+	// resize the microenvironment  
+	if( default_microenvironment_options.simulate_2D == true )
+	{
+		default_microenvironment_options.Z_range[0] = -default_microenvironment_options.dz/2.0; 
+		default_microenvironment_options.Z_range[1] = default_microenvironment_options.dz/2.0;
+	}
+	microenvironment.resize_space( default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
+		default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1], 
+		default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], 
+		default_microenvironment_options.dx,default_microenvironment_options.dy,default_microenvironment_options.dz );
 		
-		// set the default substrate to oxygen (with typical units of mmHg)
-		if( default_microenvironment_options.use_oxygen_as_first_field == true )
-		{
-			microenvironment.set_density( 0, "oxygen" , "mmHg" );
-			microenvironment.diffusion_coefficients[0] = 1e5;
-			microenvironment.decay_rates[0] = 0.1;
-		}
-		
-		// resize the microenvironment
-		if( default_microenvironment_options.simulate_2D == true )
-		{
-			default_microenvironment_options.Z_range[0] = -default_microenvironment_options.dz/2.0;
-			default_microenvironment_options.Z_range[1] = default_microenvironment_options.dz/2.0;
-		}
-		microenvironment.resize_space( default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1], 
-			default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1], 
-			default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], 
-			default_microenvironment_options.dx,default_microenvironment_options.dy,default_microenvironment_options.dz );
-		
-		// set units
-		microenvironment.spatial_units = default_microenvironment_options.spatial_units;
-		microenvironment.time_units = default_microenvironment_options.time_units;
-		microenvironment.mesh.units = default_microenvironment_options.spatial_units;
-		
-		// set the initial densities to the values set in the initial_condition_vector
-		
-		// if the initial condition vector has not been set, use the Dirichlet condition vector
-		if( default_microenvironment_options.initial_condition_vector.size() != 
-			microenvironment.number_of_densities() )
-		{
-			std::cout << "BioFVM Warning: Initial conditions not set. " << std::endl
-				<< "                Using Dirichlet condition vector to set initial substrate values!" << std::endl
-				<< "                In the future, set default_microenvironment_options.initial_condition_vector."
-				<< std::endl << std::endl;
-			default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector;
-		}
+	// set units
+	microenvironment.spatial_units = default_microenvironment_options.spatial_units;
+	microenvironment.time_units = default_microenvironment_options.time_units;
+	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
+
+	// set the initial densities to the values set in the initial_condition_vector
+	
+	// if the initial condition vector has not been set, use the Dirichlet condition vector 
+	if( default_microenvironment_options.initial_condition_vector.size() != 
+		microenvironment.number_of_densities() )
+	{
+		std::cout << "BioFVM Warning: Initial conditions not set. " << std::endl 
+				  << "                Using Dirichlet condition vector to set initial substrate values!" << std::endl 
+				  << "                In the future, set default_microenvironment_options.initial_condition_vector." 
+				  << std::endl << std::endl;  
+		default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector; 
 	}
 
 	// set the initial condition
+	set_microenvironment_initial_condition();
+}
 
+void set_microenvironment_initial_condition( void )
+{
 	if (default_microenvironment_options.initial_condition_from_file_enabled)
 	{
 		if (default_microenvironment_options.initial_condition_file_type=="matlab")
@@ -1392,51 +1393,6 @@ void initialize_microenvironment( bool reload )
 		}
 		
 	}
-	
-/*
-	if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
-	{
-		
-		for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
-		{
-			// set Dirichlet conditions along the 4 outer edges 
-			for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
-			{
-				int J = microenvironment.mesh.y_coordinates.size()-1;
-				microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,0,k) , default_microenvironment_options.Dirichlet_condition_vector );
-				microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_condition_vector );
-			}
-			int I = microenvironment.mesh.x_coordinates.size()-1;
-			for( unsigned int j=1; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
-			{
-				microenvironment.add_dirichlet_node( microenvironment.voxel_index(0,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
-				microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_condition_vector );
-			}		
-		}
-		// if 3-D, also along the corresponding additional faces 
-		if( default_microenvironment_options.simulate_2D == false )
-		{
-			int K = microenvironment.mesh.z_coordinates.size()-1; 
-			for( unsigned int j=1 ; j < microenvironment.mesh.y_coordinates.size()-1 ; j++ )
-			{
-				for( unsigned int i=1; i < microenvironment.mesh.x_coordinates.size()-1 ; i++ )
-				{
-					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,0) , default_microenvironment_options.Dirichlet_condition_vector );
-					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_condition_vector );
-				}	
-			}	
-		}
-		
-	}
-*/
-	
-    // April 2023: no longer necessary after flipping our approach and doing an "additive" instead of "subtractive" DCs handling. I.e., we assume DC activation is false by default; make true on-demand.
-
-	// // set the Dirichlet condition activation vector to match the microenvironment options
-	// for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
-	// {
-	// 	microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] );
-	// }
 
 	microenvironment.display_information(std::cout);
 	return;

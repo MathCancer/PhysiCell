@@ -79,10 +79,12 @@ bool physicell_config_dom_initialized = false;
 pugi::xml_document physicell_config_doc; 	
 pugi::xml_node physicell_config_root; 
 	
-bool load_PhysiCell_config_file( std::string filename , bool reload )
+bool read_PhysiCell_config_file( std::string filename )
 {
+	physicell_config_dom_initialized = false; 
+
 	std::cout << "Using config file " << filename << " ... " << std::endl ; 
-	pugi::xml_parse_result result = physicell_config_doc.load_file( filename.c_str()  );
+	pugi::xml_parse_result result = physicell_config_doc.load_file( filename.c_str() );
 	
 	if( result.status != pugi::xml_parse_status::status_ok )
 	{
@@ -92,27 +94,28 @@ bool load_PhysiCell_config_file( std::string filename , bool reload )
 	
 	physicell_config_root = physicell_config_doc.child("PhysiCell_settings");
 	physicell_config_dom_initialized = true; 
-	
+	return true;
+}
+
+bool load_PhysiCell_config_file( std::string filename )
+{
+	if (!read_PhysiCell_config_file( filename ))
+	{ return false; }
+
 	PhysiCell_settings.read_from_pugixml(); 
 	
 	// now read the microenvironment (optional) 
 	
-	if ( !reload )
+	if( !setup_microenvironment_from_XML( physicell_config_root ) )
 	{
-		if( !setup_microenvironment_from_XML( physicell_config_root ) )
-		{
-			std::cout << std::endl
-				<< "Warning: microenvironment_setup not found in " << filename << std::endl
-				<< "         Either manually setup microenvironment in setup_microenvironment() (custom.cpp)" << std::endl
-				<< "         or consult documentation to add microenvironment_setup to your configuration file." << std::endl << std::endl;
-		}
+		std::cout << std::endl
+			<< "Warning: microenvironment_setup not found in " << filename << std::endl
+			<< "         Either manually setup microenvironment in setup_microenvironment() (custom.cpp)" << std::endl
+			<< "         or consult documentation to add microenvironment_setup to your configuration file." << std::endl << std::endl;
 	}
 	
 	// now read user parameters
-	if( !reload )
-	{
-		parameters.read_from_pugixml( physicell_config_root );
-	}
+	parameters.read_from_pugixml( physicell_config_root );
 
 	create_output_directory( PhysiCell_settings.folder );
 
