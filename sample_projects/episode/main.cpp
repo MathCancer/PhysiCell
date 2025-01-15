@@ -97,8 +97,6 @@ int main( int argc, char* argv[] )
 
 	// densities and cell types have to be defined in the first episode
 	// and then reloaded in all following episodes!
-	bool reload = false;
-
 	for ( int i_episode = 0; i_episode < 4; i_episode++ )
 	{
 		///////////
@@ -115,11 +113,6 @@ int main( int argc, char* argv[] )
 
 		// generate output folder
 		std::string folder = "output" + std::to_string( i_episode );
-		#if defined(_WIN32)
-		mkdir( folder.c_str() );
-                #else
-		mkdir( folder.c_str(), 0775 );
-		#endif
 
 		// handle settings file
 		std::string settingxml = "config/PhysiCell_settings.xml";
@@ -135,18 +128,30 @@ int main( int argc, char* argv[] )
 		// load xml file
 		std::cout << "load setting xml " << settingxml << " ..." << std::endl;
 		bool XML_status = false;
-		XML_status = load_PhysiCell_config_file( settingxml, reload );
+		if ( i_episode ==0 )
+		{
+			XML_status = load_PhysiCell_config_file( settingxml );
+		}
+		else
+		{
+			XML_status = read_PhysiCell_config_file( settingxml );
+			if (XML_status)
+			{
+				PhysiCell_settings.read_from_pugixml();
+			}
+		}
 		if ( !XML_status ) { exit( -1 ); }
 		PhysiCell_settings.folder = folder;
+		create_output_directory( PhysiCell_settings.folder );
 
 		// OpenMP setup
 		omp_set_num_threads( PhysiCell_settings.omp_num_threads );
 
-		if ( !reload )  // defined densities and cell types
+		if ( i_episode==0 )  // defined densities and cell types
 		{
 			// setup microenviroment and mechanics voxel size and match the data structure to BioFVM
 			std::cout << "set densities ..." << std::endl;
-			setup_microenvironment( reload );  // modify this in the custom code
+			setup_microenvironment();  // modify this in the custom code
 			double mechanics_voxel_size = 30;
 			Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 
@@ -154,10 +159,6 @@ int main( int argc, char* argv[] )
 			std::cout << "load cell type definition and setup tissue ..." << std::endl;
 			generate_cell_types();  // modify this in the custom code
 			setup_tissue();  // modify this in the custom code
-
-			// densities and cell types can only be defined in the first episode
-			// and have to be reloaded in all following episodes!
-			reload = true;
 
 			// set MultiCellDS save options
 			set_save_biofvm_mesh_as_matlab( true );
@@ -181,7 +182,7 @@ int main( int argc, char* argv[] )
 
 			// reset microenvironment and mechanics voxel size and match the data structure to BioFVM
 			std::cout << "reset densities ..." << std::endl;
-			setup_microenvironment( reload );  // modify this in the custom code
+			set_microenvironment_initial_condition();
 			microenvironment.display_information( std::cout );
 			double mechanics_voxel_size = 30;
 			Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );

@@ -77,7 +77,7 @@ void generate_cell_types( void );
 void setup_tissue( void );
 
 // set up the BioFVM microenvironment
-void setup_microenvironment( bool reload = false );
+void setup_microenvironment( void );
 
 // custom pathology coloring function
 std::vector<std::string> my_coloring_function( Cell* );
