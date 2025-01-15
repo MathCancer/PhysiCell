@@ -134,7 +134,7 @@ int main( int argc, char* argv[] )
 			PhysiCell_settings.folder = folder;
 			create_output_directory( PhysiCell_settings.folder );
 
-`			// OpenMP setup
+			// OpenMP setup
 			omp_set_num_threads( PhysiCell_settings.omp_num_threads );
 
 			// setup microenviroment and mechanics voxel size and match the data structure to BioFVM
