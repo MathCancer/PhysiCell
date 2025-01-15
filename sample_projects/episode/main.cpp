@@ -127,7 +127,7 @@ int main( int argc, char* argv[] )
 
 		// reset global variables
 		std::cout << "(re)set global variables ..." << std::endl;
-		PhysiCell_globals = PhysiCell_Globals();  // bue 20240624: reset
+		PhysiCell_globals = PhysiCell_Globals();
 
 		// time setup
 		std::string time_units = "min";
@@ -236,7 +236,6 @@ int main( int argc, char* argv[] )
 			log_output( PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file );  // output00000000
 		}
 
-
 		// standard output
 		display_citations();
 		display_simulation_status( std::cout );  // output00000000
@@ -330,7 +329,6 @@ int main( int argc, char* argv[] )
 					if ( PhysiCell_settings.enable_full_saves == true )
 					{
 						sprintf( filename, "%s/output%08u", PhysiCell_settings.folder.c_str(), PhysiCell_globals.full_output_index );
-
 						save_PhysiCell_to_MultiCellDS_v2( filename, microenvironment, PhysiCell_globals.current_time );
 					}
 
