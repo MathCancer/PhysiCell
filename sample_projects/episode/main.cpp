@@ -111,7 +111,7 @@ int main( int argc, char* argv[] )
 
 		// generate output folder
 		std::string s_episode = std::to_string( i_episode );
-		std::string folder = "output/episode" + s_episode.insert( 0, 8 - s_episode.length(), '0');
+		std::string folder = "output/episode" + s_episode.insert( 0, 8 - s_episode.length(), '0' );
 
 		// handle settings file
 		std::string settingxml = "config/PhysiCell_settings.xml";
@@ -172,7 +172,8 @@ int main( int argc, char* argv[] )
 
 			// reset cells
 			std::cout << "reset cells ..." << std::endl;
-			for ( Cell* pCell: (*all_cells) ) {
+			for ( Cell* pCell: (*all_cells) )
+			{
 				pCell->die();
 			}
 			BioFVM::reset_max_basic_agent_ID();
