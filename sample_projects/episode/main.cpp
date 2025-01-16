@@ -146,7 +146,7 @@ int main( int argc, char* argv[] )
 
 			// load cell type definition and setup tisse
 			std::cout << "load cell type definition and setup tissue ..." << std::endl;
-			generate_cell_types();  // modify this in the custom code
+			create_cell_types();  // modify this in the custom code
 			setup_tissue();  // modify this in the custom code
 
 			// set MultiCellDS save options
