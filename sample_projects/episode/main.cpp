@@ -109,7 +109,7 @@ int main( int argc, char* argv[] )
 		std::vector<std::string> ( *cell_coloring_function )( Cell* ) = my_coloring_function;  // set a pathology coloring function
 		std::string ( *substrate_coloring_function )( double, double, double ) = paint_by_density_percentage;
 
-		// generate output folder
+		// generate output folder name
 		std::string s_episode = std::to_string( i_episode );
 		std::string folder = "output/episode" + s_episode.insert( 0, 8 - s_episode.length(), '0' );
 
