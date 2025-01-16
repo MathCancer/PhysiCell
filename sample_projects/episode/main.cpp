@@ -114,7 +114,7 @@ int main( int argc, char* argv[] )
 		std::string folder = "output/episode" + s_episode.insert( 0, 8 - s_episode.length(), '0' );
 
 		// handle settings file
-		std::string settingxml = "config/PhysiCell_settings.xml";
+		char* settingxml = "config/PhysiCell_settings.xml";
 		if ( argc > 1 ) { settingxml = argv[1]; };
 
 		// reset global variables
@@ -200,7 +200,7 @@ int main( int argc, char* argv[] )
 
 		// copy config file to output directory
 		char copy_command [1024];
-		sprintf( copy_command, "cp %s %s", settingxml.c_str(), PhysiCell_settings.folder.c_str() );
+		sprintf( copy_command, "cp %s %s", settingxml, PhysiCell_settings.folder.c_str() );
 		system( copy_command );
 
 		// save initial data simulation snapshot
