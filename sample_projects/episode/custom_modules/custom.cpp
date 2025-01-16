@@ -77,7 +77,7 @@ static const std::vector<double> VECTOR_ZERO (4, ZERO);  // generate a 4 charact
 
 // functions
 
-void generate_cell_types(void)
+void generate_cell_types( void )
 {
 	std::cout << "generate cell types ..." << std::endl;
 	std::cout << "cell types can only be defined the first episode of the runtime!" << std::endl;
