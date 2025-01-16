@@ -200,7 +200,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
 
-void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
+void custom_function( Cell* pCell, Phenotype& phenotype, double dt )
 { return; }
 
 void contact_function( Cell* pMe, Phenotype& phenoMe, Cell* pOther, Phenotype& phenoOther, double dt )
