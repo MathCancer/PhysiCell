@@ -114,7 +114,7 @@ int main( int argc, char* argv[] )
 		std::string folder = "output/episode" + s_episode.insert( 0, 8 - s_episode.length(), '0' );
 
 		// handle settings file
-		char* settingxml = "config/PhysiCell_settings.xml";
+		const char* settingxml = "config/PhysiCell_settings.xml";
 		if ( argc > 1 ) { settingxml = argv[1]; };
 
 		// reset global variables
