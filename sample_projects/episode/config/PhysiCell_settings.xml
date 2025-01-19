@@ -23,7 +23,7 @@
     </overall>
 
     <parallel>
-        <omp_num_threads>1</omp_num_threads>
+        <omp_num_threads>8</omp_num_threads>
     </parallel>
 
     <save>
@@ -125,6 +125,11 @@
                         <duration index="2" fixed_duration="true">240.0</duration>
                         <duration index="3" fixed_duration="true">60.0</duration>
                     </phase_durations>
+                    <standard_asymmetric_division enabled="False">
+                        <asymmetric_division_probability name="celltype_a" units="dimensionless">1.0</asymmetric_division_probability>
+                        <asymmetric_division_probability name="celltype_b" units="dimensionless">0</asymmetric_division_probability>
+                        <asymmetric_division_probability name="celltype_c" units="dimensionless">0</asymmetric_division_probability>
+                    </standard_asymmetric_division>
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
@@ -289,6 +294,11 @@
                         <duration index="2" fixed_duration="true">240.0</duration>
                         <duration index="3" fixed_duration="true">60.0</duration>
                     </phase_durations>
+                    <standard_asymmetric_division enabled="False">
+                        <asymmetric_division_probability name="celltype_a" units="dimensionless">0</asymmetric_division_probability>
+                        <asymmetric_division_probability name="celltype_b" units="dimensionless">1.0</asymmetric_division_probability>
+                        <asymmetric_division_probability name="celltype_c" units="dimensionless">0</asymmetric_division_probability>
+                    </standard_asymmetric_division>
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
@@ -453,6 +463,11 @@
                         <duration index="2" fixed_duration="true">240.0</duration>
                         <duration index="3" fixed_duration="true">60.0</duration>
                     </phase_durations>
+                    <standard_asymmetric_division enabled="False">
+                        <asymmetric_division_probability name="celltype_a" units="dimensionless">0</asymmetric_division_probability>
+                        <asymmetric_division_probability name="celltype_b" units="dimensionless">0</asymmetric_division_probability>
+                        <asymmetric_division_probability name="celltype_c" units="dimensionless">1.0</asymmetric_division_probability>
+                    </standard_asymmetric_division>
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
@@ -628,10 +643,10 @@
     </cell_rules>
 
     <user_parameters>
-        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">13</number_of_cells>
-        <my_double3 type="double" units="" description="">3.3</my_double3>
-        <my_int3 type="int" units="" description="">3</my_int3>
-        <my_bool3 type="bool" units="" description="">true</my_bool3>
-        <my_string3 type="string" units="" description="">three</my_string3>
+        <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">12</number_of_cells>
+        <my_double type="double" units="" description="">0.0</my_double>
+        <my_int type="int" units="" description="">0</my_int>
+        <my_bool type="bool" units="" description="">false</my_bool>
+        <my_string type="string" units="" description="">abc</my_string>
     </user_parameters>
 </PhysiCell_settings>
