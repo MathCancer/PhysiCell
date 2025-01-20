@@ -20,6 +20,7 @@ jobs:
           {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
           {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
           {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+          {short_name: "episode", project: "episode-sample", name: "PhysiCell Episode", binary: "project", extra_run: ""},
         ]
     
     runs-on: ubuntu-latest
@@ -32,7 +33,7 @@ jobs:
         make ${{ matrix.projects.project }}
         make clean
         ${{ matrix.projects.extra_run }}
-        make static STATIC_OPENMP=/usr/lib/gcc/x86_64-linux-gnu/11/libgomp.a
+        make static STATIC_OPENMP=/usr/lib/gcc/x86_64-linux-gnu/12/libgomp.a
       
     - name: Checking binary for ${{ matrix.projects.name }}
       run: |
@@ -66,6 +67,7 @@ jobs:
           {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
           {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
           {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+          {short_name: "episode", project: "episode-sample", name: "PhysiCell Episode", binary: "project", extra_run: ""},
         ]
     
     runs-on: windows-latest
@@ -122,6 +124,7 @@ jobs:
           {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
           {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
           {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+          {short_name: "episode", project: "episode-sample", name: "PhysiCell Episode", binary: "project", extra_run: ""},
        ]
     
     runs-on: macos-13
@@ -171,6 +174,7 @@ jobs:
           {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
           {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
           {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+          {short_name: "episode", project: "episode-sample", name: "PhysiCell Episode", binary: "project", extra_run: ""},
         ]
     
     runs-on: macos-14
@@ -220,6 +224,7 @@ jobs:
           {short_name: "rules", project: "rules-sample", name: "PhysiCell Rules", binary: "project", extra_run: ""},
           {short_name: "physimess", project: "physimess-sample", name: "PhysiMeSS", binary: "project", extra_run: ""},
           {short_name: "interaction", project: "interaction-sample", name: "PhysiCell Interaction", binary: "interaction_demo", extra_run: ""},
+          {short_name: "episode", project: "episode-sample", name: "PhysiCell Episode", binary: "project", extra_run: ""},
         ]
         
     runs-on: macos-13

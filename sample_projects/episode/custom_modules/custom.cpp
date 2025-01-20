@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2025, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,194 +65,144 @@
 ###############################################################################
 */
 
-#include "./PhysiCell_custom.h" 
-#include <vector>
-#include <cstdio>
-#include <iostream>
-#include <cstring>
 
-namespace PhysiCell
-{
-	
-Variable::Variable()
-{
-	name = "unnamed"; 
-	units = "dimensionless"; 
-	value = 0.0; 
-	conserved_quantity = false; 
-	return; 
-}
-
-std::ostream& operator<<(std::ostream& os, const Variable& v)
-{
-	os << v.name << ": " << v.value << " " << v.units; 
-	return os; 
-}
+#include "custom.h"
 
 
-Vector_Variable::Vector_Variable()
-{
-	name = "unnamed"; 
-	units = "dimensionless"; 
-	value.resize(3, 0.0 );
-	conserved_quantity = false; 
-	return; 
-}
+// constantes variables
 
-std::ostream& operator<<(std::ostream& os, const Vector_Variable& v)
-{
- 	os << v.name << ": ";
-	if( v.value.size() == 0 )
-	{ os << "[empty]"; return os; }
-/*
-	if( v.value.size() == 1 )
-	{ os << v.value[0] << " (" << v.units << ")"; return os;  }
-*/
-	for( int i=0; i < v.value.size()-1 ; i++ )
-	{ os << v.value[i] << ","; }
-	os << v.value[v.value.size()-1] << " (" << v.units << ")"; 
-	return os; 
-}
+static const double ZERO = 0;
+static const std::vector<double> VECTOR_ZERO (4, ZERO);  // generate a 4 character long vector of zeros.
 
-	
-Custom_Cell_Data::Custom_Cell_Data()
+
+// functions
+
+void create_cell_types( void )
 {
-//	std::cout << __FUNCTION__ << "(default)" << std::endl; 
-	variables.resize(0); 
-	vector_variables.resize(0); 
-	
-	name_to_index_map.clear(); 
-//	vector_name_to_index_map.clear();
-	
+	std::cout << "generate cell types ..." << std::endl;
+	std::cout << "cell types can only be defined the first episode of the runtime!" << std::endl;
+
+	// put any modifications to default cell definition here if you
+	// want to have "inherited" by other cell types.
+	// this is a good place to set default functions.
+
+	// cell_default initial definition
+	initialize_default_cell_definition();
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
+
+	cell_defaults.functions.update_migration_bias = NULL;
+	cell_defaults.functions.update_phenotype = NULL;  // update_cell_and_death_parameters_O2_based;
+	cell_defaults.functions.custom_cell_rule = NULL;
+	cell_defaults.functions.contact_function = NULL;
+
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL;
+	cell_defaults.functions.calculate_distance_to_membrane = NULL;
+
+	// parse the cell definitions in the XML config file
+	initialize_cell_definitions_from_pugixml();
+
+	// generate the maps of cell definitions.
+	build_cell_definitions_maps();
+
+	// intializes cell signal and response dictionaries
+	setup_signal_behavior_dictionaries();
+
+	// initializ cell rule definitions
+	setup_cell_rules();
+
+	// put any modifications to individual cell definitions here.
+	// this is a good place to set custom functions.
+	cell_defaults.functions.update_phenotype = phenotype_function;
+	cell_defaults.functions.custom_cell_rule = custom_function;
+	cell_defaults.functions.contact_function = contact_function;
+
+	// summarize the cell defintion setup.
+	display_cell_definitions( std::cout );
+
 	return;
 }
 
-Custom_Cell_Data::Custom_Cell_Data( const Custom_Cell_Data& ccd )
+
+void setup_microenvironment( void )
 {
-//	std::cout << __FUNCTION__ << "(copy)" << std::endl; 
-	variables = ccd.variables; 
-	vector_variables = ccd.vector_variables; 
-	
-	name_to_index_map= ccd.name_to_index_map; 
-	
-	return; 
+	// set domain parameters
+
+	// put any custom code to set non-homogeneous initial conditions or
+	// extra Dirichlet nodes here.
+
+	// initialize BioFVM
+	initialize_microenvironment();
+
+	return;
 }
 
-int Custom_Cell_Data::add_variable( Variable& v )
-{
-	int n = variables.size(); 
-	variables.push_back( v ); 
-	name_to_index_map[ v.name ] = n; 
-	return n; 
-}
 
-int Custom_Cell_Data::add_variable( std::string name , std::string units , double value )
+void setup_tissue( void )
 {
-	int n = variables.size(); 
-	variables.resize( n+1 ); 
-	variables[n].name = name; 
-	variables[n].units = units; 
-	variables[n].value = value; 
-	name_to_index_map[ name ] = n; 
-	return n; 
-}
+	double Xmin = microenvironment.mesh.bounding_box[0];
+	double Ymin = microenvironment.mesh.bounding_box[1];
+	double Zmin = microenvironment.mesh.bounding_box[2];
 
-int Custom_Cell_Data::add_variable( std::string name , double value )
-{
-	int n = variables.size(); 
-	variables.resize( n+1 ); 
-	variables[n].name = name; 
-	variables[n].units = "dimensionless"; 
-	variables[n].value = value; 
-	name_to_index_map[ name ] = n; 
-	return n; 
-}
+	double Xmax = microenvironment.mesh.bounding_box[3];
+	double Ymax = microenvironment.mesh.bounding_box[4];
+	double Zmax = microenvironment.mesh.bounding_box[5];
 
-int Custom_Cell_Data::add_vector_variable( Vector_Variable& v )
-{
-	int n = vector_variables.size(); 
-	vector_variables.push_back( v ); 
-//	vector_name_to_index_map[ v.name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_vector_variable( std::string name , std::string units , std::vector<double>& value )
-{
-	int n = vector_variables.size(); 
-	vector_variables.resize( n+1 ); 
-	vector_variables[n].name = name; 
-	vector_variables[n].units = units; 
-	vector_variables[n].value = value; 
-//	vector_name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::add_vector_variable( std::string name , std::vector<double>& value )
-{
-	int n = vector_variables.size(); 
-	vector_variables.resize( n+1 ); 
-	vector_variables[n].name = name; 
-	vector_variables[n].units = "dimensionless"; 
-	vector_variables[n].value = value; 
-//	vector_name_to_index_map[ name ] = n; 
-	return n; 
-}
-
-int Custom_Cell_Data::find_variable_index( std::string name )
-{
-	// this should return -1 if not found, not zero 
-	auto out = name_to_index_map.find( name ); 
-	if( out != name_to_index_map.end() )
-	{ return out->second; }
-	return -1; 
-}
-
-/*
-int Custom_Cell_Data::find_vector_variable_index( std::string name )
-{
-	return vector_name_to_index_map[ name ]; 
-}
-*/
-
-int Custom_Cell_Data::find_vector_variable_index( std::string name )
-{
-	int n = 0; 
-	while( n < vector_variables.size() )
+	if ( default_microenvironment_options.simulate_2D == true )
 	{
-		if( std::strcmp( vector_variables[n].name.c_str() , name.c_str() ) == 0 )
-		{ return n; } 
-		n++; 
-	}
-	
-	return -1; 
-}
-
-
-double& Custom_Cell_Data::operator[](int i)
-{
-	return variables[i].value; 
-}
-
-double& Custom_Cell_Data::operator[]( std::string name )
-{
-	return variables[ name_to_index_map[name] ].value; 
-}
-
-std::ostream& operator<<(std::ostream& os, const Custom_Cell_Data& ccd)
-{
-	os << "Custom data (scalar): " << std::endl; 
-	for( int i=0 ; i < ccd.variables.size() ; i++ )
-	{
-		os << i << ": " << ccd.variables[i] << std::endl; 
+		Zmin = 0.0;
+		Zmax = 0.0;
 	}
 
-	os << "Custom data (vector): " << std::endl; 
-	for( int i=0 ; i < ccd.vector_variables.size() ; i++ )
+	double Xrange = Xmax - Xmin;
+	double Yrange = Ymax - Ymin;
+	double Zrange = Zmax - Zmin;
+
+	// create some of each type of cell
+	Cell* pC;
+
+	for ( int k=0; k < cell_definitions_by_index.size(); k++ )
 	{
-		os << i << ": " << ccd.vector_variables[i] << std::endl; 
+		Cell_Definition* pCD = cell_definitions_by_index[k];
+		std::cout << "Placing cells of type " << pCD->name << " ... " << std::endl;
+		for ( int n = 0; n < parameters.ints( "number_of_cells" ); n++ )
+		{
+			std::vector<double> position = {0,0,0};
+			position[0] = Xmin + UniformRandom() * Xrange;
+			position[1] = Ymin + UniformRandom() * Yrange;
+			position[2] = Zmin + UniformRandom() * Zrange;
+
+			pC = create_cell( *pCD );
+			pC->assign_position( position );
+		}
 	}
-	
-	return os;
+	std::cout << std::endl;
+
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml();
+	set_parameters_from_distributions();
+
+	// add custom data vector
+	for ( int i = 0 ; i < all_cells->size(); i++ )
+	{
+		std::vector<double> vector_double = VECTOR_ZERO;
+		( *all_cells )[i]->custom_data.add_vector_variable( "my_vector", vector_double );
+	}
+
+	return;
 }
 
-};
+std::vector<std::string> my_coloring_function( Cell* pCell )
+{ return paint_by_number_cell_coloring( pCell ); }
+
+void phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
+{ return; }
+
+void custom_function( Cell* pCell, Phenotype& phenotype, double dt )
+{ return; }
+
+void contact_function( Cell* pMe, Phenotype& phenoMe, Cell* pOther, Phenotype& phenoOther, double dt )
+{ return; }
+

@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2024, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2025, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -514,17 +514,28 @@ void setup_signal_behavior_dictionaries( void )
 		behavior_to_int[temp] = map_index; 
 	}	
 	
-	// transformation 
+	// transformation / transition 
 	for( int i=0; i < n ; i++ )
 	{
 		map_index++; 
 		Cell_Definition* pCD = cell_definitions_by_type[i]; 
-		std::string temp =  "transform to " + pCD->name; 
+		// std::string temp =  "transform to " + pCD->name; 
+		std::string temp =  "transition to " + pCD->name; 
 		behavior_to_int[temp] = map_index; 
 		int_to_behavior[map_index] = temp; 
+
+
 		// synonym 
 		temp = "transform to cell type " + std::to_string(pCD->type); 
 		behavior_to_int[temp] = map_index; 
+
+		temp = "transform to " + pCD->name; 
+		behavior_to_int[temp] = map_index; 
+
+		temp = "transition to cell type " + std::to_string(pCD->type); 
+		behavior_to_int[temp] = map_index; 
+
+
 	}	
 
 	// asymmetic division
@@ -651,12 +662,23 @@ void display_signal_dictionary( void )
 
 
 void display_signal_dictionary_with_synonyms( void )
-{
+{ display_signal_dictionary_with_synonyms( std::cout ); }
+/*
 	std::cout << "Signals (with synonyms): " << std::endl 
 			  << "=======================" << std::endl; 
 	for( auto it = signal_to_int.begin() ; it != signal_to_int.end() ; it++ )
 	{ std::cout << it->second << " : " << it->first << std::endl; }
 	std::cout << std::endl << std::endl;  	
+    return; 
+*/
+
+void display_signal_dictionary_with_synonyms( std::ostream& os )
+{
+	os << "Signals (with synonyms): " << std::endl 
+	   << "=======================" << std::endl; 
+	for( auto it = signal_to_int.begin() ; it != signal_to_int.end() ; it++ )
+	{ os << it->second << " : " << it->first << std::endl; }
+	os << std::endl << std::endl;  	
     return; 
 }
 
@@ -677,15 +699,26 @@ void display_behavior_dictionary( void )
 	return; 
 }
 
-void display_response_dictionary_with_synonyms( void )
+void display_behavior_dictionary_with_synonyms( std::ostream& os )
 {
+	os << "Behaviors (with synonyms): " << std::endl 
+  	   << "=========================" << std::endl; 
+	for( auto it = behavior_to_int.begin() ; it != behavior_to_int.end() ; it++ )
+	{ os << it->second << " : " << it->first << std::endl; }
+	os << std::endl << std::endl;  	
+    return; 
+}
+
+void display_behavior_dictionary_with_synonyms( void )
+{ display_behavior_dictionary_with_synonyms( std::cout ); return; }
+/*
 	std::cout << "Behaviors (with synonyms): " << std::endl 
 			  << "=========================" << std::endl; 
 	for( auto it = behavior_to_int.begin() ; it != behavior_to_int.end() ; it++ )
 	{ std::cout << it->second << " : " << it->first << std::endl; }
 	std::cout << std::endl << std::endl;  	
     return; 
-}
+*/	
 
 int find_signal_index( std::string signal_name )
 {

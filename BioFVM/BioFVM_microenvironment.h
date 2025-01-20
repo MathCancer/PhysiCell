@@ -13,7 +13,7 @@
 #                                                                           #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)   #
 #                                                                           #
-# Copyright (c) 2015-2017, Paul Macklin and the BioFVM Project              #
+# Copyright (c) 2015-2025, Paul Macklin and the BioFVM Project              #
 # All rights reserved.                                                      #
 #                                                                           #
 # Redistribution and use in source and binary forms, with or without        #
@@ -362,7 +362,8 @@ class Microenvironment_Options
 extern Microenvironment_Options default_microenvironment_options; 
 extern Microenvironment microenvironment;
 
-void initialize_microenvironment( void ); 
+void initialize_microenvironment( void );
+void set_microenvironment_initial_condition( void );
 
 void load_initial_conditions_from_matlab( std::string filename );
 void load_initial_conditions_from_csv( std::string filename );
