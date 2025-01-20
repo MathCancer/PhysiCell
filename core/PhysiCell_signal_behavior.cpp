@@ -525,6 +525,12 @@ void setup_signal_behavior_dictionaries( void )
 		// synonym 
 		temp = "transform to cell type " + std::to_string(pCD->type); 
 		behavior_to_int[temp] = map_index; 
+		temp = "transition to " + std::to_string(pCD->type); 
+		behavior_to_int[temp] = map_index; 
+		temp = "transition to cell type " + std::to_string(pCD->type); 
+		behavior_to_int[temp] = map_index; 
+
+
 	}	
 
 	// asymmetic division
