@@ -211,8 +211,8 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
   and then to run studio (with the template project):
 
   ```
-    make template && make
-    python studio/bin/studio.py
+    make reset && make template && make
+    python studio/bin/studio.py & 
   ```
   
 #### 1.14.1
