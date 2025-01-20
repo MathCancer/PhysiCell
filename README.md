@@ -199,7 +199,8 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 
 ### Minor new features and changes: 
 #### 1.14.2
-- 
+- #352 (minor improvement): more robust macro to check for windows machines when creating directories
+- #353 (feature): Python script to download latest release of Studio (and create /studio)
 
 #### 1.14.1
 - PhysiBoSS PDFs removed from repo, links provided in tutorial README.md
@@ -217,7 +218,8 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
  
 ### Bugfixes: 
 #### 1.14.2 
-+ 
++ #350 (minor fix): use standard save event triggers in asymmetric division example
++ #351 (minor fix): re-round template project cycle durations
 
 #### 1.14.1
 - store value of `attack_duration` when parsing config file
