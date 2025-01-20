@@ -45,6 +45,8 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
       * rules-sample
       * physimess-sample
       * custom-division-sample
+      * asymmetric-division-sample
+      * immune-function-sample episode-sample
 
 **`make list-projects`** : list all available sample projects 
 
@@ -92,6 +94,8 @@ Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), incl
 
 ### Version 1.14.2 (20 Jan 2025): 
 Version 1.14.2 primarily introduces bugfixes and stability refinements, closer matching to the cell behavior grammar (including the new `transition to X` synonym for `transform to X` behavior and better support for asymmetric division), a new script to more easily download PhysiCell Studio, and improvements to allow parallel "episodes" of PhysiCell in machine learning environments, such as the upcoming PhysiGym addon. 
+
+We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergman, Heber Rocha, and Elmar Bucher in this release. 
 
 ### Version 1.14.1 (13 Dec 2024): 
 Version 1.14.1 primarily introduces bug fixes as noted below, but also introduces the first implementation of asymmetric division. 
