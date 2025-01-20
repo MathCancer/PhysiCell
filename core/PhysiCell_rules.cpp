@@ -2366,8 +2366,10 @@ void setup_cell_rules( void )
 	std::string dictionary_file = "./" + PhysiCell_settings.folder + "/dictionaries.txt";
 	std::ofstream dict_of( dictionary_file , std::ios::out ); 
 
-	display_signal_dictionary( dict_of ); // done 
-	display_behavior_dictionary( dict_of ); // done 
+	// display_signal_dictionary( dict_of ); // done 
+	display_signal_dictionary_with_synonyms( dict_of ); // 
+	// display_behavior_dictionary( dict_of ); // done 
+	display_behavior_dictionary_with_synonyms( dict_of ); // done 
 	dict_of.close(); 
 
 	// save rules (v3)

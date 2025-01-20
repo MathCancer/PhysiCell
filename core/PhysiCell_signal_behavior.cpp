@@ -523,11 +523,15 @@ void setup_signal_behavior_dictionaries( void )
 		std::string temp =  "transition to " + pCD->name; 
 		behavior_to_int[temp] = map_index; 
 		int_to_behavior[map_index] = temp; 
+
+
 		// synonym 
 		temp = "transform to cell type " + std::to_string(pCD->type); 
 		behavior_to_int[temp] = map_index; 
-		temp = "transform to " + std::to_string(pCD->type); 
+
+		temp = "transform to " + pCD->name; 
 		behavior_to_int[temp] = map_index; 
+
 		temp = "transition to cell type " + std::to_string(pCD->type); 
 		behavior_to_int[temp] = map_index; 
 
@@ -658,12 +662,23 @@ void display_signal_dictionary( void )
 
 
 void display_signal_dictionary_with_synonyms( void )
-{
+{ display_signal_dictionary_with_synonyms( std::cout ); }
+/*
 	std::cout << "Signals (with synonyms): " << std::endl 
 			  << "=======================" << std::endl; 
 	for( auto it = signal_to_int.begin() ; it != signal_to_int.end() ; it++ )
 	{ std::cout << it->second << " : " << it->first << std::endl; }
 	std::cout << std::endl << std::endl;  	
+    return; 
+*/
+
+void display_signal_dictionary_with_synonyms( std::ostream& os )
+{
+	os << "Signals (with synonyms): " << std::endl 
+	   << "=======================" << std::endl; 
+	for( auto it = signal_to_int.begin() ; it != signal_to_int.end() ; it++ )
+	{ os << it->second << " : " << it->first << std::endl; }
+	os << std::endl << std::endl;  	
     return; 
 }
 
@@ -684,15 +699,26 @@ void display_behavior_dictionary( void )
 	return; 
 }
 
-void display_response_dictionary_with_synonyms( void )
+void display_behavior_dictionary_with_synonyms( std::ostream& os )
 {
+	os << "Behaviors (with synonyms): " << std::endl 
+  	   << "=========================" << std::endl; 
+	for( auto it = behavior_to_int.begin() ; it != behavior_to_int.end() ; it++ )
+	{ os << it->second << " : " << it->first << std::endl; }
+	os << std::endl << std::endl;  	
+    return; 
+}
+
+void display_behavior_dictionary_with_synonyms( void )
+{ display_behavior_dictionary_with_synonyms( std::cout ); return; }
+/*
 	std::cout << "Behaviors (with synonyms): " << std::endl 
 			  << "=========================" << std::endl; 
 	for( auto it = behavior_to_int.begin() ; it != behavior_to_int.end() ; it++ )
 	{ std::cout << it->second << " : " << it->first << std::endl; }
 	std::cout << std::endl << std::endl;  	
     return; 
-}
+*/	
 
 int find_signal_index( std::string signal_name )
 {
