@@ -199,9 +199,22 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 
 ### Minor new features and changes: 
 #### 1.14.2
-- #352 (minor improvement): more robust macro to check for windows machines when creating directories
-- #353 (feature): Python script to download latest release of Studio (and create /studio)
+- [PR352](https://github.com/MathCancer/PhysiCell/pull/352) (minor improvement): more robust macro to check for windows machines when creating directories
+- [PR353](https://github.com/MathCancer/PhysiCell/pull/353) (minor feature): Python script to download latest release of Studio (and create /studio).
 
+  To use it, go to the root directory and run:
+
+  ```
+  python beta/get_physicell.py
+  ```
+
+  and then to run studio (with the template project):
+
+  ```
+    make template && make
+    python studio/bin/studio.py
+  ```
+  
 #### 1.14.1
 - PhysiBoSS PDFs removed from repo, links provided in tutorial README.md
 - build binaries on release `published` instead of `created`
@@ -218,8 +231,8 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
  
 ### Bugfixes: 
 #### 1.14.2 
-+ #350 (minor fix): use standard save event triggers in asymmetric division example
-+ #351 (minor fix): re-round template project cycle durations
++ [PR350](https://github.com/MathCancer/PhysiCell/pull/350) (minor fix): use standard save event triggers in asymmetric division example
++ [PR351](https://github.com/MathCancer/PhysiCell/pull/351) (minor fix): re-round template project cycle durations
 
 #### 1.14.1
 - store value of `attack_duration` when parsing config file
