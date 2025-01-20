@@ -5,6 +5,7 @@
 **Release dates:** 15 September 2024 - 
 * 1.14.0 : 15 September 2024
 * 1.14.1 : 13 December 2024
+* 1.14.2 : 20 January 2025
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -89,6 +90,11 @@ See changes.md for the full change log.
 ## Release summary: 
 Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
 
+### Version 1.14.2 (20 Jan 2025): 
+Version 1.14.2 ... 
+
+
+
 ### Version 1.14.1 (13 Dec 2024): 
 Version 1.14.1 primarily introduces bug fixes as noted below, but also introduces the first implementation of asymmetric division. 
 
@@ -112,6 +118,9 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 **NOTE 2:** Windows users need to follow an updated (from v1.8) MinGW64 installation procedure. This will install an updated version of g++, plus libraries that are needed for some of the intracellular models. See the [Setup Guides](https://github.com/physicell-training/ws2023/blob/main/agenda.md#set-up-physicell) for details.
 
 ### Major new features and changes in the 1.14.z versions
+#### 1.14.2
++  
+
 #### 1.14.1 
 + asymmetric division is now possible through the config file
   + try the sample project with make `asymmetric-division-sample`
@@ -189,6 +198,9 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
   + set the svg substrate color function by default for config-only based implementation
 
 ### Minor new features and changes: 
+#### 1.14.2
+- 
+
 #### 1.14.1
 - PhysiBoSS PDFs removed from repo, links provided in tutorial README.md
 - build binaries on release `published` instead of `created`
@@ -204,6 +216,9 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 + throw error if duplicate substrate or user_parameter name found
  
 ### Bugfixes: 
+#### 1.14.2 
++ 
+
 #### 1.14.1
 - store value of `attack_duration` when parsing config file
 - set rules to Version 3.0 for all projects
