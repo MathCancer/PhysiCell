@@ -91,9 +91,7 @@ See changes.md for the full change log.
 Version 1.14 upgrades the Cell Beheavior Hypothesis Grammar (to version 3), including refinements to cell phagocytosis, effector attack, and cell damage/integrity in response to community discussions and peer review. It also introduces numerous refinements to cell division, random seeds, and randomized parameter initialization, as well as upgrades to PhysiBoSS and PhysiMeSS and bug fixes. Other refinements are "under the hood," including new GitHub actions and improved automation of testing, as well as improvements to MultiCellDS output. 
 
 ### Version 1.14.2 (20 Jan 2025): 
-Version 1.14.2 ... 
-
-
+Version 1.14.2 primarily introduces bugfixes and stability refinements, closer matching to the cell behavior grammar (including the new `transition to X` synonym for `transform to X` behavior and better support for asymmetric division), a new script to more easily download PhysiCell Studio, and improvements to allow parallel "episodes" of PhysiCell in machine learning environments, such as the upcoming PhysiGym addon. 
 
 ### Version 1.14.1 (13 Dec 2024): 
 Version 1.14.1 primarily introduces bug fixes as noted below, but also introduces the first implementation of asymmetric division. 
@@ -119,7 +117,7 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 
 ### Major new features and changes in the 1.14.z versions
 #### 1.14.2
-+  
++ In anticipation with the upcoming `PhysiGym` addon (for machine learning / reinforcement learning), it is now possible to run multiple consecutive episodes from a single PhysiCell model within a runtime. The episode sample project demonstrates this possibility.
 
 #### 1.14.1 
 + asymmetric division is now possible through the config file
@@ -199,7 +197,15 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 
 ### Minor new features and changes: 
 #### 1.14.2
-- Added `transition to X` and `transition to cell type X` as synonyms for the behavior `transform to X` (with synonym `transform to cell type X`), at the request of the cancer community who regard `transformation` as synonymous with `cancerous transformation`. 
+- [PR349](https://github.com/MathCancer/PhysiCell/pull/349) (minor improvement): `load_PhysiCell_config_file()` was split into `load_PhysiCell_config_file()` and `read_PhysiCell_config_file()` functions
+- [PR349](https://github.com/MathCancer/PhysiCell/pull/349) (minor improvement): `BioFVM BioFVM_microenvironment::initialize_microenvironment()` was split into `initialize_microenvironment()` and `set_microenvironment_initial_condition()` functions.
+- [PR349](https://github.com/MathCancer/PhysiCell/pull/349) (minor improvement): In `BioFVM/BioFVM_MultiCellDS.*`, a new `reset_BioFVM_substrates_initialized_in_dom()` function was added.
+- [PR349](https://github.com/MathCancer/PhysiCell/pull/349) (minor improvement): A new `BioFVM::BioFVM_basic_agent::reset_max_basic_agent_ID()` function was added. 
+- Switched `setup_cell_rules( void )` to output the full list of signals and behaviors with synonyms in `./output/dictionaries.txt` for fuller reference. 
+- Added new functions:
+  - `void display_signal_dictionary_with_synonyms( std::ostream& os )`
+  - `void display_response_dictionary_with_synonyms( std::ostream& os )`
+- Added `transition to X` and `transition to cell type N` as synonyms for the behavior `transform to X` (with synonym `transform to cell type X`), at the request of the cancer community who regard `transformation` as synonymous with `cancerous transformation`. (And `transition to X` is now the "primary" name for the behavior.) 
 - [PR352](https://github.com/MathCancer/PhysiCell/pull/352) (minor improvement): more robust macro to check for windows machines when creating directories
 - [PR353](https://github.com/MathCancer/PhysiCell/pull/353) (minor feature): Python script to download latest release of Studio (and create /studio).
 
