@@ -74,7 +74,7 @@ list-projects:
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
 	@echo "                 worm-sample interaction-sample mechano-sample rules-sample physimess-sample custom-division-sample"
-	@echo "					asymmetric-division-sample immune-function-sample"
+	@echo "                 asymmetric-division-sample immune-function-sample episode-sample"
 	@echo ""
 	@echo "Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample"
 	@echo "                 cancer-metabolism-sample physiboss-tutorial physiboss-tutorial-invasion"
@@ -224,6 +224,14 @@ immune-function-sample:
 	cp ./sample_projects/immune_function/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp -r ./sample_projects/immune_function/config/* ./config/
+
+episode-sample:
+	cp -r ./sample_projects/episode/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/episode/main.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects/episode/Makefile .
+	cp -r ./sample_projects/episode/config/* ./config
 
 # ---- intracellular projects 
 ode-energy-sample:
