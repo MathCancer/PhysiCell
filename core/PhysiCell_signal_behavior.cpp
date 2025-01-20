@@ -514,18 +514,19 @@ void setup_signal_behavior_dictionaries( void )
 		behavior_to_int[temp] = map_index; 
 	}	
 	
-	// transformation 
+	// transformation / transition 
 	for( int i=0; i < n ; i++ )
 	{
 		map_index++; 
 		Cell_Definition* pCD = cell_definitions_by_type[i]; 
-		std::string temp =  "transform to " + pCD->name; 
+		// std::string temp =  "transform to " + pCD->name; 
+		std::string temp =  "transition to " + pCD->name; 
 		behavior_to_int[temp] = map_index; 
 		int_to_behavior[map_index] = temp; 
 		// synonym 
 		temp = "transform to cell type " + std::to_string(pCD->type); 
 		behavior_to_int[temp] = map_index; 
-		temp = "transition to " + std::to_string(pCD->type); 
+		temp = "transform to " + std::to_string(pCD->type); 
 		behavior_to_int[temp] = map_index; 
 		temp = "transition to cell type " + std::to_string(pCD->type); 
 		behavior_to_int[temp] = map_index; 
