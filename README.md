@@ -199,6 +199,7 @@ We are grateful for contributions by Vincent Noël, Randy Heiland, Daniel Bergma
 
 ### Minor new features and changes: 
 #### 1.14.2
+- Added `transition to X` and `transition to cell type X` as synonyms for the behavior `transform to X` (with synonym `transform to cell type X`), at the request of the cancer community who regard `transformation` as synonymous with `cancerous transformation`. 
 - [PR352](https://github.com/MathCancer/PhysiCell/pull/352) (minor improvement): more robust macro to check for windows machines when creating directories
 - [PR353](https://github.com/MathCancer/PhysiCell/pull/353) (minor feature): Python script to download latest release of Studio (and create /studio).
 
