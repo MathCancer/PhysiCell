@@ -484,7 +484,7 @@ void setup_signal_behavior_dictionaries( void )
 		behavior_to_int[temp] = map_index; 
 
 		// synonym 
-		temp = "phagocytosis of " + std::to_string(pCD->type); 
+		temp = "phagocytosis of " + pCD->name; 
 		behavior_to_int[temp] = map_index; 
 	}
 
