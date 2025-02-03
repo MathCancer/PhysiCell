@@ -82,7 +82,7 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 mingw-w64-x86_64-python mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-python-cffi make bison flex mingw-w64-x86_64-ca-certificates
+        install: mingw-w64-x86_64-gcc make mingw-w64-x86_64-imagemagick mingw-w64-x86_64-ffmpeg unzip zip git mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-ca-certificates
 
     - name: Build ${{ matrix.projects.name }} project
       run: |
@@ -134,10 +134,10 @@ jobs:
 
     - name: Install dependencies
       run : |
-        if ! brew list gcc@13 &>/dev/null; then
-          brew install gcc@13
+        if ! brew list gcc@14 &>/dev/null; then
+          brew install gcc@14
         else
-          echo "gcc@13 is already installed."
+          echo "gcc@14 is already installed."
         fi
       
     - name: Build ${{ matrix.projects.name }} project
@@ -146,7 +146,7 @@ jobs:
         make ${{ matrix.projects.project }}
         make clean
         ${{ matrix.projects.extra_run }}
-        make PHYSICELL_CPP=g++-13 static
+        make PHYSICELL_CPP=g++-14 static
         cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos13
 
     - name: Caching produced project binary 
@@ -184,10 +184,10 @@ jobs:
 
     - name: Install dependencies
       run : |
-        if ! brew list gcc@13 &>/dev/null; then
-          brew install gcc@13
+        if ! brew list gcc@14 &>/dev/null; then
+          brew install gcc@14
         else
-          echo "gcc@13 is already installed."
+          echo "gcc@14 is already installed."
         fi
       
     - name: Build ${{ matrix.projects.name }} project
@@ -196,7 +196,7 @@ jobs:
         make ${{ matrix.projects.project }}
         make clean
         ${{ matrix.projects.extra_run }}
-        make PHYSICELL_CPP=g++-13 static
+        make PHYSICELL_CPP=g++-14 static
         cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macosm1
    
     - name: Caching produced project binary 
