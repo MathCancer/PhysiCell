@@ -111,7 +111,6 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	void post_update(PhysiCell::Cell* cell);
     
 	void inherit(PhysiCell::Cell * cell) {}
-
 	// These find_<IO>_mapping functions are not currently used, but since I made them, we'll keep them around.
 	RoadRunnerMapping *find_input_mapping(std::string sbml_species); // sbml_species is unique for inputs (below is for convenience)
 	RoadRunnerMapping *find_input_mapping(std::string physicell_name, std::string sbml_species)
