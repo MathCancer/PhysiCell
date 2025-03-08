@@ -63,8 +63,8 @@ else:
         url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
     elif os_type.lower().startswith("linux"):
         reminder_dynamic_link_path_linux()
-        rr_file = "cpplibroadrunner-1.3.0-linux_x86_64.tar.gz"
-        url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.3/" + rr_file + "/download"
+        rr_file = "roadrunner_ubuntu_24.zip"
+        url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
     else:
         print("Your operating system seems to be unsupported. Please submit a ticket at https://sourceforge.net/p/physicell/tickets/ ")
         sys.exit(1)
@@ -116,7 +116,8 @@ else:
         if mac_silicon:
             rrlib_dir = my_file[:-4]
         else:
-            rrlib_dir = my_file[:-7]
+            # rrlib_dir = my_file[:-7]
+            rrlib_dir = my_file[:-4]
     print('rrlib_dir = ',rrlib_dir)
 
     def download_cb(blocknum, blocksize, totalsize):
