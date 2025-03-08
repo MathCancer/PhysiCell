@@ -48,17 +48,17 @@ else:
     rr_file = ""
     url = ""
 
-    mac_silicon = False
+    workflow_v2 = True
     if os_type.lower() == 'darwin':
         reminder_dynamic_link_path_macos()
         if "ARM64" in platform.uname().version:
             rr_file = "roadrunner_macos_arm64.zip"
             url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
-            mac_silicon = True
         else:
             rr_file = "roadrunner_macos_x86_64.zip"
             url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
     elif os_type.lower().startswith("win"):
+        workflow_v2 = False
         rr_file = "roadrunner-win64-vs14-cp35m.zip"
         url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
     elif os_type.lower().startswith("linux"):
@@ -70,7 +70,7 @@ else:
         sys.exit(1)
 
     print("url=",url)
-    if mac_silicon:
+    if workflow_v2:
         fname = url.split('/')[-1]
     else:
         fname = url.split('/')[-2]
@@ -110,14 +110,11 @@ else:
     my_file = os.path.join(dir_name, fname)
     print('my_file = ',my_file)
 
-    if os_type.lower().startswith("win"):
-        rrlib_dir = my_file[:-4]
-    else:  # darwin or linux
-        if mac_silicon:
-            rrlib_dir = my_file[:-4]
-        else:
-            # rrlib_dir = my_file[:-7]
-            rrlib_dir = my_file[:-4]
+    rrlib_dir = my_file[:-4]
+    # if os_type.lower().startswith("win"):
+    #     rrlib_dir = my_file[:-4]
+    # else:  # darwin or linux
+    #     rrlib_dir = my_file[:-4]
     print('rrlib_dir = ',rrlib_dir)
 
     def download_cb(blocknum, blocksize, totalsize):
