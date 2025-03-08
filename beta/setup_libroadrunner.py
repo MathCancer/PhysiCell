@@ -56,7 +56,7 @@ else:
             url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
             mac_silicon = True
         else:
-            rr_file = "roadrunner_mac_x86_64.zip"
+            rr_file = "roadrunner_macos_x86_64.zip"
             url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
     elif os_type.lower().startswith("win"):
         rr_file = "roadrunner-win64-vs14-cp35m.zip"
