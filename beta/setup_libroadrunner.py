@@ -53,11 +53,11 @@ else:
         reminder_dynamic_link_path_macos()
         if "ARM64" in platform.uname().version:
             rr_file = "roadrunner_macos_arm64.zip"
-            url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/roadrunner_macos_arm64.zip"
+            url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
             mac_silicon = True
         else:
-            rr_file = "roadrunner-osx-10.9-cp36m.tar.gz"
-            url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
+            rr_file = "roadrunner_mac_x86_64.zip"
+            url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
     elif os_type.lower().startswith("win"):
         rr_file = "roadrunner-win64-vs14-cp35m.zip"
         url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
