@@ -6,6 +6,7 @@
 
 import platform
 import urllib.request
+import urllib.error
 import os
 import sys
 import tarfile
@@ -55,12 +56,8 @@ else:
     if os_type.lower() == 'darwin':
         reminder_dynamic_link_path_macos()
         if "ARM64" in platform.uname().version:
-            # pass
-            # print('... for the arm64 processor.')
-            # url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/libs/macos12_arm64/libroadrunner_c_api.dylib"
-            rr_file = "roadrunner_macos_arm64.tar.gz"
-            # url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/roadrunner_macos_arm64.tar.gz"
-            url = "https://github.com/rheiland/intracellular_libs/blob/main/ode/roadrunner_macos_arm64.zip"
+            rr_file = "roadrunner_macos_arm64.zip"
+            url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/roadrunner_macos_arm64.zip"
             mac_silicon = True
         else:
             rr_file = "roadrunner-osx-10.9-cp36m.tar.gz"
@@ -83,14 +80,9 @@ else:
         fname = url.split('/')[-2]
     print("fname=",fname)
 
-    # home = os.path.expanduser("~")
     print('libRoadRunner will now be installed into this location:')
-    # dir_name = os.path.join(home, 'libroadrunner')
     dir_name = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'addons', 'libRoadrunner')
     print(dir_name + '\n')
-    # print('   - Press ENTER to confirm the location')
-    # print('   - Press CTL-C to abort the installation')
-    # print('   - Or specify a different location below\n')
     prompt_str = '[' + dir_name + '] >>> '
     try:
         # response = input(prompt_str)
@@ -117,7 +109,7 @@ else:
         exit(1)
 
     print('Beginning download of libroadrunner into ' + dir_name + ' ...')
-    print(url)
+    print("url=" ,url)
 
     my_file = os.path.join(dir_name, fname)
     print('my_file = ',my_file)
@@ -126,10 +118,7 @@ else:
         rrlib_dir = my_file[:-4]
     else:  # darwin or linux
         if mac_silicon:
-            # idx_end = my_file.rindex('/')
-            # rrlib_dir = my_file[:idx_end]
-            rrlib_dir = my_file[:-7]
-            # rrlib_dir = my_file
+            rrlib_dir = my_file[:-4]
         else:
             rrlib_dir = my_file[:-7]
     print('rrlib_dir = ',rrlib_dir)
@@ -155,30 +144,19 @@ else:
         try:
             with zipfile.ZipFile(rr_file) as zf:
                 zf.extractall('.')
-            os.rename("roadrunner-win64-vs14-cp35m", new_dir_name)
+            os.rename("roadrunner-win64-vs14-cp35m", new_dir_name) 
         except:
             print('error unzipping the file')
             exit(1)
     else:  # Darwin or Linux
         try:
-            print("untarring ",rr_file)
-            tar = tarfile.open(rr_file)
-            tar.extractall()
-            tar.close()
-            if 'darwin' in os_type.lower():
-                if mac_silicon:
-                    os.rename("roadrunner_macos_arm64", new_dir_name)
-                else:
-                    os.rename("roadrunner-osx-10.9-cp36m", new_dir_name)
-            else:
-                os.rename("libroadrunner", new_dir_name)
+            print(f'unzipping (uncompressing) {rr_file}')
+            with zipfile.ZipFile(rr_file) as zf:
+                zf.extractall('.')
+            # os.rename("roadrunner_macos_arm64", new_dir_name)   # new workflow has this name
         except:
-            if mac_silicon:
-                print()
-                # pass
-            else:
-                print('error untarring the file')
-                exit(1)
+            print('error unzipping the file')
+            exit(1)
 
     print('Done.\n')
 
