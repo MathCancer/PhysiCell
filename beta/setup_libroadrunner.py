@@ -30,12 +30,8 @@ def reminder_dynamic_link_path_linux():
 
 os_type = platform.system()
 
-# Old:
-# if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "libRoadrunner", "roadrunner")):
-
-# New: July 2023 - trying to be smarter about deciding whether to (re)download libRR
 #  NOTE: needs to be tested cross-platform!
-if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "libRoadrunner", "roadrunner","include","rr","C","rrc_api.h")):
+if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "addons", "libRoadrunner", "roadrunner","include","rr","rrc_api.h")):
     print('\nlibroadrunner already installed.\n')
 
     # regardless, let's remind the user about the env var requirement!
