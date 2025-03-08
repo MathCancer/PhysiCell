@@ -27,6 +27,7 @@ ifeq ($(OS),Windows_NT)
 		OSFLAG += -D IA32
 	endif
 else
+#	@echo remember 
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
 		OSFLAG += -D LINUX
@@ -37,6 +38,7 @@ else
 		LIBRR_LIBS := ${LIBRR_DIR}/lib
 	endif
 	ifeq ($(UNAME_S),Darwin)
+#		@echo remember 
 		OSFLAG += -D OSX
 		LIBRR_DIR := ./addons/libRoadrunner/roadrunner
 		LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr
@@ -79,6 +81,8 @@ all: libRoadrunner main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) $(OMP_LIB) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp -L$(LIBRR_LIBS) -lroadrunner_c_api
 	@echo
 	@echo created $(PROGRAM_NAME)
+	@echo 'remember on Mac: export DYLD_LIBRARY_PATH=$$DYLD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib'
+	@echo 'remember on Linux: export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:./addons/libRoadrunner/roadrunner/lib'
 	@echo
 
 name:
