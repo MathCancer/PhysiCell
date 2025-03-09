@@ -48,7 +48,6 @@ else:
     rr_file = ""
     url = ""
 
-    workflow_v2 = True
     if os_type.lower() == 'darwin':
         reminder_dynamic_link_path_macos()
         if "ARM64" in platform.uname().version:
@@ -58,9 +57,8 @@ else:
             rr_file = "roadrunner_macos_x86_64.zip"
             url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
     elif os_type.lower().startswith("win"):
-        workflow_v2 = False
-        rr_file = "roadrunner-win64-vs14-cp35m.zip"
-        url = "https://sourceforge.net/projects/libroadrunner/files/libroadrunner-1.4.18/" + rr_file + "/download"
+        rr_file = "roadrunner_win_x86_64.zip"
+        url = "https://github.com/PhysiCell-Tools/intracellular_libs/raw/main/ode/" + rr_file
     elif os_type.lower().startswith("linux"):
         reminder_dynamic_link_path_linux()
         rr_file = "roadrunner_ubuntu_24.zip"
@@ -69,11 +67,7 @@ else:
         print("Your operating system seems to be unsupported. Please submit a ticket at https://sourceforge.net/p/physicell/tickets/ ")
         sys.exit(1)
 
-    print("url=",url)
-    if workflow_v2:
-        fname = url.split('/')[-1]
-    else:
-        fname = url.split('/')[-2]
+    fname = url.split('/')[-1]
     print("fname=",fname)
 
     print('libRoadRunner will now be installed into this location:')
@@ -138,7 +132,6 @@ else:
         try:
             with zipfile.ZipFile(rr_file) as zf:
                 zf.extractall('.')
-            os.rename("roadrunner-win64-vs14-cp35m", new_dir_name) 
         except:
             print('error unzipping the file')
             exit(1)
@@ -147,18 +140,8 @@ else:
             print(f'unzipping (uncompressing) {rr_file}')
             with zipfile.ZipFile(rr_file) as zf:
                 zf.extractall('.')
-            # os.rename("roadrunner_macos_arm64", new_dir_name)   # new workflow has this name
         except:
             print('error unzipping the file')
             exit(1)
 
     print('Done.\n')
-
-    # # LIBRR_DIR := /Users/heiland/libroadrunner/roadrunner-osx-10.9-cp36m
-    # print("Replace the following variables in your PhysiCell Makefile with these:\n")
-    # #print("LIBRR_DIR := /Users/heiland/libroadrunner/roadrunner-osx-10.9-cp36m")
-    # print("LIBRR_DIR := " + rrlib_dir)
-    # if os_type == 'Windows':
-    #     print("LIBRR_LIBS := " + rrlib_dir + "/bin\n")
-    # else:
-    #     print("LIBRR_LIBS := " + rrlib_dir + "/lib\n")
