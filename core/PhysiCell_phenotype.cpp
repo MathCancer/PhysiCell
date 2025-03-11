@@ -15,11 +15,75 @@
 #     able software used in your PhysiCell application.                       #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
-#     as below:                                                               #
-#                                                                             #
-# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
-# with BioFVM [2] to solve the transport equations.                           #
-#                                                                             #
+#     as below:                                                               #double read_number_in_line(const std::string& line) {
+    std::istringstream stream(line);
+    std::string key;
+    stream >> key;
+    std::string numberStr;
+
+    if (stream >> numberStr) {
+        try {
+            long double value = std::stold(numberStr);
+
+            // Se il valore è fuori dal range di un double, lancia un'eccezione
+            if (value > std::numeric_limits<double>::max() || value < -std::numeric_limits<double>::max()) {
+                throw std::out_of_range("Value out of range for double: " + numberStr);
+            }
+
+            return static_cast<double>(value);
+        } catch (const std::invalid_argument&) {
+            throw std::runtime_error("Error: Failed to parse value from line: " + line);
+        } catch (const std::out_of_range&) {
+            throw std::runtime_error("Error: Value out of range for double in line: " + line);
+        }
+    }
+
+    throw std::runtime_error("Error: Failed to parse value from line: " + line);
+}
+
+int read_number_in_line_int(const std::string& line) {
+    std::istringstream stream(line);
+    std::string key;
+    stream >> key;
+    std::string numberStr;
+
+    if (stream >> numberStr) {
+        try {
+            long long value = std::stoll(numberStr); // Usa `stoll` per numeri grandi
+
+            // Se il valore è fuori dal range di un int, lancia un'eccezione
+            if (value > std::numeric_limits<int>::max() || value < std::numeric_limits<int>::min()) {
+                throw std::out_of_range("Value out of range for int: " + numberStr);
+            }
+
+            return static_cast<int>(value);
+        } catch (const std::invalid_argument&) {
+            throw std::runtime_error("Error: Failed to parse value from line: " + line);
+        } catch (const std::out_of_range&) {
+            throw std::runtime_error("Error: Value out of range for int in line: " + line);
+        }
+    }
+
+    throw std::runtime_error("Error: Failed to parse value from line: " + line);
+}
+
+bool read_number_in_line_bool(const std::string& line){
+	std::istringstream stream(line);
+	std::string key, value;
+	stream >> key >> value;
+	
+	
+	if(value == "true"){
+		return true;
+	}
+	else if(value == "false"){
+		return false;
+	}
+	else{
+		throw std::runtime_error("Failed to parse value from line");
+	}
+};
+
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
 #     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
@@ -2460,42 +2524,57 @@ std::ostream& operator<<(std::ostream& os, const Phenotype& phenotype) {
     }
 
 };
-double read_number_in_line(const std::string& line){
+double read_number_in_line(const std::string& line) {
     std::istringstream stream(line);
     std::string key;
     stream >> key;
     std::string numberStr;
-    if(stream >> numberStr) {
-        try {
-            long double value = std::stod(numberStr);
-			
-            return value;
-        } catch (std::invalid_argument& e) {
-            throw std::runtime_error("Failed to parse value from line");
-        } catch (std::out_of_range& e) {
-            throw std::runtime_error("Value out of range for type");
-        }
-    }
-    throw std::runtime_error("Failed to parse value from line");
-};
 
-int read_number_in_line_int(const std::string& line){
+    if (stream >> numberStr) {
+        try {
+            long double value = std::stold(numberStr);
+
+            // Se il valore è fuori dal range di un double, lancia un'eccezione
+            if (value > std::numeric_limits<double>::max() || value < -std::numeric_limits<double>::max()) {
+                throw std::out_of_range("Value out of range for double: " + numberStr);
+            }
+
+            return static_cast<double>(value);
+        } catch (const std::invalid_argument&) {
+            throw std::runtime_error("Error: Failed to parse value from line: " + line);
+        } catch (const std::out_of_range&) {
+            throw std::runtime_error("Error: Value out of range for double in line: " + line);
+        }
+    }
+
+    throw std::runtime_error("Error: Failed to parse value from line: " + line);
+}
+
+int read_number_in_line_int(const std::string& line) {
     std::istringstream stream(line);
     std::string key;
     stream >> key;
     std::string numberStr;
-    if(stream >> numberStr) {
+
+    if (stream >> numberStr) {
         try {
-            int value = std::stoi(numberStr);
-            return value;
-        } catch (std::invalid_argument& e) {
-            throw std::runtime_error("Failed to parse value from line");
-        } catch (std::out_of_range& e) {
-            throw std::runtime_error("Value out of range for type");
+            long long value = std::stoll(numberStr); // Usa `stoll` per numeri grandi
+
+            // Se il valore è fuori dal range di un int, lancia un'eccezione
+            if (value > std::numeric_limits<int>::max() || value < std::numeric_limits<int>::min()) {
+                throw std::out_of_range("Value out of range for int: " + numberStr);
+            }
+
+            return static_cast<int>(value);
+        } catch (const std::invalid_argument&) {
+            throw std::runtime_error("Error: Failed to parse value from line: " + line);
+        } catch (const std::out_of_range&) {
+            throw std::runtime_error("Error: Value out of range for int in line: " + line);
         }
     }
-    throw std::runtime_error("Failed to parse value from line");
-};
+
+    throw std::runtime_error("Error: Failed to parse value from line: " + line);
+}
 
 bool read_number_in_line_bool(const std::string& line){
 	std::istringstream stream(line);

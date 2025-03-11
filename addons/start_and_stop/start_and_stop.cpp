@@ -18,6 +18,8 @@ void reset_microenv(){
 	
     // Call the operator>> function to read data from the file into the Microenvironment instance
     input_file >> microenvironment;
+	
+	setup_signal_behavior_dictionaries();
 
     // Close the file
     input_file.close();
@@ -332,7 +334,7 @@ void reset_cell(double last_cell_cycle_time)
 				}
 			}
 			// reinit maboss
-			pCell->phenotype.intracellular->reinit_maboss(current_bnd_filename, current_cfg_filename);
+			//pCell->phenotype.intracellular->reinit_maboss(current_bnd_filename, current_cfg_filename);
 		}
 
 		// current_voxel_index
@@ -374,6 +376,8 @@ void reset_cell(double last_cell_cycle_time)
 			// Check if the number of nodes is the same
 
 			assert(n_line == pCell->phenotype.intracellular->get_number_of_nodes());
+			//pCell->phenotype.intracellular->set_state_int();
+			//pCell->phenotype.intracellular->update(pCell, pCell->phenotype, phenotype_dt);
 		}
 		
 	}

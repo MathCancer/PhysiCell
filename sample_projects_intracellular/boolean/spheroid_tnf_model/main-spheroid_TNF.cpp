@@ -119,12 +119,6 @@ int main( int argc, char* argv[] )
 	setup_microenvironment(); // modify this in the custom code 
 
 	bool start_stop = parameters.bools("start_stop");
-	if( start_stop ){
-	
-		// reset microenvironment and cells as they were in the previous simulation
-		reset_microenv();
-	}
-
 
 	// User parameters
 	
@@ -165,8 +159,7 @@ int main( int argc, char* argv[] )
 
 		reset_global_parameters(cell_container);
 
-		update_variables_monitor();
-
+		reset_microenv();
 
 	} else{
 		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.
@@ -269,9 +262,6 @@ int main( int argc, char* argv[] )
 				
 				if( PhysiCell_settings.enable_full_saves == true )
 				{	
-					save_cell_microenv_data(cell_container);
-					std::cout << "cells data saved succesfully" << std::endl;
-
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
@@ -383,6 +373,9 @@ int main( int argc, char* argv[] )
 
 	
 	// timer 
+
+	save_cell_microenv_data(cell_container);
+	std::cout << "cells data saved succesfully" << std::endl;
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 

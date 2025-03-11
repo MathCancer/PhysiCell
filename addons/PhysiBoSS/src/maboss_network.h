@@ -150,13 +150,25 @@ class MaBoSSNetwork
 		 */
 		void save_nodes(std::ostream& out_stream);
 
-		void save_current_parameters(std::ostream& out_stream){
+void save_current_parameters(std::ostream& out_stream){
 
 			out_stream << "maboss_network_parameters:" << std::endl;
-			//out_stream << "update_time_step: " << this->update_time_step << std::endl;
+			out_stream << "update_time_step: " << this->update_time_step << std::endl;
 			out_stream << "time_to_update: " << this->time_to_update << std::endl;
 			out_stream << "scaling: " << this->scaling << std::endl;
 			out_stream << "time_stochasticity: " << this->time_stochasticity << std::endl;
+
+			out_stream << "initial_values_size: " << initial_values.size() << std::endl;
+			for (const auto& pair : initial_values) {
+				out_stream << "Key: " << pair.first << " Value: " << pair.second << std::endl;
+			}
+
+			out_stream << "mutations_size: " << mutations.size() << std::endl;
+			for (const auto& pair : mutations) {
+				out_stream << "Key: " << pair.first << " Value: " << pair.second << std::endl;
+			}
+			
+
 			//out_stream << "seed: " << this->seed << std::endl;
 			out_stream << std::endl;
 		}
@@ -166,6 +178,10 @@ class MaBoSSNetwork
 
 			//skip header
 			std::getline(in_stream, dummy);
+			
+			// update_time_step
+			std::getline(in_stream, dummy);
+			this->update_time_step = read_number_in_line(dummy);
 
 			//time_to_update
 			std::getline(in_stream, dummy);
@@ -178,6 +194,32 @@ class MaBoSSNetwork
 			//time_stochasticity
 			std::getline(in_stream, dummy);
 			this->time_stochasticity = read_number_in_line(dummy);
+
+			// initial_values
+			int initial_values_size;
+			std::getline(in_stream, dummy);
+			initial_values_size = read_number_in_line_int(dummy);
+			for (int i = 0; i < initial_values_size; ++i) {
+				std::getline(in_stream, dummy);
+				std::istringstream stream(dummy);
+				std::string key;
+				double value;
+				stream >> key >> value;
+				initial_values[key] = value;
+			}
+
+			// mutations
+			int mutations_size;
+			std::getline(in_stream, dummy);
+			mutations_size = read_number_in_line_int(dummy);
+			for (int i = 0; i < mutations_size; ++i) {
+				std::getline(in_stream, dummy);
+				std::istringstream stream(dummy);
+				std::string key;
+				double value;
+				stream >> key >> value;
+				mutations[key] = value;
+			}
 
 			// skip empty line
 			std::getline(in_stream, dummy);

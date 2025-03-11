@@ -146,26 +146,54 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		out_stream << "inherit_state: " << (this->inherit_state ? "true" : "false") << std::endl;
 		out_stream << "start_time: " << this->start_time << std::endl;
 		out_stream << "next_physiboss_run: " << this->next_physiboss_run << std::endl;
-		/*
-		// Print the contents of the inherit_nodes map 
-		for(const auto& pair : inherit_nodes) {
+		
+		// Stampa inherit_nodes
+		out_stream << "inherit_nodes_size: " << inherit_nodes.size() << std::endl;
+		for (const auto& pair : inherit_nodes) {
 			out_stream << "Key: " << pair.first << " Value: " << (pair.second ? "true" : "false") << std::endl;
 		}
-		
-		// Print the contents of the initial_values map
-		for(const auto& pair : initial_values) {
+
+		// Stampa initial_values
+		out_stream << "initial_values_size: " << initial_values.size() << std::endl;
+		for (const auto& pair : initial_values) {
 			out_stream << "Key: " << pair.first << " Value: " << pair.second << std::endl;
 		}
 
-		// Print the contents of the mutations map
-		for(const auto& pair : mutations) {
+		// Stampa mutations
+		out_stream << "mutations_size: " << mutations.size() << std::endl;
+		for (const auto& pair : mutations) {
 			out_stream << "Key: " << pair.first << " Value: " << pair.second << std::endl;
 		}
 
-		// Print the contents of the parameters map
-		for(const auto& pair : parameters) {
+		// Stampa parameters
+		out_stream << "parameters_size: " << parameters.size() << std::endl;
+		for (const auto& pair : parameters) {
 			out_stream << "Key: " << pair.first << " Value: " << pair.second << std::endl;
-		}*/
+		}
+
+		// Stampa indicesOfInputs
+		out_stream << "indicesOfInputs_size: " << indicesOfInputs.size() << std::endl;
+		for (size_t i = 0; i < indicesOfInputs.size(); ++i) {
+			out_stream << "Index_" << i << ": " << indicesOfInputs[i] << std::endl;
+		}
+
+		// Stampa indicesOfOutputs
+		out_stream << "indicesOfOutputs_size: " << indicesOfOutputs.size() << std::endl;
+		for (size_t i = 0; i < indicesOfOutputs.size(); ++i) {
+			out_stream << "Index_" << i << ": " << indicesOfOutputs[i] << std::endl;
+		}
+		out_stream << "listOfInputs_size: " << listOfInputs.size() << std::endl;
+		for (const auto& pair : listOfInputs) {
+			out_stream << pair.first << std::endl;
+			pair.second.save_maboss_input(out_stream);
+		}
+
+		out_stream << "listOfoUTPUTS_size: " << listOfOutputs.size() << std::endl;
+		for (const auto& pair : listOfOutputs) {
+			out_stream << pair.first << std::endl;
+			pair.second.save_maboss_output(out_stream);
+		}
+
 		out_stream << std::endl;
 		
 	}
@@ -207,10 +235,112 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		//next_physiboss_run
 		std::getline(in_stream, dummy);
 		this->next_physiboss_run = read_number_in_line(dummy);
+		
+		//inherit_nodes
+		int inherit_nodes_size;
+		std::getline(in_stream, dummy);
+		inherit_nodes_size = read_number_in_line_int(dummy);
+		for (int i = 0; i < inherit_nodes_size; ++i) {
+			std::getline(in_stream, dummy);
+			std::istringstream stream(dummy);
+			std::string key, value;
+			stream >> key >> value;
+		
+			if (value == "true") {
+				inherit_nodes[key] = true;
+			} else if (value == "false") {
+				inherit_nodes[key] = false;
+			} else {
+				throw std::runtime_error("Invalid boolean value in line: " + dummy);
+			}
+		}
+		// initial_values
+		int initial_values_size;
+		std::getline(in_stream, dummy);
+		initial_values_size = read_number_in_line_int(dummy);
+		for (int i = 0; i < initial_values_size; ++i) {
+			std::getline(in_stream, dummy);
+			std::istringstream stream(dummy);
+			std::string key;
+			double value;
+			stream >> key >> value;
+			initial_values[key] = value;
+		}
 
+		// mutations
+		int mutations_size;
+		std::getline(in_stream, dummy);
+		mutations_size = read_number_in_line_int(dummy);
+		for (int i = 0; i < mutations_size; ++i) {
+			std::getline(in_stream, dummy);
+			std::istringstream stream(dummy);
+			std::string key;
+			double value;
+			stream >> key >> value;
+			mutations[key] = value;
+		}
+
+		// parameters
+		int parameters_size;
+		std::getline(in_stream, dummy);
+		parameters_size = read_number_in_line_int(dummy);
+		for (int i = 0; i < parameters_size; ++i) {
+			std::getline(in_stream, dummy);
+			std::istringstream stream(dummy);
+			std::string key;
+			double value;
+			stream >> key >> value;
+			parameters[key] = value;
+		}
+
+		// indicesOfInputs
+		int indicesOfInputs_size;
+		std::getline(in_stream, dummy);
+		indicesOfInputs_size = read_number_in_line_int(dummy);
+		indicesOfInputs.clear();  
+		for (int i = 0; i < indicesOfInputs_size; ++i) {
+			std::getline(in_stream, dummy);
+			
+			int new_value = read_number_in_line_int(dummy);
+
+			indicesOfInputs.push_back(new_value);
+		}
+
+		// indicesOfOutputs
+		int indicesOfOutputs_size;
+		std::getline(in_stream, dummy);
+		indicesOfOutputs_size = read_number_in_line_int(dummy);
+		indicesOfOutputs.clear();  // Assicuriamoci che sia vuoto prima di riempirlo
+		for (int i = 0; i < indicesOfOutputs_size; ++i) {
+			std::getline(in_stream, dummy);
+			indicesOfOutputs.push_back(read_number_in_line_int(dummy));
+		}
+
+		int listOfInputs_size;
+		std::getline(in_stream, dummy);
+		listOfInputs_size = read_number_in_line_int(dummy);
+		listOfInputs.clear();
+		for (int i = 0; i < listOfInputs_size; ++i) {
+			std::getline(in_stream, dummy);
+			std::string key = dummy;
+			MaBoSSInput input;
+			input.read_maboss_input(in_stream);
+			listOfInputs[key] = input;
+		}
+
+		int listOfOutputs_size;
+		std::getline(in_stream, dummy);
+		listOfOutputs_size = read_number_in_line_int(dummy);
+		listOfOutputs.clear();
+		for (int i = 0; i < listOfOutputs_size; ++i) {
+			std::getline(in_stream, dummy);
+			std::string key = dummy;
+			MaBoSSOutput output;
+			output.read_maboss_output(in_stream);
+			listOfOutputs[key] = output;
+		}
 		// skip empty line
 		std::getline(in_stream, dummy);
-	
 	}
 
 	void display(std::ostream& os);
