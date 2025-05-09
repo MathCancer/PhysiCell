@@ -2,6 +2,8 @@
 #define __custom_main_h__
 
 #include "../core/PhysiCell.h"
+#include "../addons/start_and_stop/start_and_stop.h"
+
 
 inline double current_value( double min, double max, double percent )
 { return (min + (max-min) * percent); };

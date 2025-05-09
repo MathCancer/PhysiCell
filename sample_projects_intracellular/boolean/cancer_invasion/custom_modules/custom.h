@@ -102,3 +102,4 @@ void post_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt);
 
 std::string my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc );
 void color_node(Cell* pCell);
+bool auto_stop();

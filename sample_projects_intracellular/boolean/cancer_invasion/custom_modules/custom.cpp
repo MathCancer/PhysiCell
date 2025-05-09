@@ -399,3 +399,19 @@ std::string my_coloring_function_for_stroma( double concentration, double max_co
 	 return paint_by_density_percentage( concentration,  max_conc,  min_conc); 
 
 }
+
+bool auto_stop() {
+
+	bool condition = false;
+	bool stop;
+	float stop_time = 1440;
+	if ((fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt) && (PhysiCell_globals.next_full_save_time == stop_time)) {
+		condition = true;
+	}
+    if (condition) {
+        stop = true;
+    } else {
+        stop = false;
+    }
+    return stop;
+}

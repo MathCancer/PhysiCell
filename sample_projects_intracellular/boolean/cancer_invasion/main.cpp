@@ -86,7 +86,13 @@ using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
+	clock_t T_save_start, T_save_stop, T_reload_start, T_reload_stop, T_total_start, T_total_stop, T_main_start, T_main_stop;
+	T_total_start = clock();
+	T_reload_start = clock();
 	// load and parse settings file(s)
+
+	std::ofstream file_times("output/interesting_times.txt", std::ios::app);
+
 	
 	bool XML_status = false; 
 	char copy_command [1024]; 
@@ -122,6 +128,8 @@ int main( int argc, char* argv[] )
 	/* Microenvironment setup */ 
 	
 	setup_microenvironment(); // modify this in the custom code 
+
+	bool start_stop = parameters.bools("start_stop");
 	
 	/* PhysiCell setup */ 
  	
@@ -132,8 +140,26 @@ int main( int argc, char* argv[] )
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	create_cell_types();
-	
-	setup_tissue();
+
+	if( start_stop ){
+
+
+		setup_tissue();
+
+		reset_cell(cell_container->last_cell_cycle_time);
+
+		//exit(-1);
+
+
+		reset_global_parameters(cell_container);
+
+		reset_microenv();
+
+
+
+	} else{
+		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.
+	}
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	
@@ -183,15 +209,25 @@ int main( int argc, char* argv[] )
 		report_file.open(filename); 	// create the data log file 
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
+
+	//put here reset randomness
+	if( start_stop ){
+		reset_randomness();
+	}
+
+	//define auto stop variable
+	bool stop = false;
 	
 	// main loop 
-	
+	T_reload_stop = clock();
+
+	T_main_start = clock();
 	try 
 	{		
-		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
+		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt && stop!=true)
 		{
 			// save data if it's time. 
-			if( PhysiCell_globals.current_time > PhysiCell_globals.next_full_save_time - 0.5 * diffusion_dt )
+			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
 			{
 				display_simulation_status( std::cout ); 
 				if( PhysiCell_settings.enable_legacy_saves == true )
@@ -201,17 +237,22 @@ int main( int argc, char* argv[] )
 				
 				if( PhysiCell_settings.enable_full_saves == true )
 				{	
+
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
+					if ( parameters.bools("auto_stop") ){
+						stop = auto_stop();
+				}
 				}
 				
 				PhysiCell_globals.full_output_index++; 
 				PhysiCell_globals.next_full_save_time += PhysiCell_settings.full_save_interval;
+
 			}
 			
 			// save SVG plot if it's time
-			if( PhysiCell_globals.current_time > PhysiCell_globals.next_SVG_save_time - 0.5 * diffusion_dt )
+			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_SVG_save_time  ) < 0.01 * diffusion_dt )
 			{
 				if( PhysiCell_settings.enable_SVG_saves == true )
 				{	
@@ -246,6 +287,7 @@ int main( int argc, char* argv[] )
 	{ // reference to the base of a polymorphic object
 		std::cout << e.what(); // information from length_error printed
 	}
+	T_main_stop = clock();
 	
 	// save a final simulation snapshot 
 	
@@ -254,11 +296,26 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, ECM_coloring_function);
+
+	// save the necessary files for the start and stop add-on
+	T_save_start = clock();
+	save_cell_microenv_data(cell_container);
+	std::cout << "cells data saved succesfully" << std::endl;
+	T_save_stop = clock();
+
 	
 	// timer 
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
+	T_total_stop = clock();
+	double T_save, T_reload, T_total, T_main;
+	T_save = (double)(T_save_stop - T_save_start)/CLOCKS_PER_SEC;
+	T_reload = (double)(T_reload_stop - T_reload_start)/CLOCKS_PER_SEC;
+	T_total = (double)(T_total_stop - T_total_start)/CLOCKS_PER_SEC;
+	T_main = (double)(T_main_stop - T_main_start)/CLOCKS_PER_SEC;
+	file_times << T_save << " " << T_reload << " " << T_total << " " << T_main << std::endl;
+	file_times.close();
 
 	return 0; 
 }

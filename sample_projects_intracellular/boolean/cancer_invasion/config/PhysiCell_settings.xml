@@ -14,7 +14,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">2880.0</max_time>
+        <max_time units="min">600</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -29,11 +29,11 @@
     <save>
         <folder>output</folder>
         <full_data>
-            <interval units="min">10</interval>
+            <interval units="min">30</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">10</interval>
+            <interval units="min">30</interval>
             <enable>true</enable>
             <legend enabled="true">
                 <cell_phase>false</cell_phase>
@@ -670,6 +670,9 @@
     </initial_conditions>
 
     <user_parameters>
+    	<start_stop type="bool" units="">false</start_stop>
+        <auto_stop type="bool" units="">false</auto_stop>
+
         <random_seed type="int" units="dimensionless" description="">0</random_seed>
         <tumor_radius type="double" units="micron" description="">30.0</tumor_radius>
         <config_radius type="double" units="" description="change the initial radius of the tumor">30</config_radius>
