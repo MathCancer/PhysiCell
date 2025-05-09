@@ -84,8 +84,12 @@ using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
+	clock_t T_save_start, T_save_stop, T_reload_start, T_reload_stop, T_total_start, T_total_stop, T_main_start, T_main_stop;
+	T_total_start = clock();
+	T_reload_start = clock();
 	// load and parse settings file(s)
 	std::ofstream file_resistant("output/resistant_cells.txt", std::ios::app);
+	std::ofstream file_times("output/interesting_times.txt", std::ios::app);
 	
 	bool XML_status = false; 
 	char copy_command [1024]; 
@@ -132,6 +136,7 @@ int main( int argc, char* argv[] )
 	double tnf_pulse_timer = tnf_pulse_period;
 	double tnf_pulse_injection_timer = tnf_pulse_duration; // tnf_pulse_duration; // -1;
 	static int tnf_idx = microenvironment.find_density_index("tnf");	
+	int resistant_cells = 0;
 
 
 	/* PhysiCell setup */ 
@@ -159,7 +164,10 @@ int main( int argc, char* argv[] )
 
 		reset_global_parameters(cell_container);
 
+		update_variables_monitor();
+
 		reset_microenv();
+
 
 	} else{
 		setup_tissue(); //death model index = 1 == necrotic...= 0 == apoptotic.
@@ -216,6 +224,7 @@ int main( int argc, char* argv[] )
 	// set the performance timers 
 	BioFVM::RUNTIME_TIC();
 	BioFVM::TIC();
+	T_reload_stop = clock();
 	
 	std::ofstream report_file;
 	if( PhysiCell_settings.enable_legacy_saves == true )
@@ -233,6 +242,8 @@ int main( int argc, char* argv[] )
 
 	//define auto stop variable
 	bool stop = false;
+
+	T_main_start = clock();
 
 	// main loop
 	try 
@@ -272,7 +283,9 @@ int main( int argc, char* argv[] )
 					
 					// add test necessities, not necessary for the correct functioning of the model
 
-					int resistant_cells = save_resistant_cells(file_resistant);
+					resistant_cells = save_resistant_cells(file_resistant);
+
+
 					if(parameters.bools("auto_stop")){
 
 						int alive = total_live_cell_count();
@@ -298,6 +311,7 @@ int main( int argc, char* argv[] )
 				PhysiCell_globals.full_output_index++; 
 				PhysiCell_globals.next_full_save_time += PhysiCell_settings.full_save_interval;
 			}
+
 			
 			// save SVG plot if it's time
 			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_SVG_save_time  ) < 0.01 * diffusion_dt )
@@ -334,7 +348,7 @@ int main( int argc, char* argv[] )
 				remove_density(tnf_idx);
 				time_remove_tnf += PhysiCell_settings.max_time;
 			}
-
+			
 				
 
 			// update the microenvironment
@@ -360,6 +374,7 @@ int main( int argc, char* argv[] )
 		std::cout << e.what(); // information from length_error printed
 	}
 	
+	T_main_stop = clock();
 	// save a final simulation snapshot 
 	
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
@@ -371,16 +386,26 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 
+	// Save all the files needed for Start & Stop at the right point.
+	T_save_start = clock();
+	save_cell_microenv_data(cell_container);
+	std::cout << "cells data saved successfully" << std::endl;
+	T_save_stop = clock();
 	
 	// timer 
-
-	save_cell_microenv_data(cell_container);
-	std::cout << "cells data saved succesfully" << std::endl;
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
 
 	file_resistant.close();
+	T_total_stop = clock();
+	double T_save, T_reload, T_total, T_main;
+	T_save = (double)(T_save_stop - T_save_start)/CLOCKS_PER_SEC;
+	T_reload = (double)(T_reload_stop - T_reload_start)/CLOCKS_PER_SEC;
+	T_total = (double)(T_total_stop - T_total_start)/CLOCKS_PER_SEC;
+	T_main = (double)(T_main_stop - T_main_start)/CLOCKS_PER_SEC;
+	file_times << T_save << " " << T_reload << " " << T_total <<" " << T_main <<  std::endl;
+	file_times.close();
 
 	return 0; 
 }

@@ -488,46 +488,40 @@ int save_resistant_cells(ofstream& file_resistant){
 	vector<vector<string>> stable_states = {
         {"TNF", "TNFR", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
         {"FASL", "TNF", "TNFR", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
-        {"TNF", "TNFR", "DISC-TNF", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
-        {"FASL", "DISC-FAS", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
-        {"FASL", "TNF", "TNFR", "DISC-TNF", "DISC-TNF", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"}
+        {"TNF", "TNFR", "DISC_TNF", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
+        {"FASL", "DISC_FAS", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"},
+        {"FASL", "TNF", "TNFR", "DISC_TNF", "DISC_FAS", "FADD", "RIP1", "RIP1ub", "RIP1K", "IKK", "NFkB", "BCL2", "ATP", "cIAP", "XIAP", "cFLIP", "Survival"}
     };
 
     // Read the bool_data.txt file
-    ifstream file("start_and_stop_saving_files/bool_data.txt");
-    if (!file.is_open()) {
-        cerr << "Error opening file." << endl;
-        exit(1);
-    }
 
     string line;
     int counter_stable = 0;
-    while (getline(file, line)) {
-        istringstream iss(line);
-        string node;
+
+	for (int i = 0; i < (*all_cells).size(); i++)
+	{
+		// Access the current cell
+		Cell *pCell = (*all_cells)[i];
+		string node;
         vector<string> nodes; // Define nodes as a vector
-        while (iss >> node) {
-            size_t pos = node.find('=');
-            if (pos != string::npos) {
-                string key = node.substr(0, pos);
-                string value = node.substr(pos + 1);
-                if (value == "1") {
-                    nodes.push_back(key); // Push key to nodes vector
-                }
-            }
-        }
-
-        sort(nodes.begin(), nodes.end()); // Sort nodes vector
-
-        // Loop through stable_states vectors
-        for (auto& state : stable_states) {
-            sort(state.begin(), state.end()); // Sort each stable state vector
-            if (includes(nodes.begin(), nodes.end(), state.begin(), state.end())) {
-                counter_stable++;
-                break;
-            }
-        }
-    }
+		bool is_resistant = false;
+		int num_stable_states = stable_states.size();
+		int j = 0;
+		while (j < num_stable_states && !is_resistant) {
+			const auto& state = stable_states[j];
+			int counter = 0;
+			for (const auto& node : state) {
+				if (pCell->phenotype.intracellular->get_boolean_variable_value(node) == 1) {
+					counter++;
+				}
+			}
+			if (counter == state.size()) {
+				is_resistant = true;
+				counter_stable++;
+			}
+			j++;
+		}
+	}
 	// save the number of resistant cells on a file 
 	
 	file_resistant << counter_stable << endl;
@@ -540,7 +534,7 @@ bool auto_stop() {
 
 	bool condition = false;
 	bool stop;
-	// impèlement here your condition to stop the simulation
+	// implement here your condition to stop the simulation
 
     if (condition) {
         stop = true;
