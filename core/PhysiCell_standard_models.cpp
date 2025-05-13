@@ -1422,87 +1422,55 @@ void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daug
 void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 {
     // check for detachments 
-    double detachment_probability = phenotype.mechanics.detachment_rate * dt; 
-    for( int j=0; j < pCell->state.attached_cells.size(); j++ )
-    {
-        Cell* pTest = pCell->state.attached_cells[j]; 
-        if( UniformRandom() <= detachment_probability )
-        { detach_cells( pCell , pTest ); }
-    }
+    double detachment_probability = phenotype.mechanics.detachment_rate * dt;
+	for( auto pTest : pCell->state.attached_cells )
+	{
+		if( UniformRandom() <= detachment_probability )
+		{ detach_cells( pCell , pTest ); }
+	}
 
-    // check if I have max number of attachments 
-    if( pCell->state.attached_cells.size() >= phenotype.mechanics.maximum_number_of_attachments )
-    { return; }
-
-    // check for new attachments; 
-    double attachment_probability = phenotype.mechanics.attachment_rate * dt; 
-    bool done = false; 
-    int j = 0; 
-    while( done == false && j < pCell->state.neighbors.size() )
-    {
-        Cell* pTest = pCell->state.neighbors[j]; 
-        if( pTest->state.number_of_attached_cells() < pTest->phenotype.mechanics.maximum_number_of_attachments )
-        {
-            // std::string search_string = "adhesive affinity to " + pTest->type_name; 
-            // double affinity = get_single_behavior( pCell , search_string );
-			double affinity = phenotype.mechanics.cell_adhesion_affinity(pTest->type_name); 
-
-            double prob = attachment_probability * affinity; 
-            if( UniformRandom() <= prob )
-            {
-                // attempt the attachment. testing for prior connection is already automated 
-                attach_cells( pCell, pTest ); 
-                if( pCell->state.attached_cells.size() >= phenotype.mechanics.maximum_number_of_attachments )
-                { done = true; }
-            }
-        }
-        j++; 
-    }
+	// check for new attachments
+	for ( auto pTest : pCell->state.neighbors )
+	{
+		if( pCell->state.attached_cells.size() >= phenotype.mechanics.maximum_number_of_attachments )
+		{ break; }
+		
+		double prob = phenotype.mechanics.attachment_rate * dt * phenotype.mechanics.cell_adhesion_affinity(pTest->type_name);
+		if( UniformRandom() <= prob )
+		{
+			// attempt the attachment. testing for prior connection is already automated 
+			attach_cells( pCell, pTest ); 
+		}
+	}
     return; 
 }
 
 void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 {
     // check for detachments 
-    double detachment_probability = phenotype.mechanics.detachment_rate * dt; 
-    for( int j=0; j < pCell->state.spring_attachments.size(); j++ )
-    {
-        Cell* pTest = pCell->state.spring_attachments[j];
-		if (phenotype.cell_interactions.pAttackTarget==pTest || pTest->phenotype.cell_interactions.pAttackTarget==pCell) // do not let attackers detach randomly
+    double detachment_probability = phenotype.mechanics.detachment_rate * dt;
+	for( auto pTest : pCell->state.spring_attachments )
+	{
+		if( phenotype.cell_interactions.pAttackTarget==pTest || pTest->phenotype.cell_interactions.pAttackTarget==pCell ) // do not let attackers detach randomly
 		{ continue; }
         if( UniformRandom() <= detachment_probability )
         { detach_cells_as_spring( pCell , pTest ); }
-    }
+	}
 
-    // check if I have max number of attachments 
-    if( pCell->state.spring_attachments.size() >= phenotype.mechanics.maximum_number_of_attachments )
-    { return; }
-
-    // check for new attachments; 
-    double attachment_probability = phenotype.mechanics.attachment_rate * dt; 
-    bool done = false; 
-    int j = 0; 
-    while( done == false && j < pCell->state.neighbors.size() )
-    {
-        Cell* pTest = pCell->state.neighbors[j]; 
-        if( pTest->state.spring_attachments.size() < pTest->phenotype.mechanics.maximum_number_of_attachments )
-        {
-            // std::string search_string = "adhesive affinity to " + pTest->type_name; 
-            // double affinity = get_single_behavior( pCell , search_string );
-			double affinity = phenotype.mechanics.cell_adhesion_affinity(pTest->type_name); 
-
-            double prob = attachment_probability * affinity; 
-            if( UniformRandom() <= prob )
-            {
-                // attempt the attachment. testing for prior connection is already automated 
-                attach_cells_as_spring( pCell, pTest ); 
-                if( pCell->state.spring_attachments.size() >= phenotype.mechanics.maximum_number_of_attachments )
-                { done = true; }
-            }
-        }
-        j++; 
-    }
-    return; 
+	// check for new attachments
+	for ( auto pTest : pCell->state.neighbors )
+	{
+		if( pCell->state.spring_attachments.size() >= phenotype.mechanics.maximum_number_of_attachments )
+		{ break; }
+		
+		double prob = phenotype.mechanics.attachment_rate * dt * phenotype.mechanics.cell_adhesion_affinity(pTest->type_name);
+		if( UniformRandom() <= prob )
+		{
+			// attempt the attachment. testing for prior connection is already automated
+			attach_cells_as_spring(pCell, pTest);
+		}
+	}
+	return;
 }
 
 	
