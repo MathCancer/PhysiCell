@@ -1441,8 +1441,6 @@ void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt )
     while( done == false && j < pCell->state.neighbors.size() )
     {
         Cell* pTest = pCell->state.neighbors[j]; 
-		if (phenotype.cell_interactions.pAttackTarget==pTest || pTest->phenotype.cell_interactions.pAttackTarget==pCell) // do not let attackers detach randomly
-		{ continue; }
         if( pTest->state.number_of_attached_cells() < pTest->phenotype.mechanics.maximum_number_of_attachments )
         {
             // std::string search_string = "adhesive affinity to " + pTest->type_name; 
@@ -1469,7 +1467,9 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
     double detachment_probability = phenotype.mechanics.detachment_rate * dt; 
     for( int j=0; j < pCell->state.spring_attachments.size(); j++ )
     {
-        Cell* pTest = pCell->state.spring_attachments[j]; 
+        Cell* pTest = pCell->state.spring_attachments[j];
+		if (phenotype.cell_interactions.pAttackTarget==pTest || pTest->phenotype.cell_interactions.pAttackTarget==pCell) // do not let attackers detach randomly
+		{ continue; }
         if( UniformRandom() <= detachment_probability )
         { detach_cells_as_spring( pCell , pTest ); }
     }
