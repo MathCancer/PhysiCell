@@ -1861,7 +1861,35 @@ std::ostream& operator<<(std::ostream& os, Microenvironment& S)
         os << S.voxels(n).center << std::endl;
     }
     os << std::endl;
-    return os;
+
+	// dirichlet_value_vectors
+	os << "dirichlet_value_vectors:" << std::endl;
+	for (const auto& vec : S.dirichlet_value_vectors) {
+		for (const auto& val : vec) {
+			os << val << " ";
+		}
+		os << std::endl;
+	}
+	os << std::endl;
+
+	// dirichlet_activation_vector (singolo)
+	os << "dirichlet_activation_vector: ";
+	for (bool val : S.dirichlet_activation_vector) {
+		os << (val ? "true" : "false") << " ";
+	}
+	os << std::endl << std::endl;
+
+	// dirichlet_activation_vectors (matrice)
+	os << "dirichlet_activation_vectors:" << std::endl;
+	for (const auto& vec : S.dirichlet_activation_vectors) {
+		for (bool val : vec) {
+			os << (val ? "true" : "false") << " ";
+		}
+		os << std::endl;
+	}
+	os << std::endl;
+
+	return os;
 }
 
 std::istream& operator>>(std::istream& is, Microenvironment& microenv){
@@ -2380,6 +2408,69 @@ std::istream& operator>>(std::istream& is, Microenvironment& microenv){
 	}
 	}
 	assert(n_lines == microenv.number_of_voxels());
+
+		// skip empty line
+		std::getline(is, dummy);
+		std::getline(is, dummy);
+	
+		// dirichlet_value_vectors
+		n_lines = 0;
+		for (unsigned int n = 0; n < microenv.dirichlet_value_vectors.size(); n++) {
+			std::getline(is, dummy); 
+			n_lines++;
+			std::istringstream stream(dummy);
+			size_t j = 0;
+			while (stream >> value) {
+				microenv.dirichlet_value_vectors[n][j] = value;
+				j++;
+			}
+		}
+		assert(n_lines == microenv.dirichlet_value_vectors.size());
+	
+		// read empty line
+		std::getline(is, dummy);
+		// dirichlet_activation_vector
+		n_lines = 0;
+		std::getline(is, dummy);
+		bool dirichlet_activation_vector;
+		std::istringstream stream_dirichlet_activation_vector(dummy);
+		std::string key_dirichlet_activation_vector;
+		stream_dirichlet_activation_vector >> key_dirichlet_activation_vector;
+		for (int i = 0; i < microenv.dirichlet_activation_vector.size(); i++){
+			stream_dirichlet_activation_vector >> value_2;
+			if(value_2 == "true"){
+				dirichlet_activation_vector = true;
+			}
+			else if(value_2 == "false"){
+				dirichlet_activation_vector = false;
+			}
+			microenv.dirichlet_activation_vector[i] = dirichlet_activation_vector;
+		}
+		
+		// read empty line
+		std::getline(is, dummy);
+		std::getline(is, dummy);
+	
+		// dirichlet_activation_vectors
+		n_lines = 0;
+		for (unsigned int n = 0; n < microenv.dirichlet_activation_vectors.size(); n++) {
+			std::getline(is, dummy); 
+			n_lines++;
+			std::istringstream stream(dummy);
+			size_t j = 0;
+			while (stream >> value_2) {
+				if(value_2 == "true"){
+					microenv.dirichlet_activation_vectors[n][j] = true;
+				}
+				else if(value_2 == "false"){
+					microenv.dirichlet_activation_vectors[n][j] = false;
+				}
+				j++;
+			}
+		}	
+
+		// verifica che il numero di righe lette corrisponda
+		assert(n_lines == microenv.dirichlet_activation_vectors.size());
 
 	
 	return is;

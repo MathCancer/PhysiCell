@@ -34,7 +34,7 @@ void save_cell_microenv_data(Cell_Container* cell_container)
 	string filename_cells = "start_and_stop_saving_files/cell_data.txt";
 	string filename_bool = "start_and_stop_saving_files/bool_data.txt";
 	string filename_microenv = "start_and_stop_saving_files/microenv_data.txt";
-	string cell_pos_filename = "start_and_stop_saving_files/initial.tsv";
+	string cell_pos_filename = "start_and_stop_saving_files/cells.csv";
 	string global_param_filename = "start_and_stop_saving_files/global_param.txt";
 	string random_counters_filename = "start_and_stop_saving_files/random_counters.txt";
 
@@ -89,7 +89,7 @@ void save_cell_microenv_data(Cell_Container* cell_container)
 	file_microenv << microenvironment;
 
 	// add header to pos file
-	cell_pos_file << "x	y	z" << endl;
+	cell_pos_file << "x,y,z,type" << endl;
 
 	// Iterate through all cells
 	for (int i = 0; i < (*all_cells).size(); i++)
@@ -119,9 +119,10 @@ void save_cell_microenv_data(Cell_Container* cell_container)
 		file_cells << std::endl;
 
 		// Write the positions in the cell file
-		cell_pos_file << pCell->position[0] << "	";
-		cell_pos_file << pCell->position[1] << "	";
-		cell_pos_file << pCell->position[2];
+		cell_pos_file << pCell->position[0] << ",";
+		cell_pos_file << pCell->position[1] << ",";
+		cell_pos_file << pCell->position[2] << ",";
+		cell_pos_file << pCell->type_name;
 
 		
 		if (pCell->phenotype.intracellular){

@@ -213,8 +213,7 @@ void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& 
 void treatment_function () 
 {
 	if (PhysiCell::parameters.bools.find_index("treatment") != -1) 
-	{
-		int treatment_substrate_index = BioFVM::microenvironment.find_density_index(PhysiCell::parameters.strings("treatment_substrate"));
+	{	int treatment_substrate_index = BioFVM::microenvironment.find_density_index(PhysiCell::parameters.strings("treatment_substrate"));
 
 		if (PhysiCell::parameters.bools("treatment")){
 		
