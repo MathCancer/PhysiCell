@@ -124,7 +124,7 @@ void setup_tissue(void)
 	if ( parameters.bools("read_init") )
 	{
 		std::string csv_fname = parameters.strings("init_cells_filename");
-		positions = read_cells_positions(csv_fname, '\t', true);
+		positions = read_cells_positions(csv_fname, ',', true);
 
 	}
 	else

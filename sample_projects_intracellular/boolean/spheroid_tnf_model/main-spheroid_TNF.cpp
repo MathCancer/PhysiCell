@@ -284,28 +284,27 @@ int main( int argc, char* argv[] )
 					// add test necessities, not necessary for the correct functioning of the model
 
 					resistant_cells = save_resistant_cells(file_resistant);
+					int alive = total_live_cell_count();
 
 
 					if(parameters.bools("auto_stop")){
 
-						int alive = total_live_cell_count();
+						//auto stop condition (alive)
+						stop = auto_stop_alive(alive);
+						if (stop){
+							std::cout << "auto stop alive condition activated, simulation interrupted." << std::endl;
+						}
+					}		
 
-						if(parameters.bools("auto_stop_resistance")){
-							
-							//auto stop condition (resistance)
-							stop = auto_stop_resistance(alive, resistant_cells);
-							if (stop){
-								std::cout << "auto stop resistance condition activated, simulation interrupted." << std::endl;
-							}
-						}else{
-
-							//auto stop condition (alive)
-							stop = auto_stop_alive(alive);
-							if (stop){
-								std::cout << "auto stop alive condition activated, simulation interrupted." << std::endl;
-							}
+					if(parameters.bools("auto_stop_resistance")){
+						
+						//auto stop condition (resistance)
+						stop = auto_stop_resistance(alive, resistant_cells);
+						if (stop){
+							std::cout << "auto stop resistance condition activated, simulation interrupted." << std::endl;
 						}
 					}
+				
 				}
 
 				PhysiCell_globals.full_output_index++; 
