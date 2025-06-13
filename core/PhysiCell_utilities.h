@@ -80,9 +80,8 @@
 
 namespace PhysiCell{
 
-
-	extern std::vector<unsigned int> physicell_random_seeds; 
-
+extern std::vector<unsigned int> physicell_random_seeds;
+extern bool warned_rng;
 void setup_rng( void );
 void SeedRandom( unsigned int input );
 void SeedRandom( void );

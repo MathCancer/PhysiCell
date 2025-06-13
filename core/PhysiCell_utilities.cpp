@@ -78,18 +78,18 @@ thread_local bool local_pnrg_setup_done = false;
 unsigned int physicell_random_seed = 0; 
 std::vector<unsigned int> physicell_random_seeds; 
 
+bool warned_rng = false;
 void setup_rng( void )
 {
 	static bool setup_done = false;
-	static bool warned = false;
-	if (!warned && setup_done)
+	if (!warned_rng && setup_done)
 	{
 		std::cout << "WARNING: Setting the random seed again." << std::endl
 				  << "\tYou probably have set a user parameter called random_seed." << std::endl
 				  << "\tHere, we will use the random seed set in user parameters." << std::endl	
 				  << "\tHOWEVER, as of PhysiCell 1.14.0, you should set the random seed in the <options><random_seed> element in the config file." << std::endl
 				  << "\tFuture versions of PhysiCell may throw an error here. Kindly remove the user parameter and just use the <options><random_seed> element." << std::endl;
-		warned = true;
+		warned_rng = true;
 	}
 	std::cout << "Setting up RNG with seed " << physicell_random_seed << std::endl;
 
