@@ -249,6 +249,7 @@ int main( int argc, char* argv[] )
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
+	std::cout << std::endl;
 
 	return 0; 
 }

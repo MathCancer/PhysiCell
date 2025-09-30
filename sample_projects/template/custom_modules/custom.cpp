@@ -95,6 +95,10 @@ void create_cell_types( void )
 	
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+
+	cell_defaults.functions.update_phenotype = phenotype_function;
+	cell_defaults.functions.custom_cell_rule = custom_function;
+	cell_defaults.functions.contact_function = contact_function;
 	
 	/*
 	   This parses the cell definitions in the XML config file. 
@@ -126,9 +130,6 @@ void create_cell_types( void )
 	   This is a good place to set custom functions. 
 	*/ 
 	
-	cell_defaults.functions.update_phenotype = phenotype_function; 
-	cell_defaults.functions.custom_cell_rule = custom_function; 
-	cell_defaults.functions.contact_function = contact_function; 
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -211,4 +212,4 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 { return; } 
 
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
-{ return; } 
+{ return; }
