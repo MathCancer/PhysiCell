@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iostream>
 
+#include "../../../BioFVM/BioFVM_microenvironment_interface.h"
+
 RoadRunnerIntracellular::RoadRunnerIntracellular() : Intracellular()
 {
 	intracellular_type = "sbml";
@@ -319,7 +321,7 @@ void RoadRunnerIntracellular::save_libRR(std::string path, std::string index)
 	state_file << "---------  dummy output from save_libRR  ---------" << std::endl;
 	state_file << "ID,state" << std::endl;
 	for( auto cell : *PhysiCell::all_cells )
-		state_file << cell->ID << "," << cell->phenotype.intracellular->get_state() << std::endl;
+		state_file << cell->get_ID() << "," << cell->phenotype.intracellular->get_state() << std::endl;
 	state_file.close();
 }
 
@@ -380,31 +382,31 @@ int RoadRunnerIntracellular::update_phenotype_parameters(PhysiCell::Phenotype& p
                 token = s.substr(0, pos);
                 s.erase(0, pos + delimiter.length());
             }
-            int sub_index = microenvironment.find_density_index(s);
+            int sub_index = BioFVM::get_microenvironment_i()->find_density_index(s);
 
             //transport types
             //uptake rate
             if (elm.first.substr(0,3) == "sur")
             {
                 //std::cout << sub_index << std::endl;
-                //std::cout << "Before sur1 : " << phenotype.secretion.uptake_rates[sub_index] << std::endl;
-                phenotype.secretion.uptake_rates[1] = phenotype.intracellular->get_parameter_value(elm.second);
-                //std::cout << "After sur1 : " << phenotype.secretion.uptake_rates[sub_index] << std::endl;
+                //std::cout << "Before sur1 : " << phenotype.secretion.uptake_rates()[sub_index] << std::endl;
+                phenotype.secretion.uptake_rates()[1] = phenotype.intracellular->get_parameter_value(elm.second);
+                //std::cout << "After sur1 : " << phenotype.secretion.uptake_rates()[sub_index] << std::endl;
             }
             //secretion rate
             else if (elm.first.substr(0,3) == "ssr")
             {
-                phenotype.secretion.secretion_rates[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
+                phenotype.secretion.secretion_rates()[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
             }
             //secretion density
             else if (elm.first.substr(0,3) == "ssd")
             {
-                phenotype.secretion.saturation_densities[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
+                phenotype.secretion.saturation_densities()[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
             }
             //net export rate
             else if (elm.first.substr(0,3) == "ser")
             {
-                phenotype.secretion.net_export_rates[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
+                phenotype.secretion.net_export_rates()[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
             }
             else
             {
@@ -533,7 +535,7 @@ int RoadRunnerIntracellular::validate_PhysiCell_tokens(PhysiCell::Phenotype& phe
                 token = s.substr(0, pos);
                 s.erase(0, pos + delimiter.length());
             }
-            int sub_index = microenvironment.find_density_index(s);
+            int sub_index = BioFVM::get_microenvironment_i()->find_density_index(s);
             //std::cout << "SUBSTRATE_INDEX = : " << sub_index << std::endl;
             if ( sub_index < 0 )
             {

@@ -126,7 +126,7 @@ class General_Mesh
 	std::vector< std::vector<int> > connected_voxel_indices; 
 	
 	int nearest_voxel_index( std::vector<double>& position );   
-	bool is_position_valid(double x, double y, double z);
+	bool is_position_valid(double x, double y, double z) const;
 	/* the following help manage the voxel faces */ 
 
 	// returns the index of the voxel face connecting from voxels[i] to voxels[j] 
@@ -159,7 +159,7 @@ class General_Mesh
 	
 	void display_information( std::ostream& os); 
 	
-	void write_to_matlab( std::string filename ); 
+	void write_to_matlab( std::string filename ) const; 
 	void read_from_matlab( std::string filename ); 
 };
 
@@ -198,8 +198,8 @@ class Cartesian_Mesh : public General_Mesh
 	void resize( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx, double dy, double dz ); 
 	void resize_uniform( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx ); 
 	
-	int nearest_voxel_index( std::vector<double>& position );   
-	int nearest_voxel_face_index( std::vector<double>& position );  
+	int nearest_voxel_index( const std::vector<double>& position );   
+	int nearest_voxel_face_index( const std::vector<double>& position );  
 	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
 	Voxel& nearest_voxel( std::vector<double>& position ); 
 	

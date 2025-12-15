@@ -65,9 +65,8 @@
 ###############################################################################
 */
 
-#include "../BioFVM/BioFVM_agent_container.h"
+#include "../BioFVM/BioFVM_implementation.h"
 #include "PhysiCell_constants.h"
-#include "../BioFVM/BioFVM_vector.h"
 #include "PhysiCell_cell.h"
 
 #include <algorithm>
@@ -81,7 +80,7 @@ std::vector<Cell*> *all_cells;
 
 Cell_Container::Cell_Container()
 {
-	all_cells = (std::vector<Cell*> *) &all_basic_agents;	
+	all_cells = (std::vector<Cell*> *) BioFVM_Implementation::get_all_basic_agents();
 	boundary_condition_for_pushed_out_agents= PhysiCell_constants::default_boundary_condition_for_pushed_out_agents;
 	std::vector<Cell*> cells_ready_to_divide;
 	std::vector<Cell*> cells_ready_to_die;
@@ -98,7 +97,7 @@ void Cell_Container::initialize(double x_start, double x_end, double y_start, do
 
 void Cell_Container::initialize(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx, double dy, double dz)
 {
-	all_cells = (std::vector<Cell*> *) &all_basic_agents;	
+	all_cells = (std::vector<Cell*> *) BioFVM_Implementation::get_all_basic_agents();
 	boundary_condition_for_pushed_out_agents= PhysiCell_constants::default_boundary_condition_for_pushed_out_agents;
 	std::vector<Cell*> cells_ready_to_divide;
 	std::vector<Cell*> cells_ready_to_die;
@@ -122,17 +121,6 @@ void Cell_Container::update_all_cells(double t)
 
 void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double mechanics_dt_ , double diffusion_dt_ )
 {
-	// secretions and uptakes. Syncing with BioFVM is automated. 
-
-	#pragma omp parallel for 
-	for( int i=0; i < (*all_cells).size(); i++ )
-	{
-		if( (*all_cells)[i]->is_out_of_domain == false )
-		{
-			(*all_cells)[i]->phenotype.secretion.advance( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
-		}
-	}
-	
 	//if it is the time for running cell cycle, do it!
 	double time_since_last_cycle= t- last_cell_cycle_time;
 
@@ -210,8 +198,8 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		
 		// new February 2018 
 		// if we need gradients, compute them
-		if( default_microenvironment_options.calculate_gradients ) 
-		{ microenvironment.compute_all_gradient_vectors();  }
+		if( BioFVM::get_microenvironment_i()->calculate_gradients() ) 
+		{ BioFVM::get_microenvironment_i()->compute_all_gradient_vectors();  }
 		// end of new in Feb 2018 
 		
 		// perform interactions -- new in June 2020 
@@ -372,17 +360,17 @@ bool Cell_Container::contain_any_cell(int voxel_index)
 
 int find_escaping_face_index(Cell* agent)
 {
-	if(agent->position[0] <= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_min_x_index])
+	if(agent->get_position()[0] <= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_min_x_index])
 	{ return PhysiCell_constants::mesh_lx_face_index; }
-	if(agent->position[0] >= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_max_x_index])
+	if(agent->get_position()[0] >= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_max_x_index])
 	{ return PhysiCell_constants::mesh_ux_face_index; }
-	if(agent->position[1] <= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_min_y_index])
+	if(agent->get_position()[1] <= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_min_y_index])
 	{ return PhysiCell_constants::mesh_ly_face_index; }
-	if(agent->position[1] >= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_max_y_index])
+	if(agent->get_position()[1] >= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_max_y_index])
 	{ return PhysiCell_constants::mesh_uy_face_index; }
-	if(agent->position[2] <= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_min_z_index])
+	if(agent->get_position()[2] <= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_min_z_index])
 	{ return PhysiCell_constants::mesh_lz_face_index; }
-	if(agent->position[2] >= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_max_z_index])
+	if(agent->get_position()[2] >= agent->get_container()->underlying_mesh.bounding_box[PhysiCell_constants::mesh_max_z_index])
 	{ return PhysiCell_constants::mesh_uz_face_index; }
 	return -1; 
 }
@@ -409,19 +397,23 @@ void Cell_Container::flag_cell_for_removal( Cell* pCell )
 	return; 
 }
 
-Cell_Container* create_cell_container_for_microenvironment( BioFVM::Microenvironment& m , double mechanics_voxel_size )
+Cell_Container* create_cell_container( double mechanics_voxel_size )
 {
-	Cell_Container* cell_container = new Cell_Container;
-	cell_container->initialize( m.mesh.bounding_box[0], m.mesh.bounding_box[3], 
-		m.mesh.bounding_box[1], m.mesh.bounding_box[4], 
-		m.mesh.bounding_box[2], m.mesh.bounding_box[5],  mechanics_voxel_size );
-	m.agent_container = (Agent_Container*) cell_container; 
+	// Get the default microenvironment via our interface
+	Microenvironment_Interface* m = BioFVM::get_microenvironment_i();
 	
-	if( BioFVM::get_default_microenvironment() == NULL )
-	{ 
-		BioFVM::set_default_microenvironment( &m ); 
+	if( m == nullptr )
+	{
+		std::cerr << "Error: Cannot create cell container - no microenvironment available" << std::endl;
+		return nullptr;
 	}
 	
+	Cell_Container* cell_container = new Cell_Container;
+	cell_container->initialize( m->get_mesh().bounding_box[0], m->get_mesh().bounding_box[3],
+		m->get_mesh().bounding_box[1], m->get_mesh().bounding_box[4],
+		m->get_mesh().bounding_box[2], m->get_mesh().bounding_box[5],  mechanics_voxel_size );
+	m->set_agent_container( cell_container );
+
 	return cell_container; 
 }
 

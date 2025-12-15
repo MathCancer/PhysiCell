@@ -66,6 +66,8 @@
 */
  
 #include "PhysiCell_MultiCellDS.h"
+#include "../BioFVM/BioFVM_MultiCellDS.h"
+#include "../BioFVM/BioFVM_microenvironment_interface.h"
 #ifdef ADDON_PHYSIBOSS
 #include "../addons/PhysiBoSS/src/maboss_intracellular.h"	
 #endif
@@ -73,7 +75,7 @@ namespace PhysiCell{
 
 void add_PhysiCell_cell_to_open_xml_pugi(  pugi::xml_document& xml_dom, Cell& C ); // not implemented -- future edition 
 
-void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M  )
+void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment_Interface& M  )
 {
 	std::cout << "Warning: " << __FUNCTION__ << " is deprecated and has been removed." << std::endl; 
 		
@@ -82,8 +84,10 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 
 void add_PhysiCell_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M );
 
-void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double current_simulation_time)
+void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base ,  double current_simulation_time)
 {
+	Microenvironment_Interface& M = *get_microenvironment_i();
+
 	std::cout << __LINE__ << " " << __FUNCTION__ << std::endl; 
 
 	// start with a standard BioFVM save
@@ -105,11 +109,13 @@ void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base , Microen
 }
 
 
-void save_PhysiCell_to_MultiCellDS_v2( std::string filename_base , Microenvironment& M , double current_simulation_time)
+void save_PhysiCell_to_MultiCellDS_v2( std::string filename_base , double current_simulation_time)
 {
 	// std::cout << __LINE__ << " " << __FUNCTION__ << std::endl; // we use this one July 2024
 
 	// set some metadata
+
+	Microenvironment_Interface& M = *get_microenvironment_i();
 
 	BioFVM::MultiCellDS_version_string = "2"; 
 	BioFVM::BioFVM_metadata.program.program_name = "PhysiCell"; 
@@ -138,7 +144,7 @@ void save_PhysiCell_to_MultiCellDS_v2( std::string filename_base , Microenvironm
 		// save metadata 
 	BioFVM_metadata.add_to_open_xml_pugi( current_simulation_time , BioFVM::biofvm_doc ); 
 		// save diffusing substrates 
-	add_BioFVM_substrates_to_open_xml_pugi( BioFVM::biofvm_doc , filename_base, M  ); 
+	add_BioFVM_substrates_to_open_xml_pugi( BioFVM::biofvm_doc , filename_base, M );
 
 		// add_BioFVM_agents_to_open_xml_pugi( xml_dom , filename_base, M); 
 	
@@ -190,12 +196,12 @@ void add_variable_to_labels( std::vector<std::string>& data_names ,
 	return; 
 }
 
-void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M  ) 
+void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment_Interface& M  )
 {
 	// std::cout << __LINE__ << " " << __FUNCTION__ << std::endl; // we use this one July 2024
 
 	// get number of substrates 
-	static int m =  microenvironment.number_of_densities(); // number_of_substrates  
+	static int m =  M.number_of_densities(); // number_of_substrates  
 	// get number of cell types
 	static int n = cell_definition_indices_by_name.size(); // number_of_cell_types
 	// get number of death models 
@@ -629,9 +635,9 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		temp = new char [1024]; 
 		initialized = true; 
 		
-		sprintf( rate_chars, "1/%s" , M.time_units.c_str() ); 
-		sprintf( volume_chars, "%s^3" , M.spatial_units.c_str() ); 
-		sprintf( diffusion_chars , "%s^2/%s", M.spatial_units.c_str() , M.time_units.c_str() ); 
+		sprintf( rate_chars, "1/%s" , M.get_time_units().c_str() ); 
+		sprintf( volume_chars, "%s^3" , M.get_spatial_units().c_str() ); 
+		sprintf( diffusion_chars , "%s^2/%s", M.get_spatial_units().c_str() , M.get_time_units().c_str() ); 
 	}
 
 	node = node.child( "cell_populations" ); 
@@ -785,14 +791,14 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		// fwrite( (char*) &( ID_temp ) , sizeof(double) , 1 , fp ); 
 
 		// name = "ID"; 
-		dTemp = (double) pCell->ID;
+		dTemp = (double) pCell->get_ID();
 		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "position";    NOTE very different syntax for writing vectors!
-        std::fwrite( pCell->position.data() , sizeof(double) , 3 , fp );
+        std::fwrite( pCell->get_position().data() , sizeof(double) , 3 , fp );
 		// name = "total_volume"; 
 		std::fwrite( &( pCell->phenotype.volume.total ) , sizeof(double) , 1 , fp ); 
 		// name = "cell_type"; 
-		dTemp = (double) pCell->type;
+		dTemp = (double) pCell->get_type();
 		std::fwrite( &( dTemp ) , sizeof(double) , 1 , fp ); 
 		// name = "cycle_model"; 
 		dTemp = (double) pCell->phenotype.cycle.model().code; 
@@ -818,7 +824,7 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
  /* state variables to save */ 
 // state
 		// name = "velocity"; 
-		std::fwrite( pCell->velocity.data() , sizeof(double) , 3 , fp ); 
+		std::fwrite( pCell->get_velocity().data() , sizeof(double) , 3 , fp ); 
 		// name = "pressure"; 
 		std::fwrite( &( pCell->state.simple_pressure ) , sizeof(double) , 1 , fp ); 
 		// name = "number_of_nuclei"; 
@@ -926,21 +932,21 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 
 // secretion 
  		// name = "secretion_rates"; 
-		std::fwrite( pCell->phenotype.secretion.secretion_rates.data() , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.secretion.secretion_rates() , sizeof(double) , m , fp ); 
 	 	// name = "uptake_rates"; 
-		std::fwrite( pCell->phenotype.secretion.uptake_rates.data() , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.secretion.uptake_rates() , sizeof(double) , m , fp ); 
  		// name = "saturation_densities"; 
-		std::fwrite( pCell->phenotype.secretion.saturation_densities.data() , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.secretion.saturation_densities() , sizeof(double) , m , fp ); 
  		// name = "net_export_rates"; 
-		std::fwrite( pCell->phenotype.secretion.net_export_rates.data() , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.secretion.net_export_rates() , sizeof(double) , m , fp ); 
 
 // molecular 
  		// name = "internalized_total_substrates"; 
-		std::fwrite( pCell->phenotype.molecular.internalized_total_substrates.data() , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.molecular.internalized_total_substrates() , sizeof(double) , m , fp ); 
  		// name = "fraction_released_at_death"; 
-		std::fwrite( pCell->phenotype.molecular.fraction_released_at_death.data() , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.molecular.fraction_released_at_death() , sizeof(double) , m , fp ); 
  		// name = "fraction_transferred_when_ingested"; 
-		std::fwrite( pCell->phenotype.molecular.fraction_transferred_when_ingested.data() , sizeof(double) , m , fp ); 
+		std::fwrite( pCell->phenotype.molecular.fraction_transferred_when_ingested() , sizeof(double) , m , fp ); 
 
 // interactions 
 	/*
@@ -964,7 +970,7 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		Cell* pTarget = pCell->phenotype.cell_interactions.pAttackTarget; 
 		int AttackID = -1; 
 		if( pTarget )
-		{ AttackID = pTarget->ID; }
+		{ AttackID = pTarget->get_ID(); }
 		dTemp = (double) AttackID; 
 		std::fwrite( &(dTemp) , sizeof(double) , 1 , fp ); 
  		// name = "attack_damage_rate"; 
@@ -1225,11 +1231,11 @@ void write_neighbor_graph( std::string filename )
 
 	for( int i=0 ; i < (*all_cells).size(); i++ )
 	{
-		buffer << (*all_cells)[i]->ID << ": " ; 
+		buffer << (*all_cells)[i]->get_ID() << ": " ; 
 		int size = (*all_cells)[i]->state.neighbors.size(); 
 		for( int j=0 ; j < size; j++ )
 		{
-			buffer << (*all_cells)[i]->state.neighbors[j]->ID; 
+			buffer << (*all_cells)[i]->state.neighbors[j]->get_ID(); 
 			if( j != size-1 )
 			{ buffer << ","; }
 		}
@@ -1252,11 +1258,11 @@ void write_attached_cells_graph( std::string filename )
 
 	for( int i=0 ; i < (*all_cells).size(); i++ )
 	{
-		buffer << (*all_cells)[i]->ID << ": " ; 
+		buffer << (*all_cells)[i]->get_ID() << ": " ; 
 		int size = (*all_cells)[i]->state.attached_cells.size(); 
 		for( int j=0 ; j < size; j++ )
 		{
-			buffer << (*all_cells)[i]->state.attached_cells[j]->ID; 
+			buffer << (*all_cells)[i]->state.attached_cells[j]->get_ID(); 
 			if( j != size-1 )
 			{ buffer << ","; }
 		}
@@ -1278,11 +1284,11 @@ void write_spring_attached_cells_graph( std::string filename )
 
 	for( int i=0 ; i < (*all_cells).size(); i++ )
 	{
-		buffer << (*all_cells)[i]->ID << ": " ; 
+		buffer << (*all_cells)[i]->get_ID() << ": " ; 
 		int size = (*all_cells)[i]->state.spring_attachments.size();
 		for( int j=0 ; j < size; j++ )
 		{
-			buffer << (*all_cells)[i]->state.spring_attachments[j]->ID; 
+			buffer << (*all_cells)[i]->state.spring_attachments[j]->get_ID(); 
 			if( j != size-1 )
 			{ buffer << ","; }
 		}
@@ -1432,18 +1438,18 @@ int resume_from_MultiCellDS(std::string folder_path, std::string xml_filename, b
 
     // pugi::xml_node microenv_data = doc.child("MultiCellDS").child("microenvironment").child("filename").child("data");
 
-    int retval = recreate_sim_state(cells_mat_filename, microenvironment, custom_data_vars, create_cells, debug_print);
+    int retval = recreate_sim_state(cells_mat_filename, *get_microenvironment_i(), custom_data_vars, create_cells, debug_print);
 
     return 0;
 }
 
-int recreate_sim_state(std::string filename, Microenvironment& M,   
+int recreate_sim_state(std::string filename, Microenvironment_Interface& M,   
     std::vector<std::pair<std::string, int>> custom_data_vars, bool create_cells, bool debug_print)
 {
     std::cout << "------- " << __FUNCTION__ << std::endl;
 
     // Get number of substrates, cell types, death models
-    static int m_densities = microenvironment.number_of_densities();
+    static int m_densities = M.number_of_densities();
     static int n_cell_types = cell_definition_indices_by_name.size();
     std::cout << "------- number_of_densities= " << m_densities << std::endl;
     std::cout << "------- number of cell types= " << n_cell_types << std::endl;
@@ -1528,8 +1534,8 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
             pCD = cell_definitions_by_type[cell_type];    // rwh: better?
             pCell = create_cell( *pCD );
 
-            pCell->ID = cell_ID;
-            pCell->type = cell_type;
+            pCell->set_ID(cell_ID);
+            pCell->set_type(cell_type);
             pCell->phenotype.volume.total = cell_vol;
 
             pCell->assign_position(position[0], position[1], position[2]);
@@ -1612,9 +1618,9 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
         { std::cout << "velocity= " << velocity[0]<<", "<<velocity[1]<<", " << velocity[2]  << std::endl; }
         if (create_cells)
         {
-            pCell->velocity[0] = velocity[0];
-            pCell->velocity[1] = velocity[1];
-            pCell->velocity[2] = velocity[2];
+			pCell->get_velocity()[0] = velocity[0];
+			pCell->get_velocity()[1] = velocity[1];
+			pCell->get_velocity()[2] = velocity[2];
         }
         
         fread(&dTemp, sizeof(double), 1, fp);
@@ -1870,60 +1876,49 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
         { std::cout << "------ motility:\n"; }
             
         // fread(pCell->phenotype.secretion.secretion_rates.data(), sizeof(double), m, fp);
-        if (create_cells)
-        { pCell->phenotype.secretion.secretion_rates.resize(m_densities); }
         for (int idx=0; idx < m_densities; idx++)
         {
             fread(&dTemp, sizeof(double), 1, fp);
             if (debug_print)
             { std::cout << " phenotype.secretion.secretion_rates[" << idx << "] = " << dTemp << std::endl; }
             if (create_cells)
-            { pCell->phenotype.secretion.secretion_rates[idx] = dTemp; }
+            { pCell->phenotype.secretion.secretion_rates()[idx] = dTemp; }
         }
 
         // fread(pCell->phenotype.secretion.uptake_rates.data(), sizeof(double), m, fp);
-        if (create_cells)
-        { pCell->phenotype.secretion.uptake_rates.resize(m_densities); }
         for (int idx=0; idx < m_densities; idx++)
         {
             fread(&dTemp, sizeof(double), 1, fp);
             if (debug_print)
             { std::cout << " phenotype.secretion.uptake_rates[" << idx << "] = " << dTemp << std::endl; }
             if (create_cells)
-            { pCell->phenotype.secretion.uptake_rates[idx] = dTemp; }
+            { pCell->phenotype.secretion.uptake_rates()[idx] = dTemp; }
         }
 
         // fread(pCell->phenotype.secretion.saturation_densities.data(), sizeof(double), m, fp);
-        if (create_cells)
-        { pCell->phenotype.secretion.saturation_densities.resize(m_densities); }
         for (int idx=0; idx < m_densities; idx++)
         {
             fread(&dTemp, sizeof(double), 1, fp);
             if (debug_print)
             { std::cout << " phenotype.secretion.saturation_densities[" << idx << "] = " << dTemp << std::endl; }
             if (create_cells)
-            { pCell->phenotype.secretion.saturation_densities[idx] = dTemp; }
+            { pCell->phenotype.secretion.saturation_densities()[idx] = dTemp; }
         }
 
         // fread(pCell->phenotype.secretion.net_export_rates.data(), sizeof(double), m, fp);
-        if (create_cells)
-        { pCell->phenotype.secretion.net_export_rates.resize(m_densities); }
-
         for (int idx=0; idx < m_densities; idx++)
         {
             fread(&dTemp, sizeof(double), 1, fp);
             if (debug_print)
             { std::cout << " phenotype.secretion.net_export_rates[" << idx << "] = " << dTemp << std::endl; }
             if (create_cells)
-            { pCell->phenotype.secretion.net_export_rates[idx] = dTemp; }
+            { pCell->phenotype.secretion.net_export_rates()[idx] = dTemp; }
         }
         
 
         // Molecular
         if (debug_print)
         { std::cout << "------ molecular:\n"; }
-        if (create_cells)
-        { pCell->phenotype.molecular.internalized_total_substrates.resize(m_densities); }
 
         for (int idx=0; idx < m_densities; idx++)
         {
@@ -1931,12 +1926,10 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
             if (debug_print)
             { std::cout << " phenotype.molecular.internalized_total_substrates[" << idx << "] = " << dTemp << std::endl; }
             if (create_cells)
-            { pCell->phenotype.molecular.internalized_total_substrates[idx] = dTemp; }
+            { pCell->phenotype.molecular.internalized_total_substrates()[idx] = dTemp; }
         }
 
         // fread(pCell->phenotype.molecular.fraction_released_at_death.data(), sizeof(double), m, fp);
-        if (create_cells)
-        { pCell->phenotype.molecular.fraction_released_at_death.resize(m_densities); }
 
         for (int idx=0; idx < m_densities; idx++)
         {
@@ -1944,19 +1937,17 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
             if (debug_print)
             { std::cout << " phenotype.molecular.fraction_released_at_death[" << idx << "] = " << dTemp << std::endl; }
             if (create_cells)
-            { pCell->phenotype.molecular.fraction_released_at_death[idx] = dTemp; }
+            { pCell->phenotype.molecular.fraction_released_at_death()[idx] = dTemp; }
         }
 
         // fread(pCell->phenotype.molecular.fraction_transferred_when_ingested.data(), sizeof(double), m, fp);
-        if (create_cells)
-        { pCell->phenotype.molecular.fraction_transferred_when_ingested.resize(m_densities); }
         for (int idx=0; idx < m_densities; idx++)
         {
             fread(&dTemp, sizeof(double), 1, fp);
             if (debug_print)
             { std::cout << " phenotype.molecular.fraction_transferred_when_ingested[" << idx << "] = " << dTemp << std::endl; }
             if (create_cells)
-            { pCell->phenotype.molecular.fraction_transferred_when_ingested[idx] = dTemp; }
+            { pCell->phenotype.molecular.fraction_transferred_when_ingested()[idx] = dTemp; }
         }
         
 
@@ -2194,11 +2185,11 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
         {
             for (auto* cell : *all_cells)   // loop over all cells
             {
-                if (cell->ID == pair.second)
+                if (cell->get_ID() == pair.second)
                 {
                     (pair.first)->phenotype.cell_interactions.pAttackTarget = cell;
                     if (debug_print)
-                    { std::cout << "    cell ID=" << (pair.first)->ID << " attacking  cell ID=" << cell->ID << std::endl; }
+                    { std::cout << "    cell ID=" << (pair.first)->get_ID() << " attacking  cell ID=" << cell->get_ID() << std::endl; }
                     break;
                 }
             }

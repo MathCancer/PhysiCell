@@ -73,7 +73,7 @@
 #include <omp.h>
 #include <fstream>
 
-
+#include "../BioFVM/BioFVM.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h"   
 
@@ -162,7 +162,7 @@ int main( int argc, char* argv[] )
 	
 	// Cell_Container 
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size );
 	
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
@@ -186,7 +186,7 @@ int main( int argc, char* argv[] )
 	cell_defaults.functions.cycle_model = Ki67_advanced; 	
 	// set default_cell_functions; 
 	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() );
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions );
 	
 	int Q_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_negative );
@@ -201,7 +201,7 @@ int main( int argc, char* argv[] )
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// make sure the cells uptake oxygen at the right rate 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
+	cell_defaults.phenotype.secretion.uptake_rates()[oxygen_substrate_index] = 10; 
 
 	// update transition times 
 	cell_defaults.phenotype.cycle.data.transition_rate(Q_index,K1_index) = 1.0 / ( 8.5 * 60.0 ); 
@@ -247,7 +247,7 @@ for(int i=0;i<cell_positions.size();i++)
 		if(cell_positions[i][0]>0)
 			continue;
 		pCell = create_cell();
-		pCell->register_microenvironment(&microenvironment);
+		pCell->register_microenvironment( get_microenvironment_i() );
 		pCell->assign_position(cell_positions[i]);
 		pCell->phenotype.cycle.data.current_phase_index = Q_index; 
 		if( pCell->phenotype.cycle.current_phase().entry_function )                      
@@ -278,7 +278,7 @@ for(int i=0;i<cell_positions.size();i++)
 		{
 			if( t > t_next_output_time - 0.5 * dt )
 			{
-				log_output(t, output_index, microenvironment, report_file);
+				log_output(t, output_index, report_file);
 				t_next_output_time += t_output_interval;						
 			}
 			microenvironment.simulate_cell_sources_and_sinks( dt );
@@ -287,7 +287,7 @@ for(int i=0;i<cell_positions.size();i++)
 			t += dt; 
 			output_index++;
 		}
-		log_output(t, output_index, microenvironment, report_file);
+		log_output(t, output_index, report_file);
 		report_file.close();
 	}
 	catch( const std::exception& e ) { // reference to the base of a polymorphic object

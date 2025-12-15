@@ -87,7 +87,7 @@ void create_cell_types( void )
 	// housekeeping 
 	
 	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( PhysiCell::get_microenvironment() ); 
 	
 	// enable internalized substrate tracking 
 	
@@ -116,7 +116,7 @@ void create_cell_types( void )
 	
 	// make sure the defaults are self-consistent. 
 	
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( PhysiCell::get_microenvironment() );
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 
 	// set the rate terms in the default phenotype 

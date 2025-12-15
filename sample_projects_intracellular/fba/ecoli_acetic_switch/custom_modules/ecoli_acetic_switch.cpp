@@ -112,20 +112,20 @@ void create_bacteria_cell ( void )
 	bacteria_cell.parameters.o2_reference = 38.0;
 
 	// set oxygen uptake and secretion to zero
-	static int oxygen_idx = microenvironment.find_density_index( "oxygen" ); // 0
-	bacteria_cell.phenotype.secretion.secretion_rates[oxygen_idx] = 0;
-	bacteria_cell.phenotype.secretion.uptake_rates[oxygen_idx] = 0;
-	bacteria_cell.phenotype.secretion.saturation_densities[oxygen_idx] = 0;
+	static int oxygen_idx = get_microenvironment_i()->find_density_index( "oxygen" ); // 0
+	bacteria_cell.phenotype.secretion.secretion_rates()[oxygen_idx] = 0;
+	bacteria_cell.phenotype.secretion.uptake_rates()[oxygen_idx] = 0;
+	bacteria_cell.phenotype.secretion.saturation_densities()[oxygen_idx] = 0;
 
-	static int glucose_idx = microenvironment.find_density_index( "glucose" );
-	bacteria_cell.phenotype.secretion.secretion_rates[glucose_idx] = 0;
-	bacteria_cell.phenotype.secretion.uptake_rates[glucose_idx] = 0;
-	bacteria_cell.phenotype.secretion.saturation_densities[glucose_idx] = 0;
+	static int glucose_idx = get_microenvironment_i()->find_density_index( "glucose" );
+	bacteria_cell.phenotype.secretion.secretion_rates()[glucose_idx] = 0;
+	bacteria_cell.phenotype.secretion.uptake_rates()[glucose_idx] = 0;
+	bacteria_cell.phenotype.secretion.saturation_densities()[glucose_idx] = 0;
 	
-	static int acetate_idx = microenvironment.find_density_index( "acetate" );
-	bacteria_cell.phenotype.secretion.secretion_rates[acetate_idx] = 0;
-	bacteria_cell.phenotype.secretion.uptake_rates[acetate_idx] = 0;
-	bacteria_cell.phenotype.secretion.saturation_densities[acetate_idx] = 0;
+	static int acetate_idx = get_microenvironment_i()->find_density_index( "acetate" );
+	bacteria_cell.phenotype.secretion.secretion_rates()[acetate_idx] = 0;
+	bacteria_cell.phenotype.secretion.uptake_rates()[acetate_idx] = 0;
+	bacteria_cell.phenotype.secretion.saturation_densities()[acetate_idx] = 0;
 
 	// set the default cell type to no phenotype updates
 	bacteria_cell.functions.update_phenotype = NULL;
@@ -143,7 +143,7 @@ void create_cell_types( void )
 	
 	// housekeeping 
 	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
 	
 	// turn the default cycle model to live, 
 	// so it's easier to turn off proliferation
@@ -170,7 +170,7 @@ void create_cell_types( void )
 void setup_microenvironment( void )
 {
 
-	if( default_microenvironment_options.simulate_2D == false )
+	if( get_microenvironment_i()->simulate_2D() == false )
 	{
 		std::cout << "WARNING: overriding from 3-D to 2-D" << std::endl;
 		default_microenvironment_options.simulate_2D = true;
@@ -255,9 +255,9 @@ void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double
   std::string glucose_flux_id = FBA::exchange_flux_density_map[glucose_name];
   std::string acetate_flux_id = FBA::exchange_flux_density_map[acetate_name];
 
-  static int oxygen_idx = microenvironment.find_density_index( oxygen_name );
-  static int glucose_idx = microenvironment.find_density_index( glucose_name );
-  static int acetate_idx = microenvironment.find_density_index( acetate_name );
+  static int oxygen_idx = get_microenvironment_i()->find_density_index( oxygen_name );
+  static int glucose_idx = get_microenvironment_i()->find_density_index( glucose_name );
+  static int acetate_idx = get_microenvironment_i()->find_density_index( acetate_name );
 
   double oxygen_density = pCell->nearest_density_vector()[oxygen_idx];
   double glucose_density = pCell->nearest_density_vector()[glucose_idx]; // dived by voxel size?
@@ -297,16 +297,16 @@ void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double
 	std::cout << "acetate flux: " << acetate_flux << std::endl;
 		
 	if ( oxygen_flux < 0)
-		phenotype.secretion.uptake_rates[oxygen_idx] = abs(oxygen_flux / oxygen_density);
+		phenotype.secretion.uptake_rates()[oxygen_idx] = abs(oxygen_flux / oxygen_density);
 
 	if ( glucose_flux < 0)
-		phenotype.secretion.uptake_rates[glucose_idx] = abs(glucose_flux / glucose_density);
+		phenotype.secretion.uptake_rates()[glucose_idx] = abs(glucose_flux / glucose_density);
 
 	if ( acetate_flux < 0 )
-		phenotype.secretion.uptake_rates[acetate_idx] = abs(acetate_flux / acetate_density);
+		phenotype.secretion.uptake_rates()[acetate_idx] = abs(acetate_flux / acetate_density);
 			
 	else if ( acetate_flux > 0 )
-		phenotype.secretion.secretion_rates[acetate_idx] = abs(acetate_flux / acetate_density);
+		phenotype.secretion.secretion_rates()[acetate_idx] = abs(acetate_flux / acetate_density);
 		
   }
   else
@@ -398,7 +398,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	output[1] = "red";
 	output[2] = "red";
 
-	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
+	if( pCell->phenotype.death.dead == false && pCell->get_type() == 1 )
 	{
 		 output[0] = "black";
 		 output[2] = "black";

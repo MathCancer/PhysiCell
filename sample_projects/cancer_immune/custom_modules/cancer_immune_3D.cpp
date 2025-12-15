@@ -65,6 +65,8 @@
 ###############################################################################
 */
 
+#include "../BioFVM/BioFVM_vector.h"
+#include "../BioFVM/BioFVM_microenvironment_interface.h"
 #include "./cancer_immune_3D.h"
 
 Cell_Definition* pImmuneCell; 
@@ -73,12 +75,12 @@ void create_immune_cell_type( void )
 {
 	pImmuneCell = find_cell_definition( "immune cell" ); 
 	
-	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); 
-	static int immuno_ID = microenvironment.find_density_index( "immunostimulatory factor" ); 
+	static int oxygen_ID = get_microenvironment_i()->find_density_index( "oxygen" ); 
+	static int immuno_ID = get_microenvironment_i()->find_density_index( "immunostimulatory factor" ); 
 	
 	// reduce o2 uptake 
 	
-	pImmuneCell->phenotype.secretion.uptake_rates[oxygen_ID] *= 
+	pImmuneCell->phenotype.secretion.uptake_rates()[oxygen_ID] *= 
 		parameters.doubles("immune_o2_relative_uptake");  
 	
 	pImmuneCell->phenotype.mechanics.cell_cell_adhesion_strength *= 
@@ -131,8 +133,8 @@ void create_cell_types( void )
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
 	cell_defaults.parameters.o2_reference = 38.0; 
 
-	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0 
-	static int immuno_ID = microenvironment.find_density_index( "immunostimulatory factor" ); // 1
+	static int oxygen_ID = get_microenvironment_i()->find_density_index( "oxygen" ); // 0 
+	static int immuno_ID = get_microenvironment_i()->find_density_index( "immunostimulatory factor" ); // 1
 	
 	/*
 	   This parses the cell definitions in the XML config file. 
@@ -181,13 +183,13 @@ void create_cell_types( void )
 void setup_microenvironment( void )
 {
 	
-	if( default_microenvironment_options.simulate_2D == true )
+	if( get_microenvironment_i()->simulate_2D() == true )
 	{
-		std::cout << "Warning: overriding 2D setting to return to 3D" << std::endl; 
-		default_microenvironment_options.simulate_2D = false; 
+		std::cout << "Error: overriding 2D setting to return to 3D" << std::endl; 
+		std::exit(1);
 	}
 	
-	initialize_microenvironment(); 	
+	get_microenvironment_i()->initialize();
 
 	return; 
 }	
@@ -200,7 +202,7 @@ void introduce_immune_cells( void )
 	// for the loop, deal with the (faster) norm squared 
 	for( int i=0; i < (*all_cells).size() ; i++ )
 	{
-		temp_radius = norm_squared( (*all_cells)[i]->position ); 
+		temp_radius = norm_squared( (*all_cells)[i]->get_position() ); 
 		if( temp_radius > tumor_radius )
 		{ tumor_radius = temp_radius; }
 	}
@@ -337,11 +339,11 @@ void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& p
 	
 	// update secretion rates based on hypoxia 
 	
-	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
-	static int immune_factor_index = microenvironment.find_density_index( "immunostimulatory factor" ); 
+	static int o2_index = get_microenvironment_i()->find_density_index( "oxygen" ); 
+	static int immune_factor_index = get_microenvironment_i()->find_density_index( "immunostimulatory factor" ); 
 	double o2 = pCell->nearest_density_vector()[o2_index];	
 
-	phenotype.secretion.secretion_rates[immune_factor_index] = 10.0; 
+	phenotype.secretion.secretion_rates()[immune_factor_index] = 10.0; 
 	
 	update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
 	
@@ -349,7 +351,7 @@ void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& p
 	// set it to secrete the immunostimulatory factor 
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.secretion_rates[immune_factor_index] = 10; 
+		phenotype.secretion.secretion_rates()[immune_factor_index] = 10; 
 		pCell->functions.update_phenotype = NULL; 		
 		return; 
 	}
@@ -367,7 +369,7 @@ std::vector<std::string> cancer_immune_coloring_function( Cell* pCell )
 	// immune are black
 	std::vector< std::string > output( 4, "black" ); 
 	
-	if( pCell->type == 1 )
+	if( pCell->get_type() == 1 )
 	{ 
 		output[0] = "lime";
 		output[1] = "lime";
@@ -422,7 +424,7 @@ std::vector<std::string> cancer_immune_coloring_function( Cell* pCell )
 /*
 void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant )
 {
-	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
+	std::vector<double> displacement = pAttachedTo->get_position() - pActingOn->position; 
 	axpy( &(pActingOn->velocity) , elastic_constant , displacement ); 
 	
 	return; 
@@ -515,7 +517,7 @@ void immune_cell_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	// if attached, biased motility towards director chemoattractant 
 	// otherwise, biased motility towards cargo chemoattractant 
 	
-	static int immune_factor_index = microenvironment.find_density_index( "immunostimulatory factor" ); 
+	static int immune_factor_index = get_microenvironment_i()->find_density_index( "immunostimulatory factor" ); 
 
 	// if not docked, attempt biased chemotaxis 
 	if( pCell->state.attached_cells.size() == 0 )
@@ -570,7 +572,7 @@ bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt 
 	
 	if( pTarget->custom_data[oncoprotein_i] > oncoprotein_threshold && pTarget->phenotype.death.dead == false )
 	{
-		std::vector<double> displacement = pTarget->position - pAttacker->position;
+		std::vector<double> displacement = pTarget->get_position() - pAttacker->get_position();
 		double distance_scale = norm( displacement ); 
 		if( distance_scale > max_attachment_distance )
 		{ return false; } 
@@ -700,7 +702,7 @@ void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 
 void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt )
 {
-	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
+	std::vector<double> displacement = pAttachedTo->get_position() - pActingOn->get_position();
 	
 	static double max_elastic_displacement = pao.geometry.radius * pao.mechanics.relative_detachment_distance; 
 	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
@@ -713,7 +715,7 @@ void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttached
 		return; 
 	}
 	
-	axpy( &(pActingOn->velocity) , pao.mechanics.attachment_elastic_constant , displacement ); 
+	axpy( &(pActingOn->get_velocity()) , pao.mechanics.attachment_elastic_constant , displacement ); 
 	
 	return; 
 }

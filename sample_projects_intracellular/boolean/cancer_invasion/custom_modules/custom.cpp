@@ -68,7 +68,7 @@
 #include <cmath>
 #include <sstream>
 #include "./custom.h"
-#include "../BioFVM/BioFVM.h"  
+#include "../BioFVM/BioFVM_vector.h"
 
 void create_cell_types( void )
 {
@@ -86,7 +86,7 @@ void create_cell_types( void )
 	*/ 
 	
 	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -165,15 +165,15 @@ void set_substrate_density(int density_index, double max, double min, double rad
 	std::cout << "SETTING SUBSTRATE --> " << density_index << std::endl;
 	// Inject given concentration on the extremities only
 
-	std::cout << microenvironment.number_of_voxels() << "\n";
+	std::cout << get_microenvironment_i()->number_of_voxels() << "\n";
 
-	for (unsigned int n = 0; n < microenvironment.number_of_voxels(); n++)
+	for (unsigned int n = 0; n < get_microenvironment_i()->number_of_voxels(); n++)
 	{
-		auto current_voxel = microenvironment.voxels(n);
+		auto current_voxel = get_microenvironment_i()->voxels(n);
 		double t_norm = norm(current_voxel.center);
 
 		if ((radius - t_norm) <= 0)
-			microenvironment.density_vector(n)[density_index] = current_value(min, max, uniform_random());
+			get_microenvironment_i()->density_vector(n)[density_index] = current_value(min, max, uniform_random());
 	}
 }
 
@@ -186,7 +186,7 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	initialize_microenvironment(); 
+	get_microenvironment_i()->initialize(); 
 
 	double ECM_min = parameters.doubles("density_ECM_min");
 	double ECM_max = parameters.doubles("density_ECM_max");
@@ -194,11 +194,11 @@ void setup_microenvironment( void )
 	double tgfbeta_min = parameters.doubles("density_tgfbeta_min");
 
 	if(ECM_max != ECM_min){
-	int ecm_index = microenvironment.find_density_index("ecm");
+	int ecm_index = get_microenvironment_i()->find_density_index("ecm");
 	set_substrate_density(ecm_index, ECM_max, ECM_min);
 	}
 	if(tgfbeta_max != tgfbeta_min){
-	int tgfbeta_index = microenvironment.find_density_index("TGFbeta");
+	int tgfbeta_index = get_microenvironment_i()->find_density_index("TGFbeta");
 	set_substrate_density(tgfbeta_index, tgfbeta_max, tgfbeta_min);
 	}
 
@@ -211,15 +211,15 @@ void setup_tissue( void )
 	load_cells_from_pugixml(); 
 
 	// removing substrate in cell voxel
-	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
-	int tgfbeta_index = BioFVM::microenvironment.find_density_index("tgfbeta");
+	int ecm_index = get_microenvironment_i()->find_density_index("ecm");
+	int tgfbeta_index = get_microenvironment_i()->find_density_index("tgfbeta");
 	for( int i=0; i < (*all_cells).size(); i++ )
 		{
 			Cell* pC = (*all_cells)[i]; 
 
 			int voxel_index = pC->get_current_voxel_index();
-			microenvironment.density_vector(voxel_index)[ecm_index] = 0.0;
-			microenvironment.density_vector(voxel_index)[tgfbeta_index] = 0.0;
+			get_microenvironment_i()->density_vector(voxel_index)[ecm_index] = 0.0;
+			get_microenvironment_i()->density_vector(voxel_index)[tgfbeta_index] = 0.0;
 		}
 }
 
@@ -249,16 +249,16 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 	pCell->custom_data["nucleus_deform"] = 0.0;
 	//std::cout << pCell->custom_data["nucleus_deform"] << std::endl;
 
-	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
+	int ecm_index = get_microenvironment_i()->find_density_index("ecm");
 	if ( ecm_index >= 0 ){
 		add_ecm_interaction( pCell, ecm_index, pCell->get_current_voxel_index() );
 		//add_TGFbeta_interaction(pCell, pCell->get_current_mechanics_voxel_index());
-		std::vector<int>::iterator neighbor_voxel_index;
-		std::vector<int>::iterator neighbor_voxel_index_end = 
-		microenvironment.mesh.moore_connected_voxel_indices[pCell->get_current_voxel_index()].end();
+		std::vector<int>::const_iterator neighbor_voxel_index;
+		std::vector<int>::const_iterator neighbor_voxel_index_end = 
+		get_microenvironment_i()->get_mesh().moore_connected_voxel_indices[pCell->get_current_voxel_index()].end();
 
 		for( neighbor_voxel_index = 
-			microenvironment.mesh.moore_connected_voxel_indices[pCell->get_current_voxel_index()].begin();
+			get_microenvironment_i()->get_mesh().moore_connected_voxel_indices[pCell->get_current_voxel_index()].begin();
 			neighbor_voxel_index != neighbor_voxel_index_end; 
 			++neighbor_voxel_index )
 		{
@@ -277,8 +277,8 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt )
 { 
 
-	std::vector<double> displacement = pOther->position;
-	displacement -= pMe->position;
+	std::vector<double> displacement = pOther->get_position();
+	displacement -= pMe->get_position();
 	double distance = norm( displacement ); 
 			
 	double max_distance = pMe->phenotype.geometry.radius + 
@@ -313,15 +313,15 @@ void post_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt){
 void add_ecm_interaction(Cell* pC, int index_ecm, int index_voxel )
 {
 	// Check if there is ECM material in given voxel
-	//double dens2 = get_microenvironment()->density_vector(index_voxel)[index_ecm];
+	//double dens2 = get_microenvironment_i()->density_vector(index_voxel)[index_ecm];
 	double dens = pC->get_microenvironment()->nearest_density_vector(index_voxel)[index_ecm];
-	double ecmrad = sqrt(3.0) * pC->get_microenvironment()->mesh.dx * 0.5;
+	double ecmrad = sqrt(3.0) * pC->get_microenvironment()->get_mesh().dx * 0.5;
 	// if voxel is "full", density is 1
 	dens = std::min( dens, 1.0 ); 
 	if ( dens > EPSILON )
 	{
 		// Distance between agent center and ECM voxel center
-		pC->displacement = pC->position - microenvironment.mesh.voxels[index_voxel].center;
+		pC->displacement = pC->get_position() - get_microenvironment_i()->get_mesh().voxels[index_voxel].center;
 		double distance = norm(pC->displacement);
 		// Make sure that the distance is not zero
 		distance = std::max(distance, EPSILON);
@@ -374,7 +374,7 @@ void add_ecm_interaction(Cell* pC, int index_ecm, int index_voxel )
 			return;
 		tmp_r/=distance;
 
-		axpy( &pC->velocity , tmp_r , pC->displacement ); 
+		axpy( &pC->get_velocity() , tmp_r , pC->displacement ); 
 	}
 
 }
@@ -383,12 +383,12 @@ void set_substrate_density(int density_index, double max, double min)
 {
 	std::cout << "SETTING SUBSTRATE \n";
 
-	std::cout << microenvironment.number_of_voxels() << "\n";
+	std::cout << get_microenvironment_i()->number_of_voxels() << "\n";
 	#pragma omp parallel for
-	for (int n = 0; n < microenvironment.number_of_voxels(); n++)
+	for (int n = 0; n < get_microenvironment_i()->number_of_voxels(); n++)
 	{
-		auto current_voxel = microenvironment.voxels(n);
-		microenvironment.density_vector(n)[density_index] = current_value(min, max, uniform_random());
+		auto current_voxel = get_microenvironment_i()->voxels(n);
+		get_microenvironment_i()->density_vector(n)[density_index] = current_value(min, max, uniform_random());
 	}
 }
 

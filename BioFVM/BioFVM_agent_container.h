@@ -54,7 +54,6 @@
 namespace BioFVM{
 
 class Basic_Agent; 
-class Microenvironment;
 
 class Agent_Container
 {

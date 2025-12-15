@@ -66,6 +66,7 @@
 */
 
 #include "./custom.h"
+#include "../BioFVM/BioFVM_vector.h"
 
 void create_cell_types( void )
 {
@@ -143,20 +144,20 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	initialize_microenvironment(); 	
+	get_microenvironment_i()->initialize();
 	
 	return; 
 }
 
 void setup_tissue( void )
 {
-	double Xmin = microenvironment.mesh.bounding_box[0]; 
-	double Ymin = microenvironment.mesh.bounding_box[1]; 
-	double Zmin = microenvironment.mesh.bounding_box[2]; 
+	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0]; 
+	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1]; 
+	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2]; 
 
-	double Xmax = microenvironment.mesh.bounding_box[3]; 
-	double Ymax = microenvironment.mesh.bounding_box[4]; 
-	double Zmax = microenvironment.mesh.bounding_box[5]; 
+	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3]; 
+	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4]; 
+	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5]; 
 	
 	double max_radius = parameters.doubles("max_distance_from_origin");
 	if( Xmax > max_radius )
@@ -174,7 +175,7 @@ void setup_tissue( void )
 	if( Zmin < -max_radius )
 	{ Zmin = -max_radius; }
 	
-	if( default_microenvironment_options.simulate_2D == true )
+	if( get_microenvironment_i()->simulate_2D() == true )
 	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
@@ -277,7 +278,7 @@ std::vector<std::string> regular_colors( Cell* pCell )
 
 	// color live C 
 		
-	if( pCell->type == A_type )
+	if( pCell->get_type() == A_type )
 	{
 		 output[0] = parameters.strings("A_color");  
 		 output[2] = parameters.strings("A_color");  
@@ -285,7 +286,7 @@ std::vector<std::string> regular_colors( Cell* pCell )
 	
 	// color live B
 
-	if( pCell->type == B_type )
+	if( pCell->get_type() == B_type )
 	{
 		 output[0] = parameters.strings("B_color");  
 		 output[2] = parameters.strings("B_color");  
@@ -293,7 +294,7 @@ std::vector<std::string> regular_colors( Cell* pCell )
 	
 	// color live C
 
-	if( pCell->type == C_type )
+	if( pCell->get_type() == C_type )
 	{
 		 output[0] = parameters.strings("C_color");  
 		 output[2] = parameters.strings("C_color");  
@@ -323,9 +324,9 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 	static int B_type = get_cell_definition( "B" ).type; 
 	static int C_type = get_cell_definition( "C" ).type; 
 	
-	static int nA = microenvironment.find_density_index( "signal A" ); 
-	static int nB = microenvironment.find_density_index( "signal B" ); 
-	static int nC = microenvironment.find_density_index( "signal C" ); 
+	static int nA = get_microenvironment_i()->find_density_index( "signal A" ); 
+	static int nB = get_microenvironment_i()->find_density_index( "signal B" ); 
+	static int nC = get_microenvironment_i()->find_density_index( "signal C" ); 
 	
 	static Cell_Definition* pCD_A  = find_cell_definition("A");
 	static Cell_Definition* pCD_B  = find_cell_definition("B");
@@ -342,10 +343,10 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 
 	// color live A
 		
-	if( pCell->type == A_type )
+	if( pCell->get_type() == A_type )
 	{
-		value = pCell->phenotype.secretion.secretion_rates[nA] 
-			/ ( 0.001 + pCD_A->phenotype.secretion.secretion_rates[nA] ) ;
+		value = pCell->phenotype.secretion.secretion_rates()[nA] 
+			/ ( 0.001 + pCD_A->phenotype.secretion.secretion_rates()[nA] ) ;
 			
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
 		if( pCell->phenotype.death.dead == true )
@@ -355,10 +356,10 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 	
 	// color live B
 
-	if( pCell->type == B_type )
+	if( pCell->get_type() == B_type )
 	{
-		value = pCell->phenotype.secretion.secretion_rates[nB] 
-			/ ( 0.001 + pCD_B->phenotype.secretion.secretion_rates[nB] ); 
+		value = pCell->phenotype.secretion.secretion_rates()[nB] 
+			/ ( 0.001 + pCD_B->phenotype.secretion.secretion_rates()[nB] ); 
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
 		if( pCell->phenotype.death.dead == true )
 		{ value = (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence; }
@@ -367,10 +368,10 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 	
 	// color live C
 
-	if( pCell->type == C_type )
+	if( pCell->get_type() == C_type )
 	{
-		value = pCell->phenotype.secretion.secretion_rates[nC] 
-			/ ( 0.001 + pCD_C->phenotype.secretion.secretion_rates[nC] ); 
+		value = pCell->phenotype.secretion.secretion_rates()[nC] 
+			/ ( 0.001 + pCD_C->phenotype.secretion.secretion_rates()[nC] ); 
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
 		if( pCell->phenotype.death.dead == true )
 		{ value = (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence; }
@@ -498,10 +499,10 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// sample A, B, C, resource, and pressure 
-	static int nA = microenvironment.find_density_index( "signal A" ); 
-	static int nB = microenvironment.find_density_index( "signal B" ); 
-	static int nC = microenvironment.find_density_index( "signal C" ); 
-	static int nR = microenvironment.find_density_index( "resource" ); 
+	static int nA = get_microenvironment_i()->find_density_index( "signal A" ); 
+	static int nB = get_microenvironment_i()->find_density_index( "signal B" ); 
+	static int nC = get_microenvironment_i()->find_density_index( "signal C" ); 
+	static int nR = get_microenvironment_i()->find_density_index( "resource" ); 
 
 	double A = pCell->nearest_density_vector()[nA];
 	double B = pCell->nearest_density_vector()[nB];
@@ -594,7 +595,7 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("A_signal_R") );	
 
-	phenotype.secretion.secretion_rates[nA] = sig.compute_effect();
+	phenotype.secretion.secretion_rates()[nA] = sig.compute_effect();
 
 	return; 
 }
@@ -618,10 +619,10 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// sample A, B, C, resource, and pressure 
-	static int nA = microenvironment.find_density_index( "signal A" ); 
-	static int nB = microenvironment.find_density_index( "signal B" ); 
-	static int nC = microenvironment.find_density_index( "signal C" ); 
-	static int nR = microenvironment.find_density_index( "resource" ); 
+	static int nA = get_microenvironment_i()->find_density_index( "signal A" ); 
+	static int nB = get_microenvironment_i()->find_density_index( "signal B" ); 
+	static int nC = get_microenvironment_i()->find_density_index( "signal C" ); 
+	static int nR = get_microenvironment_i()->find_density_index( "resource" ); 
 
 	double A = pCell->nearest_density_vector()[nA];
 	double B = pCell->nearest_density_vector()[nB];
@@ -714,7 +715,7 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("B_signal_R") );	
 
-	phenotype.secretion.secretion_rates[nB] = sig.compute_effect();
+	phenotype.secretion.secretion_rates()[nB] = sig.compute_effect();
 
 	return; 
 }
@@ -738,10 +739,10 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// sample A, B, C, resource, and pressure 
-	static int nA = microenvironment.find_density_index( "signal A" ); 
-	static int nB = microenvironment.find_density_index( "signal B" ); 
-	static int nC = microenvironment.find_density_index( "signal C" ); 
-	static int nR = microenvironment.find_density_index( "resource" ); 
+	static int nA = get_microenvironment_i()->find_density_index( "signal A" ); 
+	static int nB = get_microenvironment_i()->find_density_index( "signal B" ); 
+	static int nC = get_microenvironment_i()->find_density_index( "signal C" ); 
+	static int nR = get_microenvironment_i()->find_density_index( "resource" ); 
 
 	double A = pCell->nearest_density_vector()[nA];
 	double B = pCell->nearest_density_vector()[nB];
@@ -836,19 +837,19 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("C_signal_R") );	
 
-	phenotype.secretion.secretion_rates[nC] = sig.compute_effect();
+	phenotype.secretion.secretion_rates()[nC] = sig.compute_effect();
 
 	return; 
 }
 
 
-void SVG_plot_dark( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) )
+void SVG_plot_dark( std::string filename , Microenvironment_Interface& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) )
 {
-	double X_lower = M.mesh.bounding_box[0];
-	double X_upper = M.mesh.bounding_box[3];
+	double X_lower = M.get_mesh().bounding_box[0];
+	double X_upper = M.get_mesh().bounding_box[3];
  
-	double Y_lower = M.mesh.bounding_box[1]; 
-	double Y_upper = M.mesh.bounding_box[4]; 
+	double Y_lower = M.get_mesh().bounding_box[1]; 
+	double Y_upper = M.get_mesh().bounding_box[4]; 
 
 	double plot_width = X_upper - X_lower; 
 	double plot_height = Y_upper - Y_lower; 
@@ -903,8 +904,8 @@ void SVG_plot_dark( std::string filename , Microenvironment& M, double z_slice ,
 	   
 	// prepare to do mesh-based plot (later)
 	
-	double dx_stroma = M.mesh.dx; 
-	double dy_stroma = M.mesh.dy; 
+	double dx_stroma = M.get_mesh().dx; 
+	double dy_stroma = M.get_mesh().dy; 
 	
 	os << "  <g id=\"ECM\">" << std::endl; 
   
@@ -980,28 +981,28 @@ void SVG_plot_dark( std::string filename , Microenvironment& M, double z_slice ,
 		Cell* pC = (*all_cells)[i]; // global_cell_list[i]; 
   
 		static std::vector<std::string> Colors; 
-		if( fabs( (pC->position)[2] - z_slice ) < pC->phenotype.geometry.radius )
+		if( fabs( (pC->get_position())[2] - z_slice ) < pC->phenotype.geometry.radius )
 		{
 			double r = pC->phenotype.geometry.radius ; 
 			double rn = pC->phenotype.geometry.nuclear_radius ; 
-			double z = fabs( (pC->position)[2] - z_slice) ; 
+			double z = fabs( (pC->get_position())[2] - z_slice) ; 
    
 			Colors = cell_coloring_function( pC ); 
 
-			os << "   <g id=\"cell" << pC->ID << "\">" << std::endl; 
+			os << "   <g id=\"cell" << pC->get_ID() << "\">" << std::endl; 
   
 			// figure out how much of the cell intersects with z = 0 
    
 			double plot_radius = sqrt( r*r - z*z ); 
 
-			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
+			Write_SVG_circle( os, (pC->get_position())[0]-X_lower, (pC->get_position())[1]-Y_lower, 
 				plot_radius , 0.5, Colors[1], Colors[0] ); 
 
 			// plot the nucleus if it, too intersects z = 0;
 			if( fabs(z) < rn && PhysiCell_SVG_options.plot_nuclei == true )
 			{   
 				plot_radius = sqrt( rn*rn - z*z ); 
-			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
+			 	Write_SVG_circle( os, (pC->get_position())[0]-X_lower, (pC->get_position())[1]-Y_lower, 
 					plot_radius, 0.5, Colors[3],Colors[2]); 
 			}					  
 			os << "   </g>" << std::endl;

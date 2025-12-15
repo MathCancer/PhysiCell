@@ -73,6 +73,7 @@
 #include <omp.h>
 #include <fstream>
 
+#include "../BioFVM/BioFVM.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 using namespace BioFVM;
@@ -133,7 +134,7 @@ int main( int argc, char* argv[] )
 	
 	// Cell_Container
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size );
 	//microenvironment.agent_container= (Agent_Container *) cell_container; // cell_container;
 	
 	initialize_default_cell_definition(); 	
@@ -162,7 +163,7 @@ int main( int argc, char* argv[] )
 	point2[0]= num2; point2[1]= num2; point2[2]= num2; 
 	
 	Cell* pCell1 = create_cell();
-	pCell1->register_microenvironment(&microenvironment);
+	pCell1->register_microenvironment( get_microenvironment_i() );
 	pCell1->assign_position(point1);
 	pCell1->phenotype.cycle.data.current_phase_index = Q_index; 
 	/* NOTE: for this experiment, you need to disable volume update function 
@@ -171,7 +172,7 @@ int main( int argc, char* argv[] )
 	pCell1->set_total_volume(volume);
 	
 	Cell* pCell2 = create_cell();
-	 pCell2->register_microenvironment(&microenvironment);
+	 pCell2->register_microenvironment( get_microenvironment_i() );
 	pCell2->assign_position(point2);
 	pCell2->phenotype.cycle.data.current_phase_index = Q_index; 
 	//pCell2->functions.volume_update_function=do_nothing;
@@ -192,13 +193,13 @@ int main( int argc, char* argv[] )
 	pCell1->functions.update_velocity(pCell1,pCell1->phenotype, dt);
 	pCell2->functions.update_velocity(pCell2,pCell2->phenotype, dt);
 	
-	pCell1->set_previous_velocity(pCell1->velocity[0],pCell1->velocity[1],pCell1->velocity[2]);
-	pCell2->set_previous_velocity(pCell2->velocity[0],pCell2->velocity[1],pCell2->velocity[2]);
+	pCell1->set_previous_velocity(pCell1->get_velocity()[0],pCell1->get_velocity()[1],pCell1->get_velocity()[2]);
+	pCell2->set_previous_velocity(pCell2->get_velocity()[0],pCell2->get_velocity()[1],pCell2->get_velocity()[2]);
 		
 	for(int i=0;i<10;i++)
 	{
-		pCell1->position += (dt/10.0)*pCell1->velocity; 
-		pCell2->position += (dt/10.0)*pCell2->velocity;
+		pCell1->assign_position( pCell1->get_position() + (dt/10.0)*pCell1->get_velocity() ); 
+		pCell2->assign_position( pCell2->get_position() + (dt/10.0)*pCell2->get_velocity() );
 		t+=dt/10.0;
 	}
 	std::cout<<"time: "<< t<<std::endl;
@@ -211,7 +212,7 @@ int main( int argc, char* argv[] )
 			
 			if( t > t_next_output_time - 0.5 * dt )
 			{
-				report_file<<t<<"\t"<<dist(pCell1->position,pCell2->position)<<"\n";
+				report_file<<t<<"\t"<<dist(pCell1->get_position(),pCell2->get_position())<<"\n";
 				t_next_output_time += t_output_interval; 
 			}
 			
@@ -219,7 +220,7 @@ int main( int argc, char* argv[] )
 			t += dt; 
 		}
 		report_file.close();
-		std::cout<<pCell1->position<<"  "<< pCell2->position<< ", distance: " <<dist(pCell1->position,pCell2->position)<<  std::endl;
+		std::cout<<pCell1->get_position()<<"  "<< pCell2->get_position()<< ", distance: " <<dist(pCell1->get_position(),pCell2->get_position())<<  std::endl;
 		
 		std::cout<<pCell1->get_total_volume()<<std::endl;
 		std::cout << "total number of agents: " << (*all_cells).size()<<std::endl << std::endl;

@@ -74,6 +74,7 @@
 #include <fstream>
 #include <time.h>
 
+#include "../BioFVM/BioFVM.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h"   
 
@@ -121,22 +122,22 @@ double distance_to_membrane_duct(Cell* pCell, Phenotype& phenotype, double dummy
 {
 	double epsillon= 1e-7;
 	//Note that this function assumes that duct cap center is located at <0, 0, 0>
-	if(pCell->position[0]>=0) // Cell is within the cylinder part of the duct
+	if(pCell->get_position()[0]>=0) // Cell is within the cylinder part of the duct
 	{
-		double distance_to_x_axis= sqrt(pCell->position[1]* pCell->position[1] + pCell->position[2]*pCell->position[2]);
+		double distance_to_x_axis= sqrt(pCell->get_position()[1]* pCell->get_position()[1] + pCell->get_position()[2]*pCell->get_position()[2]);
 		distance_to_x_axis = std::max(distance_to_x_axis, epsillon);		// prevents division by zero
 		pCell->displacement[0]=0; 
-		pCell->displacement[1]= -pCell->position[1]/ distance_to_x_axis; 
-		pCell->displacement[2]= -pCell->position[2]/ distance_to_x_axis; 
+		pCell->displacement[1]= -pCell->get_position()[1]/ distance_to_x_axis; 
+		pCell->displacement[2]= -pCell->get_position()[2]/ distance_to_x_axis; 
 		return fabs(duct_radius- distance_to_x_axis);
 	}
 	
 	// Cell is inside the cap of the duct
-	double distance_to_origin= dist(pCell->position, {0.0,0.0,0.0});  // distance to the origin 
+	double distance_to_origin= dist(pCell->get_position(), {0.0,0.0,0.0});  // distance to the origin 
 	distance_to_origin = std::max(distance_to_origin, epsillon);			  // prevents division by zero
-	pCell->displacement[0]= -pCell->position[0]/ distance_to_origin;
-	pCell->displacement[1]= -pCell->position[1]/ distance_to_origin;
-	pCell->displacement[2]= -pCell->position[2]/ distance_to_origin;
+	pCell->displacement[0]= -pCell->get_position()[0]/ distance_to_origin;
+	pCell->displacement[1]= -pCell->get_position()[1]/ distance_to_origin;
+	pCell->displacement[2]= -pCell->get_position()[2]/ distance_to_origin;
 	return fabs(duct_radius- distance_to_origin);
 }
 
@@ -188,7 +189,7 @@ int main( int argc, char* argv[] )
 	
 	// Cell_Container 
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size );
 	
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
@@ -212,7 +213,7 @@ int main( int argc, char* argv[] )
 	cell_defaults.functions.cycle_model = Ki67_advanced; 	
 	// set default_cell_functions; 
 	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() );
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions );
 	
 	int Q_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_negative );
@@ -227,7 +228,7 @@ int main( int argc, char* argv[] )
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// make sure the cells uptake oxygen at the right rate 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
+	cell_defaults.phenotype.secretion.uptake_rates()[oxygen_substrate_index] = 10; 
 
 	// update transition times 
 	cell_defaults.phenotype.cycle.data.transition_rate(Q_index,K1_index) = 1.0 / ( 8.5 * 60.0 ); 
@@ -270,7 +271,7 @@ int main( int argc, char* argv[] )
 		if(cell_positions[i][0]>0)
 			continue;
 		pCell = create_cell();
-		pCell->register_microenvironment(&microenvironment);
+		pCell->register_microenvironment( get_microenvironment_i() );
 		pCell->assign_position(cell_positions[i]);
 		pCell->phenotype.cycle.data.current_phase_index = Q_index; 
 		if( pCell->phenotype.cycle.current_phase().entry_function )                      
@@ -313,7 +314,7 @@ int main( int argc, char* argv[] )
 		{
 			if( t > t_next_output_time - 0.5 * dt )
 			{
-				log_output(t, output_index, microenvironment, report_file);
+				log_output(t, output_index, report_file);
 				t_next_output_time += t_output_interval;						
 			}
 			// std::cout<<__LINE__<<std::endl;			
@@ -323,7 +324,7 @@ int main( int argc, char* argv[] )
 			t += dt; 
 			output_index++;
 		}
-		log_output(t, output_index, microenvironment, report_file);
+		log_output(t, output_index, report_file);
 		report_file.close();
 	}
 	catch( const std::exception& e ) { // reference to the base of a polymorphic object

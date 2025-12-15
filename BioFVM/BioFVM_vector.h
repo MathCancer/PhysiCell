@@ -103,6 +103,8 @@ void randomize( std::vector<double>* v );
 /* axpy and related BLAS-type operations */ 
 
 // y = y + a*x 
+void axpy( std::vector<double>* y, const double& a , const double* x );
+// y = y + a*x 
 void axpy( std::vector<double>* y, const double& a , const std::vector<double>& x );
 // y = y + a.*x
 void axpy( std::vector<double>* y, const std::vector<double>& a , const std::vector<double>& x ); 
@@ -129,6 +131,7 @@ void double_axpy_div( std::vector<double>* y, std::vector<double>& a1 , std::vec
 
 // turn a delimited character array (e.g., csv) into a vector of doubles
 
+void csv_to_vector( const char* buffer , double* vect); 
 void csv_to_vector( const char* buffer , std::vector<double>& vect ); 
 char* vector_to_csv( const std::vector<double>& vect );
 void vector_to_csv_safe( const std::vector<double>& vect , char*& buffer );
@@ -138,6 +141,7 @@ void list_to_vector( const char* buffer , std::vector<double>& vect , char delim
 char* vector_to_list( const std::vector<double>& vect , char delim );
 void vector_to_list_safe( const std::vector<double>& vect , char*& buffer , char delim );
 void vector_to_list( const std::vector<double>& vect , char*& buffer , char delim );
+void ptr_to_list( const double* vect , int size , char*& buffer , char delim );
 
 void vector3_to_list( const std::vector<double>& vect , char*& buffer , char delim ); 
 

@@ -66,7 +66,7 @@
 */
 
 #include "PhysiCell_utilities.h"
-#include "PhysiCell_constants.h"
+#include "../BioFVM/BioFVM_vector.h"
 
 #include "PhysiCell.h" 
 

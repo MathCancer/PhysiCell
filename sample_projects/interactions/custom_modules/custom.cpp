@@ -83,7 +83,7 @@ void create_cell_types( void )
 	*/ 
 	
 	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -187,22 +187,22 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	initialize_microenvironment(); 	
+	get_microenvironment_i()->initialize();
 	
 	return; 
 }
 
 void setup_tissue( void )
 {
-	double Xmin = microenvironment.mesh.bounding_box[0]; 
-	double Ymin = microenvironment.mesh.bounding_box[1]; 
-	double Zmin = microenvironment.mesh.bounding_box[2]; 
+	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0]; 
+	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1]; 
+	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2]; 
 
-	double Xmax = microenvironment.mesh.bounding_box[3]; 
-	double Ymax = microenvironment.mesh.bounding_box[4]; 
-	double Zmax = microenvironment.mesh.bounding_box[5]; 
+	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3]; 
+	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4]; 
+	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5]; 
 	
-	if( default_microenvironment_options.simulate_2D == true )
+	if( get_microenvironment_i()->simulate_2D() == true )
 	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
@@ -367,25 +367,25 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample resource, quorum, and toxin 
 
-	static int nR = microenvironment.find_density_index( "resource" ); 
-	static int nDebris = microenvironment.find_density_index( "debris" ); 
-	static int nQuorum = microenvironment.find_density_index( "quorum" );
-	static int nToxin = microenvironment.find_density_index( "toxin" ); 
+	static int nR = get_microenvironment_i()->find_density_index( "resource" ); 
+	static int nDebris = get_microenvironment_i()->find_density_index( "debris" ); 
+	static int nQuorum = get_microenvironment_i()->find_density_index( "quorum" );
+	static int nToxin = get_microenvironment_i()->find_density_index( "toxin" ); 
 
 	// if dead: stop exporting quorum factor. 
 	// also, replace phenotype function 
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nQuorum] = 0; 
-		phenotype.secretion.net_export_rates[nToxin] = 0; 
+		phenotype.secretion.net_export_rates()[nQuorum] = 0; 
+		phenotype.secretion.net_export_rates()[nToxin] = 0; 
 
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		
 		pCell->functions.update_phenotype = NULL; 
 		return; 
 	}
 
-	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double* samples = pCell->nearest_density_vector(); 
 	double R = samples[nR];
 	double Q = samples[nQuorum]; 
 	double Tox = samples[nToxin]; 
@@ -450,19 +450,19 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
-	static int nDebris = microenvironment.find_density_index( "debris"); 
-	static int nQ = microenvironment.find_density_index("quorum");
+	static int nPIF = get_microenvironment_i()->find_density_index( "pro-inflammatory" ); 
+	static int nDebris = get_microenvironment_i()->find_density_index( "debris"); 
+	static int nQ = get_microenvironment_i()->find_density_index("quorum");
 
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}	
 
-	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double* samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];
 	double debris = samples[nDebris]; 
 	double Q = samples[nQ];
@@ -480,7 +480,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		{ num_dead++; }
 		else
 		{ 
-			if( pC->type == bacteria_type )
+			if( pC->get_type() == bacteria_type )
 			{ num_bacteria++; }
 		}
 	}
@@ -493,7 +493,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static double secretion_debris_sensitivity = 2; 
 	static double secretion_quorum_sensitivity = 5; 
 
-	double base_val = pCD->phenotype.secretion.secretion_rates[nPIF]; 
+	double base_val = pCD->phenotype.secretion.secretion_rates()[nPIF]; 
 	double max_response = 10; // phenotype.volume.total; 
 	double signal = 
 		secretion_dead_sensitivity*num_dead + 
@@ -504,15 +504,15 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double hill = Hill_response_function( signal , half_max , 1.5 ); 
 	
 	
-	phenotype.secretion.secretion_rates[nPIF] = base_val + (max_response-base_val)*hill; 
+	phenotype.secretion.secretion_rates()[nPIF] = base_val + (max_response-base_val)*hill; 
 	
 /*	
 	#pragma omp critical
 	{
-	std::cout << "secretion index: " << nPIF << " base: " << base_val << " max: " << max_response << " actual: " << phenotype.secretion.secretion_rates[nPIF] << std::endl; 
+	std::cout << "secretion index: " << nPIF << " base: " << base_val << " max: " << max_response << " actual: " << phenotype.secretion.secretion_rates()[nPIF] << std::endl; 
 	std::cout << "\tsignal: " << signal << " vs halfmax: " << half_max << std::endl; 
 	std::cout << "\t\tdead: " << num_dead << " bac: " << num_bacteria << " debris: " << debris << " Q: " << Q << std::endl; 
-	std::cout << "\t\t\tsaturation: " << phenotype.secretion.saturation_densities[nPIF]<< std::endl; 
+	std::cout << "\t\t\tsaturation: " << phenotype.secretion.saturation_densities()[nPIF]<< std::endl; 
 	}
 */	
 
@@ -561,18 +561,18 @@ void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nR = microenvironment.find_density_index( "resource");
-	static int nTox = microenvironment.find_density_index( "toxin");
-	static int nDebris = microenvironment.find_density_index( "debris" );
-	static int nPIF = microenvironment.find_density_index( "pro-inflammatory"); 
+	static int nR = get_microenvironment_i()->find_density_index( "resource");
+	static int nTox = get_microenvironment_i()->find_density_index( "toxin");
+	static int nDebris = get_microenvironment_i()->find_density_index( "debris" );
+	static int nPIF = get_microenvironment_i()->find_density_index( "pro-inflammatory"); 
 	
-	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double* samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];	
 	
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}
@@ -609,18 +609,18 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nR = microenvironment.find_density_index( "resource");
-	static int nTox = microenvironment.find_density_index( "toxin");
-	static int nDebris = microenvironment.find_density_index( "debris" );
-	static int nPIF = microenvironment.find_density_index( "pro-inflammatory"); 
+	static int nR = get_microenvironment_i()->find_density_index( "resource");
+	static int nTox = get_microenvironment_i()->find_density_index( "toxin");
+	static int nDebris = get_microenvironment_i()->find_density_index( "debris" );
+	static int nPIF = get_microenvironment_i()->find_density_index( "pro-inflammatory"); 
 	
-	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double* samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];	
 	
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}
@@ -645,19 +645,19 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nR = microenvironment.find_density_index( "resource");
-	static int nTox = microenvironment.find_density_index( "toxin");
-	static int nDebris = microenvironment.find_density_index( "debris" ); 
+	static int nR = get_microenvironment_i()->find_density_index( "resource");
+	static int nTox = get_microenvironment_i()->find_density_index( "toxin");
+	static int nDebris = get_microenvironment_i()->find_density_index( "debris" ); 
 
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}
 
-	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double* samples = pCell->nearest_density_vector(); 
 	double R = samples[nR];
 	double toxin = samples[nTox];
 
@@ -678,11 +678,11 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		{ num_dead++; }
 		else
 		{ 
-			if( pC->type == stem_type )
+			if( pC->get_type() == stem_type )
 			{ num_stem++; }
-			if( pC->type == num_differentiated )
+			if( pC->get_type() == num_differentiated )
 			{ num_differentiated++; }
-			if( pC->type == bacteria_type )
+			if( pC->get_type() == bacteria_type )
 			{ num_bacteria++; }
 		}
 	}
@@ -744,19 +744,19 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 
 	// sample environment 
 
-	static int nR = microenvironment.find_density_index( "resource");
-	static int nTox = microenvironment.find_density_index( "toxin");
-	static int nDebris = microenvironment.find_density_index( "debris" );
+	static int nR = get_microenvironment_i()->find_density_index( "resource");
+	static int nTox = get_microenvironment_i()->find_density_index( "toxin");
+	static int nDebris = get_microenvironment_i()->find_density_index( "debris" );
 	
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}
 	
-	std::vector<double> samples = pCell->nearest_density_vector(); 
+	double* samples = pCell->nearest_density_vector(); 
 	double R = samples[nR];
 	double toxin = samples[nTox];
 

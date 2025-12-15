@@ -66,6 +66,7 @@
 */
 
 #include "./custom.h"
+#include "../BioFVM/BioFVM_vector.h"
 
 void create_cell_types( void )
 {
@@ -83,7 +84,7 @@ void create_cell_types( void )
 	*/ 
 	
 	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -190,22 +191,22 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	initialize_microenvironment(); 	
+	get_microenvironment_i()->initialize();
 	
 	return; 
 }
 
 void setup_tissue( void )
 {
-	double Xmin = microenvironment.mesh.bounding_box[0]; 
-	double Ymin = microenvironment.mesh.bounding_box[1]; 
-	double Zmin = microenvironment.mesh.bounding_box[2]; 
+	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0]; 
+	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1]; 
+	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2]; 
 
-	double Xmax = microenvironment.mesh.bounding_box[3]; 
-	double Ymax = microenvironment.mesh.bounding_box[4]; 
-	double Zmax = microenvironment.mesh.bounding_box[5]; 
+	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3]; 
+	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4]; 
+	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5]; 
 	
-	if( default_microenvironment_options.simulate_2D == true )
+	if( get_microenvironment_i()->simulate_2D() == true )
 	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
@@ -321,7 +322,7 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* pCell )
 	static Cell_Definition* pCD_worker = find_cell_definition( "worker cell"); 
 	
 	// cargo cell 
-	if( pCell->type == pCD_cargo->type )
+	if( pCell->get_type() == pCD_cargo->type )
 	{
 		output[0] = "blue";
 		output[1] = "blue";
@@ -331,7 +332,7 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* pCell )
 	}
 	
 	// worker cell 
-	if( pCell->type == pCD_worker->type )
+	if( pCell->get_type() == pCD_worker->type )
 	{
 		output[0] = "red";
 		output[1] = "red";
@@ -384,11 +385,11 @@ void introduce_biorobots( void )
 		parameters.ints("number_of_injected_cells"); // 500; /* param */ 
 	
 	// make these vary with domain size 
-	double left_coordinate = default_microenvironment_options.X_range[1] - 150.0; // 600.0; 
-	double right_cooridnate = default_microenvironment_options.X_range[1] - 50.0; // 700.0;
+	double left_coordinate = get_microenvironment_i()->get_mesh().bounding_box[3] - 150.0; // 600.0; 
+	double right_cooridnate = get_microenvironment_i()->get_mesh().bounding_box[3] - 50.0; // 700.0;
 
-	double bottom_coordinate = default_microenvironment_options.Y_range[0] + 50.0; // -700; 
-	double top_coordinate = default_microenvironment_options.Y_range[1] - 50.0; // 700; 
+	double bottom_coordinate = get_microenvironment_i()->get_mesh().bounding_box[1] + 50.0; // -700; 
+	double top_coordinate = get_microenvironment_i()->get_mesh().bounding_box[4] - 50.0; // 700; 
 
 	Cell_Definition* pCD_worker = find_cell_definition( "worker cell");
 	Cell_Definition* pCD_cargo = find_cell_definition( "cargo cell");
@@ -485,7 +486,7 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 
 void biorobots_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt )
 {
-	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
+	std::vector<double> displacement = pAttachedTo->get_position() - pActingOn->get_position(); 
 	
 	static double max_elastic_displacement = pao.geometry.radius * pao.mechanics.relative_detachment_distance; 
 	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
@@ -498,7 +499,7 @@ void biorobots_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttache
 		return; 
 	}
 	
-	axpy( &(pActingOn->velocity) , pao.mechanics.attachment_elastic_constant , displacement ); 
+	axpy( &(pActingOn->get_velocity()) , pao.mechanics.attachment_elastic_constant , displacement ); 
 	
 	return; 
 }
@@ -636,5 +637,6 @@ void worker_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	return; 
 }
+
 
 

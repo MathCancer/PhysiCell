@@ -319,6 +319,15 @@ void randomize( std::vector<double>* v )
 
 /* axpy and related BLAS-type operations */ 
 
+void axpy( std::vector<double>* y, const double& a , const double* x )
+{
+ for( unsigned int i=0; i < (*y).size() ; i++ )
+ {
+  (*y)[i] += a * x[i] ; 
+ }
+ return ; 
+}
+
 void axpy( std::vector<double>* y, const double& a , const std::vector<double>& x )
 {
  for( unsigned int i=0; i < (*y).size() ; i++ )
@@ -356,6 +365,26 @@ void naxpy( std::vector<double>* y, const std::vector<double>& a , const std::ve
 }
 
 // turn a delimited character array (e.g., csv) into a vector of doubles
+
+void csv_to_vector( const char* buffer , double* data )
+{
+	unsigned int data_n=0;
+	unsigned int i=0;
+	while( i < strlen( buffer )  )
+	{
+		// churn through delimiters, whitespace, etc. to reach the next numeric term
+		while( isdigit( buffer[i] ) == false && buffer[i] != '.' && buffer[i] != '-' && buffer[i] != 'e' && buffer[i] != 'E' )
+		{ i++; } 
+		char* pEnd; 
+		if( i < strlen(buffer) ) // add this extra check in case of a final character, e.g., ']'
+		{
+			data[data_n] = strtod( buffer+i , &pEnd ); 
+			i = pEnd - buffer; 
+			data_n++;
+		}
+	}			
+	return; 
+}
 
 void csv_to_vector( const char* buffer , std::vector<double>& vect )
 {
@@ -486,6 +515,20 @@ void vector_to_list( const std::vector<double>& vect , char*& buffer , char deli
 		position += sprintf( buffer+position , "%.7e%c" , vect[j] , delim ); 
 	}
 	sprintf( buffer + position , "%.7e" , vect[ vect.size()-1 ] ); 
+	return; 
+}
+
+void ptr_to_list( const double* vect , int size , char*& buffer , char delim )
+{ 
+	// %.7e is approximately the same at matlab longe for single precision. 
+	// If you want better precision, use a binary data format like matlab, or (in the future) HDF 
+
+	int position = 0; 
+	for( int j=0; j < size-1 ; j++ )
+	{
+		position += sprintf( buffer+position , "%.7e%c" , vect[j] , delim ); 
+	}
+	sprintf( buffer + position , "%.7e" , vect[ size-1 ] ); 
 	return; 
 }
 

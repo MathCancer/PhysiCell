@@ -73,7 +73,8 @@
 #include <unordered_map>
 #include <map> 
 
-#include "../BioFVM/BioFVM.h" 
+#include "../BioFVM/BioFVM_microenvironment_interface.h"
+#include "../BioFVM/BioFVM_basic_agent_interface.h"
 
 #include "../modules/PhysiCell_settings.h"
 
@@ -447,7 +448,7 @@ class Motility
 	double& chemotactic_sensitivity( std::string name ); 
 	
 	void sync_to_current_microenvironment( void ); 
-	void sync_to_microenvironment( Microenvironment* pNew_Microenvironment ); 
+	void sync_to_microenvironment( Microenvironment_Interface* pNew_Microenvironment ); 
 	
 		
 	Motility(); // done 
@@ -456,27 +457,34 @@ class Motility
 class Secretion
 {
  private:
+ 	Basic_Agent_Interface* pCell;
+	Cell_Definition* pCD;
  public:
-	Microenvironment* pMicroenvironment; 
+	Microenvironment_Interface* pMicroenvironment; 
 	
-	std::vector<double> secretion_rates; 
-	std::vector<double> uptake_rates; 
-	std::vector<double> saturation_densities;
-	std::vector<double> net_export_rates; 
+	double* secretion_rates() const; 
+	double* uptake_rates() const; 
+	double* saturation_densities() const;
+	double* net_export_rates() const; 
 	
-	// in the default constructor, we'll size to the default microenvironment, if 
-	// specified. (This ties to BioFVM.) 
+	// in the constructor, we'll set pMicroenvironment to the current 
+	// default microenvironment.
 	Secretion(); // done 
 
-	// use this to properly size the secretion parameters to the microenvironment in 
-	// pMicroenvironment
+	Secretion& operator=( const Secretion& rhs );
+
+	// use this to assign the microenvironment to this secretion model
 	void sync_to_current_microenvironment( void ); // done 
+
+	void advance( Basic_Agent_Interface* pCell, Phenotype& phenotype , double dt ); 
 	
-	void advance( Basic_Agent* pCell, Phenotype& phenotype , double dt ); 
-	
-	// use this to properly size the secretion parameters to the microenvironment 
-	void sync_to_microenvironment( Microenvironment* pNew_Microenvironment ); // done 
-	
+	// use this to assign the microenvironment to this secretion model
+	void sync_to_microenvironment( Microenvironment_Interface* pNew_Microenvironment ); // done 
+
+	// use this 
+	void sync_to_cell( Basic_Agent_Interface* pCell ); 
+	void sync_to_cell_definition( Cell_Definition* pCD ); 
+
 	void set_all_secretion_to_zero( void ); // NEW
 	void set_all_uptake_to_zero( void ); // NEW
 	void scale_all_secretion_by_factor( double factor ); // NEW
@@ -554,24 +562,27 @@ class Bools
 class Molecular
 {
 	private:
+ 		Basic_Agent_Interface* pCell;
+		Cell_Definition* pCD;
 	public: 
-		Microenvironment* pMicroenvironment; 
+		Microenvironment_Interface* pMicroenvironment; 
 	
 		// model much of this from Secretion 
 		Molecular(); 
+
+		Molecular& operator=( const Molecular& rhs );
  	
-		// we'll set this to replace BioFVM's version		
-		std::vector<double> internalized_total_substrates; 
+		double* internalized_total_substrates() const; 
 
 		// for each substrate, a fraction 0 <= f <= 1 of the 
 		// total internalized substrate is released back inot
 		// the environment at death 
-		std::vector<double> fraction_released_at_death; 
+		double* fraction_released_at_death() const; 
 
 		// for each substrate, a fraction 0 <= f <= 1 of the 
 		// total internalized substrate is transferred to the  
 		// predatory cell when ingested 
-		std::vector<double> fraction_transferred_when_ingested; 
+		double* fraction_transferred_when_ingested() const; 
 		
 		/* prototyping / beta in 1.5.0 */ 
 		// Boolean, Integer, and Double parameters
@@ -605,10 +616,11 @@ class Molecular
 		
 		// use this to properly size the secretion parameters to the microenvironment in 
 		// pMicroenvironment
-		void sync_to_microenvironment( Microenvironment* pNew_Microenvironment ); // done 
+		void sync_to_microenvironment( Microenvironment_Interface* pNew_Microenvironment ); // done 
 		
 		// use this 
-		void sync_to_cell( Basic_Agent* pCell ); 
+		void sync_to_cell( Basic_Agent_Interface* pCell ); 
+		void sync_to_cell_definition( Cell_Definition* pCD ); 
 
 		// ease of access 
 		double&  internalized_total_substrate( std::string name ); 
@@ -802,7 +814,7 @@ class Phenotype
 
 	void sync_to_functions( Cell_Functions& functions ); // done 
 	
-	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 
+	void sync_to_microenvironment( Microenvironment_Interface* pMicroenvironment ); 
 	
 	// make sure cycle, death, etc. are synced to the defaults. 
 	void sync_to_default_functions( void ); // done 

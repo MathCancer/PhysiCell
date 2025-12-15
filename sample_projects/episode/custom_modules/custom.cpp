@@ -67,6 +67,7 @@
 
 
 #include "custom.h"
+#include "../BioFVM/BioFVM_microenvironment_interface.h"
 
 
 // constantes variables
@@ -88,7 +89,7 @@ void create_cell_types( void )
 
 	// cell_default initial definition
 	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() );
 
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -134,7 +135,7 @@ void setup_microenvironment( void )
 	// extra Dirichlet nodes here.
 
 	// initialize BioFVM
-	initialize_microenvironment();
+	get_microenvironment_i()->initialize();
 
 	return;
 }
@@ -142,15 +143,15 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	double Xmin = microenvironment.mesh.bounding_box[0];
-	double Ymin = microenvironment.mesh.bounding_box[1];
-	double Zmin = microenvironment.mesh.bounding_box[2];
+	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0];
+	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1];
+	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2];
 
-	double Xmax = microenvironment.mesh.bounding_box[3];
-	double Ymax = microenvironment.mesh.bounding_box[4];
-	double Zmax = microenvironment.mesh.bounding_box[5];
+	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3];
+	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4];
+	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5];
 
-	if ( default_microenvironment_options.simulate_2D == true )
+	if ( get_microenvironment_i()->simulate_2D() == true )
 	{
 		Zmin = 0.0;
 		Zmax = 0.0;

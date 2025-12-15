@@ -73,6 +73,7 @@
 #include <omp.h>
 #include <fstream>
 
+#include "../BioFVM/BioFVM.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
@@ -98,7 +99,7 @@ int write_test_report(std::vector<Cell*> all_cells, double timepoint)
     for(int i=0;i<all_cells.size();i++)
     {
         phenotype_code=all_cells[i]->phenotype.cycle.current_phase().code;
-        outputFile<<i<<"\t"<<all_cells[i]->ID<<"\t"<<all_cells[i]->position[0]<<"\t" << all_cells[i]->position[1] <<"\t"<< all_cells[i]->position[2]<<"\t";
+        outputFile<<i<<"\t"<<all_cells[i]->get_ID()<<"\t"<<all_cells[i]->get_position()[0]<<"\t" << all_cells[i]->get_position()[1] <<"\t"<< all_cells[i]->get_position()[2]<<"\t";
         outputFile<<all_cells[i]->phenotype.geometry.radius<<"\t"<<phenotype_code<< "\t"<< all_cells[i]->
         phenotype.cycle.data.elapsed_time_in_phase <<std::endl;
          
@@ -156,7 +157,7 @@ int main( int argc, char* argv[] )
 	microenvironment.mesh.units = "microns";
 	// Cell_Container 
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size );
 	
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
@@ -176,7 +177,7 @@ int main( int argc, char* argv[] )
 	
 	// disable cell's movement
 	cell_defaults.functions.update_velocity=empty_function;
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() );
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 	// first find index for a few key variables. 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
@@ -195,7 +196,7 @@ int main( int argc, char* argv[] )
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// make sure the cells uptake oxygen at the right rate 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates()[oxygen_substrate_index] = 0; 
 
 	// cells leave the Q phase and enter the K1 phase after 5 hours 
 	cell_defaults.phenotype.cycle.data.transition_rate(Q_index,K1_index) = 1.0 / ( 5.0 * 60.0 ); 
@@ -225,7 +226,7 @@ int main( int argc, char* argv[] )
 		for(int j=0;j<3;j++)
 			temp_position[j]= uniform_random()*1000+500;
 		Cell* pCell = create_cell();
-		pCell->register_microenvironment(&microenvironment);
+		pCell->register_microenvironment( get_microenvironment_i() );
 		pCell->assign_position(temp_position);
 		//pCell->advance_cell_current_phase=ki67_advanced_cycle_model_stochastic;
 		if(i<num_ki67_positive_pre)

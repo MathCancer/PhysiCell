@@ -481,7 +481,7 @@ void MaBoSSIntracellular::save(std::string filename)
 
 	for( auto cell : *PhysiCell::all_cells )
 		if (cell->phenotype.intracellular != NULL && cell->phenotype.intracellular->intracellular_type == "maboss")
-			state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
+			state_file << cell->get_ID() << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
 	
 	state_file.close();
 }

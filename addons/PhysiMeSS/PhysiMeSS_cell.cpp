@@ -1,6 +1,8 @@
 #include "PhysiMeSS_cell.h"
 #include "PhysiMeSS_fibre.h"
 
+#include "../../BioFVM/BioFVM_vector.h"
+
 PhysiMeSS_Cell::PhysiMeSS_Cell()
 {
     stuck_counter = 0;
@@ -11,7 +13,7 @@ PhysiMeSS_Cell::PhysiMeSS_Cell()
 void PhysiMeSS_Cell::register_fibre_voxels() 
 {
     //a cell will be in one voxel
-    int voxel = this->get_container()->underlying_mesh.nearest_voxel_index(this->position);
+    int voxel = this->get_container()->underlying_mesh.nearest_voxel_index(get_position());
     physimess_voxels.push_back(voxel);
 
 }
@@ -27,7 +29,7 @@ void PhysiMeSS_Cell::add_potentials_from_fibre(PhysiMeSS_Fibre* pFibre)
 {
     
     double distance = 0.0;
-    pFibre->nearest_point_on_fibre(position, displacement);
+    pFibre->nearest_point_on_fibre(get_position(), displacement);
     for (int index = 0; index < 3; index++) {
         distance += displacement[index] * displacement[index];
     }
@@ -72,7 +74,7 @@ void PhysiMeSS_Cell::add_potentials_from_fibre(PhysiMeSS_Fibre* pFibre)
     if (fabs(temp_r) < 1e-16) { return; }
     temp_r /= distance;
 
-    axpy(&(velocity), temp_r, displacement);
+    axpy(&(get_velocity()), temp_r, displacement);
 
     //Then additional repulsion/adhesion as per Cicely's code
     double fibre_adhesion = 0;
@@ -84,7 +86,7 @@ void PhysiMeSS_Cell::add_potentials_from_fibre(PhysiMeSS_Fibre* pFibre)
             cell_velocity_dot_fibre_direction += pFibre->state.orientation[j] * previous_velocity[j];
         }
         double cell_velocity = 0;
-        for (unsigned int j = 0; j < velocity.size(); j++) {
+        for (unsigned int j = 0; j < get_velocity().size(); j++) {
             cell_velocity += previous_velocity[j] * previous_velocity[j];
         }
         cell_velocity = std::max(sqrt(cell_velocity), 1e-8);
@@ -100,8 +102,8 @@ void PhysiMeSS_Cell::add_potentials_from_fibre(PhysiMeSS_Fibre* pFibre)
 
         fibre_repulsion = this->custom_data["vel_contact"] * xiq;
 
-        axpy(&(velocity), fibre_adhesion, pFibre->state.orientation);
-        naxpy(&(velocity), fibre_repulsion, previous_velocity);
+        axpy(&(get_velocity()), fibre_adhesion, pFibre->state.orientation);
+        naxpy(&(get_velocity()), fibre_repulsion, previous_velocity);
 
         degrade_fibre(pFibre);
     }
@@ -112,7 +114,7 @@ void PhysiMeSS_Cell::degrade_fibre(PhysiMeSS_Fibre* pFibre)
 {
     
     double distance = 0.0;
-    pFibre->nearest_point_on_fibre(position, displacement);
+    pFibre->nearest_point_on_fibre(get_position(), displacement);
     for (int index = 0; index < 3; index++) {
         distance += displacement[index] * displacement[index];
     }

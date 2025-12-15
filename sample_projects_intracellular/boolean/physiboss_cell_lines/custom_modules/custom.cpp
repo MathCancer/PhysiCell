@@ -66,7 +66,6 @@
 */
 
 #include "custom.h"
-#include "../BioFVM/BioFVM.h"  
 using namespace BioFVM;
 
 // declare cell definitions here 
@@ -89,7 +88,7 @@ void create_cell_types( void )
 	*/ 
 
 	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
 
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = NULL;
@@ -147,7 +146,7 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	initialize_microenvironment(); 	
+	get_microenvironment_i()->initialize();
 	
 	return; 
 }

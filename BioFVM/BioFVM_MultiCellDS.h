@@ -49,6 +49,8 @@
 #ifndef __BioFVM_MultiCellDS_h__
 #define __BioFVM_MultiCellDS_h__
 
+#include "BioFVM_microenvironment_interface.h"
+#include "BioFVM_basic_agent_interface.h"
 #include "pugixml.hpp"
 
 #include <cstdio>
@@ -160,7 +162,7 @@ class MultiCellDS_Metadata
 	
 		MultiCellDS_Metadata();	
 		void display_information( std::ostream& os); 
-		void sync_to_microenvironment( Microenvironment& M );  
+		void sync_to_microenvironment( Microenvironment_Interface& M );  
 		void restart_runtime( void );  
 	
 		void add_to_open_xml_pugi( double current_simulation_time, pugi::xml_document& xml_dom ); 
@@ -182,14 +184,14 @@ void set_save_biofvm_cell_data_as_custom_matlab( bool newvalue ); // default: tr
 /* writing parts of BioFVM to a MultiCellDS file */ 
 
 void reset_BioFVM_substrates_initialized_in_dom( void );
-void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base , Microenvironment& M ); 
-void add_BioFVM_basic_agent_to_open_xml_pugi(  pugi::xml_document& xml_dom, Basic_Agent& BA ); // not implemented -- future edition 
-void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M  ); 
-void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M );
+void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base , Microenvironment_Interface& M ); 
+void add_BioFVM_basic_agent_to_open_xml_pugi(  pugi::xml_document& xml_dom, Basic_Agent_Interface& BA ); // not implemented -- future edition 
+void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment_Interface& M  ); 
+void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment_Interface& M );
 
 void write_coordinates_node(pugi::xml_node &node, const std::vector<double> &coordinates, std::string name);
 
-void save_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double current_simulation_time); 
+void save_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment_Interface& M , double current_simulation_time); 
 
 /* beta in PhysiCell 1.11.0 */
 
@@ -197,14 +199,14 @@ bool read_microenvironment_from_matlab( std::string mat_filename );
 
 /* future / not yet supported */
 
-void read_BioFVM_from_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double& current_simulation_time , Microenvironment& M );
-void read_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double& current_simulation_time ); 
+void read_BioFVM_from_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double& current_simulation_time , Microenvironment_Interface& M );
+void read_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment_Interface& M , double& current_simulation_time ); 
 
 /* partly-implemented code snippets -- not to be used as of March 2016 */
 
 // functions to read multiscale_microenvironment from MultiCellDS file (requires pugixml)
-void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination , std::string filename );
-void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination , pugi::xml_document& xml_dom ); 
+void read_microenvironment_from_MultiCellDS_xml( Microenvironment_Interface& M_destination , std::string filename );
+void read_microenvironment_from_MultiCellDS_xml( Microenvironment_Interface& M_destination , pugi::xml_document& xml_dom ); 
 
 };
 

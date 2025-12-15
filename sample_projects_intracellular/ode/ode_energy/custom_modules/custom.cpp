@@ -66,7 +66,7 @@
 */
 
 #include "./custom.h"
-#include "../BioFVM/BioFVM.h"  
+#include "../BioFVM/BioFVM_vector.h"
 using namespace BioFVM;
 
 
@@ -91,7 +91,7 @@ void create_cell_types( void )
 	*/ 
 	
 	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -126,7 +126,7 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	initialize_microenvironment(); 	
+	get_microenvironment_i()->initialize();
 	
 	return; 
 }
@@ -134,20 +134,20 @@ void setup_microenvironment( void )
 void setup_tissue( void )
 {
 
-    static int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" );
-    static int glucose_substrate_index = microenvironment.find_density_index( "glucose" ); 
-    static int lactate_substrate_index = microenvironment.find_density_index( "lactate");
+    static int oxygen_substrate_index = get_microenvironment_i()->find_density_index( "oxygen" );
+    static int glucose_substrate_index = get_microenvironment_i()->find_density_index( "glucose" ); 
+    static int lactate_substrate_index = get_microenvironment_i()->find_density_index( "lactate");
     
     
-	double Xmin = microenvironment.mesh.bounding_box[0]; 
-	double Ymin = microenvironment.mesh.bounding_box[1]; 
-	double Zmin = microenvironment.mesh.bounding_box[2]; 
+	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0]; 
+	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1]; 
+	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2]; 
 
-	double Xmax = microenvironment.mesh.bounding_box[3]; 
-	double Ymax = microenvironment.mesh.bounding_box[4]; 
-	double Zmax = microenvironment.mesh.bounding_box[5]; 
+	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3]; 
+	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4]; 
+	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5]; 
 	
-	if( default_microenvironment_options.simulate_2D == true )
+	if( get_microenvironment_i()->simulate_2D() == true )
 	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
@@ -193,9 +193,9 @@ void setup_tissue( void )
         set_single_behavior( pCell , "custom:intra_oxy" , parameters.doubles("initial_internal_oxygen"));
         
         
-        pCell->phenotype.molecular.internalized_total_substrates[oxygen_substrate_index]= get_single_signal( pCell, "custom:intra_oxy") * cell_volume;
-        pCell->phenotype.molecular.internalized_total_substrates[glucose_substrate_index]= get_single_signal( pCell, "custom:intra_glu") * cell_volume;
-        pCell->phenotype.molecular.internalized_total_substrates[lactate_substrate_index]= get_single_signal( pCell, "custom:intra_lac") * cell_volume;
+        pCell->phenotype.molecular.internalized_total_substrates()[oxygen_substrate_index]= get_single_signal( pCell, "custom:intra_oxy") * cell_volume;
+        pCell->phenotype.molecular.internalized_total_substrates()[glucose_substrate_index]= get_single_signal( pCell, "custom:intra_glu") * cell_volume;
+        pCell->phenotype.molecular.internalized_total_substrates()[lactate_substrate_index]= get_single_signal( pCell, "custom:intra_lac") * cell_volume;
         pCell->phenotype.intracellular->start();
         (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Energy",get_single_signal( pCell, "custom:intra_energy"));
        
@@ -207,9 +207,9 @@ void setup_tissue( void )
 void update_intracellular()
 {
     // BioFVM Indices
-    static int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" );
-    static int glucose_substrate_index = microenvironment.find_density_index( "glucose" ); 
-    static int lactate_substrate_index = microenvironment.find_density_index( "lactate");
+    static int oxygen_substrate_index = get_microenvironment_i()->find_density_index( "oxygen" );
+    static int glucose_substrate_index = get_microenvironment_i()->find_density_index( "glucose" ); 
+    static int lactate_substrate_index = get_microenvironment_i()->find_density_index( "lactate");
 
     #pragma omp parallel for 
     for( int i=0; i < (*all_cells).size(); i++ )
@@ -236,9 +236,9 @@ void update_intracellular()
             (*all_cells)[i]->phenotype.intracellular->update_phenotype_parameters((*all_cells)[i]->phenotype);
                         
             // Internalized Chemical Update After SBML Simulation
-            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates[oxygen_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxygen") * cell_volume;
-            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates[glucose_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Glucose") * cell_volume;
-            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates[lactate_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Lactate") * cell_volume;
+            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates()[oxygen_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxygen") * cell_volume;
+            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates()[glucose_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Glucose") * cell_volume;
+            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates()[lactate_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Lactate") * cell_volume;
             
 
             //Save custom data
@@ -265,21 +265,21 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	
 	// color
     // proliferative cell
-	if( pCell->phenotype.death.dead == false && pCell->type == 0 && pCell->custom_data[energy_vi] > 445)
+	if( pCell->phenotype.death.dead == false && pCell->get_type() == 0 && pCell->custom_data[energy_vi] > 445)
 	{
 		output[0] = "rgb(255,255,0)";
 		output[2] = "rgb(125,125,0)";
 	}
 
     // arrested cell
-	if( pCell->phenotype.death.dead == false && pCell->type == 0 && pCell->custom_data[energy_vi] <= 445)
+	if( pCell->phenotype.death.dead == false && pCell->get_type() == 0 && pCell->custom_data[energy_vi] <= 445)
 	{
 		output[0] = "rgb(255,0,0)";
 		output[2] = "rgb(125,0,0)";
 	}     
     
     // dead cell
-	if( pCell->phenotype.death.dead == true && pCell->type == 0)
+	if( pCell->phenotype.death.dead == true && pCell->get_type() == 0)
 	{
 		output[0] = "rgb(20,20,20)";
 		output[2] = "rgb(10,10,10)";

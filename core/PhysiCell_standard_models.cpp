@@ -68,6 +68,9 @@
 #include "PhysiCell_standard_models.h" 
 #include "PhysiCell_cell.h" 
 #include "../modules/PhysiCell_pathology.h"
+#include "../BioFVM/BioFVM_microenvironment_interface.h"
+
+#include "../BioFVM/BioFVM_vector.h"
 
 namespace PhysiCell{
 	
@@ -647,7 +650,7 @@ void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt
 	}
 
 	pCell->update_motility_vector(dt); 
-	pCell->velocity += phenotype.motility.motility_vector; 
+	pCell->get_velocity() += phenotype.motility.motility_vector; 
 	
 	return; 
 }
@@ -681,7 +684,7 @@ void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype& phenot
 	if( fabs( temp_r ) < 1e-16 )
 	{ return; }
 	
-	axpy( &( pCell->velocity ) , temp_r , pCell->displacement ); 
+	axpy( &( pCell->get_velocity() ) , temp_r , pCell->displacement ); 
 	return;	
 }
 
@@ -705,7 +708,7 @@ void standard_domain_edge_avoidance_interactions( Cell* pCell, Phenotype& phenot
 	if( fabs( temp_r ) < 1e-16 )
 	{ return; }
 	
-	axpy( &( pCell->velocity ) , temp_r , pCell->displacement ); 
+	axpy( &( pCell->get_velocity() ) , temp_r , pCell->displacement ); 
 	return;
 }
 
@@ -727,8 +730,8 @@ void initialize_default_cell_definition( void )
 	
 	// set the microenvironment pointer 
 	cell_defaults.pMicroenvironment = NULL;
-	if( BioFVM::get_default_microenvironment() != NULL )
-	{ cell_defaults.pMicroenvironment = BioFVM::get_default_microenvironment(); }
+	if( BioFVM::get_microenvironment_i() != NULL )
+	{ cell_defaults.sync_to_microenvironment( BioFVM::get_microenvironment_i() );}
 	
 	// make sure phenotype.secretions are correctly sized 
 	
@@ -801,7 +804,7 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	static int end_phase_index; // K_phase_index;
 	static int necrosis_index; 
 	
-	static int oxygen_substrate_index = pCell->get_microenvironment()->find_density_index( "oxygen" ); 
+	static int oxygen_substrate_index = get_microenvironment_i()->find_density_index( "oxygen" ); 
 	
 	if( indices_initiated == false )
 	{
@@ -978,15 +981,15 @@ void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt
 
 void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt )
 {
-	if( pC1->position.size() != 3 || pC2->position.size() != 3 )
+	if( pC1->get_position().size() != 3 || pC2->get_position().size() != 3 )
 	{ return; }
 	
-	std::vector<double> displacement = pC2->position;
-	displacement -= pC1->position; 
+	std::vector<double> displacement = pC2->get_position();
+	displacement -= pC1->get_position(); 
 
 	// update May 2022 - effective adhesion 
-	int ii = find_cell_definition_index( pC1->type ); 
-	int jj = find_cell_definition_index( pC2->type ); 
+	int ii = find_cell_definition_index( pC1->get_type() ); 
+	int jj = find_cell_definition_index( pC2->get_type() ); 
 
 	double adhesion_ii = pC1->phenotype.mechanics.attachment_elastic_constant * pC1->phenotype.mechanics.cell_adhesion_affinities[jj]; 
 	double adhesion_jj = pC2->phenotype.mechanics.attachment_elastic_constant * pC2->phenotype.mechanics.cell_adhesion_affinities[ii]; 
@@ -994,21 +997,21 @@ void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phe
 	double effective_attachment_elastic_constant = sqrt( adhesion_ii*adhesion_jj ); 
 
 	// axpy( &(pC1->velocity) , p1.mechanics.attachment_elastic_constant , displacement ); 
-	axpy( &(pC1->velocity) , effective_attachment_elastic_constant , displacement ); 
+	axpy( &(pC1->get_velocity()) , effective_attachment_elastic_constant , displacement ); 
 	return; 
 }
 
 void standard_elastic_contact_function_confluent_rest_length( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt )
 {
-	if( pC1->position.size() != 3 || pC2->position.size() != 3 )
+	if( pC1->get_position().size() != 3 || pC2->get_position().size() != 3 )
 	{ return; }
 	
-	std::vector<double> displacement = pC2->position;
-	displacement -= pC1->position; 
+	std::vector<double> displacement = pC2->get_position();
+	displacement -= pC1->get_position(); 
 
 	// update May 2022 - effective adhesion 
-	int ii = find_cell_definition_index( pC1->type ); 
-	int jj = find_cell_definition_index( pC2->type ); 
+	int ii = find_cell_definition_index( pC1->get_type() ); 
+	int jj = find_cell_definition_index( pC2->get_type() ); 
 
 	double adhesion_ii = pC1->phenotype.mechanics.attachment_elastic_constant * pC1->phenotype.mechanics.cell_adhesion_affinities[jj]; 
 	double adhesion_jj = pC2->phenotype.mechanics.attachment_elastic_constant * pC2->phenotype.mechanics.cell_adhesion_affinities[ii]; 
@@ -1023,7 +1026,7 @@ void standard_elastic_contact_function_confluent_rest_length( Cell* pC1, Phenoty
 
 	double strength = ( norm(displacement) - rest_length )*effective_attachment_elastic_constant;
 	normalize( &displacement );
-	axpy( &(pC1->velocity) , strength , displacement ); 
+	axpy( &(pC1->get_velocity()) , strength , displacement ); 
 
 	return; 
 }
@@ -1054,13 +1057,13 @@ double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dummy)
 	int nearest_boundary = -1; 
 	
 	// check against xL and xU
-	double temp_distance = pCell->position[0] - microenvironment.mesh.bounding_box[0]; 
+	double temp_distance = pCell->get_position()[0] - get_microenvironment_i()->get_mesh().bounding_box[0]; 
 	if( temp_distance < min_distance )
 	{
 		min_distance = temp_distance; 
 		nearest_boundary = 0; 
 	}
-	temp_distance = microenvironment.mesh.bounding_box[3] - pCell->position[0]; 
+	temp_distance = get_microenvironment_i()->get_mesh().bounding_box[3] - pCell->get_position()[0]; 
 	if( temp_distance < min_distance )
 	{
 		min_distance = temp_distance; 
@@ -1068,29 +1071,29 @@ double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dummy)
 	}
 	
 	// check against yL and yU
-	temp_distance = pCell->position[1] - microenvironment.mesh.bounding_box[1]; 
+	temp_distance = pCell->get_position()[1] - get_microenvironment_i()->get_mesh().bounding_box[1]; 
 	if( temp_distance < min_distance )
 	{
 		min_distance = temp_distance; 
 		nearest_boundary = 2; 
 	}
-	temp_distance = microenvironment.mesh.bounding_box[4] - pCell->position[1]; 
+	temp_distance = get_microenvironment_i()->get_mesh().bounding_box[4] - pCell->get_position()[1]; 
 	if( temp_distance < min_distance )
 	{
 		min_distance = temp_distance; 
 		nearest_boundary = 3; 
 	}	
 	
-	if( default_microenvironment_options.simulate_2D == false )
+	if( get_microenvironment_i()->simulate_2D() == false )
 	{
 		// if in 3D, check against zL and zU
-		temp_distance = pCell->position[2] - microenvironment.mesh.bounding_box[2]; 
+		temp_distance = pCell->get_position()[2] - get_microenvironment_i()->get_mesh().bounding_box[2]; 
 		if( temp_distance < min_distance )
 		{
 			min_distance = temp_distance; 
 			nearest_boundary = 4; 
 		}
-		temp_distance = microenvironment.mesh.bounding_box[5] - pCell->position[2]; 
+		temp_distance = get_microenvironment_i()->get_mesh().bounding_box[5] - pCell->get_position()[2]; 
 		if( temp_distance < min_distance )
 		{
 			min_distance = temp_distance; 
@@ -1100,32 +1103,32 @@ double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dummy)
 		// check for 3D exceptions 
 		
 		// lines 
-		if( fabs( (pCell->position[0]) - (pCell->position[1]) ) < tolerance && 
-			fabs( (pCell->position[1]) - (pCell->position[2]) ) < tolerance && 
-			fabs( (pCell->position[0]) - (pCell->position[2]) ) < tolerance )
+		if( fabs( (pCell->get_position()[0]) - (pCell->get_position()[1]) ) < tolerance && 
+			fabs( (pCell->get_position()[1]) - (pCell->get_position()[2]) ) < tolerance && 
+			fabs( (pCell->get_position()[0]) - (pCell->get_position()[2]) ) < tolerance )
 		{
-			if( pCell->position[0] > 0 )
+			if( pCell->get_position()[0] > 0 )
 			{
-				if( pCell->position[0] > 0 && pCell->position[1] > 0 )
+				if( pCell->get_position()[0] > 0 && pCell->get_position()[1] > 0 )
 				{ pCell->displacement = { -one_over_sqrt_3 , -one_over_sqrt_3 , -one_over_sqrt_3 }; }
-				if( pCell->position[0] < 0 && pCell->position[1] > 0 )
+				if( pCell->get_position()[0] < 0 && pCell->get_position()[1] > 0 )
 				{ pCell->displacement = { one_over_sqrt_3 , -one_over_sqrt_3 , -one_over_sqrt_3 }; }
 				
-				if( pCell->position[0] > 0 && pCell->position[1] < 0 )
+				if( pCell->get_position()[0] > 0 && pCell->get_position()[1] < 0 )
 				{ pCell->displacement = { -one_over_sqrt_3 , one_over_sqrt_3 , -one_over_sqrt_3 }; }
-				if( pCell->position[0] < 0 && pCell->position[1] < 0 )
+				if( pCell->get_position()[0] < 0 && pCell->get_position()[1] < 0 )
 				{ pCell->displacement = { one_over_sqrt_3 , one_over_sqrt_3 , -one_over_sqrt_3 }; }
 			} 
 			else
 			{
-				if( pCell->position[0] > 0 && pCell->position[1] > 0 )
+				if( pCell->get_position()[0] > 0 && pCell->get_position()[1] > 0 )
 				{ pCell->displacement = { -one_over_sqrt_3 , -one_over_sqrt_3 , one_over_sqrt_3 }; }
-				if( pCell->position[0] < 0 && pCell->position[1] > 0 )
+				if( pCell->get_position()[0] < 0 && pCell->get_position()[1] > 0 )
 				{ pCell->displacement = { one_over_sqrt_3 , -one_over_sqrt_3 , one_over_sqrt_3 }; }
 				
-				if( pCell->position[0] > 0 && pCell->position[1] < 0 )
+				if( pCell->get_position()[0] > 0 && pCell->get_position()[1] < 0 )
 				{ pCell->displacement = { -one_over_sqrt_3 , one_over_sqrt_3 , one_over_sqrt_3 }; }
-				if( pCell->position[0] < 0 && pCell->position[1] < 0 )
+				if( pCell->get_position()[0] < 0 && pCell->get_position()[1] < 0 )
 				{ pCell->displacement = { one_over_sqrt_3 , one_over_sqrt_3 , one_over_sqrt_3 }; }				
 			}
 			return min_distance; 
@@ -1138,16 +1141,16 @@ double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dummy)
 	{
 		// check for 2D  exceptions 
 		
-		if( fabs( (pCell->position[0]) - (pCell->position[1]) ) < tolerance )
+		if( fabs( (pCell->get_position()[0]) - (pCell->get_position()[1]) ) < tolerance )
 		{
-			if( pCell->position[0] > 0 && pCell->position[1] > 0 )
+			if( pCell->get_position()[0] > 0 && pCell->get_position()[1] > 0 )
 			{ pCell->displacement = { -one_over_sqrt_2 , -one_over_sqrt_2 , 0 }; }
-			if( pCell->position[0] < 0 && pCell->position[1] > 0 )
+			if( pCell->get_position()[0] < 0 && pCell->get_position()[1] > 0 )
 			{ pCell->displacement = { one_over_sqrt_2 , -one_over_sqrt_2 , 0 }; }
 			
-			if( pCell->position[0] > 0 && pCell->position[1] < 0 )
+			if( pCell->get_position()[0] > 0 && pCell->get_position()[1] < 0 )
 			{ pCell->displacement = { -one_over_sqrt_2 , one_over_sqrt_2 , 0 }; }
-			if( pCell->position[0] < 0 && pCell->position[1] < 0 )
+			if( pCell->get_position()[0] < 0 && pCell->get_position()[1] < 0 )
 			{ pCell->displacement = { one_over_sqrt_2 , one_over_sqrt_2 , 0 }; }
 			return min_distance; 
 		}
@@ -1200,7 +1203,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 	for( int n=0; n < pCell->state.neighbors.size(); n++ )
 	{
 		pTarget = pCell->state.neighbors[n]; 
-		type = pTarget->type; 
+		type = pTarget->get_type(); 
 		type_name = pTarget->type_name; 
 		
 		if( pTarget->phenotype.volume.total < 1e-15 )
@@ -1378,20 +1381,20 @@ void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daug
 	double total = pCell_parent->phenotype.cycle.asymmetric_division.probabilities_total();
 	if (total > 1.0)
 	{
-		double sym_div_prob = pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_parent->type] + 1.0 - total;
+		double sym_div_prob = pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_parent->get_type()] + 1.0 - total;
 		if (sym_div_prob < 0.0)
 		{ 
 			throw std::runtime_error("Error: Asymmetric division probabilities for " + pCD_parent->name + " sum to greater than 1.0 and cannot be normalized.");
 		}
-		pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_parent->type] = sym_div_prob;
-		pCell_daughter->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_daughter->type] = sym_div_prob;
+		pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_parent->get_type()] = sym_div_prob;
+		pCell_daughter->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_daughter->get_type()] = sym_div_prob;
 	}
 	double r = UniformRandom();
 	for( int i=0; i < pCD_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.size(); i++ )
 	{
 		if( r <= pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[i] )
 		{
-			if (i != pCell_daughter->type) // only convert if the daughter is not already the correct type
+			if (i != pCell_daughter->get_type()) // only convert if the daughter is not already the correct type
 			{ pCell_daughter->convert_to_cell_definition( *cell_definitions_by_index[i] ); }
 			return;
 		}

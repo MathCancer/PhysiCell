@@ -402,13 +402,14 @@ std::string formatted_minutes_to_DDHHMM( double minutes )
 	return output ;
 }
 
-void SVG_plot(std::string filename, Microenvironment &M, double z_slice, double time, std::vector<std::string> (*cell_coloring_function)(Cell *), std::string (*substrate_coloring_function)(double, double, double), void(cell_counts_function)(char *))
+void SVG_plot(std::string filename, double z_slice, double time, std::vector<std::string> (*cell_coloring_function)(Cell *), std::string (*substrate_coloring_function)(double, double, double), void(cell_counts_function)(char *))
 {
-	double X_lower = M.mesh.bounding_box[0];
-	double X_upper = M.mesh.bounding_box[3];
+	Microenvironment_Interface& M = *get_microenvironment_i();
+	double X_lower = M.get_mesh().bounding_box[0];
+	double X_upper = M.get_mesh().bounding_box[3];
 
-	double Y_lower = M.mesh.bounding_box[1];
-	double Y_upper = M.mesh.bounding_box[4];
+	double Y_lower = M.get_mesh().bounding_box[1];
+	double Y_upper = M.get_mesh().bounding_box[4];
 
 	double plot_width = X_upper - X_lower;
 	double plot_height = Y_upper - Y_lower;
@@ -482,8 +483,8 @@ void SVG_plot(std::string filename, Microenvironment &M, double z_slice, double 
 
 	// prepare to do mesh-based plot (later)
 
-	double dx_stroma = M.mesh.dx;
-	double dy_stroma = M.mesh.dy;
+	double dx_stroma = M.get_mesh().dx;
+	double dy_stroma = M.get_mesh().dy;
 
 	os << "  <g id=\"ECM\">" << std::endl;
 
@@ -499,7 +500,7 @@ void SVG_plot(std::string filename, Microenvironment &M, double z_slice, double 
 	// color in the background ECM
 	if(PhysiCell_settings.enable_substrate_plot == true && (*substrate_coloring_function) != NULL)
 	{
-		double dz_stroma = M.mesh.dz;
+		double dz_stroma = M.get_mesh().dz;
 
 		std::string sub = PhysiCell_settings.substrate_to_monitor;
 		int sub_index = M.find_density_index(sub); // check the substrate does actually exist
@@ -541,7 +542,7 @@ void SVG_plot(std::string filename, Microenvironment &M, double z_slice, double 
 
 				double z_compare = z_displ;
 
-				if (default_microenvironment_options.simulate_2D == true){
+				if (get_microenvironment_i()->simulate_2D() == true){
 					z_compare = z_center;
 				};
 
@@ -622,9 +623,9 @@ void SVG_plot(std::string filename, Microenvironment &M, double z_slice, double 
 	{
 		Cell* pC = (*all_cells)[i]; // global_cell_list[i]; 
 
-		if( fabs( (pC->position)[2] - z_slice ) < pC->phenotype.geometry.radius )
+		if( fabs( (pC->get_position())[2] - z_slice ) < pC->phenotype.geometry.radius )
 		{
-			os << "   <g id=\"cell" << pC->ID << "\" "
+			os << "   <g id=\"cell" << pC->get_ID() << "\" "
 			   << "type=\"" << pC->type_name << "\" "; // new April 2022
 			if( pC->phenotype.death.dead == true )
 			{ os << "dead=\"true\" " ; } 
@@ -765,7 +766,7 @@ void standard_agent_SVG(std::ofstream& os, PhysiCell::Cell* pC, double z_slice, 
 
 	double r = pC->phenotype.geometry.radius ; 
 	double rn = pC->phenotype.geometry.nuclear_radius ; 
-	double z = fabs( (pC->position)[2] - z_slice) ; 
+	double z = fabs( (pC->get_position())[2] - z_slice) ; 
 
 	std::vector<std::string> Colors = cell_coloring_function( pC ); 
 	
@@ -773,13 +774,13 @@ void standard_agent_SVG(std::ofstream& os, PhysiCell::Cell* pC, double z_slice, 
 	double plot_radius = sqrt( r*r - z*z );
 
 	// then normal cell, plot sphere if it intersects z = 0;
-	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower,
+	Write_SVG_circle( os, (pC->get_position())[0]-X_lower, (pC->get_position())[1]-Y_lower,
 						plot_radius , 0.5, Colors[1], Colors[0] );
 	// plot the nucleus if it, too intersects z = 0;
 	if( fabs(z) < rn && PhysiCell_SVG_options.plot_nuclei == true )
 	{
 		plot_radius = sqrt( rn*rn - z*z );
-		Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower,
+		Write_SVG_circle( os, (pC->get_position())[0]-X_lower, (pC->get_position())[1]-Y_lower,
 							plot_radius, 0.5, Colors[3],Colors[2]);
 	}
 }
@@ -1740,8 +1741,8 @@ std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
 	// paint by number -- by cell type 
 	
 	std::string interior_color = "white"; 
-	if( pCell->type < 13 )
-	{ interior_color = colors[ pCell->type ]; }
+	if( pCell->get_type() < 13 )
+	{ interior_color = colors[ pCell->get_type() ]; }
 	
 	output[0] = interior_color; // set cytoplasm color 
 	

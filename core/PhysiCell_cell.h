@@ -70,7 +70,6 @@
 
 #include "./PhysiCell_custom.h" 
 
-#include "../BioFVM/BioFVM.h"
 #include "./PhysiCell_phenotype.h"
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
@@ -78,7 +77,8 @@
 #include "../modules/PhysiCell_settings.h" 
 
 #include "./PhysiCell_standard_models.h" 
-#include "./PhysiCell_rules.h"
+
+#include "../BioFVM/BioFVM_basic_agent_PIMPL.h"
 
 using namespace BioFVM; 
 
@@ -124,16 +124,30 @@ class Cell_Definition
 
 	bool is_movable; 
  
-	Microenvironment* pMicroenvironment; 
+	Microenvironment_Interface* pMicroenvironment; 
 	
 	Cell_Parameters parameters; 
 	Custom_Cell_Data custom_data; 
 	Cell_Functions functions; 
 	Phenotype phenotype; 
 
+	// Cell Definition needs to own Secretion and Molecular data
+	// because this->phenotype.secretions and this->phenotype.molecular
+	// have just observer pointers to these data structures
+	// We have the vectors here so we can set defaults when a new cell is created
+	std::vector<double> secretion_rates;
+	std::vector<double> uptake_rates;
+	std::vector<double> saturation_densities;
+	std::vector<double> net_export_rates;
+	std::vector<double> internalized_total_substrates;
+	std::vector<double> fraction_released_at_death;
+	std::vector<double> fraction_transferred_when_ingested;
+
 	Cell_Definition();  // done 
 	Cell_Definition( Cell_Definition& cd ); // copy constructor 
 	Cell_Definition& operator=( const Cell_Definition& cd ); // copy assignment 
+
+	void sync_to_microenvironment( Microenvironment_Interface* pNew_Microenvironment );
 };
 
 extern Cell_Definition cell_defaults; 
@@ -161,7 +175,7 @@ class Cell_State
 	Cell_State(); 
 };
 
-class Cell : public Basic_Agent 
+class Cell : public Basic_Agent_PIMPL
 {
  private: 
 	Cell_Container * container;
@@ -202,7 +216,7 @@ class Cell : public Basic_Agent
 	
 	virtual ~Cell(); 
 	
-	bool assign_position(std::vector<double> new_position);
+	bool assign_position(const std::vector<double>& new_position);
 	bool assign_position(double, double, double);
 	void set_total_volume(double);
 	

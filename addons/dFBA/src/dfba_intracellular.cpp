@@ -192,7 +192,7 @@ int dFBAIntracellular::update_phenotype_parameters(PhysiCell::Phenotype& phenoty
         // how to rescale FBA exchanges into net_export_rates
         float scaling = 1;
         flux *= scaling;
-        phenotype.secretion.net_export_rates[ex_strut.density_index] = flux;
+        phenotype.secretion.net_export_rates()[ex_strut.density_index] = flux;
     }
 
     float delta_vol = 1;
