@@ -80,7 +80,7 @@ void create_immune_cell_type( void )
 	
 	// reduce o2 uptake 
 	
-	pImmuneCell->phenotype.secretion.uptake_rates()[oxygen_ID] *= 
+	pImmuneCell->phenotype.secretion.uptake_rates[oxygen_ID] *= 
 		parameters.doubles("immune_o2_relative_uptake");  
 	
 	pImmuneCell->phenotype.mechanics.cell_cell_adhesion_strength *= 
@@ -343,7 +343,7 @@ void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& p
 	static int immune_factor_index = get_microenvironment_i()->find_density_index( "immunostimulatory factor" ); 
 	double o2 = pCell->nearest_density_vector()[o2_index];	
 
-	phenotype.secretion.secretion_rates()[immune_factor_index] = 10.0; 
+	phenotype.secretion.secretion_rates[immune_factor_index] = 10.0; 
 	
 	update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
 	
@@ -351,7 +351,7 @@ void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& p
 	// set it to secrete the immunostimulatory factor 
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.secretion_rates()[immune_factor_index] = 10; 
+		phenotype.secretion.secretion_rates[immune_factor_index] = 10; 
 		pCell->functions.update_phenotype = NULL; 		
 		return; 
 	}

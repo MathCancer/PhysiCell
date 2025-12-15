@@ -345,8 +345,8 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 		
 	if( pCell->get_type() == A_type )
 	{
-		value = pCell->phenotype.secretion.secretion_rates()[nA] 
-			/ ( 0.001 + pCD_A->phenotype.secretion.secretion_rates()[nA] ) ;
+		value = pCell->phenotype.secretion.secretion_rates[nA] 
+			/ ( 0.001 + pCD_A->phenotype.secretion.secretion_rates[nA] ) ;
 			
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
 		if( pCell->phenotype.death.dead == true )
@@ -358,8 +358,8 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 
 	if( pCell->get_type() == B_type )
 	{
-		value = pCell->phenotype.secretion.secretion_rates()[nB] 
-			/ ( 0.001 + pCD_B->phenotype.secretion.secretion_rates()[nB] ); 
+		value = pCell->phenotype.secretion.secretion_rates[nB] 
+			/ ( 0.001 + pCD_B->phenotype.secretion.secretion_rates[nB] ); 
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
 		if( pCell->phenotype.death.dead == true )
 		{ value = (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence; }
@@ -370,8 +370,8 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 
 	if( pCell->get_type() == C_type )
 	{
-		value = pCell->phenotype.secretion.secretion_rates()[nC] 
-			/ ( 0.001 + pCD_C->phenotype.secretion.secretion_rates()[nC] ); 
+		value = pCell->phenotype.secretion.secretion_rates[nC] 
+			/ ( 0.001 + pCD_C->phenotype.secretion.secretion_rates[nC] ); 
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
 		if( pCell->phenotype.death.dead == true )
 		{ value = (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence; }
@@ -595,7 +595,7 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("A_signal_R") );	
 
-	phenotype.secretion.secretion_rates()[nA] = sig.compute_effect();
+	phenotype.secretion.secretion_rates[nA] = sig.compute_effect();
 
 	return; 
 }
@@ -715,7 +715,7 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("B_signal_R") );	
 
-	phenotype.secretion.secretion_rates()[nB] = sig.compute_effect();
+	phenotype.secretion.secretion_rates[nB] = sig.compute_effect();
 
 	return; 
 }
@@ -837,7 +837,7 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("C_signal_R") );	
 
-	phenotype.secretion.secretion_rates()[nC] = sig.compute_effect();
+	phenotype.secretion.secretion_rates[nC] = sig.compute_effect();
 
 	return; 
 }

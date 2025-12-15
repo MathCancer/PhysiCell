@@ -228,7 +228,7 @@ int main( int argc, char* argv[] )
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// make sure the cells uptake oxygen at the right rate 
-	cell_defaults.phenotype.secretion.uptake_rates()[oxygen_substrate_index] = 10; 
+	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
 
 	// update transition times 
 	cell_defaults.phenotype.cycle.data.transition_rate(Q_index,K1_index) = 1.0 / ( 8.5 * 60.0 ); 

@@ -573,22 +573,22 @@ double get_single_base_behavior( Cell_Definition* pCD , std::string name )
 	// first m entries are secretion 
 	static int first_secretion_index = find_behavior_index( microenvironment.density_names[0] + " secretion" ); // 0; 
 	if( index >= first_secretion_index && index < first_secretion_index + m )
-	{ return pCD->phenotype.secretion.secretion_rates()[index-first_secretion_index]; }
+	{ return pCD->phenotype.secretion.secretion_rates[index-first_secretion_index]; }
 
 	// next m entries are secretion targets
 	static int first_secretion_target_index = find_behavior_index( microenvironment.density_names[0] + " secretion target" ); // m; 
 	if( index >= first_secretion_target_index && index < first_secretion_target_index + m )
-	{ return pCD->phenotype.secretion.saturation_densities()[index-first_secretion_target_index]; }
+	{ return pCD->phenotype.secretion.saturation_densities[index-first_secretion_target_index]; }
 
 	// next m entries are uptake rates
 	static int first_uptake_index = find_behavior_index( microenvironment.density_names[0] + " uptake" );  // 2*m; 
 	if( index >= first_uptake_index && index < first_uptake_index + m )
-	{ return pCD->phenotype.secretion.uptake_rates()[index-first_uptake_index]; }
+	{ return pCD->phenotype.secretion.uptake_rates[index-first_uptake_index]; }
 
 	// next m entries are net export rates 
 	static int first_export_index = find_behavior_index( microenvironment.density_names[0] + " export" ); //  3*m; 
 	if( index >= first_export_index && index < first_export_index + m )
-	{ return pCD->phenotype.secretion.net_export_rates()[index-first_export_index]; }
+	{ return pCD->phenotype.secretion.net_export_rates[index-first_export_index]; }
 
 	// cycle entry (exit from phase 0) and exit from up to 5 more phases 
 	static int first_cycle_index = find_behavior_index("exit from cycle phase 0" ); //  4*m; 
