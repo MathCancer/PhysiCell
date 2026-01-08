@@ -214,13 +214,12 @@ double* Microenvironment_Adapter::density_vector(int i, int j, int k)
 
 double* Microenvironment_Adapter::nearest_density_vector(const std::vector<double>& position)
 {
-	// Need to cast away const for BioFVM's API
-	return biofvm_microenvironment->nearest_density_vector(const_cast<std::vector<double>&>(position)).data();
+	return biofvm_microenvironment->nearest_density_vector(position);
 }
 
 double* Microenvironment_Adapter::nearest_density_vector(int voxel_index)
 {
-	return biofvm_microenvironment->nearest_density_vector(voxel_index).data();
+	return biofvm_microenvironment->nearest_density_vector(voxel_index);
 }
 
 const double* Microenvironment_Adapter::density_vector(int n) const

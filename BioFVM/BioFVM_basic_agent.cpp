@@ -189,24 +189,25 @@ void Basic_Agent::register_microenvironment( Microenvironment_Interface* microen
 void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )
 {
 	microenvironment = microenvironment_in; 	
-	secretion_rates.resize( microenvironment->density_vector(0).size() , 0.0 );
-	saturation_densities.resize( microenvironment->density_vector(0).size() , 0.0 );
-	uptake_rates.resize( microenvironment->density_vector(0).size() , 0.0 );	
-	net_export_rates.resize( microenvironment->density_vector(0).size() , 0.0 ); 
+	unsigned int num_densities = microenvironment->number_of_densities();
+	secretion_rates.resize( num_densities , 0.0 );
+	saturation_densities.resize( num_densities , 0.0 );
+	uptake_rates.resize( num_densities , 0.0 );	
+	net_export_rates.resize( num_densities , 0.0 ); 
 
 	// some solver temporary variables 
-	cell_source_sink_solver_temp1.resize( microenvironment->density_vector(0).size() , 0.0 );
-	cell_source_sink_solver_temp2.resize( microenvironment->density_vector(0).size() , 1.0 );
+	cell_source_sink_solver_temp1.resize( num_densities , 0.0 );
+	cell_source_sink_solver_temp2.resize( num_densities , 1.0 );
 	
-	cell_source_sink_solver_temp_export1.resize( microenvironment->density_vector(0).size() , 0.0 );
-	cell_source_sink_solver_temp_export2.resize( microenvironment->density_vector(0).size() , 0.0 );
+	cell_source_sink_solver_temp_export1.resize( num_densities , 0.0 );
+	cell_source_sink_solver_temp_export2.resize( num_densities , 0.0 );
 
 	// new for internalized substrate tracking 
-	internalized_substrates.resize( microenvironment->density_vector(0).size() , 0.0 );
-	total_extracellular_substrate_change.resize( microenvironment->density_vector(0).size() , 1.0 );
+	internalized_substrates.resize( num_densities , 0.0 );
+	total_extracellular_substrate_change.resize( num_densities , 1.0 );
 	
-	fraction_released_at_death.resize( microenvironment->density_vector(0).size() , 0.0 ); 
-	fraction_transferred_when_ingested.resize( microenvironment->density_vector(0).size() , 1.0 ); 
+	fraction_released_at_death.resize( num_densities , 0.0 ); 
+	fraction_transferred_when_ingested.resize( num_densities , 1.0 ); 
 
 	return; 
 }
@@ -289,7 +290,7 @@ int Basic_Agent::get_current_voxel_index( void )
 
 std::vector<double>& Basic_Agent::nearest_density_vector( void ) 
 {  
-	return microenvironment->nearest_density_vector( current_voxel_index ); 
+	return (*microenvironment)( current_voxel_index ); 
 }
 
 

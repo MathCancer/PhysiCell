@@ -53,6 +53,7 @@
 #include "BioFVM_mesh.h"
 #include "BioFVM_agent_container.h"
 #include "BioFVM_MultiCellDS.h"
+#include "BioFVM_microenvironment_interface.h"
 
 namespace BioFVM{
 
@@ -63,7 +64,7 @@ typedef std::vector<double> gradient;
 
 class Basic_Agent; 
 
-class Microenvironment
+class Microenvironment : public Microenvironment_Interface
 {
  private:
 	friend std::ostream& operator<<(std::ostream& os, const Microenvironment& S);  
@@ -154,7 +155,6 @@ class Microenvironment
 	std::vector< std::vector<double> > supply_target_densities_times_supply_rates; 
 	std::vector< std::vector<double> > supply_rates; 
 	std::vector< std::vector<double> > uptake_rates; 
-	void update_rates( void ); 
 	
 	Microenvironment(); 
 	Microenvironment(std::string name);
@@ -166,40 +166,48 @@ class Microenvironment
 		
 	/*! functions to simplify size queries */ 
 	
-	unsigned int number_of_densities( void ); 
-	unsigned int number_of_voxels( void ); 
-	unsigned int number_of_voxel_faces( void ); 
+	unsigned int number_of_densities( void ) const override; 
+	unsigned int number_of_voxels( void ) const override; 
+	unsigned int number_of_voxel_faces( void ) const override; 
 
  	
 	void auto_choose_diffusion_decay_solver( void ); 
 	
 	// Only use this on non-Cartesian meshes. It's a fail-safe. 
-	void resize_voxels( int new_number_of_voxes ); 
+	void resize_voxels( int new_number_of_voxes ) override; 
 	
-	void resize_space( int x_nodes, int y_nodes, int z_nodes ); 
-	void resize_space( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , int x_nodes, int y_nodes, int z_nodes );  
-	void resize_space( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx_new , double dy_new , double dz_new ); 
-	void resize_space_uniform( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx_new ); 
+	void resize_space( int x_nodes, int y_nodes, int z_nodes ) override; 
+	void resize_space( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , int x_nodes, int y_nodes, int z_nodes ) override;  
+	void resize_space( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx_new , double dy_new , double dz_new ) override; 
+	void resize_space_uniform( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx_new ) override; 
 
-	void resize_densities( int new_size );  
-	void add_density( void ); 
-	void add_density( std::string name , std::string units );
-	void add_density( std::string name , std::string units, double diffusion_constant, double decay_rate ); 
+	void resize_densities( int new_size ) override;  
+	void add_density( void ) override; 
+	void add_density( const std::string& name , const std::string& units ) override;
+	void add_density( const std::string& name , const std::string& units, double diffusion_constant, double decay_rate ) override; 
 
-	void set_density( int index , std::string name , std::string units ); 
-	void set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate ); 
+	void set_density( int index , const std::string& name , const std::string& units ) override; 
+	void set_density( int index , const std::string& name , const std::string& units , double diffusion_constant , double decay_rate ) override; 
 
-	int find_density_index( std::string name ); 
+	int find_density_index( const std::string& name ) const override;
+	// Non-const version for backward compatibility
+	int find_density_index( const std::string& name ); 
 	
-	int voxel_index( int i, int j, int k ); 
-	std::vector<unsigned int> cartesian_indices( int n ); 
+	int voxel_index( int i, int j, int k ) const override; 
+	std::vector<unsigned int> cartesian_indices( int n ) const override; 
 	
+	int nearest_voxel_index( const std::vector<double>& position ) const override; 
+	std::vector<unsigned int> nearest_cartesian_indices( const std::vector<double>& position ) const override; 
+	Voxel& nearest_voxel( const std::vector<double>& position ) override; 
+	Voxel& voxels( int voxel_index ) override;
+	const Voxel& voxels( int voxel_index ) const override;
+	
+	// Legacy non-const versions for backward compatibility
 	int nearest_voxel_index( std::vector<double>& position ); 
 	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
 	Voxel& nearest_voxel( std::vector<double>& position ); 
-	Voxel& voxels( int voxel_index );
-	std::vector<double>& nearest_density_vector( std::vector<double>& position );  
-	std::vector<double>& nearest_density_vector( int voxel_index );  
+	std::vector<double>& nearest_density_vector_ref( std::vector<double>& position );  
+	std::vector<double>& nearest_density_vector_ref( int voxel_index );  
 
 	/*! access the density vector at  [ X(i),Y(j),Z(k) ] */
 	std::vector<double>& operator()( int i, int j, int k ); 
@@ -208,55 +216,68 @@ class Microenvironment
 	/*! access the density vector at [x,y,z](n) */
 	std::vector<double>& operator()( int n );  
 	
-	std::vector<gradient>& gradient_vector(int i, int j, int k); 
-	std::vector<gradient>& gradient_vector(int i, int j ); 
-	std::vector<gradient>& gradient_vector(int n );  
+	std::vector<gradient>& gradient_vector(int i, int j, int k) override; 
+	std::vector<gradient>& gradient_vector(int i, int j ) override; 
+	std::vector<gradient>& gradient_vector(int n ) override;  
 	
+	std::vector<gradient>& nearest_gradient_vector( const std::vector<double>& position ) override;
+	// Backward compatibility non-const version
 	std::vector<gradient>& nearest_gradient_vector( std::vector<double>& position ); 
 
-	void compute_all_gradient_vectors( void ); 
-	void compute_gradient_vector( int n );  
-	void reset_all_gradient_vectors( void ); 
+	void compute_all_gradient_vectors( void ) override; 
+	void compute_gradient_vector( int n ) override;  
+	void reset_all_gradient_vectors( void ) override; 
 	
-	/*! access the density vector at  [ X(i),Y(j),Z(k) ] */
-	std::vector<double>& density_vector( int i, int j, int k ); 
-	/*! access the density vector at  [ X(i),Y(j),0 ]  -- helpful for 2-D problems */
-	std::vector<double>& density_vector( int i, int j ); 
-	/*! access the density vector at [x,y,z](n) */
-	std::vector<double>& density_vector( int n ); 
+	/*! access the density vector reference at  [ X(i),Y(j),Z(k) ] */
+	std::vector<double>& density_vector_ref( int i, int j, int k ); 
+	/*! access the density vector reference at  [ X(i),Y(j),0 ]  -- helpful for 2-D problems */
+	std::vector<double>& density_vector_ref( int i, int j ); 
+	/*! access the density vector reference at [x,y,z](n) */
+	std::vector<double>& density_vector_ref( int n ); 
+	
+	// Interface methods for density vector access (return pointers)
+	double* density_vector( int n ) override;
+	double* density_vector( int i, int j ) override;
+	double* density_vector( int i, int j, int k ) override;
+	double* nearest_density_vector( const std::vector<double>& position ) override;
+	double* nearest_density_vector( int voxel_index ) override;
+	const double* density_vector( int n ) const override; 
 
 	/*! advance the diffusion-decay solver by dt time */
-	void simulate_diffusion_decay( double dt ); 
+	void simulate_diffusion_decay( double dt ) override; 
 	
 	/*! advance the source/sink solver by dt time */
-	void simulate_bulk_sources_and_sinks( double dt ); 
+	void simulate_bulk_sources_and_sinks( double dt ) override; 
 	
 	// use the supplied list of cells
 	void simulate_cell_sources_and_sinks( std::vector<Basic_Agent*>& basic_agent_list , double dt ); 
 	// use the global list of cells 
-	void simulate_cell_sources_and_sinks( double dt ); 
+	void simulate_cell_sources_and_sinks( double dt ) override; 
 	
-	void display_information( std::ostream& os ); 
+	// Interface method for simulate_time_step
+	void simulate_time_step( double dt ) override;
 	
-	void add_dirichlet_node( int voxel_index, std::vector<double>& value ); 
-	void update_dirichlet_node( int voxel_index , std::vector<double>& new_value ); 
-	void update_dirichlet_node( int voxel_index , int substrate_index , double new_value );
-	void remove_dirichlet_node( int voxel_index ); 
-	void apply_dirichlet_conditions( void ); 
+	void display_information( std::ostream& os ) const override; 
+	
+	void add_dirichlet_node( int voxel_index, std::vector<double>& value ) override; 
+	void update_dirichlet_node( int voxel_index , std::vector<double>& new_value ) override; 
+	void update_dirichlet_node( int voxel_index , int substrate_index , double new_value ) override;
+	void remove_dirichlet_node( int voxel_index ) override; 
+	void apply_dirichlet_conditions( void ) override; 
 
 	// set for ALL Dirichlet nodes -- 1.7.0
-	void set_substrate_dirichlet_activation( int substrate_index , bool new_value );  
+	void set_substrate_dirichlet_activation( int substrate_index , bool new_value ) override;  
 	// not quite as relevant as it used to be ?? -- 1.7.0 
-	bool get_substrate_dirichlet_activation( int substrate_index );   
+	bool get_substrate_dirichlet_activation( int substrate_index ) const override;   
 	
 	// new functions for finer-grained control of Dirichlet conditions -- 1.7.0
-	void set_substrate_dirichlet_activation( int substrate_index , int index, bool new_value );  
-	void set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ); 
-	bool get_substrate_dirichlet_activation( int substrate_index, int index );  
+	void set_substrate_dirichlet_activation( int substrate_index , int index, bool new_value ) override;  
+	void set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ) override; 
+	bool get_substrate_dirichlet_activation( int substrate_index, int index ) const override;  
 
-    double get_substrate_dirichlet_value( int substrate_index, int index );
+    double get_substrate_dirichlet_value( int substrate_index, int index ) const override;
 	
-	bool& is_dirichlet_node( int voxel_index ); 
+	bool& is_dirichlet_node( int voxel_index ) override; 
 
 	friend void diffusion_decay_solver__constant_coefficients_explicit( Microenvironment& S, double dt ); 
 	friend void diffusion_decay_solver__constant_coefficients_explicit_uniform_mesh( Microenvironment& S, double dt ); 
@@ -267,13 +288,44 @@ class Microenvironment
 	
 	friend void diffusion_decay_explicit_uniform_rates( Microenvironment& M, double dt );
 	
-	void write_to_matlab( std::string filename );
+	void write_to_matlab( std::string filename ) override;
 	void write_mesh_to_matlab( std::string filename ); // not yet written 
 	void write_densities_to_matlab( std::string filename ); // not yet written 
 	
 	void write_to_xml( std::string xml_filename , std::string data_filename ); // not yet written
 	void read_from_matlab( std::string filename ); // not yet written 
 	void read_from_xml( std::string filename ); // not yet written 
+	
+	// Interface methods for accessing properties
+	std::string& get_time_units() override;
+	const std::string& get_time_units() const override;
+	std::string& get_spatial_units() override;
+	const std::string& get_spatial_units() const override;
+	std::string& get_name() override;
+	const std::string& get_name() const override;
+	
+	const Cartesian_Mesh& get_mesh() const override;
+	Cartesian_Mesh& get_mesh() override;
+	
+	Agent_Container* get_agent_container() override;
+	const Agent_Container* get_agent_container() const override;
+	void set_agent_container(Agent_Container* container) override;
+	
+	std::vector<std::string>& get_density_names() override;
+	const std::vector<std::string>& get_density_names() const override;
+	std::vector<std::string>& get_density_units() override;
+	const std::vector<std::string>& get_density_units() const override;
+	std::vector<double>& get_diffusion_coefficients() override;
+	const double* get_diffusion_coefficients() const override;
+	std::vector<double>& get_decay_rates() override;
+	const double* get_decay_rates() const override;
+	
+	void update_rates( void ) override;
+	
+	bool simulate_2D() const override;
+	bool calculate_gradients() const override;
+	bool setup_microenvironment_from_XML( const std::string& filename ) override;
+	void initialize() override; 
 };
 
 extern void diffusion_decay_solver__constant_coefficients_explicit( Microenvironment& S, double dt ); 

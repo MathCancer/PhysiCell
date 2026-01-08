@@ -248,13 +248,13 @@ void Microenvironment::set_substrate_dirichlet_activation( int index, std::vecto
 }
 
 
-bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index )
+bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index ) const
 {
 	return dirichlet_activation_vector[substrate_index]; 
 }
 
 // TODO? fix confusing swapped usage of args
-double Microenvironment::get_substrate_dirichlet_value( int substrate_index, int index )
+double Microenvironment::get_substrate_dirichlet_value( int substrate_index, int index ) const
 { 
 	return dirichlet_value_vectors[index][substrate_index];
 }  
@@ -267,7 +267,7 @@ void Microenvironment::set_substrate_dirichlet_activation( int substrate_index ,
 	return; 
 }
 
-bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index, int index )
+bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index, int index ) const
 { return dirichlet_activation_vectors[index][substrate_index]; }
 
 
@@ -481,14 +481,14 @@ void Microenvironment::add_density( void )
 	return add_density( "unnamed" , "none" );
 }
 
-void Microenvironment::add_density( std::string name , std::string units )
+void Microenvironment::add_density( const std::string& name , const std::string& units )
 {
 	// fix in PhysiCell preview November 2017 
 	// default_microenvironment_options.use_oxygen_as_first_field = false; 
 	return add_density( name , units , 0.0 , 0.0 );
 }
 
-void Microenvironment::add_density( std::string name , std::string units, double diffusion_constant, double decay_rate )
+void Microenvironment::add_density( const std::string& name , const std::string& units, double diffusion_constant, double decay_rate )
 {
 	// check if density exist
 	if ( find_density_index( name ) != -1 )
@@ -562,7 +562,7 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	return; 
 }
 
-int Microenvironment::find_density_index( std::string name )
+int Microenvironment::find_density_index( const std::string& name )
 {
 	for( unsigned int i=0; i < density_names.size() ; i++ )
 	{
@@ -572,7 +572,17 @@ int Microenvironment::find_density_index( std::string name )
 	return -1; 
 }
 
-void Microenvironment::set_density( int index , std::string name , std::string units )
+int Microenvironment::find_density_index( const std::string& name ) const
+{
+	for( unsigned int i=0; i < density_names.size() ; i++ )
+	{
+		if( density_names[i] == name )
+		{ return i; }
+	}
+	return -1; 
+}
+
+void Microenvironment::set_density( int index , const std::string& name , const std::string& units )
 {
 	// fix in PhysiCell preview November 2017 
 	if( index == 0 )
@@ -583,7 +593,7 @@ void Microenvironment::set_density( int index , std::string name , std::string u
 	return; 
 }
 
-void Microenvironment::set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate )
+void Microenvironment::set_density( int index , const std::string& name , const std::string& units , double diffusion_constant , double decay_rate )
 {
 	// fix in PhysiCell preview November 2017 
 	if( index == 0 )
@@ -597,11 +607,11 @@ void Microenvironment::set_density( int index , std::string name , std::string u
 	return; 
 }
 
-int Microenvironment::voxel_index( int i, int j, int k )
-{ return mesh.voxel_index(i,j,k) ; }
+int Microenvironment::voxel_index( int i, int j, int k ) const
+{ return const_cast<Cartesian_Mesh&>(mesh).voxel_index(i,j,k) ; }
 
-std::vector<unsigned int> Microenvironment::cartesian_indices( int n )
-{ return mesh.cartesian_indices( n ); }
+std::vector<unsigned int> Microenvironment::cartesian_indices( int n ) const
+{ return const_cast<Cartesian_Mesh&>(mesh).cartesian_indices( n ); }
 
 int Microenvironment::nearest_voxel_index( std::vector<double>& position )
 { return mesh.nearest_voxel_index( position ); }
@@ -615,10 +625,10 @@ std::vector<unsigned int> Microenvironment::nearest_cartesian_indices( std::vect
 Voxel& Microenvironment::nearest_voxel( std::vector<double>& position )
 { return mesh.nearest_voxel( position ); }
 
-std::vector<double>& Microenvironment::nearest_density_vector( std::vector<double>& position )
+std::vector<double>& Microenvironment::nearest_density_vector_ref( std::vector<double>& position )
 { return (*p_density_vectors)[ mesh.nearest_voxel_index( position ) ]; }
 
-std::vector<double>& Microenvironment::nearest_density_vector( int voxel_index )
+std::vector<double>& Microenvironment::nearest_density_vector_ref( int voxel_index )
 { return (*p_density_vectors)[ voxel_index ]; }
 
 std::vector<double>& Microenvironment::operator()( int i, int j, int k )
@@ -630,14 +640,33 @@ std::vector<double>& Microenvironment::operator()( int i, int j )
 std::vector<double>& Microenvironment::operator()( int n )
 { return (*p_density_vectors)[ n ]; }
 
-std::vector<double>& Microenvironment::density_vector( int i, int j, int k )
+std::vector<double>& Microenvironment::density_vector_ref( int i, int j, int k )
 { return (*p_density_vectors)[ voxel_index(i,j,k) ]; }
 
-std::vector<double>& Microenvironment::density_vector( int i, int j )
+std::vector<double>& Microenvironment::density_vector_ref( int i, int j )
 { return (*p_density_vectors)[ voxel_index(i,j,0) ]; }
 
-std::vector<double>& Microenvironment::density_vector( int n )
+std::vector<double>& Microenvironment::density_vector_ref( int n )
 { return (*p_density_vectors)[ n ]; }
+
+// Interface methods returning pointers
+double* Microenvironment::density_vector(int n)
+{ return (*p_density_vectors)[n].data(); }
+
+double* Microenvironment::density_vector(int i, int j)
+{ return (*p_density_vectors)[voxel_index(i,j,0)].data(); }
+
+double* Microenvironment::density_vector(int i, int j, int k)
+{ return (*p_density_vectors)[voxel_index(i,j,k)].data(); }
+
+double* Microenvironment::nearest_density_vector(const std::vector<double>& position)
+{ return (*p_density_vectors)[nearest_voxel_index(position)].data(); }
+
+double* Microenvironment::nearest_density_vector(int voxel_index)
+{ return (*p_density_vectors)[voxel_index].data(); }
+
+const double* Microenvironment::density_vector(int n) const
+{ return (*p_density_vectors)[n].data(); }
 
 void Microenvironment::simulate_diffusion_decay( double dt )
 {
@@ -665,10 +694,10 @@ void Microenvironment::auto_choose_diffusion_decay_solver( void )
 
 }
  
-void Microenvironment::display_information( std::ostream& os )
+void Microenvironment::display_information( std::ostream& os ) const
 {
 	os << std::endl << "Microenvironment summary: " << name << ": " << std::endl; 
-	mesh.display_information( os ); 
+	const_cast<Cartesian_Mesh&>(mesh).display_information( os ); 
 	os << "Densities: (" << number_of_densities() << " total)" << std::endl; 
 	for( unsigned int i = 0 ; i < density_names.size() ; i++ )
 	{
@@ -695,13 +724,13 @@ void Microenvironment::display_information( std::ostream& os )
 	return; 
 }
 	
-unsigned int Microenvironment::number_of_densities( void )
+unsigned int Microenvironment::number_of_densities( void ) const
 { return (*p_density_vectors)[0].size(); }
 
-unsigned int Microenvironment::number_of_voxels( void )
+unsigned int Microenvironment::number_of_voxels( void ) const
 { return mesh.voxels.size(); }
 
-unsigned int Microenvironment::number_of_voxel_faces( void )
+unsigned int Microenvironment::number_of_voxel_faces( void ) const
 { return mesh.voxel_faces.size(); } 
 
 void Microenvironment::write_to_matlab( std::string filename )
@@ -837,7 +866,7 @@ std::vector<gradient>& Microenvironment::gradient_vector(int n )
 	return gradient_vectors[n];
 }
 	
-std::vector<gradient>& Microenvironment::nearest_gradient_vector( std::vector<double>& position )
+std::vector<gradient>& Microenvironment::nearest_gradient_vector( const std::vector<double>& position )
 {
 	int n = nearest_voxel_index( position );
 	if( gradient_vector_computed[n] == false )
@@ -846,6 +875,12 @@ std::vector<gradient>& Microenvironment::nearest_gradient_vector( std::vector<do
 	}
 	
 	return gradient_vectors[n];
+}
+
+// Backward compatibility non-const version
+std::vector<gradient>& Microenvironment::nearest_gradient_vector( std::vector<double>& position )
+{
+	return nearest_gradient_vector(const_cast<const std::vector<double>&>(position));
 }
 
 void Microenvironment::compute_all_gradient_vectors( void )
@@ -1227,7 +1262,7 @@ void set_microenvironment_initial_condition( void )
 	else // do what was done before
 	{
 		for (unsigned int n = 0; n < microenvironment.number_of_voxels(); n++)
-		{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
+		{ microenvironment(n) = default_microenvironment_options.initial_condition_vector; }
 	}
 
 	// now, figure out which sides have BCs (for at least one substrate): 
@@ -1941,6 +1976,167 @@ bool setup_microenvironment_from_XML_node( pugi::xml_node root_node )
 	node = node.parent(); 
 	
 	return true;  
+}
+
+// ============================================================================
+// Interface implementation methods
+// ============================================================================
+
+// Units access
+std::string& Microenvironment::get_time_units()
+{
+	return time_units;
+}
+
+const std::string& Microenvironment::get_time_units() const
+{
+	return time_units;
+}
+
+std::string& Microenvironment::get_spatial_units()
+{
+	return spatial_units;
+}
+
+const std::string& Microenvironment::get_spatial_units() const
+{
+	return spatial_units;
+}
+
+std::string& Microenvironment::get_name()
+{
+	return name;
+}
+
+const std::string& Microenvironment::get_name() const
+{
+	return name;
+}
+
+// Mesh access
+const Cartesian_Mesh& Microenvironment::get_mesh() const
+{
+	return mesh;
+}
+
+Cartesian_Mesh& Microenvironment::get_mesh()
+{
+	return mesh;
+}
+
+// Agent container access
+Agent_Container* Microenvironment::get_agent_container()
+{
+	return agent_container;
+}
+
+const Agent_Container* Microenvironment::get_agent_container() const
+{
+	return agent_container;
+}
+
+void Microenvironment::set_agent_container(Agent_Container* container)
+{
+	agent_container = container;
+}
+
+// Metadata access
+std::vector<std::string>& Microenvironment::get_density_names()
+{
+	return density_names;
+}
+
+const std::vector<std::string>& Microenvironment::get_density_names() const
+{
+	return density_names;
+}
+
+std::vector<std::string>& Microenvironment::get_density_units()
+{
+	return density_units;
+}
+
+const std::vector<std::string>& Microenvironment::get_density_units() const
+{
+	return density_units;
+}
+
+std::vector<double>& Microenvironment::get_diffusion_coefficients()
+{
+	return diffusion_coefficients;
+}
+
+const double* Microenvironment::get_diffusion_coefficients() const
+{
+	return diffusion_coefficients.data();
+}
+
+std::vector<double>& Microenvironment::get_decay_rates()
+{
+	return decay_rates;
+}
+
+const double* Microenvironment::get_decay_rates() const
+{
+	return decay_rates.data();
+}
+
+// Const overloads for voxel/position access
+int Microenvironment::nearest_voxel_index(const std::vector<double>& position) const
+{
+	return nearest_voxel_index(const_cast<std::vector<double>&>(position));
+}
+
+std::vector<unsigned int> Microenvironment::nearest_cartesian_indices(const std::vector<double>& position) const
+{
+	return nearest_cartesian_indices(const_cast<std::vector<double>&>(position));
+}
+
+Voxel& Microenvironment::nearest_voxel(const std::vector<double>& position)
+{
+	return nearest_voxel(const_cast<std::vector<double>&>(position));
+}
+
+const Voxel& Microenvironment::voxels(int voxel_index) const
+{
+	return const_cast<Microenvironment*>(this)->voxels(voxel_index);
+}
+
+// Simulation method
+void Microenvironment::simulate_time_step(double dt)
+{
+	simulate_diffusion_decay(dt);
+	simulate_cell_sources_and_sinks(dt);
+}
+
+// Configuration query methods
+bool Microenvironment::simulate_2D() const
+{
+	return default_microenvironment_options.simulate_2D;
+}
+
+bool Microenvironment::calculate_gradients() const
+{
+	return default_microenvironment_options.calculate_gradients;
+}
+
+bool Microenvironment::setup_microenvironment_from_XML(const std::string& filename)
+{
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(filename.c_str());
+	if (!result)
+	{
+		std::cerr << "Error: Could not load XML file " << filename << ": " << result.description() << std::endl;
+		return false;
+	}
+	pugi::xml_node root_node = doc.child("PhysiCell_settings");
+	
+	return setup_microenvironment_from_XML_node(root_node);
+}
+
+void Microenvironment::initialize()
+{
+	initialize_microenvironment();
 }
 
 };
