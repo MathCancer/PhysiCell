@@ -121,6 +121,17 @@ void Cell_Container::update_all_cells(double t)
 
 void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double mechanics_dt_ , double diffusion_dt_ )
 {
+	// secretions and uptakes. Syncing with BioFVM is automated. 
+
+	#pragma omp parallel for 
+	for( int i=0; i < (*all_cells).size(); i++ )
+	{
+		if( (*all_cells)[i]->is_out_of_domain == false )
+		{
+			(*all_cells)[i]->phenotype.secretion.advance( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+		}
+	}
+	
 	//if it is the time for running cell cycle, do it!
 	double time_since_last_cycle= t- last_cell_cycle_time;
 
