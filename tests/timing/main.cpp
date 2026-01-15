@@ -87,7 +87,7 @@ int time_custom_vars1()
 
     std::cout << "--------------  " << __FUNCTION__ << " -------------- " << std::endl;
     double mechanics_voxel_size = 30; 
-    PhysiCell::Cell_Container* cell_container = PhysiCell::create_cell_container( mechanics_voxel_size  );
+    PhysiCell::Cell_Container* cell_container = PhysiCell::create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 
     PhysiCell::cell_defaults.custom_data.add_variable( "myvar0" , "dimensionless", 42.0); 
     PhysiCell::cell_defaults.custom_data.add_variable( "myvar1" , "dimensionless", 42.1); 
