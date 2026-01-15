@@ -157,7 +157,7 @@ int main( int argc, char* argv[] )
 	microenvironment.mesh.units = "microns";
 	// Cell_Container 
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size );
+	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
@@ -177,7 +177,7 @@ int main( int argc, char* argv[] )
 	
 	// disable cell's movement
 	cell_defaults.functions.update_velocity=empty_function;
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() );
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 	// first find index for a few key variables. 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
@@ -226,7 +226,7 @@ int main( int argc, char* argv[] )
 		for(int j=0;j<3;j++)
 			temp_position[j]= uniform_random()*1000+500;
 		Cell* pCell = create_cell();
-		pCell->register_microenvironment( get_microenvironment_i() );
+		pCell->register_microenvironment(&microenvironment);
 		pCell->assign_position(temp_position);
 		//pCell->advance_cell_current_phase=ki67_advanced_cycle_model_stochastic;
 		if(i<num_ki67_positive_pre)

@@ -397,22 +397,13 @@ void Cell_Container::flag_cell_for_removal( Cell* pCell )
 	return; 
 }
 
-Cell_Container* create_cell_container( double mechanics_voxel_size )
+Cell_Container* create_cell_container_for_microenvironment( BioFVM::Microenvironment_Interface& m , double mechanics_voxel_size )
 {
-	// Get the default microenvironment via our interface
-	Microenvironment_Interface* m = BioFVM::get_microenvironment_i();
-	
-	if( m == nullptr )
-	{
-		std::cerr << "Error: Cannot create cell container - no microenvironment available" << std::endl;
-		return nullptr;
-	}
-	
 	Cell_Container* cell_container = new Cell_Container;
-	cell_container->initialize( m->get_mesh().bounding_box[0], m->get_mesh().bounding_box[3],
-		m->get_mesh().bounding_box[1], m->get_mesh().bounding_box[4],
-		m->get_mesh().bounding_box[2], m->get_mesh().bounding_box[5],  mechanics_voxel_size );
-	m->set_agent_container( cell_container );
+	cell_container->initialize( m.get_mesh().bounding_box[0], m.get_mesh().bounding_box[3],
+		m.get_mesh().bounding_box[1], m.get_mesh().bounding_box[4],
+		m.get_mesh().bounding_box[2], m.get_mesh().bounding_box[5],  mechanics_voxel_size );
+	m.set_agent_container( cell_container );
 
 	return cell_container; 
 }

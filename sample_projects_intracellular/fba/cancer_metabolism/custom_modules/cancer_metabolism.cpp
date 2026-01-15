@@ -121,13 +121,13 @@ void create_cell_types( void )
 void setup_microenvironment( void )
 {
 	// make sure ot override and go back to 2D 
-	if( get_microenvironment_i()->simulate_2D() == true )
+	if( default_microenvironment_options.simulate_2D == true )
 	{
-		std::cout << "Error: overriding 2D setting to return to 3D" << std::endl; 
-		std::exit(1);
+		std::cout << "Warning: overriding 2D setting to return to 3D" << std::endl;
+		default_microenvironment_options.simulate_2D = false;
 	}
 			
-	get_microenvironment_i()->initialize();
+	initialize_microenvironment(); 	
 
 	return; 
 }

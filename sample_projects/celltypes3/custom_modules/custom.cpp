@@ -66,7 +66,6 @@
 */
 
 #include "./custom.h"
-#include "../BioFVM/BioFVM_vector.h"
 
 void create_cell_types( void )
 {
@@ -144,20 +143,20 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	get_microenvironment_i()->initialize();
+	initialize_microenvironment(); 	
 	
 	return; 
 }
 
 void setup_tissue( void )
 {
-	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0]; 
-	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1]; 
-	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2]; 
+	double Xmin = microenvironment.mesh.bounding_box[0]; 
+	double Ymin = microenvironment.mesh.bounding_box[1]; 
+	double Zmin = microenvironment.mesh.bounding_box[2]; 
 
-	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3]; 
-	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4]; 
-	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5]; 
+	double Xmax = microenvironment.mesh.bounding_box[3]; 
+	double Ymax = microenvironment.mesh.bounding_box[4]; 
+	double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
 	double max_radius = parameters.doubles("max_distance_from_origin");
 	if( Xmax > max_radius )
@@ -175,7 +174,7 @@ void setup_tissue( void )
 	if( Zmin < -max_radius )
 	{ Zmin = -max_radius; }
 	
-	if( get_microenvironment_i()->simulate_2D() == true )
+	if( default_microenvironment_options.simulate_2D == true )
 	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
@@ -324,9 +323,9 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 	static int B_type = get_cell_definition( "B" ).type; 
 	static int C_type = get_cell_definition( "C" ).type; 
 	
-	static int nA = get_microenvironment_i()->find_density_index( "signal A" ); 
-	static int nB = get_microenvironment_i()->find_density_index( "signal B" ); 
-	static int nC = get_microenvironment_i()->find_density_index( "signal C" ); 
+	static int nA = microenvironment.find_density_index( "signal A" ); 
+	static int nB = microenvironment.find_density_index( "signal B" ); 
+	static int nC = microenvironment.find_density_index( "signal C" ); 
 	
 	static Cell_Definition* pCD_A  = find_cell_definition("A");
 	static Cell_Definition* pCD_B  = find_cell_definition("B");
@@ -499,10 +498,10 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// sample A, B, C, resource, and pressure 
-	static int nA = get_microenvironment_i()->find_density_index( "signal A" ); 
-	static int nB = get_microenvironment_i()->find_density_index( "signal B" ); 
-	static int nC = get_microenvironment_i()->find_density_index( "signal C" ); 
-	static int nR = get_microenvironment_i()->find_density_index( "resource" ); 
+	static int nA = microenvironment.find_density_index( "signal A" ); 
+	static int nB = microenvironment.find_density_index( "signal B" ); 
+	static int nC = microenvironment.find_density_index( "signal C" ); 
+	static int nR = microenvironment.find_density_index( "resource" ); 
 
 	double A = pCell->nearest_density_vector()[nA];
 	double B = pCell->nearest_density_vector()[nB];
@@ -619,10 +618,10 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// sample A, B, C, resource, and pressure 
-	static int nA = get_microenvironment_i()->find_density_index( "signal A" ); 
-	static int nB = get_microenvironment_i()->find_density_index( "signal B" ); 
-	static int nC = get_microenvironment_i()->find_density_index( "signal C" ); 
-	static int nR = get_microenvironment_i()->find_density_index( "resource" ); 
+	static int nA = microenvironment.find_density_index( "signal A" ); 
+	static int nB = microenvironment.find_density_index( "signal B" ); 
+	static int nC = microenvironment.find_density_index( "signal C" ); 
+	static int nR = microenvironment.find_density_index( "resource" ); 
 
 	double A = pCell->nearest_density_vector()[nA];
 	double B = pCell->nearest_density_vector()[nB];
@@ -739,10 +738,10 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	
 	// sample A, B, C, resource, and pressure 
-	static int nA = get_microenvironment_i()->find_density_index( "signal A" ); 
-	static int nB = get_microenvironment_i()->find_density_index( "signal B" ); 
-	static int nC = get_microenvironment_i()->find_density_index( "signal C" ); 
-	static int nR = get_microenvironment_i()->find_density_index( "resource" ); 
+	static int nA = microenvironment.find_density_index( "signal A" ); 
+	static int nB = microenvironment.find_density_index( "signal B" ); 
+	static int nC = microenvironment.find_density_index( "signal C" ); 
+	static int nR = microenvironment.find_density_index( "resource" ); 
 
 	double A = pCell->nearest_density_vector()[nA];
 	double B = pCell->nearest_density_vector()[nB];
@@ -843,13 +842,13 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 }
 
 
-void SVG_plot_dark( std::string filename , Microenvironment_Interface& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) )
+void SVG_plot_dark( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) )
 {
-	double X_lower = M.get_mesh().bounding_box[0];
-	double X_upper = M.get_mesh().bounding_box[3];
+	double X_lower = M.mesh.bounding_box[0];
+	double X_upper = M.mesh.bounding_box[3];
  
-	double Y_lower = M.get_mesh().bounding_box[1]; 
-	double Y_upper = M.get_mesh().bounding_box[4]; 
+	double Y_lower = M.mesh.bounding_box[1]; 
+	double Y_upper = M.mesh.bounding_box[4]; 
 
 	double plot_width = X_upper - X_lower; 
 	double plot_height = Y_upper - Y_lower; 
@@ -904,8 +903,8 @@ void SVG_plot_dark( std::string filename , Microenvironment_Interface& M, double
 	   
 	// prepare to do mesh-based plot (later)
 	
-	double dx_stroma = M.get_mesh().dx; 
-	double dy_stroma = M.get_mesh().dy; 
+	double dx_stroma = M.mesh.dx; 
+	double dy_stroma = M.mesh.dy; 
 	
 	os << "  <g id=\"ECM\">" << std::endl; 
   

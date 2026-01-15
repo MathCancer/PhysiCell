@@ -84,10 +84,8 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 
 void add_PhysiCell_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M );
 
-void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base ,  double current_simulation_time)
+void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment_Interface& M, double current_simulation_time)
 {
-	Microenvironment_Interface& M = *get_microenvironment_i();
-
 	std::cout << __LINE__ << " " << __FUNCTION__ << std::endl; 
 
 	// start with a standard BioFVM save
@@ -109,13 +107,11 @@ void save_PhysiCell_to_MultiCellDS_xml_pugi( std::string filename_base ,  double
 }
 
 
-void save_PhysiCell_to_MultiCellDS_v2( std::string filename_base , double current_simulation_time)
+void save_PhysiCell_to_MultiCellDS_v2( std::string filename_base , Microenvironment_Interface& M, double current_simulation_time)
 {
 	// std::cout << __LINE__ << " " << __FUNCTION__ << std::endl; // we use this one July 2024
 
 	// set some metadata
-
-	Microenvironment_Interface& M = *get_microenvironment_i();
 
 	BioFVM::MultiCellDS_version_string = "2"; 
 	BioFVM::BioFVM_metadata.program.program_name = "PhysiCell"; 

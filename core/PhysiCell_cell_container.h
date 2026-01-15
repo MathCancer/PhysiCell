@@ -71,6 +71,7 @@
 #include <vector>
 #include "../BioFVM/BioFVM_agent_container.h"
 #include "../BioFVM/BioFVM_mesh.h"
+#include "../BioFVM/BioFVM_microenvironment_interface.h"
 
 namespace PhysiCell{
 
@@ -118,7 +119,7 @@ class Cell_Container : public BioFVM::Agent_Container
 int find_escaping_face_index(Cell* agent);
 extern std::vector<Cell*> *all_cells; 
 
-Cell_Container* create_cell_container( double mechanics_voxel_size );
+Cell_Container* create_cell_container_for_microenvironment( BioFVM::Microenvironment_Interface& m , double mechanics_voxel_size );
 
 
 

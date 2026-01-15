@@ -66,7 +66,6 @@
 */
 
 #include "./custom.h"
-#include "../BioFVM/BioFVM_microenvironment_interface.h"
 
 void create_cell_types( void )
 {
@@ -84,7 +83,7 @@ void create_cell_types( void )
 	*/ 
 	
 	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -154,22 +153,22 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	get_microenvironment_i()->initialize(); 	
+	initialize_microenvironment(); 	
 	
 	return; 
 }
 
 void setup_tissue( void )
 {
-	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0]; 
-	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1]; 
-	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2]; 
+	double Xmin = microenvironment.mesh.bounding_box[0]; 
+	double Ymin = microenvironment.mesh.bounding_box[1]; 
+	double Zmin = microenvironment.mesh.bounding_box[2]; 
 
-	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3]; 
-	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4]; 
-	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5]; 
+	double Xmax = microenvironment.mesh.bounding_box[3]; 
+	double Ymax = microenvironment.mesh.bounding_box[4]; 
+	double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
-	if( get_microenvironment_i()->simulate_2D() == true )
+	if( default_microenvironment_options.simulate_2D == true )
 	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
@@ -227,9 +226,9 @@ void setup_tissue( void )
 	for( int i=0; i < number_of_directors ; i++ )
 	{
 		// pick a random location 
-		position[0] = get_microenvironment_i()->get_mesh().bounding_box[0] + Xrange*( relative_margin + (1.0-2*relative_margin)*UniformRandom() ); 
+		position[0] = default_microenvironment_options.X_range[0] + Xrange*( relative_margin + (1.0-2*relative_margin)*UniformRandom() ); 
 		
-		position[1] = get_microenvironment_i()->get_mesh().bounding_box[1] + Yrange*( relative_outer_margin + (1.0-2*relative_outer_margin)*UniformRandom() ); 
+		position[1] = default_microenvironment_options.Y_range[0] + Yrange*( relative_outer_margin + (1.0-2*relative_outer_margin)*UniformRandom() ); 
 		
 		// place the cell
 		Cell* pC;
@@ -245,10 +244,10 @@ void setup_tissue( void )
 	{
 		// pick a random location 
 		
-		position[0] = get_microenvironment_i()->get_mesh().bounding_box[0] + 
+		position[0] = default_microenvironment_options.X_range[0] + 
 				Xrange*( relative_outer_margin + (1-2.0*relative_outer_margin)*UniformRandom() ); 
 		
-		position[1] = get_microenvironment_i()->get_mesh().bounding_box[1] + 
+		position[1] = default_microenvironment_options.Y_range[0] + 
 				Yrange*( relative_outer_margin + (1-2.0*relative_outer_margin)*UniformRandom() ); 
 		
 		if( UniformRandom() < 0.5 )
@@ -269,9 +268,9 @@ void setup_tissue( void )
 	{
 		// pick a random location 
 		
-		position[0] = get_microenvironment_i()->get_mesh().bounding_box[0] + Xrange*( relative_margin + (1.0-2*relative_margin)*UniformRandom() ); 
+		position[0] = default_microenvironment_options.X_range[0] + Xrange*( relative_margin + (1.0-2*relative_margin)*UniformRandom() ); 
 		
-		position[1] = get_microenvironment_i()->get_mesh().bounding_box[1] + Yrange*( relative_outer_margin + (1.0-2*relative_outer_margin)*UniformRandom() ); 
+		position[1] = default_microenvironment_options.Y_range[0] + Yrange*( relative_outer_margin + (1.0-2*relative_outer_margin)*UniformRandom() ); 
 		
 		// place the cell
 		Cell* pC;
@@ -288,7 +287,7 @@ void setup_tissue( void )
 	load_cells_from_pugixml(); 		
 	
 	PhysiCell_SVG_options.length_bar = 200; 
-	SVG_plot( "initial.svg" , 0.0 , 0.0 , robot_coloring_function );	
+	SVG_plot( "initial.svg" , microenvironment, 0.0 , 0.0 , robot_coloring_function );	
 
 
 	

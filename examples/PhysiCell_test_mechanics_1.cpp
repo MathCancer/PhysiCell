@@ -134,7 +134,7 @@ int main( int argc, char* argv[] )
 	
 	// Cell_Container
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size );
+	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	//microenvironment.agent_container= (Agent_Container *) cell_container; // cell_container;
 	
 	initialize_default_cell_definition(); 	
@@ -163,7 +163,7 @@ int main( int argc, char* argv[] )
 	point2[0]= num2; point2[1]= num2; point2[2]= num2; 
 	
 	Cell* pCell1 = create_cell();
-	pCell1->register_microenvironment( get_microenvironment_i() );
+	pCell1->register_microenvironment(&microenvironment);
 	pCell1->assign_position(point1);
 	pCell1->phenotype.cycle.data.current_phase_index = Q_index; 
 	/* NOTE: for this experiment, you need to disable volume update function 
@@ -172,7 +172,7 @@ int main( int argc, char* argv[] )
 	pCell1->set_total_volume(volume);
 	
 	Cell* pCell2 = create_cell();
-	 pCell2->register_microenvironment( get_microenvironment_i() );
+	 pCell2->register_microenvironment(&microenvironment);
 	pCell2->assign_position(point2);
 	pCell2->phenotype.cycle.data.current_phase_index = Q_index; 
 	//pCell2->functions.volume_update_function=do_nothing;

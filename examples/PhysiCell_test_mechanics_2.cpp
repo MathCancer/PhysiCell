@@ -163,7 +163,7 @@ int main( int argc, char* argv[] )
 	microenvironment.mesh.units = "microns";
 	// Cell_Container * 
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size  );
+	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
 	microenvironment.display_information( std::cout );
 
@@ -192,7 +192,7 @@ int main( int argc, char* argv[] )
 	for(int i=0;i<cell_positions.size();i++)
 	{
 		Cell* pCell = create_cell();
-		pCell->register_microenvironment( get_microenvironment_i() );
+		pCell->register_microenvironment(&microenvironment);
 		pCell->assign_position(tumor_center+ cell_positions[i]);
 		// pCell->functions.volume_update_function=empty_function;
 		// pCell->functions.update_phenotype=do_nothing;

@@ -73,8 +73,7 @@
 #include <omp.h>
 #include <fstream>
 
-#include "./BioFVM/BioFVM_MultiCellDS.h"
-#include "./BioFVM/BioFVM_implementation.h"
+#include "./BioFVM/BioFVM.h"
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
@@ -129,7 +128,7 @@ int main( int argc, char* argv[] )
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size  );
+	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
 	/* Users typically start modifying here. START USERMODS */ 
 	
@@ -150,7 +149,7 @@ int main( int argc, char* argv[] )
 	
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
-	save_PhysiCell_to_MultiCellDS_v2( filename , PhysiCell_globals.current_time );
+	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
@@ -163,7 +162,7 @@ int main( int argc, char* argv[] )
 	std::string (*substrate_coloring_function)(double, double, double) = paint_by_density_percentage; 
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, substrate_coloring_function);
+	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, substrate_coloring_function);
 	
 	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
 	create_plot_legend( filename , cell_coloring_function ); 
@@ -198,14 +197,14 @@ int main( int argc, char* argv[] )
 				display_simulation_status( std::cout ); 
 				if( PhysiCell_settings.enable_legacy_saves == true )
 				{	
-					log_output( PhysiCell_globals.current_time , PhysiCell_globals.full_output_index, report_file);
+					log_output( PhysiCell_globals.current_time , PhysiCell_globals.full_output_index, microenvironment, report_file);
 				}
 				
 				if( PhysiCell_settings.enable_full_saves == true )
 				{	
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
-					save_PhysiCell_to_MultiCellDS_v2( filename , PhysiCell_globals.current_time );
+					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 				}
 				
 				PhysiCell_globals.full_output_index++; 
@@ -218,7 +217,7 @@ int main( int argc, char* argv[] )
 				if( PhysiCell_settings.enable_SVG_saves == true )
 				{	
 					sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
-					SVG_plot( filename, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, substrate_coloring_function );
+					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, substrate_coloring_function );
 					
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
@@ -229,10 +228,10 @@ int main( int argc, char* argv[] )
 			treatment_function();
 
 			// update the microenvironment
-			get_microenvironment_i()->simulate_time_step( diffusion_dt );
+			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
 			// run PhysiCell 
-			((Cell_Container *)get_microenvironment_i()->get_agent_container())->update_all_cells( PhysiCell_globals.current_time );
+			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
 			/*
 			  Custom add-ons could potentially go here. 
@@ -243,7 +242,7 @@ int main( int argc, char* argv[] )
 		
 		if( PhysiCell_settings.enable_legacy_saves == true )
 		{			
-			log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, report_file);
+			log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file);
 			report_file.close();
 		}
 	}
@@ -255,10 +254,10 @@ int main( int argc, char* argv[] )
 	// save a final simulation snapshot 
 	
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
-	save_PhysiCell_to_MultiCellDS_v2( filename , PhysiCell_globals.current_time );
+	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, substrate_coloring_function );
+	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, substrate_coloring_function );
 	
 	// timer 
 	

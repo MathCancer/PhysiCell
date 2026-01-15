@@ -65,9 +65,9 @@
 ###############################################################################
 */
 
+#include "../BioFVM/BioFVM.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
-#include "../BioFVM/BioFVM_microenvironment_interface.h"
 
 using namespace BioFVM; 
 using namespace PhysiCell;
@@ -90,7 +90,7 @@ std::vector<std::string> regular_colors( Cell* pCell );
 
 std::vector<std::string> nanohub_fluorescence( Cell* pCell );
 
-void SVG_plot_dark( std::string filename , Microenvironment_Interface& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) );
+void SVG_plot_dark( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*) );
 
 //
 

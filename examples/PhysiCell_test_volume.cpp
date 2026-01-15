@@ -143,7 +143,7 @@ int main( int argc, char* argv[] )
 	microenvironment.mesh.units = "microns";
 	// Cell_Container * 
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size );
+	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
@@ -161,7 +161,7 @@ int main( int argc, char* argv[] )
 	// set default_cell_functions; 
 	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
 	//cell_defaults.functions.volume_update_function = standard_volume_update_function;
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() );
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 	// first find index for a few key variables. 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
@@ -181,7 +181,7 @@ int main( int argc, char* argv[] )
 	point1[0]= a1; point1[1]= a1; point1[2]= a1; 
 	
 	Cell* pCell1 = create_cell();
-	pCell1->register_microenvironment( get_microenvironment_i() );
+	pCell1->register_microenvironment(&microenvironment);
 	pCell1->assign_position(point1);
 	if(test_type[1]=='A' || test_type[1]=='a')
 	{

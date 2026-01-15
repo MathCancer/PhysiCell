@@ -66,7 +66,7 @@
 */
 
 #include "./custom.h"
-#include "../BioFVM/BioFVM_vector.h"
+#include "../BioFVM/BioFVM.h"  
 using namespace BioFVM;
 
 
@@ -91,7 +91,7 @@ void create_cell_types( void )
 	*/ 
 	
 	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -126,7 +126,7 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	get_microenvironment_i()->initialize();
+	initialize_microenvironment(); 	
 	
 	return; 
 }
@@ -134,20 +134,20 @@ void setup_microenvironment( void )
 void setup_tissue( void )
 {
 
-    static int oxygen_substrate_index = get_microenvironment_i()->find_density_index( "oxygen" );
-    static int glucose_substrate_index = get_microenvironment_i()->find_density_index( "glucose" ); 
-    static int lactate_substrate_index = get_microenvironment_i()->find_density_index( "lactate");
+    static int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" );
+    static int glucose_substrate_index = microenvironment.find_density_index( "glucose" ); 
+    static int lactate_substrate_index = microenvironment.find_density_index( "lactate");
     
     
-	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0]; 
-	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1]; 
-	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2]; 
+	double Xmin = microenvironment.mesh.bounding_box[0]; 
+	double Ymin = microenvironment.mesh.bounding_box[1]; 
+	double Zmin = microenvironment.mesh.bounding_box[2]; 
 
-	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3]; 
-	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4]; 
-	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5]; 
+	double Xmax = microenvironment.mesh.bounding_box[3]; 
+	double Ymax = microenvironment.mesh.bounding_box[4]; 
+	double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
-	if( get_microenvironment_i()->simulate_2D() == true )
+	if( default_microenvironment_options.simulate_2D == true )
 	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
@@ -207,9 +207,9 @@ void setup_tissue( void )
 void update_intracellular()
 {
     // BioFVM Indices
-    static int oxygen_substrate_index = get_microenvironment_i()->find_density_index( "oxygen" );
-    static int glucose_substrate_index = get_microenvironment_i()->find_density_index( "glucose" ); 
-    static int lactate_substrate_index = get_microenvironment_i()->find_density_index( "lactate");
+    static int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" );
+    static int glucose_substrate_index = microenvironment.find_density_index( "glucose" ); 
+    static int lactate_substrate_index = microenvironment.find_density_index( "lactate");
 
     #pragma omp parallel for 
     for( int i=0; i < (*all_cells).size(); i++ )

@@ -189,7 +189,7 @@ int main( int argc, char* argv[] )
 	
 	// Cell_Container 
 	double mechanics_voxel_size = 30; 
-	Cell_Container* cell_container = create_cell_container( mechanics_voxel_size );
+	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
 	for( int n=0; n < microenvironment.number_of_voxels() ; n++ )
 	{
@@ -213,7 +213,7 @@ int main( int argc, char* argv[] )
 	cell_defaults.functions.cycle_model = Ki67_advanced; 	
 	// set default_cell_functions; 
 	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() );
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
 	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions );
 	
 	int Q_index = Ki67_advanced.find_phase_index( PhysiCell_constants::Ki67_negative );
@@ -271,7 +271,7 @@ int main( int argc, char* argv[] )
 		if(cell_positions[i][0]>0)
 			continue;
 		pCell = create_cell();
-		pCell->register_microenvironment( get_microenvironment_i() );
+		pCell->register_microenvironment(&microenvironment);
 		pCell->assign_position(cell_positions[i]);
 		pCell->phenotype.cycle.data.current_phase_index = Q_index; 
 		if( pCell->phenotype.cycle.current_phase().entry_function )                      
@@ -314,7 +314,7 @@ int main( int argc, char* argv[] )
 		{
 			if( t > t_next_output_time - 0.5 * dt )
 			{
-				log_output(t, output_index, report_file);
+				log_output(t, output_index, microenvironment, report_file);
 				t_next_output_time += t_output_interval;						
 			}
 			// std::cout<<__LINE__<<std::endl;			
@@ -324,7 +324,7 @@ int main( int argc, char* argv[] )
 			t += dt; 
 			output_index++;
 		}
-		log_output(t, output_index, report_file);
+		log_output(t, output_index, microenvironment, report_file);
 		report_file.close();
 	}
 	catch( const std::exception& e ) { // reference to the base of a polymorphic object

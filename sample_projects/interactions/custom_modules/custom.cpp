@@ -83,7 +83,7 @@ void create_cell_types( void )
 	*/ 
 	
 	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( get_microenvironment_i() ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
@@ -187,22 +187,22 @@ void setup_microenvironment( void )
 	
 	// initialize BioFVM 
 	
-	get_microenvironment_i()->initialize();
+	initialize_microenvironment(); 	
 	
 	return; 
 }
 
 void setup_tissue( void )
 {
-	double Xmin = get_microenvironment_i()->get_mesh().bounding_box[0]; 
-	double Ymin = get_microenvironment_i()->get_mesh().bounding_box[1]; 
-	double Zmin = get_microenvironment_i()->get_mesh().bounding_box[2]; 
+	double Xmin = microenvironment.mesh.bounding_box[0]; 
+	double Ymin = microenvironment.mesh.bounding_box[1]; 
+	double Zmin = microenvironment.mesh.bounding_box[2]; 
 
-	double Xmax = get_microenvironment_i()->get_mesh().bounding_box[3]; 
-	double Ymax = get_microenvironment_i()->get_mesh().bounding_box[4]; 
-	double Zmax = get_microenvironment_i()->get_mesh().bounding_box[5]; 
+	double Xmax = microenvironment.mesh.bounding_box[3]; 
+	double Ymax = microenvironment.mesh.bounding_box[4]; 
+	double Zmax = microenvironment.mesh.bounding_box[5]; 
 	
-	if( get_microenvironment_i()->simulate_2D() == true )
+	if( default_microenvironment_options.simulate_2D == true )
 	{
 		Zmin = 0.0; 
 		Zmax = 0.0; 
@@ -367,10 +367,10 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample resource, quorum, and toxin 
 
-	static int nR = get_microenvironment_i()->find_density_index( "resource" ); 
-	static int nDebris = get_microenvironment_i()->find_density_index( "debris" ); 
-	static int nQuorum = get_microenvironment_i()->find_density_index( "quorum" );
-	static int nToxin = get_microenvironment_i()->find_density_index( "toxin" ); 
+	static int nR = microenvironment.find_density_index( "resource" ); 
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
+	static int nQuorum = microenvironment.find_density_index( "quorum" );
+	static int nToxin = microenvironment.find_density_index( "toxin" ); 
 
 	// if dead: stop exporting quorum factor. 
 	// also, replace phenotype function 
@@ -450,9 +450,9 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nPIF = get_microenvironment_i()->find_density_index( "pro-inflammatory" ); 
-	static int nDebris = get_microenvironment_i()->find_density_index( "debris"); 
-	static int nQ = get_microenvironment_i()->find_density_index("quorum");
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory" ); 
+	static int nDebris = microenvironment.find_density_index( "debris"); 
+	static int nQ = microenvironment.find_density_index("quorum");
 
 	// if dead, release debris
 	if( phenotype.death.dead == true )
@@ -561,10 +561,10 @@ void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nR = get_microenvironment_i()->find_density_index( "resource");
-	static int nTox = get_microenvironment_i()->find_density_index( "toxin");
-	static int nDebris = get_microenvironment_i()->find_density_index( "debris" );
-	static int nPIF = get_microenvironment_i()->find_density_index( "pro-inflammatory"); 
+	static int nR = microenvironment.find_density_index( "resource");
+	static int nTox = microenvironment.find_density_index( "toxin");
+	static int nDebris = microenvironment.find_density_index( "debris" );
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory"); 
 	
 	double* samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];	
@@ -609,10 +609,10 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nR = get_microenvironment_i()->find_density_index( "resource");
-	static int nTox = get_microenvironment_i()->find_density_index( "toxin");
-	static int nDebris = get_microenvironment_i()->find_density_index( "debris" );
-	static int nPIF = get_microenvironment_i()->find_density_index( "pro-inflammatory"); 
+	static int nR = microenvironment.find_density_index( "resource");
+	static int nTox = microenvironment.find_density_index( "toxin");
+	static int nDebris = microenvironment.find_density_index( "debris" );
+	static int nPIF = microenvironment.find_density_index( "pro-inflammatory"); 
 	
 	double* samples = pCell->nearest_density_vector(); 
 	double PIF = samples[nPIF];	
@@ -645,9 +645,9 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	// sample environment 
 
-	static int nR = get_microenvironment_i()->find_density_index( "resource");
-	static int nTox = get_microenvironment_i()->find_density_index( "toxin");
-	static int nDebris = get_microenvironment_i()->find_density_index( "debris" ); 
+	static int nR = microenvironment.find_density_index( "resource");
+	static int nTox = microenvironment.find_density_index( "toxin");
+	static int nDebris = microenvironment.find_density_index( "debris" ); 
 
 	// if dead, release debris
 	if( phenotype.death.dead == true )
@@ -744,9 +744,9 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 
 	// sample environment 
 
-	static int nR = get_microenvironment_i()->find_density_index( "resource");
-	static int nTox = get_microenvironment_i()->find_density_index( "toxin");
-	static int nDebris = get_microenvironment_i()->find_density_index( "debris" );
+	static int nR = microenvironment.find_density_index( "resource");
+	static int nTox = microenvironment.find_density_index( "toxin");
+	static int nDebris = microenvironment.find_density_index( "debris" );
 	
 	// if dead, release debris
 	if( phenotype.death.dead == true )
