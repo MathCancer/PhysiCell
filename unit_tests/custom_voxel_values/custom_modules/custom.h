@@ -65,7 +65,6 @@
 ###############################################################################
 */
 
-#include "../BioFVM/BioFVM.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 

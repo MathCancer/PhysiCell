@@ -16,7 +16,7 @@ COMPILE_COMMAND := $(CC) $(CFLAGS)
 ODIR := ../..
 
 BioFVM_OBJECTS := $(ODIR)/BioFVM_vector.o $(ODIR)/BioFVM_mesh.o $(ODIR)/BioFVM_microenvironment.o $(ODIR)/BioFVM_solvers.o $(ODIR)/BioFVM_matlab.o \
-$(ODIR)/BioFVM_utilities.o $(ODIR)/BioFVM_basic_agent.o $(ODIR)/BioFVM_MultiCellDS.o $(ODIR)/BioFVM_agent_container.o  $(ODIR)/BioFVM_microenvironment_adapter.o
+$(ODIR)/BioFVM_utilities.o $(ODIR)/BioFVM_basic_agent.o $(ODIR)/BioFVM_MultiCellDS.o $(ODIR)/BioFVM_agent_container.o 
 
 PhysiCell_core_OBJECTS := $(ODIR)/PhysiCell_phenotype.o $(ODIR)/PhysiCell_cell_container.o $(ODIR)/PhysiCell_standard_models.o $(ODIR)/PhysiCell_cell.o $(ODIR)/PhysiCell_custom.o $(ODIR)/PhysiCell_utilities.o $(ODIR)/PhysiCell_constants.o
 
