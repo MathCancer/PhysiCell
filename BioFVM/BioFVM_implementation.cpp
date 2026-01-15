@@ -60,7 +60,11 @@ void BioFVM_implementation::set_instance( BioFVM_implementation* implementation 
 }
 
 Microenvironment_Interface* get_microenvironment_i()
-{
+{   
+    if ( BioFVM_implementation::get_instance() == nullptr ) {
+        // instance not initialized yet
+        return nullptr;
+    }
     return BioFVM_implementation::get_instance()->get_microenvironment();
 }
 
