@@ -562,16 +562,6 @@ void Microenvironment::add_density( const std::string& name , const std::string&
 	return; 
 }
 
-int Microenvironment::find_density_index( const std::string& name )
-{
-	for( unsigned int i=0; i < density_names.size() ; i++ )
-	{
-		if( density_names[i] == name )
-		{ return i; }
-	}
-	return -1; 
-}
-
 int Microenvironment::find_density_index( const std::string& name ) const
 {
 	for( unsigned int i=0; i < density_names.size() ; i++ )
@@ -608,28 +598,28 @@ void Microenvironment::set_density( int index , const std::string& name , const 
 }
 
 int Microenvironment::voxel_index( int i, int j, int k ) const
-{ return const_cast<Cartesian_Mesh&>(mesh).voxel_index(i,j,k) ; }
+{ return mesh.voxel_index(i,j,k) ; }
 
 std::vector<unsigned int> Microenvironment::cartesian_indices( int n ) const
-{ return const_cast<Cartesian_Mesh&>(mesh).cartesian_indices( n ); }
+{ return mesh.cartesian_indices( n ); }
 
-int Microenvironment::nearest_voxel_index( std::vector<double>& position )
+int Microenvironment::nearest_voxel_index( const std::vector<double>& position ) const
 { return mesh.nearest_voxel_index( position ); }
 
 Voxel& Microenvironment::voxels( int voxel_index )
 { return mesh.voxels[voxel_index]; }
 
-std::vector<unsigned int> Microenvironment::nearest_cartesian_indices( std::vector<double>& position )
+std::vector<unsigned int> Microenvironment::nearest_cartesian_indices( const std::vector<double>& position ) const
 { return mesh.nearest_cartesian_indices( position ); }
  
-Voxel& Microenvironment::nearest_voxel( std::vector<double>& position )
+Voxel& Microenvironment::nearest_voxel( const std::vector<double>& position )
 { return mesh.nearest_voxel( position ); }
 
-std::vector<double>& Microenvironment::nearest_density_vector_ref( std::vector<double>& position )
-{ return (*p_density_vectors)[ mesh.nearest_voxel_index( position ) ]; }
+double* Microenvironment::nearest_density_vector( const std::vector<double>& position )
+{ return (*p_density_vectors)[ mesh.nearest_voxel_index( position ) ].data(); }
 
-std::vector<double>& Microenvironment::nearest_density_vector_ref( int voxel_index )
-{ return (*p_density_vectors)[ voxel_index ]; }
+double* Microenvironment::nearest_density_vector( int voxel_index )
+{ return (*p_density_vectors)[ voxel_index ].data(); }
 
 std::vector<double>& Microenvironment::operator()( int i, int j, int k )
 { return (*p_density_vectors)[ voxel_index(i,j,k) ]; }
@@ -640,33 +630,14 @@ std::vector<double>& Microenvironment::operator()( int i, int j )
 std::vector<double>& Microenvironment::operator()( int n )
 { return (*p_density_vectors)[ n ]; }
 
-std::vector<double>& Microenvironment::density_vector_ref( int i, int j, int k )
-{ return (*p_density_vectors)[ voxel_index(i,j,k) ]; }
+double* Microenvironment::density_vector( int i, int j, int k )
+{ return (*p_density_vectors)[ voxel_index(i,j,k) ].data(); }
 
-std::vector<double>& Microenvironment::density_vector_ref( int i, int j )
-{ return (*p_density_vectors)[ voxel_index(i,j,0) ]; }
+double* Microenvironment::density_vector( int i, int j )
+{ return (*p_density_vectors)[ voxel_index(i,j,0) ].data(); }
 
-std::vector<double>& Microenvironment::density_vector_ref( int n )
-{ return (*p_density_vectors)[ n ]; }
-
-// Interface methods returning pointers
-double* Microenvironment::density_vector(int n)
-{ return (*p_density_vectors)[n].data(); }
-
-double* Microenvironment::density_vector(int i, int j)
-{ return (*p_density_vectors)[voxel_index(i,j,0)].data(); }
-
-double* Microenvironment::density_vector(int i, int j, int k)
-{ return (*p_density_vectors)[voxel_index(i,j,k)].data(); }
-
-double* Microenvironment::nearest_density_vector(const std::vector<double>& position)
-{ return (*p_density_vectors)[nearest_voxel_index(position)].data(); }
-
-double* Microenvironment::nearest_density_vector(int voxel_index)
-{ return (*p_density_vectors)[voxel_index].data(); }
-
-const double* Microenvironment::density_vector(int n) const
-{ return (*p_density_vectors)[n].data(); }
+double* Microenvironment::density_vector( int n )
+{ return (*p_density_vectors)[ n ].data(); }
 
 void Microenvironment::simulate_diffusion_decay( double dt )
 {
@@ -697,7 +668,7 @@ void Microenvironment::auto_choose_diffusion_decay_solver( void )
 void Microenvironment::display_information( std::ostream& os ) const
 {
 	os << std::endl << "Microenvironment summary: " << name << ": " << std::endl; 
-	const_cast<Cartesian_Mesh&>(mesh).display_information( os ); 
+	mesh.display_information( os ); 
 	os << "Densities: (" << number_of_densities() << " total)" << std::endl; 
 	for( unsigned int i = 0 ; i < density_names.size() ; i++ )
 	{
@@ -875,12 +846,6 @@ std::vector<gradient>& Microenvironment::nearest_gradient_vector( const std::vec
 	}
 	
 	return gradient_vectors[n];
-}
-
-// Backward compatibility non-const version
-std::vector<gradient>& Microenvironment::nearest_gradient_vector( std::vector<double>& position )
-{
-	return nearest_gradient_vector(const_cast<const std::vector<double>&>(position));
 }
 
 void Microenvironment::compute_all_gradient_vectors( void )
@@ -2082,21 +2047,6 @@ const double* Microenvironment::get_decay_rates() const
 }
 
 // Const overloads for voxel/position access
-int Microenvironment::nearest_voxel_index(const std::vector<double>& position) const
-{
-	return nearest_voxel_index(const_cast<std::vector<double>&>(position));
-}
-
-std::vector<unsigned int> Microenvironment::nearest_cartesian_indices(const std::vector<double>& position) const
-{
-	return nearest_cartesian_indices(const_cast<std::vector<double>&>(position));
-}
-
-Voxel& Microenvironment::nearest_voxel(const std::vector<double>& position)
-{
-	return nearest_voxel(const_cast<std::vector<double>&>(position));
-}
-
 const Voxel& Microenvironment::voxels(int voxel_index) const
 {
 	return const_cast<Microenvironment*>(this)->voxels(voxel_index);

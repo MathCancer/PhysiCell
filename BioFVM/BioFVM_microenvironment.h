@@ -155,6 +155,7 @@ class Microenvironment : public Microenvironment_Interface
 	std::vector< std::vector<double> > supply_target_densities_times_supply_rates; 
 	std::vector< std::vector<double> > supply_rates; 
 	std::vector< std::vector<double> > uptake_rates; 
+	void update_rates( void ) override; 
 	
 	Microenvironment(); 
 	Microenvironment(std::string name);
@@ -190,8 +191,6 @@ class Microenvironment : public Microenvironment_Interface
 	void set_density( int index , const std::string& name , const std::string& units , double diffusion_constant , double decay_rate ) override; 
 
 	int find_density_index( const std::string& name ) const override;
-	// Non-const version for backward compatibility
-	int find_density_index( const std::string& name ); 
 	
 	int voxel_index( int i, int j, int k ) const override; 
 	std::vector<unsigned int> cartesian_indices( int n ) const override; 
@@ -201,13 +200,8 @@ class Microenvironment : public Microenvironment_Interface
 	Voxel& nearest_voxel( const std::vector<double>& position ) override; 
 	Voxel& voxels( int voxel_index ) override;
 	const Voxel& voxels( int voxel_index ) const override;
-	
-	// Legacy non-const versions for backward compatibility
-	int nearest_voxel_index( std::vector<double>& position ); 
-	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
-	Voxel& nearest_voxel( std::vector<double>& position ); 
-	std::vector<double>& nearest_density_vector_ref( std::vector<double>& position );  
-	std::vector<double>& nearest_density_vector_ref( int voxel_index );  
+	double* nearest_density_vector( const std::vector<double>& position ) override;  
+	double* nearest_density_vector( int voxel_index ) override;  
 
 	/*! access the density vector at  [ X(i),Y(j),Z(k) ] */
 	std::vector<double>& operator()( int i, int j, int k ); 
@@ -221,27 +215,16 @@ class Microenvironment : public Microenvironment_Interface
 	std::vector<gradient>& gradient_vector(int n ) override;  
 	
 	std::vector<gradient>& nearest_gradient_vector( const std::vector<double>& position ) override;
-	// Backward compatibility non-const version
-	std::vector<gradient>& nearest_gradient_vector( std::vector<double>& position ); 
-
 	void compute_all_gradient_vectors( void ) override; 
 	void compute_gradient_vector( int n ) override;  
 	void reset_all_gradient_vectors( void ) override; 
 	
-	/*! access the density vector reference at  [ X(i),Y(j),Z(k) ] */
-	std::vector<double>& density_vector_ref( int i, int j, int k ); 
-	/*! access the density vector reference at  [ X(i),Y(j),0 ]  -- helpful for 2-D problems */
-	std::vector<double>& density_vector_ref( int i, int j ); 
-	/*! access the density vector reference at [x,y,z](n) */
-	std::vector<double>& density_vector_ref( int n ); 
-	
-	// Interface methods for density vector access (return pointers)
-	double* density_vector( int n ) override;
-	double* density_vector( int i, int j ) override;
-	double* density_vector( int i, int j, int k ) override;
-	double* nearest_density_vector( const std::vector<double>& position ) override;
-	double* nearest_density_vector( int voxel_index ) override;
-	const double* density_vector( int n ) const override; 
+	/*! access the density vector at  [ X(i),Y(j),Z(k) ] */
+	double* density_vector( int i, int j, int k ) override; 
+	/*! access the density vector at  [ X(i),Y(j),0 ]  -- helpful for 2-D problems */
+	double* density_vector( int i, int j ) override; 
+	/*! access the density vector at [x,y,z](n) */
+	double* density_vector( int n ) override; 
 
 	/*! advance the diffusion-decay solver by dt time */
 	void simulate_diffusion_decay( double dt ) override; 
@@ -319,8 +302,6 @@ class Microenvironment : public Microenvironment_Interface
 	const double* get_diffusion_coefficients() const override;
 	std::vector<double>& get_decay_rates() override;
 	const double* get_decay_rates() const override;
-	
-	void update_rates( void ) override;
 	
 	bool simulate_2D() const override;
 	bool calculate_gradients() const override;

@@ -169,9 +169,6 @@ public:
 	/** @brief Get the nearest density vector by voxel index */
 	virtual double* nearest_density_vector(int voxel_index) = 0;
 
-	/** @brief Const version of density_vector at voxel index */
-	virtual const double* density_vector(int n) const = 0;
-
 	// ========================================================================
 	// Gradient computation and access
 	// ========================================================================
