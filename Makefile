@@ -39,7 +39,7 @@ COMPILE_COMMAND := $(CC) $(CFLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o \
-BioFVM_microenvironment_adapter.o BioFVM_basic_agent_adapter.o BioFVM_basic_agent_PIMPL.o
+BioFVM_implementation.o BioFVM_legacy_implementation.o BioFVM_basic_agent_adapter.o BioFVM_basic_agent_PIMPL.o
 
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
 PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o \
@@ -374,8 +374,11 @@ BioFVM_basic_agent_adapter.o: ./BioFVM/BioFVM_basic_agent_adapter.cpp
 BioFVM_basic_agent_PIMPL.o: ./BioFVM/BioFVM_basic_agent_PIMPL.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_basic_agent_PIMPL.cpp
 
-BioFVM_microenvironment_adapter.o: ./BioFVM/BioFVM_microenvironment_adapter.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_microenvironment_adapter.cpp
+BioFVM_implementation.o: ./BioFVM/BioFVM_implementation.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_implementation.cpp
+
+BioFVM_legacy_implementation.o: ./BioFVM/BioFVM_legacy_implementation.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_legacy_implementation.cpp
 
 BioFVM_mesh.o: ./BioFVM/BioFVM_mesh.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_mesh.cpp 

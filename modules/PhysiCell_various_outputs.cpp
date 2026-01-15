@@ -183,7 +183,7 @@ void log_output(double t, int output_index, std::ofstream& report_file)
 //	std::cout << std::endl;
 	
 	std::cout << "time: "<<t<<std::endl;
-	num_new_cells=t==0?BioFVM_Implementation::get_all_basic_agents()->size():((Cell_Container *)get_microenvironment_i()->get_agent_container())->num_divisions_in_current_step;
+	num_new_cells=t==0?BioFVM_implementation::get_instance()->get_all_basic_agents()->size():((Cell_Container *)get_microenvironment_i()->get_agent_container())->num_divisions_in_current_step;
 	num_deaths=((Cell_Container *)get_microenvironment_i()->get_agent_container())->num_deaths_in_current_step;
 	std::cout<<"total number of agents (newly born, deaths): " << (*all_cells).size()<<"("<<num_new_cells<<", "<<num_deaths<<")" << std::endl; 
 	report_file<<t<<"\t"<<(*all_cells).size()<<"\t"<<num_new_cells<<"\t"<<num_deaths<<"\t"<<BioFVM::stopwatch_value()<< std::endl; 

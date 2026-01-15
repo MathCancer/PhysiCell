@@ -419,7 +419,7 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	return; 
 }
 
-Cell::Cell() : Basic_Agent_PIMPL(BioFVM::BioFVM_Implementation::create_basic_agent())
+Cell::Cell() : Basic_Agent_PIMPL(BioFVM::BioFVM_implementation::get_instance()->create_basic_agent())
 {
 	// use the cell defaults; 
 	

@@ -50,7 +50,6 @@
 #define __BioFVM_basic_agent_adapter_h__
 
 #include "BioFVM_basic_agent_interface.h"
-#include "BioFVM_microenvironment_adapter.h"
 
 namespace BioFVM{
 

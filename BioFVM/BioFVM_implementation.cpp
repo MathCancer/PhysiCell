@@ -46,39 +46,22 @@
 #############################################################################
 */
 
-#include "BioFVM_microenvironment_interface.h"
-#include "BioFVM.h"
-#include "BioFVM_agent_container.h"
-#include "BioFVM_basic_agent.h"
-#include "BioFVM_microenvironment.h"
 #include "BioFVM_implementation.h"
-#include "BioFVM_basic_agent_adapter.h"
 
-// ============================================================================
-// Global interface functions
-// ============================================================================
+namespace BioFVM {
 
-namespace BioFVM{
+BioFVM_implementation* BioFVM_implementation::instance_ = nullptr;
+
+BioFVM_implementation* BioFVM_implementation::get_instance() {
+    return instance_;
+}
+void BioFVM_implementation::set_instance( BioFVM_implementation* implementation ) {
+    instance_ = implementation;
+}
 
 Microenvironment_Interface* get_microenvironment_i()
 {
-	return &microenvironment;
+    return BioFVM_implementation::get_instance()->get_microenvironment();
 }
 
-void initialize_microenvironment_interface()
-{
-	// No initialization needed - Microenvironment now implements the interface directly
-}
-
-void BioFVM::BioFVM_Implementation::initialize_microenvironment(){
-    initialize_microenvironment_interface();
-}
-
-BioFVM::Basic_Agent_Interface* BioFVM::BioFVM_Implementation::create_basic_agent(){
-    return new BioFVM::Basic_Agent_Adapter(new BioFVM::Basic_Agent(), true);
-}
-
-std::vector<Basic_Agent_Interface*>* BioFVM::BioFVM_Implementation::get_all_basic_agents(){
-    return (std::vector<Basic_Agent_Interface*>*)&all_basic_agents;
-}
 } // namespace BioFVM

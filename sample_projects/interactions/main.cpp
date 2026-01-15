@@ -87,9 +87,6 @@ using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
-	// Initialize PhysiCell microenvironment interface
-	BioFVM::BioFVM_Implementation::initialize_microenvironment();
-
 	// load and parse settings file(s)
 	
 	bool XML_status = false; 

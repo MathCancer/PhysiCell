@@ -79,7 +79,6 @@
 
 // loade PhysiCell library
 #include "./BioFVM/BioFVM.h"
-#include "./BioFVM/BioFVM_microenvironment_adapter.h"
 #include "./BioFVM/BioFVM_implementation.h"
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h"
@@ -93,8 +92,6 @@ using namespace PhysiCell;
 // main function
 int main( int argc, char* argv[] )
 	{
-	// Initialize PhysiCell microenvironment interface
-	BioFVM::BioFVM_Implementation::initialize_microenvironment();
 
 	////////////////////////
 	// EPISODE LOOP BEGIN //

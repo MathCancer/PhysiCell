@@ -370,6 +370,7 @@ public:
 };
 
 // Global accessors for the microenvironment interface
+// Implemented in BioFVM_implementation.cpp
 Microenvironment_Interface* get_microenvironment_i();
 
 } // namespace BioFVM

@@ -46,20 +46,25 @@
 #############################################################################
 */
 
-#ifndef __BioFVM_microenvironment_adapter_h__
-#define __BioFVM_microenvironment_adapter_h__
+#include "BioFVM_legacy_implementation.h"
 
-// This file is deprecated. The Microenvironment_Adapter class has been removed.
-// Microenvironment now directly implements Microenvironment_Interface.
-// This header is kept for backward compatibility only.
+#include "BioFVM_agent_container.h"
+#include "BioFVM_basic_agent.h"
+#include "BioFVM_basic_agent_adapter.h"
+#include "BioFVM_microenvironment.h"
 
-#include "BioFVM_microenvironment_interface.h"
+namespace BioFVM {
 
-namespace BioFVM{
+Microenvironment_Interface* legacy_implementation::get_microenvironment() {
+	return &microenvironment;
+}
 
-// Global function to initialize the microenvironment interface
-void initialize_microenvironment_interface();
+Basic_Agent_Interface* legacy_implementation::create_basic_agent() {
+    return new Basic_Agent_Adapter(new BioFVM::Basic_Agent(), true);
+}
 
-} // namespace BioFVM
+std::vector<Basic_Agent_Interface*>* legacy_implementation::get_all_basic_agents(){
+    return (std::vector<Basic_Agent_Interface*>*)&all_basic_agents;
+}
 
-#endif // __BioFVM_microenvironment_adapter_h__
+}

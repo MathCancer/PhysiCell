@@ -80,7 +80,7 @@ std::vector<Cell*> *all_cells;
 
 Cell_Container::Cell_Container()
 {
-	all_cells = (std::vector<Cell*> *) BioFVM_Implementation::get_all_basic_agents();
+	all_cells = (std::vector<Cell*> *) BioFVM_implementation::get_instance()->get_all_basic_agents();
 	boundary_condition_for_pushed_out_agents= PhysiCell_constants::default_boundary_condition_for_pushed_out_agents;
 	std::vector<Cell*> cells_ready_to_divide;
 	std::vector<Cell*> cells_ready_to_die;
@@ -97,7 +97,7 @@ void Cell_Container::initialize(double x_start, double x_end, double y_start, do
 
 void Cell_Container::initialize(double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx, double dy, double dz)
 {
-	all_cells = (std::vector<Cell*> *) BioFVM_Implementation::get_all_basic_agents();
+	all_cells = (std::vector<Cell*> *) BioFVM_implementation::get_instance()->get_all_basic_agents();
 	boundary_condition_for_pushed_out_agents= PhysiCell_constants::default_boundary_condition_for_pushed_out_agents;
 	std::vector<Cell*> cells_ready_to_divide;
 	std::vector<Cell*> cells_ready_to_die;

@@ -910,7 +910,7 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		
 		// next, create a matlab structure and save it!
 
-		auto& all_basic_agents = *BioFVM_Implementation::get_all_basic_agents();
+		auto& all_basic_agents = *BioFVM_implementation::get_instance()->get_all_basic_agents();
 		
 		// order: ID,x,y,z,volume,radius, 
 		int number_of_data_entries = all_basic_agents.size(); 
@@ -961,7 +961,7 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 
 	// now go through all cells 
 
-	auto& all_basic_agents = *BioFVM_Implementation::get_all_basic_agents();
+	auto& all_basic_agents = *BioFVM_implementation::get_instance()->get_all_basic_agents();
 
 	root = node; 
 	for( unsigned int i=0; i < all_basic_agents.size(); i++ )

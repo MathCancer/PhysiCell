@@ -46,30 +46,22 @@
 #############################################################################
 */
 
-#ifndef __BioFVM_implementation_h__
-#define __BioFVM_implementation_h__
+#ifndef __BioFVM_legacy_implementation_h__
+#define __BioFVM_legacy_implementation_h__
 
-#include "BioFVM_basic_agent_interface.h"
-#include "BioFVM_microenvironment_interface.h"
+#include "BioFVM_implementation.h"
 
 namespace BioFVM{
-
-// This class provides a contract for any new BioFVM implementation
-class BioFVM_implementation 
+    
+// This class provides a contract for the original BioFVM implementation
+class legacy_implementation : public BioFVM_implementation 
 {
-    static BioFVM_implementation* instance_;
 public:
-    virtual Microenvironment_Interface* get_microenvironment() = 0;
-    virtual Basic_Agent_Interface* create_basic_agent() = 0;
-    virtual std::vector<Basic_Agent_Interface*>* get_all_basic_agents() = 0;
-
-    // Global singleton accessors
-    // set_instance is called at the start of a simulation to set the implementation
-    // which will be used throughout the simulation
-    static BioFVM_implementation* get_instance();
-    static void set_instance( BioFVM_implementation* implementation );
+    virtual Microenvironment_Interface* get_microenvironment() override;
+    virtual Basic_Agent_Interface* create_basic_agent() override;
+    virtual std::vector<Basic_Agent_Interface*>* get_all_basic_agents() override;
 };
 
 }
 
-#endif // __BioFVM_implementation_h__
+#endif // __BioFVM_legacy_implementation_h__
