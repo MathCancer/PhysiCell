@@ -93,12 +93,12 @@ void Basic_Agent_Adapter::set_internal_uptake_constants( double dt )
 void Basic_Agent_Adapter::register_microenvironment( Microenvironment_Interface* mi )
 {
 	wrapped_agent->register_microenvironment(mi);
-	microenvironment_adapter = dynamic_cast<Microenvironment_Adapter*>(mi);
+	microenvironment_interface = mi;
 }
 
 Microenvironment_Interface* Basic_Agent_Adapter::get_microenvironment( void )
 {
-	return microenvironment_adapter;
+	return microenvironment_interface;
 }
 
 int Basic_Agent_Adapter::get_ID() const

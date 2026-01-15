@@ -179,11 +179,11 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 
 void Basic_Agent::register_microenvironment( Microenvironment_Interface* microenvironment_in )
 {
-	auto adapter = dynamic_cast<BioFVM::Microenvironment_Adapter*>(microenvironment_in);
-	if (!adapter) {
-		throw std::invalid_argument("Basic_Agent::register_microenvironment: Provided Microenvironment_Interface is not a BioFVM::Microenvironment_Adapter.");
+	auto me = dynamic_cast<BioFVM::Microenvironment*>(microenvironment_in);
+	if (!me) {
+		throw std::invalid_argument("Basic_Agent::register_microenvironment: Provided Microenvironment_Interface is not a BioFVM::Microenvironment.");
 	}
-	register_microenvironment(adapter->get_biofvm_microenvironment());
+	register_microenvironment(me);
 }
 
 void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_in )

@@ -66,7 +66,7 @@ class Basic_Agent;
 class Basic_Agent_Adapter : public Basic_Agent_Interface
 {
 private:
-	Microenvironment_Adapter* microenvironment_adapter;
+	Microenvironment_Interface* microenvironment_interface;
 	Basic_Agent* wrapped_agent;
 	bool owns_agent;
 
