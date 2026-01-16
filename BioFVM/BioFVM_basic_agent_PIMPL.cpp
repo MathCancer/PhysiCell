@@ -102,9 +102,9 @@ void Basic_Agent_PIMPL::register_microenvironment( Microenvironment_Interface* m
 	pImpl->register_microenvironment(me);
 }
 
-Microenvironment_Interface* Basic_Agent_PIMPL::get_microenvironment( void )
+Microenvironment_Interface* Basic_Agent_PIMPL::get_microenvironment_interface( void )
 {
-	return pImpl->get_microenvironment();
+	return pImpl->get_microenvironment_interface();
 }
 
 // ID and type accessors

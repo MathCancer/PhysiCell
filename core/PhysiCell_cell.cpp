@@ -638,7 +638,7 @@ Cell* Cell::divide( )
 	if( this->functions.cell_division_direction_function )
 	{ 
 		rand_vec = this->functions.cell_division_direction_function( this ); 
-        if( get_microenvironment()->simulate_2D() == true )  // ensure vec in XY plane
+        if( get_microenvironment_interface()->simulate_2D() == true )  // ensure vec in XY plane
 	        { rand_vec[2] = 0.0; }
         normalize( &rand_vec );  // ensure normalized
 	}

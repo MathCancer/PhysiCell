@@ -314,8 +314,8 @@ void add_ecm_interaction(Cell* pC, int index_ecm, int index_voxel )
 {
 	// Check if there is ECM material in given voxel
 	//double dens2 = get_microenvironment()->density_vector(index_voxel)[index_ecm];
-	double dens = pC->get_microenvironment()->nearest_density_vector(index_voxel)[index_ecm];
-	double ecmrad = sqrt(3.0) * pC->get_microenvironment()->get_mesh().dx * 0.5;
+	double dens = pC->get_microenvironment_interface()->nearest_density_vector(index_voxel)[index_ecm];
+	double ecmrad = sqrt(3.0) * pC->get_microenvironment_interface()->get_mesh().dx * 0.5;
 	// if voxel is "full", density is 1
 	dens = std::min( dens, 1.0 ); 
 	if ( dens > EPSILON )

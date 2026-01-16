@@ -53,16 +53,15 @@
 #include "BioFVM_microenvironment.h"
 #include "BioFVM_matlab.h"
 #include "BioFVM_vector.h"
+#include "BioFVM_basic_agent_interface.h"
 
 namespace BioFVM{
 
 void reset_max_basic_agent_ID( void );
 
-class Basic_Agent
+class Basic_Agent : public Basic_Agent_Interface
 {
  private:
-	friend class Basic_Agent_Adapter;
-
 	Microenvironment* microenvironment; 
 	int selected_microenvironment; 
 	
@@ -80,6 +79,9 @@ class Basic_Agent
 //	bool is_active;
 	
 	std::vector<double> total_extracellular_substrate_change; 
+
+	// Interface implementation
+	double* get_position_internal() override;
 	
  public:
 	bool is_active;
@@ -88,50 +90,82 @@ class Basic_Agent
 	std::vector<double> saturation_densities; 
 	std::vector<double> uptake_rates;  
 	std::vector<double> net_export_rates; 
-	double& get_total_volume();
-	void set_total_volume(double);
-	void update_voxel_index();
+	double& get_total_volume() override;
+	void set_total_volume(double) override;
+	void update_voxel_index() override;
 
 	/* new for internalized substrates in 1.5.0 */ 
 	std::vector<double> internalized_substrates; 
 	std::vector<double> fraction_released_at_death; 
 	std::vector<double> fraction_transferred_when_ingested; 
-	void release_internalized_substrates( void ); 
+	void release_internalized_substrates( void ) override; 
 
-	void set_internal_uptake_constants( double dt ); // any time you update the cell volume or rates, should call this function. 
+	void set_internal_uptake_constants( double dt ) override; // any time you update the cell volume or rates, should call this function. 
 
 	void register_microenvironment( Microenvironment* );
-	void register_microenvironment( Microenvironment_Interface* );
-	Microenvironment* get_microenvironment( void ); 
+	void register_microenvironment( Microenvironment_Interface* ) override;
+	Microenvironment* get_microenvironment( void );
+	Microenvironment_Interface* get_microenvironment_interface( void ) override; 
 
 	int ID; 
 	int index; 
 	int type;
 	
-	bool assign_position(double x, double y, double z);
-	bool assign_position(std::vector<double> new_position);
+	// ID and type accessors
+	int get_ID() const override;
+	void set_ID(int new_ID) override;
+	int get_index() const override;
+	void set_index(int new_index) override;
+	int get_type() const override;
+	void set_type(int new_type) override;
+	
+	bool assign_position(double x, double y, double z) override;
+	bool assign_position(std::vector<double> new_position) override;
+	const std::vector<double>& get_position() const override;
 	
 	std::vector<double> position;  
 	std::vector<double> velocity; 
-	void update_position( double dt );
+	std::vector<double>& get_velocity() override;
+	const std::vector<double>& get_velocity() const override;
+	std::vector<double>& get_previous_velocity( void ) override;
+	const std::vector<double>& get_previous_velocity( void ) const override;
+	void update_position( double dt ) override;
+	
+	// Activity status
+	bool get_is_active() const override;
+	void set_is_active(bool active) override;
+	
+	// Getter methods for vector pointers
+	double* get_secretion_rates() override;
+	const double* get_secretion_rates() const override;
+	double* get_saturation_densities() override;
+	const double* get_saturation_densities() const override;
+	double* get_uptake_rates() override;
+	const double* get_uptake_rates() const override;
+	double* get_net_export_rates() override;
+	const double* get_net_export_rates() const override;
+	double* get_internalized_total_substrates() override;
+	const double* get_internalized_total_substrates() const override;
+	double* get_fraction_released_at_death() override;
+	const double* get_fraction_released_at_death() const override;
+	double* get_fraction_transferred_when_ingested() override;
+	const double* get_fraction_transferred_when_ingested() const override;
 	
 	Basic_Agent(); 
 	virtual ~Basic_Agent(){};
 	// simulate secretion and uptake at the nearest voxel at the indicated microenvironment.
 	// if no microenvironment indicated, use the currently selected microenvironment. 
-	void simulate_secretion_and_uptake( double dt ); 
+	void simulate_secretion_and_uptake( double dt ) override; 
 
-	int get_current_voxel_index( void ); 
+	int get_current_voxel_index( void ) override; 
 	// directly access the substrate vector at the nearest voxel at the indicated microenvironment 
 	std::vector<double>& nearest_density_vector( int microenvironment_index ); // not implemented!
-	std::vector<double>& nearest_density_vector( void );
+	double* nearest_density_vector( void ) override;
 	
 	// directly access the gradient of substrate n nearest to the cell 
-	std::vector<double>& nearest_gradient( int substrate_index );
+	std::vector<double>& nearest_gradient( int substrate_index ) override;
 	// directly access a vector of gradients, one gradient per substrate 
-	std::vector<gradient>& nearest_gradient_vector( void ); 
-	
-	const std::vector<double>& get_previous_velocity( void );
+	std::vector<std::vector<double>>& nearest_gradient_vector( void ) override;
 };
 
 extern std::vector<Basic_Agent*> all_basic_agents; 

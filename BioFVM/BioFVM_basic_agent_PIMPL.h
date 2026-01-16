@@ -104,7 +104,7 @@ class Basic_Agent_PIMPL : public Basic_Agent_Interface
 
 	// Microenvironment registration and access - delegate to pImpl
 	virtual void register_microenvironment( Microenvironment_Interface* ) override;
-	virtual Microenvironment_Interface* get_microenvironment( void ) override;
+	virtual Microenvironment_Interface* get_microenvironment_interface( void ) override;
 
 	// ID and type accessors - delegate to pImpl
 	virtual int get_ID() const override;

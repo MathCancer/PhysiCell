@@ -78,7 +78,7 @@ public:
 
 	// Microenvironment registration and access
 	virtual void register_microenvironment( Microenvironment_Interface* ) = 0;
-	virtual Microenvironment_Interface* get_microenvironment( void ) = 0;
+	virtual Microenvironment_Interface* get_microenvironment_interface( void ) = 0;
 
 	// ID and type accessors
 	virtual int get_ID() const = 0;

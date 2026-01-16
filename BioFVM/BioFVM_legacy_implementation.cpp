@@ -50,7 +50,6 @@
 
 #include "BioFVM_agent_container.h"
 #include "BioFVM_basic_agent.h"
-#include "BioFVM_basic_agent_adapter.h"
 #include "BioFVM_microenvironment.h"
 
 namespace BioFVM {
@@ -60,7 +59,7 @@ Microenvironment_Interface* legacy_implementation::get_microenvironment() {
 }
 
 Basic_Agent_Interface* legacy_implementation::create_basic_agent() {
-    return new Basic_Agent_Adapter(new BioFVM::Basic_Agent(), true);
+    return new BioFVM::Basic_Agent();
 }
 
 std::vector<Basic_Agent_Interface*>* legacy_implementation::get_all_basic_agents(){

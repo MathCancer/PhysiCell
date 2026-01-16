@@ -287,9 +287,9 @@ int Basic_Agent::get_current_voxel_index( void )
 	return current_voxel_index;
 }
 
-std::vector<double>& Basic_Agent::nearest_density_vector( void ) 
+double* Basic_Agent::nearest_density_vector( void ) 
 {  
-	return (*microenvironment)( current_voxel_index ); 
+	return (*microenvironment)( current_voxel_index ).data();
 }
 
 
@@ -316,8 +316,151 @@ double& Basic_Agent::get_total_volume()
 	return volume;
 }
 
-const std::vector<double>& Basic_Agent::get_previous_velocity( void ) {
+// Implementation of interface methods
+
+double* Basic_Agent::get_position_internal()
+{
+	return position.data();
+}
+
+const std::vector<double>& Basic_Agent::get_position() const
+{
+	return position;
+}
+
+std::vector<double>& Basic_Agent::get_velocity()
+{
+	return velocity;
+}
+
+const std::vector<double>& Basic_Agent::get_velocity() const
+{
+	return velocity;
+}
+
+std::vector<double>& Basic_Agent::get_previous_velocity( void )
+{
 	return previous_velocity;
+}
+
+const std::vector<double>& Basic_Agent::get_previous_velocity( void ) const
+{
+	return previous_velocity;
+}
+
+int Basic_Agent::get_ID() const
+{
+	return ID;
+}
+
+void Basic_Agent::set_ID(int new_ID)
+{
+	ID = new_ID;
+}
+
+int Basic_Agent::get_index() const
+{
+	return index;
+}
+
+void Basic_Agent::set_index(int new_index)
+{
+	index = new_index;
+}
+
+int Basic_Agent::get_type() const
+{
+	return type;
+}
+
+void Basic_Agent::set_type(int new_type)
+{
+	type = new_type;
+}
+
+bool Basic_Agent::get_is_active() const
+{
+	return is_active;
+}
+
+void Basic_Agent::set_is_active(bool active)
+{
+	is_active = active;
+}
+
+double* Basic_Agent::get_secretion_rates()
+{
+	return secretion_rates.data();
+}
+
+const double* Basic_Agent::get_secretion_rates() const
+{
+	return secretion_rates.data();
+}
+
+double* Basic_Agent::get_saturation_densities()
+{
+	return saturation_densities.data();
+}
+
+const double* Basic_Agent::get_saturation_densities() const
+{
+	return saturation_densities.data();
+}
+
+double* Basic_Agent::get_uptake_rates()
+{
+	return uptake_rates.data();
+}
+
+const double* Basic_Agent::get_uptake_rates() const
+{
+	return uptake_rates.data();
+}
+
+double* Basic_Agent::get_net_export_rates()
+{
+	return net_export_rates.data();
+}
+
+const double* Basic_Agent::get_net_export_rates() const
+{
+	return net_export_rates.data();
+}
+
+double* Basic_Agent::get_internalized_total_substrates()
+{
+	return internalized_substrates.data();
+}
+
+const double* Basic_Agent::get_internalized_total_substrates() const
+{
+	return internalized_substrates.data();
+}
+
+double* Basic_Agent::get_fraction_released_at_death()
+{
+	return fraction_released_at_death.data();
+}
+
+const double* Basic_Agent::get_fraction_released_at_death() const
+{
+	return fraction_released_at_death.data();
+}
+
+double* Basic_Agent::get_fraction_transferred_when_ingested()
+{
+	return fraction_transferred_when_ingested.data();
+}
+
+const double* Basic_Agent::get_fraction_transferred_when_ingested() const
+{
+	return fraction_transferred_when_ingested.data();
+}
+
+Microenvironment_Interface* Basic_Agent::get_microenvironment_interface( void )
+{
+	return microenvironment;
 }
 
 void Basic_Agent::simulate_secretion_and_uptake( double dt )
