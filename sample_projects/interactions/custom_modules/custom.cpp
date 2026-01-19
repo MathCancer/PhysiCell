@@ -376,10 +376,10 @@ void bacteria_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// also, replace phenotype function 
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nQuorum] = 0; 
-		phenotype.secretion.net_export_rates[nToxin] = 0; 
+		phenotype.secretion.net_export_rates()[nQuorum] = 0; 
+		phenotype.secretion.net_export_rates()[nToxin] = 0; 
 
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		
 		pCell->functions.update_phenotype = NULL; 
 		return; 
@@ -457,7 +457,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}	
@@ -493,7 +493,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static double secretion_debris_sensitivity = 2; 
 	static double secretion_quorum_sensitivity = 5; 
 
-	double base_val = pCD->phenotype.secretion.secretion_rates[nPIF]; 
+	double base_val = pCD->phenotype.secretion.secretion_rates()[nPIF]; 
 	double max_response = 10; // phenotype.volume.total; 
 	double signal = 
 		secretion_dead_sensitivity*num_dead + 
@@ -504,15 +504,15 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	double hill = Hill_response_function( signal , half_max , 1.5 ); 
 	
 	
-	phenotype.secretion.secretion_rates[nPIF] = base_val + (max_response-base_val)*hill; 
+	phenotype.secretion.secretion_rates()[nPIF] = base_val + (max_response-base_val)*hill; 
 	
 /*	
 	#pragma omp critical
 	{
-	std::cout << "secretion index: " << nPIF << " base: " << base_val << " max: " << max_response << " actual: " << phenotype.secretion.secretion_rates[nPIF] << std::endl; 
+	std::cout << "secretion index: " << nPIF << " base: " << base_val << " max: " << max_response << " actual: " << phenotype.secretion.secretion_rates()[nPIF] << std::endl; 
 	std::cout << "\tsignal: " << signal << " vs halfmax: " << half_max << std::endl; 
 	std::cout << "\t\tdead: " << num_dead << " bac: " << num_bacteria << " debris: " << debris << " Q: " << Q << std::endl; 
-	std::cout << "\t\t\tsaturation: " << phenotype.secretion.saturation_densities[nPIF]<< std::endl; 
+	std::cout << "\t\t\tsaturation: " << phenotype.secretion.saturation_densities()[nPIF]<< std::endl; 
 	}
 */	
 
@@ -572,7 +572,7 @@ void CD8Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}
@@ -620,7 +620,7 @@ void neutrophil_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}
@@ -652,7 +652,7 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}
@@ -751,7 +751,7 @@ void differentiated_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt
 	// if dead, release debris
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.net_export_rates[nDebris] = phenotype.volume.total; 
+		phenotype.secretion.net_export_rates()[nDebris] = phenotype.volume.total; 
 		pCell->functions.update_phenotype = NULL; 
 		return;
 	}

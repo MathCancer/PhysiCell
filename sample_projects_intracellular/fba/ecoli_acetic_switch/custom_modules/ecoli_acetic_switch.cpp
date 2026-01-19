@@ -113,19 +113,19 @@ void create_bacteria_cell ( void )
 
 	// set oxygen uptake and secretion to zero
 	static int oxygen_idx = microenvironment.find_density_index( "oxygen" ); // 0
-	bacteria_cell.phenotype.secretion.secretion_rates[oxygen_idx] = 0;
-	bacteria_cell.phenotype.secretion.uptake_rates[oxygen_idx] = 0;
-	bacteria_cell.phenotype.secretion.saturation_densities[oxygen_idx] = 0;
+	bacteria_cell.phenotype.secretion.secretion_rates()[oxygen_idx] = 0;
+	bacteria_cell.phenotype.secretion.uptake_rates()[oxygen_idx] = 0;
+	bacteria_cell.phenotype.secretion.saturation_densities()[oxygen_idx] = 0;
 
 	static int glucose_idx = microenvironment.find_density_index( "glucose" );
-	bacteria_cell.phenotype.secretion.secretion_rates[glucose_idx] = 0;
-	bacteria_cell.phenotype.secretion.uptake_rates[glucose_idx] = 0;
-	bacteria_cell.phenotype.secretion.saturation_densities[glucose_idx] = 0;
+	bacteria_cell.phenotype.secretion.secretion_rates()[glucose_idx] = 0;
+	bacteria_cell.phenotype.secretion.uptake_rates()[glucose_idx] = 0;
+	bacteria_cell.phenotype.secretion.saturation_densities()[glucose_idx] = 0;
 	
 	static int acetate_idx = microenvironment.find_density_index( "acetate" );
-	bacteria_cell.phenotype.secretion.secretion_rates[acetate_idx] = 0;
-	bacteria_cell.phenotype.secretion.uptake_rates[acetate_idx] = 0;
-	bacteria_cell.phenotype.secretion.saturation_densities[acetate_idx] = 0;
+	bacteria_cell.phenotype.secretion.secretion_rates()[acetate_idx] = 0;
+	bacteria_cell.phenotype.secretion.uptake_rates()[acetate_idx] = 0;
+	bacteria_cell.phenotype.secretion.saturation_densities()[acetate_idx] = 0;
 
 	// set the default cell type to no phenotype updates
 	bacteria_cell.functions.update_phenotype = NULL;
@@ -297,16 +297,16 @@ void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double
 	std::cout << "acetate flux: " << acetate_flux << std::endl;
 		
 	if ( oxygen_flux < 0)
-		phenotype.secretion.uptake_rates[oxygen_idx] = abs(oxygen_flux / oxygen_density);
+		phenotype.secretion.uptake_rates()[oxygen_idx] = abs(oxygen_flux / oxygen_density);
 
 	if ( glucose_flux < 0)
-		phenotype.secretion.uptake_rates[glucose_idx] = abs(glucose_flux / glucose_density);
+		phenotype.secretion.uptake_rates()[glucose_idx] = abs(glucose_flux / glucose_density);
 
 	if ( acetate_flux < 0 )
-		phenotype.secretion.uptake_rates[acetate_idx] = abs(acetate_flux / acetate_density);
+		phenotype.secretion.uptake_rates()[acetate_idx] = abs(acetate_flux / acetate_density);
 			
 	else if ( acetate_flux > 0 )
-		phenotype.secretion.secretion_rates[acetate_idx] = abs(acetate_flux / acetate_density);
+		phenotype.secretion.secretion_rates()[acetate_idx] = abs(acetate_flux / acetate_density);
 		
   }
   else

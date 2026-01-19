@@ -389,24 +389,24 @@ int RoadRunnerIntracellular::update_phenotype_parameters(PhysiCell::Phenotype& p
             if (elm.first.substr(0,3) == "sur")
             {
                 //std::cout << sub_index << std::endl;
-                //std::cout << "Before sur1 : " << phenotype.secretion.uptake_rates[sub_index] << std::endl;
-                phenotype.secretion.uptake_rates[1] = phenotype.intracellular->get_parameter_value(elm.second);
-                //std::cout << "After sur1 : " << phenotype.secretion.uptake_rates[sub_index] << std::endl;
+                //std::cout << "Before sur1 : " << phenotype.secretion.uptake_rates()[sub_index] << std::endl;
+                phenotype.secretion.uptake_rates()[1] = phenotype.intracellular->get_parameter_value(elm.second);
+                //std::cout << "After sur1 : " << phenotype.secretion.uptake_rates()[sub_index] << std::endl;
             }
             //secretion rate
             else if (elm.first.substr(0,3) == "ssr")
             {
-                phenotype.secretion.secretion_rates[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
+                phenotype.secretion.secretion_rates()[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
             }
             //secretion density
             else if (elm.first.substr(0,3) == "ssd")
             {
-                phenotype.secretion.saturation_densities[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
+                phenotype.secretion.saturation_densities()[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
             }
             //net export rate
             else if (elm.first.substr(0,3) == "ser")
             {
-                phenotype.secretion.net_export_rates[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
+                phenotype.secretion.net_export_rates()[sub_index] = phenotype.intracellular->get_parameter_value(elm.second);
             }
             else
             {

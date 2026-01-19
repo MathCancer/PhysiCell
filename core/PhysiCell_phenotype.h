@@ -456,13 +456,16 @@ class Motility
 
 class Secretion
 {
+ private:
+ 	Basic_Agent_Interface* pCell;
+	Cell_Definition* pCD;
  public:
 	Microenvironment_Interface* pMicroenvironment; 
 	
-	double* secretion_rates;
-	double* uptake_rates; 
-	double* saturation_densities;
-	double* net_export_rates; 
+	double* secretion_rates() const; 
+	double* uptake_rates() const; 
+	double* saturation_densities() const;
+	double* net_export_rates() const; 
 	
 	// in the constructor, we'll set pMicroenvironment to the current 
 	// default microenvironment.
@@ -558,6 +561,9 @@ class Bools
 
 class Molecular
 {
+	private:
+ 		Basic_Agent_Interface* pCell;
+		Cell_Definition* pCD;
 	public: 
 		Microenvironment_Interface* pMicroenvironment; 
 	
@@ -566,17 +572,17 @@ class Molecular
 
 		Molecular& operator=( const Molecular& rhs );
  	
-		double* internalized_total_substrates; 
+		double* internalized_total_substrates() const; 
 
 		// for each substrate, a fraction 0 <= f <= 1 of the 
 		// total internalized substrate is released back inot
 		// the environment at death 
-		double* fraction_released_at_death; 
+		double* fraction_released_at_death() const; 
 
 		// for each substrate, a fraction 0 <= f <= 1 of the 
 		// total internalized substrate is transferred to the  
 		// predatory cell when ingested 
-		double* fraction_transferred_when_ingested; 
+		double* fraction_transferred_when_ingested() const; 
 		
 		/* prototyping / beta in 1.5.0 */ 
 		// Boolean, Integer, and Double parameters
