@@ -367,6 +367,7 @@ BioFVM_vector.o: ./BioFVM/BioFVM_vector.cpp
 
 BioFVM_agent_container.o: ./BioFVM/BioFVM_agent_container.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_agent_container.cpp 
+
 BioFVM_basic_agent_PIMPL.o: ./BioFVM/BioFVM_basic_agent_PIMPL.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_basic_agent_PIMPL.cpp
 

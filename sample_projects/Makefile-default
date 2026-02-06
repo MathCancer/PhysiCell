@@ -367,13 +367,16 @@ BioFVM_vector.o: ./BioFVM/BioFVM_vector.cpp
 
 BioFVM_agent_container.o: ./BioFVM/BioFVM_agent_container.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_agent_container.cpp 
-	
+
+BioFVM_basic_agent_PIMPL.o: ./BioFVM/BioFVM_basic_agent_PIMPL.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_basic_agent_PIMPL.cpp
+
 BioFVM_implementation.o: ./BioFVM/BioFVM_implementation.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_implementation.cpp
 
 BioFVM_legacy_implementation.o: ./BioFVM/BioFVM_legacy_implementation.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_legacy_implementation.cpp
-	
+
 BioFVM_mesh.o: ./BioFVM/BioFVM_mesh.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_mesh.cpp 
 
