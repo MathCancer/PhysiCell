@@ -64,7 +64,7 @@ typedef std::vector<double> gradient;
 
 class Basic_Agent; 
 
-class Microenvironment : public Microenvironment_Interface
+class Microenvironment final : public Microenvironment_Interface
 {
  private:
 	friend std::ostream& operator<<(std::ostream& os, const Microenvironment& S);  

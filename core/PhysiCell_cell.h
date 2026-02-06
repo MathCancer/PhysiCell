@@ -175,7 +175,7 @@ class Cell_State
 	Cell_State(); 
 };
 
-class Cell : public Basic_Agent_PIMPL
+class Cell final : public Basic_Agent_PIMPL
 {
  private: 
 	Cell_Container * container;

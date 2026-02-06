@@ -59,7 +59,7 @@ namespace BioFVM{
 
 void reset_max_basic_agent_ID( void );
 
-class Basic_Agent : public Basic_Agent_Interface
+class Basic_Agent final : public Basic_Agent_Interface
 {
  private:
 	Microenvironment* microenvironment; 
