@@ -48,6 +48,7 @@
 
 #include "BioFVM_microenvironment.h"
 #include "BioFVM_basic_agent.h"
+#include "BioFVM_basic_agent_interface.h"
 #include "BioFVM_solvers.h"
 #include "BioFVM_vector.h"
 #include <cmath>
@@ -764,10 +765,11 @@ void Microenvironment::simulate_bulk_sources_and_sinks( double dt )
 
 void Microenvironment::simulate_cell_sources_and_sinks( std::vector<Basic_Agent*>& basic_agent_list , double dt )
 {
+	auto itf_agent_list = (std::vector<Basic_Agent_Interface*>&) basic_agent_list;
 	#pragma omp parallel for
-	for( long long i=0 ; i < basic_agent_list.size() ; i++ )
+	for( long long i=0 ; i < itf_agent_list.size() ; i++ )
 	{		
-		basic_agent_list[i]->simulate_secretion_and_uptake( dt ); 
+		itf_agent_list[i]->simulate_secretion_and_uptake( dt ); 
 	}
 	
 	return; 
