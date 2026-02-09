@@ -283,14 +283,14 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 		{ pCell->functions.update_migration_bias = head_migration_direction; }
 		else
 		{ pCell->functions.update_migration_bias = tail_migration_direction; }
-		phenotype.secretion.secretion_rates[nSignal] = 100; 
+		phenotype.secretion.secretion_rates()[nSignal] = 100; 
 	} 
 	
 	// if 2 or more attachments, use middle 
 	if( number_of_attachments > 1 )
 	{
 		pCell->functions.update_migration_bias = middle_migration_direction;
-		phenotype.secretion.secretion_rates[nSignal] = 1; 
+		phenotype.secretion.secretion_rates()[nSignal] = 1; 
 	} 
 	
 	return; 

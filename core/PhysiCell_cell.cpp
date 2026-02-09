@@ -69,7 +69,9 @@
 #include "PhysiCell_cell_container.h"
 #include "PhysiCell_utilities.h"
 #include "PhysiCell_constants.h"
-#include "../BioFVM/BioFVM_vector.h" 
+#include "PhysiCell_rules.h"
+#include "../BioFVM/BioFVM_vector.h"
+#include "../BioFVM/BioFVM_implementation.h"
 
 #ifdef ADDON_PHYSIBOSS
 #include "../addons/PhysiBoSS/src/maboss_intracellular.h"
@@ -131,8 +133,8 @@ Cell_Definition::Cell_Definition()
 {
 	// set the microenvironment pointer 
 	pMicroenvironment = NULL;
-	if( BioFVM::get_default_microenvironment() != NULL )
-	{ pMicroenvironment = BioFVM::get_default_microenvironment(); }
+	if( BioFVM::get_microenvironment_i() != NULL )
+	{ pMicroenvironment = BioFVM::get_microenvironment_i(); }
 
 //	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 //	int number_of_cell_defs = cell_definition_indices_by_name.size(); 
@@ -229,6 +231,24 @@ Cell_Definition& Cell_Definition::operator=( const Cell_Definition& cd )
 	// cell_definitions_by_index.push_back( this ); 
 	
 	return *this; 
+}
+
+void Cell_Definition::sync_to_microenvironment( Microenvironment_Interface* pNew_Microenvironment )
+{
+	pMicroenvironment = pNew_Microenvironment; 
+	
+	secretion_rates.resize( pNew_Microenvironment->number_of_densities() );
+	uptake_rates.resize( pNew_Microenvironment->number_of_densities() );
+	saturation_densities.resize( pNew_Microenvironment->number_of_densities() );
+	net_export_rates.resize( pNew_Microenvironment->number_of_densities() );
+	internalized_total_substrates.resize( pNew_Microenvironment->number_of_densities() );
+	fraction_released_at_death.resize( pNew_Microenvironment->number_of_densities() );
+	fraction_transferred_when_ingested.resize( pNew_Microenvironment->number_of_densities() );
+
+	phenotype.secretion.sync_to_cell_definition( this );
+	phenotype.molecular.sync_to_cell_definition( this );
+
+	return; 
 }
 
 Cell_Definition cell_defaults; 
@@ -399,20 +419,21 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	return; 
 }
 
-Cell::Cell()
+Cell::Cell() : Basic_Agent_PIMPL(BioFVM::BioFVM_implementation::get_instance()->create_basic_agent())
 {
 	// use the cell defaults; 
 	
-	type = cell_defaults.type; 
+	set_type(cell_defaults.type); 
 	type_name = cell_defaults.name; 
 	
 	custom_data = cell_defaults.custom_data; 
 	parameters = cell_defaults.parameters; 
 	functions = cell_defaults.functions; 
 	
-	phenotype = cell_defaults.phenotype; 
-	
+	phenotype.secretion.sync_to_cell( this ); 
 	phenotype.molecular.sync_to_cell( this ); 
+	
+	phenotype = cell_defaults.phenotype; 
 	
 	// cell state should be fine by the default constructor 
 	
@@ -442,7 +463,7 @@ Cell::~Cell()
 	if( result != std::end(*all_cells) )
 	{
 		std::cout << "Warning: Cell was never removed from data structure " << std::endl ; 
-		std::cout << "I am of type " << this->type << " at " << this->position << std::endl; 
+		std::cout << "I am of type " << this->get_type() << " at " << this->get_position() << std::endl; 
 
 		int temp_index = -1; 
 		bool found = false; 
@@ -470,7 +491,7 @@ Cell::~Cell()
 			// alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
 
 			// move last item to index location  
-			(*all_cells)[ (*all_cells).size()-1 ]->index=temp_index;
+			(*all_cells)[ (*all_cells).size()-1 ]->set_index(temp_index);
 			(*all_cells)[temp_index] = (*all_cells)[ (*all_cells).size()-1 ];
 			// shrink the vector
 			(*all_cells).pop_back();	
@@ -575,8 +596,12 @@ Cell* Cell::divide( )
 	
 	// evenly divide internalized substrates 
 	// if these are not actively tracked, they are zero anyway 
-	*internalized_substrates *= 0.5; 
-	*(child->internalized_substrates) = *internalized_substrates ; 
+	for ( int n = 0 ; n < phenotype.molecular.pMicroenvironment->number_of_densities() ; n++ )
+	{
+		phenotype.molecular.internalized_total_substrates()[n] *= 0.5; 
+		child->phenotype.molecular.internalized_total_substrates()[n] = 
+			phenotype.molecular.internalized_total_substrates()[n];
+	}
 	
 	// The following is already performed by create_cell(). JULY 2017 ***
 	// child->register_microenvironment( get_microenvironment() );
@@ -613,7 +638,7 @@ Cell* Cell::divide( )
 	if( this->functions.cell_division_direction_function )
 	{ 
 		rand_vec = this->functions.cell_division_direction_function( this ); 
-        if( default_microenvironment_options.simulate_2D == true )  // ensure vec in XY plane
+        if( get_microenvironment_interface()->simulate_2D() == true )  // ensure vec in XY plane
 	        { rand_vec[2] = 0.0; }
         normalize( &rand_vec );  // ensure normalized
 	}
@@ -626,21 +651,23 @@ Cell* Cell::divide( )
 
 	rand_vec *= phenotype.geometry.radius;
 
-	child->assign_position(position[0] + rand_vec[0],
-						   position[1] + rand_vec[1],
-						   position[2] + rand_vec[2]);
+	child->assign_position(get_position()[0] + rand_vec[0],
+						   get_position()[1] + rand_vec[1],
+						   get_position()[2] + rand_vec[2]);
 						 
 	//change my position to keep the center of mass intact 
 	// and then see if I need to update my voxel index
 	static double negative_one_half = -0.5; 
-	axpy( &position, negative_one_half , rand_vec ); // position = position - 0.5*rand_vec; 
+	int dims = get_microenvironment_i()->simulate_2D() ? 2 : 3;
+	for ( int i = 0 ; i < dims ; i++ )
+	{ get_position_internal()[i] += negative_one_half * rand_vec[i]; }// position = position - 0.5*rand_vec; 
 
 	//If this cell has been moved outside of the boundaries, mark it as such.
 	//(If the child cell is outside of the boundaries, that has been taken care of in the assign_position function.)
-	if( !get_container()->underlying_mesh.is_position_valid(position[0], position[1], position[2]))
+	if( !get_container()->underlying_mesh.is_position_valid(get_position()[0], get_position()[1], get_position()[2]))
 	{
 		is_out_of_domain = true;
-		is_active = false;
+		set_is_active(false);
 		is_movable = false;
 	}	
 	 
@@ -676,30 +703,31 @@ Cell* Cell::divide( )
 	return child;
 }
 
-bool Cell::assign_position(std::vector<double> new_position)
+bool Cell::assign_position(const std::vector<double>& new_position)
 {
 	return assign_position(new_position[0], new_position[1], new_position[2]);
 }
 
 void Cell::set_previous_velocity(double xV, double yV, double zV)
 {
-	previous_velocity[0] = xV;
-	previous_velocity[1] = yV;
-	previous_velocity[2] = zV;
+	get_previous_velocity()[0] = xV;
+	get_previous_velocity()[1] = yV;
+	get_previous_velocity()[2] = zV;
 
 	return; 
 }
 
 bool Cell::assign_position(double x, double y, double z)
 {
-	position[0]=x;
-	position[1]=y;
-	position[2]=z;
+	get_position_internal()[0] = x;
+	get_position_internal()[1] = y;
+	if ( !get_microenvironment_i()->simulate_2D() )
+	{ get_position_internal()[2] = z; }
 	
 	// update microenvironment current voxel index
 	update_voxel_index();
 	// update current_mechanics_voxel_index
-	current_mechanics_voxel_index= get_container()->underlying_mesh.nearest_voxel_index( position );
+	current_mechanics_voxel_index= get_container()->underlying_mesh.nearest_voxel_index( get_position() );
 
     // Since it is most likely our first position, we update the max_cell_interactive_distance_in_voxel
 	// which was not initialized at cell creation
@@ -716,7 +744,7 @@ bool Cell::assign_position(double x, double y, double z)
 	if( !get_container()->underlying_mesh.is_position_valid(x,y,z) )
 	{	
 		is_out_of_domain = true; 
-		is_active = false; 
+		set_is_active(false); 
 		is_movable = false; 
 		
 		return false;
@@ -727,7 +755,7 @@ bool Cell::assign_position(double x, double y, double z)
 
 void Cell::set_total_volume(double volume)
 {
-	Basic_Agent::set_total_volume(volume);
+	pImpl->set_total_volume(volume);
 	
 	// If the new volume is significantly different than the 
 	// current total volume, adjust all the sub-volumes 
@@ -826,13 +854,13 @@ double& Cell::get_total_volume(void)
 
 void Cell::turn_off_reactions(double dt)
 {	
-	is_active = false;  
-	
-	for(int i=0;i< phenotype.secretion.uptake_rates.size();i++)
+	set_is_active(false);  
+
+	for(int i=0;i< phenotype.secretion.pMicroenvironment->number_of_densities();i++)
 	{
-		phenotype.secretion.uptake_rates[i] = 0.0;  
-		phenotype.secretion.secretion_rates[i] = 0.0; 
-		phenotype.secretion.net_export_rates[i] = 0.0; 
+		phenotype.secretion.uptake_rates()[i] = 0.0;  
+		phenotype.secretion.secretion_rates()[i] = 0.0; 
+		phenotype.secretion.net_export_rates()[i] = 0.0; 
 	}
 	set_internal_uptake_constants(dt);
 	
@@ -843,7 +871,7 @@ Cell_Container * Cell::get_container()
 {
 	if(container == NULL)
 	{
-		container = (Cell_Container *)get_microenvironment()->agent_container;
+		container = (Cell_Container *)get_microenvironment_i()->get_agent_container();
 	}
 	
 	return container;
@@ -876,29 +904,34 @@ void Cell::update_position( double dt )
 	}
 	
 	// new AUgust 2017
-	if( default_microenvironment_options.simulate_2D == true )
-	{ velocity[2] = 0.0; }
+	if( get_microenvironment_i()->simulate_2D() == true )
+	{ get_velocity()[2] = 0.0; }
 	
-	// std::vector<double> old_position(position); 
-	axpy( &position , d1 , velocity );  
-	axpy( &position , d2 , previous_velocity );  
+	int dims = get_microenvironment_i()->simulate_2D() ? 2 : 3;
+
+	// std::vector<double> old_position = position;
+	for ( int i = 0 ; i < dims ; i++ )
+	{
+		get_position_internal()[i] += 
+			( d1 * get_velocity()[i] + d2 * get_previous_velocity()[i] );
+	}
 	// overwrite previous_velocity for future use 
 	// if(sqrt(dist(old_position, position))>3* phenotype.geometry.radius)
 		// std::cout<<sqrt(dist(old_position, position))<<"old_position: "<<old_position<<", new position: "<< position<<", velocity: "<<velocity<<", previous_velocity: "<< previous_velocity<<std::endl;
 	
-	previous_velocity = velocity; 
+	get_previous_velocity() = get_velocity(); 
 	
-	velocity[0]=0; velocity[1]=0; velocity[2]=0;
-	if(get_container()->underlying_mesh.is_position_valid(position[0],position[1],position[2]))
+	get_velocity()[0]=0; get_velocity()[1]=0; get_velocity()[2]=0;
+	if(get_container()->underlying_mesh.is_position_valid(get_position()[0],get_position()[1],get_position()[2]))
 	{
-		updated_current_mechanics_voxel_index=get_container()->underlying_mesh.nearest_voxel_index( position );
+		updated_current_mechanics_voxel_index=get_container()->underlying_mesh.nearest_voxel_index( get_position() );
 	}
 	else
 	{
 		updated_current_mechanics_voxel_index=-1;
 		
 		is_out_of_domain = true; 
-		is_active = false; 
+		set_is_active(false); 
 		is_movable = false; 
 	}
 	return; 
@@ -928,7 +961,7 @@ void Cell::update_voxel_in_container()
 		// std::cout<<"cell out of boundary..."<< __LINE__<<" "<<ID<<std::endl;
 		current_mechanics_voxel_index=-1;
 		is_out_of_domain=true;
-		is_active=false;
+		set_is_active(false);
 		return;
 	}
 	
@@ -951,16 +984,19 @@ void Cell::update_voxel_in_container()
 void Cell::copy_data(Cell* copy_me)
 {
 	// phenotype=copyMe->phenotype; //it is taken care in set_phenotype
-	type = copy_me->type; 
+	set_type(copy_me->get_type()); 
 	type_name = copy_me->type_name; 
 	
 	custom_data = copy_me->custom_data; 
 	parameters = copy_me->parameters; 
 	
-	velocity = copy_me->velocity; 
+	get_velocity() = copy_me->get_velocity(); 
 	// expected_phenotype = copy_me-> expected_phenotype; //it is taken care in set_phenotype
-	cell_source_sink_solver_temp1 = std::vector<double>(copy_me->cell_source_sink_solver_temp1);
-	cell_source_sink_solver_temp2 = std::vector<double>(copy_me->cell_source_sink_solver_temp2);
+	for ( int i = 0 ; i < copy_me->phenotype.molecular.pMicroenvironment->number_of_densities() ; i++ )
+	{
+		phenotype.molecular.internalized_total_substrates()[i] = 
+			copy_me->phenotype.molecular.internalized_total_substrates()[i];
+	}
 	
 	return; 
 }
@@ -989,7 +1025,7 @@ void Cell::add_potentials(Cell* other_agent)
 	double distance = 0; 
 	for( int i = 0 ; i < 3 ; i++ ) 
 	{ 
-		displacement[i] = position[i] - (*other_agent).position[i]; 
+		displacement[i] = get_position()[i] - (*other_agent).get_position()[i]; 
 		distance += displacement[i] * displacement[i]; 
 	}
 	// Make sure that the distance is not zero
@@ -1051,8 +1087,8 @@ void Cell::add_potentials(Cell* other_agent)
 		
 		// August 2017 - back to the original if both have same coefficient 
 		// May 2022 - back to oriinal if both affinities are 1
-		int ii = find_cell_definition_index( this->type ); 
-		int jj = find_cell_definition_index( other_agent->type ); 
+		int ii = find_cell_definition_index( this->get_type() ); 
+		int jj = find_cell_definition_index( other_agent->get_type() ); 
 
 		double adhesion_ii = phenotype.mechanics.cell_cell_adhesion_strength * phenotype.mechanics.cell_adhesion_affinities[jj]; 
 		double adhesion_jj = other_agent->phenotype.mechanics.cell_cell_adhesion_strength * other_agent->phenotype.mechanics.cell_adhesion_affinities[ii]; 
@@ -1073,7 +1109,7 @@ void Cell::add_potentials(Cell* other_agent)
 	// {
 	//	velocity[i] += displacement[i] * temp_r; 
 	// }
-	axpy( &velocity , temp_r , displacement ); 
+	axpy( &(get_velocity()) , temp_r , displacement ); 
 	
 	
 	// state.neighbors.push_back(other_agent); // new 1.8.0
@@ -1092,13 +1128,13 @@ Cell* create_cell( Cell* (*custom_instantiate)())
 	}
 	
 	(*all_cells).push_back( pNew ); 
-	pNew->index=(*all_cells).size()-1;
+	pNew->set_index((*all_cells).size()-1);
 	
 	// new usability enhancements in May 2017 
 	
-	if( BioFVM::get_default_microenvironment() )
+	if( BioFVM::get_microenvironment_i() )
 	{
-		pNew->register_microenvironment( BioFVM::get_default_microenvironment() );
+		pNew->register_microenvironment( BioFVM::get_microenvironment_i() );
 	}
 
 	// All the phenotype and other data structures are already set 
@@ -1116,7 +1152,7 @@ Cell* create_cell( Cell_Definition& cd )
 	Cell* pNew = create_cell(cd.functions.instantiate_cell); 
 	
 	// use the cell defaults; 
-	pNew->type = cd.type; 
+	pNew->set_type(cd.type); 
 	pNew->type_name = cd.name; 
 	
 	pNew->custom_data = cd.custom_data; 
@@ -1145,7 +1181,7 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	Molecular cell_molecular = phenotype.molecular;
 	Custom_Cell_Data cell_custom_data = custom_data;
 	// use the cell defaults; 
-	type = cd.type; 
+	set_type(cd.type); 
 	type_name = cd.name; 
 	
 	custom_data = cd.custom_data; // this is kinda risky since users may want to be updating custom_data throughout
@@ -1162,7 +1198,6 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	phenotype.volume.relative_rupture_volume = cd.phenotype.volume.relative_rupture_volume;
 	
 	phenotype.geometry = cell_geometry; // leave the geometry alone
-	phenotype.molecular.internalized_total_substrates = cell_molecular.internalized_total_substrates;
 	
 	for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
 	{
@@ -1223,7 +1258,7 @@ void delete_cell( int index )
 	// alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
 
 	// move last item to index location  
-	(*all_cells)[ (*all_cells).size()-1 ]->index=index;
+	(*all_cells)[ (*all_cells).size()-1 ]->set_index(index);
 	(*all_cells)[index] = (*all_cells)[ (*all_cells).size()-1 ];
 	// shrink the vector
 	(*all_cells).pop_back();	
@@ -1233,6 +1268,12 @@ void delete_cell( int index )
 	// de-allocate (delete) the cell; 
 	delete pDeleteMe; 
 
+	if ( index < (int)(*all_cells).size() )
+	{
+		// need to update the moved cell's position in the container
+		(*all_cells)[index]->phenotype.secretion.sync_to_cell( (*all_cells)[index] );
+		(*all_cells)[index]->phenotype.molecular.sync_to_cell( (*all_cells)[index] );
+	}
 
 	return; 
 }
@@ -1259,7 +1300,7 @@ void delete_cell_original( int index ) // before June 11, 2020
 	// alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
 
 	// move last item to index location  
-	(*all_cells)[ (*all_cells).size()-1 ]->index=index;
+	(*all_cells)[ (*all_cells).size()-1 ]->set_index(index);
 	(*all_cells)[index] = (*all_cells)[ (*all_cells).size()-1 ];
 	// shrink the vector
 	(*all_cells).pop_back();	
@@ -1268,7 +1309,7 @@ void delete_cell_original( int index ) // before June 11, 2020
 
 void delete_cell( Cell* pDelete )
 {
-	delete_cell(pDelete->index);
+	delete_cell(pDelete->get_index());
 	return; 
 }
 
@@ -1294,7 +1335,7 @@ bool is_neighbor_voxel(Cell* pCell, std::vector<double> my_voxel_center, std::ve
 	if(comparing_dimension != -1) 
 	{ //then it is an immediate neighbor (through side faces)
 		double surface_coord= 0.5*(my_voxel_center[comparing_dimension] + other_voxel_center[comparing_dimension]);
-		if(std::fabs(pCell->position[comparing_dimension] - surface_coord) > max_interactive_distance)
+		if(std::fabs(pCell->get_position()[comparing_dimension] - surface_coord) > max_interactive_distance)
 		{ return false; }
 		return true;
 	}
@@ -1316,15 +1357,15 @@ bool is_neighbor_voxel(Cell* pCell, std::vector<double> my_voxel_center, std::ve
 	{
 		double line_coord1= 0.5*(my_voxel_center[comparing_dimension] + other_voxel_center[comparing_dimension]);
 		double line_coord2= 0.5*(my_voxel_center[comparing_dimension2] + other_voxel_center[comparing_dimension2]);
-		double distance_squared= std::pow( pCell->position[comparing_dimension] - line_coord1,2)+ std::pow( pCell->position[comparing_dimension2] - line_coord2,2);
+		double distance_squared= std::pow( pCell->get_position()[comparing_dimension] - line_coord1,2)+ std::pow( pCell->get_position()[comparing_dimension2] - line_coord2,2);
 		if(distance_squared > max_interactive_distance * max_interactive_distance)
 		{ return false; }
 		return true;
 	}
 	std::vector<double> corner_point= 0.5*(my_voxel_center+other_voxel_center);
-	double distance_squared= (corner_point[0]-pCell->position[0])*(corner_point[0]-pCell->position[0])
-		+(corner_point[1]-pCell->position[1])*(corner_point[1]-pCell->position[1]) 
-		+(corner_point[2]-pCell->position[2]) * (corner_point[2]-pCell->position[2]);
+	double distance_squared= (corner_point[0]-pCell->get_position()[0])*(corner_point[0]-pCell->get_position()[0])
+		+(corner_point[1]-pCell->get_position()[1])*(corner_point[1]-pCell->get_position()[1]) 
+		+(corner_point[2]-pCell->get_position()[2]) * (corner_point[2]-pCell->get_position()[2]);
 	if(distance_squared > max_interactive_distance * max_interactive_distance)
 	{ return false; }
 	return true;
@@ -1381,7 +1422,7 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 
 		// set cell as unmovable and non-secreting 
 		pCell_to_eat->is_movable = false; 
-		pCell_to_eat->is_active = false; 
+		pCell_to_eat->set_is_active(false); 
 
 		// absorb all the volume(s)
 
@@ -1433,12 +1474,16 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		
 		// multiply by the fraction that is supposed to be ingested (for each substrate) 
 
-		*(pCell_to_eat->internalized_substrates) *= 
-			*(pCell_to_eat->fraction_transferred_when_ingested); // 
+		for ( int i = 0 ; i < pCell_to_eat->phenotype.molecular.pMicroenvironment->number_of_densities() ; i++ )
+		{
+			pCell_to_eat->phenotype.molecular.internalized_total_substrates()[i] *= 
+				pCell_to_eat->custom_data["fraction_transferred_when_ingested"]; //
+			
+			phenotype.molecular.internalized_total_substrates()[i] += 
+				pCell_to_eat->phenotype.molecular.internalized_total_substrates()[i];
 
-		*internalized_substrates += *(pCell_to_eat->internalized_substrates); 
-		static int n_substrates = internalized_substrates->size(); 
-		pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
+			pCell_to_eat->phenotype.molecular.internalized_total_substrates()[i] = 0.0;
+		}
 
 		// conserved quantitites in custom data during phagocytosis
 		// so that phagocyte cell absorbs the full amount from the engulfed cell;
@@ -1519,31 +1564,31 @@ void Cell::fuse_cell( Cell* pCell_to_fuse )
 		// set new position at center of volume 
 			// x_new = (vol_B * x_B + vol_S * x_S ) / (vol_B + vol_S )
 		
-		std::vector<double> new_position = position; // x_B
+		std::vector<double> new_position = get_position(); // x_B
 		new_position *= phenotype.volume.total; // vol_B * x_B 
 		double total_volume = phenotype.volume.total; 
 		total_volume += pCell_to_fuse->phenotype.volume.total ;  
 
-		axpy( &new_position , pCell_to_fuse->phenotype.volume.total , pCell_to_fuse->position ); // vol_B*x_B + vol_S*x_S
+		axpy( &new_position , pCell_to_fuse->phenotype.volume.total , pCell_to_fuse->get_position() ); // vol_B*x_B + vol_S*x_S
 		new_position /= total_volume; // (vol_B*x_B+vol_S*x_S)/(vol_B+vol_S);
 
-		static double xL = get_default_microenvironment()->mesh.bounding_box[0];		 
-		static double xU = get_default_microenvironment()->mesh.bounding_box[3]; 
+		static double xL = get_microenvironment_i()->get_mesh().bounding_box[0];		 
+		static double xU = get_microenvironment_i()->get_mesh().bounding_box[3]; 
 
-		static double yL = get_default_microenvironment()->mesh.bounding_box[1];		 
-		static double yU = get_default_microenvironment()->mesh.bounding_box[4]; 
+		static double yL = get_microenvironment_i()->get_mesh().bounding_box[1];		 
+		static double yU = get_microenvironment_i()->get_mesh().bounding_box[4]; 
 
-		static double zL = get_default_microenvironment()->mesh.bounding_box[2];		 
-		static double zU = get_default_microenvironment()->mesh.bounding_box[5]; 
+		static double zL = get_microenvironment_i()->get_mesh().bounding_box[2];		 
+		static double zU = get_microenvironment_i()->get_mesh().bounding_box[5]; 
 
 		if( new_position[0] < xL || new_position[0] > xU || 
 		    new_position[1] < yL || new_position[1] > yU || 
 			new_position[2] < zL || new_position[2] > zU )
 		{
 			std::cout << "cell fusion at " << new_position << " violates domain bounds" << std::endl; 
-			std::cout << get_default_microenvironment()->mesh.bounding_box << std::endl << std::endl; 
+			std::cout << get_microenvironment_i()->get_mesh().bounding_box << std::endl << std::endl; 
 		}
-		position = new_position; 
+		assign_position( new_position );
 		update_voxel_in_container();
 
 		// set number of nuclei 
@@ -1600,10 +1645,13 @@ void Cell::fuse_cell( Cell* pCell_to_fuse )
 		pCell_to_fuse->set_total_volume( 0.0 ); 
 
 		// absorb the internalized substrates 
-		
-		*internalized_substrates += *(pCell_to_fuse->internalized_substrates); 
-		static int n_substrates = internalized_substrates->size(); 
-		pCell_to_fuse->internalized_substrates->assign( n_substrates , 0.0 ); 	
+		for ( int i = 0 ; i < pCell_to_fuse->phenotype.molecular.pMicroenvironment->number_of_densities() ; i++ )
+		{
+			phenotype.molecular.internalized_total_substrates()[i] += 
+				pCell_to_fuse->phenotype.molecular.internalized_total_substrates()[i];
+
+			pCell_to_fuse->phenotype.molecular.internalized_total_substrates()[i] = 0.0;
+		}
 
 		// set target volume(s)
 
@@ -1634,7 +1682,7 @@ void Cell::fuse_cell( Cell* pCell_to_fuse )
 		
 		// set cell as unmovable and non-secreting 
 		pCell_to_fuse->is_movable = false; 
-		pCell_to_fuse->is_active = false; 
+		pCell_to_fuse->set_is_active(false); 
 
 	}
 
@@ -1678,7 +1726,7 @@ void Cell::lyse_cell( void )
 
 	// set cell as unmovable and non-secreting 
 	is_movable = false; 
-	is_active = false; 	
+	set_is_active(false); 	
 
 	return; 
 }
@@ -1884,7 +1932,7 @@ void display_cell_definitions( std::ostream& os )
 		os << val << ")" << std::endl 
 			<< "\t\t\talong " 
 			<< pM->chemotaxis_direction << " * grad(" 
-			<< microenvironment.density_names[ pM->chemotaxis_index ] << ") " << std::endl; 
+			<< get_microenvironment_i()->get_density_names()[ pM->chemotaxis_index ] << ") " << std::endl; 
 			
 		// secretion
 		
@@ -2023,6 +2071,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	{ pCD = new Cell_Definition; }
 	else
 	{ pCD = &cell_defaults; }
+
+	// sync to microenvironment
+	pCD->pMicroenvironment = NULL;
+	if( BioFVM::get_microenvironment_i() != NULL )
+	{ pCD->sync_to_microenvironment(BioFVM::get_microenvironment_i()); }
 	
 	// set the name 
 	pCD->name = cd_node.attribute("name").value();
@@ -2071,7 +2124,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 		if( disable_bugfix == false )
 		{
-			int number_of_substrates = microenvironment.density_names.size(); 
+			int number_of_substrates = get_microenvironment_i()->get_density_names().size(); 
 			int number_of_cell_defs = cell_definition_indices_by_name.size(); 
 
 			// motility 
@@ -2080,10 +2133,13 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			pCD->functions.update_migration_bias = NULL; 
 
 			// secretion  
-			pCD->phenotype.secretion.secretion_rates.assign(number_of_substrates,0.0); 
-			pCD->phenotype.secretion.uptake_rates.assign(number_of_substrates,0.0); 
-			pCD->phenotype.secretion.net_export_rates.assign(number_of_substrates,0.0); 
-			pCD->phenotype.secretion.saturation_densities.assign(number_of_substrates,0.0); 
+			for (int i = 0; i < number_of_substrates; i++ )
+			{
+				pCD->phenotype.secretion.secretion_rates()[i] = 0.0; 
+				pCD->phenotype.secretion.uptake_rates()[i] = 0.0; 
+				pCD->phenotype.secretion.net_export_rates()[i] = 0.0; 
+				pCD->phenotype.secretion.saturation_densities()[i] = 0.0; 
+			}
 
 			// interaction 
 			pCD->phenotype.cell_interactions.apoptotic_phagocytosis_rate = 0.0; 
@@ -2111,13 +2167,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 	}
 
-	// sync to microenvironment
-	pCD->pMicroenvironment = NULL;
-	if( BioFVM::get_default_microenvironment() != NULL )
-	{ pCD->pMicroenvironment = BioFVM::get_default_microenvironment(); }
-
 	// figure out if this ought to be 2D
-	if( default_microenvironment_options.simulate_2D )
+	if( get_microenvironment_i()->simulate_2D() )
 	{
 		std::cout << "Note: setting cell definition to 2D based on microenvironment domain settings ... "
 		<< std::endl; 
@@ -2749,7 +2800,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				pMot->restrict_to_2D = xml_get_my_bool_value( node_mot1 ); 
 			}
 			
-			if( default_microenvironment_options.simulate_2D && pMot->restrict_to_2D == false )
+			if( get_microenvironment_i()->simulate_2D() && pMot->restrict_to_2D == false )
 			{
 				std::cout << "Note: Overriding to set cell motility for " << pCD->name << " to 2D based on " 
 						  << "microenvironment domain settings ... " << std::endl; 				
@@ -2769,7 +2820,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				// search for the right chemo index 
 				
 				std::string substrate_name = xml_get_string_value( node_mot1 , "substrate" ); 
-				pMot->chemotaxis_index = microenvironment.find_density_index( substrate_name ); 
+				pMot->chemotaxis_index = get_microenvironment_i()->find_density_index( substrate_name ); 
 				if( pMot->chemotaxis_index < 0)
 				{
 					std::cout << __FUNCTION__ << ": Error: parsing phenotype:motility:options:chemotaxis:  invalid substrate" << std::endl; 
@@ -2777,7 +2828,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					exit(-1); 
 				}
 				
-				std::string actual_name = microenvironment.density_names[ pMot->chemotaxis_index ]; 
+				std::string actual_name = get_microenvironment_i()->get_density_names()[ pMot->chemotaxis_index ]; 
 				
 				// error check 
 				if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )
@@ -2824,10 +2875,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					while( node_cs )
 					{
 						std::string substrate_name = node_cs.attribute( "substrate").value(); 
-						int index = microenvironment.find_density_index( substrate_name ); 
+						int index = get_microenvironment_i()->find_density_index( substrate_name ); 
 						std::string actual_name = ""; 
 						if( index > -1 )
-						{ actual_name = microenvironment.density_names[ index ]; }
+						{ actual_name = get_microenvironment_i()->get_density_names()[ index ]; }
 			
 						// error check 
 						if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )						
@@ -2860,35 +2911,35 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		{
 			std::cout << "Cells of type " << pCD->name << " use standard chemotaxis: " << std::endl 
 			<< "\t d_bias (before normalization) = " << pMot->chemotaxis_direction << " * grad(" 
-			<< microenvironment.density_names[pMot->chemotaxis_index] << ")" << std::endl; 
+			<< get_microenvironment_i()->get_density_names()[pMot->chemotaxis_index] << ")" << std::endl; 
 		}
 
 		if( pCD->functions.update_migration_bias == advanced_chemotaxis_function && pMot->is_motile == true )
 		{
-			int number_of_substrates = microenvironment.density_names.size(); 
+			int number_of_substrates = get_microenvironment_i()->get_density_names().size(); 
 
 			std::cout << "Cells of type " << pCD->name << " use advanced chemotaxis: " << std::endl 
 			<< "\t d_bias (before normalization) = " 
-			<< pMot->chemotactic_sensitivities[0] << " * grad(" << microenvironment.density_names[0] << ")"; 
+			<< pMot->chemotactic_sensitivities[0] << " * grad(" << get_microenvironment_i()->get_density_names()[0] << ")"; 
 
 			for( int n=1; n < number_of_substrates; n++ )
-			{ std::cout << " + " << pMot->chemotactic_sensitivities[n] << " * grad(" << microenvironment.density_names[n] << ")"; }
+			{ std::cout << " + " << pMot->chemotactic_sensitivities[n] << " * grad(" << get_microenvironment_i()->get_density_names()[n] << ")"; }
 			std::cout << std::endl; 
 		}		
 
 		if( pCD->functions.update_migration_bias == advanced_chemotaxis_function_normalized && pMot->is_motile == true )
 		{
-			int number_of_substrates = microenvironment.density_names.size(); 
+			int number_of_substrates = get_microenvironment_i()->get_density_names().size(); 
 
 			std::cout << "Cells of type " << pCD->name << " use normalized advanced chemotaxis: " << std::endl 
 			<< "\t d_bias (before normalization) = " 
-			<< pMot->chemotactic_sensitivities[0] << " * grad(" << microenvironment.density_names[0] << ")" 
-			<< " / ||grad(" << microenvironment.density_names[0] << ")||"; 
+			<< pMot->chemotactic_sensitivities[0] << " * grad(" << get_microenvironment_i()->get_density_names()[0] << ")" 
+			<< " / ||grad(" << get_microenvironment_i()->get_density_names()[0] << ")||"; 
 
 			for( int n=1; n < number_of_substrates; n++ )
 			{
-				std::cout << " + " << pMot->chemotactic_sensitivities[n] << " * grad(" << microenvironment.density_names[n] << ")"
-				<< " / ||grad(" << microenvironment.density_names[n] << ")||"; 
+				std::cout << " + " << pMot->chemotactic_sensitivities[n] << " * grad(" << get_microenvironment_i()->get_density_names()[n] << ")"
+				<< " / ||grad(" << get_microenvironment_i()->get_density_names()[n] << ")||"; 
 			}
 			std::cout << std::endl; 
 		}		
@@ -2909,8 +2960,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// which substrate? 
 			
 			std::string substrate_name = node_sec.attribute( "name").value(); 
-			int index = microenvironment.find_density_index( substrate_name ); 
-			std::string actual_name = microenvironment.density_names[ index ]; 
+			int index = get_microenvironment_i()->find_density_index( substrate_name ); 
+			std::string actual_name = get_microenvironment_i()->get_density_names()[ index ]; 
 			
 			// error check 
 			if( std::strcmp( substrate_name.c_str() , actual_name.c_str() ) != 0 )
@@ -2924,22 +2975,22 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// secretion rate
 			pugi::xml_node node_sec1 = node_sec.child( "secretion_rate" ); 
 			if( node_sec1 )
-			{ pS->secretion_rates[index] = xml_get_my_double_value( node_sec1 ); }
+			{ pS->secretion_rates()[index] = xml_get_my_double_value( node_sec1 ); }
 			
 			// secretion target 
 			node_sec1 = node_sec.child( "secretion_target" ); 
 			if( node_sec1 )
-			{ pS->saturation_densities[index] = xml_get_my_double_value( node_sec1 ); }
+			{ pS->saturation_densities()[index] = xml_get_my_double_value( node_sec1 ); }
 	
 			// uptake rate 
 			node_sec1 = node_sec.child( "uptake_rate" ); 
 			if( node_sec1 )
-			{ pS->uptake_rates[index] = xml_get_my_double_value( node_sec1 ); }
+			{ pS->uptake_rates()[index] = xml_get_my_double_value( node_sec1 ); }
 			
 			// net export rate 
 			node_sec1 = node_sec.child( "net_export_rate" ); 
 			if( node_sec1 )
-			{ pS->net_export_rates[index] = xml_get_my_double_value( node_sec1 ); }
+			{ pS->net_export_rates()[index] = xml_get_my_double_value( node_sec1 ); }
 			
 			node_sec = node_sec.next_sibling( "substrate" ); 
 		}
@@ -3525,7 +3576,7 @@ std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell )
 	std::vector<Cell*>::iterator end = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].end();
 	for( neighbor = pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()].begin(); neighbor != end; ++neighbor)
 	{
-		std::vector<double> displacement = (*neighbor)->position - pCell->position; 
+		std::vector<double> displacement = (*neighbor)->get_position() - pCell->get_position(); 
 		double distance = norm( displacement ); 
 		if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
 			+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius 
@@ -3547,7 +3598,7 @@ std::vector<Cell*> find_nearby_interacting_cells( Cell* pCell )
 		end = pCell->get_container()->agent_grid[*neighbor_voxel_index].end();
 		for(neighbor = pCell->get_container()->agent_grid[*neighbor_voxel_index].begin();neighbor != end; ++neighbor)
 		{
-			std::vector<double> displacement = (*neighbor)->position - pCell->position; 
+			std::vector<double> displacement = (*neighbor)->get_position() - pCell->get_position(); 
 			double distance = norm( displacement ); 
 			if( distance <= pCell->phenotype.mechanics.relative_maximum_adhesion_distance * pCell->phenotype.geometry.radius 
 				+ (*neighbor)->phenotype.mechanics.relative_maximum_adhesion_distance * (*neighbor)->phenotype.geometry.radius

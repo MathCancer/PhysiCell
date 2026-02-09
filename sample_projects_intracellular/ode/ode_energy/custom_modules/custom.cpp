@@ -193,9 +193,9 @@ void setup_tissue( void )
         set_single_behavior( pCell , "custom:intra_oxy" , parameters.doubles("initial_internal_oxygen"));
         
         
-        pCell->phenotype.molecular.internalized_total_substrates[oxygen_substrate_index]= get_single_signal( pCell, "custom:intra_oxy") * cell_volume;
-        pCell->phenotype.molecular.internalized_total_substrates[glucose_substrate_index]= get_single_signal( pCell, "custom:intra_glu") * cell_volume;
-        pCell->phenotype.molecular.internalized_total_substrates[lactate_substrate_index]= get_single_signal( pCell, "custom:intra_lac") * cell_volume;
+        pCell->phenotype.molecular.internalized_total_substrates()[oxygen_substrate_index]= get_single_signal( pCell, "custom:intra_oxy") * cell_volume;
+        pCell->phenotype.molecular.internalized_total_substrates()[glucose_substrate_index]= get_single_signal( pCell, "custom:intra_glu") * cell_volume;
+        pCell->phenotype.molecular.internalized_total_substrates()[lactate_substrate_index]= get_single_signal( pCell, "custom:intra_lac") * cell_volume;
         pCell->phenotype.intracellular->start();
         (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Energy",get_single_signal( pCell, "custom:intra_energy"));
        
@@ -236,9 +236,9 @@ void update_intracellular()
             (*all_cells)[i]->phenotype.intracellular->update_phenotype_parameters((*all_cells)[i]->phenotype);
                         
             // Internalized Chemical Update After SBML Simulation
-            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates[oxygen_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxygen") * cell_volume;
-            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates[glucose_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Glucose") * cell_volume;
-            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates[lactate_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Lactate") * cell_volume;
+            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates()[oxygen_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxygen") * cell_volume;
+            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates()[glucose_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Glucose") * cell_volume;
+            (*all_cells)[i]->phenotype.molecular.internalized_total_substrates()[lactate_substrate_index] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Lactate") * cell_volume;
             
 
             //Save custom data
@@ -265,21 +265,21 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	
 	// color
     // proliferative cell
-	if( pCell->phenotype.death.dead == false && pCell->type == 0 && pCell->custom_data[energy_vi] > 445)
+	if( pCell->phenotype.death.dead == false && pCell->get_type() == 0 && pCell->custom_data[energy_vi] > 445)
 	{
 		output[0] = "rgb(255,255,0)";
 		output[2] = "rgb(125,125,0)";
 	}
 
     // arrested cell
-	if( pCell->phenotype.death.dead == false && pCell->type == 0 && pCell->custom_data[energy_vi] <= 445)
+	if( pCell->phenotype.death.dead == false && pCell->get_type() == 0 && pCell->custom_data[energy_vi] <= 445)
 	{
 		output[0] = "rgb(255,0,0)";
 		output[2] = "rgb(125,0,0)";
 	}     
     
     // dead cell
-	if( pCell->phenotype.death.dead == true && pCell->type == 0)
+	if( pCell->phenotype.death.dead == true && pCell->get_type() == 0)
 	{
 		output[0] = "rgb(20,20,20)";
 		output[2] = "rgb(10,10,10)";

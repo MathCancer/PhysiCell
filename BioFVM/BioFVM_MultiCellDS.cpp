@@ -46,9 +46,16 @@
 #############################################################################
 */
 
-#include "BioFVM.h" 
+#include "BioFVM_basic_agent_interface.h"
+#include "BioFVM_implementation.h"
+#include "BioFVM_microenvironment_interface.h"
+#include "BioFVM_utilities.h"
+#include "BioFVM_matlab.h"
+#include "BioFVM_vector.h"
 // #include "BioFVM_strings.h" 
 #include "BioFVM_MultiCellDS.h"
+
+#include <sstream>
 
 namespace BioFVM{
 std::string BioFVM_Version = "1.1.7";
@@ -347,10 +354,10 @@ void MultiCellDS_Metadata::display_information( std::ostream& os)
 		<< "Program run time: " << current_runtime << " " << runtime_units << std::endl; 
 }
 
-void MultiCellDS_Metadata::sync_to_microenvironment( Microenvironment& M )
+void MultiCellDS_Metadata::sync_to_microenvironment( Microenvironment_Interface& M )
 {
-	spatial_units = M.spatial_units; 
-	time_units = M.time_units; 
+	spatial_units = M.get_spatial_units(); 
+	time_units = M.get_time_units(); 
 	
 	return; 
 }
@@ -523,7 +530,7 @@ void reset_BioFVM_substrates_initialized_in_dom( void )
 }
 
 
-void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, Microenvironment& M )
+void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, Microenvironment_Interface& M )
 {
 	add_MultiCellDS_main_structure_to_open_xml_pugi( xml_dom ); 
 	
@@ -540,39 +547,39 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		// add a domain 
 		node = node.append_child( "domain" ); 
 		pugi::xml_attribute attrib = node.append_attribute( "name" ); 
-		attrib.set_value( M.name.c_str() ); 
+		attrib.set_value( M.get_name().c_str() ); 
 		
 		// add the mesh
 		
 		node = node.append_child( "mesh" ); 
 		// information about the mesh 
 		attrib = node.append_attribute( "type" ); 
-		if( M.mesh.Cartesian_mesh == true )
+		if( M.get_mesh().Cartesian_mesh == true )
 		{ attrib.set_value( "Cartesian" ); }
 		else
 		{ attrib.set_value( "general"); }
 		attrib = node.append_attribute( "uniform" ); 
-		attrib.set_value( M.mesh.uniform_mesh ); 
+		attrib.set_value( M.get_mesh().uniform_mesh ); 
 		attrib = node.append_attribute( "regular" ); 
-		attrib.set_value( M.mesh.regular_mesh ); 		
+		attrib.set_value( M.get_mesh().regular_mesh ); 		
 		attrib = node.append_attribute( "units" ); 
-		attrib.set_value( M.mesh.units.c_str() );
+		attrib.set_value( M.get_mesh().units.c_str() );
 		// add the bounding box 
 		node = node.append_child( "bounding_box" ); 
 		attrib = node.append_attribute( "type" ); 
 		attrib.set_value( "axis-aligned" ); 
 		attrib = node.append_attribute( "units" ); 
-		attrib.set_value( M.mesh.units.c_str() ); 
-		sprintf( buffer , "%f %f %f %f %f %f" , M.mesh.bounding_box[0] , M.mesh.bounding_box[1] , M.mesh.bounding_box[2] , 
-		M.mesh.bounding_box[3] , M.mesh.bounding_box[4] , M.mesh.bounding_box[5] ); 
+		attrib.set_value( M.get_mesh().units.c_str() ); 
+		sprintf( buffer , "%f %f %f %f %f %f" , M.get_mesh().bounding_box[0] , M.get_mesh().bounding_box[1] , M.get_mesh().bounding_box[2] , 
+		M.get_mesh().bounding_box[3] , M.get_mesh().bounding_box[4] , M.get_mesh().bounding_box[5] ); 
 		node.append_child( pugi::node_pcdata ).set_value( buffer ); 
 		node = node.parent(); 		
 		// if Cartesian, add the x, y, and z coordinates 
-		if( M.mesh.Cartesian_mesh == true )
+		if( M.get_mesh().Cartesian_mesh == true )
 		{
-			write_coordinates_node(node, M.mesh.x_coordinates, "x_coordinates");
-			write_coordinates_node(node, M.mesh.y_coordinates, "y_coordinates");
-			write_coordinates_node(node, M.mesh.z_coordinates, "z_coordinates");
+			write_coordinates_node(node, M.get_mesh().x_coordinates, "x_coordinates");
+			write_coordinates_node(node, M.get_mesh().y_coordinates, "y_coordinates");
+			write_coordinates_node(node, M.get_mesh().z_coordinates, "z_coordinates");
 		}
 		// write out the voxels -- minimal data, even if redundant for cartesian 
 		if( save_mesh_as_matlab == false )
@@ -581,24 +588,24 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			attrib = node.append_attribute("type");
 			attrib.set_value( "xml" ); 
 			char temp [1024]; 
-			for( unsigned int k=0; k < M.mesh.voxels.size() ; k++ )
+			for( unsigned int k=0; k < M.get_mesh().voxels.size() ; k++ )
 			{
 				node = node.append_child( "voxel" );
 				
 				attrib = node.append_attribute( "ID" ); 
-				attrib.set_value( M.mesh.voxels[k].mesh_index ); 
+				attrib.set_value( M.get_mesh().voxels[k].mesh_index ); 
 				attrib = node.append_attribute( "type" ); 
 				attrib.set_value( "cube" ); // allowed: cube or unknown 
 
 				node = node.append_child( "center" );
 				attrib = node.append_attribute( "delimiter" );
 				attrib.set_value( " " );
-				sprintf( temp , "%f %f %f" , M.mesh.voxels[k].center[0] , M.mesh.voxels[k].center[1], M.mesh.voxels[k].center[2] );
+				sprintf( temp , "%f %f %f" , M.get_mesh().voxels[k].center[0] , M.get_mesh().voxels[k].center[1], M.get_mesh().voxels[k].center[2] );
 				node.append_child( pugi::node_pcdata ).set_value( temp ); 
 				node = node.parent(); 
 				
 				node = node.append_child( "volume" );
-				sprintf( temp , "%f" , M.mesh.voxels[k].volume );
+				sprintf( temp , "%f" , M.get_mesh().voxels[k].volume );
 				node.append_child( pugi::node_pcdata ).set_value( temp ); 
 				node = node.parent(); 
 
@@ -614,7 +621,7 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 	
 			char filename [1024]; 
 			sprintf( filename , "%s_mesh%d.mat" , filename_base.c_str() , 0 ); 
-			M.mesh.write_to_matlab( filename ); 
+			M.get_mesh().write_to_matlab( filename ); 
 			
 			node = node.append_child( "filename" ); 
 			
@@ -644,9 +651,9 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		{
 			node = node.append_child( "variable" ); 
 			attrib = node.append_attribute( "name" ); 
-			attrib.set_value( M.density_names[j].c_str() ); 
+			attrib.set_value( M.get_density_names()[j].c_str() ); 
 			attrib = node.append_attribute( "units" ); 
-			attrib.set_value( M.density_units[j].c_str() ); 
+			attrib.set_value( M.get_density_units()[j].c_str() ); 
 			attrib = node.append_attribute( "ID" ); 
 			attrib.set_value( j ); 
 			
@@ -655,18 +662,18 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			node = node.parent(); 
 			
 			node = node.append_child( "diffusion_coefficient" ); 
-			sprintf( temp , "%f" , M.diffusion_coefficients[j] ); 
+			sprintf( temp , "%f" , M.get_diffusion_coefficients()[j] ); 
 			node.append_child( pugi::node_pcdata ).set_value( temp );
 			attrib = node.append_attribute( "units" ); 
-			sprintf( temp , "%s^2/%s" , M.spatial_units.c_str() , M.time_units.c_str() ); 
+			sprintf( temp , "%s^2/%s" , M.get_spatial_units().c_str() , M.get_time_units().c_str() ); 
 			attrib.set_value( temp ); 
 			node = node.parent(); 
 
 			node = node.append_child( "decay_rate" ); 
-			sprintf( temp , "%f" , M.decay_rates[j] ); 
+			sprintf( temp , "%f" , M.get_decay_rates()[j] ); 
 			node.append_child( pugi::node_pcdata ).set_value( temp );
 			attrib = node.append_attribute( "units" ); 
-			sprintf( temp , "1/%s" , M.time_units.c_str() ); 
+			sprintf( temp , "1/%s" , M.get_time_units().c_str() ); 
 			attrib.set_value( temp ); 
 			node = node.parent(); 
 
@@ -689,12 +696,12 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 			
 			char* buffer; 
 			buffer = new char [data_size]; 
-			for( unsigned int j=0 ; j < M.mesh.voxels.size() ; j++ )
+			for( unsigned int j=0 ; j < M.get_mesh().voxels.size() ; j++ )
 			{
-				vector_to_list( M.density_vector(j) , buffer , ' ' ); 
+				ptr_to_list( M.density_vector(j) , M.number_of_densities() , buffer , ' ' ); 
 				node = node.append_child( "data_vector"); 
 				attrib = node.append_attribute( "voxel_ID" ); 
-				attrib.set_value( M.mesh.voxels[j].mesh_index ); 
+				attrib.set_value( M.get_mesh().voxels[j].mesh_index ); 
 				attrib = node.append_attribute( "delimiter" ); 
 				attrib.set_value( " " ); 
 				
@@ -750,9 +757,9 @@ void add_BioFVM_substrates_to_open_xml_pugi( pugi::xml_document& xml_dom , std::
 		char* buffer; 
 		buffer = new char [data_size]; 
 		node = node.child( "data_vector" );
-		for( unsigned int j=0 ; j < M.mesh.voxels.size() ; j++ )
+		for( unsigned int j=0 ; j < M.get_mesh().voxels.size() ; j++ )
 		{
-			vector_to_list( M.density_vector(j) , buffer , ' ' ); 
+			ptr_to_list( M.density_vector(j) , M.number_of_densities() , buffer , ' ' ); 
 			node = node.first_child(); 
 			
 			node.set_value( buffer ); 
@@ -807,9 +814,9 @@ void write_coordinates_node(pugi::xml_node &node, const std::vector<double> &coo
 }
 
 // not yet implemented 
-void add_BioFVM_basic_agent_to_open_xml_pugi( pugi::xml_document& xml_dom, Basic_Agent& BA  ); 
+void add_BioFVM_basic_agent_to_open_xml_pugi( pugi::xml_document& xml_dom, Basic_Agent_Interface& BA  ); 
 
-void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment& M )
+void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::string filename_base, Microenvironment_Interface& M )
 {
 	if( save_cell_data == false )
 	{ return; }
@@ -832,9 +839,9 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		temp = new char [1024]; 
 		initialized = true; 
 		
-		sprintf( rate_chars, "1/%s" , M.time_units.c_str() ); 
-		sprintf( volume_chars, "%s^3" , M.spatial_units.c_str() ); 
-		sprintf( diffusion_chars , "%s^2/%s", M.spatial_units.c_str() , M.time_units.c_str() ); 
+		sprintf( rate_chars, "1/%s" , M.get_time_units().c_str() ); 
+		sprintf( volume_chars, "%s^3" , M.get_spatial_units().c_str() ); 
+		sprintf( diffusion_chars , "%s^2/%s", M.get_spatial_units().c_str() , M.get_time_units().c_str() ); 
 	}
 
 	node = node.child( "cell_populations" ); 
@@ -902,6 +909,8 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		}
 		
 		// next, create a matlab structure and save it!
+
+		auto& all_basic_agents = *BioFVM_implementation::get_instance()->get_all_basic_agents();
 		
 		// order: ID,x,y,z,volume,radius, 
 		int number_of_data_entries = all_basic_agents.size(); 
@@ -912,23 +921,23 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		// storing data as cols 
 		for( int i=0; i < number_of_data_entries ; i++ )
 		{
-			double ID_temp = (double) all_basic_agents[i]->ID;
+			double ID_temp = (double) all_basic_agents[i]->get_ID();
 			fwrite( (char*) &( ID_temp ) , sizeof(double) , 1 , fp ); 
 
-			fwrite( (char*) &( all_basic_agents[i]->position[0] ) , sizeof(double) , 1 , fp ); 
-			fwrite( (char*) &( all_basic_agents[i]->position[1] ) , sizeof(double) , 1 , fp ); 
-			fwrite( (char*) &( all_basic_agents[i]->position[2] ) , sizeof(double) , 1 , fp ); 
+			fwrite( (char*) &( all_basic_agents[i]->get_position()[0] ) , sizeof(double) , 1 , fp ); 
+			fwrite( (char*) &( all_basic_agents[i]->get_position()[1] ) , sizeof(double) , 1 , fp ); 
+			fwrite( (char*) &( all_basic_agents[i]->get_position()[2] ) , sizeof(double) , 1 , fp ); 
 			double volTemp=all_basic_agents[i]->get_total_volume();
 			fwrite( (char*) &( volTemp ) , sizeof(double) , 1 , fp ); 
 			
 			// add variables and their source/sink/saturation values (per-cell basis)
 			for( unsigned int j=0; j < M.number_of_densities() ; j++ ) 
 			{
-				double dTemp = all_basic_agents[i]->get_total_volume() * (*all_basic_agents[i]->secretion_rates)[j]; 
+				double dTemp = all_basic_agents[i]->get_total_volume() * (all_basic_agents[i]->get_secretion_rates())[j]; 
 				fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
-				dTemp = all_basic_agents[i]->get_total_volume() * (*all_basic_agents[i]->uptake_rates)[j]; 
+				dTemp = all_basic_agents[i]->get_total_volume() * (all_basic_agents[i]->get_uptake_rates())[j]; 
 				fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
-				dTemp = (*all_basic_agents[i]->saturation_densities)[j]; 
+				dTemp = (all_basic_agents[i]->get_saturation_densities())[j]; 
 				fwrite( (char*) &( dTemp ) , sizeof(double) , 1 , fp ); 
 			}
 			
@@ -952,12 +961,14 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 
 	// now go through all cells 
 
+	auto& all_basic_agents = *BioFVM_implementation::get_instance()->get_all_basic_agents();
+
 	root = node; 
 	for( unsigned int i=0; i < all_basic_agents.size(); i++ )
 	{
 		node = node.append_child( "cell" ); 
 		attrib = node.append_attribute( "ID" ); 
-		attrib.set_value(  all_basic_agents[i]->ID ); 
+		attrib.set_value(  all_basic_agents[i]->get_ID() ); 
 		
 		node = node.append_child( "phenotype_dataset" ); 
 		node = node.append_child( "phenotype" ); // add a type? 
@@ -970,7 +981,7 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		{
 			node = node.append_child( "variable" ); 
 			attrib = node.append_attribute( "name" ); 
-			attrib.set_value( M.density_names[j].c_str() ); 
+			attrib.set_value( M.get_density_names()[j].c_str() ); 
 			// ChEBI would go here later 
 			attrib = node.append_attribute( "ID" );
 			attrib.set_value( j ); 
@@ -978,21 +989,21 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 			node = node.append_child( "export_rate" ); 
 			attrib = node.append_attribute( "units" ); 
 			attrib.set_value( rate_chars ); 
-			sprintf( temp , "%f" , all_basic_agents[i]->get_total_volume() * (*all_basic_agents[i]->secretion_rates)[j] ); 
+			sprintf( temp , "%f" , all_basic_agents[i]->get_total_volume() * (all_basic_agents[i]->get_secretion_rates())[j] ); 
 			node.append_child( pugi::node_pcdata ).set_value( temp ); 
 			node = node.parent( ); 
 			
 			node = node.append_child( "import_rate" ); 
 			attrib = node.append_attribute( "units" ); 
 			attrib.set_value( rate_chars ); 
-			sprintf( temp,  "%f" , all_basic_agents[i]->get_total_volume() * (*all_basic_agents[i]->uptake_rates)[j] ); 
+			sprintf( temp,  "%f" , all_basic_agents[i]->get_total_volume() * (all_basic_agents[i]->get_uptake_rates())[j] ); 
 			node.append_child( pugi::node_pcdata ).set_value( temp ); 
 			node = node.parent(); 
 			
 			node = node.append_child( "saturation_density" ); 
 			attrib = node.append_attribute( "units" ); 
-			attrib.set_value( M.density_units[j].c_str() ); 
-			sprintf( temp, "%f" , (*all_basic_agents[i]->saturation_densities)[j] ); 
+			attrib.set_value( M.get_density_units()[j].c_str() ); 
+			sprintf( temp, "%f" , (all_basic_agents[i]->get_saturation_densities())[j] ); 
 			node.append_child( pugi::node_pcdata ).set_value( temp ); 
 			node = node.parent(); 
 			
@@ -1022,10 +1033,10 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		node = node.append_child( "state"); 
 		node = node.append_child( "position" ); 
 		attrib = node.append_attribute( "units" ); 
-		attrib.set_value( M.spatial_units.c_str() ); 
+		attrib.set_value( M.get_spatial_units().c_str() ); 
 		
 		// vector3_to_list( all_basic_agents[i]->position , temp , ' ');
-		sprintf( temp , "%.7e %.7e %.7e" , all_basic_agents[i]->position[0], all_basic_agents[i]->position[1], all_basic_agents[i]->position[2] ); 
+		sprintf( temp , "%.7e %.7e %.7e" , all_basic_agents[i]->get_position()[0], all_basic_agents[i]->get_position()[1], all_basic_agents[i]->get_position()[2] ); 
 		node.append_child( pugi::node_pcdata ).set_value( temp ); 		
 		
 		node = root; 
@@ -1034,7 +1045,7 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 	return; 
 }
 
-void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M )
+void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment_Interface& M )
 {
 	
 	add_MultiCellDS_main_structure_to_open_xml_pugi( xml_dom ); 
@@ -1050,7 +1061,7 @@ void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string file
 	return; 
 }
 
-void save_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double current_simulation_time)
+void save_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment_Interface& M , double current_simulation_time)
 {
 	add_BioFVM_to_open_xml_pugi( biofvm_doc , filename_base , current_simulation_time , M ); 
 		
@@ -1065,13 +1076,13 @@ void save_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvir
 
 /* future / not yet supported */
 
-void read_BioFVM_from_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double& current_simulation_time , Microenvironment& M );
-void read_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment& M , double& current_simulation_time ); 
+void read_BioFVM_from_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double& current_simulation_time , Microenvironment_Interface& M );
+void read_BioFVM_to_MultiCellDS_xml_pugi( std::string filename_base , Microenvironment_Interface& M , double& current_simulation_time ); 
 
-/* partly-implemented code snippets -- not to be used as of February 2016 */
+// partly-implemented code snippets -- not to be used as of February 2016 
 
 // not yet supported 
-void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination , std::string filename )
+void read_microenvironment_from_MultiCellDS_xml( Microenvironment_Interface& M_destination , std::string filename )
 {
 	std::cout << "Reading data from file " << filename << " ... " ; 
 	pugi::xml_document doc; 
@@ -1082,7 +1093,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 }
 
 // not yet supported 
-void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination , pugi::xml_document& xml_dom )
+void read_microenvironment_from_MultiCellDS_xml( Microenvironment_Interface& M_destination , pugi::xml_document& xml_dom )
 {
         size_t result;
 
@@ -1098,7 +1109,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 	// int microenvironment_index = -1; // g++ warning: set but not used 
 	while( root )
 	{
-		M_destination.name = root.attribute("name").value(); 
+		M_destination.get_name() = root.attribute("name").value(); 
 		
 		// read the mesh 
 		bool cartesian = true; 
@@ -1107,26 +1118,26 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 		if( strcmp(  node.attribute( "type" ).value()  , "Cartesian" ) != 0 && strcmp(  node.attribute( "type" ).value()  , "cartesian" ) != 0  ) 
 		{ cartesian = false; }
 
-		M_destination.mesh.units = node.attribute("units").value(); 
-		M_destination.spatial_units = node.attribute("units").value(); 
+		M_destination.get_mesh().units = node.attribute("units").value(); 
+		M_destination.get_spatial_units() = node.attribute("units").value(); 
 
 		// if the dataset doesn't specify uniform or regular at all, assume it's very simple (regular Cartesian)
 		if( node.attribute("uniform" ) )
-		{ M_destination.mesh.uniform_mesh = node.attribute("uniform").as_bool(); }
+		{ M_destination.get_mesh().uniform_mesh = node.attribute("uniform").as_bool(); }
 		else
-		{ M_destination.mesh.uniform_mesh = true; } 
+		{ M_destination.get_mesh().uniform_mesh = true; } 
 		
 		if( node.attribute("regular" ) )
-		{ M_destination.mesh.regular_mesh = node.attribute("regular").as_bool(); }
+		{ M_destination.get_mesh().regular_mesh = node.attribute("regular").as_bool(); }
 		else
-		{ M_destination.mesh.regular_mesh = true; }
+		{ M_destination.get_mesh().regular_mesh = true; }
 
 		// get the bounding box 
 		node = node.child( "bounding_box");
 		
 		// int i=0; // g++ warning: set but not used 
 		
-		csv_to_vector( node.text().get() , M_destination.mesh.bounding_box ); 
+		csv_to_vector( node.text().get() , M_destination.get_mesh().bounding_box ); 
 		
 		// if Cartesian, try to get the mesh just by reading the x, y, z coordinates 
 		if( cartesian == true )
@@ -1136,61 +1147,61 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 			// read the x coordinates 
 			node = node.parent();
 			node = node.child("x_coordinates"); 
-			M_destination.mesh.x_coordinates.clear();
+			M_destination.get_mesh().x_coordinates.clear();
 			// i=0;// g++ warning: set but not used 
 			
-			csv_to_vector( node.text().get() , M_destination.mesh.x_coordinates ); 
+			csv_to_vector( node.text().get() , M_destination.get_mesh().x_coordinates ); 
 			
-			if( M_destination.mesh.x_coordinates.size() > 1 )
-			{ M_destination.mesh.dx = M_destination.mesh.x_coordinates[1] - M_destination.mesh.x_coordinates[0]; }
+			if( M_destination.get_mesh().x_coordinates.size() > 1 )
+			{ M_destination.get_mesh().dx = M_destination.get_mesh().x_coordinates[1] - M_destination.get_mesh().x_coordinates[0]; }
 			else
-			{ M_destination.mesh.dx = 1.0; }
+			{ M_destination.get_mesh().dx = 1.0; }
 		
 			// read the y coordinates 
 			node = node.parent();
 			node = node.child("y_coordinates"); 
-			M_destination.mesh.y_coordinates.clear();
+			M_destination.get_mesh().y_coordinates.clear();
 			// i=0; // g++ warning: set but not used 
 			
-			csv_to_vector( node.text().get() , M_destination.mesh.y_coordinates );
+			csv_to_vector( node.text().get() , M_destination.get_mesh().y_coordinates );
 			
-			if( M_destination.mesh.y_coordinates.size() > 1 )
-			{ M_destination.mesh.dy = M_destination.mesh.y_coordinates[1] - M_destination.mesh.y_coordinates[0]; }
+			if( M_destination.get_mesh().y_coordinates.size() > 1 )
+			{ M_destination.get_mesh().dy = M_destination.get_mesh().y_coordinates[1] - M_destination.get_mesh().y_coordinates[0]; }
 			else
-			{ M_destination.mesh.dy = 1.0; }
+			{ M_destination.get_mesh().dy = 1.0; }
 
 			// read the z coordinates 
 			node = node.parent();
 			node = node.child("z_coordinates"); 
-			M_destination.mesh.z_coordinates.clear();
+			M_destination.get_mesh().z_coordinates.clear();
 			// i=0; // g++ warning: set but not used 
-			csv_to_vector( node.text().get() , M_destination.mesh.z_coordinates );
-			if( M_destination.mesh.z_coordinates.size() > 1 )
-			{ M_destination.mesh.dz = M_destination.mesh.z_coordinates[1] - M_destination.mesh.z_coordinates[0]; }
+			csv_to_vector( node.text().get() , M_destination.get_mesh().z_coordinates );
+			if( M_destination.get_mesh().z_coordinates.size() > 1 )
+			{ M_destination.get_mesh().dz = M_destination.get_mesh().z_coordinates[1] - M_destination.get_mesh().z_coordinates[0]; }
 			else
-			{ M_destination.mesh.dz = 1.0; }
+			{ M_destination.get_mesh().dz = 1.0; }
 			
-			M_destination.mesh.dV = M_destination.mesh.dx * M_destination.mesh.dy * M_destination.mesh.dz; 
-			M_destination.mesh.dS = M_destination.mesh.dx * M_destination.mesh.dy; 
-			M_destination.mesh.dS_xy = M_destination.mesh.dx * M_destination.mesh.dy;
-			M_destination.mesh.dS_yz = M_destination.mesh.dy * M_destination.mesh.dz;
-			M_destination.mesh.dS_xz = M_destination.mesh.dx * M_destination.mesh.dz;
+			M_destination.get_mesh().dV = M_destination.get_mesh().dx * M_destination.get_mesh().dy * M_destination.get_mesh().dz; 
+			M_destination.get_mesh().dS = M_destination.get_mesh().dx * M_destination.get_mesh().dy; 
+			M_destination.get_mesh().dS_xy = M_destination.get_mesh().dx * M_destination.get_mesh().dy;
+			M_destination.get_mesh().dS_yz = M_destination.get_mesh().dy * M_destination.get_mesh().dz;
+			M_destination.get_mesh().dS_xz = M_destination.get_mesh().dx * M_destination.get_mesh().dz;
 			
-			// now, use this mesh information to properly initialize M_destination.mesh
+			// now, use this mesh information to properly initialize M_destination.get_mesh()
 			
-			if( M_destination.mesh.x_coordinates.size() < 2 )
-			{ M_destination.mesh.dx = M_destination.mesh.bounding_box[3] - M_destination.mesh.bounding_box[0]; } 
-			if( M_destination.mesh.y_coordinates.size() < 2 )
-			{ M_destination.mesh.dy = M_destination.mesh.bounding_box[4] - M_destination.mesh.bounding_box[1]; } 
-			if( M_destination.mesh.z_coordinates.size() < 2 )
-			{ M_destination.mesh.dz = M_destination.mesh.bounding_box[5] - M_destination.mesh.bounding_box[2]; } 
+			if( M_destination.get_mesh().x_coordinates.size() < 2 )
+			{ M_destination.get_mesh().dx = M_destination.get_mesh().bounding_box[3] - M_destination.get_mesh().bounding_box[0]; } 
+			if( M_destination.get_mesh().y_coordinates.size() < 2 )
+			{ M_destination.get_mesh().dy = M_destination.get_mesh().bounding_box[4] - M_destination.get_mesh().bounding_box[1]; } 
+			if( M_destination.get_mesh().z_coordinates.size() < 2 )
+			{ M_destination.get_mesh().dz = M_destination.get_mesh().bounding_box[5] - M_destination.get_mesh().bounding_box[2]; } 
 
-			if( M_destination.mesh.regular_mesh || M_destination.mesh.uniform_mesh )
+			if( M_destination.get_mesh().regular_mesh || M_destination.get_mesh().uniform_mesh )
 			{
-				M_destination.resize_space( M_destination.mesh.bounding_box[0], M_destination.mesh.bounding_box[3], 
-					M_destination.mesh.bounding_box[1], M_destination.mesh.bounding_box[4], 
-					M_destination.mesh.bounding_box[2], M_destination.mesh.bounding_box[5],
-					M_destination.mesh.dx, M_destination.mesh.dy, M_destination.mesh.dz ); 			
+				M_destination.resize_space( M_destination.get_mesh().bounding_box[0], M_destination.get_mesh().bounding_box[3], 
+					M_destination.get_mesh().bounding_box[1], M_destination.get_mesh().bounding_box[4], 
+					M_destination.get_mesh().bounding_box[2], M_destination.get_mesh().bounding_box[5],
+					M_destination.get_mesh().dx, M_destination.get_mesh().dy, M_destination.get_mesh().dz ); 			
 			}
 			else
 			{
@@ -1198,7 +1209,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 			}
 		}
 		
-		if( cartesian == false || M_destination.mesh.regular_mesh == false )
+		if( cartesian == false || M_destination.get_mesh().regular_mesh == false )
 		{
 			// Read in the voxels here and create them.
 			// If non-regular Cartesian, create and populate them here, one by one. 
@@ -1214,10 +1225,10 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 			if( strcmp(  node.attribute( "type" ).value()  , "matlab" ) == 0 )
 			{
 				std::cout << "matlab" << std::endl; 				
-				M_destination.mesh.Cartesian_mesh = false; 
-				M_destination.mesh.uniform_mesh = false; 
-				M_destination.mesh.regular_mesh = false; 
-				M_destination.mesh.use_voxel_faces = false; 				
+				M_destination.get_mesh().Cartesian_mesh = false; 
+				M_destination.get_mesh().uniform_mesh = false; 
+				M_destination.get_mesh().regular_mesh = false; 
+				M_destination.get_mesh().use_voxel_faces = false; 				
 				
 				// determine the number of voxels 
 				unsigned int rows; 
@@ -1232,10 +1243,10 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 				for( unsigned int j=0; j < columns ; j++ )
 				{
 					// read x, y, z, dV
-					result = fread( (char*) & (M_destination.mesh.voxels[j].center[0])   , sizeof(double) , 1 , fp );
-					result = fread( (char*) & (M_destination.mesh.voxels[j].center[1])   , sizeof(double) , 1 , fp );
-					result = fread( (char*) & (M_destination.mesh.voxels[j].center[2])   , sizeof(double) , 1 , fp );
-					result = fread( (char*) & (M_destination.mesh.voxels[j].volume)   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.get_mesh().voxels[j].center[0])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.get_mesh().voxels[j].center[1])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.get_mesh().voxels[j].center[2])   , sizeof(double) , 1 , fp );
+					result = fread( (char*) & (M_destination.get_mesh().voxels[j].volume)   , sizeof(double) , 1 , fp );
 				} 
 				fclose( fp );				
 			}
@@ -1244,10 +1255,10 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 				// Need to set the mesh to non-Cartesian. 
 				// We're in very, very basic mode here. 
 				
-				M_destination.mesh.Cartesian_mesh = false; 
-				M_destination.mesh.uniform_mesh = false; 
-				M_destination.mesh.regular_mesh = false; 
-				M_destination.mesh.use_voxel_faces = false; 
+				M_destination.get_mesh().Cartesian_mesh = false; 
+				M_destination.get_mesh().uniform_mesh = false; 
+				M_destination.get_mesh().regular_mesh = false; 
+				M_destination.get_mesh().use_voxel_faces = false; 
 				
 				// first, figure out how many voxels. 
 				node = node.child( "voxel" ); 
@@ -1271,16 +1282,16 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 				int voxel_index = 0; 
 				while( node ) 
 				{
-					M_destination.mesh.voxels[voxel_index].mesh_index = node.attribute( "ID" ).as_int(); 
+					M_destination.get_mesh().voxels[voxel_index].mesh_index = node.attribute( "ID" ).as_int(); 
 					
 					// now, get the coordinates 
 					node = node.child("center"); 
-					csv_to_vector( node.first_child().value() , M_destination.mesh.voxels[voxel_index].center ); 
+					csv_to_vector( node.first_child().value() , M_destination.get_mesh().voxels[voxel_index].center ); 
 					node = node.parent(); 
 					
 					// now, get the volume
 					node = node.child( "volume"); 
-					M_destination.mesh.voxels[voxel_index].volume = strtod( node.first_child().value() , NULL );  
+					M_destination.get_mesh().voxels[voxel_index].volume = strtod( node.first_child().value() , NULL );  
 					node = node.parent(); 
 
 					voxel_index++; 
@@ -1322,12 +1333,12 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 			
 			// get the diffusivity 
 			node = node.child( "diffusion_constant" ); 
-			M_destination.diffusion_coefficients[substrate_index] = strtod(  node.first_child().value() , NULL ); 
+			M_destination.get_diffusion_coefficients()[substrate_index] = strtod(  node.first_child().value() , NULL ); 
 			node = node.parent();
 
 			// get the decay rate 
 			node = node.child( "decay_rate" ); 
-			M_destination.decay_rates[substrate_index] = strtod(  node.first_child().value() , NULL ); 
+			M_destination.get_decay_rates()[substrate_index] = strtod(  node.first_child().value() , NULL ); 
 			node = node.parent(); 
 			
 			node = node.next_sibling("density");
@@ -1366,7 +1377,7 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 		{
 			// attempt to read it in as XML data, voxel by voxel 
 			node = node.child( "density_vector" ); 
-			for( unsigned int j=0 ; j < M_destination.mesh.voxels.size() ; j++ )
+			for( unsigned int j=0 ; j < M_destination.get_mesh().voxels.size() ; j++ )
 			{
 				csv_to_vector( node.first_child().value() , M_destination.density_vector(j)  ); 
 				if( node.next_sibling( "density_vector" ) ) 
@@ -1398,18 +1409,18 @@ bool read_microenvironment_from_matlab( std::string mat_filename )
 	int number_of_mat_voxels = num_cols; 
 	int number_of_mat_substrates = num_rows - 3 -1; 
 
-	if( number_of_mat_substrates != microenvironment.number_of_densities() )
+	if( number_of_mat_substrates != get_microenvironment_i()->number_of_densities() )
 	{
 		std::cout << "Error reading microenvironment from " << mat_filename << "! ";  
-		std::cout << "Expected " << microenvironment.number_of_densities() << " substrates but only detected "
+		std::cout << "Expected " << get_microenvironment_i()->number_of_densities() << " substrates but only detected "
 			<< number_of_mat_substrates << std::endl; 
 		return false; 
 	}
 
-	if( number_of_mat_voxels != microenvironment.number_of_voxels() )
+	if( number_of_mat_voxels != get_microenvironment_i()->number_of_voxels() )
 	{
 		std::cout << "Error reading microenvironment from " << mat_filename << "! ";  
-		std::cout << "Expected " << microenvironment.number_of_voxels() << " voxels but only detected "
+		std::cout << "Expected " << get_microenvironment_i()->number_of_voxels() << " voxels but only detected "
 			<< number_of_mat_voxels << std::endl; 
 		return false; 
 	}
@@ -1418,7 +1429,7 @@ bool read_microenvironment_from_matlab( std::string mat_filename )
 	{
 		// std::cout << microenvironment.mesh.voxels[n].center << " vs " << mat[0][n] << " " << mat[1][n] << " " << mat[2][n] << std::endl; 	
 		for( int k=4; k < num_rows ; k++ )
-		{ microenvironment(n)[k-4] = mat[k][n]; }
+		{ get_microenvironment_i()->density_vector(n)[k-4] = mat[k][n]; }
 	}
 
 	std::cout << "done!" << std::endl << std::endl; 

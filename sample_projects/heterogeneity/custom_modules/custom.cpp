@@ -336,7 +336,7 @@ std::vector<std::string> heterogeneity_coloring_function( Cell* pCell )
 	// immune are black
 	std::vector< std::string > output( 4, "black" ); 
 	
-	if( pCell->type == 1 )
+	if( pCell->get_type() == 1 )
 	{ return output; } 
 	
 	// live cells are green, but shaded by oncoprotein value 

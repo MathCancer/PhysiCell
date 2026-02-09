@@ -78,7 +78,6 @@
 #include <unordered_map>
 
 #include "../BioFVM/pugixml.hpp"
-#include "../BioFVM/BioFVM_basic_agent.h"
 
 namespace PhysiCell{
 

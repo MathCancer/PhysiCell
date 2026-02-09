@@ -73,6 +73,7 @@
 #include <omp.h>
 #include <fstream>
 
+#include "../BioFVM/BioFVM.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
@@ -98,7 +99,7 @@ int write_test_report(std::vector<Cell*> all_cells, double timepoint)
     for(int i=0;i<all_cells.size();i++)
     {
         phenotype_code=all_cells[i]->phenotype.cycle.current_phase().code;
-        outputFile<<i<<"\t"<<all_cells[i]->ID<<"\t"<<all_cells[i]->position[0]<<"\t" << all_cells[i]->position[1] <<"\t"<< all_cells[i]->position[2]<<"\t";
+        outputFile<<i<<"\t"<<all_cells[i]->get_ID()<<"\t"<<all_cells[i]->get_position()[0]<<"\t" << all_cells[i]->get_position()[1] <<"\t"<< all_cells[i]->get_position()[2]<<"\t";
         outputFile<<all_cells[i]->phenotype.geometry.radius<<"\t"<<phenotype_code<< "\t"<< all_cells[i]->
         phenotype.cycle.data.elapsed_time_in_phase <<std::endl;
          
@@ -195,7 +196,7 @@ int main( int argc, char* argv[] )
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// make sure the cells uptake oxygen at the right rate 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 0; 
+	cell_defaults.phenotype.secretion.uptake_rates()[oxygen_substrate_index] = 0; 
 
 	// cells leave the Q phase and enter the K1 phase after 5 hours 
 	cell_defaults.phenotype.cycle.data.transition_rate(Q_index,K1_index) = 1.0 / ( 5.0 * 60.0 ); 

@@ -249,7 +249,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	output[1] = "red";
 	output[2] = "red";
 
-	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
+	if( pCell->phenotype.death.dead == false && pCell->get_type() == 1 )
 	{
 		 output[0] = "black";
 		 output[2] = "black";

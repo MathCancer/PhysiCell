@@ -252,13 +252,13 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	static Cell_Definition* pPreyDef = find_cell_definition( "prey" ); 
 	static Cell_Definition* pPredDef = find_cell_definition( "predator" ); 
 	
-	if( pCell->type == pFarmerDef->type )
+	if( pCell->get_type() == pFarmerDef->type )
 	{ return { "grey", "black", "grey", "grey" }; } 
 	
-	if( pCell->type == pPreyDef->type )
+	if( pCell->get_type() == pPreyDef->type )
 	{ return { "blue", "black", "blue", "blue" }; } 
 
-	if( pCell->type == pPredDef->type )
+	if( pCell->get_type() == pPredDef->type )
 	{ return { "orange", "black", "orange", "orange" }; } 
 
 	return paint_by_number_cell_coloring(pCell); 
@@ -310,22 +310,22 @@ void avoid_boundaries( Cell* pCell )
 	
 	// near edge: 
 	bool near_edge = false; 
-	if( pCell->position[0] < Xmin + avoid_zone || pCell->position[0] > Xmax - avoid_zone )
+	if( pCell->get_position()[0] < Xmin + avoid_zone || pCell->get_position()[0] > Xmax - avoid_zone )
 	{ near_edge = true; } 
 	
-	if( pCell->position[1] < Ymin + avoid_zone || pCell->position[1] > Ymax - avoid_zone )
+	if( pCell->get_position()[1] < Ymin + avoid_zone || pCell->get_position()[1] > Ymax - avoid_zone )
 	{ near_edge = true; } 
 	
-	if( default_microenvironment_options.simulate_2D == false )
+	if( get_microenvironment_i()->simulate_2D() == false )
 	{
-		if( pCell->position[2] < Zmin + avoid_zone || pCell->position[2] > Zmax - avoid_zone )
+		if( pCell->get_position()[2] < Zmin + avoid_zone || pCell->get_position()[2] > Zmax - avoid_zone )
 		{ near_edge = true; } 
 	}
 	
 	if( near_edge )
 	{
-		pCell->velocity = pCell->position; // move towards origin 
-		pCell->velocity *= avoid_speed; // move towards origin 
+		pCell->get_velocity() = pCell->get_position(); // move towards origin 
+		pCell->get_velocity() *= avoid_speed; // move towards origin 
 	}
 	
 	return; 
@@ -360,7 +360,7 @@ void wrap_boundaries( Cell* pCell )
 	
 	bool wrapped = false; 
 	
-	std::vector<double> p = pCell->position;
+	std::vector<double> p = pCell->get_position();
 	double Delta;
 
 
@@ -499,12 +499,12 @@ void predator_phenotype_function( Cell* pCell, Phenotype& phenotype, double dt )
 		Cell* pC = nearby[i]; 
 		// is it prey ? 
 		
-		if( pC->type == pPreyDef->type )
+		if( pC->get_type() == pPreyDef->type )
 		{
 			bool eat_it = true; 
 			// in range? 
-			std::vector<double> displacement = pC->position; 
-			displacement -= pCell->position; 
+			std::vector<double> displacement = pC->get_position(); 
+			displacement -= pCell->get_position(); 
 			double distance = norm( displacement ); 
 			if( distance > pCell->phenotype.geometry.radius + pC->phenotype.geometry.radius 
 				+ max_detection_distance )

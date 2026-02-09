@@ -194,7 +194,7 @@ std::ostream& operator<<(std::ostream& os, const General_Mesh& mesh)
  return os; 
 }
 
-bool General_Mesh::is_position_valid(double x, double y, double z)
+bool General_Mesh::is_position_valid(double x, double y, double z) const
 {
 	if(x< bounding_box[mesh_min_x_index] || x>bounding_box[mesh_max_x_index])
 		return false;
@@ -289,7 +289,7 @@ void General_Mesh::display_information( std::ostream& os )
 	return; 
 }
 
-void General_Mesh::write_to_matlab( std::string filename )
+void General_Mesh::write_to_matlab( std::string filename ) const
 { 
 	unsigned int number_of_data_entries = voxels.size();
 	unsigned int size_of_each_datum = 3 + 1; // x,y,z, volume 
@@ -596,12 +596,12 @@ void Cartesian_Mesh::create_moore_neighborhood()
 		}
 	}
 }
-unsigned int Cartesian_Mesh::voxel_index( unsigned int i, unsigned int j, unsigned int k )
+unsigned int Cartesian_Mesh::voxel_index( unsigned int i, unsigned int j, unsigned int k ) const
 {
  return ( k*y_coordinates.size() + j )*x_coordinates.size() + i; 
 }
 
-std::vector<unsigned int> Cartesian_Mesh::cartesian_indices( unsigned int n )
+std::vector<unsigned int> Cartesian_Mesh::cartesian_indices( unsigned int n ) const
 {
 	std::vector<unsigned int> out(3, -1 ); 
 
@@ -877,7 +877,7 @@ void Cartesian_Mesh::resize( int x_nodes, int y_nodes, int z_nodes )
 void Cartesian_Mesh::resize_uniform( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx_new )
 { return resize( x_start, x_end, y_start, y_end, z_start, z_end , dx_new, dx_new , dx_new ); }
 
-int Cartesian_Mesh::nearest_voxel_index( std::vector<double>& position )
+int Cartesian_Mesh::nearest_voxel_index( const std::vector<double>& position ) const
 {
 	unsigned int i = (unsigned int) floor( (position[0]-bounding_box[0])/dx ); 
 	unsigned int j = (unsigned int) floor( (position[1]-bounding_box[1])/dy ); 
@@ -897,7 +897,7 @@ int Cartesian_Mesh::nearest_voxel_index( std::vector<double>& position )
 	return ( k*y_coordinates.size() + j )*x_coordinates.size() + i; 
 }
 
-std::vector<unsigned int> Cartesian_Mesh::nearest_cartesian_indices( std::vector<double>& position )
+std::vector<unsigned int> Cartesian_Mesh::nearest_cartesian_indices( const std::vector<double>& position ) const
 {
 	std::vector<unsigned int> out; 
 	out.assign(3, 0 ); 
@@ -919,10 +919,10 @@ std::vector<unsigned int> Cartesian_Mesh::nearest_cartesian_indices( std::vector
 	return out; 
 }
 
-Voxel& Cartesian_Mesh::nearest_voxel( std::vector<double>& position )
+Voxel& Cartesian_Mesh::nearest_voxel( const std::vector<double>& position )
 { return voxels[ nearest_voxel_index( position ) ]; }
 
-void Cartesian_Mesh::display_information( std::ostream& os )
+void Cartesian_Mesh::display_information( std::ostream& os ) const
 {
 	os << std::endl << "Mesh information: " << std::endl;
 	if( uniform_mesh ) 

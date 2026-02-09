@@ -74,6 +74,7 @@
 #include <fstream>
 #include <string> 
 
+#include "./BioFVM/BioFVM.h"
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
@@ -221,7 +222,7 @@ int main( int argc, char* argv[] )
 			for(int n=0; n < all_cells->size(); n++)
 			  {
 			    PhysiCell::Cell* pCell = (*all_cells)[n];
-				std::cout << "Updating " << pCell->ID << " dFBA model bounds" << std::endl;
+				std::cout << "Updating " << pCell->get_ID() << " dFBA model bounds" << std::endl;
 			    update_cell(pCell, pCell->phenotype, diffusion_dt);
 			  }
 			

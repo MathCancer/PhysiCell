@@ -325,11 +325,11 @@ std::vector<std::string> robot_coloring_function( Cell* pCell )
 	static int cargo_ID = find_cell_definition( "cargo cell" )->type; 
 	static int director_ID = find_cell_definition( "director cell" )->type; 
 
-	if( pCell->type == worker_ID )
+	if( pCell->get_type() == worker_ID )
 	{ color = worker_color; }
-	else if( pCell->type == cargo_ID )
+	else if( pCell->get_type() == cargo_ID )
 	{ color = cargo_color; }
-	else if( pCell->type == director_ID )
+	else if( pCell->get_type() == director_ID )
 	{ color = director_color; }
 	else
 	{ color = "white"; } 

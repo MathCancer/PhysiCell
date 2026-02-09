@@ -229,7 +229,7 @@ void setup_tissue( void )
 	for( int n=0; n < (*all_cells).size() ; n++ )
 	{
 		Cell* pC = (*all_cells)[n]; 
-		if( fabs( pC->position[0]) > 450 )
+		if( fabs( pC->get_position()[0]) > 450 )
 		{ set_single_behavior( pC, "is movable" , 0); }
 
 	}

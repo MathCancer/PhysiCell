@@ -66,6 +66,7 @@
 */
 
 #include "./PhysiCell_geometry.h"
+#include "../BioFVM/BioFVM_vector.h"
 
 namespace PhysiCell{
 

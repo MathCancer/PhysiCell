@@ -78,12 +78,9 @@
 #include <unordered_map>
 
 #include "./PhysiCell_pugixml.h"
-#include "../BioFVM/BioFVM.h"
 
 #include "../core/PhysiCell_constants.h" 
 #include "../core/PhysiCell_utilities.h"
-
-using namespace BioFVM; 
 
 namespace PhysiCell{
  	
@@ -231,9 +228,6 @@ extern PhysiCell_Globals PhysiCell_globals;
 extern PhysiCell_Settings PhysiCell_settings; 
 
 extern User_Parameters parameters; 
-
-bool setup_microenvironment_from_XML( pugi::xml_node root_node );
-bool setup_microenvironment_from_XML( void );
 
 }
 

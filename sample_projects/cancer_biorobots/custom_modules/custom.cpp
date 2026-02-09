@@ -321,7 +321,7 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* pCell )
 	static Cell_Definition* pCD_worker = find_cell_definition( "worker cell"); 
 	
 	// cargo cell 
-	if( pCell->type == pCD_cargo->type )
+	if( pCell->get_type() == pCD_cargo->type )
 	{
 		output[0] = "blue";
 		output[1] = "blue";
@@ -331,7 +331,7 @@ std::vector<std::string> cancer_biorobots_coloring_function( Cell* pCell )
 	}
 	
 	// worker cell 
-	if( pCell->type == pCD_worker->type )
+	if( pCell->get_type() == pCD_worker->type )
 	{
 		output[0] = "red";
 		output[1] = "red";
@@ -485,7 +485,7 @@ void cargo_cell_phenotype_rule( Cell* pCell, Phenotype& phenotype, double dt )
 
 void biorobots_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt )
 {
-	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
+	std::vector<double> displacement = pAttachedTo->get_position() - pActingOn->get_position(); 
 	
 	static double max_elastic_displacement = pao.geometry.radius * pao.mechanics.relative_detachment_distance; 
 	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
@@ -498,7 +498,7 @@ void biorobots_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttache
 		return; 
 	}
 	
-	axpy( &(pActingOn->velocity) , pao.mechanics.attachment_elastic_constant , displacement ); 
+	axpy( &(pActingOn->get_velocity()) , pao.mechanics.attachment_elastic_constant , displacement ); 
 	
 	return; 
 }

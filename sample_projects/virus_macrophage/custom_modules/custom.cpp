@@ -116,17 +116,17 @@ void create_cell_types( void )
 		
 	pEpithelial->functions.update_phenotype = epithelial_function;
 	
-	pEpithelial->phenotype.molecular.fraction_released_at_death[ virus_index ] = 
+	pEpithelial->phenotype.molecular.fraction_released_at_death()[ virus_index ] = 
 		parameters.doubles("fraction_released_at_death"); 
-	pEpithelial->phenotype.molecular.fraction_transferred_when_ingested[ virus_index ] = 
+	pEpithelial->phenotype.molecular.fraction_transferred_when_ingested()[ virus_index ] = 
 		parameters.doubles("fraction_transferred_when_ingested"); 
 /*		
-	pEpithelial->phenotype.molecular.fraction_released_at_death[ nInterferon ] = 0;
-	pEpithelial->phenotype.molecular.fraction_transferred_when_ingested[ nInterferon ] = 0; 		
+	pEpithelial->phenotype.molecular.fraction_released_at_death()[ nInterferon ] = 0;
+	pEpithelial->phenotype.molecular.fraction_transferred_when_ingested()[ nInterferon ] = 0; 		
 */		
 	pMacrophage->phenotype.mechanics.cell_cell_adhesion_strength *= parameters.doubles( "macrophage_relative_adhesion" ); 
-	pMacrophage->phenotype.molecular.fraction_released_at_death[ virus_index ]= 0.0; 
-	pMacrophage->phenotype.molecular.fraction_transferred_when_ingested[ virus_index ]= 0.0; 
+	pMacrophage->phenotype.molecular.fraction_released_at_death()[ virus_index ]= 0.0; 
+	pMacrophage->phenotype.molecular.fraction_transferred_when_ingested()[ virus_index ]= 0.0; 
 		
 	pMacrophage->functions.update_phenotype = macrophage_function; 
 	pMacrophage->functions.custom_cell_rule = avoid_boundaries;
@@ -195,7 +195,7 @@ void setup_tissue( void )
 		double x = microenvironment.mesh.bounding_box[0] + UniformRandom() * length_x; 
 		double y = microenvironment.mesh.bounding_box[1] + UniformRandom() * length_y; 
 		pC->assign_position( x,y, 0.0 );
-		pC->phenotype.molecular.internalized_total_substrates[ nVirus ] = 1; 
+		pC->phenotype.molecular.internalized_total_substrates()[ nVirus ] = 1; 
 	}
 
 	int number_of_uninfected_cells = parameters.ints( "number_of_uninfected_cells" ); 
@@ -227,7 +227,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	
 	std::vector<std::string> output = false_cell_coloring_cytometry(pCell); 
 		
-	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
+	if( pCell->phenotype.death.dead == false && pCell->get_type() == 1 )
 	{
 		 output[0] = "black"; 
 		 output[2] = "black"; 
@@ -257,14 +257,14 @@ std::vector<std::string> viral_coloring_function( Cell* pCell )
 		 return output; 
 	}
 	
-	if( pCell->type != pMacrophage->type )
+	if( pCell->get_type() != pMacrophage->type )
 	{
 		output[0] = "blue"; 
 		output[2] = "darkblue"; 
 		
-		double virus = pCell->phenotype.molecular.internalized_total_substrates[nVirus]; 
+		double virus = pCell->phenotype.molecular.internalized_total_substrates()[nVirus]; 
 		
-		if( pCell->phenotype.molecular.internalized_total_substrates[nVirus] >= min_virus )
+		if( pCell->phenotype.molecular.internalized_total_substrates()[nVirus] >= min_virus )
 		{
 			double interp = (virus - min_virus )/ denominator;  
 			if( interp > 1.0 )
@@ -306,14 +306,14 @@ std::vector<std::string> viral_coloring_function_bar( Cell* pCell )
 		 return output; 
 	}
 	
-	if( pCell->type != pMacrophage->type )
+	if( pCell->get_type() != pMacrophage->type )
 	{
 		output[0] = "blue"; 
 		output[2] = "darkblue"; 
 		
-		double virus = pCell->phenotype.molecular.internalized_total_substrates[nVirus]; 
+		double virus = pCell->phenotype.molecular.internalized_total_substrates()[nVirus]; 
 		
-		if( pCell->phenotype.molecular.internalized_total_substrates[nVirus] >= min_virus )
+		if( pCell->phenotype.molecular.internalized_total_substrates()[nVirus] >= min_virus )
 		{
 			double interp = (virus - min_virus )/ denominator;  
 			if( interp > 1.0 )
@@ -386,7 +386,7 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	static double implicit_Euler_constant = 
 		(1.0 + dt * pCell->custom_data["virus_digestion_rate"] );
-	phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
+	phenotype.molecular.internalized_total_substrates()[nVirus] /= implicit_Euler_constant; 
 	
 	// check for contact with a cell
 	
@@ -398,11 +398,11 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 	{
 		pTestCell = neighbors[n]; 
 		// if it is not me and not a macrophage 
-		if( pTestCell != pCell && pTestCell->type != pMacrophage->type )
+		if( pTestCell != pCell && pTestCell->get_type() != pMacrophage->type )
 		{
 			// calculate distance to the cell 
-			std::vector<double> displacement = pTestCell->position;
-			displacement -= pCell->position;
+			std::vector<double> displacement = pTestCell->get_position();
+			displacement -= pCell->get_position();
 			double distance = norm( displacement ); 
 			
 			double max_distance = pCell->phenotype.geometry.radius + 
@@ -412,7 +412,7 @@ void macrophage_function( Cell* pCell, Phenotype& phenotype, double dt )
 			// if it is not a macrophage, test for viral load 
 			// if high viral load, eat it. 
 		
-			if( pTestCell->phenotype.molecular.internalized_total_substrates[nVirus] 
+			if( pTestCell->phenotype.molecular.internalized_total_substrates()[nVirus] 
 				> pCell->custom_data["min_virion_detection_threshold"] &&
 				distance < max_distance )
 			{
@@ -435,7 +435,7 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	// compare against viral load. Should I commit apoptosis? 
 	
-	double virus = phenotype.molecular.internalized_total_substrates[nVirus]; 
+	double virus = phenotype.molecular.internalized_total_substrates()[nVirus]; 
 	if( virus >= pCell->custom_data["burst_virion_count"] )
 	{
 		std::cout << "\t\tburst!" << std::endl; 
@@ -450,17 +450,17 @@ void epithelial_function( Cell* pCell, Phenotype& phenotype, double dt )
 	{
 		double new_virus = pCell->custom_data["viral_replication_rate"]; 
 		new_virus *= dt;
-		phenotype.molecular.internalized_total_substrates[nVirus] += new_virus; 
+		phenotype.molecular.internalized_total_substrates()[nVirus] += new_virus; 
 	}
 	
 	if( virus >= pCell->custom_data["virion_threshold_for_interferon"] )
 	{
-		phenotype.secretion.secretion_rates[nInterferon] = pCell->custom_data["max_interferon_secretion_rate"];
+		phenotype.secretion.secretion_rates()[nInterferon] = pCell->custom_data["max_interferon_secretion_rate"];
 	}
 	
 //	static double implicit_Euler_constant = 
 //		(1.0 + dt * pCell->custom_data["virus_digestion_rate"] );
-//	phenotype.molecular.internalized_total_substrates[nVirus] /= implicit_Euler_constant; 
+//	phenotype.molecular.internalized_total_substrates()[nVirus] /= implicit_Euler_constant; 
 	
 	
 	// if I have too many 
@@ -485,7 +485,10 @@ std::vector<double> integrate_total_substrates( void )
 	for( unsigned int n=0; n < (*all_cells).size(); n++ )
 	{
 		Cell* pC = (*all_cells)[n];
-		out += pC->phenotype.molecular.internalized_total_substrates;
+		for ( int i=0 ; i < get_microenvironment_i()->number_of_densities() ; i++ )
+		{
+			out[i] += pC->phenotype.molecular.internalized_total_substrates()[i];
+		}
 	}
 	
 	return out; 
@@ -507,22 +510,22 @@ void avoid_boundaries( Cell* pCell )
 	
 	// near edge: 
 	bool near_edge = false; 
-	if( pCell->position[0] < Xmin + avoid_zone || pCell->position[0] > Xmax - avoid_zone )
+	if( pCell->get_position()[0] < Xmin + avoid_zone || pCell->get_position()[0] > Xmax - avoid_zone )
 	{ near_edge = true; } 
 	
-	if( pCell->position[1] < Ymin + avoid_zone || pCell->position[1] > Ymax - avoid_zone )
+	if( pCell->get_position()[1] < Ymin + avoid_zone || pCell->get_position()[1] > Ymax - avoid_zone )
 	{ near_edge = true; } 
 	
-	if( default_microenvironment_options.simulate_2D == false )
+	if( get_microenvironment_i()->simulate_2D() == false )
 	{
-		if( pCell->position[2] < Zmin + avoid_zone || pCell->position[2] > Zmax - avoid_zone )
+		if( pCell->get_position()[2] < Zmin + avoid_zone || pCell->get_position()[2] > Zmax - avoid_zone )
 		{ near_edge = true; } 
 	}
 	
 	if( near_edge )
 	{
-		pCell->velocity = pCell->position; // move towards origin 
-		pCell->velocity *= avoid_speed; // move towards origin 
+		pCell->get_velocity() = pCell->get_position(); // move towards origin 
+		pCell->get_velocity() *= avoid_speed; // move towards origin 
 	}
 	
 	return; 

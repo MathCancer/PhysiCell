@@ -309,7 +309,7 @@ void PhysiMeSS_Cell_Custom_Degrade::degrade_fibre(PhysiMeSS_Fibre* pFibre)
 {
 	// Here this version of the degrade function takes cell pressure into account in the degradation rate
     double distance = 0.0;
-    pFibre->nearest_point_on_fibre(position, displacement);
+    pFibre->nearest_point_on_fibre(get_position(), displacement);
     for (int index = 0; index < 3; index++) {
         distance += displacement[index] * displacement[index];
     }

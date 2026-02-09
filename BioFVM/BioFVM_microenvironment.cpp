@@ -47,11 +47,15 @@
 */
 
 #include "BioFVM_microenvironment.h"
+#include "BioFVM_basic_agent.h"
+#include "BioFVM_basic_agent_interface.h"
 #include "BioFVM_solvers.h"
 #include "BioFVM_vector.h"
 #include <cmath>
 
 #include "BioFVM_basic_agent.h"
+#include "../modules/PhysiCell_pugixml.h"
+#include "../core/PhysiCell_utilities.h"
 
 namespace BioFVM{
 
@@ -245,13 +249,13 @@ void Microenvironment::set_substrate_dirichlet_activation( int index, std::vecto
 }
 
 
-bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index )
+bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index ) const
 {
 	return dirichlet_activation_vector[substrate_index]; 
 }
 
 // TODO? fix confusing swapped usage of args
-double Microenvironment::get_substrate_dirichlet_value( int substrate_index, int index )
+double Microenvironment::get_substrate_dirichlet_value( int substrate_index, int index ) const
 { 
 	return dirichlet_value_vectors[index][substrate_index];
 }  
@@ -264,7 +268,7 @@ void Microenvironment::set_substrate_dirichlet_activation( int substrate_index ,
 	return; 
 }
 
-bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index, int index )
+bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index, int index ) const
 { return dirichlet_activation_vectors[index][substrate_index]; }
 
 
@@ -478,14 +482,14 @@ void Microenvironment::add_density( void )
 	return add_density( "unnamed" , "none" );
 }
 
-void Microenvironment::add_density( std::string name , std::string units )
+void Microenvironment::add_density( const std::string& name , const std::string& units )
 {
 	// fix in PhysiCell preview November 2017 
 	// default_microenvironment_options.use_oxygen_as_first_field = false; 
 	return add_density( name , units , 0.0 , 0.0 );
 }
 
-void Microenvironment::add_density( std::string name , std::string units, double diffusion_constant, double decay_rate )
+void Microenvironment::add_density( const std::string& name , const std::string& units, double diffusion_constant, double decay_rate )
 {
 	// check if density exist
 	if ( find_density_index( name ) != -1 )
@@ -559,7 +563,7 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	return; 
 }
 
-int Microenvironment::find_density_index( std::string name )
+int Microenvironment::find_density_index( const std::string& name ) const
 {
 	for( unsigned int i=0; i < density_names.size() ; i++ )
 	{
@@ -569,7 +573,7 @@ int Microenvironment::find_density_index( std::string name )
 	return -1; 
 }
 
-void Microenvironment::set_density( int index , std::string name , std::string units )
+void Microenvironment::set_density( int index , const std::string& name , const std::string& units )
 {
 	// fix in PhysiCell preview November 2017 
 	if( index == 0 )
@@ -580,7 +584,7 @@ void Microenvironment::set_density( int index , std::string name , std::string u
 	return; 
 }
 
-void Microenvironment::set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate )
+void Microenvironment::set_density( int index , const std::string& name , const std::string& units , double diffusion_constant , double decay_rate )
 {
 	// fix in PhysiCell preview November 2017 
 	if( index == 0 )
@@ -594,29 +598,29 @@ void Microenvironment::set_density( int index , std::string name , std::string u
 	return; 
 }
 
-int Microenvironment::voxel_index( int i, int j, int k )
+int Microenvironment::voxel_index( int i, int j, int k ) const
 { return mesh.voxel_index(i,j,k) ; }
 
-std::vector<unsigned int> Microenvironment::cartesian_indices( int n )
+std::vector<unsigned int> Microenvironment::cartesian_indices( int n ) const
 { return mesh.cartesian_indices( n ); }
 
-int Microenvironment::nearest_voxel_index( std::vector<double>& position )
+int Microenvironment::nearest_voxel_index( const std::vector<double>& position ) const
 { return mesh.nearest_voxel_index( position ); }
 
 Voxel& Microenvironment::voxels( int voxel_index )
 { return mesh.voxels[voxel_index]; }
 
-std::vector<unsigned int> Microenvironment::nearest_cartesian_indices( std::vector<double>& position )
+std::vector<unsigned int> Microenvironment::nearest_cartesian_indices( const std::vector<double>& position ) const
 { return mesh.nearest_cartesian_indices( position ); }
  
-Voxel& Microenvironment::nearest_voxel( std::vector<double>& position )
+Voxel& Microenvironment::nearest_voxel( const std::vector<double>& position )
 { return mesh.nearest_voxel( position ); }
 
-std::vector<double>& Microenvironment::nearest_density_vector( std::vector<double>& position )
-{ return (*p_density_vectors)[ mesh.nearest_voxel_index( position ) ]; }
+double* Microenvironment::nearest_density_vector( const std::vector<double>& position )
+{ return (*p_density_vectors)[ mesh.nearest_voxel_index( position ) ].data(); }
 
-std::vector<double>& Microenvironment::nearest_density_vector( int voxel_index )
-{ return (*p_density_vectors)[ voxel_index ]; }
+double* Microenvironment::nearest_density_vector( int voxel_index )
+{ return (*p_density_vectors)[ voxel_index ].data(); }
 
 std::vector<double>& Microenvironment::operator()( int i, int j, int k )
 { return (*p_density_vectors)[ voxel_index(i,j,k) ]; }
@@ -627,14 +631,14 @@ std::vector<double>& Microenvironment::operator()( int i, int j )
 std::vector<double>& Microenvironment::operator()( int n )
 { return (*p_density_vectors)[ n ]; }
 
-std::vector<double>& Microenvironment::density_vector( int i, int j, int k )
-{ return (*p_density_vectors)[ voxel_index(i,j,k) ]; }
+double* Microenvironment::density_vector( int i, int j, int k )
+{ return (*p_density_vectors)[ voxel_index(i,j,k) ].data(); }
 
-std::vector<double>& Microenvironment::density_vector( int i, int j )
-{ return (*p_density_vectors)[ voxel_index(i,j,0) ]; }
+double* Microenvironment::density_vector( int i, int j )
+{ return (*p_density_vectors)[ voxel_index(i,j,0) ].data(); }
 
-std::vector<double>& Microenvironment::density_vector( int n )
-{ return (*p_density_vectors)[ n ]; }
+double* Microenvironment::density_vector( int n )
+{ return (*p_density_vectors)[ n ].data(); }
 
 void Microenvironment::simulate_diffusion_decay( double dt )
 {
@@ -662,7 +666,7 @@ void Microenvironment::auto_choose_diffusion_decay_solver( void )
 
 }
  
-void Microenvironment::display_information( std::ostream& os )
+void Microenvironment::display_information( std::ostream& os ) const
 {
 	os << std::endl << "Microenvironment summary: " << name << ": " << std::endl; 
 	mesh.display_information( os ); 
@@ -692,13 +696,13 @@ void Microenvironment::display_information( std::ostream& os )
 	return; 
 }
 	
-unsigned int Microenvironment::number_of_densities( void )
+unsigned int Microenvironment::number_of_densities( void ) const
 { return (*p_density_vectors)[0].size(); }
 
-unsigned int Microenvironment::number_of_voxels( void )
+unsigned int Microenvironment::number_of_voxels( void ) const
 { return mesh.voxels.size(); }
 
-unsigned int Microenvironment::number_of_voxel_faces( void )
+unsigned int Microenvironment::number_of_voxel_faces( void ) const
 { return mesh.voxel_faces.size(); } 
 
 void Microenvironment::write_to_matlab( std::string filename )
@@ -761,10 +765,11 @@ void Microenvironment::simulate_bulk_sources_and_sinks( double dt )
 
 void Microenvironment::simulate_cell_sources_and_sinks( std::vector<Basic_Agent*>& basic_agent_list , double dt )
 {
+	auto itf_agent_list = (std::vector<Basic_Agent_Interface*>&) basic_agent_list;
 	#pragma omp parallel for
-	for( long long i=0 ; i < basic_agent_list.size() ; i++ )
+	for( long long i=0 ; i < itf_agent_list.size() ; i++ )
 	{		
-		basic_agent_list[i]->simulate_secretion_and_uptake( this , dt ); 
+		itf_agent_list[i]->simulate_secretion_and_uptake( dt ); 
 	}
 	
 	return; 
@@ -832,7 +837,7 @@ std::vector<gradient>& Microenvironment::gradient_vector(int n )
 	return gradient_vectors[n];
 }
 	
-std::vector<gradient>& Microenvironment::nearest_gradient_vector( std::vector<double>& position )
+std::vector<gradient>& Microenvironment::nearest_gradient_vector( const std::vector<double>& position )
 {
 	int n = nearest_voxel_index( position );
 	if( gradient_vector_computed[n] == false )
@@ -1222,7 +1227,7 @@ void set_microenvironment_initial_condition( void )
 	else // do what was done before
 	{
 		for (unsigned int n = 0; n < microenvironment.number_of_voxels(); n++)
-		{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
+		{ microenvironment(n) = default_microenvironment_options.initial_condition_vector; }
 	}
 
 	// now, figure out which sides have BCs (for at least one substrate): 
@@ -1572,4 +1577,516 @@ void get_row_from_substrate_initial_condition_csv(std::vector<int> &voxel_set, c
 	}
 	voxel_set.push_back(voxel_ind);
 }
+
+using namespace PhysiCell;
+
+bool setup_microenvironment_from_XML_node( pugi::xml_node root_node )
+{
+	pugi::xml_node node; 
+
+	// First, look for the correct XML node. 
+	// If it isn't there, return false. 
+	
+	node = xml_find_node( root_node , "microenvironment_setup" );
+	if( !node )
+	{ return false; }
+
+	// now that we're using the XML to specify the microenvironment, don't 
+	// use old defaults 
+	
+	// Don't let BioFVM use oxygen as the default 
+	
+	default_microenvironment_options.use_oxygen_as_first_field = false; 
+
+	std::vector<double> initial_condition_vector = {}; 
+	std::vector<double> Dirichlet_condition_vector = {}; 
+	std::vector<bool> Dirichlet_activation_vector = {}; 
+
+	std::vector<bool> Dirichlet_all = {}; 
+	std::vector<bool> Dirichlet_xmin = {}; 
+	std::vector<bool> Dirichlet_xmax = {}; 
+	std::vector<bool> Dirichlet_ymin = {}; 
+	std::vector<bool> Dirichlet_ymax = {}; 
+	std::vector<bool> Dirichlet_zmin = {}; 
+	std::vector<bool> Dirichlet_zmax = {}; 
+
+	std::vector<double> Dirichlet_xmin_values = {}; 
+	std::vector<double> Dirichlet_xmax_values = {}; 
+	std::vector<double> Dirichlet_ymin_values = {}; 
+	std::vector<double> Dirichlet_ymax_values = {}; 
+	std::vector<double> Dirichlet_zmin_values = {}; 
+	std::vector<double> Dirichlet_zmax_values = {}; 
+	std::vector<double> Dirichlet_interior_values = {}; 
+
+
+	// next, add all the substrates to the microenvironment
+	// build the initial conditions and Dirichlet conditions as we go 
+
+	// find the first substrate 
+	pugi::xml_node node1 = node.child( "variable" ); // xml_find_node( node , "variable" ); 
+	node = node1; 
+	int i = 0; 
+	
+	bool activated_Dirichlet_boundary_detected = false; 
+	
+	while( node )
+	{
+		// get the name and units 
+		std::string name = node.attribute( "name" ).value(); 
+		std::string units = node.attribute( "units" ).value(); 
+		
+		// add the substrate 
+		if( i == 0 )
+		{ microenvironment.set_density( 0, name, units ); }
+		else
+		{ microenvironment.add_density( name, units ); }
+		
+		// get the diffusion and decay parameters 
+		node1 = xml_find_node( node, "physical_parameter_set" ); 
+		
+		microenvironment.diffusion_coefficients[i] = 
+			xml_get_double_value( node1, "diffusion_coefficient" ); 
+		microenvironment.decay_rates[i] = 
+			xml_get_double_value( node1, "decay_rate" ); 
+			
+		// now, get the initial value  
+		node1 = xml_find_node( node, "initial_condition" ); 
+		initial_condition_vector.push_back( xml_get_my_double_value(node1) );
+		
+		// now, get the Dirichlet value
+		node1 = xml_find_node( node, "Dirichlet_boundary_condition" ); 
+		Dirichlet_condition_vector.push_back( xml_get_my_double_value(node1) );
+
+		// now, decide whether or not to enable it 
+		Dirichlet_activation_vector.push_back( node1.attribute("enabled").as_bool() );
+
+		Dirichlet_all.push_back( Dirichlet_activation_vector[i] ); 
+		if( Dirichlet_activation_vector[i] )
+		{ activated_Dirichlet_boundary_detected = true; }
+		
+		// default interior activation will mirror the boundary 
+		
+		Dirichlet_xmin.push_back( Dirichlet_activation_vector[i] ); 
+		Dirichlet_xmax.push_back( Dirichlet_activation_vector[i] ); 
+		Dirichlet_ymin.push_back( Dirichlet_activation_vector[i] ); 
+		Dirichlet_ymax.push_back( Dirichlet_activation_vector[i] ); 
+		Dirichlet_zmin.push_back( Dirichlet_activation_vector[i] ); 
+		Dirichlet_zmax.push_back( Dirichlet_activation_vector[i] ); 
+		
+		Dirichlet_xmin_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_xmax_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_ymin_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_ymax_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_zmin_values.push_back( Dirichlet_condition_vector[i] ); 
+		Dirichlet_zmax_values.push_back( Dirichlet_condition_vector[i] ); 
+		
+		// now figure out finer-grained controls 
+		
+		node1 = node.child( "Dirichlet_options" );
+		if( node1 )
+		{
+			// xmin, xmax, ymin, ymax, zmin, zmax, interior 
+			pugi::xml_node node2 = node1.child("boundary_value"); 
+			
+			while( node2 )
+			{
+				// which boundary? 
+				std::string boundary_ID = node2.attribute("ID").value(); 
+				
+				// xmin 
+				if( std::strstr( boundary_ID.c_str() , "xmin" ) )
+				{
+					// on or off 
+					Dirichlet_xmin[i] = node2.attribute("enabled").as_bool();
+					// if there is at least one off bondary here, "all" is false for this substrate 
+					if( node2.attribute("enabled").as_bool() == false )
+					{ Dirichlet_all[i] = false; }
+					
+					// which value 
+					{ Dirichlet_xmin_values[i] = xml_get_my_double_value( node2 ); }
+				}
+				
+				// xmax 
+				if( std::strstr( boundary_ID.c_str() , "xmax" ) )
+				{
+					// on or off 
+					Dirichlet_xmax[i] = node2.attribute("enabled").as_bool();
+					// if there is at least one off bondary here, "all" is false for this substrate 
+					if( node2.attribute("enabled").as_bool() == false )
+					{ Dirichlet_all[i] = false; }
+				
+					// which value 
+					{ Dirichlet_xmax_values[i] = xml_get_my_double_value( node2 ); }
+				}
+				
+				// ymin 
+				if( std::strstr( boundary_ID.c_str() , "ymin" ) )
+				{
+					// on or off 
+					Dirichlet_ymin[i] = node2.attribute("enabled").as_bool();
+					// if there is at least one off bondary here, "all" is false for this substrate 
+					if( node2.attribute("enabled").as_bool() == false )
+					{ Dirichlet_all[i] = false; }
+				
+					// which value 
+					{ Dirichlet_ymin_values[i] = xml_get_my_double_value( node2 ); }
+				}
+				
+				// ymax 
+				if( std::strstr( boundary_ID.c_str() , "ymax" ) )
+				{
+					// on or off 
+					Dirichlet_ymax[i] = node2.attribute("enabled").as_bool();
+					// if there is at least one off bondary here, "all" is false for this substrate 
+					if( node2.attribute("enabled").as_bool() == false )
+					{ Dirichlet_all[i] = false; }					
+					
+					// which value 
+					{ Dirichlet_ymax_values[i] = xml_get_my_double_value( node2 ); }
+				}				
+								
+				// zmin 
+				if( std::strstr( boundary_ID.c_str() , "zmin" ) )
+				{
+					// on or off 
+					Dirichlet_zmin[i] = node2.attribute("enabled").as_bool();
+					// if there is at least one off bondary here, "all" is false for this substrate 
+					if( node2.attribute("enabled").as_bool() == false )
+					{ Dirichlet_all[i] = false; }
+				
+					// which value 
+					{ Dirichlet_zmin_values[i] = xml_get_my_double_value( node2 ); }
+				}
+				
+				// zmax 
+				if( std::strstr( boundary_ID.c_str() , "zmax" ) )
+				{
+					// on or off 
+					Dirichlet_zmax[i] = node2.attribute("enabled").as_bool();
+					// if there is at least one off bondary here, "all" is false for this substrate 
+					if( node2.attribute("enabled").as_bool() == false )
+					{ Dirichlet_all[i] = false; }
+				
+					// which value 
+					{ Dirichlet_zmax_values[i] = xml_get_my_double_value( node2 ); }
+				}
+				
+				node2 = node2.next_sibling("boundary_value"); 
+			}
+		}
+		
+		// now, figure out if individual boundaries are set 
+/*		
+		if( node1.attribute("boundaries") )
+		{
+			std::string option_string = node1.attribute("boundaries").value(); 
+			Dirichlet_all.push_back(false); 
+
+			if( strstr( option_string.c_str() , "xmin" ) )
+			{ Dirichlet_xmin.push_back( true ); }
+			else
+			{ Dirichlet_xmin.push_back( false ); }
+		
+			if( strstr( option_string.c_str() , "xmax" ) )
+			{ Dirichlet_xmax.push_back( true ); }
+			else
+			{ Dirichlet_xmax.push_back( false ); }
+		
+			if( strstr( option_string.c_str() , "ymin" ) )
+			{ Dirichlet_ymin.push_back( true ); }
+			else
+			{ Dirichlet_ymin.push_back( false ); }
+		
+			if( strstr( option_string.c_str() , "ymax" ) )
+			{ Dirichlet_ymax.push_back( true ); }
+			else
+			{ Dirichlet_ymax.push_back( false ); }
+		
+			if( strstr( option_string.c_str() , "zmin" ) )
+			{ Dirichlet_zmin.push_back( true ); }
+			else
+			{ Dirichlet_zmin.push_back( false ); }
+
+			if( strstr( option_string.c_str() , "zmax" ) )
+			{ Dirichlet_zmax.push_back( true ); }
+			else
+			{ Dirichlet_zmax.push_back( false ); }
+		}
+		else
+		{	
+			Dirichlet_all.push_back(true); 
+		}
+*/		
+		
+		// move on to the next variable (if any!)
+		node = node.next_sibling( "variable" ); 
+		i++; 
+	}
+
+	// now that all the variables and boundary / initial conditions are defined, 
+	// make sure that BioFVM knows about them 
+
+	default_microenvironment_options.Dirichlet_condition_vector = Dirichlet_condition_vector;  
+	default_microenvironment_options.Dirichlet_activation_vector = Dirichlet_activation_vector;
+	default_microenvironment_options.initial_condition_vector = initial_condition_vector; 
+
+	default_microenvironment_options.Dirichlet_all = Dirichlet_all; 
+	
+	default_microenvironment_options.Dirichlet_xmin = Dirichlet_xmin; 
+	default_microenvironment_options.Dirichlet_xmax = Dirichlet_xmax; 
+	default_microenvironment_options.Dirichlet_ymin = Dirichlet_ymin; 
+	default_microenvironment_options.Dirichlet_ymax = Dirichlet_ymax; 
+	default_microenvironment_options.Dirichlet_zmin = Dirichlet_zmin; 
+	default_microenvironment_options.Dirichlet_zmax = Dirichlet_zmax; 
+	
+	default_microenvironment_options.Dirichlet_xmin_values = Dirichlet_xmin_values; 
+	default_microenvironment_options.Dirichlet_xmax_values = Dirichlet_xmax_values; 
+	default_microenvironment_options.Dirichlet_ymin_values = Dirichlet_ymin_values; 
+	default_microenvironment_options.Dirichlet_ymax_values = Dirichlet_ymax_values; 
+	default_microenvironment_options.Dirichlet_zmin_values = Dirichlet_zmin_values; 
+	default_microenvironment_options.Dirichlet_zmax_values = Dirichlet_zmax_values; 
+
+	// because outer boundary Dirichlet conditions are defined in the XML, 
+	// make sure we don't accidentally disable them 
+	
+	default_microenvironment_options.outer_Dirichlet_conditions = false;
+	
+	// if *any* of the substrates have outer Dirichlet conditions enables, 
+	// then set teh outer_Dirichlet_conditions = true; 
+	
+	if( activated_Dirichlet_boundary_detected ) 
+	{
+		default_microenvironment_options.outer_Dirichlet_conditions = true;
+	}
+	
+	std::cout << activated_Dirichlet_boundary_detected << std::endl; 
+	std::cout << "dc? " << default_microenvironment_options.outer_Dirichlet_conditions << std::endl; 
+	
+	// now, get the options 
+	node = xml_find_node( root_node , "microenvironment_setup" );
+	node = xml_find_node( node , "options" ); 
+	
+	// calculate gradients? 
+	default_microenvironment_options.calculate_gradients = xml_get_bool_value( node, "calculate_gradients" ); 
+	
+	// track internalized substrates in each agent? 
+	default_microenvironment_options.track_internalized_substrates_in_each_agent 
+		= xml_get_bool_value( node, "track_internalized_substrates_in_each_agent" );
+
+	node = xml_find_node(node, "initial_condition");
+	if (node)
+	{
+		default_microenvironment_options.initial_condition_from_file_enabled = node.attribute("enabled").as_bool();
+		if (default_microenvironment_options.initial_condition_from_file_enabled)
+		{
+			default_microenvironment_options.initial_condition_file_type = node.attribute("type").as_string();
+			default_microenvironment_options.initial_condition_file = xml_get_string_value(node, "filename");
+
+			copy_file_to_output(default_microenvironment_options.initial_condition_file);
+		}
+	}
+
+	// not yet supported : read initial conditions 
+	/*
+	// read in initial conditions from an external file 
+			<!-- not yet supported --> 
+			<initial_condition type="matlab" enabled="false">
+				<filename>./config/initial.mat</filename>
+			</initial_condition>
+	*/
+	
+	// not yet supported : read Dirichlet nodes (including boundary)
+	/*
+	// Read in Dirichlet nodes from an external file.
+	// Note that if they are defined this way, then 
+	// set 	default_microenvironment_options.outer_Dirichlet_conditions = false;
+	// so that the microenvironment initialization in BioFVM does not 
+	// also add Dirichlet nodes at the outer boundary
+
+			<!-- not yet supported --> 
+			<dirichlet_nodes type="matlab" enabled="false">
+				<filename>./config/dirichlet.mat</filename>
+			</dirichlet_nodes>
+	*/	
+
+		// domain options 
+	
+	node = xml_find_node( root_node , "domain" );
+
+	double xmin = xml_get_double_value( node , "x_min" );
+	double xmax = xml_get_double_value( node , "x_max" );
+	double ymin = xml_get_double_value( node , "y_min" );
+	double ymax = xml_get_double_value( node , "y_max" );
+	double zmin = xml_get_double_value( node , "z_min" );
+	double zmax = xml_get_double_value( node , "z_max" );
+	double dx = xml_get_double_value( node, "dx" ); 
+	double dy = xml_get_double_value( node, "dy" ); 
+	double dz = xml_get_double_value( node, "dz" ); 
+	
+	default_microenvironment_options.simulate_2D = xml_get_bool_value( node, "use_2D" ); 
+
+	if( default_microenvironment_options.simulate_2D == true )
+	{
+		zmin = -0.5 * dz; 
+		zmax = 0.5 * dz; 
+	}			
+	default_microenvironment_options.X_range = {xmin, xmax}; 
+	default_microenvironment_options.Y_range = {ymin, ymax}; 
+	default_microenvironment_options.Z_range = {zmin, zmax}; 
+
+	default_microenvironment_options.dx = dx; 
+	default_microenvironment_options.dy = dy; 
+	default_microenvironment_options.dz = dz; 		
+
+	node = node.parent(); 
+	
+	return true;  
+}
+
+// ============================================================================
+// Interface implementation methods
+// ============================================================================
+
+// Units access
+std::string& Microenvironment::get_time_units()
+{
+	return time_units;
+}
+
+const std::string& Microenvironment::get_time_units() const
+{
+	return time_units;
+}
+
+std::string& Microenvironment::get_spatial_units()
+{
+	return spatial_units;
+}
+
+const std::string& Microenvironment::get_spatial_units() const
+{
+	return spatial_units;
+}
+
+std::string& Microenvironment::get_name()
+{
+	return name;
+}
+
+const std::string& Microenvironment::get_name() const
+{
+	return name;
+}
+
+// Mesh access
+const Cartesian_Mesh& Microenvironment::get_mesh() const
+{
+	return mesh;
+}
+
+Cartesian_Mesh& Microenvironment::get_mesh()
+{
+	return mesh;
+}
+
+// Agent container access
+Agent_Container* Microenvironment::get_agent_container()
+{
+	return agent_container;
+}
+
+const Agent_Container* Microenvironment::get_agent_container() const
+{
+	return agent_container;
+}
+
+void Microenvironment::set_agent_container(Agent_Container* container)
+{
+	agent_container = container;
+}
+
+// Metadata access
+std::vector<std::string>& Microenvironment::get_density_names()
+{
+	return density_names;
+}
+
+const std::vector<std::string>& Microenvironment::get_density_names() const
+{
+	return density_names;
+}
+
+std::vector<std::string>& Microenvironment::get_density_units()
+{
+	return density_units;
+}
+
+const std::vector<std::string>& Microenvironment::get_density_units() const
+{
+	return density_units;
+}
+
+std::vector<double>& Microenvironment::get_diffusion_coefficients()
+{
+	return diffusion_coefficients;
+}
+
+const double* Microenvironment::get_diffusion_coefficients() const
+{
+	return diffusion_coefficients.data();
+}
+
+std::vector<double>& Microenvironment::get_decay_rates()
+{
+	return decay_rates;
+}
+
+const double* Microenvironment::get_decay_rates() const
+{
+	return decay_rates.data();
+}
+
+// Const overloads for voxel/position access
+const Voxel& Microenvironment::voxels(int voxel_index) const
+{
+	return const_cast<Microenvironment*>(this)->voxels(voxel_index);
+}
+
+// Simulation method
+void Microenvironment::simulate_time_step(double dt)
+{
+	simulate_diffusion_decay(dt);
+	simulate_cell_sources_and_sinks(dt);
+}
+
+// Configuration query methods
+bool Microenvironment::simulate_2D() const
+{
+	return default_microenvironment_options.simulate_2D;
+}
+
+bool Microenvironment::calculate_gradients() const
+{
+	return default_microenvironment_options.calculate_gradients;
+}
+
+bool Microenvironment::setup_microenvironment_from_XML(const std::string& filename)
+{
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(filename.c_str());
+	if (!result)
+	{
+		std::cerr << "Error: Could not load XML file " << filename << ": " << result.description() << std::endl;
+		return false;
+	}
+	pugi::xml_node root_node = doc.child("PhysiCell_settings");
+	
+	return setup_microenvironment_from_XML_node(root_node);
+}
+
+void Microenvironment::initialize()
+{
+	initialize_microenvironment();
+}
+
 };

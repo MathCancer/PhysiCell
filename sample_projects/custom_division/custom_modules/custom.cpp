@@ -219,7 +219,7 @@ void custom_division_function( Cell* pCell1, Cell* pCell2 )
 { 
     static int idx_default = find_cell_definition_index("default");
     static int idx_ctype1 = find_cell_definition_index("ctype1");
-    std::cout << __FUNCTION__ << ": " << PhysiCell_globals.current_time << ": cell IDs= " << pCell1->ID << ", " << pCell2->ID << std::endl;
+    std::cout << __FUNCTION__ << ": " << PhysiCell_globals.current_time << ": cell IDs= " << pCell1->get_ID() << ", " << pCell2->get_ID() << std::endl;
 
     // Asymmetric division
     if (UniformRandom() < 0.5)

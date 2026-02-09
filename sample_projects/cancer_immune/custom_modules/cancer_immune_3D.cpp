@@ -78,7 +78,7 @@ void create_immune_cell_type( void )
 	
 	// reduce o2 uptake 
 	
-	pImmuneCell->phenotype.secretion.uptake_rates[oxygen_ID] *= 
+	pImmuneCell->phenotype.secretion.uptake_rates()[oxygen_ID] *= 
 		parameters.doubles("immune_o2_relative_uptake");  
 	
 	pImmuneCell->phenotype.mechanics.cell_cell_adhesion_strength *= 
@@ -200,7 +200,7 @@ void introduce_immune_cells( void )
 	// for the loop, deal with the (faster) norm squared 
 	for( int i=0; i < (*all_cells).size() ; i++ )
 	{
-		temp_radius = norm_squared( (*all_cells)[i]->position ); 
+		temp_radius = norm_squared( (*all_cells)[i]->get_position() ); 
 		if( temp_radius > tumor_radius )
 		{ tumor_radius = temp_radius; }
 	}
@@ -341,7 +341,7 @@ void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& p
 	static int immune_factor_index = microenvironment.find_density_index( "immunostimulatory factor" ); 
 	double o2 = pCell->nearest_density_vector()[o2_index];	
 
-	phenotype.secretion.secretion_rates[immune_factor_index] = 10.0; 
+	phenotype.secretion.secretion_rates()[immune_factor_index] = 10.0; 
 	
 	update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
 	
@@ -349,7 +349,7 @@ void tumor_cell_phenotype_with_and_immune_stimulation( Cell* pCell, Phenotype& p
 	// set it to secrete the immunostimulatory factor 
 	if( phenotype.death.dead == true )
 	{
-		phenotype.secretion.secretion_rates[immune_factor_index] = 10; 
+		phenotype.secretion.secretion_rates()[immune_factor_index] = 10; 
 		pCell->functions.update_phenotype = NULL; 		
 		return; 
 	}
@@ -367,7 +367,7 @@ std::vector<std::string> cancer_immune_coloring_function( Cell* pCell )
 	// immune are black
 	std::vector< std::string > output( 4, "black" ); 
 	
-	if( pCell->type == 1 )
+	if( pCell->get_type() == 1 )
 	{ 
 		output[0] = "lime";
 		output[1] = "lime";
@@ -570,7 +570,7 @@ bool immune_cell_attempt_attachment( Cell* pAttacker, Cell* pTarget , double dt 
 	
 	if( pTarget->custom_data[oncoprotein_i] > oncoprotein_threshold && pTarget->phenotype.death.dead == false )
 	{
-		std::vector<double> displacement = pTarget->position - pAttacker->position;
+		std::vector<double> displacement = pTarget->get_position() - pAttacker->get_position();
 		double distance_scale = norm( displacement ); 
 		if( distance_scale > max_attachment_distance )
 		{ return false; } 
@@ -700,7 +700,7 @@ void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
 
 void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttachedTo, Phenotype& pat , double dt )
 {
-	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
+	std::vector<double> displacement = pAttachedTo->get_position() - pActingOn->get_position();
 	
 	static double max_elastic_displacement = pao.geometry.radius * pao.mechanics.relative_detachment_distance; 
 	static double max_displacement_squared = max_elastic_displacement*max_elastic_displacement; 
@@ -713,7 +713,7 @@ void adhesion_contact_function( Cell* pActingOn, Phenotype& pao, Cell* pAttached
 		return; 
 	}
 	
-	axpy( &(pActingOn->velocity) , pao.mechanics.attachment_elastic_constant , displacement ); 
+	axpy( &(pActingOn->get_velocity()) , pao.mechanics.attachment_elastic_constant , displacement ); 
 	
 	return; 
 }
