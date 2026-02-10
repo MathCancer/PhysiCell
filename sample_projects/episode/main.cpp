@@ -141,7 +141,8 @@ int main( int argc, char* argv[] )
 			// setup microenviroment and mechanics voxel size and match the data structure to BioFVM
 			std::cout << "set densities ..." << std::endl;
 			setup_microenvironment();  // modify this in the custom code
-			double mechanics_voxel_size = 30;
+            double mechanics_voxel_size = PhysiCell_settings.mechanics_voxel_size; 
+	        std::cout << "Setting mechanics voxel size= " << mechanics_voxel_size << std::endl;
 			Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 
 			// load cell type definition and setup tisse
