@@ -157,6 +157,7 @@ extern double diffusion_dt;
 extern double mechanics_dt;
 extern double phenotype_dt;
 extern double intracellular_dt;
+extern double mechanics_voxel_size;
 
 
 extern std::unordered_map<std::string,int> cycle_model_codes;
