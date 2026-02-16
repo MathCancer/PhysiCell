@@ -946,15 +946,17 @@ void Cell::update_voxel_in_container()
 			container->add_agent_to_voxel(this, updated_current_mechanics_voxel_index);
 		}
 		current_mechanics_voxel_index=updated_current_mechanics_voxel_index;
+
+		// Update max_cell_interactive_distance_in_voxel if needed
+		if( get_container()->max_cell_interactive_distance_in_voxel[current_mechanics_voxel_index] < 
+			phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+		{
+			get_container()->max_cell_interactive_distance_in_voxel[current_mechanics_voxel_index] = phenotype.geometry.radius
+				* phenotype.mechanics.relative_maximum_adhesion_distance;
+		}
 	}
 
-	// Update max_cell_interactive_distance_in_voxel if needed
-	if( get_container()->max_cell_interactive_distance_in_voxel[current_mechanics_voxel_index] < 
-		phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
-	{
-		get_container()->max_cell_interactive_distance_in_voxel[current_mechanics_voxel_index] = phenotype.geometry.radius
-			* phenotype.mechanics.relative_maximum_adhesion_distance;
-	}
+	
 	
 	return; 
 }
