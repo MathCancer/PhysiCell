@@ -127,17 +127,17 @@ jobs:
           {short_name: "episode", project: "episode-sample", name: "PhysiCell Episode", binary: "project", extra_run: ""},
        ]
     
-    runs-on: macos-13
+    runs-on: macos-15-intel
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Install dependencies
       run : |
-        if ! brew list gcc@13 &>/dev/null; then
-          brew install gcc@13
+        if ! brew list gcc@14 &>/dev/null; then
+          brew install gcc@14
         else
-          echo "gcc@13 is already installed."
+          echo "gcc@14 is already installed."
         fi
       
     - name: Build ${{ matrix.projects.name }} project
@@ -146,15 +146,15 @@ jobs:
         make ${{ matrix.projects.project }}
         make clean
         ${{ matrix.projects.extra_run }}
-        make PHYSICELL_CPP=g++-13 static
-        cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos13
+        make PHYSICELL_CPP=g++-14 static
+        cp ${{ matrix.projects.binary }} ${{ matrix.projects.short_name }}_macos_intel
 
     - name: Caching produced project binary 
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/${{ matrix.projects.binary }}_macos13
-        key: ${{ runner.os }}-macos13-${{ github.run_id }}
+          ${{ github.workspace }}/${{ matrix.projects.short_name }}_macos_intel
+        key: ${{ runner.os }}-macos-intel-${{ github.run_id }}
     
     - name: Look at the generated binary
       run: |
@@ -184,10 +184,10 @@ jobs:
 
     - name: Install dependencies
       run : |
-        if ! brew list gcc@13 &>/dev/null; then
-          brew install gcc@13
+        if ! brew list gcc@14 &>/dev/null; then
+          brew install gcc@14
         else
-          echo "gcc@13 is already installed."
+          echo "gcc@14 is already installed."
         fi
       
     - name: Build ${{ matrix.projects.name }} project
@@ -196,15 +196,15 @@ jobs:
         make ${{ matrix.projects.project }}
         make clean
         ${{ matrix.projects.extra_run }}
-        make PHYSICELL_CPP=g++-13 static
-        cp ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macosm1
+        make PHYSICELL_CPP=g++-14 static
+        cp ${{ matrix.projects.binary }} ${{ matrix.projects.short_name }}_macos_arm
    
     - name: Caching produced project binary 
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/${{ matrix.projects.binary }}_macosm1
-        key: ${{ runner.os }}-macosm1-${{ github.run_id }}
+          ${{ github.workspace }}/${{ matrix.projects.short_name }}_macos_arm
+        key: ${{ runner.os }}-macos-arm-${{ github.run_id }}
       
     - name: Look at the generated binary
       run: |
@@ -227,7 +227,7 @@ jobs:
           {short_name: "episode", project: "episode-sample", name: "PhysiCell Episode", binary: "project", extra_run: ""},
         ]
         
-    runs-on: macos-13
+    runs-on: macos-15-intel
     needs: [macos_step0a, macos_step0b]
 
     steps:
@@ -237,20 +237,19 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/${{ matrix.projects.binary }}_macosm1
-        key: ${{ runner.os }}-macosm1-${{ github.run_id }}
+          ${{ github.workspace }}/${{ matrix.projects.short_name }}_macos_arm
+        key: ${{ runner.os }}-macos-arm-${{ github.run_id }}
     
     - name: Caching produced project binary 
       uses: actions/cache@v4
       with:
         path: |
-          ${{ github.workspace }}/${{ matrix.projects.binary }}_macos13
-        key: ${{ runner.os }}-macos13-${{ github.run_id }}
+          ${{ github.workspace }}/${{ matrix.projects.short_name }}_macos_intel
+        key: ${{ runner.os }}-macos-intel-${{ github.run_id }}
     
     - name: Creating universal binary
       run: | 
-        lipo -create -output ${{ matrix.projects.binary }} ${{ matrix.projects.binary }}_macos13 ${{ matrix.projects.binary }}_macosm1
-
+        lipo -create -output ${{ matrix.projects.binary }} ${{ matrix.projects.short_name }}_macos_arm ${{ matrix.projects.short_name }}_macos_intel
     - name: Checking universal binary
       run: |
         lipo -archs ${{ matrix.projects.binary }}

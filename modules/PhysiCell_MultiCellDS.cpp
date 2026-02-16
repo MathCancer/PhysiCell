@@ -1294,4 +1294,923 @@ void write_spring_attached_cells_graph( std::string filename )
 
 	return; 
 }
+
+int resume_from_MultiCellDS(std::string folder_path, std::string xml_filename, bool create_cells, bool debug_print)
+{
+    pugi::xpath_node xpath_node;
+    pugi::xml_node node;
+
+    std::string xml_filepath = folder_path + "/" + xml_filename;
+    std::cout << xml_filepath << std::endl;
+    std::cout << __FUNCTION__ << "   xml_filepath= " << xml_filepath << std::endl;
+
+    pugi::xml_document doc; 
+    if (!doc.load_file(  xml_filepath.c_str()  ) )
+    {
+        std::cout << "Invalid file: " <<  xml_filepath << std::endl;
+        return -1;
+    }
+    // std::cout << "-- successfully read" << std::endl;
+
+    xpath_node = doc.select_node("//metadata//current_time");
+    node = xpath_node.node();
+    if (node)
+    {
+        std::cout << "\n   Success reading current_time\n" << std::endl;
+        PhysiCell_globals.current_time = xml_get_my_double_value(node);
+        std::cout << "--- resetting PhysiCell_globals.current_time " << PhysiCell_globals.current_time  << std::endl;
+    }
+    else
+    {
+        std::cout << " --- Error reading  metadata//current_time\n" << std::endl;
+        return -1;
+    }
+
+    pugi::xml_node microenv_data = doc.child("MultiCellDS").child("microenvironment").child("domain").child("data");
+    if (!microenv_data)
+    {
+        std::cout << "Error parsing microenv data: " << std::endl;
+        return -1;
+    }
+
+    xpath_node = doc.select_node("//microenvironment//domain//data[@type='matlab']");
+    node = xpath_node.node();
+    if (!node)
+    {
+        std::cout << "\n --- Error parsing microenv matlab data\n" << std::endl;
+        return -1;
+    }
+    std::string matlab_name = node.child_value("filename");
+    std::string microenv_mat_filename = folder_path + "/" + matlab_name;
+    // std::cout << "\n--- calling read_microenvironment_from_matlab" << std::endl;
+    bool read_microenv_flag = read_microenvironment_from_matlab( microenv_mat_filename );
+    if (read_microenv_flag )
+    {
+        std::cout << "\n   Success!\n" << std::endl;
+    }
+    else
+    {
+        std::cout << "   Error reading microenv matlab data " << std::endl;
+        return -1;
+    }
+
+    // read/skip over all labels until the last one, damage_repair_rate, so we can parse custom data vars
+    xpath_node = doc.select_node("//cellular_information//cell_populations//custom//simplified_data//labels//label[@index=0]");
+    node = xpath_node.node();
+    if (!node)
+    {
+        std::cout << " --- Error: could not find <label index='0'\n" << std::endl;
+        return -1;
+    }
+
+    while (node)
+    {
+        std::string var_name = xml_get_my_string_value(node);
+        std::cout << " --- var_name=" << var_name << std::endl;
+        if (var_name == "damage_repair_rate")
+        {
+            break;
+        }
+        else
+        {
+            node = node.next_sibling();
+        }
+    }
+    std::string last_var = xml_get_my_string_value(node);
+    std::cout << "last_var= " << last_var << std::endl;
+    if (last_var != "damage_repair_rate")
+    {
+        std::cout << "\n   Error: last var should be 'damage_repair_rate'\n" << std::endl;
+        return -1;
+    }
+
+    // NOTE: even if a custom vector is defined before a custom scalar in the config file .xml,
+    //    they will be reordered in the "output000<#>.xml" to have all scalars followed by vectors
+            // <label index="99" size="1" units="1/min">damage_repair_rate</label>
+            // <label index="100" size="1" units="dimensionless">sample</label>
+            // <label index="101" size="1" units="">dummy</label>
+            // <label index="101" size="1" units="">dummy2</label>
+            // <label index="102" size="3" units="">myvec</label>
+
+    // store the name of the custom data [vector] variable and its size (# of values)
+    std::vector<std::pair<std::string, int>> custom_data_vars;
+    node = node.next_sibling(); // Move to the next sibling
+    while (node) {
+        std::string var = xml_get_my_string_value(node);
+        std::cout << "var: " << var << std::endl;  
+        if (node.attribute("index")) {
+            std::cout << "  index: " << node.attribute("index").value() << std::endl;  
+            int mysize = std::stoi(node.attribute("size").value());  
+            std::cout << "  size: " << mysize << std::endl;  
+            custom_data_vars.push_back({var, mysize});
+        }
+        node = node.next_sibling(); // Move to the next sibling
+    }
+    for (const auto& pair : custom_data_vars) 
+    {
+        std::cout << "name: " << pair.first << ", size: " << pair.second << std::endl;
+    }
+
+
+    std::cout << "\nreading //cellular_information//cell_populations//custom//simplified_data[@type='matlab']//filename" << std::endl;
+    xpath_node = doc.select_node("//cellular_information//cell_populations//custom//simplified_data[@type='matlab']//filename");
+    node = xpath_node.node();
+    if (node)
+    {
+        std::cout << "\n   Success!\n" << std::endl;
+    }
+    else
+    {
+        std::cout << "\n --- Error parsing cellular matlab data\n" << std::endl;
+        return -1;
+    }
+
+    matlab_name = xml_get_my_string_value(node);
+    std::cout << "\n ---> " << matlab_name << std::endl;
+    std::string cells_mat_filename = folder_path + "/" + matlab_name;
+    std::cout << " ---> " << cells_mat_filename << std::endl;
+
+    // pugi::xml_node microenv_data = doc.child("MultiCellDS").child("microenvironment").child("filename").child("data");
+
+    int retval = recreate_sim_state(cells_mat_filename, microenvironment, custom_data_vars, create_cells, debug_print);
+
+    return 0;
+}
+
+int recreate_sim_state(std::string filename, Microenvironment& M,   
+    std::vector<std::pair<std::string, int>> custom_data_vars, bool create_cells, bool debug_print)
+{
+    std::cout << "------- " << __FUNCTION__ << std::endl;
+
+    // Get number of substrates, cell types, death models
+    static int m_densities = microenvironment.number_of_densities();
+    static int n_cell_types = cell_definition_indices_by_name.size();
+    std::cout << "------- number_of_densities= " << m_densities << std::endl;
+    std::cout << "------- number of cell types= " << n_cell_types << std::endl;
+    static int nd = 0; // will be set from first cell
+    
+    // Open the MAT file for reading
+    FILE* fp = fopen(filename.c_str(), "rb");
+    if (fp == NULL)
+    {
+        std::cout << std::endl << "Error: Failed to open " << filename << " for reading." << std::endl << std::endl;
+        return -1;
+    }
+    
+    // Read MATLAB v4 header (5 integers)
+    int32_t header[5];
+    fread(header, sizeof(int32_t), 5, fp);
+    
+    int32_t type = header[0];        // Data type (should be 0 for double)
+    int32_t mrows = header[1];       // Number of rows
+    int32_t ncols = header[2];       // Number of columns
+    int32_t imagf = header[3];       // Imaginary flag (should be 0)
+    int32_t namelen = header[4];     // Length of name + 1
+    
+    // Read variable name
+    char* var_name = new char[namelen];
+    fread(var_name, sizeof(char), namelen, fp);
+    
+    int size_of_each_datum = mrows;
+    int number_of_data_entries = ncols;
+    
+    std::cout << "Reading " << number_of_data_entries << " cells with " 
+              << size_of_each_datum << " data points each..." << std::endl;
+    
+    delete[] var_name;
+    
+    double dTemp;
+    double position[3];
+    int cell_ID, cell_type;
+    double cell_vol;
+    double orientation[3];
+    double velocity[3];
+    double migration_bias_direction[3];
+    double motility_vector[3];
+    double params[10];
+    double *dptr;
+    
+    // Store attack target IDs for later resolution
+    std::vector<int> attack_target_ids;
+    
+    Cell_Definition* pCD; 
+    Cell* pCell;
+    std::vector<std::pair<Cell*, int>> cell_attackID;
+
+    // Read each cell
+    std::cout << "reading cell data..." << std::endl;
+    for (int i = 0; i < number_of_data_entries; i++)
+    {
+        if (debug_print)
+        { std::cout << "\n ------  reading cell # " << i << std::endl; }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        cell_ID = (int)dTemp;
+        if (debug_print)
+        { std::cout << "ID= " << cell_ID << std::endl; }
+        
+        fread(position, sizeof(double), 3, fp);
+        if (debug_print)
+        { std::cout << "pos= " << position[0]<<", "<< position[1] << ", " << position[2] << std::endl; }
+        
+        fread(&cell_vol, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "total vol= " << cell_vol  << std::endl; }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        cell_type = (int)dTemp;
+        if (debug_print)
+        { std::cout << "type= " << cell_type  << std::endl; }
+
+        if (create_cells)
+        {
+            // Cell_Definition* pCD = cell_definitions_by_type[cell_type]; 
+            pCD = cell_definitions_by_type[cell_type];    // rwh: better?
+            pCell = create_cell( *pCD );
+
+            pCell->ID = cell_ID;
+            pCell->type = cell_type;
+            pCell->phenotype.volume.total = cell_vol;
+
+            pCell->assign_position(position[0], position[1], position[2]);
+            pCell->update_voxel_index();
+        }
+        
+        // -------- cycle and phase params
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.cycle.model().code= " << int(dTemp)  << std::endl; }
+
+        if (create_cells)
+        { pCell->phenotype.cycle.model().code = int(dTemp); }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        // std::cout << "phenotype.cycle.current_phase()= " << int(dTemp)  << std::endl;
+        int current_phase_code = int(dTemp);   // used below
+        if (debug_print)
+        {
+            std::cout << "current_phase_code = " << current_phase_code << std::endl;
+            std::cout << "phenotype.cycle.current_phase().code = " << int(dTemp)  << std::endl;
+        }
+        if (create_cells)
+        { pCell->phenotype.cycle.current_phase().code = int(dTemp); }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.cycle.data.elapsed_time_in_phase= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cycle.data.elapsed_time_in_phase = dTemp; }
+        
+
+        // -------- volume params
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.volume.nuclear= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.volume.nuclear = dTemp; }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.volume.cytoplasmic= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.volume.cytoplasmic = dTemp; }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.volume.fluid_fraction= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.volume.fluid_fraction = dTemp; }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.volume.calcified_fraction= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.volume.calcified_fraction = dTemp; }
+        
+
+        // -------- state 
+        fread(orientation, sizeof(double), 3, fp);
+        if (debug_print)
+        { std::cout << "orientation= " << orientation[0]<<", "<<orientation[1]<<", " << orientation[2]  << std::endl; }
+        if (create_cells)
+        {
+            pCell->state.orientation[0] = orientation[0];
+            pCell->state.orientation[1] = orientation[1];
+            pCell->state.orientation[2] = orientation[2];
+        }
+        
+        // -------- geometry 
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.geometry.polarity= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.geometry.polarity = dTemp; }
+        
+
+        fread(velocity, sizeof(double), 3, fp);
+        if (debug_print)
+        { std::cout << "velocity= " << velocity[0]<<", "<<velocity[1]<<", " << velocity[2]  << std::endl; }
+        if (create_cells)
+        {
+            pCell->velocity[0] = velocity[0];
+            pCell->velocity[1] = velocity[1];
+            pCell->velocity[2] = velocity[2];
+        }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "state.simple_pressure= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->state.simple_pressure = dTemp; }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "state.number_of_nuclei= " << (int)dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->state.number_of_nuclei = (int)dTemp; }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "state.total_attack_time= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->state.total_attack_time = dTemp; }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "state.contact_with_basement_membrane= " << bool(dTemp)  << std::endl; }
+        if (create_cells)
+        { pCell->state.contact_with_basement_membrane = (bool)dTemp; }
+        
+
+
+        // cell cycle
+        // e.g., phenotype.cycle.model().find_phase_index( PhysiCell_constants::quiescent )
+        int phase_index = pCell->phenotype.cycle.model().find_phase_index(current_phase_code);
+        if (debug_print)
+        {
+            std::cout << "------ cycle:\n";
+            std::cout << "  --- phase_index =" << phase_index  << std::endl;
+        }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.cycle.data.exit_rate(phase_index)= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cycle.data.exit_rate(phase_index) = dTemp; }
+        
+        // elapsed_time_in_phase (duplicate: rf. https://github.com/MathCancer/PhysiCell/pull/380)
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "phenotype.cycle.data.elapsed_time_in_phase= " << dTemp  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cycle.data.elapsed_time_in_phase = dTemp; }
+        
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        {
+            std::cout << "------ death:\n";
+            std::cout << " phenotype.death.dead= " << int(dTemp)  << std::endl;
+        }
+        if (create_cells)
+        { pCell->phenotype.death.dead = (int)dTemp; } // read bool as int
+        
+        if (debug_print)
+        { std::cout << "------reading phenotype.death.current_death_model_index :\n"; }
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << " phenotype.death.current_death_model_index= " << int(dTemp)  << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.death.current_death_model_index = (int)dTemp; }
+        // std::cout << " -- past current_death_model_index " << std::endl;
+        
+        int ndeath = 2;  // 2 types of death
+        if (create_cells)
+        {
+            pCell->phenotype.death.rates.resize(2);  
+            if (debug_print)
+            { std::cout << " phenotype.death.rates.size()= " <<  pCell->phenotype.death.rates.size()  << std::endl; }
+        }
+        // std::cout << " ndeath= " <<  ndeath  << std::endl;
+        for (int idx=0; idx < ndeath; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << "  phenotype.death.rates[" << idx << "] = " << dTemp  << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.death.rates[idx] = dTemp; }
+        }
+        
+
+        // Volume rates
+        fread(params, sizeof(double), 7, fp);
+        if (debug_print)
+        {
+            std::cout << "------ volume:\n";
+            std::cout << "phenotype.volume.cytoplasmic_biomass_change_rate= " << params[0] << std::endl;
+            std::cout << "phenotype.volume.nuclear_biomass_change_rate= " << params[1] << std::endl;
+            std::cout << "phenotype.volume.fluid_change_rate= " << params[2] << std::endl;
+            std::cout << "phenotype.volume.calcification_rate= " << params[3] << std::endl;
+            std::cout << "phenotype.volume.target_solid_cytoplasmic= " << params[4] << std::endl;
+            std::cout << "phenotype.volume.target_solid_nuclear= " << params[5] << std::endl;
+            std::cout << "phenotype.volume.target_fluid_fraction= " << params[6] << std::endl;
+        }
+        if (create_cells)
+        {
+            pCell->phenotype.volume.cytoplasmic_biomass_change_rate = params[0];
+            pCell->phenotype.volume.nuclear_biomass_change_rate = params[1];
+            pCell->phenotype.volume.fluid_change_rate = params[2];
+            pCell->phenotype.volume.calcification_rate = params[3];
+            pCell->phenotype.volume.target_solid_cytoplasmic = params[4];
+            pCell->phenotype.volume.target_solid_nuclear = params[5];
+            pCell->phenotype.volume.target_fluid_fraction = params[6];
+        }
+
+        
+        // Geometry
+        fread(params, sizeof(double), 3, fp);
+        if (debug_print)
+        {
+            std::cout << "------ geometry:\n";
+            std::cout << "phenotype.geometry.radius= " << params[0] << std::endl;
+            std::cout << "phenotype.geometry.nuclear_radius= " << params[1] << std::endl;
+            std::cout << "phenotype.geometry.surface_area= " << params[2] << std::endl;
+        }
+        if (create_cells)
+        {
+            pCell->phenotype.geometry.radius= params[0];
+            pCell->phenotype.geometry.nuclear_radius= params[1];
+            pCell->phenotype.geometry.surface_area = params[2];
+        }
+        
+        // Mechanics
+        fread(params, sizeof(double), 4, fp);
+        if (debug_print)
+        {
+            std::cout << "------ mechanics:\n";
+            std::cout << "phenotype.mechanics.cell_cell_adhesion_strength= " << params[0] << std::endl;
+            std::cout << "phenotype.mechanics.cell_BM_adhesion_strength= " << params[1] << std::endl;
+            std::cout << "phenotype.mechanics.cell_cell_repulsion_strength= " << params[2] << std::endl;
+            std::cout << "phenotype.mechanics.cell_BM_repulsion_strength= " << params[3] << std::endl;
+        }
+        if (create_cells)
+        {
+            pCell->phenotype.mechanics.cell_cell_adhesion_strength= params[0];
+            pCell->phenotype.mechanics.cell_BM_adhesion_strength= params[1];
+            pCell->phenotype.mechanics.cell_cell_repulsion_strength = params[2];
+            pCell->phenotype.mechanics.cell_BM_repulsion_strength = params[3];
+        }
+
+        // fread(pCell->phenotype.mechanics.cell_adhesion_affinities.data(), sizeof(double), n, fp);  // NOTE
+        if (create_cells)
+        { pCell->phenotype.mechanics.cell_adhesion_affinities.resize(n_cell_types); }
+        for (int idx=0; idx < n_cell_types; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.mechanics.cell_adhesion_affinities[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.mechanics.cell_adhesion_affinities[idx] = dTemp; }
+        }
+
+        // continuation of mechanics params
+        fread(params, sizeof(double), 5, fp);
+        if (debug_print)
+        {
+            std::cout << "pCell->phenotype.mechanics.attachment_elastic_constant = " << params[0] << std::endl;
+            std::cout << "pCell->phenotype.mechanics.attachment_rate = " << params[1] << std::endl;
+            std::cout << "pCell->phenotype.mechanics.detachment_rate = " << params[2] << std::endl;
+            std::cout << "pCell->phenotype.relative_maximum_adhesion_distance = " << params[3] << std::endl;
+            std::cout << "pCell->phenotype.mechanics.maximum_number_of_attachments = " << (int)params[4] << std::endl;
+        }
+        if (create_cells)
+        {
+            pCell->phenotype.mechanics.attachment_elastic_constant = params[0];
+            pCell->phenotype.mechanics.attachment_rate = params[1];
+            pCell->phenotype.mechanics.detachment_rate = params[2];
+            pCell->phenotype.mechanics.relative_maximum_adhesion_distance = params[3];
+            pCell->phenotype.mechanics.maximum_number_of_attachments = (int)params[4];
+        }
+
+        
+        // Motility
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        {
+            std::cout << "------ motility:\n";
+            std::cout << "pCell->phenotype.motility.is_motile = " << (bool)dTemp << std::endl;
+        }
+        if (create_cells)
+        { pCell->phenotype.motility.is_motile = (bool)dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.motility.persistence_time = " << dTemp << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.motility.persistence_time = dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.motility.migration_speed = " << dTemp << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.motility.migration_speed = dTemp; }
+
+        fread(migration_bias_direction, sizeof(double), 3, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.motility.migration_speed = " << migration_bias_direction[0]<<", " <<migration_bias_direction[1] << ", " << migration_bias_direction[2] << std::endl; }
+        if (create_cells)
+        {
+            pCell->phenotype.motility.migration_bias_direction[0] = migration_bias_direction[0];
+            pCell->phenotype.motility.migration_bias_direction[1] = migration_bias_direction[1];
+            pCell->phenotype.motility.migration_bias_direction[2] = migration_bias_direction[2];
+        }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.motility.migration_bias = " << dTemp <<std::endl; }
+        if (create_cells)
+        { pCell->phenotype.motility.migration_bias = dTemp; }
+
+        fread(motility_vector, sizeof(double), 3, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.motility.motility_vector = " << motility_vector[0]<<", " <<motility_vector[1] << ", " << motility_vector[2] << std::endl; }
+        if (create_cells)
+        {
+            pCell->phenotype.motility.motility_vector[0] = motility_vector[0];
+            pCell->phenotype.motility.motility_vector[1] = motility_vector[1];
+            pCell->phenotype.motility.motility_vector[2] = motility_vector[2];
+        }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.motility.chemotaxis_index = " << (int)dTemp <<std::endl; }
+        if (create_cells)
+        { pCell->phenotype.motility.chemotaxis_index = (int)dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.motility.chemotaxis_direction = " << (int)dTemp <<std::endl; }
+        if (create_cells)
+        { pCell->phenotype.motility.chemotaxis_direction = (int)dTemp; }
+
+        // rwh - is this correct?
+        if (create_cells)
+        { pCell->phenotype.motility.chemotactic_sensitivities.resize(m_densities); }
+        for (int idx=0; idx < m_densities; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.motility.chemotactic_sensitivities[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.motility.chemotactic_sensitivities[idx] = dTemp; }
+        }
+        
+        // Secretion
+        if (debug_print)
+        { std::cout << "------ motility:\n"; }
+            
+        // fread(pCell->phenotype.secretion.secretion_rates.data(), sizeof(double), m, fp);
+        if (create_cells)
+        { pCell->phenotype.secretion.secretion_rates.resize(m_densities); }
+        for (int idx=0; idx < m_densities; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.secretion.secretion_rates[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.secretion.secretion_rates[idx] = dTemp; }
+        }
+
+        // fread(pCell->phenotype.secretion.uptake_rates.data(), sizeof(double), m, fp);
+        if (create_cells)
+        { pCell->phenotype.secretion.uptake_rates.resize(m_densities); }
+        for (int idx=0; idx < m_densities; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.secretion.uptake_rates[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.secretion.uptake_rates[idx] = dTemp; }
+        }
+
+        // fread(pCell->phenotype.secretion.saturation_densities.data(), sizeof(double), m, fp);
+        if (create_cells)
+        { pCell->phenotype.secretion.saturation_densities.resize(m_densities); }
+        for (int idx=0; idx < m_densities; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.secretion.saturation_densities[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.secretion.saturation_densities[idx] = dTemp; }
+        }
+
+        // fread(pCell->phenotype.secretion.net_export_rates.data(), sizeof(double), m, fp);
+        if (create_cells)
+        { pCell->phenotype.secretion.net_export_rates.resize(m_densities); }
+
+        for (int idx=0; idx < m_densities; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.secretion.net_export_rates[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.secretion.net_export_rates[idx] = dTemp; }
+        }
+        
+
+        // Molecular
+        if (debug_print)
+        { std::cout << "------ molecular:\n"; }
+        if (create_cells)
+        { pCell->phenotype.molecular.internalized_total_substrates.resize(m_densities); }
+
+        for (int idx=0; idx < m_densities; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.molecular.internalized_total_substrates[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.molecular.internalized_total_substrates[idx] = dTemp; }
+        }
+
+        // fread(pCell->phenotype.molecular.fraction_released_at_death.data(), sizeof(double), m, fp);
+        if (create_cells)
+        { pCell->phenotype.molecular.fraction_released_at_death.resize(m_densities); }
+
+        for (int idx=0; idx < m_densities; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.molecular.fraction_released_at_death[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.molecular.fraction_released_at_death[idx] = dTemp; }
+        }
+
+        // fread(pCell->phenotype.molecular.fraction_transferred_when_ingested.data(), sizeof(double), m, fp);
+        if (create_cells)
+        { pCell->phenotype.molecular.fraction_transferred_when_ingested.resize(m_densities); }
+        for (int idx=0; idx < m_densities; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.molecular.fraction_transferred_when_ingested[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.molecular.fraction_transferred_when_ingested[idx] = dTemp; }
+        }
+        
+
+        // Interactions
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        {
+            std::cout << "------ interactions:\n";
+            std::cout << "pCell->phenotype.cell_interactions.apoptotic_phagocytosis_rate = " << dTemp <<std::endl;
+        }
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.apoptotic_phagocytosis_rate = dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.cell_interactions.necrotic_phagocytosis_rate = " << dTemp <<std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.necrotic_phagocytosis_rate = dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.cell_interactions.other_dead_phagocytosis_rate = " << dTemp <<std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.other_dead_phagocytosis_rate = dTemp; }
+
+        // fread(pCell->phenotype.cell_interactions.live_phagocytosis_rates.data(), sizeof(double), n, fp);
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.live_phagocytosis_rates.resize(n_cell_types); }
+        for (int idx=0; idx < n_cell_types; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.cell_interactions.live_phagocytosis_rates[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.cell_interactions.live_phagocytosis_rates[idx] = dTemp; }
+        }
+
+        // fread(pCell->phenotype.cell_interactions.attack_rates.data(), sizeof(double), n, fp);
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.attack_rates.resize(n_cell_types); }
+        for (int idx=0; idx < n_cell_types; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.cell_interactions.attack_rates[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.cell_interactions.attack_rates[idx] = dTemp; }
+        }
+
+        // fread(pCell->phenotype.cell_interactions.immunogenicities.data(), sizeof(double), n, fp);
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.immunogenicities.resize(n_cell_types); }
+        for (int idx=0; idx < n_cell_types; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.cell_interactions.immunogenicities[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.cell_interactions.immunogenicities[idx] = dTemp; }
+        }
+        
+        // // name = "attack_target"; 
+		// Cell* pTarget = pCell->phenotype.cell_interactions.pAttackTarget; 
+		// int AttackID = -1; 
+		// if( pTarget )
+		// { AttackID = pTarget->ID; }
+		// dTemp = (double) AttackID; 
+		// std::fwrite( &(dTemp) , sizeof(double) , 1 , fp ); 
+ 		// // name = "attack_damage_rate"; 
+		// std::fwrite( &( pCell->phenotype.cell_interactions.attack_damage_rate ) , sizeof(double) , 1 , fp ); 
+ 		// // name = "attack_duration"; 
+		// std::fwrite( &( pCell->phenotype.cell_interactions.attack_duration ) , sizeof(double) , 1 , fp ); 
+ 		// // name = "total_damage_delivered"; 
+		// std::fwrite( &( pCell->phenotype.cell_interactions.total_damage_delivered ) , sizeof(double) , 1 , fp ); 
+
+        // attack_target (stored as ID, need to resolve later as the actual cell pointer)
+        fread(&dTemp, sizeof(double), 1, fp);
+        int attack_target_ID = (int)dTemp;
+        if (debug_print)
+        { std::cout << "------- pCell->phenotype.cell_interactions.pAttackTarget (attack_target ID)= " << attack_target_ID << std::endl; }
+        if (create_cells)
+        {
+            if (attack_target_ID < 0)
+            {
+                pCell->phenotype.cell_interactions.pAttackTarget = NULL;
+            }
+            else
+            {
+                // keep track of this cell and the target cell's ID; resolve later
+                cell_attackID.push_back({pCell, attack_target_ID});
+            }
+        }
+        
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.cell_interactions.attack_damage_rate = " << dTemp << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.attack_damage_rate = dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.cell_interactions.attack_duration = " << dTemp << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.attack_duration = dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.cell_interactions.total_damage_delivered = " << dTemp << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.total_damage_delivered = dTemp; }
+
+
+        // fread(pCell->phenotype.cell_interactions.fusion_rates.data(), sizeof(double), n, fp);
+        
+        // Transformations
+        // fread(pCell->phenotype.cell_transformations.transformation_rates.data(), sizeof(double), n, fp);
+        
+        // Asymmetric division
+        // fread(pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.data(), sizeof(double), n, fp);
+
+        if (create_cells)
+        { pCell->phenotype.cell_interactions.fusion_rates.resize(n_cell_types); }
+        for (int idx=0; idx < n_cell_types; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.cell_interactions.fusion_rates[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.cell_interactions.fusion_rates[idx] = dTemp; }
+        }
+
+        if (create_cells)
+        { pCell->phenotype.cell_transformations.transformation_rates.resize(n_cell_types); }
+        for (int idx=0; idx < n_cell_types; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.cell_transformations.transformation_rates[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.cell_transformations.transformation_rates[idx] = dTemp; }
+        }
+
+        if (create_cells)
+        { pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.resize(n_cell_types); }
+        for (int idx=0; idx < n_cell_types; idx++)
+        {
+            fread(&dTemp, sizeof(double), 1, fp);
+            if (debug_print)
+            { std::cout << " phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[" << idx << "] = " << dTemp << std::endl; }
+            if (create_cells)
+            { pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[idx] = dTemp; }
+        }
+        
+        // Cell integrity
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.cell_integrity.damage= " << dTemp << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cell_integrity.damage = dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.cell_integrity.damage_rate= " << dTemp << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cell_integrity.damage_rate = dTemp; }
+
+        fread(&dTemp, sizeof(double), 1, fp);
+        if (debug_print)
+        { std::cout << "pCell->phenotype.cell_integrity.damage_repair_rate= " << dTemp << std::endl; }
+        if (create_cells)
+        { pCell->phenotype.cell_integrity.damage_repair_rate = dTemp; }
+        
+
+        if (debug_print)
+        { std::cout << "   ----  reading custom data  ----" << std::endl; }
+        for (const auto& pair : custom_data_vars) 
+        {
+            if (pair.second == 1)   // got a custom (scalar) variable
+            {
+                fread(&dTemp, sizeof(double), 1, fp);
+                if (debug_print)
+                { std::cout << "custom var: " << pair.first << " = " << dTemp << std::endl; }
+
+                // find the variable 
+                // int n = pCD->custom_data.find_variable_index( name ); 
+                int idx_var = pCell->custom_data.find_variable_index( pair.first ); 
+                // if it exists, overwrite 
+                if( idx_var > -1 )
+                { 
+                    // pCell->custom_data.variables[idx_var].value = pair.second; 
+                    pCell->custom_data.variables[idx_var].value = dTemp; 
+                    if (debug_print)
+                    { std::cout << "   ----   pCell->custom_data[" << pair.first << "] = " <<pCell->custom_data[pair.first] << std::endl; }
+                }
+                else
+                {
+                    std::cout << __FUNCTION__ << "   Error: got an invalid custom data var name: " << pair.first << " . Exiting! " << std::endl;
+                    std::exit(-1);
+                }
+            }
+
+            else   // got a custom vector variable
+            {
+                for (int jj=0; jj<pair.second; jj++)   // loop over all elms of the vector
+                {
+                    // std::cout << "pair.first << ", size: " << pair.second << std::endl;
+                    fread(&dTemp, sizeof(double), 1, fp);
+                    if (debug_print)
+                    { std::cout << "custom vector var: " << pair.first << "[" << jj << "] = " << dTemp << std::endl; }
+
+                    // find the variable 
+                    // int n = pCD->custom_data.find_variable_index( name ); 
+                    int idx_var = pCell->custom_data.find_vector_variable_index( pair.first ); 
+                    // if it exists, overwrite 
+                    if( idx_var > -1 )
+                    { 
+                        pCell->custom_data.vector_variables[idx_var].value[jj] = pair.second;
+                    }
+                    else
+                    {
+                        std::cout << __FUNCTION__ << "   Error: got an invalid custom data vector name: " << pair.first << " . Exiting! " << std::endl;
+                        std::exit(-1);
+                    }
+                }
+            }
+        }
+    }
+    
+    if (create_cells)
+    {
+        if (debug_print)
+        { std::cout << "----  resolve cell_interactions.pAttackTarget (if any) ----" << std::endl; }
+        // recall:  cell_attackID.push_back({pCell, attack_target_ID});
+        for (const auto& pair : cell_attackID)  // for each pair, find cell with ID
+        {
+            for (auto* cell : *all_cells)   // loop over all cells
+            {
+                if (cell->ID == pair.second)
+                {
+                    (pair.first)->phenotype.cell_interactions.pAttackTarget = cell;
+                    if (debug_print)
+                    { std::cout << "    cell ID=" << (pair.first)->ID << " attacking  cell ID=" << cell->ID << std::endl; }
+                    break;
+                }
+            }
+        }
+
+        std::cout << __FUNCTION__ << "--- (*all_cells).size() = " << (*all_cells).size() << std::endl;
+    }
+
+    fclose(fp);
+    
+    std::cout << __FUNCTION__ << ": read " << number_of_data_entries << " cells from " << filename << std::endl;
+
+    return 0;
+}
 };

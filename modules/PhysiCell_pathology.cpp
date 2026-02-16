@@ -789,6 +789,14 @@ void setup_svg_substrate_colormap(std::vector<std::string> &colormap)
 	std::string map_name = PhysiCell_settings.svg_substrate_colormap;
 	int name_length = map_name.size();
 	bool is_reversed = false;
+	if (name_length < 2)
+	{
+		std::cout << "WARNING: colormap name " << map_name << " is too short. Using default 'YlOrRd' colormap." << std::endl
+				  << "  Check your save//SVG//plot_substrate//colormap element in your configuration file." << std::endl;
+		map_name = "YlOrRd";
+		name_length = map_name.size();
+		PhysiCell_settings.svg_substrate_colormap = map_name;
+	}
 	if (map_name.substr(name_length-2,2)=="_r")
 	{
 		map_name = map_name.substr(0,name_length-2);
