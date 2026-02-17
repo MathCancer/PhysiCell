@@ -1,23 +1,48 @@
 *.asv
 ._.DS_Store
 .DS_Store
-*.exe
 *.o
 addons/libRoadrunner/roadrunner/
 addons/libRoadrunner/roadrunner-win64-vs14-cp35m.zip
 addons/PhysiBoSS/MaBoSS/
 addons/PhysiBoSS/libMaBoSS-*.tar.gz
-biorobots
-cancer_immune_3D
+build/
 config/PhysiCell_settings-backup.xml
-heterogeneity
 initial.svg
-interaction_demo
 Makefile-backup
 pmb_debug.log
-project
 studio_debug.log
 user_projects/*
 !user_projects/empty.txt
 Studio.zip
 /studio
+
+# executables
+/project
+/biorobots
+/cancer_biorobots
+/cancer_immune_3D
+/celltypes3
+/heterogeneity
+/interaction_demo
+/pred_prey
+/virus-sample
+/worm
+/*.exe
+
+# boolean intracellular project executables
+/invasion_model
+/PhysiBoSS_Cell_Lines
+
+# fba intracellular project executables
+/cancer_metabolism
+/ecoli-dfba
+
+# ode intracellular project executables
+/ode_energy
+
+# test project executables
+/time_tests
+/unit_tests
+/test_custom_DCs
+/test_voxel_values

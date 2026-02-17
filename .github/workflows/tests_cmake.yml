@@ -1,0 +1,89 @@
+name: Tests CMake
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Testing ${{ matrix.projects.name }} on ${{ matrix.platform.os }}
+    runs-on: ${{ matrix.platform.os }}
+
+    strategy:
+      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
+      fail-fast: false
+
+      # Set up a matrix to run cross-product of projects and OS/compiler combinations
+      matrix:
+        projects: [
+          {"use_physiboss": false, cwd: "build/sample_projects/template", name: "PhysiCell Template", binary: "template", max_time: 120, config: "config/PhysiCell_settings.xml", validation_output_folder: "output_template"},
+          {"use_physiboss": true, cwd: "build/sample_projects_intracellular/boolean/template_BM", name: "PhysiBoSS Template", binary: "template_BM", max_time: 120, config: "config/PhysiCell_settings.xml", validation_output_folder: "output_template_BM"},
+          {"use_physiboss": true, cwd: "build/sample_projects_intracellular/boolean/physiboss_cell_lines", name: "PhysiBoSS Cell Lines", binary: "physiboss_cell_lines", max_time: 120, config: "config/PhysiCell_settings.xml", validation_output_folder: "output_physiboss-cell-lines-sample"},
+          {"use_physiboss": false, cwd: "build/sample_projects/physimess", name: "PhysiMeSS Sample", binary: "physimess", config: "config/Fibre_Degradation/mymodel_matrix_degradation.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": true, cwd: "build/sample_projects_intracellular/boolean/tutorial", name: "PhysiBoSS Tutorial", binary: "tutorial", config: "config/cell_cycle/PhysiCell_settings.xml", max_time: 300, validation_output_folder: "output_physiboss-tutorial"},
+          {"use_physiboss": false, cwd: "build/sample_projects/worm", name: "PhysiCell worm", binary: "worm", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: "output_worm-sample"},
+          {"use_physiboss": false, cwd: "build/sample_projects/virus_macrophage", name: "Virus Macrophage", binary: "virus_macrophage", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: "output_virus-macrophage-sample"},
+          {"use_physiboss": false, cwd: "build/sample_projects/mechano", name: "PhysiCell Mechano", binary: "mechano", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: "output_mechano-sample"},
+          {"use_physiboss": false, cwd: "build/sample_projects/cancer_biorobots", name: "PhysiCell Cancer Biorobots", binary: "cancer_biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": false, cwd: "build/sample_projects/biorobots", name: "PhysiCell Biorobots", binary: "biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": false, cwd: "build/sample_projects/celltypes3", name: "PhysiCell Celltypes3", binary: "celltypes3", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": false, cwd: "build/sample_projects/custom_division", name: "PhysiCell custom division", binary: "custom_division", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": false, cwd: "build/sample_projects/interactions", name: "PhysiCell interactions", binary: "interactions", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": false, cwd: "build/sample_projects/pred_prey_farmer", name: "PhysiCell prey predator", binary: "pred_prey_farmer", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": false, cwd: "build/sample_projects/rules_sample", name: "PhysiCell rules sample", binary: "rules_sample", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": false, cwd: "build/sample_projects/asymmetric_division", name: "PhysiCell asymmetric division", binary: "asymmetric_division", config: "config/PhysiCell_settings.xml", max_time: 120, validation_output_folder: ""},
+          {"use_physiboss": false, cwd: "build/sample_projects/episode", name: "PhysiCell Episode", binary: "episode", max_time: 120, config: "config/PhysiCell_settings.xml", validation_output_folder: ""},
+        ]
+        platform: [
+          {"os": "windows-latest", "c_compiler": "cl", "cpp_compiler": "cl", "build_physiboss": "OFF"},
+          {"os": "ubuntu-latest", "c_compiler": "gcc", "cpp_compiler": "g++", "build_physiboss": "ON"},
+          {"os": "ubuntu-latest", "c_compiler": "clang", "cpp_compiler": "clang++", "build_physiboss": "ON"},
+          {"os": "macos-latest", "c_compiler": "gcc-15", "cpp_compiler": "g++-15", "build_physiboss": "ON"},
+          # {"os": "macos-latest", "c_compiler": "cc", "cpp_compiler": "c++", "build_physiboss": "ON"},
+        ]
+        exclude:
+          - { projects: { use_physiboss: true }, platform: { build_physiboss: "OFF" } }
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set reusable strings
+      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Install dependencies (Linux)
+      if: matrix.platform.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libomp-dev
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.platform.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.platform.c_compiler }}
+        -DCMAKE_BUILD_TYPE=Release
+        -DPHYSICELL_BUILD_PHYSIBOSS=${{ matrix.platform.build_physiboss }}
+        -S ${{ github.workspace }}
+
+    - name: Build
+      # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config Release --target ${{ matrix.projects.binary }}
+        
+    - name: Run ${{ matrix.projects.name }} project
+      run: |
+        python ${{ github.workspace }}/beta/test_run_sample.py ${{ matrix.platform.os == 'windows-latest' && 'Release/' || '' }}${{ matrix.projects.binary }} ${{ matrix.projects.config }} ${{ matrix.projects.max_time }}
+      working-directory: ${{ matrix.projects.cwd }}
+    
+    - name: Check ${{ matrix.projects.name }} project simulation results
+      if: matrix.projects.validation_output_folder != ''
+      run: |
+        python ${{ github.workspace }}/beta/test_diff_svg.py output ${{ github.workspace }}/tests/cases/${{ matrix.projects.validation_output_folder }}
+      working-directory: ${{ matrix.projects.cwd }}
+      

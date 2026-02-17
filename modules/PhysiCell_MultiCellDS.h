@@ -106,6 +106,9 @@ void write_neighbor_graph( std::string filename );
 void write_attached_cells_graph( std::string filename ); 
 void write_spring_attached_cells_graph( std::string filename ); 
 
+int resume_from_MultiCellDS(std::string folder_path, std::string xml_filename, bool create_cells = true, bool debug_print = false);
+int recreate_sim_state(std::string filename, Microenvironment& M, std::vector<std::pair<std::string, int>> custom_data_vars, bool create_cells, bool debug_print);
+
 };
 
 #endif
