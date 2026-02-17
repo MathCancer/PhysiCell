@@ -240,7 +240,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
 			Cell* pC = (*all_cells)[i]; 
-			if( pC->functions.update_velocity && pC->is_out_of_domain == false && pC->is_movable )
+			if( pC->functions.update_velocity && pC->is_out_of_domain == false )
 			{ pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); }
 		}
 

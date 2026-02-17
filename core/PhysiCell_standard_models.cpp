@@ -645,7 +645,14 @@ void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt
 			pCell->add_potentials(*neighbor);
 		}
 	}
-
+	
+	// Set the velocity to zero if the cell is not movable - This allows non-movable cells have neighbors list and simple_pressure calculated, but not move.
+	if( pCell->is_movable == false )
+	{ 
+		pCell->velocity = {0.0, 0.0, 0.0}; 
+		return;
+	}
+	
 	pCell->update_motility_vector(dt); 
 	pCell->velocity += phenotype.motility.motility_vector; 
 	
