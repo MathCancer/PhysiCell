@@ -1330,67 +1330,6 @@ bool is_neighbor_voxel(Cell* pCell, std::vector<double> my_voxel_center, std::ve
 	return true;
 }
 
-// bool is_neighbor_voxel_original(Cell* pCell, std::vector<double> my_voxel_center, std::vector<double> other_voxel_center, int other_voxel_index)
-// bool is_neighbor_voxel_Claude(Cell* pCell, const std::vector<double>& my_voxel_center, 
-//                        const std::vector<double>& other_voxel_center, int other_voxel_index)
-// {
-//     // Cache frequently used values
-//     const double max_interactive_distance = pCell->phenotype.mechanics.relative_maximum_adhesion_distance * 
-//                                            pCell->phenotype.geometry.radius + 
-//                                            pCell->get_container()->max_cell_interactive_distance_in_voxel[other_voxel_index];
-//     const double max_distance_squared = max_interactive_distance * max_interactive_distance;
-//     const auto& pos = pCell->position;
-    
-//     // Helper lambda to compute squared distance
-//     auto squared_distance = [](double dx, double dy, double dz = 0.0) {
-//         return dx * dx + dy * dy + dz * dz;
-//     };
-    
-//     // Count matching dimensions to determine neighbor type
-//     int matching_dims = 0;
-//     int differing_dim = -1;
-    
-//     for (int i = 0; i < 3; ++i) {
-//         if (my_voxel_center[i] == other_voxel_center[i]) {
-//             matching_dims++;
-//         } else {
-//             differing_dim = i;
-//         }
-//     }
-    
-//     // Case 1: Face neighbor (2 matching dimensions)
-//     if (matching_dims == 2) {
-//         const double surface_coord = 0.5 * (my_voxel_center[differing_dim] + other_voxel_center[differing_dim]);
-//         return std::fabs(pos[differing_dim] - surface_coord) <= max_interactive_distance;
-//     }
-    
-//     // Case 2: Edge neighbor (1 matching dimension)
-//     if (matching_dims == 1) {
-//         int dim1 = -1, dim2 = -1;
-//         for (int i = 0, count = 0; i < 3; ++i) {
-//             if (my_voxel_center[i] != other_voxel_center[i]) {
-//                 if (count == 0) dim1 = i;
-//                 else dim2 = i;
-//                 count++;
-//             }
-//         }
-        
-//         const double line_coord1 = 0.5 * (my_voxel_center[dim1] + other_voxel_center[dim1]);
-//         const double line_coord2 = 0.5 * (my_voxel_center[dim2] + other_voxel_center[dim2]);
-//         const double dist_sq = squared_distance(pos[dim1] - line_coord1, pos[dim2] - line_coord2);
-        
-//         return dist_sq <= max_distance_squared;
-//     }
-    
-//     // Case 3: Corner neighbor (0 matching dimensions)
-//     const double corner_x = 0.5 * (my_voxel_center[0] + other_voxel_center[0]);
-//     const double corner_y = 0.5 * (my_voxel_center[1] + other_voxel_center[1]);
-//     const double corner_z = 0.5 * (my_voxel_center[2] + other_voxel_center[2]);
-//     const double dist_sq = squared_distance(pos[0] - corner_x, pos[1] - corner_y, pos[2] - corner_z);
-    
-//     return dist_sq <= max_distance_squared;
-// }
-
 std::vector<Cell*>& Cell::cells_in_my_container( void )
 {
 	return get_container()->agent_grid[get_current_mechanics_voxel_index()];
