@@ -76,7 +76,6 @@ double mechanics_dt = 0.1;
 double phenotype_dt = 6.0;
 double intracellular_dt = 0.01;
 
-double mechanics_voxel_size = 30.0;
 
 // currently recognized cell cycle models 
 const int PhysiCell_constants::advanced_Ki67_cycle_model= 0;
