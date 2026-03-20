@@ -49,3 +49,8 @@ nbrs= {0: {5, 7, 8, 9, 10}, 2: {9}, 3: {9}, 4: {8, 10, 6}, 5: {0, 10, 7}, 6: {8,
 9: {8, 0, 2, 3}, 10: {0, 8, 4, 5}}
 ``
 -->
+<hr>
+A different scenario is having a fixed cell cycle, but different sizes for mechanics voxel. In this case, we will end up with the same number of cells, but they will likely be positioned differently. Here we are basically using the template model, but no death.
+
+<img src="cell_cycle_fixed.png" width="600" />
+
