@@ -1277,6 +1277,7 @@ Cell_Interactions::Cell_Interactions()
 	immunogenicities = {1}; 
 
 	pAttackTarget = NULL; 
+	attacked_by = std::vector<Cell*>{};
 	total_damage_delivered = 0.0; 
 
 	attack_duration = 30.0; // a typical attack duration for a T cell using perforin/granzyme is ~30 minutes

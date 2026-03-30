@@ -1207,6 +1207,9 @@ void delete_cell( int index )
 	// released internalized substrates (as of 1.5.x releases)
 	pDeleteMe->release_internalized_substrates(); 
 
+	// new Dec 2, 2025
+	pDeleteMe->remove_self_from_attackers(); 
+	
 	// performance goal: don't delete in the middle -- very expensive reallocation
 	// alternative: copy last element to index position, then shrink vector by 1 at the end O(constant)
 
@@ -3433,6 +3436,15 @@ void Cell::remove_all_spring_attachments( void )
 	return; 
 }
 
+void Cell::remove_self_from_attackers( void )
+{
+	for (Cell* pCell : phenotype.cell_interactions.attacked_by) 
+	{	
+		pCell->phenotype.cell_interactions.pAttackTarget = NULL;
+	}
+	phenotype.cell_interactions.attacked_by.clear();
+	return;
+}
 
 void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 {

@@ -698,6 +698,7 @@ class Cell_Interactions
 	double attack_damage_rate;  
 
 	Cell* pAttackTarget; 
+	std::vector<Cell*> attacked_by;
 	double total_damage_delivered; 
 
 	double attack_duration; 

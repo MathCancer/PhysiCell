@@ -238,6 +238,7 @@ class Cell : public Basic_Agent
 	void attach_cell_as_spring( Cell* pAddMe ); // done 
 	void detach_cell_as_spring( Cell* pRemoveMe ); // done 
 	void remove_all_spring_attachments( void ); // done 
+	void remove_self_from_attackers( void ); 
 
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 

@@ -68,6 +68,7 @@
 #include "PhysiCell_standard_models.h" 
 #include "PhysiCell_cell.h" 
 #include "../modules/PhysiCell_pathology.h"
+#include <algorithm>
 
 namespace PhysiCell{
 	
@@ -1267,6 +1268,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 				if( UniformRandom() < probability ) 
 				{				
 					pCell->phenotype.cell_interactions.pAttackTarget = pTarget; 
+					pTarget->phenotype.cell_interactions.attacked_by.push_back(pCell);
 					attacked = true; 
 					/*					
 					std::cout << "*********   *********  ********  start atack **** " << PhysiCell_globals.current_time << std::endl; 
@@ -1345,6 +1347,14 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 				detach_cells_as_spring(pCell,pTarget); 
 
 				pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
+				pTarget->phenotype.cell_interactions.attacked_by.erase( 
+					std::remove(
+						pTarget->phenotype.cell_interactions.attacked_by.begin(), 
+						pTarget->phenotype.cell_interactions.attacked_by.end(),
+						pCell), 
+					pTarget->phenotype.cell_interactions.attacked_by.end() 
+				);
+				
 			} 
 		} 
 
