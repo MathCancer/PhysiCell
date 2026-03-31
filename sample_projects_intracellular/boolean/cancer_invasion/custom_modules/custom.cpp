@@ -129,8 +129,8 @@ void create_cell_types( void )
 	   This is a good place to set custom functions. 
 	*/ 
 
-	cell_defaults.functions.pre_update_intracellular = pre_update_intracellular;
-	cell_defaults.functions.post_update_intracellular = post_update_intracellular;
+	cell_defaults.phenotype.intracellulars[0]->pre_update_intracellular = pre_update_intracellular;
+	cell_defaults.phenotype.intracellulars[0]->post_update_intracellular = post_update_intracellular;
 	
 	cell_defaults.functions.update_phenotype = phenotype_function; 
 	cell_defaults.functions.custom_cell_rule = custom_function; 
@@ -138,15 +138,15 @@ void create_cell_types( void )
 
 	Cell_Definition* pCD = find_cell_definition( "epithelial");
 
-	pCD->functions.pre_update_intracellular = pre_update_intracellular;
-	pCD->functions.post_update_intracellular = post_update_intracellular;
+	pCD->phenotype.intracellulars[0]->pre_update_intracellular = pre_update_intracellular;
+	pCD->phenotype.intracellulars[0]->post_update_intracellular = post_update_intracellular;
 	pCD->functions.custom_cell_rule = custom_function; 
 	pCD->functions.contact_function = contact_function; 
 	pCD->functions.update_velocity = standard_update_cell_velocity; 
 
 	pCD = find_cell_definition( "mesenchymal");
-	pCD->functions.pre_update_intracellular = pre_update_intracellular;
-	pCD->functions.post_update_intracellular = post_update_intracellular;
+	pCD->phenotype.intracellulars[0]->pre_update_intracellular = pre_update_intracellular;
+	pCD->phenotype.intracellulars[0]->post_update_intracellular = post_update_intracellular;
 	pCD->functions.custom_cell_rule = custom_function; 
 	pCD->functions.contact_function = contact_function;
 	pCD->functions.update_velocity = standard_update_cell_velocity; 
@@ -301,11 +301,11 @@ void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& 
 	return; 
 } 
 
-void pre_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt){
+void pre_update_intracellular(Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt){
 	return;
 }
 
-void post_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt){
+void post_update_intracellular(Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt){
 	return;
 }
 

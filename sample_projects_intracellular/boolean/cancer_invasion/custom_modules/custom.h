@@ -97,8 +97,8 @@ inline double get_motility_amplitude( double percent )
 void contact_function( Cell* pMe, Phenotype& phenoMe , Cell* pOther, Phenotype& phenoOther , double dt ); 
 
 void add_ecm_interaction( Cell* pCell, int index_ecm, int index_voxel );
-void pre_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt);
-void post_update_intracellular(Cell* pCell, Phenotype& phenotype, double dt);
+void pre_update_intracellular(Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt);
+void post_update_intracellular(Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt);
 
 std::string my_coloring_function_for_stroma( double concentration, double max_conc, double min_conc );
 void color_node(Cell* pCell);
