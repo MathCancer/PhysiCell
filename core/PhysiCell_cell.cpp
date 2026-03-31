@@ -666,10 +666,12 @@ Cell* Cell::divide( )
 	// pAttackTarget was cleared above, so the daughter inherits a NULL one
 	child->phenotype = phenotype; 
 
-    if (child->phenotype.intracellular){
-        child->phenotype.intracellular->start();
-		child->phenotype.intracellular->inherit(this);
+	for (size_t i=0; i < child->phenotype.intracellulars.size(); i++)
+	{
+		child->phenotype.intracellulars[i]->start();
+		child->phenotype.intracellulars[i]->inherit(this->phenotype.intracellulars[i]);
 	}
+    
 // #ifdef ADDON_PHYSIDFBA
 // 	child->fba_model = this->fba_model;
 // #endif
@@ -1137,8 +1139,8 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->functions = cd.functions; 
 	
 	pNew->phenotype = cd.phenotype; 
-	if (pNew->phenotype.intracellular)
-		pNew->phenotype.intracellular->start();
+	for (auto* intracellular: pNew->phenotype.intracellulars)
+		intracellular->start();
 
 	pNew->is_movable = cd.is_movable; //  true;
 	pNew->is_out_of_domain = false;
@@ -1949,9 +1951,9 @@ void display_cell_definitions( std::ostream& os )
 	
 
 		// intracellular
-		if (pCD->phenotype.intracellular != NULL)
+		for (auto intracellular: pCD->phenotype.intracellulars)
 		{
-			pCD->phenotype.intracellular->display(os);
+			intracellular->display(os);
 		}
 		
 		Custom_Cell_Data* pCCD = &(pCD->custom_data); 
@@ -3192,13 +3194,13 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 #ifdef ADDON_PHYSIBOSS
 		if (model_type == "maboss") {
 			// If it has already be copied
-			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
-				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+			if (pParent != NULL && pParent->phenotype.intracellulars.size() > 0) {
+				pCD->phenotype.intracellulars[0]->initialize_intracellular_from_pugixml(node);
 				
 			// Otherwise we need to create a new one
 			} else {
 				MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(node);
-				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+				pCD->phenotype.intracellulars.push_back(pIntra->getIntracellularModel());
 			}
 		}
 #endif
@@ -3207,17 +3209,21 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if (model_type == "roadrunner") 
         {
 			// If it has already be copied
-			if (pParent != NULL && pParent->phenotype.intracellular != NULL) 
+			if (pParent != NULL && pParent->phenotype.intracellulars.size() > 0) 
             {
-				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
-				pCD->phenotype.intracellular->validate_PhysiCell_tokens(pCD->phenotype);
-				pCD->phenotype.intracellular->validate_SBML_species();
+                // std::cout << "------ " << __FUNCTION__ << ": copying another\n";
+				pCD->phenotype.intracellulars[0]->initialize_intracellular_from_pugixml(node);
+				pCD->phenotype.intracellulars[0]->validate_PhysiCell_tokens(pCD->phenotype);
+				pCD->phenotype.intracellulars[0]->validate_SBML_species();
             }	
 			// Otherwise we need to create a new one
 			else 
             {
 				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
-				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+				pIntra->validate_PhysiCell_tokens(pCD->phenotype);
+                pIntra->validate_SBML_species();
+				pCD->phenotype.intracellulars.push_back(pIntra->getIntracellularModel());
+                
 			}
 			pCD->phenotype.intracellular->validate_PhysiCell_tokens(pCD->phenotype);
 			pCD->phenotype.intracellular->validate_SBML_species();
@@ -3227,22 +3233,98 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 #ifdef ADDON_PHYSIDFBA
 		if (model_type == "dfba") {
 			// If it has already be copied
-			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
-				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+			if (pParent != NULL && pParent->phenotype.intracellulars.size() > 0) {
+				pCD->phenotype.intracellulars[0]->initialize_intracellular_from_pugixml(node);
 			// Otherwise we need to create a new one
 			} else {
 				dFBAIntracellular* pIntra = new dFBAIntracellular(node);
-				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+				pCD->phenotype.intracellulars.push_back(pIntra->getIntracellularModel());
 			}
 		}
 #endif
 
 	} else{
 
-		pCD->phenotype.intracellular = NULL;
+		pCD->phenotype.intracellulars.clear();
 
 	}
+	
+	node = cd_node.child( "phenotype" );
+	node = node.child( "intracellulars" ); 
+	if( node )
+	{
+		//If there are intracellular models, we clear whatever existed before, including if there was an old format intracellular model
+		pCD->phenotype.intracellulars.clear();
+		
+		pugi::xml_node intracellular = node.child( "intracellular" );
+		size_t intracellular_count = 0;
+		while( intracellular )
+		{
+			// which substrate? 
+			
+		
+			std::string model_type = intracellular.attribute( "type" ).value(); 
+		
 
+#ifdef ADDON_PHYSIBOSS
+			if (model_type == "maboss") {
+				// If it has already be copied
+				if (pParent != NULL && pParent->phenotype.intracellulars.size() >= intracellular_count) {
+					pCD->phenotype.intracellulars[intracellular_count]->initialize_intracellular_from_pugixml(intracellular);
+					
+				// Otherwise we need to create a new one
+				} else {
+					MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(intracellular);
+					pCD->phenotype.intracellulars.push_back(pIntra->getIntracellularModel());
+				}
+			}
+#endif
+
+#ifdef ADDON_ROADRUNNER
+		if (model_type == "roadrunner") 
+        {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellulars.size() >= intracellular_count) 
+            {
+                // std::cout << "------ " << __FUNCTION__ << ": copying another\n";
+				pCD->phenotype.intracellulars[intracellular_count]->initialize_intracellular_from_pugixml(node);
+            }	
+			// Otherwise we need to create a new one
+			else 
+            {
+                std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
+				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(intracellular);
+				pIntra->validate_PhysiCell_tokens(pCD->phenotype);
+                pIntra->validate_SBML_species();
+				pCD->phenotype.intracellulars.push_back(pIntra->getIntracellularModel());
+                
+			}
+		}
+#endif
+
+#ifdef ADDON_PHYSIDFBA
+		if (model_type == "dfba") {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellulars.size() > intracellular_count) {
+				pCD->phenotype.intracellulars[intracellular_count]->initialize_intracellular_from_pugixml(intracellular);
+			// Otherwise we need to create a new one
+			} else {
+				PhysiCelldFBA::dFBAIntracellular* pIntra = new PhysiCelldFBA::dFBAIntracellular(intracellular);
+				pCD->phenotype.intracellulars.push_back(pIntra->getIntracellularModel());
+			}
+		}
+#endif
+
+// 	} else{
+
+// 		pCD->phenotype.intracellulars.clear();
+
+// 	}
+			intracellular = intracellular.next_sibling( "intracellular" ); 
+			intracellular_count += 1;
+		}
+	}
+	
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
 	pugi::xml_node node1 = node.first_child(); 
