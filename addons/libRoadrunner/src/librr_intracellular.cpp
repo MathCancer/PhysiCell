@@ -710,26 +710,17 @@ RoadRunnerMapping* RoadRunnerIntracellular::find_output_mapping(std::string phys
 
 double RoadRunnerIntracellular::get_parameter_value(std::string param_name)
 {
-    rrc::RRVectorPtr vptr;
-
-    vptr = rrc::getFloatingSpeciesConcentrations(this->rrHandle);
-
-    int offset = species_result_column_index[param_name];
-    double res = vptr->Data[offset];
-    rrc::freeVector(vptr);
-    return res;
+    double return_value = 0.0;
+    rrc::getFloatingSpeciesByIndex(this->rrHandle, species_result_column_index[param_name], &return_value);
+    return return_value;
 }
 	
 // rwh: might consider doing a multi-[species_name, value] "set" method
+// vn: Actually its better that way. In case there is a species which is linked to an assignment rule, 
+// we can't use the setFloatingSpecies method without getting an error message, which breaks the thread-safety.
 void RoadRunnerIntracellular::set_parameter_value(std::string species_name, double value)
 {
-    rrc::RRVectorPtr vptr;
-
-    vptr = rrc::getFloatingSpeciesConcentrations(this->rrHandle);
-    int idx = species_result_column_index[species_name];
-    vptr->Data[idx] = value;
-    rrc::setFloatingSpeciesConcentrations(this->rrHandle, vptr);
-    rrc::freeVector(vptr);
+    rrc::setFloatingSpeciesByIndex(this->rrHandle, species_result_column_index[species_name], value);
 }
 
 RoadRunnerIntracellular* getRoadRunnerModel(PhysiCell::Phenotype& phenotype) {
