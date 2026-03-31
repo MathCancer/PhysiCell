@@ -15,13 +15,13 @@ void RoadRunnerMapping::initialize_mapping( void )
         index = behavior_ind;
         if (use_for_input)
         {
-            value_map = [this](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(this->sbml_species, PhysiCell::get_single_behavior(pCell, this->index)); };
+            value_map = [this](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(this->sbml_species, PhysiCell::get_single_behavior(pCell, this->index)); };
         }
         else
         {
-            value_map = [this](PhysiCell::Cell *pCell)
-            { PhysiCell::set_single_behavior(pCell, this->index, pCell->phenotype.intracellular->get_parameter_value(this->sbml_species)); };
+            value_map = [this](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { PhysiCell::set_single_behavior(pCell, this->index, intracellular->get_parameter_value(this->sbml_species)); };
         }
     }
     else if (signal_ind != -1)
@@ -30,8 +30,8 @@ void RoadRunnerMapping::initialize_mapping( void )
         index = signal_ind;
         if (use_for_input)
         {
-            value_map = [this](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(this->sbml_species, PhysiCell::get_single_signal(pCell, this->index)); };
+            value_map = [this](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(this->sbml_species, PhysiCell::get_single_signal(pCell, this->index)); };
         }
         else
         {
@@ -82,8 +82,8 @@ MappingFunction select_signal_setter(const std::string& name, const std::string&
             int density_index = microenvironment.find_density_index(substrate_name);
             if (density_index != -1)
             {
-                return [density_index, sbml_species](PhysiCell::Cell *pCell)
-                { pCell->phenotype.molecular.internalized_total_substrates[density_index] = pCell->phenotype.intracellular->get_parameter_value(sbml_species) * pCell->phenotype.volume.total; };
+                return [density_index, sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+                { pCell->phenotype.molecular.internalized_total_substrates[density_index] = intracellular->get_parameter_value(sbml_species) * pCell->phenotype.volume.total; };
             }
         }
         std::cerr << "ERROR: \"" << name << "\" is not a valid signal that can be set using libRoadRunner." << std::endl
@@ -97,15 +97,15 @@ MappingFunction select_signal_setter(const std::string& name, const std::string&
     {
         std::cout << "WARNING: setting the volume using libRoadRunner will do so by rescaling ALL cell volumes, not just setting the total volume."
                   << "    To only set the total volume (or to set other components of the volume), use the `pCell->functions.post_update_intracellular`." << std::endl;
-        return [sbml_species](PhysiCell::Cell *pCell)
-        { pCell->phenotype.volume.multiply_by_ratio(pCell->phenotype.intracellular->get_parameter_value(sbml_species) / pCell->phenotype.volume.total); };
+        return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+        { pCell->phenotype.volume.multiply_by_ratio(intracellular->get_parameter_value(sbml_species) / pCell->phenotype.volume.total); };
     }
 
     // if "damage", set the cell damage
     else if (name == "damage")
     {
-        return [sbml_species](PhysiCell::Cell *pCell)
-        { pCell->phenotype.cell_integrity.damage = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+        return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+        { pCell->phenotype.cell_integrity.damage = intracellular->get_parameter_value(sbml_species); };
     }
 
     // if begins with "custom", check that it is custom data and set that
@@ -219,18 +219,18 @@ MappingFunction select_phenotype_by_token_inputter(const std::string& name, cons
     {
         if (name == "mms")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.motility.migration_speed); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.motility.migration_speed); };
         }
         else if (name == "mpt")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.motility.persistence_time); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.motility.persistence_time); };
         }
         else if (name == "mmb")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.motility.migration_bias); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.motility.migration_bias); };
         }
         else
         {
@@ -246,14 +246,14 @@ MappingFunction select_phenotype_by_token_inputter(const std::string& name, cons
         if (name == "da")
         {
             int death_model_index = PhysiCell::cell_defaults.phenotype.death.find_death_model_index(PhysiCell::PhysiCell_constants::apoptosis_death_model);
-            return [sbml_species, death_model_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.death.rates[death_model_index]); };
+            return [sbml_species, death_model_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.death.rates[death_model_index]); };
         }
         else if (name == "dn")
         {
             int death_model_index = PhysiCell::cell_defaults.phenotype.death.find_death_model_index(PhysiCell::PhysiCell_constants::necrosis_death_model);
-            return [sbml_species, death_model_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.death.rates[death_model_index]); };
+            return [sbml_species, death_model_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.death.rates[death_model_index]); };
         }
         else
         {
@@ -283,23 +283,23 @@ MappingFunction select_phenotype_by_token_inputter(const std::string& name, cons
 
         if (token_prefix == "sur")
         {
-            return [sbml_species, substrate_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.secretion.uptake_rates[substrate_index]); };
+            return [sbml_species, substrate_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.secretion.uptake_rates[substrate_index]); };
         }
         else if (token_prefix == "ssr")
         {
-            return [sbml_species, substrate_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.secretion.secretion_rates[substrate_index]); };
+            return [sbml_species, substrate_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.secretion.secretion_rates[substrate_index]); };
         }
         else if (token_prefix == "ssd")
         {
-            return [sbml_species, substrate_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.secretion.saturation_densities[substrate_index]); };
+            return [sbml_species, substrate_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.secretion.saturation_densities[substrate_index]); };
         }
         else if (token_prefix == "ser")
         {
-            return [sbml_species, substrate_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.secretion.net_export_rates[substrate_index]); };
+            return [sbml_species, substrate_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.secretion.net_export_rates[substrate_index]); };
         }
         else
         {
@@ -315,26 +315,26 @@ MappingFunction select_phenotype_by_token_inputter(const std::string& name, cons
         std::vector<int> indices = parse_ctr_token(name);
         int start_index = indices[0];
         int end_index = indices[1];
-        
-        return [sbml_species, start_index, end_index](PhysiCell::Cell *pCell)
-        { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.cycle.data.transition_rate(start_index, end_index)); };
+
+        return [sbml_species, start_index, end_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+        { intracellular->set_parameter_value(sbml_species, pCell->phenotype.cycle.data.transition_rate(start_index, end_index)); };
     }
     else if (name[0] == 'v')
     {
         if (name == "vtsc")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.volume.target_solid_cytoplasmic); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.volume.target_solid_cytoplasmic); };
         }
         else if (name == "vtsn")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.volume.target_solid_nuclear); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.volume.target_solid_nuclear); };
         }
         else if (name == "vff")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.intracellular->set_parameter_value(sbml_species, pCell->phenotype.volume.target_fluid_fraction); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { intracellular->set_parameter_value(sbml_species, pCell->phenotype.volume.target_fluid_fraction); };
         }
         else
         {
@@ -361,18 +361,18 @@ MappingFunction select_phenotype_by_token_outputter(const std::string& name, con
     {
         if (name == "mms")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.motility.migration_speed = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.motility.migration_speed = intracellular->get_parameter_value(sbml_species); };
         }
         else if (name == "mpt")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.motility.persistence_time = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.motility.persistence_time = intracellular->get_parameter_value(sbml_species); };
         }
         else if (name == "mmb")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.motility.migration_bias = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.motility.migration_bias = intracellular->get_parameter_value(sbml_species); };
         }
         else
         {
@@ -388,14 +388,14 @@ MappingFunction select_phenotype_by_token_outputter(const std::string& name, con
         if (name == "da")
         {
             int death_model_index = PhysiCell::cell_defaults.phenotype.death.find_death_model_index(PhysiCell::PhysiCell_constants::apoptosis_death_model);
-            return [sbml_species, death_model_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.death.rates[death_model_index] = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species, death_model_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.death.rates[death_model_index] = intracellular->get_parameter_value(sbml_species); };
         }
         else if (name == "dn")
         {
             int death_model_index = PhysiCell::cell_defaults.phenotype.death.find_death_model_index(PhysiCell::PhysiCell_constants::necrosis_death_model);
-            return [sbml_species, death_model_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.death.rates[death_model_index] = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species, death_model_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.death.rates[death_model_index] = intracellular->get_parameter_value(sbml_species); };
         }
         else
         {
@@ -425,23 +425,23 @@ MappingFunction select_phenotype_by_token_outputter(const std::string& name, con
 
         if (token_prefix == "sur")
         {
-            return [sbml_species, substrate_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.secretion.uptake_rates[substrate_index] = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species, substrate_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.secretion.uptake_rates[substrate_index] = intracellular->get_parameter_value(sbml_species); };
         }
         else if (token_prefix == "ssr")
         {
-            return [sbml_species, substrate_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.secretion.secretion_rates[substrate_index] = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species, substrate_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.secretion.secretion_rates[substrate_index] = intracellular->get_parameter_value(sbml_species); };
         }
         else if (token_prefix == "ssd")
         {
-            return [sbml_species, substrate_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.secretion.saturation_densities[substrate_index] = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species, substrate_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.secretion.saturation_densities[substrate_index] = intracellular->get_parameter_value(sbml_species); };
         }
         else if (token_prefix == "ser")
         {
-            return [sbml_species, substrate_index](PhysiCell::Cell *pCell)
-            { pCell->phenotype.secretion.net_export_rates[substrate_index] = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species, substrate_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.secretion.net_export_rates[substrate_index] = intracellular->get_parameter_value(sbml_species); };
         }
         else
         {
@@ -458,25 +458,25 @@ MappingFunction select_phenotype_by_token_outputter(const std::string& name, con
         int start_index = indices[0];
         int end_index = indices[1];
 
-        return [sbml_species, start_index, end_index](PhysiCell::Cell *pCell)
-        { pCell->phenotype.cycle.data.transition_rate(start_index, end_index) = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+        return [sbml_species, start_index, end_index](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+        { pCell->phenotype.cycle.data.transition_rate(start_index, end_index) = intracellular->get_parameter_value(sbml_species); };
     }
     else if (name[0] == 'v')
     {
         if (name == "vtsc")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.volume.target_solid_cytoplasmic = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.volume.target_solid_cytoplasmic = intracellular->get_parameter_value(sbml_species); };
         }
         else if (name == "vtsn")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.volume.target_solid_nuclear = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.volume.target_solid_nuclear = intracellular->get_parameter_value(sbml_species); };
         }
         else if (name == "vff")
         {
-            return [sbml_species](PhysiCell::Cell *pCell)
-            { pCell->phenotype.volume.target_fluid_fraction = pCell->phenotype.intracellular->get_parameter_value(sbml_species); };
+            return [sbml_species](PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular)
+            { pCell->phenotype.volume.target_fluid_fraction = intracellular->get_parameter_value(sbml_species); };
         }
         else
         {
@@ -672,7 +672,7 @@ void RoadRunnerIntracellular::pre_update(PhysiCell::Cell* pCell)
 {
     for (auto mapping : input_mappings)
     {
-        mapping->value_map(pCell);
+        mapping->value_map(pCell, this);
     }
 }
 
@@ -680,7 +680,7 @@ void RoadRunnerIntracellular::post_update(PhysiCell::Cell* pCell)
 {
     for (auto mapping : output_mappings)
     {
-        mapping->value_map(pCell);
+        mapping->value_map(pCell, this);
     }
 }
 
@@ -733,7 +733,14 @@ void RoadRunnerIntracellular::set_parameter_value(std::string species_name, doub
 }
 
 RoadRunnerIntracellular* getRoadRunnerModel(PhysiCell::Phenotype& phenotype) {
-	return static_cast<RoadRunnerIntracellular*>(phenotype.intracellular);
+    for (auto* intracellular : phenotype.intracellulars)
+    {
+        if (intracellular->intracellular_type == "sbml" || intracellular->intracellular_type == "roadrunner")
+        {
+            return static_cast<RoadRunnerIntracellular*>(intracellular);
+        }
+    }
+	return nullptr;
 }
 
 RoadRunnerIntracellular* getRoadRunnerModel(PhysiCell::Cell* pCell) {
@@ -747,7 +754,7 @@ void RoadRunnerIntracellular::save_libRR(std::string path, std::string index)
 	state_file << "---------  dummy output from save_libRR  ---------" << std::endl;
 	state_file << "ID,state" << std::endl;
 	for( auto cell : *PhysiCell::all_cells )
-		state_file << cell->ID << "," << cell->phenotype.intracellular->get_state() << std::endl;
+		state_file << cell->ID << "," << getRoadRunnerModel(cell)->get_state() << std::endl;
 	state_file.close();
 }
 
