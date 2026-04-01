@@ -73,7 +73,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	std::vector<RoadRunnerMapping *> output_mappings;
 	std::map<std::string, int> species_result_column_index;
 	
-    rrc::RRHandle rrHandle;
+    rrc::RRHandle rrHandle = NULL;
 	rrc::RRCDataPtr result = 0;  // start time, end time, and number of points
 
 	double update_time_step = 0.01;
@@ -85,6 +85,15 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	RoadRunnerIntracellular(pugi::xml_node& node);
 	
 	RoadRunnerIntracellular(RoadRunnerIntracellular* copy);
+	
+	~RoadRunnerIntracellular() 
+	{
+		if (this->rrHandle != NULL)
+		{
+			rrc::freeRRInstance(this->rrHandle);
+			this->rrHandle = NULL;
+		}
+	}
 	
 	Intracellular* clone()
     {
