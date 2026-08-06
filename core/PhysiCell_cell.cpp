@@ -943,9 +943,25 @@ void Cell::update_voxel_in_container()
 			container->add_agent_to_voxel(this, updated_current_mechanics_voxel_index);
 		}
 		current_mechanics_voxel_index=updated_current_mechanics_voxel_index;
+
+		// keep max_cell_interactive_distance_in_voxel current as cells migrate between voxels (PR 409),
+		// not just on the rare type-conversion path (convert_to_cell_definition()). Without this, the
+		// bound goes stale as cells move, which can make a voxel's neighbor search wrongly skip a cell
+		// that has since moved in -- a real correctness gap, not just a reproducibility one. Protected
+		// for the same reason as convert_to_cell_definition() (max is order-independent, critical alone
+		// is sufficient -- no "ordered" needed).
+		#pragma omp critical
+		{
+			if( get_container()->max_cell_interactive_distance_in_voxel[current_mechanics_voxel_index] <
+				phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+			{
+				get_container()->max_cell_interactive_distance_in_voxel[current_mechanics_voxel_index] = phenotype.geometry.radius
+					* phenotype.mechanics.relative_maximum_adhesion_distance;
+			}
+		}
 	}
-	
-	return; 
+
+	return;
 }
 
 void Cell::copy_data(Cell* copy_me)
