@@ -68,6 +68,7 @@
 #ifndef __PhysiCell_cell_container_h__
 #define __PhysiCell_cell_container_h__
 
+#include <cstdint>
 #include <vector>
 #include "PhysiCell_cell.h"
 #include "../BioFVM/BioFVM_agent_container.h"

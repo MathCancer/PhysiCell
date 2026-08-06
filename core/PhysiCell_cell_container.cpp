@@ -69,15 +69,34 @@
 #include "PhysiCell_constants.h"
 #include "../BioFVM/BioFVM_vector.h"
 #include "PhysiCell_cell.h"
+#include "PhysiCell_utilities.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iterator> 
+#include <cstdint>
 
 using namespace BioFVM;
 
 namespace PhysiCell{
 
 std::vector<Cell*> *all_cells;
+
+namespace
+{
+constexpr std::uint64_t RANDOM_PURPOSE_SECRETION = 1;
+constexpr std::uint64_t RANDOM_PURPOSE_INTRACELLULAR = 2;
+constexpr std::uint64_t RANDOM_PURPOSE_PHENOTYPE = 3;
+constexpr std::uint64_t RANDOM_PURPOSE_MECHANICS = 4;
+constexpr std::uint64_t RANDOM_PURPOSE_INTERACTION = 5;
+constexpr std::uint64_t RANDOM_PURPOSE_CUSTOM_RULE = 6;
+constexpr std::uint64_t RANDOM_PURPOSE_UPDATE_VELOCITY = 7;
+constexpr std::uint64_t RANDOM_PURPOSE_SPRINGS = 8;
+constexpr std::uint64_t RANDOM_PURPOSE_CELL_CELL = 9;
+constexpr std::uint64_t RANDOM_PURPOSE_POSITION = 10;
+constexpr std::uint64_t RANDOM_PURPOSE_DIVISION = 11;
+constexpr std::uint64_t RANDOM_PURPOSE_DEATH = 12;
+}
 
 Cell_Container::Cell_Container()
 {
@@ -122,14 +141,44 @@ void Cell_Container::update_all_cells(double t)
 
 void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double mechanics_dt_ , double diffusion_dt_ )
 {
-	// secretions and uptakes. Syncing with BioFVM is automated. 
+	std::uint64_t random_step = static_cast<std::uint64_t>( std::llround( t / diffusion_dt_ ) );
+	bool use_counter_based_rng = PhysiCell_settings.use_counter_based_rng;
+	auto activate_random_context = [use_counter_based_rng, random_step]( std::uint64_t cell_id, std::uint64_t purpose )
+	{
+		if( use_counter_based_rng )
+		{
+			set_deterministic_random_context( cell_id, random_step, purpose );
+		}
+	};
+	auto clear_random_context = [use_counter_based_rng]()
+	{
+		if( use_counter_based_rng )
+		{
+			clear_deterministic_random_context();
+		}
+	};
 
-	#pragma omp parallel for 
+	// secretions and uptakes. Syncing with BioFVM is automated.
+	// ordered: Secretion::advance() -> Basic_Agent::simulate_secretion_and_uptake() accumulates directly
+	// into the shared voxel density vector at (*pS)(current_voxel_index), with no lock (see
+	// BioFVM/BioFVM_basic_agent.cpp). Diffusion voxels are typically larger than a single cell, so
+	// multiple cells commonly share one; without a fixed commit order, two cells in the same voxel
+	// processed by different threads at the same time race on that shared read-modify-write (a genuine
+	// lost-update, not just reordering). This is the actual call path PhysiCell uses for cell secretion
+	// (unlike Microenvironment::simulate_cell_sources_and_sinks, which is never invoked by the core
+	// simulation loop) -- forcing the same relative commit order as a single-thread run removes the race.
+
+	#pragma omp parallel for schedule(static) ordered
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
 		if( (*all_cells)[i]->is_out_of_domain == false )
 		{
-			(*all_cells)[i]->phenotype.secretion.advance( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+			activate_random_context( (*all_cells)[i]->ID, RANDOM_PURPOSE_SECRETION );
+			#pragma omp ordered
+			{
+				(*all_cells)[i]->phenotype.secretion.advance( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+			}
+			clear_random_context();
 		}
 	}
 	
@@ -148,6 +197,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 
 			if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
 			{
+				activate_random_context( (*all_cells)[i]->ID, RANDOM_PURPOSE_INTRACELLULAR );
 				if ((*all_cells)[i]->functions.pre_update_intracellular != NULL)
 					(*all_cells)[i]->functions.pre_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
 
@@ -155,6 +205,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 
 				if ((*all_cells)[i]->functions.post_update_intracellular != NULL)
 					(*all_cells)[i]->functions.post_update_intracellular( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+				clear_random_context();
 			}
 		}
 	}
@@ -177,18 +228,38 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{
 			if( (*all_cells)[i]->is_out_of_domain == false )
 			{
+				activate_random_context( (*all_cells)[i]->ID, RANDOM_PURPOSE_PHENOTYPE );
 				(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
+				clear_random_context();
 			}
 		}
 		
 		// process divides / removes 
+		// sort cells_ready_to_divide by cell ID to make sure that new generation of cell ids are preserved.
+		if ( PhysiCell_settings.use_counter_based_rng )
+			std::sort( cells_ready_to_divide.begin(), cells_ready_to_divide.end(),
+				[]( const Cell* lhs, const Cell* rhs )
+				{
+					return lhs->ID < rhs->ID;
+				} );
 		for( int i=0; i < cells_ready_to_divide.size(); i++ )
 		{
+			activate_random_context( cells_ready_to_divide[i]->ID, RANDOM_PURPOSE_DIVISION );
 			cells_ready_to_divide[i]->divide();
+			clear_random_context();
 		}
+		// sort cells_ready_to_die by cell ID to make sure that all_cells order is preserved.
+		if ( PhysiCell_settings.use_counter_based_rng )
+			std::sort( cells_ready_to_die.begin(), cells_ready_to_die.end(),
+				[]( const Cell* lhs, const Cell* rhs )
+				{
+					return lhs->ID < rhs->ID;
+				} );
 		for( int i=0; i < cells_ready_to_die.size(); i++ )
 		{	
+			activate_random_context( cells_ready_to_die[i]->ID, RANDOM_PURPOSE_DEATH );
 			cells_ready_to_die[i]->die();	
+			clear_random_context();
 		}
 		num_divisions_in_current_step+=  cells_ready_to_divide.size();
 		num_deaths_in_current_step+=  cells_ready_to_die.size();
@@ -220,7 +291,11 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{
 			Cell* pC = (*all_cells)[i]; 
 			if( pC->functions.contact_function && pC->is_out_of_domain == false )
-			{ evaluate_interactions( pC,pC->phenotype,time_since_last_mechanics ); }
+			{ 
+				activate_random_context( pC->ID, RANDOM_PURPOSE_INTERACTION );
+				evaluate_interactions( pC,pC->phenotype,time_since_last_mechanics ); 
+				clear_random_context();
+			}
 		}
 		
 		// perform custom computations 
@@ -231,7 +306,11 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			Cell* pC = (*all_cells)[i]; 
 						
 			if( pC->functions.custom_cell_rule && pC->is_out_of_domain == false )
-			{ pC->functions.custom_cell_rule( pC,pC->phenotype,time_since_last_mechanics ); }
+			{ 
+				activate_random_context( pC->ID, RANDOM_PURPOSE_CUSTOM_RULE );
+				pC->functions.custom_cell_rule( pC,pC->phenotype,time_since_last_mechanics ); 
+				clear_random_context();
+			}
 		}
 		
 		// update velocities 
@@ -241,7 +320,11 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{
 			Cell* pC = (*all_cells)[i]; 
 			if( pC->functions.update_velocity && pC->is_out_of_domain == false && pC->is_movable )
-			{ pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); }
+			{ 
+				activate_random_context( pC->ID, RANDOM_PURPOSE_UPDATE_VELOCITY );
+				pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); 
+				clear_random_context();
+			}
 		}
 
 		// new March 2023: 
@@ -249,41 +332,71 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 
 		if( PhysiCell_settings.disable_automated_spring_adhesions == false )
 		{
-			#pragma omp parallel for 
+			// ordered: dynamic_spring_attachments() decides whether to attach/detach based on a
+			// *neighbor's* current attachment count vs. its max, then calls attach_cells_as_spring()/
+			// detach_cells_as_spring() on that neighbor. The capacity check is never re-validated once
+			// the lock inside attach_cells_as_spring() is actually held, so without a fixed commit order
+			// two different cells can both see "room for one more" on the same neighbor at once and both
+			// attach, pushing it past its intended maximum -- a thread-count-dependent result.
+			#pragma omp parallel for schedule(static) ordered
 			for( int i=0; i < (*all_cells).size(); i++ )
 			{
-				Cell* pC = (*all_cells)[i]; 
-				dynamic_spring_attachments(pC,pC->phenotype,time_since_last_mechanics); 
-			}		
-			#pragma omp parallel for 
+				Cell* pC = (*all_cells)[i];
+				activate_random_context( pC->ID, RANDOM_PURPOSE_SPRINGS );
+				#pragma omp ordered
+				{
+					dynamic_spring_attachments(pC,pC->phenotype,time_since_last_mechanics);
+				}
+				clear_random_context();
+			}
+			#pragma omp parallel for
 			for( int i=0; i < (*all_cells).size(); i++ )
 			{
-				Cell* pC = (*all_cells)[i]; 
+				Cell* pC = (*all_cells)[i];
 				if( pC->is_movable )
 				{
 					for( int j=0; j < pC->state.spring_attachments.size(); j++ )
 					{
 						Cell* pC1 = pC->state.spring_attachments[j]; 
 						// standard_elastic_contact_function_confluent_rest_length(pC,pC->phenotype,pC1,pC1->phenotype,time_since_last_mechanics);  
+						activate_random_context( pC->ID, RANDOM_PURPOSE_SPRINGS );
 						standard_elastic_contact_function(pC,pC->phenotype,pC1,pC1->phenotype,time_since_last_mechanics);  
+						clear_random_context();
 					}
 				}
 			}	
 		}
 
-		// new March 2022: 
-		// run standard interactions (phagocytosis, attack, fusion) here 
-		#pragma omp parallel for 
+		// new March 2022:
+		// run standard interactions (phagocytosis, attack, fusion) here
+		// this loop is "ordered": standard_cell_cell_interactions() can ingest, attack, or fuse
+		// a *different* cell (mutating its live state), and it early-exits based on that cell's
+		// current death flag. Enforcing the same relative commit order as a single-thread run
+		// (via #pragma omp ordered) makes those cross-cell interactions thread-count independent,
+		// instead of depending on however OpenMP happens to schedule the threads this run.
+		#pragma omp parallel for schedule(static) ordered
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
-			Cell* pC = (*all_cells)[i]; 
-			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics); 
+			Cell* pC = (*all_cells)[i];
+			activate_random_context( pC->ID, RANDOM_PURPOSE_CELL_CELL );
+			#pragma omp ordered
+			{
+				standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics);
+			}
+			clear_random_context();
 		}
 		// super-critical to performance! clear the "dummy" cells from phagocytosis / fusion
 		// otherwise, comptuational cost increases at polynomial rate VERY fast, as O(10,000) 
 		// dummy cells of size zero are left ot interact mechanically, etc. 
 		if( cells_ready_to_die.size() > 0 )
 		{
+			// sort cells_ready_to_die by cell ID to make sure that all_cells order is preserved.
+			if ( PhysiCell_settings.use_counter_based_rng )
+				std::sort( cells_ready_to_die.begin(), cells_ready_to_die.end(),
+					[]( const Cell* lhs, const Cell* rhs )
+					{
+						return lhs->ID < rhs->ID;
+					} );
 			/*
 			std::cout << "\tClearing dummy cells from phagocytosis and fusion events ... " << std::endl; 
 			std::cout << "\t\tClearing " << cells_ready_to_die.size() << " cells ... " << std::endl; 
@@ -302,7 +415,11 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{
 			Cell* pC = (*all_cells)[i]; 
 			if( pC->is_out_of_domain == false && pC->is_movable)
-			{ pC->update_position(time_since_last_mechanics); }
+			{ 
+				activate_random_context( pC->ID, RANDOM_PURPOSE_POSITION );
+				pC->update_position(time_since_last_mechanics); 
+				clear_random_context();
+			}
 		}
 		
 		// When somebody reviews this code, let's add proper braces for clarity!!! 

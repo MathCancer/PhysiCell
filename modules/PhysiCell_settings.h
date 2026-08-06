@@ -114,6 +114,7 @@ class PhysiCell_Settings
 	bool enable_legacy_saves = false; 
 
 	bool disable_automated_spring_adhesions = false; 
+	bool use_counter_based_rng = false;
 	
 	double SVG_save_interval = 60; 
 	bool enable_SVG_saves = true; 

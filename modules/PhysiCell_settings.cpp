@@ -276,6 +276,27 @@ void PhysiCell_Settings::read_from_pugixml( void )
 			PhysiCell_settings.disable_automated_spring_adhesions = true;
 		}
 
+		pugi::xml_node rng_mode_node = xml_find_node(node_options, "rng_mode");
+		if (rng_mode_node)
+		{
+			std::string rng_mode = xml_get_my_string_value(rng_mode_node);
+			if( rng_mode == "counter_based" || rng_mode == "counter" || rng_mode == "philox" )
+			{
+				PhysiCell_settings.use_counter_based_rng = true;
+				std::cout << "Using counter-based RNG mode" << std::endl;
+			}
+			else if( rng_mode == "legacy" || rng_mode == "thread_local" || rng_mode == "mt19937" )
+			{
+				PhysiCell_settings.use_counter_based_rng = false;
+				std::cout << "Using legacy RNG mode" << std::endl;
+			}
+			else if( rng_mode != "" )
+			{
+				std::cout << "ERROR: unsupported rng_mode '" << rng_mode << "'. Use 'legacy' or 'counter_based'." << std::endl;
+				exit(-1);
+			}
+		}
+
 		pugi::xml_node random_seed_node = xml_find_node(node_options, "random_seed");
 		std::string random_seed = ""; // default is system clock, even if this element is not present
 		if (random_seed_node)
