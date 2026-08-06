@@ -1204,17 +1204,25 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	// phenotype.geometry.update( this, phenotype, 0.0 ); // not necessary since we copy geometry above
 	*/
 
-	// Here the current mechanics voxel index may not be initialized, when position is still unknown. 
+	// Here the current mechanics voxel index may not be initialized, when position is still unknown.
+	// This can run from convert_to_cell_definition(), which is reachable from rule-triggered type
+	// transformations inside the (unordered) phenotype loop -- max_cell_interactive_distance_in_voxel
+	// is shared across all cells in the voxel, so the read-compare-write must be atomic. A max is
+	// order-independent (unlike a sum), so a plain critical section is sufficient here -- no need for
+	// "ordered".
 	if (get_current_mechanics_voxel_index() >= 0)
     {
-        if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] < 
-            phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
-        {
-            get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
-                * phenotype.mechanics.relative_maximum_adhesion_distance;
-        }
+		#pragma omp critical
+		{
+			if( get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] <
+				phenotype.geometry.radius * phenotype.mechanics.relative_maximum_adhesion_distance )
+			{
+				get_container()->max_cell_interactive_distance_in_voxel[get_current_mechanics_voxel_index()] = phenotype.geometry.radius
+					* phenotype.mechanics.relative_maximum_adhesion_distance;
+			}
+		}
 	}
-	return; 
+	return;
 }
 
 void delete_cell( int index )
