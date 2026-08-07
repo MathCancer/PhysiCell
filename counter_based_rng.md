@@ -8,9 +8,7 @@ The core RNG layer now has a keyed entry point in [core/PhysiCell_utilities.h](c
 
 The main simulation loop sets that context around the major per-cell update phases in [core/PhysiCell_cell_container.cpp](core/PhysiCell_cell_container.cpp). That means the existing simulation code can keep calling the usual random helpers, but those helpers will now draw from a reproducible per-cell, per-step sequence instead of a thread-order-dependent stream.
 
-I also added a reusable end-to-end thread reproducibility checker in [beta/test_thread_repro.py](beta/test_thread_repro.py). The GitHub Actions workflow uses it for the template and intracellular template jobs in [tests.yml](.github/workflows/tests.yml).
-
-The checker runs the same project twice with different thread counts and compares the final XML output after normalizing volatile metadata.
+I also added a reusable end-to-end thread reproducibility checker in [beta/test_thread_repro.py](beta/test_thread_repro.py). The checker runs the same project twice with different thread counts and compares the final XML output after normalizing volatile metadata.
 
 ## Why this did not require changing every `Random()` call
 
@@ -119,64 +117,6 @@ There are also mixed code paths where one logical operation first makes a decisi
 
 This is why `sub_index` is convenient even when `purpose` is automatic. A single semantic purpose such as `motility update` can safely contain several actual draws without inventing a separate micro-purpose for every internal step.
 
-## Why `cell_id` and `time_step` alone are not enough
-
-They are not enough if more than one random draw can happen for the same cell in the same step, which is normal in PhysiCell.
-
-There are two independent problems.
-
-### Problem 1: multiple draws within one context
-
-Suppose cell 10 is in phenotype step 25 and a function does this:
-
-```cpp
-if( UniformRandom() < p )
-{
-	double theta = UniformRandom();
-}
-```
-
-If the key were only `(cell_id, time_step)`, both calls would ask for the same value. That is wrong.
-
-`sub_index` fixes this by making the first call use sub-index 0 and the second call use sub-index 1.
-
-### Problem 2: different purposes in the same step
-
-Suppose in the same saved step you do both of these for the same cell:
-
-- phenotype transition draw,
-- motility direction draw.
-
-If the key were only `(cell_id, time_step)`, those unrelated events would collide too.
-
-`purpose` fixes this by giving each update phase its own namespace.
-
-## About "the internal index will always start from 0 after restart"
-
-That statement is only partly true.
-
-It is true that `sub_index` should normally restart at 0 when entering a new deterministic context.
-
-It is not true that this makes `purpose` unnecessary.
-
-Why:
-
-- in one resumed step, cell 10 can enter several different stochastic contexts,
-- each of those contexts may start its own `sub_index` at 0,
-- but they must still remain distinct from each other.
-
-So after restart you can absolutely do this:
-
-- phenotype context for cell 10, step 25: sub-index starts at 0,
-- velocity context for cell 10, step 25: sub-index also starts at 0.
-
-That is correct only if `purpose` is also part of the key. Otherwise both contexts collide.
-
-So the right rule is:
-
-- `sub_index` resets to 0 per context,
-- not per whole simulation step.
-
 ## Restart implication
 
 If restart always begins from a saved snapshot, you may be able to derive `step_key` from the restored snapshot state rather than saving a separate hidden counter. But you still need the full four-role scheme:
@@ -189,8 +129,6 @@ If restart always begins from a saved snapshot, you may be able to derive `step_
 If any one of those roles is missing, different random events can collapse onto the same keyed draw.
 
 ## The existing precedent: ordering division and death
-
-The counter-based RNG work already had to solve a version of this problem for cell division and death, and the fixes below follow the same pattern it established.
 
 Division and death are decided inside the parallel phenotype loop, but a cell can't safely divide or remove itself from `(*all_cells)` while that loop is still running on other threads. So instead of acting immediately, a cell calls `flag_cell_for_division()` / `flag_cell_for_removal()`, which push it onto `cells_ready_to_divide` / `cells_ready_to_die` under `#pragma omp critical`. Only after the parallel loop finishes does [core/PhysiCell_cell_container.cpp](core/PhysiCell_cell_container.cpp) actually call `divide()` / `die()` on those lists — serially, and, when `PhysiCell_settings.use_counter_based_rng` is enabled, only after sorting each list by cell ID first:
 
@@ -248,8 +186,6 @@ Each mechanics voxel keeps a running maximum of `radius * relative_maximum_adhes
 Unlike Fixes 1 and 2, this doesn't need `ordered`: a `max` over a fixed set of candidate values is the same regardless of the order you compare them in, so a plain `#pragma omp critical` around the read-compare-write is enough to make it both race-free and deterministic.
 
 ### Fix 4: cell secretion/uptake into shared diffusion voxels
-
-This was the one that actually explained the residual, hard-to-pin-down mismatches in a rules-driven multi-cell-type model, after Fixes 1–3 were already in place and confirmed to not be the cause (isolated by testing with those mechanisms enabled, disabled, and recombined).
 
 PhysiCell's real per-cell secretion path is `Cell_Container::update_all_cells()`'s first loop → `Secretion::advance()` → `Basic_Agent::simulate_secretion_and_uptake()` (in [BioFVM/BioFVM_basic_agent.cpp](BioFVM/BioFVM_basic_agent.cpp)), which does:
 
