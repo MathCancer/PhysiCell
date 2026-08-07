@@ -96,6 +96,68 @@ constexpr std::uint64_t RANDOM_PURPOSE_CELL_CELL = 9;
 constexpr std::uint64_t RANDOM_PURPOSE_POSITION = 10;
 constexpr std::uint64_t RANDOM_PURPOSE_DIVISION = 11;
 constexpr std::uint64_t RANDOM_PURPOSE_DEATH = 12;
+
+// The three functions below are the "ordered" counterpart of a loop that still exists, unchanged,
+// inline in Cell_Container::update_all_cells() (the plain #pragma omp parallel for version). Each
+// is called from update_all_cells() only when PhysiCell_settings.use_counter_based_rng is enabled,
+// selected once per phase per step -- not per cell. They protect a phase whose function can mutate
+// a *different* cell's live state from inside a parallel per-cell loop (secretion into a shared
+// voxel, spring-attachment capacity, attack/ingest/fuse), by forcing the same relative commit order
+// a single-thread run would use. Legacy (non-counter-based) runs take the unchanged, fully parallel
+// branch instead, keeping their existing performance profile at the cost of leaving these races
+// present in that mode. See protocols/counter_based_rng.md for the full discussion of this trade-off,
+// including why "ordered" (not just "critical") is required for the secretion and interactions
+// phases specifically.
+
+void run_secretion_phase_ordered( double diffusion_dt_, std::uint64_t random_step )
+{
+	#pragma omp parallel for schedule(static) ordered
+	for( int i=0; i < (*all_cells).size(); i++ )
+	{
+		if( (*all_cells)[i]->is_out_of_domain == false )
+		{
+			set_deterministic_random_context( (*all_cells)[i]->ID, random_step, RANDOM_PURPOSE_SECRETION );
+			#pragma omp ordered
+			{
+				(*all_cells)[i]->phenotype.secretion.advance( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+			}
+			clear_deterministic_random_context();
+		}
+	}
+	return;
+}
+
+void run_spring_attachment_phase_ordered( double time_since_last_mechanics, std::uint64_t random_step )
+{
+	#pragma omp parallel for schedule(static) ordered
+	for( int i=0; i < (*all_cells).size(); i++ )
+	{
+		Cell* pC = (*all_cells)[i];
+		set_deterministic_random_context( pC->ID, random_step, RANDOM_PURPOSE_SPRINGS );
+		#pragma omp ordered
+		{
+			dynamic_spring_attachments(pC,pC->phenotype,time_since_last_mechanics);
+		}
+		clear_deterministic_random_context();
+	}
+	return;
+}
+
+void run_cell_cell_interactions_phase_ordered( double time_since_last_mechanics, std::uint64_t random_step )
+{
+	#pragma omp parallel for schedule(static) ordered
+	for( int i=0; i < (*all_cells).size(); i++ )
+	{
+		Cell* pC = (*all_cells)[i];
+		set_deterministic_random_context( pC->ID, random_step, RANDOM_PURPOSE_CELL_CELL );
+		#pragma omp ordered
+		{
+			standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics);
+		}
+		clear_deterministic_random_context();
+	}
+	return;
+}
 }
 
 Cell_Container::Cell_Container()
@@ -164,24 +226,24 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 	// BioFVM/BioFVM_basic_agent.cpp). Diffusion voxels are typically larger than a single cell, so
 	// multiple cells commonly share one; without a fixed commit order, two cells in the same voxel
 	// processed by different threads at the same time race on that shared read-modify-write (a genuine
-	// lost-update, not just reordering). This is the actual call path PhysiCell uses for cell secretion
-	// (unlike Microenvironment::simulate_cell_sources_and_sinks, which is never invoked by the core
-	// simulation loop) -- forcing the same relative commit order as a single-thread run removes the race.
-
-	#pragma omp parallel for schedule(static) ordered
-	for( int i=0; i < (*all_cells).size(); i++ )
+	// lost-update, not just reordering). Only taken when counter_based_rng is enabled; see
+	// protocols/counter_based_rng.md.
+	if( use_counter_based_rng )
 	{
-		if( (*all_cells)[i]->is_out_of_domain == false )
+		run_secretion_phase_ordered( diffusion_dt_, random_step );
+	}
+	else
+	{
+		#pragma omp parallel for
+		for( int i=0; i < (*all_cells).size(); i++ )
 		{
-			activate_random_context( (*all_cells)[i]->ID, RANDOM_PURPOSE_SECRETION );
-			#pragma omp ordered
+			if( (*all_cells)[i]->is_out_of_domain == false )
 			{
 				(*all_cells)[i]->phenotype.secretion.advance( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
 			}
-			clear_random_context();
 		}
 	}
-	
+
 	//if it is the time for running cell cycle, do it!
 	double time_since_last_cycle= t- last_cell_cycle_time;
 
@@ -337,17 +399,20 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			// detach_cells_as_spring() on that neighbor. The capacity check is never re-validated once
 			// the lock inside attach_cells_as_spring() is actually held, so without a fixed commit order
 			// two different cells can both see "room for one more" on the same neighbor at once and both
-			// attach, pushing it past its intended maximum -- a thread-count-dependent result.
-			#pragma omp parallel for schedule(static) ordered
-			for( int i=0; i < (*all_cells).size(); i++ )
+			// attach, pushing it past its intended maximum. Only taken when counter_based_rng is
+			// enabled; see protocols/counter_based_rng.md.
+			if( use_counter_based_rng )
 			{
-				Cell* pC = (*all_cells)[i];
-				activate_random_context( pC->ID, RANDOM_PURPOSE_SPRINGS );
-				#pragma omp ordered
+				run_spring_attachment_phase_ordered( time_since_last_mechanics, random_step );
+			}
+			else
+			{
+				#pragma omp parallel for
+				for( int i=0; i < (*all_cells).size(); i++ )
 				{
+					Cell* pC = (*all_cells)[i];
 					dynamic_spring_attachments(pC,pC->phenotype,time_since_last_mechanics);
 				}
-				clear_random_context();
 			}
 			#pragma omp parallel for
 			for( int i=0; i < (*all_cells).size(); i++ )
@@ -369,21 +434,24 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 
 		// new March 2022:
 		// run standard interactions (phagocytosis, attack, fusion) here
-		// this loop is "ordered": standard_cell_cell_interactions() can ingest, attack, or fuse
-		// a *different* cell (mutating its live state), and it early-exits based on that cell's
-		// current death flag. Enforcing the same relative commit order as a single-thread run
-		// (via #pragma omp ordered) makes those cross-cell interactions thread-count independent,
-		// instead of depending on however OpenMP happens to schedule the threads this run.
-		#pragma omp parallel for schedule(static) ordered
-		for( int i=0; i < (*all_cells).size(); i++ )
+		// ordered: standard_cell_cell_interactions() can ingest, attack, or fuse a *different* cell
+		// (mutating its live state), and it early-exits based on that cell's current death flag.
+		// Enforcing the same relative commit order as a single-thread run makes those cross-cell
+		// interactions thread-count independent, instead of depending on however OpenMP happens to
+		// schedule the threads this run. Only taken when counter_based_rng is enabled; see
+		// protocols/counter_based_rng.md.
+		if( use_counter_based_rng )
 		{
-			Cell* pC = (*all_cells)[i];
-			activate_random_context( pC->ID, RANDOM_PURPOSE_CELL_CELL );
-			#pragma omp ordered
+			run_cell_cell_interactions_phase_ordered( time_since_last_mechanics, random_step );
+		}
+		else
+		{
+			#pragma omp parallel for
+			for( int i=0; i < (*all_cells).size(); i++ )
 			{
+				Cell* pC = (*all_cells)[i];
 				standard_cell_cell_interactions(pC,pC->phenotype,time_since_last_mechanics);
 			}
-			clear_random_context();
 		}
 		// super-critical to performance! clear the "dummy" cells from phagocytosis / fusion
 		// otherwise, comptuational cost increases at polynomial rate VERY fast, as O(10,000) 
