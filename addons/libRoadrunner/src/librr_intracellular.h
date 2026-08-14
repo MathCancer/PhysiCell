@@ -47,9 +47,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	std::map<std::string, std::string> phenotype_species;
 	std::map<std::string, int> species_result_column_index;
 	
-    // rrc::RRHandle rrHandle = createRRInstance();
-    rrc::RRHandle rrHandle;
-    // rrc::RRHandle rrHandle;
+    rrc::RRHandle rrHandle = nullptr;  // created by start(), released by the destructor
     // rrc::RRVectorPtr vptr;
 	rrc::RRCDataPtr result = 0;  // start time, end time, and number of points
 
@@ -58,9 +56,15 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
     RoadRunnerIntracellular();
 
 	RoadRunnerIntracellular(pugi::xml_node& node);
-	
+
 	RoadRunnerIntracellular(RoadRunnerIntracellular* copy);
-	
+
+	~RoadRunnerIntracellular();
+
+	// owns rrHandle, so the implicit copies would double-free it; clone() is the way to copy
+	RoadRunnerIntracellular( const RoadRunnerIntracellular& ) = delete;
+	RoadRunnerIntracellular& operator=( const RoadRunnerIntracellular& ) = delete;
+
     // rwh: review this
 	Intracellular* clone()
     {
@@ -70,6 +74,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 		clone->substrate_species = this->substrate_species;
         clone->phenotype_species = this->phenotype_species;
 		clone->custom_data_species = this->custom_data_species;
+		clone->start(); // must follow the assignments above: start() loads sbml_filename
 		return static_cast<Intracellular*>(clone);
 	}
 

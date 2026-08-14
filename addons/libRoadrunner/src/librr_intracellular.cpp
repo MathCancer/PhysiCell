@@ -43,7 +43,14 @@ RoadRunnerIntracellular::RoadRunnerIntracellular(RoadRunnerIntracellular* copy)
 	// initial_values = copy->initial_values;
 	// mutations = copy->mutations;
 	parameters = copy->parameters;
-	
+	// rrHandle and result are left at their in-class initializers; a RoadRunner instance
+	// cannot be copied, so clone() calls start() to create this one's own.
+}
+
+RoadRunnerIntracellular::~RoadRunnerIntracellular()
+{
+	rrc::freeRRInstance( rrHandle );
+	rrc::freeRRCData( result );
 }
 
 // Parse the <intracellular> info in the .xml for (possibly) each <cell_definition ...>, e.g.
@@ -258,6 +265,18 @@ void RoadRunnerIntracellular::update()
     // return 0;
 }
 
+// Fatal, like the setup-time check in validate_SBML_species(): there is no value to return
+// and nothing sensible to write, so continuing would feed a fabricated number into the model.
+static void librr_unknown_species_fatal(const std::string& species_name, const char* caller)
+{
+    std::cerr << std::endl
+              << "ERROR: " << caller << "() was asked for the SBML species \"" << species_name
+              << "\", which is not present in this model." << std::endl
+              << "       Check the spelling against the species in the SBML file." << std::endl
+              << std::endl;
+    exit(-1);
+}
+
 double RoadRunnerIntracellular::get_parameter_value(std::string param_name)
 {
     rrc::RRVectorPtr vptr;
@@ -277,14 +296,17 @@ double RoadRunnerIntracellular::get_parameter_value(std::string param_name)
     // std::string species_name = this->substrate_species[substrate_name];
     // std::cout << "    species_name = " << species_name << std::endl;
 
-    vptr = rrc::getFloatingSpeciesConcentrations(this->rrHandle);
-    //std::cerr << vptr->Count << std::endl;
-    for (int kdx=0; kdx<vptr->Count; kdx++)
+    // find(), not operator[]: the inserting form silently yields column 0 for an unknown
+    // species, so a typo reads a different species than the caller named, and a read
+    // mutates the map.
+    std::map<std::string,int>::const_iterator it = species_result_column_index.find( param_name );
+    if( it == species_result_column_index.end() )
     {
-        //std::cerr << kdx << ") " << vptr->Data[kdx] << std::endl;
+        librr_unknown_species_fatal( param_name, __FUNCTION__ );
     }
 
-    int offset = species_result_column_index[param_name];
+    vptr = rrc::getFloatingSpeciesConcentrations(this->rrHandle);
+    int offset = it->second;
     //std::cout << "    result offset = "<< offset << std::endl;
     // double res = this->result->Data[offset];
     double res = vptr->Data[offset];
@@ -298,8 +320,16 @@ void RoadRunnerIntracellular::set_parameter_value(std::string species_name, doub
 {
     rrc::RRVectorPtr vptr;
 
+    // see get_parameter_value(): operator[] would silently write column 0 for an unknown
+    // species, i.e. corrupt a different species than the caller named.
+    std::map<std::string,int>::const_iterator it = species_result_column_index.find( species_name );
+    if( it == species_result_column_index.end() )
+    {
+        librr_unknown_species_fatal( species_name, __FUNCTION__ );
+    }
+
     vptr = rrc::getFloatingSpeciesConcentrations(this->rrHandle);
-    int idx = species_result_column_index[species_name];
+    int idx = it->second;
     vptr->Data[idx] = value;
 	// rrc::setFloatingSpeciesConcentrations(pCell->phenotype.molecular.model_rr, vptr);
     rrc::setFloatingSpeciesConcentrations(this->rrHandle, vptr);
