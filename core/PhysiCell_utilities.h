@@ -75,6 +75,7 @@
 #include <vector>
 #include <chrono>
 #include <random>
+#include <cstdint>
 
 #include <omp.h> 
 
@@ -82,16 +83,27 @@ namespace PhysiCell{
 
 
 	extern std::vector<unsigned int> physicell_random_seeds; 
+	extern unsigned int physicell_random_seed;
+
+	void set_deterministic_random_context( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose );
+	void clear_deterministic_random_context( void );
+
+	double Random( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index );
+	double Random( void );
 
 void setup_rng( void );
 void SeedRandom( unsigned int input );
 void SeedRandom( void );
 
 double UniformRandom( void );
+	double UniformRandom( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index );
 
 int UniformInt( void );
+	int UniformInt( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index );
 double NormalRandom( double mean, double standard_deviation );
+	double NormalRandom( double mean, double standard_deviation, std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index );
 double LogNormalRandom( double mean, double standard_deviation );
+	double LogNormalRandom( double mean, double standard_deviation, std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index );
 
 std::vector<double> UniformOnUnitSphere( void ); 
 std::vector<double> UniformOnUnitCircle( void ); 

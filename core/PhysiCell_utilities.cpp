@@ -69,11 +69,106 @@
 #include "PhysiCell_constants.h"
 
 #include "PhysiCell.h" 
+#include "../modules/philox.h"
+
+#include <array>
+#include <limits>
+#include <utility>
 
 namespace PhysiCell{
 
 thread_local std::mt19937_64 physicell_PRNG_generator; 
 thread_local bool local_pnrg_setup_done = false; 
+
+namespace
+{
+
+struct DeterministicRandomContext
+{
+	bool active = false;
+	std::uint64_t cell_id = 0;
+	std::uint64_t time_step = 0;
+	std::uint64_t purpose = 0;
+	std::uint64_t sub_index = 0;
+};
+
+thread_local DeterministicRandomContext deterministic_random_context;
+
+std::array<std::uint32_t,4> make_counter( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index )
+{
+	return ::philox::make_counter( cell_id, time_step, purpose, sub_index );
+}
+
+std::array<std::uint32_t,2> make_key( void )
+{
+	std::uint64_t seed0 = ::philox::splitmix64( static_cast<std::uint64_t>( physicell_random_seed ) );
+	std::uint64_t seed1 = ::philox::splitmix64( seed0 ^ 0xD1342543DE82EF95ull );
+	return {
+		static_cast<std::uint32_t>( seed0 ),
+		static_cast<std::uint32_t>( seed1 )
+	};
+}
+
+std::array<std::uint32_t,4> make_philox_block( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index )
+{
+	return ::philox::philox4x32_10( make_counter( cell_id, time_step, purpose, sub_index ), make_key() );
+}
+
+double block_to_unit_double( const std::array<std::uint32_t,4>& block )
+{
+	std::uint64_t mantissa = ( static_cast<std::uint64_t>( block[0] ) << 21 ) | ( static_cast<std::uint64_t>( block[1] ) >> 11 );
+	return std::ldexp( static_cast<double>( mantissa ), -53 );
+}
+
+double next_context_random( void )
+{
+	double value = Random( deterministic_random_context.cell_id,
+		deterministic_random_context.time_step,
+		deterministic_random_context.purpose,
+		deterministic_random_context.sub_index );
+	deterministic_random_context.sub_index += 1;
+	return value;
+}
+
+double next_context_normal( double mean, double standard_deviation )
+{
+	double u1 = next_context_random();
+	double u2 = next_context_random();
+	u1 = std::max( u1, std::numeric_limits<double>::min() );
+	double magnitude = std::sqrt( -2.0 * std::log( u1 ) );
+	double angle = 6.283185307179586476925286766559 * u2;
+	return mean + standard_deviation * magnitude * std::cos( angle );
+}
+
+} // namespace
+
+void set_deterministic_random_context( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose )
+{
+	deterministic_random_context.active = true;
+	deterministic_random_context.cell_id = cell_id;
+	deterministic_random_context.time_step = time_step;
+	deterministic_random_context.purpose = purpose;
+	deterministic_random_context.sub_index = 0;
+}
+
+void clear_deterministic_random_context( void )
+{
+	deterministic_random_context.active = false;
+	deterministic_random_context.cell_id = 0;
+	deterministic_random_context.time_step = 0;
+	deterministic_random_context.purpose = 0;
+	deterministic_random_context.sub_index = 0;
+}
+
+double Random( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index )
+{
+	return block_to_unit_double( make_philox_block( cell_id, time_step, purpose, sub_index ) );
+}
+
+double Random( void )
+{
+	return UniformRandom();
+}
 
 unsigned int physicell_random_seed = 0; 
 std::vector<unsigned int> physicell_random_seeds; 
@@ -147,6 +242,11 @@ double UniformRandom_old_not_thread_safe()
 
 double UniformRandom( void )
 {
+	if( deterministic_random_context.active )
+	{
+		return next_context_random();
+	}
+
 	thread_local std::uniform_real_distribution<double> distribution(0.0,1.0);
 	if( local_pnrg_setup_done == false )
 	{
@@ -175,23 +275,66 @@ double UniformRandom( void )
 */	
 }
 
+double UniformRandom( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index )
+{
+	return Random( cell_id, time_step, purpose, sub_index );
+}
+
 
 int UniformInt()
 {
+	if( deterministic_random_context.active )
+	{
+		return static_cast<int>( make_philox_block( deterministic_random_context.cell_id,
+			deterministic_random_context.time_step,
+			deterministic_random_context.purpose,
+			deterministic_random_context.sub_index++ )[0] & 0x7fffffffU );
+	}
+
 	static std::uniform_int_distribution<int> int_dis;
 	return int_dis(physicell_PRNG_generator);
+}
+
+int UniformInt( std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index )
+{
+	return static_cast<int>( make_philox_block( cell_id, time_step, purpose, sub_index )[0] & 0x7fffffffU );
 }
 
 
 double NormalRandom( double mean, double standard_deviation )
 {
+	if( deterministic_random_context.active )
+	{
+		return next_context_normal( mean, standard_deviation );
+	}
+
 	std::normal_distribution<double> d(mean,standard_deviation);
 	return d(physicell_PRNG_generator); 
 }
 
+double NormalRandom( double mean, double standard_deviation, std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index )
+{
+	double u1 = Random( cell_id, time_step, purpose, sub_index );
+	double u2 = Random( cell_id, time_step, purpose, sub_index + 1 );
+	u1 = std::max( u1, std::numeric_limits<double>::min() );
+	double magnitude = std::sqrt( -2.0 * std::log( u1 ) );
+	double angle = 6.283185307179586476925286766559 * u2;
+	return mean + standard_deviation * magnitude * std::cos( angle );
+}
+
 double LogNormalRandom( double mean, double standard_deviation )
 {
+	if( deterministic_random_context.active )
+	{
+		return exp( next_context_normal( log( mean ), standard_deviation ) );
+	}
+
 	return exp(NormalRandom(log(mean), standard_deviation));
+}
+
+double LogNormalRandom( double mean, double standard_deviation, std::uint64_t cell_id, std::uint64_t time_step, std::uint64_t purpose, std::uint64_t sub_index )
+{
+	return exp( NormalRandom( log( mean ), standard_deviation, cell_id, time_step, purpose, sub_index ) );
 }
 
 std::vector<double> UniformOnUnitSphere( void )
