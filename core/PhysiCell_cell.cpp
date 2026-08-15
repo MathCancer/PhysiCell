@@ -366,8 +366,10 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	// check for new death events 
 	if( phenotype.death.check_for_death( dt_ ) == true )
 	{
-		// if so, change the cycle model to the current death model 
-		phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() ); 
+		// if so, change the cycle model to the current death model, taking the
+		// parameters from this cell definition rather than from the shared model (#199) 
+		phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() , 
+			phenotype.death.current_model_data() ); 
 		
 		// also, turn off motility.
 		
@@ -505,8 +507,10 @@ void Cell::start_death( int death_model_index )
 {
 	// set the death data struture to the indicated death model 
 	phenotype.death.trigger_death( death_model_index ); 
-	// change the cycle model to the current death model 
-	phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() ); 
+	// change the cycle model to the current death model, taking the parameters
+	// from this cell definition rather than from the shared model (#199) 
+	phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() , 
+		phenotype.death.current_model_data() ); 
 		
 	// turn off secretion, and reduce uptake by a factor of 10 
 	phenotype.secretion.set_all_secretion_to_zero();
@@ -1861,7 +1865,9 @@ void display_cell_definitions( std::ostream& os )
 			<< " with rate " << pCD->phenotype.death.rates[k] << " 1/min" << std::endl; 
 
 			Cycle_Model* pCM = (pCD->phenotype.death.models[k] ); 
-			Cycle_Data* pCMD = &(pCD->phenotype.death.models[k]->data ); 
+			// phases and links come from the shared model, but the parameters are
+			// per-definition now, so take those from model_data (#199) 
+			Cycle_Data* pCMD = &(pCD->phenotype.death.model_data[k] ); 
 
 			
 			os << "\t\tdeath phase transitions: " << std::endl 
@@ -2293,8 +2299,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				
 				// set the transition rate 
 				pCD->phenotype.cycle.data.transition_rate(start,end) = value; 
-				// set it to fixed / non-fixed 
-				pCD->phenotype.cycle.model().phase_link(start,end).fixed_duration = fixed; 
+				// set it to fixed / non-fixed -- into this definition's own data, not
+				// the shared Cycle_Model (#199) 
+				pCD->phenotype.cycle.data.fixed_duration(start,end) = fixed; 
 				
 				node = node.next_sibling( "rate" ); 
 			}
@@ -2322,7 +2329,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				// set the transition rate 
 				pCD->phenotype.cycle.data.exit_rate(start) = 1.0 / (value+1e-16); 
 				// set it to fixed / non-fixed 
-				pCD->phenotype.cycle.model().phase_links[start][0].fixed_duration = fixed; 
+				pCD->phenotype.cycle.data.exit_fixed_duration(start) = fixed; 
 				
 				node = node.next_sibling( "duration" ); 
 			}
@@ -2551,9 +2558,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					double value = xml_get_my_double_value( node1 ); 
 					
 					// set the transition rate 
-					pCD->phenotype.death.models[death_index]->transition_rate(start,end) = value; 
-					// set it to fixed / non-fixed 
-					pCD->phenotype.death.models[death_index]->phase_link(start,end).fixed_duration = fixed; 
+					pCD->phenotype.death.model_data[death_index].transition_rate(start,end) = value; 
+					// set it to fixed / non-fixed -- into this definition's own copy, not
+					// the shared Cycle_Model (#199) 
+					pCD->phenotype.death.model_data[death_index].fixed_duration(start,end) = fixed; 
 					
 					node1 = node1.next_sibling( "rate" ); 
 				}
@@ -2575,10 +2583,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					double value = xml_get_my_double_value( node ); 
 					
 					// set the transition rate 
-					pCD->phenotype.death.models[death_index]->data.exit_rate(start) 
+					pCD->phenotype.death.model_data[death_index].exit_rate(start) 
 						= 1.0 / (value+1e-16); 
-					// set it to fixed / non-fixed 
-					pCD->phenotype.death.models[death_index]->phase_links[start][0].fixed_duration 
+					// set it to fixed / non-fixed -- into this definition's own copy, not
+					// the shared Cycle_Model (#199) 
+					pCD->phenotype.death.model_data[death_index].exit_fixed_duration(start) 
 						= fixed; 
 					
 					node = node.next_sibling( "duration" ); 

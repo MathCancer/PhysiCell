@@ -239,7 +239,7 @@ void create_ki67_models( void )
 	
 	Ki67_basic.transition_rate(0,1) = 1.0/(4.59*60.0); // MCF10A cells are ~4.59 hours in Ki67- state
 	Ki67_basic.transition_rate(1,0) = 1.0/(15.5*60.0); // length of Ki67+ states in advanced model 
-	Ki67_basic.phase_link(1,0).fixed_duration = true; 
+	Ki67_basic.data.fixed_duration(1,0) = true; 
 	
 	Ki67_basic.phases[0].entry_function = NULL; // standard_Ki67_negative_phase_entry_function;
 	Ki67_basic.phases[1].entry_function = standard_Ki67_positive_phase_entry_function;
@@ -261,8 +261,8 @@ void create_ki67_models( void )
 	Ki67_advanced.add_phase_link( 1 , 2 , NULL ); // + (pre-mitotic) to + (post-mitotic) 
 	Ki67_advanced.add_phase_link( 2 , 0 , NULL ); // + to - 
 	
-	Ki67_advanced.phase_link(1,2).fixed_duration = true; 
-	Ki67_advanced.phase_link(2,0).fixed_duration = true; 
+	Ki67_advanced.data.fixed_duration(1,2) = true; 
+	Ki67_advanced.data.fixed_duration(2,0) = true; 
 
 	Ki67_advanced.transition_rate(0,1) = 1.0/(3.62*60.0); // MCF10A cells ~3.62 hours in Ki67- in this fitted model
 	Ki67_advanced.transition_rate(1,2) = 1.0/(13.0*60.0); 
@@ -376,7 +376,7 @@ void create_cycling_quiescent_model( void )
 	
 	cycling_quiescent.transition_rate(0,1) = 1.0/(4.59*60.0); // MCF10A cells are ~4.59 hours in Ki67- state
 	cycling_quiescent.transition_rate(1,0) = 1.0/(15.5*60.0); // length of Ki67+ states in advanced model 
-	cycling_quiescent.phase_link(1,0).fixed_duration = true; 
+	cycling_quiescent.data.fixed_duration(1,0) = true; 
 	
 	cycling_quiescent.phases[0].entry_function = NULL; 
 	cycling_quiescent.phases[1].entry_function = standard_cycling_entry_function;
@@ -440,7 +440,7 @@ void create_standard_apoptosis_model( void )
 	apoptosis.transition_rate( 0, 1) = 1.0 / (8.6 * 60.0); 
 
 		// Use the deterministic model, where this phase has fixed duration
-	apoptosis.phase_link(0,1).fixed_duration = true; 
+	apoptosis.data.fixed_duration(0,1) = true; 
 	
 	return; 
 }
@@ -482,7 +482,7 @@ void create_standard_necrosis_model( void )
 	necrosis.transition_rate( 1, 2 ) = 1.0 / (60.0 * 24.0 * 60.0 ); // 60 days max  
 
 	// Deterministically remove the necrotic cell if it has been 60 days
-	necrosis.phase_link(1,2).fixed_duration = true; 
+	necrosis.data.fixed_duration(1,2) = true; 
 
 	return; 
 }	
