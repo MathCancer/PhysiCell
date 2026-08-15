@@ -143,14 +143,21 @@ void setup_signal_behavior_dictionaries( void )
 
         map_index++; 
 	}    
-	
+
+	// current cycle phase index
+	signal_to_int["current cycle phase"] = map_index;
+	int_to_signal[map_index] = "current cycle phase";
+	// synonyms
+	signal_to_int["current cycle phase index"] = map_index;
+	signal_to_int["cycle phase"] = map_index;
+	signal_to_int["cycle phase index"] = map_index;
+
 	// mechanical pressure 
-	// int map_index = m; 
+	map_index++;
 	signal_to_int[ "pressure"] = map_index; 
 	int_to_signal[map_index] = "pressure"; 
 
 	// total volume 
-
 	map_index++; 
 	signal_to_int[ "volume"] = map_index; 
 	int_to_signal[map_index] = "volume"; 
@@ -209,6 +216,16 @@ void setup_signal_behavior_dictionaries( void )
 	int_to_signal[map_index] = "contact with basement membrane"; 
 	// synonym
 	signal_to_int["contact with BM"] = map_index; 
+
+	// number of attachments
+	map_index++;
+	signal_to_int["number of attachments"] = map_index;
+	int_to_signal[map_index] = "number of attachments";
+
+	// number of spring attachments
+	map_index++;
+	signal_to_int["number of spring attachments"] = map_index;
+	int_to_signal[map_index] = "number of spring attachments";
 	
 	// damage state 
 
@@ -795,6 +812,10 @@ std::vector<double> get_signals( Cell* pCell )
 	for( int i=0; i < m ; i++ )
 	{ signals[start_substrate_grad_ind+i] = norm( pCell->nearest_gradient(i) ); }    
 
+	// current cycle phase
+	static int cycle_phase_ind = find_signal_index( "cycle phase" );
+	signals[cycle_phase_ind] = pCell->phenotype.cycle.data.current_phase_index;
+
 	// mechanical pressure 
 	static int pressure_ind = find_signal_index( "pressure"); 
 	signals[pressure_ind] = pCell->state.simple_pressure;
@@ -856,6 +877,14 @@ std::vector<double> get_signals( Cell* pCell )
 	// physical contact with basement membrane (not implemented) 
 	static int BM_contact_ind = find_signal_index( "contact with basement membrane"); 
 	signals[BM_contact_ind] = (int) pCell->state.contact_with_basement_membrane; 
+
+	// number of attachments
+	static int num_attachments_ind = find_signal_index( "number of attachments"); 
+	signals[num_attachments_ind] = pCell->state.attached_cells.size();
+
+	// number of spring attachments
+	static int num_spring_attachments_ind = find_signal_index( "number of spring attachments"); 
+	signals[num_spring_attachments_ind] = pCell->state.spring_attachments.size();
 
 	// damage
 	static int damage_ind = find_signal_index( "damage"); 
@@ -1044,6 +1073,15 @@ double get_single_signal( Cell* pCell, int index )
 		return out; 
 	}
 
+	// current cycle phase 
+	static int cycle_phase_ind = find_signal_index( "cycle phase" ); 
+	if( index == cycle_phase_ind )
+	{
+		out = pCell->phenotype.cycle.data.current_phase_index;
+		out /= signal_scales[index]; 
+		return out; 
+	}
+	
 	// mechanical pressure 
 	static int pressure_ind = find_signal_index( "pressure" ); 
 	if( index == pressure_ind )
@@ -1152,6 +1190,24 @@ double get_single_signal( Cell* pCell, int index )
 		out /= signal_scales[index]; 
 		return out; 
 	} 
+
+	// number of attachments
+	static int num_attachments_ind = find_signal_index( "number of attachments"); 
+	if( index == num_attachments_ind )
+	{
+		out = pCell->state.attached_cells.size(); 
+		out /= signal_scales[index]; 
+		return out;
+	}
+
+	// number of spring attachments
+	static int num_spring_attachments_ind = find_signal_index( "number of spring attachments"); 
+	if( index == num_spring_attachments_ind )
+	{
+		out = pCell->state.spring_attachments.size(); 
+		out /= signal_scales[index]; 
+		return out;
+	}
 
 	// damage
 	static int damage_ind = find_signal_index( "damage"); 
