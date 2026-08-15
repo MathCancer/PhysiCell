@@ -160,6 +160,7 @@ int main( int argc, char* argv[] )
 		{
 			// load xml file
 			std::cout << "load setting xml " << settingxml << " ..." << std::endl;
+			warned_rng = true;
 			bool XML_status = false;
 			XML_status = read_PhysiCell_config_file( settingxml );
 			if ( XML_status ) { PhysiCell_settings.read_from_pugixml(); }
