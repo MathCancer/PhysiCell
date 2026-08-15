@@ -65,8 +65,10 @@
 ###############################################################################
 */
 
-#include <vector>
+#include <algorithm>
 #include <string>
+#include <unordered_set>
+#include <vector>
 
 #ifndef __PhysiCell_pathology__
 #define __PhysiCell_pathology__

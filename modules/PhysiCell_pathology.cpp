@@ -1707,40 +1707,197 @@ std::string paint_by_density_percentage(double concentration, double max_conc, d
 	return colormap[ind];
 }
 
+// Returns true if the string is a valid SVG/CSS color:
+//   - CSS named color (case-insensitive)
+//   - #rgb or #rrggbb hex notation
+//   - rgb(r,g,b) functional notation (integers 0-255)
+static bool is_valid_svg_color( const std::string& s )
+{
+	if( s.empty() ) return false;
+
+	// #rgb / #rrggbb
+	if( s[0] == '#' )
+	{
+		if( s.size() != 4 && s.size() != 7 ) return false;
+		for( size_t i = 1; i < s.size(); i++ )
+		{
+			char c = s[i];
+			if( !( (c>='0'&&c<='9') || (c>='a'&&c<='f') || (c>='A'&&c<='F') ) )
+				return false;
+		}
+		return true;
+	}
+
+	// rgb(r,g,b) — accept optional whitespace, integers 0-255
+	if( s.size() > 4 && s.substr(0,4) == "rgb(" && s.back() == ')' )
+	{
+		std::string inner = s.substr(4, s.size()-5);
+		// parse three comma-separated integers
+		int vals[3]; int nread;
+		char extra;
+		nread = std::sscanf(inner.c_str(), " %d , %d , %d %c", &vals[0], &vals[1], &vals[2], &extra);
+		if( nread != 3 ) return false;
+		for( int i = 0; i < 3; i++ )
+			if( vals[i] < 0 || vals[i] > 255 ) return false;
+		return true;
+	}
+
+	// CSS named colors (standard 147 + rebeccapurple)
+	static const std::unordered_set<std::string> named = {
+		"aliceblue","antiquewhite","aqua","aquamarine","azure","beige","bisque","black",
+		"blanchedalmond","blue","blueviolet","brown","burlywood","cadetblue","chartreuse",
+		"chocolate","coral","cornflowerblue","cornsilk","crimson","cyan","darkblue","darkcyan",
+		"darkgoldenrod","darkgray","darkgreen","darkgrey","darkkhaki","darkmagenta",
+		"darkolivegreen","darkorange","darkorchid","darkred","darksalmon","darkseagreen",
+		"darkslateblue","darkslategray","darkslategrey","darkturquoise","darkviolet","deeppink",
+		"deepskyblue","dimgray","dimgrey","dodgerblue","firebrick","floralwhite","forestgreen",
+		"fuchsia","gainsboro","ghostwhite","gold","goldenrod","gray","green","greenyellow",
+		"grey","honeydew","hotpink","indianred","indigo","ivory","khaki","lavender",
+		"lavenderblush","lawngreen","lemonchiffon","lightblue","lightcoral","lightcyan",
+		"lightgoldenrodyellow","lightgray","lightgreen","lightgrey","lightpink","lightsalmon",
+		"lightseagreen","lightskyblue","lightslategray","lightslategrey","lightsteelblue",
+		"lightyellow","lime","limegreen","linen","magenta","maroon","mediumaquamarine",
+		"mediumblue","mediumorchid","mediumpurple","mediumseagreen","mediumslateblue",
+		"mediumspringgreen","mediumturquoise","mediumvioletred","midnightblue","mintcream",
+		"mistyrose","moccasin","navajowhite","navy","oldlace","olive","olivedrab","orange",
+		"orangered","orchid","palegoldenrod","palegreen","paleturquoise","palevioletred",
+		"papayawhip","peachpuff","peru","pink","plum","powderblue","purple","rebeccapurple",
+		"red","rosybrown","royalblue","saddlebrown","salmon","sandybrown","seagreen",
+		"seashell","sienna","silver","skyblue","slateblue","slategray","slategrey","snow",
+		"springgreen","steelblue","tan","teal","thistle","tomato","turquoise","violet",
+		"wheat","white","whitesmoke","yellow","yellowgreen"
+	};
+	// compare lower-case
+	std::string lower = s;
+	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+	return named.count(lower) > 0;
+}
+
+// Convert HSV (h in [0,360), s and v in [0,1]) to an SVG "rgb(r,g,b)" string.
+static std::string hsv_to_svg_color( double h, double s, double v )
+{
+	double c = v * s;
+	double x = c * ( 1.0 - std::fabs( std::fmod( h / 60.0, 2.0 ) - 1.0 ) );
+	double m = v - c;
+	double r1, g1, b1;
+	if     ( h <  60 ) { r1 = c; g1 = x; b1 = 0; }
+	else if( h < 120 ) { r1 = x; g1 = c; b1 = 0; }
+	else if( h < 180 ) { r1 = 0; g1 = c; b1 = x; }
+	else if( h < 240 ) { r1 = 0; g1 = x; b1 = c; }
+	else if( h < 300 ) { r1 = x; g1 = 0; b1 = c; }
+	else               { r1 = c; g1 = 0; b1 = x; }
+	int r = (int)std::round( (r1 + m) * 255 );
+	int g = (int)std::round( (g1 + m) * 255 );
+	int b = (int)std::round( (b1 + m) * 255 );
+	return "rgb(" + std::to_string(r) + "," + std::to_string(g) + "," + std::to_string(b) + ")";
+}
+
 std::vector<std::string> paint_by_number_cell_coloring( Cell* pCell )
 {
-	static std::vector< std::string > colors(0); 
-	static bool setup_done = false; 
+	static std::vector<std::string> colors;
+	static bool setup_done = false;
 	if( setup_done == false )
 	{
-		colors.push_back( "grey" ); // default color will be grey 
+		// Built-in palette for the first 13 cell types.
+		static const std::vector<std::string> builtin = {
+			"grey", "red", "yellow", "green", "blue",
+			"magenta", "orange", "lime", "cyan",
+			"hotpink", "peachpuff", "darkseagreen", "lightskyblue"
+		};
 
-		colors.push_back( "red" );
-		colors.push_back( "yellow" ); 	
-		colors.push_back( "green" ); 	
-		colors.push_back( "blue" ); 
-		
-		colors.push_back( "magenta" ); 	
-		colors.push_back( "orange" ); 	
-		colors.push_back( "lime" ); 	
-		colors.push_back( "cyan" );
-		
-		colors.push_back( "hotpink" ); 	
-		colors.push_back( "peachpuff" ); 	
-		colors.push_back( "darkseagreen" ); 	
-		colors.push_back( "lightskyblue" );
+		int n = (int)cell_definitions_by_index.size();
 
-		setup_done = true; 
+		if( PhysiCell_settings.svg_cell_colors_specified )
+		{
+			// Validate: every user-supplied name must match a cell definition.
+			for( auto& kv : PhysiCell_settings.svg_cell_colors_by_name )
+			{
+				if( cell_definitions_by_name.find(kv.first) == cell_definitions_by_name.end() )
+				{
+					std::cerr << "ERROR (paint_by_number_cell_coloring): <cell_color name=\""
+					          << kv.first << "\"> does not match any cell definition." << std::endl;
+					exit(-1);
+				}
+			}
+			// Validate: every supplied color value must be a recognized SVG color.
+			for( auto& kv : PhysiCell_settings.svg_cell_colors_by_name )
+			{
+				if( !is_valid_svg_color(kv.second) )
+				{
+					std::cerr << "ERROR (paint_by_number_cell_coloring): <cell_color name=\""
+					          << kv.first << "\"> has unrecognized color value \""
+					          << kv.second << "\"." << std::endl;
+					exit(-1);
+				}
+			}
+			// Build the pool of default colors not already claimed by the user (case-insensitive).
+			std::unordered_set<std::string> claimed;
+			for( auto& kv : PhysiCell_settings.svg_cell_colors_by_name )
+			{
+				std::string lc = kv.second;
+				std::transform(lc.begin(), lc.end(), lc.begin(), ::tolower);
+				claimed.insert(lc);
+			}
+			std::vector<std::string> pool;
+			for( auto& c : builtin )
+			{
+				if( claimed.count(c) == 0 )
+				{ pool.push_back(c); }
+			}
+
+			// Assign colors: user-specified first, then pool, then HSV-generated.
+			colors.resize(n);
+			int pool_idx = 0;
+			int extra_idx = 0;
+			for( int i = 0; i < n; i++ )
+			{
+				const std::string& name = cell_definitions_by_index[i]->name;
+				auto it = PhysiCell_settings.svg_cell_colors_by_name.find(name);
+				if( it != PhysiCell_settings.svg_cell_colors_by_name.end() )
+				{
+					colors[i] = it->second;
+				}
+				else if( pool_idx < (int)pool.size() )
+				{
+					colors[i] = pool[pool_idx++];
+				}
+				else
+				{
+					double hue = std::fmod( extra_idx * 137.508, 360.0 );
+					colors[i] = hsv_to_svg_color( hue, 0.65, 0.85 );
+					extra_idx++;
+				}
+			}
+		}
+		else
+		{
+			// No user colors: use built-in palette; generate via golden-angle HSV for extras.
+			colors.resize(n);
+			int n_extra = 0;
+			for( int i = 0; i < n; i++ )
+			{
+				if( i < (int)builtin.size() )
+				{ colors[i] = builtin[i]; }
+				else
+				{
+					double hue = std::fmod( n_extra * 137.508, 360.0 );
+					colors[i] = hsv_to_svg_color( hue, 0.65, 0.85 );
+					n_extra++;
+				}
+			}
+		}
+
+		setup_done = true;
 	}
-	
-	// start all black 
-	
-	std::vector<std::string> output = { "black", "black", "black", "black" }; 
-	
-	// paint by number -- by cell type 
-	
-	std::string interior_color = "white"; 
-	if( pCell->type < 13 )
+
+	// start all black
+
+	std::vector<std::string> output = { "black", "black", "black", "black" };
+
+	// paint by number -- by cell type
+
+	std::string interior_color = "white";
+	if( pCell->type >= 0 && pCell->type < (int)colors.size() )
 	{ interior_color = colors[ pCell->type ]; }
 	
 	output[0] = interior_color; // set cytoplasm color 

@@ -35,6 +35,18 @@
         <SVG>
             <interval units="min">60</interval>
             <enable>true</enable>
+            <!-- Optional: override SVG colors for specific cell types.
+                 Names must match cell_definition names exactly; an unrecognized name is an error.
+                 Partial coverage is fine: unlisted cell types are assigned colors automatically
+                 from the built-in palette (with any user-claimed colors skipped), then generated
+                 via golden-angle HSV spacing once the palette is exhausted.
+                 If this element is absent entirely, all colors are assigned automatically.
+                 Accepted color formats: CSS named colors (e.g. "red"), #rrggbb/#rgb hex, rgb(r,g,b).
+            <cell_colors>
+                <cell_color name="cancer cell">red</cell_color>
+                <cell_color name="immune cell">cyan</cell_color>
+            </cell_colors>
+            -->
         </SVG>
         <legacy_data>
             <enable>false</enable>
