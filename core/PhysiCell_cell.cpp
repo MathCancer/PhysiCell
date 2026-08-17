@@ -1079,7 +1079,7 @@ void Cell::add_potentials(Cell* other_agent)
 		state.neighbors.push_back(other_agent); // move here in 1.10.2 so non-adhesive cells also added. 
 	}
 	/////////////////////////////////////////////////////////////////
-	if( fabs(temp_r) < 1e-16 )
+	if( fabs(temp_r) < 1e-16 || is_movable == false )
 	{ return; }
 	temp_r /= distance;
 	// for( int i = 0 ; i < 3 ; i++ ) 
