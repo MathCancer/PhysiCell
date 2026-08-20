@@ -398,7 +398,8 @@ bool load_cells_from_pugixml( pugi::xml_node root )
 		exit(-1);
 	}
 
-	copy_file_to_output(input_filename);
+	std::string default_basename = "cells.csv";
+	copy_file_to_output(input_filename, default_basename);
 	return true; 
 }
 

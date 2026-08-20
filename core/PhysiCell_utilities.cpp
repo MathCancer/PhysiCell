@@ -365,7 +365,7 @@ int choose_event( std::vector<double>& probabilities )
 	return probabilities.size(); 
 }
 
-void copy_file_to_output(std::string filename)
+void copy_file_to_output(const std::string &filename, const std::string &default_basename)
 {
 	std::cout << "Copying " << filename << " to output folder." << std::endl;
 	// copy the file to the output folder
@@ -381,8 +381,25 @@ void copy_file_to_output(std::string filename)
 	// copy filename to output_filename
 	char copy_command[1024];
 	sprintf(copy_command, "cp %s %s", filename.c_str(), output_filename.c_str());
-	std::cout << "Copy command: " << copy_command << std::endl;
-	(void)system(copy_command); // make it explicit that we are ignoring the return value
+
+	int ret_code = system(copy_command);
+	if (ret_code != 0) {
+		std::cerr << "Error: Failed to execute command: " << copy_command << std::endl;
+	}
+
+	if (default_basename.empty() || default_basename == basename) {
+		return;
+	}
+
+	// copy the file to the output folder with the default basename
+	std::string default_output_filename = PhysiCell_settings.folder + "/" + default_basename;
+	sprintf(copy_command, "cp %s %s", filename.c_str(), default_output_filename.c_str());
+
+	ret_code = system(copy_command);
+	if (ret_code != 0) {
+		std::cerr << "Error: Failed to execute command: " << copy_command << std::endl;
+	}
+	return;
 }
 
 };
