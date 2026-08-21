@@ -1,9 +1,7 @@
 #ifndef _MaBoSS_Net_h_
 #define _MaBoSS_Net_h_
 
-#include "StochasticSimulationEngine.h"
-#include "BooleanNetwork.h"
-#include "RunConfig.h"
+#include "engines/StochasticSimulationEngine.h"
 #include "../../../core/PhysiCell_utilities.h"
 
 /**

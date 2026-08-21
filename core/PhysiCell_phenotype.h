@@ -517,6 +517,7 @@ class Cell_Functions
 		Cell* pOther, Phenotype& other_phenotype, double dt ); 
 
     void (*cell_division_function)(Cell* pCell1, Cell* pCell2 );
+    std::vector<double> (*cell_division_direction_function)(Cell* pCell1);
 		
 	/* prototyping / beta in 1.5.0 */ 
 /*	

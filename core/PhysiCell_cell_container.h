@@ -84,7 +84,6 @@ class Cell_Container : public BioFVM::Agent_Container
 	std::vector<Cell*> cells_ready_to_divide; // the index of agents ready to divide
 	std::vector<Cell*> cells_ready_to_die;
 	int boundary_condition_for_pushed_out_agents; 	// what to do with pushed out cells
-	bool initialzed = false;
 	
  public:
 	BioFVM::Cartesian_Mesh underlying_mesh;
@@ -104,7 +103,9 @@ class Cell_Container : public BioFVM::Agent_Container
 	void update_all_cells(double t);
 	void update_all_cells(double t, double dt);
 	void update_all_cells(double t, double phenotype_dt, double mechanics_dt);
-	void update_all_cells(double t, double phenotype_dt, double mechanics_dt, double diffusion_dt ); 
+	void update_all_cells(double t, double phenotype_dt, double mechanics_dt, double diffusion_dt );
+
+	void update_all_cells_intracellular( void );
 
 	void register_agent( Cell* agent );
 	void add_agent_to_outer_voxel(Cell* agent);

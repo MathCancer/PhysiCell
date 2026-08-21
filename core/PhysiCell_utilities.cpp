@@ -370,7 +370,7 @@ void copy_file_to_output(std::string filename)
 	std::cout << "Copying " << filename << " to output folder." << std::endl;
 	// copy the file to the output folder
 	std::string basename = filename;
-	size_t found = basename.find_last_of("/"); // find the end of the path
+	size_t found = basename.find_last_of("/\\");
 	if (found != std::string::npos)
 	{
 		basename = basename.substr(found + 1);

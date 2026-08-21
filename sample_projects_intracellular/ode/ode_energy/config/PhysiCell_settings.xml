@@ -90,7 +90,8 @@
 		<max_time units="min">1440</max_time> <!-- 1 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
-	
+
+		<dt_intracellular units="min">0.01</dt_intracellular>
 		<dt_diffusion units="min">0.01</dt_diffusion>
 		<dt_mechanics units="min">0.1</dt_mechanics>
 		<dt_phenotype units="min">6</dt_phenotype>	
@@ -307,23 +308,27 @@
 
 				<intracellular type="roadrunner">
 					<sbml_filename>./config/Toy_Metabolic_Model.xml</sbml_filename>
-                    <intracellular_dt>0.01</intracellular_dt>
-                    <map PC_substrate="oxygen" sbml_species="Oxygen"></map >
-                    <map PC_substrate="lactate" sbml_species="Lactate"></map >
-                    <map PC_substrate="glucose" sbml_species="Glucose"></map >
-                    <map PC_phenotype="da" sbml_species="apoptosis_rate"></map>
-                    <map PC_phenotype="mms" sbml_species="migration_speed"></map>
-                    <map PC_phenotype="ssr_lactate" sbml_species="Lac_Secretion_Rate"></map>
-                    <map PC_phenotype="ctr_0_0" sbml_species="Transition_Rate"></map>
+					<intracellular_dt>0.1</intracellular_dt>
+                    <map type="io" physicell_name="intracellular oxygen" sbml_species="Oxygen"></map >
+                    <map type="io" physicell_name="intracellular lactate" sbml_species="Lactate"></map >
+					<map type="io" physicell_name="intracellular glucose" sbml_species="Glucose"></map >
+                    <map type="output" physicell_name="apoptosis" sbml_species="apoptosis_rate"></map>
+                    <map type="output" physicell_name="migration speed" sbml_species="migration_speed"></map>
+                    <map type="output" physicell_name="lactate secretion" sbml_species="Lac_Secretion_Rate"></map>
+                    <map type="output" physicell_name="exit from cycle phase 0" sbml_species="Transition_Rate"></map>
+					<map type="output" physicell_name="custom:intra_oxy" sbml_species="Oxygen"></map>
+					<map type="output" physicell_name="custom:intra_lac" sbml_species="Lactate"></map>
+					<map type="output" physicell_name="custom:intra_glu" sbml_species="Glucose"></map>
+					<map type="output" physicell_name="custom:intra_energy" sbml_species="Energy"></map>
 				</intracellular>
                 
 				<molecular />
 			</phenotype>
 			<custom_data>  
-                <intra_oxy units="mmHg">0.0</intra_oxy>
-                <intra_glu units="mM">0.0</intra_glu>
+                <intra_oxy units="mmHg">0.8</intra_oxy>
+                <intra_glu units="mM">15.0</intra_glu>
                 <intra_lac units="mM">0.0</intra_lac>
-                <intra_energy units="dimensionless">0.0</intra_energy>
+                <intra_energy units="dimensionless">450.0</intra_energy>
 			</custom_data>
 		</cell_definition>
 	</cell_definitions>
@@ -347,10 +352,6 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed>
-        <initial_internal_oxygen type="double" units="mmHg">0.8</initial_internal_oxygen>
-        <initial_internal_glucose type="double" units="mM">15</initial_internal_glucose>
-        <initial_internal_lactate type="double" units="mM">0</initial_internal_lactate>
-        <initial_energy type="double" units="dimensionless">450</initial_energy>
 	</user_parameters>
 	
 </PhysiCell_settings>

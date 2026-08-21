@@ -238,12 +238,15 @@ Cell_State::Cell_State()
 	neighbors.resize(0); 
 	spring_attachments.resize(0); 
 
+	attacked_by.resize(0);
+
 	orientation.resize( 3 , 0.0 ); 
 	
 	simple_pressure = 0.0; 
 	
 	attached_cells.clear(); 
 	spring_attachments.clear(); 
+	attacked_by.clear();
 	
 	number_of_nuclei = 1; 
 	
@@ -457,6 +460,8 @@ Cell::~Cell()
 		{
 			// release any attached cells (as of 1.7.2 release)
 			this->remove_all_attached_cells(); 
+			this->remove_all_attackers();
+			this->remove_self_from_attacked();
 			// 1.11.0
 			this->remove_all_spring_attachments(); 
 
@@ -549,8 +554,12 @@ Cell* Cell::divide( )
 	// phenotype.flagged_for_division = false; 
 	// phenotype.flagged_for_removal = false; 
 	
-	// make sure ot remove adhesions 
+	// make sure to remove adhesions 
 	remove_all_attached_cells(); 
+	// the springs below include the one holding an attack together, so end the
+	// attack rather than leave it spring-less
+	remove_all_attackers();
+	remove_self_from_attacked();
 	remove_all_spring_attachments(); 
 
 	// version 1.10.3: 
@@ -608,11 +617,26 @@ Cell* Cell::divide( )
 	normalize( &rand_vec ); 
 	rand_vec *= radius; // multiply direction times the displacement 
 	*/
-	
-	std::vector<double> rand_vec = cell_division_orientation(); 
-	rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
-		rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;	
-	rand_vec *= phenotype.geometry.radius;
+
+	// direction to displace daughter cell
+	std::vector<double> rand_vec; 
+	if( this->functions.cell_division_direction_function )
+	{ 
+		rand_vec = this->functions.cell_division_direction_function( this ); 
+        if( default_microenvironment_options.simulate_2D == true )  // ensure vec in XY plane
+	        { rand_vec[2] = 0.0; }
+	}
+	else
+	{
+		rand_vec = cell_division_orientation(); 
+		// make it orthogonal to the cell's orientation
+		rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
+			rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;	
+	}
+	// make sure it is a unit vector
+	normalize( &rand_vec );
+	// push the cells far enough apart to avoid strong overlap, but still maintain some overlap
+	rand_vec *= 0.5 * phenotype.geometry.radius;
 
 	child->assign_position(position[0] + rand_vec[0],
 						   position[1] + rand_vec[1],
@@ -620,8 +644,8 @@ Cell* Cell::divide( )
 						 
 	//change my position to keep the center of mass intact 
 	// and then see if I need to update my voxel index
-	static double negative_one_half = -0.5; 
-	axpy( &position, negative_one_half , rand_vec ); // position = position - 0.5*rand_vec; 
+	static double negative_one = -1.0; 
+	axpy( &position, negative_one , rand_vec ); // position = position - rand_vec; 
 
 	//If this cell has been moved outside of the boundaries, mark it as such.
 	//(If the child cell is outside of the boundaries, that has been taken care of in the assign_position function.)
@@ -639,6 +663,7 @@ Cell* Cell::divide( )
 	set_total_volume(phenotype.volume.total);
 	
 	// child->set_phenotype( phenotype ); 
+	// pAttackTarget was cleared above, so the daughter inherits a NULL one
 	child->phenotype = phenotype; 
 
     if (child->phenotype.intracellular){
@@ -867,7 +892,7 @@ void Cell::update_position( double dt )
 	if( default_microenvironment_options.simulate_2D == true )
 	{ velocity[2] = 0.0; }
 	
-	std::vector<double> old_position(position); 
+	// std::vector<double> old_position(position); 
 	axpy( &position , d1 , velocity );  
 	axpy( &position , d2 , previous_velocity );  
 	// overwrite previous_velocity for future use 
@@ -1132,6 +1157,14 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	Geometry cell_geometry = phenotype.geometry;
 	Molecular cell_molecular = phenotype.molecular;
 	Custom_Cell_Data cell_custom_data = custom_data;
+
+	// pAttackTarget is phenotype state, and the assignment below replaces it, so
+	// end this cell's own attack. attacked_by and the spring are in state, which
+	// transformation preserves, so attacks against this cell continue.
+	remove_self_from_attacked();
+	// should we also remove all attackers?  That would be a change in behavior, so for now we don't.
+	// remove_all_attackers();
+
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
@@ -1198,6 +1231,8 @@ void delete_cell( int index )
 	
 	// release any attached cells (as of 1.7.2 release)
 	pDeleteMe->remove_all_attached_cells(); 
+	pDeleteMe->remove_all_attackers();
+	pDeleteMe->remove_self_from_attacked();
 	// 1.11.0 
 	pDeleteMe->remove_all_spring_attachments(); 
 
@@ -1232,6 +1267,8 @@ void delete_cell_original( int index ) // before June 11, 2020
 	
 	// release any attached cells (as of 1.7.2 release)
 	(*all_cells)[index]->remove_all_attached_cells(); 
+	(*all_cells)[index]->remove_all_attackers();
+	(*all_cells)[index]->remove_self_from_attacked();
 	// 1.11.0
 	(*all_cells)[index]->remove_all_spring_attachments(); 
 	
@@ -1335,132 +1372,136 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 	if( pCell_to_eat == this )
 	{ return; } 
 	
-	// don't ingest a cell that's already ingested 
-	if( pCell_to_eat->phenotype.volume.total < 1e-15 )
-	{ return; } 
-		
 	// make this thread safe 
 	#pragma omp critical
 	{
-		/*
-		if( pCell_to_eat->phenotype.death.dead == true )
-		{ std::cout << this->type_name << " (" << this << ")" << " eats dead " << pCell_to_eat->type_name << " (" << pCell_to_eat 
-			<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
-		else
-		{ std::cout << this->type_name << " (" << this << ")" << " eats live " << pCell_to_eat->type_name << " (" << pCell_to_eat 
-			<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
-		*/
+		// don't ingest a cell that's already ingested 
+		if( pCell_to_eat->phenotype.volume.total >= 1e-15 )
+		{ 
+			/*
+			if( pCell_to_eat->phenotype.death.dead == true )
+			{ std::cout << this->type_name << " (" << this << ")" << " eats dead " << pCell_to_eat->type_name << " (" << pCell_to_eat 
+				<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
+			else
+			{ std::cout << this->type_name << " (" << this << ")" << " eats live " << pCell_to_eat->type_name << " (" << pCell_to_eat 
+				<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
+			*/
 
-		// mark it as dead 
-		pCell_to_eat->phenotype.death.dead = true; 
-		// set secretion and uptake to zero 
-		pCell_to_eat->phenotype.secretion.set_all_secretion_to_zero( );  
-		pCell_to_eat->phenotype.secretion.set_all_uptake_to_zero( ); 
-		
-		// deactivate all custom function 
-		pCell_to_eat->functions.custom_cell_rule = NULL; 
-		pCell_to_eat->functions.update_phenotype = NULL; 
-		pCell_to_eat->functions.contact_function = NULL; 
-		pCell_to_eat->functions.cell_division_function = NULL; 
-		
-		// should set volume fuction to NULL too! 
-		pCell_to_eat->functions.volume_update_function = NULL; 
-
-		// set cell as unmovable and non-secreting 
-		pCell_to_eat->is_movable = false; 
-		pCell_to_eat->is_active = false; 
-
-		// absorb all the volume(s)
-
-		// absorb fluid volume (all into the cytoplasm) 
-		phenotype.volume.cytoplasmic_fluid += pCell_to_eat->phenotype.volume.fluid; 
-		pCell_to_eat->phenotype.volume.cytoplasmic_fluid = 0.0; 
-		
-		// absorb nuclear and cyto solid volume (into the cytoplasm) 
-		phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.cytoplasmic_solid; 
-		pCell_to_eat->phenotype.volume.cytoplasmic_solid = 0.0; 
-		
-		phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.nuclear_solid; 
-		pCell_to_eat->phenotype.volume.nuclear_solid = 0.0; 
-		
-		// consistency calculations 
-		
-		phenotype.volume.fluid = phenotype.volume.nuclear_fluid + 
-			phenotype.volume.cytoplasmic_fluid; 
-		pCell_to_eat->phenotype.volume.fluid = 0.0; 
-		
-		phenotype.volume.solid = phenotype.volume.cytoplasmic_solid + 
-			phenotype.volume.nuclear_solid; 
-		pCell_to_eat->phenotype.volume.solid = 0.0; 
-		
-		// no change to nuclear volume (initially) 
-		pCell_to_eat->phenotype.volume.nuclear = 0.0; 
-		pCell_to_eat->phenotype.volume.nuclear_fluid = 0.0; 
-		
-		phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + 
-			phenotype.volume.cytoplasmic_fluid; 
-		pCell_to_eat->phenotype.volume.cytoplasmic = 0.0; 
-		
-		phenotype.volume.total = phenotype.volume.nuclear + 
-			phenotype.volume.cytoplasmic; 
-		pCell_to_eat->phenotype.volume.total = 0.0; 
-
-		phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
-			(  phenotype.volume.total + 1e-16 ); 
-		pCell_to_eat->phenotype.volume.fluid_fraction = 0.0; 
-
-		phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
-			( phenotype.volume.nuclear_solid + 1e-16 );
+			// mark it as dead 
+			pCell_to_eat->phenotype.death.dead = true; 
+			// set secretion and uptake to zero 
+			pCell_to_eat->phenotype.secretion.set_all_secretion_to_zero( );  
+			pCell_to_eat->phenotype.secretion.set_all_uptake_to_zero( ); 
 			
-		// update corresponding BioFVM parameters (self-consistency) 
-		set_total_volume( phenotype.volume.total ); 
-		pCell_to_eat->set_total_volume( 0.0 ); 
-		
-		// absorb the internalized substrates 
-		
-		// multiply by the fraction that is supposed to be ingested (for each substrate) 
+			// deactivate all custom function 
+			pCell_to_eat->functions.custom_cell_rule = NULL; 
+			pCell_to_eat->functions.update_phenotype = NULL; 
+			pCell_to_eat->functions.contact_function = NULL; 
+			pCell_to_eat->functions.cell_division_function = NULL; 
+			pCell_to_eat->functions.cell_division_direction_function = NULL; 
+			
+			// should set volume fuction to NULL too! 
+			pCell_to_eat->functions.volume_update_function = NULL; 
 
-		*(pCell_to_eat->internalized_substrates) *= 
-			*(pCell_to_eat->fraction_transferred_when_ingested); // 
+			// set cell as unmovable and non-secreting 
+			pCell_to_eat->is_movable = false; 
+			pCell_to_eat->is_active = false; 
 
-		*internalized_substrates += *(pCell_to_eat->internalized_substrates); 
-		static int n_substrates = internalized_substrates->size(); 
-		pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
+			// absorb all the volume(s)
 
-		// conserved quantitites in custom data during phagocytosis
-		// so that phagocyte cell absorbs the full amount from the engulfed cell;
-		for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
-		{
-			if( custom_data.variables[nn].conserved_quantity == true )
+			// absorb fluid volume (all into the cytoplasm) 
+			phenotype.volume.cytoplasmic_fluid += pCell_to_eat->phenotype.volume.fluid; 
+			pCell_to_eat->phenotype.volume.cytoplasmic_fluid = 0.0; 
+			
+			// absorb nuclear and cyto solid volume (into the cytoplasm) 
+			phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.cytoplasmic_solid; 
+			pCell_to_eat->phenotype.volume.cytoplasmic_solid = 0.0; 
+			
+			phenotype.volume.cytoplasmic_solid += pCell_to_eat->phenotype.volume.nuclear_solid; 
+			pCell_to_eat->phenotype.volume.nuclear_solid = 0.0; 
+			
+			// consistency calculations 
+			
+			phenotype.volume.fluid = phenotype.volume.nuclear_fluid + 
+				phenotype.volume.cytoplasmic_fluid; 
+			pCell_to_eat->phenotype.volume.fluid = 0.0; 
+			
+			phenotype.volume.solid = phenotype.volume.cytoplasmic_solid + 
+				phenotype.volume.nuclear_solid; 
+			pCell_to_eat->phenotype.volume.solid = 0.0; 
+			
+			// no change to nuclear volume (initially) 
+			pCell_to_eat->phenotype.volume.nuclear = 0.0; 
+			pCell_to_eat->phenotype.volume.nuclear_fluid = 0.0; 
+			
+			phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_solid + 
+				phenotype.volume.cytoplasmic_fluid; 
+			pCell_to_eat->phenotype.volume.cytoplasmic = 0.0; 
+			
+			phenotype.volume.total = phenotype.volume.nuclear + 
+				phenotype.volume.cytoplasmic; 
+			pCell_to_eat->phenotype.volume.total = 0.0; 
+
+			phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
+				(  phenotype.volume.total + 1e-16 ); 
+			pCell_to_eat->phenotype.volume.fluid_fraction = 0.0; 
+
+			phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
+				( phenotype.volume.nuclear_solid + 1e-16 );
+				
+			// update corresponding BioFVM parameters (self-consistency) 
+			set_total_volume( phenotype.volume.total ); 
+			pCell_to_eat->set_total_volume( 0.0 ); 
+			
+			// absorb the internalized substrates 
+			
+			// multiply by the fraction that is supposed to be ingested (for each substrate) 
+
+			*(pCell_to_eat->internalized_substrates) *= 
+				*(pCell_to_eat->fraction_transferred_when_ingested); // 
+
+			*internalized_substrates += *(pCell_to_eat->internalized_substrates); 
+			static int n_substrates = internalized_substrates->size(); 
+			pCell_to_eat->internalized_substrates->assign( n_substrates , 0.0 ); 	
+
+			// conserved quantitites in custom data during phagocytosis
+			// so that phagocyte cell absorbs the full amount from the engulfed cell;
+			for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
 			{
-				custom_data.variables[nn].value += 
-				pCell_to_eat->custom_data.variables[nn].value; 			
+				if( custom_data.variables[nn].conserved_quantity == true )
+				{
+					custom_data.variables[nn].value += 
+					pCell_to_eat->custom_data.variables[nn].value; 			
+				}
 			}
-		}
-		for( int nn = 0 ; nn < custom_data.vector_variables.size() ; nn++ )
-		{
-			if( custom_data.vector_variables[nn].conserved_quantity == true )
+			for( int nn = 0 ; nn < custom_data.vector_variables.size() ; nn++ )
 			{
-				custom_data.vector_variables[nn].value += 
-				pCell_to_eat->custom_data.vector_variables[nn].value; 
+				if( custom_data.vector_variables[nn].conserved_quantity == true )
+				{
+					custom_data.vector_variables[nn].value += 
+					pCell_to_eat->custom_data.vector_variables[nn].value; 
+				}
 			}
-		}
-		
-		// trigger removal from the simulation 
-		// pCell_to_eat->die(); // I don't think this is safe if it's in an OpenMP loop 
-		
-		// flag it for removal 
-		// pCell_to_eat->flag_for_removal(); 
+			
+			// trigger removal from the simulation 
+			// pCell_to_eat->die(); // I don't think this is safe if it's in an OpenMP loop 
+			
+			// flag it for removal 
+			// pCell_to_eat->flag_for_removal(); 
 
-		// remove all adhesions 
-		// pCell_to_eat->remove_all_attached_cells();
+			// remove all adhesions 
+			// pCell_to_eat->remove_all_attached_cells();
+		}
 		
 	}
 
-	// things that have their own thread safety 
+	// Teardown is deferred rather than done here. flag_for_removal() queues this
+	// cell, and the serial cells_ready_to_die -> die() -> delete_cell() pass does
+	// the same four steps off-thread. Doing them here means mutating other cells'
+	// lists from inside the mechanics parallel-for, where remove_all_* walks a
+	// vector unlocked while attach/detach_cell_as_spring edits it under the
+	// critical -- a real race, not a theoretical one. 
 	pCell_to_eat->flag_for_removal();
-	pCell_to_eat->remove_all_attached_cells();
-	pCell_to_eat->remove_all_spring_attachments();
 	
 	return; 
 }
@@ -1495,139 +1536,148 @@ void Cell::attack_cell( Cell* pCell_to_attack , double dt )
 
 void Cell::fuse_cell( Cell* pCell_to_fuse )
 {
-	// don't ingest a cell that's already fused or fuse self 
-	if( pCell_to_fuse->phenotype.volume.total < 1e-15 || this == pCell_to_fuse )
+	// don't fuse self 
+	if( this == pCell_to_fuse )
 	{ return; } 
-		
+	
 	// make this thread safe 
 	#pragma omp critical
 	{
+		// don't fuse a cell that's already fused or ingested
+		if( pCell_to_fuse->phenotype.volume.total >= 1e-15)
+		{ 
 
-		// set new position at center of volume 
-			// x_new = (vol_B * x_B + vol_S * x_S ) / (vol_B + vol_S )
-		
-		std::vector<double> new_position = position; // x_B
-		new_position *= phenotype.volume.total; // vol_B * x_B 
-		double total_volume = phenotype.volume.total; 
-		total_volume += pCell_to_fuse->phenotype.volume.total ;  
-
-		axpy( &new_position , pCell_to_fuse->phenotype.volume.total , pCell_to_fuse->position ); // vol_B*x_B + vol_S*x_S
-		new_position /= total_volume; // (vol_B*x_B+vol_S*x_S)/(vol_B+vol_S);
-
-		static double xL = get_default_microenvironment()->mesh.bounding_box[0];		 
-		static double xU = get_default_microenvironment()->mesh.bounding_box[3]; 
-
-		static double yL = get_default_microenvironment()->mesh.bounding_box[1];		 
-		static double yU = get_default_microenvironment()->mesh.bounding_box[4]; 
-
-		static double zL = get_default_microenvironment()->mesh.bounding_box[2];		 
-		static double zU = get_default_microenvironment()->mesh.bounding_box[5]; 
-
-		if( new_position[0] < xL || new_position[0] > xU || 
-		    new_position[1] < yL || new_position[1] > yU || 
-			new_position[2] < zL || new_position[2] > zU )
-		{
-			std::cout << "cell fusion at " << new_position << " violates domain bounds" << std::endl; 
-			std::cout << get_default_microenvironment()->mesh.bounding_box << std::endl << std::endl; 
-		}
-		position = new_position; 
-		update_voxel_in_container();
-
-		// set number of nuclei 
-
-		state.number_of_nuclei += pCell_to_fuse->state.number_of_nuclei; 
-
-		// absorb all the volume(s)
-
-		// absorb fluid volume (all into the cytoplasm) 
-		phenotype.volume.cytoplasmic_fluid += pCell_to_fuse->phenotype.volume.cytoplasmic_fluid; 
-		pCell_to_fuse->phenotype.volume.cytoplasmic_fluid = 0.0; 
-
-		phenotype.volume.nuclear_fluid += pCell_to_fuse->phenotype.volume.nuclear_fluid; 
-		pCell_to_fuse->phenotype.volume.nuclear_fluid = 0.0; 
-
-		// absorb nuclear and cyto solid volume (into the cytoplasm) 
-		phenotype.volume.cytoplasmic_solid += pCell_to_fuse->phenotype.volume.cytoplasmic_solid; 
-		pCell_to_fuse->phenotype.volume.cytoplasmic_solid = 0.0; 
-		
-		phenotype.volume.nuclear_solid += pCell_to_fuse->phenotype.volume.nuclear_solid; 
-		pCell_to_fuse->phenotype.volume.nuclear_solid = 0.0; 
-
-		// consistency calculations 
-		
-		phenotype.volume.fluid = phenotype.volume.nuclear_fluid + 
-			phenotype.volume.cytoplasmic_fluid; 
-		pCell_to_fuse->phenotype.volume.fluid = 0.0; 
-		
-		phenotype.volume.solid = phenotype.volume.cytoplasmic_solid + 
-			phenotype.volume.nuclear_solid; 
-		pCell_to_fuse->phenotype.volume.solid = 0.0; 
-		
-		phenotype.volume.nuclear = phenotype.volume.nuclear_fluid + 
-			phenotype.volume.nuclear_solid; 
-		pCell_to_fuse->phenotype.volume.nuclear = 0.0; 
-
-		phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_fluid + 
-			phenotype.volume.cytoplasmic_solid; 
-		pCell_to_fuse->phenotype.volume.cytoplasmic = 0.0; 
-		
-		phenotype.volume.total = phenotype.volume.nuclear + 
-			phenotype.volume.cytoplasmic; 
-		pCell_to_fuse->phenotype.volume.total = 0.0; 
-
-		phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
-			(  phenotype.volume.total + 1e-16 ); 
-		pCell_to_fuse->phenotype.volume.fluid_fraction = 0.0; 
-
-		phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
-			( phenotype.volume.nuclear_solid + 1e-16 );
+			// set new position at center of volume 
+				// x_new = (vol_B * x_B + vol_S * x_S ) / (vol_B + vol_S )
 			
-		// update corresponding BioFVM parameters (self-consistency) 
-		set_total_volume( phenotype.volume.total ); 
-		pCell_to_fuse->set_total_volume( 0.0 ); 
+			std::vector<double> new_position = position; // x_B
+			new_position *= phenotype.volume.total; // vol_B * x_B 
+			double total_volume = phenotype.volume.total; 
+			total_volume += pCell_to_fuse->phenotype.volume.total ;  
 
-		// absorb the internalized substrates 
-		
-		*internalized_substrates += *(pCell_to_fuse->internalized_substrates); 
-		static int n_substrates = internalized_substrates->size(); 
-		pCell_to_fuse->internalized_substrates->assign( n_substrates , 0.0 ); 	
+			axpy( &new_position , pCell_to_fuse->phenotype.volume.total , pCell_to_fuse->position ); // vol_B*x_B + vol_S*x_S
+			new_position /= total_volume; // (vol_B*x_B+vol_S*x_S)/(vol_B+vol_S);
 
-		// set target volume(s)
+			static double xL = get_default_microenvironment()->mesh.bounding_box[0];		 
+			static double xU = get_default_microenvironment()->mesh.bounding_box[3]; 
 
-		phenotype.volume.target_solid_cytoplasmic += pCell_to_fuse->phenotype.volume.target_solid_cytoplasmic;
-		phenotype.volume.target_solid_nuclear += pCell_to_fuse->phenotype.volume.target_solid_nuclear;
-		
-		// trigger removal from the simulation 
-		// pCell_to_eat->die(); // I don't think this is safe if it's in an OpenMP loop 
-		
-		// flag it for removal 
-		// pCell_to_eat->flag_for_removal(); 
-		// mark it as dead 
-		pCell_to_fuse->phenotype.death.dead = true; 
-		// set secretion and uptake to zero 
-		pCell_to_fuse->phenotype.secretion.set_all_secretion_to_zero( );  
-		pCell_to_fuse->phenotype.secretion.set_all_uptake_to_zero( ); 
-		
-		// deactivate all custom function 
-		pCell_to_fuse->functions.custom_cell_rule = NULL; 
-		pCell_to_fuse->functions.update_phenotype = NULL; 
-		pCell_to_fuse->functions.contact_function = NULL; 
-		pCell_to_fuse->functions.cell_division_function = NULL; 
-		pCell_to_fuse->functions.volume_update_function = NULL; 
+			static double yL = get_default_microenvironment()->mesh.bounding_box[1];		 
+			static double yU = get_default_microenvironment()->mesh.bounding_box[4]; 
 
-		// remove all adhesions 
-		// pCell_to_eat->remove_all_attached_cells();
-		
-		// set cell as unmovable and non-secreting 
-		pCell_to_fuse->is_movable = false; 
-		pCell_to_fuse->is_active = false; 
+			static double zL = get_default_microenvironment()->mesh.bounding_box[2];		 
+			static double zU = get_default_microenvironment()->mesh.bounding_box[5]; 
+
+			if( new_position[0] < xL || new_position[0] > xU || 
+				new_position[1] < yL || new_position[1] > yU || 
+				new_position[2] < zL || new_position[2] > zU )
+			{
+				std::cout << "cell fusion at " << new_position << " violates domain bounds" << std::endl; 
+				std::cout << get_default_microenvironment()->mesh.bounding_box << std::endl << std::endl; 
+			}
+			position = new_position; 
+			update_voxel_in_container();
+
+			// set number of nuclei 
+
+			state.number_of_nuclei += pCell_to_fuse->state.number_of_nuclei; 
+
+			// absorb all the volume(s)
+
+			// absorb fluid volume (all into the cytoplasm) 
+			phenotype.volume.cytoplasmic_fluid += pCell_to_fuse->phenotype.volume.cytoplasmic_fluid; 
+			pCell_to_fuse->phenotype.volume.cytoplasmic_fluid = 0.0; 
+
+			phenotype.volume.nuclear_fluid += pCell_to_fuse->phenotype.volume.nuclear_fluid; 
+			pCell_to_fuse->phenotype.volume.nuclear_fluid = 0.0; 
+
+			// absorb nuclear and cyto solid volume (into the cytoplasm) 
+			phenotype.volume.cytoplasmic_solid += pCell_to_fuse->phenotype.volume.cytoplasmic_solid; 
+			pCell_to_fuse->phenotype.volume.cytoplasmic_solid = 0.0; 
+			
+			phenotype.volume.nuclear_solid += pCell_to_fuse->phenotype.volume.nuclear_solid; 
+			pCell_to_fuse->phenotype.volume.nuclear_solid = 0.0; 
+
+			// consistency calculations 
+			
+			phenotype.volume.fluid = phenotype.volume.nuclear_fluid + 
+				phenotype.volume.cytoplasmic_fluid; 
+			pCell_to_fuse->phenotype.volume.fluid = 0.0; 
+			
+			phenotype.volume.solid = phenotype.volume.cytoplasmic_solid + 
+				phenotype.volume.nuclear_solid; 
+			pCell_to_fuse->phenotype.volume.solid = 0.0; 
+			
+			phenotype.volume.nuclear = phenotype.volume.nuclear_fluid + 
+				phenotype.volume.nuclear_solid; 
+			pCell_to_fuse->phenotype.volume.nuclear = 0.0; 
+
+			phenotype.volume.cytoplasmic = phenotype.volume.cytoplasmic_fluid + 
+				phenotype.volume.cytoplasmic_solid; 
+			pCell_to_fuse->phenotype.volume.cytoplasmic = 0.0; 
+			
+			phenotype.volume.total = phenotype.volume.nuclear + 
+				phenotype.volume.cytoplasmic; 
+			pCell_to_fuse->phenotype.volume.total = 0.0; 
+
+			phenotype.volume.fluid_fraction = phenotype.volume.fluid / 
+				(  phenotype.volume.total + 1e-16 ); 
+			pCell_to_fuse->phenotype.volume.fluid_fraction = 0.0; 
+
+			phenotype.volume.cytoplasmic_to_nuclear_ratio = phenotype.volume.cytoplasmic_solid / 
+				( phenotype.volume.nuclear_solid + 1e-16 );
+				
+			// update corresponding BioFVM parameters (self-consistency) 
+			set_total_volume( phenotype.volume.total ); 
+			pCell_to_fuse->set_total_volume( 0.0 ); 
+
+			// absorb the internalized substrates 
+			
+			*internalized_substrates += *(pCell_to_fuse->internalized_substrates); 
+			static int n_substrates = internalized_substrates->size(); 
+			pCell_to_fuse->internalized_substrates->assign( n_substrates , 0.0 ); 	
+
+			// set target volume(s)
+
+			phenotype.volume.target_solid_cytoplasmic += pCell_to_fuse->phenotype.volume.target_solid_cytoplasmic;
+			phenotype.volume.target_solid_nuclear += pCell_to_fuse->phenotype.volume.target_solid_nuclear;
+			
+			// trigger removal from the simulation 
+			// pCell_to_eat->die(); // I don't think this is safe if it's in an OpenMP loop 
+			
+			// flag it for removal 
+			// pCell_to_eat->flag_for_removal(); 
+			// mark it as dead 
+			pCell_to_fuse->phenotype.death.dead = true; 
+			// set secretion and uptake to zero 
+			pCell_to_fuse->phenotype.secretion.set_all_secretion_to_zero( );  
+			pCell_to_fuse->phenotype.secretion.set_all_uptake_to_zero( ); 
+			
+			// deactivate all custom function 
+			pCell_to_fuse->functions.custom_cell_rule = NULL; 
+			pCell_to_fuse->functions.update_phenotype = NULL; 
+			pCell_to_fuse->functions.contact_function = NULL; 
+			pCell_to_fuse->functions.cell_division_function = NULL; 
+			pCell_to_fuse->functions.cell_division_direction_function = NULL; 
+			pCell_to_fuse->functions.volume_update_function = NULL; 
+
+			// remove all adhesions 
+			// pCell_to_eat->remove_all_attached_cells();
+			
+			// set cell as unmovable and non-secreting 
+			pCell_to_fuse->is_movable = false; 
+			pCell_to_fuse->is_active = false; 
+		}
 
 	}
 
 	// things that have their own thread safety 
+	// Teardown is deferred rather than done here. flag_for_removal() queues this
+	// cell, and the serial cells_ready_to_die -> die() -> delete_cell() pass does
+	// the same four steps off-thread. Doing them here means mutating other cells'
+	// lists from inside the mechanics parallel-for, where remove_all_* walks a
+	// vector unlocked while attach/detach_cell_as_spring edits it under the
+	// critical -- a real race, not a theoretical one. 
 	pCell_to_fuse->flag_for_removal();
-	pCell_to_fuse->remove_all_attached_cells();
-	pCell_to_fuse->remove_all_spring_attachments();
 
 	return; 
 }
@@ -1638,11 +1688,11 @@ void Cell::lyse_cell( void )
 	if( phenotype.volume.total < 1e-15 )
 	{ return; } 	
 	
+	// mark it as dead (before flagging, to match ingest_cell and fuse_cell)
+	phenotype.death.dead = true;
+
 	// flag for removal 
 	flag_for_removal(); // should be safe now 
-	
-	// mark it as dead 
-	phenotype.death.dead = true; 
 	
 	// set secretion and uptake to zero 
 	phenotype.secretion.set_all_secretion_to_zero( );  
@@ -1653,10 +1703,16 @@ void Cell::lyse_cell( void )
 	functions.update_phenotype = NULL; 
 	functions.contact_function = NULL; 
 	functions.cell_division_function = NULL; 
+	functions.cell_division_direction_function = NULL; 
 	
 	// remove all adhesions 
 	
-	remove_all_attached_cells(); 
+	// Teardown is deferred rather than done here. flag_for_removal() queues this
+	// cell, and the serial cells_ready_to_die -> die() -> delete_cell() pass does
+	// the same four steps off-thread. Doing them here means mutating other cells'
+	// lists from inside the mechanics parallel-for, where remove_all_* walks a
+	// vector unlocked while attach/detach_cell_as_spring edits it under the
+	// critical -- a real race, not a theoretical one. 
 	
 	// set volume to zero 
 	set_total_volume( 0.0 ); 
@@ -1750,6 +1806,13 @@ void display_ptr_as_bool( void (*ptr)(Cell*,Cell*), std::ostream& os )
 	os << "false"; 
 	return;
 }
+void display_ptr_as_bool( std::vector<double> (*ptr)(Cell*), std::ostream& os )
+{
+	if( ptr )
+	{ os << "true"; return; }
+	os << "false"; 
+	return;
+}
 
 void display_cell_definitions( std::ostream& os )
 {
@@ -1835,6 +1898,8 @@ void display_cell_definitions( std::ostream& os )
 		os << "\t\t contact function: "; display_ptr_as_bool( pCF->contact_function , std::cout ); 
 		os << std::endl; 
 		os << "\t\t cell division function: "; display_ptr_as_bool( pCF->cell_division_function , std::cout ); 
+		os << std::endl; 
+		os << "\t\t cell division direction function: "; display_ptr_as_bool( pCF->cell_division_direction_function , std::cout ); 
 		os << std::endl; 
 		
 		// summarize motility 
@@ -3144,18 +3209,16 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// If it has already be copied
 			if (pParent != NULL && pParent->phenotype.intracellular != NULL) 
             {
-                // std::cout << "------ " << __FUNCTION__ << ": copying another\n";
 				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
             }	
 			// Otherwise we need to create a new one
 			else 
             {
-                std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
 				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
 				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
-                pCD->phenotype.intracellular->validate_PhysiCell_tokens(pCD->phenotype);
-                pCD->phenotype.intracellular->validate_SBML_species();
 			}
+			pCD->phenotype.intracellular->validate_PhysiCell_tokens(pCD->phenotype);
+			pCD->phenotype.intracellular->validate_SBML_species();
 		}
 #endif
 
@@ -3433,6 +3496,78 @@ void Cell::remove_all_spring_attachments( void )
 	return; 
 }
 
+void Cell::add_attacker( Cell* pAddMe )
+{
+	#pragma omp critical
+	{
+		if( std::find( state.attacked_by.begin() , state.attacked_by.end() , pAddMe )
+			== state.attacked_by.end() )
+		{ state.attacked_by.push_back( pAddMe ); }
+	}
+	return;
+}
+
+void Cell::remove_attacker( Cell* pRemoveMe )
+{
+	#pragma omp critical
+	{
+		auto search = std::find( state.attacked_by.begin() , state.attacked_by.end() , pRemoveMe );
+		if( search != state.attacked_by.end() )
+		{
+			// copy last entry over it, then shrink by one
+			*search = state.attacked_by.back();
+			state.attacked_by.pop_back();
+		}
+	}
+	return;
+}
+
+void Cell::remove_all_attackers( void )
+{
+	// Swap the list out under the same lock add_attacker / remove_attacker use, then
+	// walk the local copy. Holding the lock across the loop is not an option:
+	// detach_cells_as_spring() takes the same unnamed critical and OpenMP criticals
+	// are not reentrant, so that would deadlock.
+	std::vector<Cell*> attackers;
+	#pragma omp critical
+	{ attackers.swap( state.attacked_by ); }
+
+	for( int i = 0; i < attackers.size() ; i++ )
+	{
+		Cell* pAttacker = attackers[i];
+		if( pAttacker->phenotype.cell_interactions.pAttackTarget == this )
+		{ pAttacker->phenotype.cell_interactions.pAttackTarget = NULL; }
+		detach_cells_as_spring( pAttacker , this );
+	}
+	return;
+}
+
+bool Cell::is_attacked_by( Cell* pCell )
+{
+	bool found = false;
+	#pragma omp critical
+	{
+		found = std::find( state.attacked_by.begin() , state.attacked_by.end() , pCell )
+			!= state.attacked_by.end();
+	}
+	return found;
+}
+
+void Cell::remove_self_from_attacked( void )
+{
+	Cell* pTarget = phenotype.cell_interactions.pAttackTarget;
+	if( pTarget == NULL )
+	{ return; }
+	phenotype.cell_interactions.pAttackTarget = NULL;
+	pTarget->remove_attacker( this );
+	// mutual attackers share one spring, so only drop it once both are done.
+	// "does pTarget attack me?" is asked of our own attacked_by, which we can lock,
+	// rather than by reading pTarget's pAttackTarget unsynchronised.
+	if( !is_attacked_by( pTarget ) )
+	{ detach_cells_as_spring( this , pTarget ); }
+	return;
+}
+
 
 void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 {
@@ -3459,6 +3594,39 @@ void detach_cells_as_spring( Cell* pCell_1 , Cell* pCell_2 )
 {
 	pCell_1->detach_cell_as_spring( pCell_2 );
 	pCell_2->detach_cell_as_spring( pCell_1 );
+	return;
+}
+
+void begin_attack( Cell* pAttacker , Cell* pTarget )
+{
+	// no self-attack, and nothing to do without both ends
+	if( pAttacker == NULL || pTarget == NULL || pAttacker == pTarget )
+	{ return; }
+
+	// a cell attacks at most one target at a time. if it is already attacking
+	// something, close that attack out cleanly rather than orphaning the link.
+	if( pAttacker->phenotype.cell_interactions.pAttackTarget != NULL )
+	{ pAttacker->remove_self_from_attacked(); }
+
+	pAttacker->phenotype.cell_interactions.pAttackTarget = pTarget;
+	pTarget->add_attacker( pAttacker );
+	// spring-link these cells
+	attach_cells_as_spring( pAttacker , pTarget );
+	return;
+}
+
+void end_attack( Cell* pAttacker , Cell* pTarget )
+{
+	if( pAttacker == NULL || pTarget == NULL )
+	{ return; }
+
+	if( pAttacker->phenotype.cell_interactions.pAttackTarget == pTarget )
+	{ pAttacker->phenotype.cell_interactions.pAttackTarget = NULL; }
+	pTarget->remove_attacker( pAttacker );
+	// two cells can attack each other, and attach_cell_as_spring dedupes, so the
+	// two attacks share ONE spring. Only drop it once nobody still needs it.
+	if( !pAttacker->is_attacked_by( pTarget ) )
+	{ detach_cells_as_spring( pAttacker , pTarget ); }
 	return; 
 }
 

@@ -97,7 +97,12 @@ else
 	endif
 endif
 
-COMPILE_COMMAND := $(CC) $(CFLAGS) $(LIBFBA_CFLAGS)
+# -MMD emits a .d file beside each .o listing the headers it included; -MP adds
+# a dummy target for each so that deleting or renaming a header does not break
+# the build. The .d files are read back in at the bottom of this file.
+DEPFLAGS := -MMD -MP
+
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(LIBFBA_CFLAGS) $(DEPFLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o
@@ -263,6 +268,7 @@ reset:
 
 clean:
 	rm -f *.o
+	rm -f *.d
 	rm -f $(PROGRAM_NAME)*
 
 data-cleanup:
@@ -296,3 +302,7 @@ unzip:
 untar:
 	cp ./archives/latest.tar .
 	tar -xzf latest.tar
+
+# Keep this at the end of the file: each .d declares rules for its own .o, so
+# including them any earlier would replace `all` as the default goal.
+-include $(ALL_OBJECTS:.o=.d)

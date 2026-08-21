@@ -161,14 +161,6 @@ int main( int argc, char* argv[] )
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
 	
-    // 
-    double intracellular_dt = 0.01;
-    double last_intracellular_time  = 0.0; 
-    double intracellular_dt_tolerance = 0.001 * intracellular_dt; 
-    double next_intracellular_update = intracellular_dt; 
-
-    
-    
 	// main loop 
 	
 	try 
@@ -211,14 +203,6 @@ int main( int argc, char* argv[] )
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
             
-            
-/*             double dt_intracellular = 1.0;
-            //std::cout << "Current_Time : " << PhysiCell_globals.current_time << " -   FMOD : " << fmod(PhysiCell_globals.current_time,1.0) << std::endl;
-            if ( fabs((fmod (PhysiCell_globals.current_time, dt_intracellular) - 1 )) < 0.001 || (fmod (PhysiCell_globals.current_time, dt_intracellular) < 0.00001) ) 
-            {
-                std::cout << "DIVIDED" <<std::endl;
-            } */
-			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
@@ -226,17 +210,6 @@ int main( int argc, char* argv[] )
 			  Custom add-ons could potentially go here. 
 			*/
             
-            double time_since_last_intracellular = PhysiCell_globals.current_time - last_intracellular_time;
-            
-            //update_intracellular();
-            
-            if( PhysiCell_globals.current_time >= next_intracellular_update )
-            {
-			    update_intracellular();
-
-                next_intracellular_update += intracellular_dt; 
-            }
-
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 		

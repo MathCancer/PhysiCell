@@ -70,6 +70,7 @@
 #include "../BioFVM/BioFVM.h"
 #include "./PhysiCell_constants.h"
 #include "./PhysiCell_utilities.h"
+#include "./PhysiCell_cell.h"
 
 using namespace BioFVM; 
 

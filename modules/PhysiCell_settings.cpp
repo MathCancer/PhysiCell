@@ -64,9 +64,16 @@
 #                                                                             #
 ###############################################################################
 */
+
+#include <version>
+
+#ifdef __cpp_lib_filesystem
+#include <filesystem>
+#endif
  
 #include <sys/stat.h>
 #include "./PhysiCell_settings.h"
+#include "../core/PhysiCell_cell.h"
 
 using namespace BioFVM; 
 
@@ -355,6 +362,20 @@ bool create_directories(const std::string &path)
     return create_directory(path);
 }
 
+#ifdef __cpp_lib_filesystem
+bool create_directory(const std::string &path)
+{
+	// Create the directory using C++17 filesystem library
+	std::error_code ec; // To capture any error
+	if (std::filesystem::create_directories(path, ec)) {
+		return true; // Directory created successfully
+	} else if (ec) {
+		std::cerr << "Error creating directory " << path << ": " << ec.message() << std::endl;
+		return false; // An error occurred
+	}
+	return true; // Directory already exists
+}
+#else
 bool create_directory(const std::string &path)
 {
 #if defined(__MINGW32__) || defined(__MINGW64__)
@@ -364,6 +385,7 @@ bool create_directory(const std::string &path)
 #endif
 	return success || errno == EEXIST;
 }
+#endif
 
 void create_output_directory(const std::string& path)
 {

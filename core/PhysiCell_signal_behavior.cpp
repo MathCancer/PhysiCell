@@ -79,6 +79,8 @@ std::map<std::string,int> behavior_to_int;
 std::map<int,std::string> int_to_signal; 
 std::map<int,std::string> int_to_behavior; 
 
+int contact_with_built_in = 5;  // live, dead, apoptotic, necrotic, other
+
 void setup_signal_behavior_dictionaries( void )
 {
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
@@ -484,7 +486,7 @@ void setup_signal_behavior_dictionaries( void )
 		behavior_to_int[temp] = map_index; 
 
 		// synonym 
-		temp = "phagocytosis of " + std::to_string(pCD->type); 
+		temp = "phagocytosis of " + pCD->name; 
 		behavior_to_int[temp] = map_index; 
 	}
 
@@ -725,10 +727,8 @@ int find_signal_index( std::string signal_name )
 	auto search = signal_to_int.find( signal_name );
 	// safety first! 
 	if( search != signal_to_int.end() )
-    { return search->second; }   
-
-	std::cout << "having trouble finding " << signal_name << std::endl; 
-
+    { return search->second; }
+	
     return -1; 
 }
 
@@ -804,7 +804,7 @@ std::vector<double> get_signals( Cell* pCell )
 	signals[volume_ind] = pCell->phenotype.volume.total; 
 
 	// physical contact with cells (of each type) 
-		// increment signals 
+	// increment signals
 	int dead_cells = 0; 
 	int apop_cells = 0;
 	int necro_cells = 0; 
@@ -964,7 +964,7 @@ std::vector<double> get_cell_contact_signals( Cell* pCell )
 	// rescale 
 	std::string search_for = "contact with " + cell_definitions_by_type[0]->name; 
 	static int scaling_start_index = find_signal_index( search_for ); 
-	for( int i=0; i < n+2 ; i++ )
+	for( int i=0; i < n+contact_with_built_in; i++ )
 	{ output[i] /= signal_scales[scaling_start_index+i]; }
 
 	return output; 
@@ -986,7 +986,7 @@ std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices
 	for( int i=0; i < indices.size() ; i++ )
 	{
 		int ind = indices[i]; 
-		if( ind >= contact_start_index && ind < contact_start_index+n+2)
+		if( ind >= contact_start_index && ind < contact_start_index+n+contact_with_built_in )
 		{ signals[i] = contact_signals[ind-contact_start_index]; }
 		else
 		{ signals[i] = get_single_signal( pCell , ind ); }
@@ -1065,7 +1065,7 @@ double get_single_signal( Cell* pCell, int index )
 	// physical contact with cells (of each type) 
 	// individual contact signals are a bit costly 
 	static int contact_ind = find_signal_index( "contact with " + cell_definitions_by_type[0]->name ); 
-	if( contact_ind <= index && index < contact_ind + n+2 )
+	if( contact_ind <= index && index < contact_ind+n+contact_with_built_in )
 	{
 		std::vector<int> counts( n , 0 ); 
 		// process all neighbors 

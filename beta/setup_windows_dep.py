@@ -16,10 +16,10 @@ if zstandard is None:
             raise ImportError("pip install zstandard")
 
 libs = {
-    "https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-gcc-libs-13.2.0-3-any.pkg.tar.zst": [
+    "https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-gcc-libs-15.2.0-8-any.pkg.tar.zst": [
         "mingw64/bin/libgcc_s_seh-1.dll", "mingw64/bin/libgomp-1.dll"
     ],
-    "https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-git-11.0.0.r551.g86a5e0f41-1-any.pkg.tar.zst": [
+    "https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-libwinpthread-git-12.0.0.r747.g1a99f8514-1-any.pkg.tar.zst": [
         "mingw64/bin/libwinpthread-1.dll"
     ]
 }

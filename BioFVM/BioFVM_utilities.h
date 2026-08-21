@@ -78,9 +78,12 @@ void seed_random( void );
 double uniform_random( void );
 
 double compute_mean( std::vector<double>& values );
-double compute_variance( std::vector<double>& values, double mean ); 
-double compute_variance( std::vector<double>& values ); 
-	
+double compute_variance( std::vector<double>& values, double mean );
+double compute_variance( std::vector<double>& values );
+
+inline void trim_cr( std::string& line )
+{ if (!line.empty() && line.back() == '\r') { line.pop_back(); } }
+
 };
  
 #endif 

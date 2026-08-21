@@ -195,7 +195,7 @@ void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, 
 	
 	M.apply_dirichlet_conditions();
 	#pragma omp parallel for 
-	for( unsigned int k=0; k < M.mesh.z_coordinates.size() ; k++ )
+	for( long long k=0; k < M.mesh.z_coordinates.size() ; k++ )
 	{
 		for( unsigned int j=0; j < M.mesh.y_coordinates.size() ; j++ )
 		{
@@ -225,7 +225,7 @@ void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, 
 
 	M.apply_dirichlet_conditions();
 	#pragma omp parallel for 
-	for( unsigned int k=0; k < M.mesh.z_coordinates.size() ; k++ )
+	for( long long k=0; k < M.mesh.z_coordinates.size() ; k++ )
 	{
 		for( unsigned int i=0; i < M.mesh.x_coordinates.size() ; i++ )
 		{
@@ -259,7 +259,7 @@ void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, 
 
 	M.apply_dirichlet_conditions();
  #pragma omp parallel for 
- for( unsigned int j=0; j < M.mesh.y_coordinates.size() ; j++ )
+ for( long long j=0; j < M.mesh.y_coordinates.size() ; j++ )
  {
 	 
   for( unsigned int i=0; i < M.mesh.x_coordinates.size() ; i++ )
@@ -386,7 +386,7 @@ void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& M, 
 
 	// x-diffusion 
 	#pragma omp parallel for 
-	for( unsigned int j=0; j < M.mesh.y_coordinates.size() ; j++ )
+	for( long long j=0; j < M.mesh.y_coordinates.size() ; j++ )
 	{
 		// Thomas solver, x-direction
 
@@ -416,7 +416,7 @@ void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& M, 
 
 	M.apply_dirichlet_conditions();
 	#pragma omp parallel for 
-	for( unsigned int i=0; i < M.mesh.x_coordinates.size() ; i++ )
+	for( long long i=0; i < M.mesh.x_coordinates.size() ; i++ )
 	{
 		// Thomas solver, y-direction
 
@@ -497,7 +497,7 @@ void diffusion_decay_explicit_uniform_rates( Microenvironment& M, double dt )
 	static vector<double> constant4 = M.one - dt * M.decay_rates;
 
 	#pragma omp parallel for
-	for( unsigned int i=0; i < (*(M.p_density_vectors)).size() ; i++ )
+	for( long long i=0; i < (*(M.p_density_vectors)).size() ; i++ )
 	{
 		unsigned int number_of_neighbors = M.mesh.connected_voxel_indices[i].size(); 
 
@@ -591,7 +591,7 @@ void diffusion_decay_solver__constant_coefficients_LOD_1D( Microenvironment& M, 
 
 	// x-diffusion 
 	#pragma omp parallel for 
-	for( unsigned int j=0; j < M.mesh.y_coordinates.size() ; j++ )
+	for( long long j=0; j < M.mesh.y_coordinates.size() ; j++ )
 	{
 		// Thomas solver, x-direction
 
