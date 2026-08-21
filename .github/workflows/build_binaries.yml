@@ -82,7 +82,7 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 mingw-w64-x86_64-python mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-python-cffi make bison flex mingw-w64-x86_64-ca-certificates
+        install: mingw-w64-x86_64-gcc make mingw-w64-x86_64-imagemagick mingw-w64-x86_64-ffmpeg unzip zip git mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-ca-certificates
 
     - name: Build ${{ matrix.projects.name }} project
       run: |
