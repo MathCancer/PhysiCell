@@ -229,6 +229,12 @@ bool& Microenvironment::is_dirichlet_node( int voxel_index )
 	return mesh.voxels[voxel_index].is_Dirichlet; 
 }
 
+void Microenvironment::set_only_substrate_dirichlet_activation( int substrate_index , bool new_value )
+{
+	dirichlet_activation_vector[substrate_index] = new_value; 
+	return;
+}
+
 void Microenvironment::set_substrate_dirichlet_activation( int substrate_index , bool new_value )
 {
 	dirichlet_activation_vector[substrate_index] = new_value; 
@@ -1226,6 +1232,210 @@ void set_microenvironment_initial_condition( void )
 		{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
 	}
 
+	// set the dirichlet condition
+	set_dirichlet_initial_condition();
+
+	microenvironment.display_information(std::cout);
+	return;
+}
+
+void load_initial_conditions_from_matlab(std::string filename)
+{
+	// The .mat file needs to contain exactly one matrix where each row corresponds to a single voxel.
+	// Each row is a vector of values as follows: [x coord, y coord, z coord, substrate id 0 value, substrate id 1 value, ...]
+	// Thus, your matrix should be of size #voxels x (3 + #densities) (rows x columns)
+	// M will be read in such that each element of M is one of these rows
+	std::vector< std::vector<double> > M = read_matlab( filename );
+	int num_mat_voxels = M.size();
+	int num_mat_features = M[1].size();
+	if (num_mat_voxels != microenvironment.number_of_voxels())
+	{
+		std::cout << "ERROR : Wrong number of voxels supplied in the .mat file specifying BioFVM initial conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_voxels() << std::endl
+				  << "\tFound: " << num_mat_voxels << std::endl
+				  << "\tRemember, save your matrix as a #voxels x (3 + #densities) matrix." << std::endl;
+		exit(-1);
+	}
+	if (num_mat_features != (microenvironment.number_of_densities() + 3))
+	{
+		std::cout << "ERROR : Wrong number of density values supplied in the .mat file specifying BioFVM initial conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_densities() << std::endl
+				  << "\tFound: " << num_mat_features - 3 << std::endl
+				  << "\tRemember, save your matrix as a #voxels x (3 + #densities) matrix." << std::endl;
+		exit(-1);
+	}
+	std::vector<int> voxel_set = {}; // set to check that no voxel value is set twice
+	int voxel_ind;
+	std::vector<double> position;
+	for (unsigned int i = 0; i < num_mat_voxels; i++)
+	{
+		position = {M[i][0], M[i][1], M[i][2]};
+		voxel_ind = microenvironment.mesh.nearest_voxel_index(position);
+		for (unsigned int ci = 0; ci < microenvironment.number_of_densities(); ci++)
+		{
+			microenvironment.density_vector(voxel_ind)[ci] = M[i][ci+3];
+		}
+		for (unsigned int j = 0; j < i; j++)
+		{
+			if (voxel_ind==voxel_set[j])
+			{
+				std::cerr << "ERROR : the matlab-supplied initial conditions for BioFVM repeat the same voxel. Fix the .mat file and try again." << std::endl
+						  << "\tPosition that was repeated: " << position << std::endl;
+				exit(-1);
+			}
+		}
+		voxel_set.push_back(voxel_ind);
+	}
+
+	return;
+}
+
+void load_initial_conditions_from_csv(std::string filename)
+{
+	// The .csv file needs to contain one row per voxel.
+	// Each row is a vector of values as follows: [x coord, y coord, z coord, substrate id 0 value, substrate id 1 value, ...]
+	// Thus, your table should be of size #voxels x (3 + #densities) (rows x columns)
+
+	// open file 
+	std::ifstream file( filename, std::ios::in );
+	if( !file )
+	{ 
+		std::cout << "ERROR: " << filename << " not found during cell loading. Quitting." << std::endl; 
+		exit(-1);
+	}
+
+	// determine if header row exists 
+	std::string line; 
+	std::getline( file , line );
+	trim_cr(line);
+	char c = line.c_str()[0];
+	std::vector<int> substrate_indices;
+	bool header_provided = false;
+	std::vector<int> voxel_set = {}; // set to check that no voxel value is set twice
+	if( c == 'X' || c == 'x' )
+	{ 
+		// do not support this with a header yet
+		if ((line.c_str()[2] != 'Y' && line.c_str()[2] != 'y') || (line.c_str()[4] != 'Z' && line.c_str()[4] != 'z'))
+		{
+			std::cout << "ERROR: Header row starts with x but then not y,z? What is this? Exiting now." << std::endl;
+			file.close();
+			exit(-1);
+		}
+		std::vector< std::string> column_names; // this will include x,y,z (so make sure to skip those below)
+		std::stringstream stream(line);
+		std::string field;
+
+		while (std::getline(stream, field, ','))
+		{
+			column_names.push_back(field);
+		}
+		for (int i = 3; i<column_names.size(); i++) // skip x,y,z by starting at 3, not 0
+		{
+			int substrate_index = microenvironment.find_density_index(column_names[i]);
+			if (substrate_index == -1)
+			{
+				std::cout << "ERROR: Substrate " << column_names[i] << " not found in the BioFVM microenvironment. Exiting now." << std::endl;
+				file.close();
+				exit(-1);
+			}
+			substrate_indices.push_back(microenvironment.find_density_index(column_names[i]));
+		}
+		header_provided = true;
+	}
+	else // no column labels given; just assume that the first n substrates are supplied (n = # columns after x,y,z)
+	{
+		std::stringstream stream(line);
+		std::string field;
+		int i = -1;
+		while (std::getline(stream, field, ','))
+		{
+			i++;
+			if (i<3) {continue;} // skip (x,y,z)
+			substrate_indices.push_back(i-3); // the substrate index is the column index - 3 (since x,y,z are the first 3 columns)
+		}
+		// in this case, we want to read this first line, so read it now and the below logic will loop through the remaining lines
+		get_row_from_substrate_initial_condition_csv(voxel_set, line, substrate_indices, header_provided);
+	}
+
+	std::cout << "Loading substrate initial conditions from CSV file " << filename << " ... " << std::endl;
+	
+	while (std::getline(file, line))
+	{
+		trim_cr(line);
+		get_row_from_substrate_initial_condition_csv(voxel_set, line, substrate_indices, header_provided);
+	}
+	
+	if (voxel_set.size() != microenvironment.number_of_voxels())
+	{
+		std::cout << "ERROR : Wrong number of voxels supplied in the .csv file specifying BioFVM initial conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_voxels() << std::endl
+				  << "\tFound: " << voxel_set.size() << std::endl
+				  << "\tRemember, your table should have dimensions #voxels x (3 + #densities)." << std::endl;
+		exit(-1);
+	}
+
+	file.close(); 	
+	
+	return;
+}
+
+void get_row_from_substrate_initial_condition_csv(std::vector<int> &voxel_set, const std::string line, const std::vector<int> substrate_indices, const bool header_provided)
+{
+	static bool warning_issued = false;
+
+	if (line.find_first_not_of(" \t\r") == std::string::npos)
+	{ return; } // skip blank lines
+
+	std::vector<double> data;
+	csv_to_vector(line.c_str(), data);
+
+	// holding a row to the expected column count is also what keeps every data[...] access below in bounds
+	if (data.size() != substrate_indices.size() + 3)
+	{
+		std::cout << "ERROR : A row of the .csv file specifying BioFVM initial conditions has the wrong number of values." << std::endl
+				  << "\tExpected: " << substrate_indices.size() + 3 << " (x, y, z and " << substrate_indices.size() << " substrate value(s))" << std::endl
+				  << "\tFound: " << data.size() << std::endl
+				  << "\tNote that an empty field is not a value here; every column must hold a number." << std::endl
+				  << "\tOffending row: " << line << std::endl;
+		exit(-1);
+	}
+
+	if (!(warning_issued) && !(header_provided) && (data.size() != (microenvironment.number_of_densities() + 3)))
+	{
+		std::cout << "WARNING: Wrong number of density values supplied in the .csv file specifying BioFVM initial conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_densities() << std::endl
+				  << "\tFound: " << data.size() - 3 << std::endl
+				  << "\tRemember, save your csv with columns as: x, y, z, substrate_0, substrate_1,...." << std::endl
+				  << "\tThis could also be resolved by including a header row \"x,y,z,[substrate_i0,substrate_i1]\"" << std::endl;
+		warning_issued = true;
+	}
+
+	std::vector<double> position = {data[0], data[1], data[2]};
+	int voxel_ind = microenvironment.mesh.nearest_voxel_index(position);
+	for (unsigned int ci = 0; ci < substrate_indices.size(); ci++) // column index, counting from the first substrate (or just the index of the vector substrate_indices)
+	{
+		microenvironment.density_vector(voxel_ind)[substrate_indices[ci]] = data[ci + 3];
+	}
+	for (unsigned int j = 0; j < voxel_set.size(); j++)
+	{
+		if (voxel_ind == voxel_set[j])
+		{
+			std::cout << "ERROR : the csv-supplied initial conditions for BioFVM repeat the same voxel. Fix the .csv file and try again." << std::endl
+					  << "\tPosition that was repeated: " << position << std::endl;
+			exit(-1);
+		}
+	}
+	voxel_set.push_back(voxel_ind);
+}
+
+void set_dirichlet_initial_condition( void )
+{
+	set_dirichlet_boundaries_from_XML();
+	set_dirichlet_boundaries_from_file();
+}
+
+void set_dirichlet_boundaries_from_XML( void )
+{
 	// now, figure out which sides have BCs (for at least one substrate): 
 
 	bool xmin = false; 
@@ -1392,70 +1602,48 @@ void set_microenvironment_initial_condition( void )
 				}
 			}				
 		}
-		
 	}
-
-	microenvironment.display_information(std::cout);
-	return;
 }
 
-void load_initial_conditions_from_matlab(std::string filename)
+void set_dirichlet_boundaries_from_file( void )
 {
-	// The .mat file needs to contain exactly one matrix where each row corresponds to a single voxel.
-	// Each row is a vector of values as follows: [x coord, y coord, z coord, substrate id 0 value, substrate id 1 value, ...]
-	// Thus, your matrix should be of size #voxels x (3 + #densities) (rows x columns)
-	// M will be read in such that each element of M is one of these rows
-	std::vector< std::vector<double> > M = read_matlab( filename );
-	int num_mat_voxels = M.size();
-	int num_mat_features = M[1].size();
-	if (num_mat_voxels != microenvironment.number_of_voxels())
+	if (!default_microenvironment_options.dirichlet_condition_from_file_enabled)
 	{
-		std::cout << "ERROR : Wrong number of voxels supplied in the .mat file specifying BioFVM initial conditions." << std::endl
-				  << "\tExpected: " << microenvironment.number_of_voxels() << std::endl
-				  << "\tFound: " << num_mat_voxels << std::endl
-				  << "\tRemember, save your matrix as a #voxels x (3 + #densities) matrix." << std::endl;
+		return;
+	}
+	std::string filetype = default_microenvironment_options.dirichlet_condition_file_type;
+	std::string filename = default_microenvironment_options.dirichlet_condition_file;
+	if (filetype == "matlab")
+	{
+		load_dirichlet_conditions_from_matlab(filename);
+	}
+	else if (filetype == "csv" || filetype == "CSV")
+	{
+		load_dirichlet_conditions_from_csv(filename);
+	}
+	else // eventually can add other file types
+	{
+		std::cout << "ERROR : Load BioFVM dirichlet conditions from " << filetype << " not yet supported." << std::endl;
 		exit(-1);
 	}
-	if (num_mat_features != (microenvironment.number_of_densities() + 3))
-	{
-		std::cout << "ERROR : Wrong number of density values supplied in the .mat file specifying BioFVM initial conditions." << std::endl
-				  << "\tExpected: " << microenvironment.number_of_densities() << std::endl
-				  << "\tFound: " << num_mat_features - 3 << std::endl
-				  << "\tRemember, save your matrix as a #voxels x (3 + #densities) matrix." << std::endl;
-		exit(-1);
-	}
-	std::vector<int> voxel_set = {}; // set to check that no voxel value is set twice
-	int voxel_ind;
-	std::vector<double> position;
-	for (unsigned int i = 0; i < num_mat_voxels; i++)
-	{
-		position = {M[i][0], M[i][1], M[i][2]};
-		voxel_ind = microenvironment.mesh.nearest_voxel_index(position);
-		for (unsigned int ci = 0; ci < microenvironment.number_of_densities(); ci++)
-		{
-			microenvironment.density_vector(voxel_ind)[ci] = M[i][ci+3];
-		}
-		for (unsigned int j = 0; j < i; j++)
-		{
-			if (voxel_ind==voxel_set[j])
-			{
-				std::cout << "ERROR : the matlab-supplied initial conditions for BioFVM repeat the same voxel. Fix the .mat file and try again." << std::endl
-						  << "\tPosition that was repeated: " << position << std::endl;
-				exit(-1);
-			}
-		}
-		voxel_set.push_back(voxel_ind);
-	}
-
 	return;
 }
 
-void load_initial_conditions_from_csv(std::string filename)
+void load_dirichlet_conditions_from_matlab(std::string filename)
+{
+	std::cerr << "ERROR: Load BioFVM dirichlet conditions from MATLAB not yet supported. Use a CSV file instead." << std::endl;
+	exit(-1);
+}
+
+void load_dirichlet_conditions_from_csv(std::string filename)
 {
 	// The .csv file needs to contain one row per voxel.
 	// Each row is a vector of values as follows: [x coord, y coord, z coord, substrate id 0 value, substrate id 1 value, ...]
 	// Thus, your table should be of size #voxels x (3 + #densities) (rows x columns)
-	// Do not include a header row.
+
+	// alternatively, include a header row that begins "x,y,z" and then lists the substrate names to have DC values set
+
+	// In either case, an empty value in the table will be interpreted as not changing the DC condition for that voxel-substrate pair
 
 	// open file 
 	std::ifstream file( filename, std::ios::in );
@@ -1472,6 +1660,8 @@ void load_initial_conditions_from_csv(std::string filename)
 	char c = line.c_str()[0];
 	std::vector<int> substrate_indices;
 	bool header_provided = false;
+	int n_cols;
+	std::vector<int> voxel_set = {}; // set to check that no voxel value is set twice
 	if( c == 'X' || c == 'x' )
 	{ 
 		// do not support this with a header yet
@@ -1501,58 +1691,62 @@ void load_initial_conditions_from_csv(std::string filename)
 			substrate_indices.push_back(microenvironment.find_density_index(column_names[i]));
 		}
 		header_provided = true;
+		n_cols = column_names.size();
 	}
 	else // no column labels given; just assume that the first n substrates are supplied (n = # columns after x,y,z)
 	{
 		std::stringstream stream(line);
 		std::string field;
-		int i = 0;
+		int i = -1;
 		while (std::getline(stream, field, ','))
 		{
+			i++;
 			if (i<3) {continue;} // skip (x,y,z)
 			substrate_indices.push_back(i-3); // the substrate index is the column index - 3 (since x,y,z are the first 3 columns)
-			i++;
 		}
-		// in this case, we want to read this first line, so close the file and re-open so that we start with this line
-		file.close();
-		std::ifstream file(filename, std::ios::in);
-		std::getline(file, line);
-		trim_cr(line);
+		// If the line ends with a comma, that implies a final empty field so no DC set at that voxel-substrate pair
+		if (!line.empty() && line.back() == ',')
+		{
+			i++;
+			if (i >= 3)
+			{
+				substrate_indices.push_back(i - 3);
+			}
+		}
+		n_cols = 3 + substrate_indices.size();
+		// in this case, we want to read this first line, so read it now and the below logic will loop through the remaining lines
+		get_row_from_dirichlet_condition_csv(voxel_set, line, substrate_indices, header_provided, n_cols);
 	}
-
-	std::cout << "Loading substrate initial conditions from CSV file " << filename << " ... " << std::endl;
-	std::vector<int> voxel_set = {}; // set to check that no voxel value is set twice
 	
 	while (std::getline(file, line))
 	{
 		trim_cr(line);
-		get_row_from_substrate_initial_condition_csv(voxel_set, line, substrate_indices, header_provided);
-	}
-	
-	if (voxel_set.size() != microenvironment.number_of_voxels())
-	{
-		std::cout << "ERROR : Wrong number of voxels supplied in the .csv file specifying BioFVM initial conditions." << std::endl
-				  << "\tExpected: " << microenvironment.number_of_voxels() << std::endl
-				  << "\tFound: " << voxel_set.size() << std::endl
-				  << "\tRemember, your table should have dimensions #voxels x (3 + #densities)." << std::endl;
-		exit(-1);
+		get_row_from_dirichlet_condition_csv(voxel_set, line, substrate_indices, header_provided, n_cols);
 	}
 
-	file.close(); 	
-	
+	file.close();
+
 	return;
 }
 
-void get_row_from_substrate_initial_condition_csv(std::vector<int> &voxel_set, const std::string line, const std::vector<int> substrate_indices, const bool header_provided)
+void get_row_from_dirichlet_condition_csv(std::vector<int> &voxel_set, const std::string line, const std::vector<int> substrate_indices, const bool header_provided, int n_cols)
 {
 	static bool warning_issued = false;
+
+	if (line.find_first_not_of(" \t\r") == std::string::npos)
+	{ return; } // skip blank lines
+
+	std::vector<bool> is_missing;
 	std::vector<double> data;
-	csv_to_vector(line.c_str(), data);
+	is_missing.resize(n_cols);
+	data.resize(n_cols);
+
+	dirichlet_csv_to_vector(line.c_str(), is_missing, data);
 
 	if (!(warning_issued) && !(header_provided) && (data.size() != (microenvironment.number_of_densities() + 3)))
 	{
-		std::cout << "WARNING: Wrong number of density values supplied in the .csv file specifying BioFVM initial conditions." << std::endl
-				  << "\tExpected: " << microenvironment.number_of_voxels() << std::endl
+		std::cout << "WARNING: Wrong number of density data supplied in the .csv file specifying BioFVM dirichlet conditions." << std::endl
+				  << "\tExpected: " << microenvironment.number_of_densities() << std::endl
 				  << "\tFound: " << data.size() - 3 << std::endl
 				  << "\tRemember, save your csv with columns as: x, y, z, substrate_0, substrate_1,...." << std::endl
 				  << "\tThis could also be resolved by including a header row \"x,y,z,[substrate_i0,substrate_i1]\"" << std::endl;
@@ -1563,13 +1757,17 @@ void get_row_from_substrate_initial_condition_csv(std::vector<int> &voxel_set, c
 	int voxel_ind = microenvironment.mesh.nearest_voxel_index(position);
 	for (unsigned int ci = 0; ci < substrate_indices.size(); ci++) // column index, counting from the first substrate (or just the index of the vector substrate_indices)
 	{
-		microenvironment.density_vector(voxel_ind)[substrate_indices[ci]] = data[ci + 3];
+		if (!is_missing[ci + 3])
+		{
+			microenvironment.update_dirichlet_node(voxel_ind, substrate_indices[ci], data[ci + 3]);
+			microenvironment.set_only_substrate_dirichlet_activation(substrate_indices[ci], true);
+		}
 	}
 	for (unsigned int j = 0; j < voxel_set.size(); j++)
 	{
 		if (voxel_ind == voxel_set[j])
 		{
-			std::cout << "ERROR : the csv-supplied initial conditions for BioFVM repeat the same voxel. Fix the .csv file and try again." << std::endl
+			std::cout << "ERROR : the csv-supplied dirichlet conditions for BioFVM repeat the same voxel. Fix the .csv file and try again." << std::endl
 					  << "\tPosition that was repeated: " << position << std::endl;
 			exit(-1);
 		}

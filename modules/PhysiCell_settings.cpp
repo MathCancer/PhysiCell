@@ -987,6 +987,21 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 		}
 	}
 
+	node = xml_find_node( root_node , "microenvironment_setup" );
+	node = xml_find_node( node , "options" );
+	node = xml_find_node(node, "dirichlet_nodes");
+	if (node)
+	{
+		default_microenvironment_options.dirichlet_condition_from_file_enabled = node.attribute("enabled").as_bool();
+		if (default_microenvironment_options.dirichlet_condition_from_file_enabled)
+		{
+			default_microenvironment_options.dirichlet_condition_file_type = node.attribute("type").as_string();
+			default_microenvironment_options.dirichlet_condition_file = xml_get_string_value(node, "filename");
+
+			copy_file_to_output(default_microenvironment_options.dirichlet_condition_file);
+		}
+	}
+
 	// not yet supported : read initial conditions 
 	/*
 	// read in initial conditions from an external file 
