@@ -51,6 +51,7 @@
 #include "BioFVM_solvers.h"
 #include "BioFVM_vector.h"
 #include <cmath>
+#include <algorithm>
 
 #include "BioFVM_basic_agent.h"
 
@@ -186,15 +187,175 @@ Microenvironment::Microenvironment(std::string name)
 	return; 
 }
 
+void Microenvironment::fix_substrate_at_voxel( std::string substrate, int voxel_index, double new_value )
+{
+	int substrate_index = find_existing_density_index( substrate ); 
+	return fix_substrate_at_voxel(substrate_index, voxel_index, new_value);
+}
+
+void Microenvironment::fix_substrate_at_voxel( std::string substrate, int voxel_index )
+{
+	int substrate_index = find_existing_density_index( substrate ); 
+	return fix_substrate_at_voxel(substrate_index, voxel_index);
+}
+
+void Microenvironment::fix_substrate_at_voxels( std::string substrate, std::vector<int>& voxel_indices, double new_value )
+{
+	int substrate_index = find_existing_density_index( substrate ); 
+	return fix_substrate_at_voxels(substrate_index, voxel_indices, new_value);
+}
+
+void Microenvironment::fix_substrate_at_voxels( std::string substrate, std::vector<int>& voxel_indices, std::vector<double>& new_values )
+{
+	int substrate_index = find_existing_density_index( substrate ); 
+	return fix_substrate_at_voxels(substrate_index, voxel_indices, new_values);
+}
+
+void Microenvironment::fix_substrate_at_voxels( std::string substrate, std::vector<int>& voxel_indices )
+{
+	int substrate_index = find_existing_density_index( substrate ); 
+	return fix_substrate_at_voxels(substrate_index, voxel_indices);
+}
+
+void Microenvironment::fix_substrate_at_voxel( int substrate_index, int voxel_index, double new_value )
+{
+	dirichlet_value_vectors[voxel_index][substrate_index] = new_value;
+	fix_substrate_at_voxel(substrate_index, voxel_index);
+}
+
+void Microenvironment::fix_substrate_at_voxel( int substrate_index, int voxel_index )
+{
+	dirichlet_activation_vectors[voxel_index][substrate_index] = true; 
+	mesh.voxels[voxel_index].is_Dirichlet = true; 
+	dirichlet_activation_vector[substrate_index] = true;
+	return;
+}
+
+void Microenvironment::fix_substrates_at_voxel( int voxel_index , std::vector<double>& new_values )
+{
+	if (new_values.size() != dirichlet_value_vectors[voxel_index].size())
+	{
+		std::cerr << "Error: Incorrect number of values passed in to fix_substrates_at_voxel. Expected " << dirichlet_value_vectors[voxel_index].size() << " values, but got " << new_values.size() << "." << std::endl;
+		exit(-1);
+	}
+	dirichlet_value_vectors[voxel_index] = new_values;
+	return fix_substrates_at_voxel( voxel_index );
+}
+
+void Microenvironment::fix_substrates_at_voxel( int voxel_index )
+{
+	for( unsigned int i=0 ; i < dirichlet_activation_vectors[voxel_index].size() ; i++ )
+	{
+		fix_substrate_at_voxel( i , voxel_index );
+	}
+	return;
+}
+
+void Microenvironment::fix_substrate_at_voxels( int substrate_index, std::vector<int>& voxel_indices, double new_value )
+{
+	for( auto voxel_index : voxel_indices )
+	{
+		dirichlet_value_vectors[voxel_index][substrate_index] = new_value;
+	}
+	return fix_substrate_at_voxels( substrate_index, voxel_indices );
+}
+
+void Microenvironment::fix_substrate_at_voxels( int substrate_index, std::vector<int>& voxel_indices, std::vector<double>& new_values )
+{
+	if (new_values.size() != voxel_indices.size())
+	{
+		std::cerr << "Error: new_values size (" << new_values.size() << ") does not match voxel_indices size (" << voxel_indices.size() << ") in Microenvironment::fix_substrate_at_voxels" << std::endl;
+		exit(-1);
+	}
+	for( unsigned int i=0 ; i < voxel_indices.size() ; i++ )
+	{
+		dirichlet_value_vectors[voxel_indices[i]][substrate_index] = new_values[i];
+	}
+	return fix_substrate_at_voxels( substrate_index, voxel_indices );
+}
+
+void Microenvironment::fix_substrate_at_voxels( int substrate_index, std::vector<int>& voxel_indices )
+{
+	for( auto voxel_index : voxel_indices )
+	{
+		dirichlet_activation_vectors[voxel_index][substrate_index] = true; 
+		mesh.voxels[voxel_index].is_Dirichlet = true; 
+	}
+
+	// do not allow dirichlet_activation_vector[substrate_index] to be set to true if no voxels are changed
+	if (voxel_indices.size() > 0)
+	{
+		dirichlet_activation_vector[substrate_index] = true;
+	}
+	return;
+}
+
+void Microenvironment::unfix_substrate_at_voxel( std::string substrate, int voxel_index )
+{
+	int substrate_index = find_existing_density_index( substrate ); 
+	return unfix_substrate_at_voxel(substrate_index, voxel_index);
+}
+
+void Microenvironment::unfix_substrate_at_voxels( std::string substrate, std::vector<int>& voxel_indices )
+{
+	int substrate_index = find_existing_density_index( substrate ); 
+	return unfix_substrate_at_voxels(substrate_index, voxel_indices);
+}
+
+void Microenvironment::unfix_substrate_at_voxel( int substrate_index, int voxel_index )
+{
+	dirichlet_activation_vectors[voxel_index][substrate_index] = false;
+	if (std::find(dirichlet_activation_vectors[voxel_index].begin(), dirichlet_activation_vectors[voxel_index].end(), true) == dirichlet_activation_vectors[voxel_index].end())
+	{
+		mesh.voxels[voxel_index].is_Dirichlet = false; 
+	}
+	sync_substrate_dirichlet_activation(substrate_index);
+	return;
+}
+
+void Microenvironment::unfix_substrate_at_voxels( int substrate_index, std::vector<int>& voxel_indices )
+{
+	// this allows for unfixing a substrate at multiple voxels at once without checking if the substrate remains a DC substrate after removing from each voxel
+	for( auto voxel_index : voxel_indices )
+	{
+		dirichlet_activation_vectors[voxel_index][substrate_index] = false;
+		if (std::find(dirichlet_activation_vectors[voxel_index].begin(), dirichlet_activation_vectors[voxel_index].end(), true) == dirichlet_activation_vectors[voxel_index].end())
+		{
+			mesh.voxels[voxel_index].is_Dirichlet = false; 
+		}
+	}
+	sync_substrate_dirichlet_activation(substrate_index);
+}
+
+void Microenvironment::unfix_substrates_at_voxel( int voxel_index )
+{
+	for( unsigned int i=0 ; i < dirichlet_activation_vectors[voxel_index].size() ; i++ )
+	{
+		dirichlet_activation_vectors[voxel_index][i] = false;
+		sync_substrate_dirichlet_activation(i);
+	}
+	mesh.voxels[voxel_index].is_Dirichlet = false;
+	return;
+}
+
+void Microenvironment::sync_substrate_dirichlet_activation( int substrate_index )
+{
+	for (const auto& voxel_activation_vector : dirichlet_activation_vectors)
+	{
+		if (voxel_activation_vector[substrate_index])
+		{
+			dirichlet_activation_vector[substrate_index] = true;
+			return;
+		}
+	}
+	dirichlet_activation_vector[substrate_index] = false;
+	return;
+}
+
 void Microenvironment::add_dirichlet_node( int voxel_index, std::vector<double>& value )
 {
 	mesh.voxels[voxel_index].is_Dirichlet=true;
-	/*
-	dirichlet_indices.push_back( voxel_index );
-	dirichlet_value_vectors.push_back( value ); 
-	*/
-	
-	dirichlet_value_vectors[voxel_index] = value; // .assign( mesh.voxels.size(), one ); 
+	dirichlet_value_vectors[voxel_index] = value;
 	
 	return; 
 }
@@ -568,6 +729,15 @@ int Microenvironment::find_density_index( std::string name )
 		{ return i; }
 	}
 	return -1; 
+}
+
+int Microenvironment::find_existing_density_index( std::string name )
+{
+	int i = find_density_index( name );
+	if( i != -1 )
+	{ return i; }
+	std::cerr << "Error: density named " << name << " not found." << std::endl;
+	exit(-1); 
 }
 
 void Microenvironment::set_density( int index , std::string name , std::string units )
@@ -1283,13 +1453,11 @@ void set_microenvironment_initial_condition( void )
 				// set Dirichlet conditions along the xmin outer edges 
 				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
 				{
-					// set the value 
-					microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_xmin_values );
-					
-					// set the activation 
-					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(I,j,k) , 
-					default_microenvironment_options.Dirichlet_xmin ); 
-					
+					for ( size_t n = 0; n < default_microenvironment_options.Dirichlet_xmin_values.size(); n++)
+					{
+						if (!default_microenvironment_options.Dirichlet_xmin[n]) { continue; }
+						microenvironment.fix_substrate_at_voxel( n, microenvironment.voxel_index(I,j,k),  default_microenvironment_options.Dirichlet_xmin_values[n] );
+					}
 				}
 			}
 		}			
@@ -1303,12 +1471,11 @@ void set_microenvironment_initial_condition( void )
 				// set Dirichlet conditions along the xmax outer edges 
 				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
 				{
-					// set the values 
-					microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_xmax_values );
-					
-					// set the activation 
-					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(I,j,k) , 
-					default_microenvironment_options.Dirichlet_xmax ); 
+					for (size_t n = 0; n < default_microenvironment_options.Dirichlet_xmax_values.size(); n++)
+					{
+						if (!default_microenvironment_options.Dirichlet_xmax[n]) { continue; }
+						microenvironment.fix_substrate_at_voxel( n, microenvironment.voxel_index(I,j,k),  default_microenvironment_options.Dirichlet_xmax_values[n] );
+					}
 				}
 			}
 		}			
@@ -1322,12 +1489,11 @@ void set_microenvironment_initial_condition( void )
 				// set Dirichlet conditions along the ymin outer edges 
 				for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
 				{
-					// set the values 
-					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_ymin_values );
-					
-					// set the activation 
-					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,J,k) , 
-					default_microenvironment_options.Dirichlet_ymin ); 
+					for (size_t n = 0; n < default_microenvironment_options.Dirichlet_ymin_values.size(); n++)
+					{
+						if (!default_microenvironment_options.Dirichlet_ymin[n]) { continue; }
+						microenvironment.fix_substrate_at_voxel( n, microenvironment.voxel_index(i,J,k),  default_microenvironment_options.Dirichlet_ymin_values[n] );
+					}
 				}
 			}
 		}	
@@ -1341,12 +1507,11 @@ void set_microenvironment_initial_condition( void )
 				// set Dirichlet conditions along the ymin outer edges 
 				for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
 				{
-					// set the value 
-					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_ymax_values );
-					
-					// set the activation 
-					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,J,k) , 
-					default_microenvironment_options.Dirichlet_ymax ); 
+					for (size_t n = 0; n < default_microenvironment_options.Dirichlet_ymax_values.size(); n++)
+					{
+						if (!default_microenvironment_options.Dirichlet_ymax[n]) { continue; }
+						microenvironment.fix_substrate_at_voxel( n, microenvironment.voxel_index(i,J,k),  default_microenvironment_options.Dirichlet_ymax_values[n] );
+					}
 				}
 			}
 		}	
@@ -1363,12 +1528,11 @@ void set_microenvironment_initial_condition( void )
 					// set Dirichlet conditions along the ymin outer edges 
 					for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
 					{
-						// set the value 
-						microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_zmin_values );
-					
-						// set the activation 
-						microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,j,K) , 
-						default_microenvironment_options.Dirichlet_zmin ); 
+						for ( size_t n = 0; n < default_microenvironment_options.Dirichlet_zmin_values.size(); n++)
+						{
+							if (!default_microenvironment_options.Dirichlet_zmin[n]) { continue; }
+							microenvironment.fix_substrate_at_voxel( n, microenvironment.voxel_index(i,j,K),  default_microenvironment_options.Dirichlet_zmin_values[n] );
+						}
 					}
 				}
 			}				
@@ -1382,12 +1546,11 @@ void set_microenvironment_initial_condition( void )
 					// set Dirichlet conditions along the ymin outer edges 
 					for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
 					{
-						// set the value 
-						microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_zmax_values );
-						
-						// set the activation 
-						microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,j,K) , 
-						default_microenvironment_options.Dirichlet_zmax ); 						
+						for ( size_t n = 0; n < default_microenvironment_options.Dirichlet_zmax_values.size(); n++)
+						{
+							if (!default_microenvironment_options.Dirichlet_zmax[n]) { continue; }
+							microenvironment.fix_substrate_at_voxel( n, microenvironment.voxel_index(i,j,K),  default_microenvironment_options.Dirichlet_zmax_values[n] );
+						}
 					}
 				}
 			}				
