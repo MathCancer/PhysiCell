@@ -114,6 +114,25 @@ class PhysiCell_Settings
 	bool enable_legacy_saves = false; 
 
 	bool disable_automated_spring_adhesions = false; 
+
+	// slack allowed when checking that asymmetric division probabilities sum to at most 1.
+	// Probabilities meant to sum to exactly 1 land a hair over it in double precision:
+	// 0.11 + 0.33 + 0.56 is 1.000000000000000222. Override with <asymmetric_division_probability_tolerance>
+	// in the <options> block. Only meaningful when the values are probabilities; see below.
+	double asymmetric_division_probability_tolerance = 1e-12;
+
+	// How the values in Asymmetric_Division::asymmetric_division_probabilities are read, model-wide.
+	// false (default): they are probabilities. They must sum to at most 1 (up to the tolerance above),
+	//   and whatever is left of 1 is the probability of dividing symmetrically.
+	// true: they are relative weights, normalized by their own sum at each division, so their scale
+	//   does not matter -- which is what lets rules move each daughter-type pair independently without
+	//   any rule needing to know what the others currently evaluate to. There is no implicit symmetric
+	//   division remainder under weights: symmetric division needs its own (type,type) weight. The one
+	//   exception is an all-zero total, which has no normalized distribution and is defined as
+	//   symmetric division.
+	// Set with <asymmetric_division_mode> in the <options> block. Mutually exclusive with
+	// <asymmetric_division_probability_tolerance>, which has nothing to bound once values are normalized.
+	bool asymmetric_division_uses_weights = false;
 	
 	double SVG_save_interval = 60; 
 	bool enable_SVG_saves = true; 

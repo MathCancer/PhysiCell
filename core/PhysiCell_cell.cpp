@@ -173,7 +173,6 @@ Cell_Definition::Cell_Definition()
 	// 					are appropriately sized. Same on motiltiy. 
 	phenotype.cell_interactions.sync_to_cell_definitions(); 
 	phenotype.cell_transformations.sync_to_cell_definitions(); 
-	phenotype.cycle.asymmetric_division.sync_to_cell_definitions();
 	phenotype.motility.sync_to_current_microenvironment(); 
 	phenotype.mechanics.sync_to_cell_definitions(); 
 	
@@ -2138,8 +2137,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// transformation 
 			pCD->phenotype.cell_transformations.transformation_rates.assign(number_of_cell_defs,0.0); 
 
-			// asymmetric division
-			pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.assign(number_of_cell_defs,0.0);
 		}
 		else 
 		{
@@ -2177,7 +2174,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// this requires that prebuild_cell_definition_index_maps was already run 
 	pCD->phenotype.cell_interactions.sync_to_cell_definitions(); 
 	pCD->phenotype.cell_transformations.sync_to_cell_definitions(); 
-	pCD->phenotype.cycle.asymmetric_division.sync_to_cell_definitions();
 	pCD->phenotype.mechanics.sync_to_cell_definitions(); 
 	
 	// set the reference phenotype 
@@ -2333,8 +2329,13 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		node = node.child( "standard_asymmetric_division" );
 		if( node && node.attribute("enabled").as_bool() )
 		{
+			pugi::xml_node node_EAD = cd_node.child( "phenotype" ).child( "cycle" ).child( "extended_asymmetric_division" );
+			if( node_EAD && node_EAD.attribute("enabled").as_bool() )
+			{
+				std::cerr << "Error: Both standard and extended asymmetric division enabled for cell type " + pCD->name << std::endl;
+				exit(-1);
+			}
 			Asymmetric_Division *pAD = &(pCD->phenotype.cycle.asymmetric_division);
-
 			// asymmetric division rates
 			pugi::xml_node node_adp = node.child( "asymmetric_division_probability");
 			while (node_adp)
@@ -2350,7 +2351,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					int target_index = search->second;
 
 					double asymmetric_division_probability = xml_get_my_double_value(node_adp);
-					pAD->asymmetric_division_probabilities[target_index] = asymmetric_division_probability;
+					pAD->set_asymmetric_division_probability(pCD->type, target_index, asymmetric_division_probability);
 				}
 				else
 				{
@@ -2361,14 +2362,50 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				}
 				node_adp = node_adp.next_sibling("asymmetric_division_probability");
 			}
-			std::cout << "Asymmetric division probabilities for " << pCD->name << ": ";
-			for (int i = 0; i < pAD->asymmetric_division_probabilities.size(); i++)
+			pCD->functions.cell_division_function = asymmetric_division_function;
+		}
+
+		node = cd_node.child( "phenotype" );
+		node = node.child( "cycle" );
+		node = node.child( "extended_asymmetric_division" );
+		if( node && node.attribute("enabled").as_bool() )
+		{
+			Asymmetric_Division *pAD = &(pCD->phenotype.cycle.asymmetric_division);
+
+			// asymmetric division rates
+			pugi::xml_node node_eadp = node.child( "extended_asymmetric_division_probability" );
+
+			while (node_eadp)
 			{
-				std::cout << pAD->asymmetric_division_probabilities[i] << " ";
+				// get the name of the target cell type
+				std::string first_target_name = node_eadp.attribute("name1").value();
+				std::string second_target_name = node_eadp.attribute("name2").value();
+				// now find its index
+				auto first_search = cell_definition_indices_by_name.find(first_target_name);
+				auto second_search = cell_definition_indices_by_name.find(second_target_name);
+				
+				// safety first!
+				if( first_search == cell_definition_indices_by_name.end() || second_search == cell_definition_indices_by_name.end() )
+				{
+					std::cout << "Error: When processing the " << pCD->name << " cell definition: " << std::endl
+						<< "\tCould not find cell type " << first_target_name << " or " << second_target_name << " for asymmetric division." << std::endl
+						<< "\tRemove this cell type from the extended asymmetric division probabilities!" << std::endl << std::endl;
+					exit(-1);
+				}
+
+				// if the target is found, set the appropriate rate
+				int first_target_index = first_search->second;
+				int second_target_index = second_search->second;
+
+				double extended_asymmetric_division_probability = xml_get_my_double_value(node_eadp);
+				pAD->set_asymmetric_division_probability(first_target_index, second_target_index, extended_asymmetric_division_probability);
+
+				node_eadp = node_eadp.next_sibling("extended_asymmetric_division_probability");
 			}
 			std::cout << std::endl;
-			pCD->functions.cell_division_function = standard_asymmetric_division_function;
+			pCD->functions.cell_division_function = asymmetric_division_function;
 		}
+
 	}
 	
 	// here's what it ***should*** do: 
