@@ -95,8 +95,6 @@ void create_cell_types( void )
 	cell_defaults.functions.update_velocity = NULL;
 	cell_defaults.functions.update_phenotype = NULL; 
 	cell_defaults.functions.update_migration_bias = NULL; 
-	cell_defaults.functions.pre_update_intracellular = pre_update_intracellular; 
-	cell_defaults.functions.post_update_intracellular = post_update_intracellular; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
 	
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
@@ -115,6 +113,8 @@ void create_cell_types( void )
 	   
 	   This is a good place to set custom functions. 
 	*/ 
+	PhysiCell::cell_definitions_by_name["last_one"]->phenotype.intracellulars[0]->pre_update_intracellular = pre_update_intracellular; 
+	PhysiCell::cell_definitions_by_name["last_one"]->phenotype.intracellulars[0]->post_update_intracellular = post_update_intracellular; 
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -158,26 +158,26 @@ void setup_tissue( void )
 	load_cells_from_pugixml(); 	
 }
 
-void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
+void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt )
 {
 	if (PhysiCell::PhysiCell_globals.current_time >= 100.0 
-		&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
+		&& intracellular->get_parameter_value("$time_scale") == 0.0
 	){
-		pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
+		intracellular->set_parameter_value("$time_scale", 0.1);
 	}
 
 }
 
-void post_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt )
+void post_update_intracellular( Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt )
 {
-	color_node(pCell);
+	color_node(pCell, intracellular);
 }
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
 	
-	if ( !pCell->phenotype.intracellular->get_boolean_variable_value( parameters.strings("node_to_visualize") ) )
+	if ( !pCell->phenotype.intracellulars[0]->get_boolean_variable_value( parameters.strings("node_to_visualize") ) )
 	{
 		output[0] = "rgb(255,0,0)";
 		output[2] = "rgb(125,0,0)";
@@ -191,7 +191,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	return output;
 }
 
-void color_node(Cell* pCell){
+void color_node(Cell* pCell, Intracellular* intracellular){
 	std::string node_name = parameters.strings("node_to_visualize");
-	pCell->custom_data[node_name] = pCell->phenotype.intracellular->get_boolean_variable_value(node_name);
+	pCell->custom_data[node_name] = intracellular->get_boolean_variable_value(node_name);
 }

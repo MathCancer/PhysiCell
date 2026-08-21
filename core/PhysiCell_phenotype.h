@@ -503,9 +503,6 @@ class Cell_Functions
 	void (*custom_cell_rule)( Cell* pCell, Phenotype& phenotype, double dt ); 
 	void (*update_phenotype)( Cell* pCell, Phenotype& phenotype, double dt ); // used in celll
 	
-	void (*pre_update_intracellular) ( Cell* pCell, Phenotype& phenotype, double dt );
-	void (*post_update_intracellular) ( Cell* pCell, Phenotype& phenotype, double dt );
-
 	void (*update_velocity)( Cell* pCell, Phenotype& phenotype, double dt ); 
 	
 	void (*add_cell_basement_membrane_interactions)(Cell* pCell, Phenotype& phenotype, double dt );
@@ -622,6 +619,9 @@ class Intracellular
     std::string intracellular_type;  // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
 	// bool enabled; 
 
+	void (*pre_update_intracellular) ( Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt );
+	void (*post_update_intracellular) ( Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt );
+
     // ==========  specific to SBML ==============
     // std::string sbml_filename;
 
@@ -641,7 +641,7 @@ class Intracellular
 	virtual void update(Cell* cell, Phenotype& phenotype, double dt) = 0;
 
 	// This function deals with inheritance from mother to daughter cells
-	virtual void inherit(Cell* cell) = 0;
+	virtual void inherit(Intracellular* intracellular) = 0;
 
 	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
@@ -657,6 +657,9 @@ class Intracellular
 	
 	virtual ~Intracellular(){};
 	
+	Intracellular(); // done 
+	Intracellular(const Intracellular *intracellular);
+	virtual Intracellular* operator=(const Intracellular* intracellular );
 
     // ================  specific to "maboss" ================
 	virtual bool has_variable(std::string name) = 0; 
@@ -790,7 +793,7 @@ class Phenotype
 
     // We need it to be a pointer to allow polymorphism
 	// then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
-	Intracellular* intracellular;
+	std::vector<Intracellular*> intracellulars;
 	
 	Cell_Interactions cell_interactions; 
 	Cell_Transformations cell_transformations; 
