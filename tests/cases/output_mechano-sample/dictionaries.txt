@@ -1,0 +1,130 @@
+Signals (with synonyms): 
+=======================
+20 : apoptotic
+15 : attacking
+12 : contact with BM
+9 : contact with apoptotic cell
+9 : contact with apoptotic cells
+12 : contact with basement membrane
+5 : contact with cancer
+5 : contact with cell type 0
+6 : contact with cell type 1
+8 : contact with dead cell
+8 : contact with dead cells
+7 : contact with live cell
+7 : contact with live cells
+10 : contact with necrotic cell
+10 : contact with necrotic cells
+11 : contact with other dead cell
+11 : contact with other dead cells
+18 : current time
+19 : custom 0
+19 : custom: sample
+19 : custom:sample
+13 : damage
+14 : damage delivered
+16 : dead
+18 : global time
+2 : grad(substrate)
+2 : gradient of substrate
+1 : internalized substrate
+1 : intracellular substrate
+15 : is attacking
+16 : is dead
+20 : is_apoptotic
+21 : is_necrotic
+21 : necrotic
+3 : pressure
+0 : substrate
+2 : substrate gradient
+18 : time
+17 : total attack time
+14 : total damage delivered
+4 : volume
+
+
+Behaviors (with synonyms): 
+=========================
+19 : adhesive affinity to BM
+18 : adhesive affinity to cancer
+18 : adhesive affinity to cell type 0
+19 : adhesive affinity to cell type 1
+10 : apoptosis
+36 : asymmetric division to BM
+35 : asymmetric division to cancer
+30 : attack BM
+29 : attack cancer
+29 : attack cell type 0
+30 : attack cell type 1
+44 : attack damage rate
+45 : attack duration
+41 : cell attachment rate
+42 : cell detachment rate
+22 : cell-BM adhesion
+23 : cell-BM repulsion
+16 : cell-cell adhesion
+17 : cell-cell adhesion elastic constant
+21 : cell-cell repulsion
+22 : cell-membrane adhesion
+23 : cell-membrane repulsion
+15 : chemotactic response to substrate
+15 : chemotactic sensitivity to substrate
+37 : custom 0
+37 : custom: sample
+37 : custom:sample
+4 : cycle entry
+46 : damage rate
+47 : damage repair rate
+4 : exit from cycle phase 0
+5 : exit from cycle phase 1
+6 : exit from cycle phase 2
+7 : exit from cycle phase 3
+8 : exit from cycle phase 4
+9 : exit from cycle phase 5
+32 : fuse to BM
+31 : fuse to cancer
+31 : fuse to cell type 0
+32 : fuse to cell type 1
+40 : immunogenicity to BM
+39 : immunogenicity to cancer
+39 : immunogenicity to cell type 0
+40 : immunogenicity to cell type 1
+38 : is movable
+38 : is_movable
+43 : maximum number of cell attachments
+13 : migration bias
+14 : migration persistence time
+12 : migration speed
+38 : movable
+11 : necrosis
+28 : phagocytose BM
+24 : phagocytose apoptotic cell
+27 : phagocytose cancer
+27 : phagocytose cell type 0
+28 : phagocytose cell type 1
+25 : phagocytose necrotic cell
+26 : phagocytose other dead cell
+28 : phagocytosis of BM
+24 : phagocytosis of apoptotic cell
+24 : phagocytosis of apoptotic cells
+27 : phagocytosis of cancer
+25 : phagocytosis of necrotic cell
+25 : phagocytosis of necrotic cells
+26 : phagocytosis of other dead cell
+26 : phagocytosis of other dead cells
+20 : relative maximum adhesion distance
+3 : substrate export
+0 : substrate secretion
+1 : substrate secretion saturation density
+1 : substrate secretion target
+2 : substrate uptake
+34 : transform to BM
+33 : transform to cancer
+33 : transform to cell type 0
+34 : transform to cell type 1
+34 : transition to BM
+33 : transition to cancer
+33 : transition to cell type 0
+34 : transition to cell type 1
+
+
