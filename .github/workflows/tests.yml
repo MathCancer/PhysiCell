@@ -24,7 +24,7 @@ jobs:
           {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Degradation/mymodel_matrix_degradation.xml", max_time: 120, output_folder: ""},
           {project: "physiboss-tutorial", name: "PhysiBoSS Tutorial", binary: "project", config: "config/cell_cycle/PhysiCell_settings.xml", max_time: 300, output_folder: "output"},
           {project: "worm-sample", name: "PhysiCell worm", binary: "worm", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
-          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "mechano-sample", name: "PhysiCell Mechano", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "cancer-biorobots-sample", name: "PhysiCell Cancer Biorobots", binary: "cancer_biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "biorobots-sample", name: "PhysiCell Biorobots", binary: "biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
