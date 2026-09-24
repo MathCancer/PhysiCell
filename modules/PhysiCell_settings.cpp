@@ -211,9 +211,22 @@ void PhysiCell_Settings::read_from_pugixml( void )
 	enable_full_saves = xml_get_bool_value( node , "enable" ); 
 	node = node.parent(); 
 	
-	node = xml_find_node( node , "SVG" ); 
+	node = xml_find_node( node , "SVG" );
 	SVG_save_interval = xml_get_double_value( node , "interval" );
-	enable_SVG_saves = xml_get_bool_value( node , "enable" ); 
+	enable_SVG_saves = xml_get_bool_value( node , "enable" );
+
+	pugi::xml_node node_cell_colors = node.child("cell_colors");
+	if( node_cell_colors )
+	{
+		svg_cell_colors_specified = true;
+		for( pugi::xml_node cc = node_cell_colors.child("cell_color"); cc; cc = cc.next_sibling("cell_color") )
+		{
+			std::string cname = cc.attribute("name").as_string();
+			std::string color  = cc.child_value();
+			if( !cname.empty() && !color.empty() )
+			{ svg_cell_colors_by_name[cname] = color; }
+		}
+	}
 
 	pugi::xml_node node_plot_substrate; 
 	node_plot_substrate = xml_find_node( node , "plot_substrate" );
