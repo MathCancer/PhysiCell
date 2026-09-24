@@ -254,6 +254,9 @@ class Microenvironment
 	void set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value ); 
 	bool get_substrate_dirichlet_activation( int substrate_index, int index );  
 
+	// only change dirichlet_activation_vector, not the activation_vectors for each voxel
+	void set_only_substrate_dirichlet_activation( int substrate_index , bool new_value );
+
     double get_substrate_dirichlet_value( int substrate_index, int index );
 	
 	bool& is_dirichlet_node( int voxel_index ); 
@@ -341,9 +344,13 @@ class Microenvironment_Options
 	
 	std::vector<double> initial_condition_vector; 
 
-	bool initial_condition_from_file_enabled;
+	bool initial_condition_from_file_enabled = false;
 	std::string initial_condition_file_type;
 	std::string initial_condition_file;
+
+	bool dirichlet_condition_from_file_enabled = false;
+	std::string dirichlet_condition_file_type;
+	std::string dirichlet_condition_file;
 	
 	bool simulate_2D; 
 	std::vector<double> X_range; 
@@ -368,6 +375,13 @@ void set_microenvironment_initial_condition( void );
 void load_initial_conditions_from_matlab( std::string filename );
 void load_initial_conditions_from_csv( std::string filename );
 void get_row_from_substrate_initial_condition_csv(std::vector<int> &voxel_set, const std::string line, const std::vector<int> substrate_indices, const bool header_provided);
+
+void set_dirichlet_initial_condition( void );
+void set_dirichlet_boundaries_from_XML( void );
+void set_dirichlet_boundaries_from_file( void );
+void load_dirichlet_conditions_from_matlab( std::string filename );
+void load_dirichlet_conditions_from_csv(std::string filename);
+void get_row_from_dirichlet_condition_csv(std::vector<int> &voxel_set, const std::string line, const std::vector<int> substrate_indices, const bool header_provided, int n_cols);
 };
 
 #endif
