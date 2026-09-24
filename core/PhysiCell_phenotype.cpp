@@ -1359,36 +1359,97 @@ double& Cell_Transformations::transformation_rate( std::string type_name )
 	return transformation_rates[n]; 
 }
 
-Asymmetric_Division::Asymmetric_Division()
+void Asymmetric_Division::set_asymmetric_division_probability(std::pair<int, int> types, double probability)
 {
-	asymmetric_division_probabilities = {0.0};
+	asymmetric_division_probabilities[types] = probability;
 }
 
-void Asymmetric_Division::sync_to_cell_definitions()
+void Asymmetric_Division::set_asymmetric_division_probability(int upper_triangular_index, double probability)
+{
+	std::pair<int, int> types = extended_asym_index_to_upper_triangle(upper_triangular_index);
+	set_asymmetric_division_probability(types, probability);
+}
+
+void Asymmetric_Division::set_asymmetric_division_probability(int type_1, int type_2, double probability)
+{
+	std::pair<int, int> types = std::make_pair(type_1, type_2);
+	set_asymmetric_division_probability(types, probability);
+}
+
+void Asymmetric_Division::set_asymmetric_division_probability(std::string type_name_1, std::string type_name_2, double probability)
 {
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-	int number_of_cell_defs = cell_definition_indices_by_name.size(); 
-	
-	if( asymmetric_division_probabilities.size() != number_of_cell_defs )
-	{ asymmetric_division_probabilities.resize( number_of_cell_defs, 0.0); }
-	
-	return; 
+	int n = cell_definition_indices_by_name[type_name_1]; 
+	int m = cell_definition_indices_by_name[type_name_2]; 
+	set_asymmetric_division_probability(n, m, probability);
+}
+
+double Asymmetric_Division::asymmetric_division_probability( std::pair<int, int> types )
+{
+	if (asymmetric_division_probabilities.find(types) == asymmetric_division_probabilities.end())
+	{ return 0.0; } // key not found, assume this means 0 probability of this type of division for the cell
+	return asymmetric_division_probabilities[types];
+}
+
+double Asymmetric_Division::asymmetric_division_probability( int type_1, int type_2 )
+{
+	return asymmetric_division_probability(std::make_pair(type_1, type_2));
+}
+
+double Asymmetric_Division::asymmetric_division_probability( int upper_triangular_index )
+{
+	std::pair<int, int> types = extended_asym_index_to_upper_triangle(upper_triangular_index);
+	return asymmetric_division_probability(types);
+}
+
+double Asymmetric_Division::asymmetric_division_probability( std::string type_name_1, std::string type_name_2 )
+{
+	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
+	int n = cell_definition_indices_by_name[type_name_1]; 
+	int m = cell_definition_indices_by_name[type_name_2]; 
+	return asymmetric_division_probability(n, m);
+}
+
+std::pair<int, int> Asymmetric_Division::select_daughter_types(int type_1, int type_2, double total_weight)
+{
+	// total_weight == 1.0 leaves this exactly as it was before weights existed: multiplying a double
+	// by 1.0 is exact, so a model reading these as probabilities draws the same numbers as ever.
+	double r = UniformRandom() * total_weight;
+	double cumulative = 0.0;
+	for( auto it = asymmetric_division_probabilities.begin(); it != asymmetric_division_probabilities.end(); ++it )
+	{
+		cumulative += it->second;
+		if( r < cumulative ) // strict: UniformRandom() can return 0, and a 0-probability pair must not win
+		{ return it->first; } // return the pair of types
+	}
+	return std::make_pair(type_1, type_2); // if we reach here, return the original types
 }
 
 double Asymmetric_Division::probabilities_total( void )
 {
 	double total = 0.0; 
-	for( int i=0; i < asymmetric_division_probabilities.size(); i++ )
-	{ total += asymmetric_division_probabilities[i]; }
+	for (const auto& pair : asymmetric_division_probabilities)
+	{ total += pair.second; }
 	return total; 
 }
 
-// ease of access
-double& Asymmetric_Division::asymmetric_division_probability( std::string type_name )
+std::pair<int, int> extended_asym_index_to_upper_triangle(int index)
+{
+	static std::vector< std::pair<int, int> > pairs_vector = initialize_pairs_vector();
+	return pairs_vector[index];
+}
+
+std::vector< std::pair<int, int> > initialize_pairs_vector()
 {
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-	int n = cell_definition_indices_by_name[type_name]; 
-	return asymmetric_division_probabilities[n]; 
+	std::vector< std::pair<int, int> > output; 
+	int n = cell_definition_indices_by_name.size(); 
+	for( int i = 0; i < n; i++ )
+	{
+		for( int j = i; j < n; j++ )
+		{ output.push_back( std::make_pair(i,j) ); }
+	}
+	return output; 
 }
 
 // beta functionality in 1.10.3 

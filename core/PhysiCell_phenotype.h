@@ -213,22 +213,46 @@ class Cycle_Model
 	std::ostream& display( std::ostream& os ); // done 
 };
 
+// Orders the (i,j) daughter type pairs, which are unordered: (i,j) and (j,i) are the same
+// pair, so keys are compared by their (min,max) form.
+struct pair_compare {
+	bool operator()(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) const
+	{
+		int lhs_lower = std::min(lhs.first, lhs.second);
+		int rhs_lower = std::min(rhs.first, rhs.second);
+		if( lhs_lower != rhs_lower )
+		{ return lhs_lower < rhs_lower; }
+		return std::max(lhs.first, lhs.second) < std::max(rhs.first, rhs.second);
+	}
+};
+
 class Asymmetric_Division
 {
-private:
 public:
-	// rates of asymmetric division into different cell types 
-	std::vector<double> asymmetric_division_probabilities; 
+	// std::map, not unordered_map: select_daughter_types() walks this container, so the order
+	// has to be reproducible from the seed alone rather than depending on the hash table.
+	std::map<std::pair<int, int>, double, pair_compare> asymmetric_division_probabilities;
 
-	// initialization
-	Asymmetric_Division(); // done 
-	void sync_to_cell_definitions(); // done 
+	void set_asymmetric_division_probability(std::pair<int, int> types, double probability);
+	void set_asymmetric_division_probability(int upper_triangular_index, double probability);
+	void set_asymmetric_division_probability(int type_1, int type_2, double probability);
+	void set_asymmetric_division_probability(std::string type_name_1, std::string type_name_2, double probability);
+
+	double asymmetric_division_probability(std::pair<int, int> types);
+	double asymmetric_division_probability(int upper_triangular_index);
+	double asymmetric_division_probability(int type_1, int type_2);
+	double asymmetric_division_probability(std::string type_name_1, std::string type_name_2);
 
 	double probabilities_total();
 
-	// ease of access 
-	double& asymmetric_division_probability( std::string type_name ); // done
+	// total_weight scales the draw. Leave it at 1.0 and the stored values are read as absolute
+	// probabilities, so whatever they leave short of 1 falls through to symmetric division; pass the
+	// map's own total and they are read as relative weights, normalized by that total.
+	std::pair<int, int> select_daughter_types(int type_1, int type_2, double total_weight = 1.0);
 };
+
+std::pair<int, int> extended_asym_index_to_upper_triangle(int index);
+std::vector<std::pair<int, int>> initialize_pairs_vector(void);
 
 class Cycle
 {

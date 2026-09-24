@@ -778,7 +778,6 @@ void initialize_default_cell_definition( void )
 	//					these for the cell_defaults 
 	cell_defaults.phenotype.cell_interactions.sync_to_cell_definitions(); 
 	cell_defaults.phenotype.cell_transformations.sync_to_cell_definitions(); 
-	cell_defaults.phenotype.cycle.asymmetric_division.sync_to_cell_definitions();
 	cell_defaults.phenotype.motility.sync_to_current_microenvironment(); 
 	cell_defaults.phenotype.mechanics.sync_to_cell_definitions(); 
 	
@@ -1317,52 +1316,69 @@ void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt
 
 }
 
-void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daughter )
+void asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daughter )
 {
-	Cell_Definition* pCD_parent = cell_definitions_by_name[pCell_parent->type_name];
-	double total = pCell_parent->phenotype.cycle.asymmetric_division.probabilities_total();
-	if (total > 1.0)
+	std::string parent_name = pCell_parent->type_name;
+	int parent_type = pCell_parent->type;
+	Asymmetric_Division& parent_asym_div = pCell_parent->phenotype.cycle.asymmetric_division;
+	double total = parent_asym_div.probabilities_total();
+
+	// The daughter pair is drawn from [0, total_weight). Left at 1.0 the stored values are absolute
+	// probabilities and whatever they leave short of 1 falls through to symmetric division; set to the
+	// map's own total they are relative weights, normalized by that total.
+	double total_weight = 1.0;
+
+	if (PhysiCell_settings.asymmetric_division_uses_weights)
 	{
-		double sym_div_prob = pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_parent->type] + 1.0 - total;
-		if (sym_div_prob < 0.0)
-		{ 
-			std::cerr << "Error: Asymmetric division probabilities for " + pCD_parent->name + " sum to greater than 1.0 and cannot be normalized." << std::endl;
-			exit(-1);
-		}
-		pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_parent->type] = sym_div_prob;
-		pCell_daughter->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_daughter->type] = sym_div_prob;
+		// An all-zero total has no normalized distribution. By convention that is symmetric division,
+		// which is what leaving total_weight at 1.0 gets: the running total never passes the draw, so
+		// select_daughter_types falls through to the parent and daughter types unchanged.
+		if (total > 0.0)
+		{ total_weight = total; }
 	}
-	double r = UniformRandom();
-	for( int i=0; i < pCD_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.size(); i++ )
+	else
 	{
-		if( r <= pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[i] )
+		// The tolerance decides only whether an overshoot is an error, never whether the
+		// probabilities get adjusted: this block rewrites the symmetric division probability, so
+		// gating entry on a user-settable threshold would let the tolerance change the model rather
+		// than just its strictness.
+		const double tolerance = PhysiCell_settings.asymmetric_division_probability_tolerance;
+		if (total > 1.0)
 		{
-			if (i != pCell_daughter->type) // only convert if the daughter is not already the correct type
-			{ pCell_daughter->convert_to_cell_definition( *cell_definitions_by_index[i] ); }
-			return;
+			double sym_div_prob = parent_asym_div.asymmetric_division_probability(parent_type, parent_type) + 1.0 - total;
+			// probabilities meant to sum to exactly 1 land a hair over it in double precision:
+			// 0.11 + 0.33 + 0.56 is 1.000000000000000222. How much slack a model needs depends on how
+			// many probabilities it sums and how they are computed, hence the configurable tolerance.
+			if (sym_div_prob < -tolerance)
+			{
+				std::cerr << "Error: Asymmetric division probabilities for " + parent_name + " sum to greater than 1.0 and cannot be normalized." << std::endl;
+				std::cerr << "Adjusted sym_div_prob = " << sym_div_prob << std::endl;
+				std::cerr << "List of all asym div probabilities for this cell:" << std::endl;
+				for (auto& entry : parent_asym_div.asymmetric_division_probabilities)
+				{
+					std::cerr << "  - " << cell_definitions_by_index[entry.first.first]->name
+						<< " and " << cell_definitions_by_index[entry.first.second]->name
+						<< ": " << entry.second << std::endl;
+				}
+				std::cerr << "If these are meant as relative weights rather than probabilities, set" << std::endl
+					<< "<asymmetric_division_mode>weights</asymmetric_division_mode> in the <options> block." << std::endl;
+				exit(-1);
+			}
+			if (sym_div_prob < 0.0)
+			{ sym_div_prob = 0.0; } // round-off only, given the check above
+			parent_asym_div.set_asymmetric_division_probability(parent_type, parent_type, sym_div_prob);
+			pCell_daughter->phenotype.cycle.asymmetric_division.set_asymmetric_division_probability(pCell_daughter->type, pCell_daughter->type, sym_div_prob);
 		}
-		r -= pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[i];
 	}
-	// if we're here, then do not do asym div
+
+	std::pair<int, int> daughter_types = parent_asym_div.select_daughter_types(pCell_parent->type, pCell_daughter->type, total_weight);
+
+	if (daughter_types.first != pCell_parent->type) // only convert if the parent is not already the correct type
+	{ pCell_parent->convert_to_cell_definition( *cell_definitions_by_index[daughter_types.first] ); }
+	if (daughter_types.second != pCell_daughter->type) // only convert if the daughter is not already the correct type
+	{ pCell_daughter->convert_to_cell_definition( *cell_definitions_by_index[daughter_types.second] ); }
 	return;
 }
-
-//  alternative way to select the index from weights that could be faster (is faster as # cell types --> infinity)
-// int select_by_probabilities( const std::vector<double>& probabilities )
-// {
-// 	double r = UniformRandom();
-
-// 	std::vector<double> cumulative_weights(probabilities.size());
-// 	std::partial_sum(probabilities.begin(), probabilities.end(), cumulative_weights.begin());
-
-// 	// Use binary search to find the index
-// 	auto it = std::upper_bound(cumulative_weights.begin(), cumulative_weights.end(), r);
-// 	int index = std::distance(cumulative_weights.begin(), it);
-// 	if (index >= probabilities.size())
-// 	{ return -1; }
-	
-// 	return index;
-// }
 
 void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 {
