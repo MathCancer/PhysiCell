@@ -304,6 +304,17 @@ template_BM:
 	mkdir ./scripts/
 	cp ./sample_projects_intracellular/boolean/template_BM/scripts/* ./scripts/
 
+spheroid_tnf:
+	cp ./sample_projects_intracellular/spheroid_tnf/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/spheroid_tnf/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/spheroid_tnf/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects_intracellular/spheroid_tnf/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects_intracellular/spheroid_tnf/scripts/* ./scripts/
+
 # early examples for convergence testing 
 
 physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 

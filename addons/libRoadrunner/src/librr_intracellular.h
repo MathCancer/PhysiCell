@@ -24,8 +24,9 @@
 // #include "rrc_utilities.h"
 extern "C" rrc::RRHandle createRRInstance();
 // #endif
+class RoadRunnerIntracellular;
 
-typedef std::function<void(PhysiCell::Cell* pCell)> MappingFunction;
+typedef std::function<void(PhysiCell::Cell* pCell, RoadRunnerIntracellular *intracellular)> MappingFunction;
 
 class RoadRunnerMapping
 {
@@ -35,7 +36,7 @@ public:
 	std::string io_type;
 	std::string physicell_dictionary_name;
 	int index;
-	MappingFunction value_map = [] (PhysiCell::Cell *pCell) {}; // default to a function that does nothing
+	MappingFunction value_map = [] (PhysiCell::Cell *pCell, RoadRunnerIntracellular *intracellular) {}; // default to a function that does nothing
 	bool mapping_initialized = false;
 
 	RoadRunnerMapping() {};
@@ -72,7 +73,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	std::vector<RoadRunnerMapping *> output_mappings;
 	std::map<std::string, int> species_result_column_index;
 	
-    rrc::RRHandle rrHandle;
+    rrc::RRHandle rrHandle = NULL;
 	rrc::RRCDataPtr result = 0;  // start time, end time, and number of points
 
 	double update_time_step = 0.01;
@@ -84,6 +85,15 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	RoadRunnerIntracellular(pugi::xml_node& node);
 	
 	RoadRunnerIntracellular(RoadRunnerIntracellular* copy);
+	
+	~RoadRunnerIntracellular() 
+	{
+		if (this->rrHandle != NULL)
+		{
+			rrc::freeRRInstance(this->rrHandle);
+			this->rrHandle = NULL;
+		}
+	}
 	
 	Intracellular* clone()
     {
@@ -110,8 +120,8 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	void pre_update(PhysiCell::Cell* cell);
 	void post_update(PhysiCell::Cell* cell);
     
-	void inherit(PhysiCell::Cell * cell) {}
-
+	void inherit(PhysiCell::Intracellular * intracellular) {}
+	
 	// These find_<IO>_mapping functions are not currently used, but since I made them, we'll keep them around.
 	RoadRunnerMapping *find_input_mapping(std::string sbml_species); // sbml_species is unique for inputs (below is for convenience)
 	RoadRunnerMapping *find_input_mapping(std::string physicell_name, std::string sbml_species)

@@ -1150,9 +1150,6 @@ Cell_Functions::Cell_Functions()
 	update_phenotype = NULL; 
 	custom_cell_rule = NULL; 
 	
-	pre_update_intracellular = NULL;
-	post_update_intracellular = NULL;
-
 	update_velocity = NULL; 
 	add_cell_basement_membrane_interactions = NULL; 
 	calculate_distance_to_membrane = NULL; 
@@ -1181,20 +1178,26 @@ Phenotype::Phenotype()
 	flagged_for_removal = false; 
 	
 	// sync the molecular stuff here automatically? 
-	intracellular = NULL;
+	intracellulars.clear();
 	
 	return; 
 }
 
 Phenotype::Phenotype(const Phenotype &p) {
-	intracellular = NULL;
+	
+	intracellulars.clear();
 	*this = p;
 }
 
 Phenotype::~Phenotype() 
 {
-	if (intracellular != NULL)
-		delete intracellular;
+	if (intracellulars.size() > 0) {
+		for (auto * intracellular: intracellulars){
+			delete intracellular;
+			intracellular = NULL;
+		}			
+		intracellulars.clear();
+	}
 }
 
 Phenotype& Phenotype::operator=(const Phenotype &p ) { 
@@ -1214,17 +1217,44 @@ Phenotype& Phenotype::operator=(const Phenotype &p ) {
 
 	cell_integrity = p.cell_integrity; 
 	
-	delete intracellular;
+	if (intracellulars.size() > 0) {
+		for (auto * intracellular: intracellulars){
+			delete intracellular;
+			intracellular = NULL;
+		}			
+		intracellulars.clear();
+	}
 	
-	if (p.intracellular != NULL)
-	{ intracellular = p.intracellular->clone(); }
-	else
-	{ intracellular = NULL; }
+	if (p.intracellulars.size() > 0)
+	{ 
+		for (auto * intracellular: p.intracellulars)
+		{
+			intracellulars.push_back(intracellular->clone());
+		}
+	}
 	
 	cell_interactions = p.cell_interactions; 
 	cell_transformations = p.cell_transformations; 
 	
 	return *this;
+}
+Intracellular::Intracellular()
+{
+	this->pre_update_intracellular = NULL;
+	this->post_update_intracellular = NULL;
+}
+
+Intracellular::Intracellular(const Intracellular *intracellular)
+{
+	this->pre_update_intracellular = intracellular->pre_update_intracellular;
+	this->post_update_intracellular = intracellular->post_update_intracellular;
+}
+	
+Intracellular* Intracellular::operator=(const Intracellular *intracellular ) { 
+
+	this->pre_update_intracellular = intracellular->pre_update_intracellular;
+	this->post_update_intracellular = intracellular->post_update_intracellular;
+	return this;
 }
 /*
 class Bools

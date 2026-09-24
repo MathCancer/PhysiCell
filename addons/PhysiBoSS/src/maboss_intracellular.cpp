@@ -23,6 +23,8 @@ MaBoSSIntracellular::MaBoSSIntracellular(pugi::xml_node& node)
 
 MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy) 
 {
+	pre_update_intracellular = copy->pre_update_intracellular;
+	post_update_intracellular = copy->post_update_intracellular;
 	intracellular_type = copy->intracellular_type;
 	bnd_filename = copy->bnd_filename;
 	cfg_filename = copy->cfg_filename;
@@ -424,7 +426,14 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 }
 
 MaBoSSIntracellular* getMaBoSSModel(PhysiCell::Phenotype& phenotype) {
-	return static_cast<MaBoSSIntracellular*>(phenotype.intracellular);
+	for (auto* intracellular : phenotype.intracellulars)
+    {
+        if (intracellular->intracellular_type == "maboss")
+        {
+            return static_cast<MaBoSSIntracellular*>(intracellular);
+        }
+    }
+	return nullptr;
 }
 
 void MaBoSSIntracellular::display(std::ostream& os)
@@ -480,8 +489,16 @@ void MaBoSSIntracellular::save(std::string filename)
 	state_file << "ID,state" << std::endl;
 
 	for( auto cell : *PhysiCell::all_cells )
-		if (cell->phenotype.intracellular != NULL && cell->phenotype.intracellular->intracellular_type == "maboss")
-			state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
-	
+	{
+		if (cell->phenotype.intracellulars.size() > 0)
+		{
+			// This only works if there is one maboss intracellular model per cell, which is the ok
+			for (auto& intracellular : cell->phenotype.intracellulars) {
+				if (intracellular->intracellular_type == "maboss") {
+					state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(intracellular)->get_state() << std::endl;
+				}
+			}
+		} 
+	}	
 	state_file.close();
 }
