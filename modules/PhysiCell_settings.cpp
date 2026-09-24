@@ -154,6 +154,9 @@ PhysiCell_Settings::PhysiCell_Settings()
 
 	intracellular_save_interval = 60;  
 	enable_intracellular_saves = false; 
+
+	// <options>
+    mechanics_voxel_size = 30.0;
 	
 	// parallel options 
 	
@@ -298,6 +301,27 @@ void PhysiCell_Settings::read_from_pugixml( void )
 			}
 			SeedRandom(seed);
 		}
+
+		double mechanics_voxel_size_val;
+        pugi::xml_node mechanics_voxel_size_node = xml_find_node(node_options, "mechanics_voxel_size");
+		if (mechanics_voxel_size_node)
+		{ 
+            mechanics_voxel_size_val = xml_get_my_double_value(mechanics_voxel_size_node ); 
+            if (mechanics_voxel_size_val > 0.0)
+            {
+                PhysiCell_settings.mechanics_voxel_size = mechanics_voxel_size_val;  // Update global value
+                std::cout << "Setting PhysiCell_settings.mechanics_voxel_size = " << PhysiCell_settings.mechanics_voxel_size << std::endl;
+            }
+            else
+            {
+                std::cout << "XML Error: mechanics_voxel_size must be > 0. Leaving at default value= " << mechanics_voxel_size << std::endl;
+            }
+        }
+		else
+		{
+			std::cout << "mechanics_voxel_size not found in XML <options>, leaving at default value= " << mechanics_voxel_size << std::endl;
+		}
+
 
 		// other options can go here, eventually
 	}
