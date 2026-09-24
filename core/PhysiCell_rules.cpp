@@ -885,7 +885,7 @@ void intialize_hypothesis_rulesets( void )
 {
 	hypothesis_rulesets.clear(); // empty(); 
 
-	for( int n; n < cell_definitions_by_index.size() ; n++ )
+	for( int n=0; n < cell_definitions_by_index.size() ; n++ )
 	{
 		Cell_Definition* pCD = cell_definitions_by_index[n]; 
 		add_hypothesis_ruleset(pCD); 
