@@ -340,10 +340,6 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		add_variable_to_labels( data_names,data_units,data_start_indices,data_sizes, 
 			"current_cycle_phase_exit_rate" , "1/min" , 1 ); 
 
-	  // elapsed time in phase // 1 
-		add_variable_to_labels( data_names,data_units,data_start_indices,data_sizes, 
-			"elapsed_time_in_phase" , "min" , 1 ); 
-
 		// death 
 		// live or dead state // 1 
 		add_variable_to_labels( data_names,data_units,data_start_indices,data_sizes, 
@@ -838,8 +834,6 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		// name = "current_cycle_phase_exit_rate"; 
 		int phase_index = pCell->phenotype.cycle.data.current_phase_index; 
 		std::fwrite( &( pCell->phenotype.cycle.data.exit_rate(phase_index) ) , sizeof(double) , 1 , fp ); 
-		// name = "elapsed_time_in_phase"; 
-		std::fwrite( &( pCell->phenotype.cycle.data.elapsed_time_in_phase ) , sizeof(double) , 1 , fp ); 
 
 // death 
   // live or dead state // 1 
