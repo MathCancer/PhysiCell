@@ -84,3 +84,11 @@ CD8_Tcell,ecm,increases,migration speed,3.4580,3.6751,8.6551,0
 Treg,ecm,increases,migration speed,3.4580,3.6751,8.6551,0
 CD8_exhausted,ecm,increases,migration speed,3.4580,3.6751,8.6551,0
 CD4_Tcell,contact with apCAF,increases,transform to Treg,0.01,0.1,4,0
+epithelial_tumor_class1,contact with CAF,increases,transform to epithelial_tumor_class1_class2,0,0.1,4,0
+epithelial_tumor_class1,contact with apCAF,increases,transform to epithelial_tumor_class1_class2,0,0.1,4,0
+mesenchymal_tumor_class1,contact with CAF,increases,transform to mesenchymal_tumor_class1_class2,0,0.1,4,0
+mesenchymal_tumor_class1,contact with apCAF,increases,transform to mesenchymal_tumor_class1_class2,0,0.1,4,0
+epithelial_tumor,contact with CAF,increases,transform to epithelial_tumor_class2,0,0.1,4,0
+epithelial_tumor,contact with apCAF,increases,transform to epithelial_tumor_class2,0,0.1,4,0
+mesenchymal_tumor,contact with CAF,increases,transform to mesenchymal_tumor_class2,0,0.1,4,0
+mesenchymal_tumor,contact with apCAF,increases,transform to mesenchymal_tumor_class2,0,0.1,4,0
