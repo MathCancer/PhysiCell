@@ -1967,7 +1967,7 @@
                     <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">0.649298757545331</speed>
+                    <speed units="micron/min">0.6665</speed>
                     <persistence_time units="min">5.0</persistence_time>
                     <migration_bias units="dimensionless">0.25</migration_bias>
                     <options>
@@ -2252,7 +2252,7 @@
                     <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">0.649298757545331</speed>
+                    <speed units="micron/min">0.6665</speed>
                     <persistence_time units="min">5.0</persistence_time>
                     <migration_bias units="dimensionless">0.25</migration_bias>
                     <options>
@@ -2537,7 +2537,7 @@
                     <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">0.649298757545331</speed>
+                    <speed units="micron/min">0.6665</speed>
                     <persistence_time units="min">5.0</persistence_time>
                     <migration_bias units="dimensionless">0.25</migration_bias>
                     <options>
@@ -2822,7 +2822,7 @@
                     <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">0.649298757545331</speed>
+                    <speed units="micron/min">0.6665</speed>
                     <persistence_time units="min">5.0</persistence_time>
                     <migration_bias units="dimensionless">0</migration_bias>
                     <options>
@@ -4944,7 +4944,7 @@
                         <transformation_rate name="mesenchymal_tumor" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="B cell" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="macrophage" units="1/min">0.0</transformation_rate>
-                        <transformation_rate name="epithelial_tumor_class1" units="1/min">1e-2</transformation_rate>
+                        <transformation_rate name="epithelial_tumor_class1" units="1/min">0</transformation_rate>
                         <transformation_rate name="epithelial_tumor_class1_class2" units="1/min">1e-2</transformation_rate>
                         <transformation_rate name="epithelial_tumor_class2" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="mesenchymal_tumor_class1" units="1/min">0.0</transformation_rate>
