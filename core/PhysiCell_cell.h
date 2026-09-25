@@ -149,6 +149,10 @@ class Cell_State
 	std::vector<Cell*> attached_cells; 
 	std::vector<Cell*> spring_attachments; 
 
+	// reverse of phenotype.cell_interactions.pAttackTarget. in state, not
+	// phenotype, so it survives convert_to_cell_definition()
+	std::vector<Cell*> attacked_by;
+
 	std::vector<Cell*> neighbors; 
 	std::vector<double> orientation;
 	
@@ -244,6 +248,13 @@ class Cell : public Basic_Agent
 	void detach_cell_as_spring( Cell* pRemoveMe ); // done 
 	void remove_all_spring_attachments( void ); // done 
 
+	void add_attacker( Cell* pAddMe ); // pAddMe has started attacking me
+	void remove_attacker( Cell* pRemoveMe ); // pRemoveMe has stopped attacking me
+	// call these wherever remove_all_spring_attachments() is called
+	void remove_all_attackers( void ); // everyone attacking me stops
+	void remove_self_from_attacked( void ); // I stop attacking whomever I attack
+	bool is_attacked_by( Cell* pCell ); // is pCell currently attacking me?
+
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 
 	
@@ -302,6 +313,11 @@ void detach_cells( Cell* pCell_1 , Cell* pCell_2 );
 
 void attach_cells_as_spring( Cell* pCell_1, Cell* pCell_2 );
 void detach_cells_as_spring( Cell* pCell_1 , Cell* pCell_2 );
+
+// maintain pAttackTarget, attacked_by, and the spring together. use these
+// rather than writing pAttackTarget directly.
+void begin_attack( Cell* pAttacker , Cell* pTarget );
+void end_attack( Cell* pAttacker , Cell* pTarget );
 
 
 std::vector<Cell*> find_nearby_cells( Cell* pCell ); // new in 1.8.0

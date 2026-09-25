@@ -239,12 +239,15 @@ Cell_State::Cell_State()
 	neighbors.resize(0); 
 	spring_attachments.resize(0); 
 
+	attacked_by.resize(0);
+
 	orientation.resize( 3 , 0.0 ); 
 	
 	simple_pressure = 0.0; 
 	
 	attached_cells.clear(); 
 	spring_attachments.clear(); 
+	attacked_by.clear();
 	
 	number_of_nuclei = 1; 
 	
@@ -367,8 +370,10 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	// check for new death events 
 	if( phenotype.death.check_for_death( dt_ ) == true )
 	{
-		// if so, change the cycle model to the current death model 
-		phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() ); 
+		// if so, change the cycle model to the current death model, taking the
+		// parameters from this cell definition rather than from the shared model (#199) 
+		phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() , 
+			phenotype.death.current_model_data() ); 
 		
 		// also, turn off motility.
 		
@@ -463,6 +468,8 @@ Cell::~Cell()
 		{
 			// release any attached cells (as of 1.7.2 release)
 			this->remove_all_attached_cells(); 
+			this->remove_all_attackers();
+			this->remove_self_from_attacked();
 			// 1.11.0
 			this->remove_all_spring_attachments(); 
 
@@ -506,8 +513,10 @@ void Cell::start_death( int death_model_index )
 {
 	// set the death data struture to the indicated death model 
 	phenotype.death.trigger_death( death_model_index ); 
-	// change the cycle model to the current death model 
-	phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() ); 
+	// change the cycle model to the current death model, taking the parameters
+	// from this cell definition rather than from the shared model (#199) 
+	phenotype.cycle.sync_to_cycle_model( phenotype.death.current_model() , 
+		phenotype.death.current_model_data() ); 
 		
 	// turn off secretion, and reduce uptake by a factor of 10 
 	phenotype.secretion.set_all_secretion_to_zero();
@@ -555,8 +564,12 @@ Cell* Cell::divide( )
 	// phenotype.flagged_for_division = false; 
 	// phenotype.flagged_for_removal = false; 
 	
-	// make sure ot remove adhesions 
+	// make sure to remove adhesions 
 	remove_all_attached_cells(); 
+	// the springs below include the one holding an attack together, so end the
+	// attack rather than leave it spring-less
+	remove_all_attackers();
+	remove_self_from_attacked();
 	remove_all_spring_attachments(); 
 
 	// version 1.10.3: 
@@ -669,10 +682,10 @@ Cell* Cell::divide( )
 	set_total_volume(phenotype.volume.total);
 	
 	// child->set_phenotype( phenotype ); 
+	// pAttackTarget was cleared above, so the daughter inherits a NULL one
 	child->phenotype = phenotype; 
 
     if (child->phenotype.intracellular){
-        child->phenotype.intracellular->start();
 		child->phenotype.intracellular->inherit(this);
 	}
 // #ifdef ADDON_PHYSIDFBA
@@ -1142,8 +1155,6 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->functions = cd.functions; 
 	
 	pNew->phenotype = cd.phenotype; 
-	if (pNew->phenotype.intracellular)
-		pNew->phenotype.intracellular->start();
 
 	pNew->is_movable = cd.is_movable; //  true;
 	pNew->is_out_of_domain = false;
@@ -1162,6 +1173,14 @@ void Cell::convert_to_cell_definition( Cell_Definition& cd )
 	Geometry cell_geometry = phenotype.geometry;
 	Molecular cell_molecular = phenotype.molecular;
 	Custom_Cell_Data cell_custom_data = custom_data;
+
+	// pAttackTarget is phenotype state, and the assignment below replaces it, so
+	// end this cell's own attack. attacked_by and the spring are in state, which
+	// transformation preserves, so attacks against this cell continue.
+	remove_self_from_attacked();
+	// should we also remove all attackers?  That would be a change in behavior, so for now we don't.
+	// remove_all_attackers();
+
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
@@ -1228,6 +1247,8 @@ void delete_cell( int index )
 	
 	// release any attached cells (as of 1.7.2 release)
 	pDeleteMe->remove_all_attached_cells(); 
+	pDeleteMe->remove_all_attackers();
+	pDeleteMe->remove_self_from_attacked();
 	// 1.11.0 
 	pDeleteMe->remove_all_spring_attachments(); 
 
@@ -1262,6 +1283,8 @@ void delete_cell_original( int index ) // before June 11, 2020
 	
 	// release any attached cells (as of 1.7.2 release)
 	(*all_cells)[index]->remove_all_attached_cells(); 
+	(*all_cells)[index]->remove_all_attackers();
+	(*all_cells)[index]->remove_self_from_attacked();
 	// 1.11.0
 	(*all_cells)[index]->remove_all_spring_attachments(); 
 	
@@ -1488,10 +1511,13 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		
 	}
 
-	// things that have their own thread safety 
+	// Teardown is deferred rather than done here. flag_for_removal() queues this
+	// cell, and the serial cells_ready_to_die -> die() -> delete_cell() pass does
+	// the same four steps off-thread. Doing them here means mutating other cells'
+	// lists from inside the mechanics parallel-for, where remove_all_* walks a
+	// vector unlocked while attach/detach_cell_as_spring edits it under the
+	// critical -- a real race, not a theoretical one. 
 	pCell_to_eat->flag_for_removal();
-	pCell_to_eat->remove_all_attached_cells();
-	pCell_to_eat->remove_all_spring_attachments();
 	
 	return; 
 }
@@ -1657,9 +1683,13 @@ void Cell::fuse_cell( Cell* pCell_to_fuse )
 	}
 
 	// things that have their own thread safety 
+	// Teardown is deferred rather than done here. flag_for_removal() queues this
+	// cell, and the serial cells_ready_to_die -> die() -> delete_cell() pass does
+	// the same four steps off-thread. Doing them here means mutating other cells'
+	// lists from inside the mechanics parallel-for, where remove_all_* walks a
+	// vector unlocked while attach/detach_cell_as_spring edits it under the
+	// critical -- a real race, not a theoretical one. 
 	pCell_to_fuse->flag_for_removal();
-	pCell_to_fuse->remove_all_attached_cells();
-	pCell_to_fuse->remove_all_spring_attachments();
 
 	return; 
 }
@@ -1670,11 +1700,11 @@ void Cell::lyse_cell( void )
 	if( phenotype.volume.total < 1e-15 )
 	{ return; } 	
 	
+	// mark it as dead (before flagging, to match ingest_cell and fuse_cell)
+	phenotype.death.dead = true;
+
 	// flag for removal 
 	flag_for_removal(); // should be safe now 
-	
-	// mark it as dead 
-	phenotype.death.dead = true; 
 	
 	// set secretion and uptake to zero 
 	phenotype.secretion.set_all_secretion_to_zero( );  
@@ -1689,7 +1719,12 @@ void Cell::lyse_cell( void )
 
 	// remove all adhesions 
 	
-	remove_all_attached_cells(); 
+	// Teardown is deferred rather than done here. flag_for_removal() queues this
+	// cell, and the serial cells_ready_to_die -> die() -> delete_cell() pass does
+	// the same four steps off-thread. Doing them here means mutating other cells'
+	// lists from inside the mechanics parallel-for, where remove_all_* walks a
+	// vector unlocked while attach/detach_cell_as_spring edits it under the
+	// critical -- a real race, not a theoretical one. 
 	
 	// set volume to zero 
 	set_total_volume( 0.0 ); 
@@ -1838,7 +1873,9 @@ void display_cell_definitions( std::ostream& os )
 			<< " with rate " << pCD->phenotype.death.rates[k] << " 1/min" << std::endl; 
 
 			Cycle_Model* pCM = (pCD->phenotype.death.models[k] ); 
-			Cycle_Data* pCMD = &(pCD->phenotype.death.models[k]->data ); 
+			// phases and links come from the shared model, but the parameters are
+			// per-definition now, so take those from model_data (#199) 
+			Cycle_Data* pCMD = &(pCD->phenotype.death.model_data[k] ); 
 
 			
 			os << "\t\tdeath phase transitions: " << std::endl 
@@ -2267,8 +2304,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				
 				// set the transition rate 
 				pCD->phenotype.cycle.data.transition_rate(start,end) = value; 
-				// set it to fixed / non-fixed 
-				pCD->phenotype.cycle.model().phase_link(start,end).fixed_duration = fixed; 
+				// set it to fixed / non-fixed -- into this definition's own data, not
+				// the shared Cycle_Model (#199) 
+				pCD->phenotype.cycle.data.fixed_duration(start,end) = fixed; 
 				
 				node = node.next_sibling( "rate" ); 
 			}
@@ -2296,7 +2334,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				// set the transition rate 
 				pCD->phenotype.cycle.data.exit_rate(start) = 1.0 / (value+1e-16); 
 				// set it to fixed / non-fixed 
-				pCD->phenotype.cycle.model().phase_links[start][0].fixed_duration = fixed; 
+				pCD->phenotype.cycle.data.exit_fixed_duration(start) = fixed; 
 				
 				node = node.next_sibling( "duration" ); 
 			}
@@ -2560,9 +2598,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					double value = xml_get_my_double_value( node1 ); 
 					
 					// set the transition rate 
-					pCD->phenotype.death.models[death_index]->transition_rate(start,end) = value; 
-					// set it to fixed / non-fixed 
-					pCD->phenotype.death.models[death_index]->phase_link(start,end).fixed_duration = fixed; 
+					pCD->phenotype.death.model_data[death_index].transition_rate(start,end) = value; 
+					// set it to fixed / non-fixed -- into this definition's own copy, not
+					// the shared Cycle_Model (#199) 
+					pCD->phenotype.death.model_data[death_index].fixed_duration(start,end) = fixed; 
 					
 					node1 = node1.next_sibling( "rate" ); 
 				}
@@ -2584,10 +2623,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					double value = xml_get_my_double_value( node ); 
 					
 					// set the transition rate 
-					pCD->phenotype.death.models[death_index]->data.exit_rate(start) 
+					pCD->phenotype.death.model_data[death_index].exit_rate(start) 
 						= 1.0 / (value+1e-16); 
-					// set it to fixed / non-fixed 
-					pCD->phenotype.death.models[death_index]->phase_links[start][0].fixed_duration 
+					// set it to fixed / non-fixed -- into this definition's own copy, not
+					// the shared Cycle_Model (#199) 
+					pCD->phenotype.death.model_data[death_index].exit_fixed_duration(start) 
 						= fixed; 
 					
 					node = node.next_sibling( "duration" ); 
@@ -3575,6 +3615,78 @@ void Cell::remove_all_spring_attachments( void )
 	return; 
 }
 
+void Cell::add_attacker( Cell* pAddMe )
+{
+	#pragma omp critical
+	{
+		if( std::find( state.attacked_by.begin() , state.attacked_by.end() , pAddMe )
+			== state.attacked_by.end() )
+		{ state.attacked_by.push_back( pAddMe ); }
+	}
+	return;
+}
+
+void Cell::remove_attacker( Cell* pRemoveMe )
+{
+	#pragma omp critical
+	{
+		auto search = std::find( state.attacked_by.begin() , state.attacked_by.end() , pRemoveMe );
+		if( search != state.attacked_by.end() )
+		{
+			// copy last entry over it, then shrink by one
+			*search = state.attacked_by.back();
+			state.attacked_by.pop_back();
+		}
+	}
+	return;
+}
+
+void Cell::remove_all_attackers( void )
+{
+	// Swap the list out under the same lock add_attacker / remove_attacker use, then
+	// walk the local copy. Holding the lock across the loop is not an option:
+	// detach_cells_as_spring() takes the same unnamed critical and OpenMP criticals
+	// are not reentrant, so that would deadlock.
+	std::vector<Cell*> attackers;
+	#pragma omp critical
+	{ attackers.swap( state.attacked_by ); }
+
+	for( int i = 0; i < attackers.size() ; i++ )
+	{
+		Cell* pAttacker = attackers[i];
+		if( pAttacker->phenotype.cell_interactions.pAttackTarget == this )
+		{ pAttacker->phenotype.cell_interactions.pAttackTarget = NULL; }
+		detach_cells_as_spring( pAttacker , this );
+	}
+	return;
+}
+
+bool Cell::is_attacked_by( Cell* pCell )
+{
+	bool found = false;
+	#pragma omp critical
+	{
+		found = std::find( state.attacked_by.begin() , state.attacked_by.end() , pCell )
+			!= state.attacked_by.end();
+	}
+	return found;
+}
+
+void Cell::remove_self_from_attacked( void )
+{
+	Cell* pTarget = phenotype.cell_interactions.pAttackTarget;
+	if( pTarget == NULL )
+	{ return; }
+	phenotype.cell_interactions.pAttackTarget = NULL;
+	pTarget->remove_attacker( this );
+	// mutual attackers share one spring, so only drop it once both are done.
+	// "does pTarget attack me?" is asked of our own attacked_by, which we can lock,
+	// rather than by reading pTarget's pAttackTarget unsynchronised.
+	if( !is_attacked_by( pTarget ) )
+	{ detach_cells_as_spring( this , pTarget ); }
+	return;
+}
+
 
 void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 {
@@ -3601,6 +3713,39 @@ void detach_cells_as_spring( Cell* pCell_1 , Cell* pCell_2 )
 {
 	pCell_1->detach_cell_as_spring( pCell_2 );
 	pCell_2->detach_cell_as_spring( pCell_1 );
+	return;
+}
+
+void begin_attack( Cell* pAttacker , Cell* pTarget )
+{
+	// no self-attack, and nothing to do without both ends
+	if( pAttacker == NULL || pTarget == NULL || pAttacker == pTarget )
+	{ return; }
+
+	// a cell attacks at most one target at a time. if it is already attacking
+	// something, close that attack out cleanly rather than orphaning the link.
+	if( pAttacker->phenotype.cell_interactions.pAttackTarget != NULL )
+	{ pAttacker->remove_self_from_attacked(); }
+
+	pAttacker->phenotype.cell_interactions.pAttackTarget = pTarget;
+	pTarget->add_attacker( pAttacker );
+	// spring-link these cells
+	attach_cells_as_spring( pAttacker , pTarget );
+	return;
+}
+
+void end_attack( Cell* pAttacker , Cell* pTarget )
+{
+	if( pAttacker == NULL || pTarget == NULL )
+	{ return; }
+
+	if( pAttacker->phenotype.cell_interactions.pAttackTarget == pTarget )
+	{ pAttacker->phenotype.cell_interactions.pAttackTarget = NULL; }
+	pTarget->remove_attacker( pAttacker );
+	// two cells can attack each other, and attach_cell_as_spring dedupes, so the
+	// two attacks share ONE spring. Only drop it once nobody still needs it.
+	if( !pAttacker->is_attacked_by( pTarget ) )
+	{ detach_cells_as_spring( pAttacker , pTarget ); }
 	return; 
 }
 

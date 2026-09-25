@@ -11,7 +11,12 @@ ARCH := native # best auto-tuning
 # CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -U LIBROADRUNNER 
 
-COMPILE_COMMAND := $(CC) $(CFLAGS) 
+# -MMD emits a .d file beside each .o listing the headers it included; -MP adds
+# a dummy target for each so that deleting or renaming a header does not break
+# the build. The .d files are read back in at the bottom of this file.
+DEPFLAGS := -MMD -MP
+
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(DEPFLAGS)
 
 ODIR := ../..
 
@@ -40,3 +45,7 @@ test_cell_def1:
 	$(COMPILE_COMMAND) -o test_cell_def1 $(ALL_OBJECTS) test_cell_def1.cpp 
 test_cell_def2: 
 	$(COMPILE_COMMAND) -o test_cell_def2 $(ALL_OBJECTS) test_cell_def2.cpp 
+
+# Keep this at the end of the file: each .d declares rules for its own .o, so
+# including them any earlier would replace `all` as the default goal.
+-include $(ALL_OBJECTS:.o=.d)

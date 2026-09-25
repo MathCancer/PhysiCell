@@ -75,16 +75,19 @@
 #include <vector>
 #include <chrono>
 #include <random>
+#include <cstdint>
 
 #include <omp.h> 
 
 namespace PhysiCell{
 
 
-	extern std::vector<unsigned int> physicell_random_seeds; 
+// the seed the run is using -- the value recorded in <output>/random_seed.txt 
+std::uint64_t get_random_seed( void );
+// the seed one thread's generator is started from, derived from the seed above 
+std::uint64_t get_thread_random_seed( int thread_index );
 
-void setup_rng( void );
-void SeedRandom( unsigned int input );
+void SeedRandom( std::uint64_t input );
 void SeedRandom( void );
 
 double UniformRandom( void );

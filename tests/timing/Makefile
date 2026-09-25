@@ -16,7 +16,12 @@ ARCH := native # best auto-tuning
 CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 #CFLAGS := -g -fopenmp -std=c++11
 
-COMPILE_COMMAND := $(CC) $(CFLAGS) 
+# -MMD emits a .d file beside each .o listing the headers it included; -MP adds
+# a dummy target for each so that deleting or renaming a header does not break
+# the build. The .d files are read back in at the bottom of this file.
+DEPFLAGS := -MMD -MP
+
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(DEPFLAGS)
 
 DIR := ../..
 BioFVM_OBJECTS := $(DIR)/BioFVM_vector.o $(DIR)/BioFVM_mesh.o $(DIR)/BioFVM_microenvironment.o $(DIR)/BioFVM_solvers.o $(DIR)/BioFVM_matlab.o \
@@ -42,4 +47,9 @@ all: main.cpp $(ALL_OBJECTS)
 
 clean:
 	rm -f *.o
+	rm -f *.d
 	rm -f $(PROGRAM_NAME)*
+
+# Keep this at the end of the file: each .d declares rules for its own .o, so
+# including them any earlier would replace `all` as the default goal.
+-include $(ALL_OBJECTS:.o=.d)
