@@ -1900,7 +1900,7 @@
             <phenotype>
                 <cycle code="5" name="live">
                     <phase_transition_rates units="1/min">
-                        <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
+                        <rate start_index="0" end_index="0" fixed_duration="false">0.00000351636</rate>
                     </phase_transition_rates>
                     <standard_asymmetric_division enabled="False">
                         <asymmetric_division_probability name="epithelial_normal" units="dimensionless">0</asymmetric_division_probability>
@@ -2191,7 +2191,7 @@
             <phenotype>
                 <cycle code="5" name="live">
                     <phase_transition_rates units="1/min">
-                        <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
+                        <rate start_index="0" end_index="0" fixed_duration="false">0.00000351636</rate>
                     </phase_transition_rates>
                     <standard_asymmetric_division enabled="False">
                         <asymmetric_division_probability name="epithelial_normal" units="dimensionless">0</asymmetric_division_probability>
@@ -2482,7 +2482,7 @@
             <phenotype>
                 <cycle code="5" name="live">
                     <phase_transition_rates units="1/min">
-                        <rate start_index="0" end_index="0" fixed_duration="false">0</rate>
+                        <rate start_index="0" end_index="0" fixed_duration="false">0.00000351636</rate>
                     </phase_transition_rates>
                     <standard_asymmetric_division enabled="False">
                         <asymmetric_division_probability name="epithelial_normal" units="dimensionless">0</asymmetric_division_probability>
@@ -5045,7 +5045,7 @@
                         <transformation_rate name="mesenchymal_tumor" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="B cell" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="macrophage" units="1/min">0.0</transformation_rate>
-                        <transformation_rate name="epithelial_tumor_class1" units="1/min">1e-2</transformation_rate>
+                        <transformation_rate name="epithelial_tumor_class1" units="1/min">0</transformation_rate>
                         <transformation_rate name="epithelial_tumor_class1_class2" units="1/min">1e-2</transformation_rate>
                         <transformation_rate name="epithelial_tumor_class2" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="mesenchymal_tumor_class1" units="1/min">0.0</transformation_rate>
