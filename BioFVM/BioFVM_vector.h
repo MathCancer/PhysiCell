@@ -130,8 +130,9 @@ void double_axpy_div( std::vector<double>* y, std::vector<double>& a1 , std::vec
 // turn a delimited character array (e.g., csv) into a vector of doubles
 
 void csv_to_vector( const char* buffer , std::vector<double>& vect );
-void substrate_csv_to_vector(const char* buffer, std::vector<double>& vect);
-void dirichlet_csv_to_vector( const char* buffer , std::vector<bool>& missings , std::vector<double>& values );
+// returns the 1-based index of the first malformed field, or 0 if the row is well formed;
+// an empty field yields NaN so that an omitted entry is distinguishable from a zero
+unsigned int substrate_csv_to_vector(const char* buffer, std::vector<double>& vect);
 char* vector_to_csv( const std::vector<double>& vect );
 void vector_to_csv_safe( const std::vector<double>& vect , char*& buffer );
 void vector_to_csv( const std::vector<double>& vect , char*& buffer );

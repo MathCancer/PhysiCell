@@ -239,7 +239,7 @@ void create_ki67_models( void )
 	
 	Ki67_basic.transition_rate(0,1) = 1.0/(4.59*60.0); // MCF10A cells are ~4.59 hours in Ki67- state
 	Ki67_basic.transition_rate(1,0) = 1.0/(15.5*60.0); // length of Ki67+ states in advanced model 
-	Ki67_basic.phase_link(1,0).fixed_duration = true; 
+	Ki67_basic.data.fixed_duration(1,0) = true; 
 	
 	Ki67_basic.phases[0].entry_function = NULL; // standard_Ki67_negative_phase_entry_function;
 	Ki67_basic.phases[1].entry_function = standard_Ki67_positive_phase_entry_function;
@@ -261,8 +261,8 @@ void create_ki67_models( void )
 	Ki67_advanced.add_phase_link( 1 , 2 , NULL ); // + (pre-mitotic) to + (post-mitotic) 
 	Ki67_advanced.add_phase_link( 2 , 0 , NULL ); // + to - 
 	
-	Ki67_advanced.phase_link(1,2).fixed_duration = true; 
-	Ki67_advanced.phase_link(2,0).fixed_duration = true; 
+	Ki67_advanced.data.fixed_duration(1,2) = true; 
+	Ki67_advanced.data.fixed_duration(2,0) = true; 
 
 	Ki67_advanced.transition_rate(0,1) = 1.0/(3.62*60.0); // MCF10A cells ~3.62 hours in Ki67- in this fitted model
 	Ki67_advanced.transition_rate(1,2) = 1.0/(13.0*60.0); 
@@ -376,7 +376,7 @@ void create_cycling_quiescent_model( void )
 	
 	cycling_quiescent.transition_rate(0,1) = 1.0/(4.59*60.0); // MCF10A cells are ~4.59 hours in Ki67- state
 	cycling_quiescent.transition_rate(1,0) = 1.0/(15.5*60.0); // length of Ki67+ states in advanced model 
-	cycling_quiescent.phase_link(1,0).fixed_duration = true; 
+	cycling_quiescent.data.fixed_duration(1,0) = true; 
 	
 	cycling_quiescent.phases[0].entry_function = NULL; 
 	cycling_quiescent.phases[1].entry_function = standard_cycling_entry_function;
@@ -440,7 +440,7 @@ void create_standard_apoptosis_model( void )
 	apoptosis.transition_rate( 0, 1) = 1.0 / (8.6 * 60.0); 
 
 		// Use the deterministic model, where this phase has fixed duration
-	apoptosis.phase_link(0,1).fixed_duration = true; 
+	apoptosis.data.fixed_duration(0,1) = true; 
 	
 	return; 
 }
@@ -482,7 +482,7 @@ void create_standard_necrosis_model( void )
 	necrosis.transition_rate( 1, 2 ) = 1.0 / (60.0 * 24.0 * 60.0 ); // 60 days max  
 
 	// Deterministically remove the necrotic cell if it has been 60 days
-	necrosis.phase_link(1,2).fixed_duration = true; 
+	necrosis.data.fixed_duration(1,2) = true; 
 
 	return; 
 }	
@@ -1211,7 +1211,9 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			{
 				if( UniformRandom() < probability ) 
 				{				
-					pCell->phenotype.cell_interactions.pAttackTarget = pTarget; 
+					// sets pAttackTarget, registers pCell in pTarget's
+					// attacked_by, and spring-links the two
+					begin_attack( pCell , pTarget );
 					attacked = true; 
 					/*					
 					std::cout << "*********   *********  ********  start atack **** " << PhysiCell_globals.current_time << std::endl; 
@@ -1219,8 +1221,6 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 					<< "attack duration: " << pCell->phenotype.cell_interactions.attack_duration << " "  
 					<< "attack damage rate: " << pCell->phenotype.cell_interactions.attack_damage_rate <<  std::endl; 
 					*/
-					// spring-link these cells 
-					attach_cells_as_spring(pCell,pTarget); 
 				} 
 			}
 
@@ -1262,11 +1262,14 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 
 	// move effector attack here. 
 
-		if( pCell->phenotype.cell_interactions.pAttackTarget != NULL ) 
+		// read the target once. attack_cell() dereferences without a null check, so
+		// testing this field and then reloading it would let any concurrent clear
+		// hand it a NULL. One load is free and does not depend on which teardown
+		// paths currently run inside this loop. 
+		Cell* pAttackTarget = pCell->phenotype.cell_interactions.pAttackTarget; 
+		if( pAttackTarget != NULL ) 
 		{
-			Cell* pTarget = pCell->phenotype.cell_interactions.pAttackTarget; 
-
-			pCell->attack_cell(pTarget,dt); 
+			pCell->attack_cell(pAttackTarget,dt); 
 			attacked = true; // attacked at least one cell in this time step 
 
 			// attack_cell
@@ -1276,20 +1279,18 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			probability = dt / (1e-15 + pCell->phenotype.cell_interactions.attack_duration); 
 
 
-			if( UniformRandom() < probability || pTarget->phenotype.death.dead ) 
+			if( UniformRandom() < probability || pAttackTarget->phenotype.death.dead ) 
 			{
 				/*
 				std::cout << "*********   *********  ********  attack done **** " << PhysiCell_globals.current_time << " " 
 				<< probability << " "
-				<< "attack time: " << pTarget->state.total_attack_time << " " 		
-				<< "damage: " << pTarget->phenotype.cell_integrity.damage <<  " " 		
-				<< "dead? " << (int) pTarget->phenotype.death.dead << " " 
+				<< "attack time: " << pAttackTarget->state.total_attack_time << " " 		
+				<< "damage: " << pAttackTarget->phenotype.cell_integrity.damage <<  " " 		
+				<< "dead? " << (int) pAttackTarget->phenotype.death.dead << " " 
 				<< "damage delivered: " << pCell->phenotype.cell_interactions.total_damage_delivered << std::endl; 
 				*/
 
-				detach_cells_as_spring(pCell,pTarget); 
-
-				pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
+				end_attack( pCell , pAttackTarget );
 			} 
 		} 
 
@@ -1322,29 +1323,58 @@ void asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daughter )
 {
 	std::string parent_name = pCell_parent->type_name;
 	int parent_type = pCell_parent->type;
-	Cell_Definition* pCD_parent = cell_definitions_by_name[parent_name];
-	double total = pCell_parent->phenotype.cycle.asymmetric_division.probabilities_total();
-	if (total > 1.0)
+	Asymmetric_Division& parent_asym_div = pCell_parent->phenotype.cycle.asymmetric_division;
+	double total = parent_asym_div.probabilities_total();
+
+	// The daughter pair is drawn from [0, total_weight). Left at 1.0 the stored values are absolute
+	// probabilities and whatever they leave short of 1 falls through to symmetric division; set to the
+	// map's own total they are relative weights, normalized by that total.
+	double total_weight = 1.0;
+
+	if (PhysiCell_settings.asymmetric_division_uses_weights)
 	{
-		double sym_div_prob = pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probability(parent_type, parent_type) + 1.0 - total;
-		if (sym_div_prob < 0.0)
-		{ 
-			std::cerr << "Error: Asymmetric division probabilities for " + pCD_parent->name + " sum to greater than 1.0 and cannot be normalized." << std::endl;
-			std::cerr << "Adjusted sym_div_prob = " << sym_div_prob << std::endl;
-			std::cerr << "List of all asym div probabilities:" << std::endl;
-			for (int i = 0; i < cell_definitions_by_index.size(); i++)
-			{
-				for (int j = i; j < cell_definitions_by_index.size(); j++)
-				{
-					std::cerr << "  - " << cell_definitions_by_index[i]->name << " and " << cell_definitions_by_index[j]->name << ": " << pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probability(i, j) << std::endl;
-				}
-			}
-			exit(-1);
-		}
-		pCell_parent->phenotype.cycle.asymmetric_division.set_asymmetric_division_probability(parent_type, parent_type, sym_div_prob);
-		pCell_daughter->phenotype.cycle.asymmetric_division.set_asymmetric_division_probability(pCell_daughter->type, pCell_daughter->type, sym_div_prob);
+		// An all-zero total has no normalized distribution. By convention that is symmetric division,
+		// which is what leaving total_weight at 1.0 gets: the running total never passes the draw, so
+		// select_daughter_types falls through to the parent and daughter types unchanged.
+		if (total > 0.0)
+		{ total_weight = total; }
 	}
-	std::pair<int, int> daughter_types = pCell_parent->phenotype.cycle.asymmetric_division.select_daughter_types(pCell_parent->type, pCell_daughter->type);
+	else
+	{
+		// The tolerance decides only whether an overshoot is an error, never whether the
+		// probabilities get adjusted: this block rewrites the symmetric division probability, so
+		// gating entry on a user-settable threshold would let the tolerance change the model rather
+		// than just its strictness.
+		const double tolerance = PhysiCell_settings.asymmetric_division_probability_tolerance;
+		if (total > 1.0)
+		{
+			double sym_div_prob = parent_asym_div.asymmetric_division_probability(parent_type, parent_type) + 1.0 - total;
+			// probabilities meant to sum to exactly 1 land a hair over it in double precision:
+			// 0.11 + 0.33 + 0.56 is 1.000000000000000222. How much slack a model needs depends on how
+			// many probabilities it sums and how they are computed, hence the configurable tolerance.
+			if (sym_div_prob < -tolerance)
+			{
+				std::cerr << "Error: Asymmetric division probabilities for " + parent_name + " sum to greater than 1.0 and cannot be normalized." << std::endl;
+				std::cerr << "Adjusted sym_div_prob = " << sym_div_prob << std::endl;
+				std::cerr << "List of all asym div probabilities for this cell:" << std::endl;
+				for (auto& entry : parent_asym_div.asymmetric_division_probabilities)
+				{
+					std::cerr << "  - " << cell_definitions_by_index[entry.first.first]->name
+						<< " and " << cell_definitions_by_index[entry.first.second]->name
+						<< ": " << entry.second << std::endl;
+				}
+				std::cerr << "If these are meant as relative weights rather than probabilities, set" << std::endl
+					<< "<asymmetric_division_mode>weights</asymmetric_division_mode> in the <options> block." << std::endl;
+				exit(-1);
+			}
+			if (sym_div_prob < 0.0)
+			{ sym_div_prob = 0.0; } // round-off only, given the check above
+			parent_asym_div.set_asymmetric_division_probability(parent_type, parent_type, sym_div_prob);
+			pCell_daughter->phenotype.cycle.asymmetric_division.set_asymmetric_division_probability(pCell_daughter->type, pCell_daughter->type, sym_div_prob);
+		}
+	}
+
+	std::pair<int, int> daughter_types = parent_asym_div.select_daughter_types(pCell_parent->type, pCell_daughter->type, total_weight);
 
 	if (daughter_types.first != pCell_parent->type) // only convert if the parent is not already the correct type
 	{ pCell_parent->convert_to_cell_definition( *cell_definitions_by_index[daughter_types.first] ); }
@@ -1400,10 +1430,25 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 {
     // check for detachments 
     double detachment_probability = phenotype.mechanics.detachment_rate * dt; 
+
+	// This runs inside the mechanics parallel-for, and this loop is not the only
+	// thing touching pCell's spring list: another thread running this same function
+	// for a neighbor calls attach_cells_as_spring(), which reaches into THIS cell's
+	// spring_attachments and push_back()s. Those writers serialize on the unnamed
+	// critical in Cell::attach_cell_as_spring() / detach_cell_as_spring(); reading
+	// here without it means a concurrent push_back that reallocates leaves the loop
+	// indexing a freed buffer and dereferencing garbage. Copy under the same lock
+	// and walk the copy.
+	// The lock is not held across the loop body: detach_cells_as_spring() takes the
+	// same unnamed critical, and OpenMP criticals are not reentrant.
+	std::vector<Cell*> spring_attachments_snapshot;
+	#pragma omp critical
+	{ spring_attachments_snapshot = pCell->state.spring_attachments; }
+
 	// detach_cells_as_spring swaps the detached cell with the last cell in the vector, so we need to iterate backwards
-	for (size_t j = pCell->state.spring_attachments.size(); j-- > 0; )
+	for (size_t j = spring_attachments_snapshot.size(); j-- > 0; )
     {
-        Cell* pTest = pCell->state.spring_attachments[j];
+        Cell* pTest = spring_attachments_snapshot[j];
 		if (phenotype.cell_interactions.pAttackTarget==pTest || pTest->phenotype.cell_interactions.pAttackTarget==pCell) // do not let attackers detach randomly
 		{ continue; }
         if( UniformRandom() <= detachment_probability )

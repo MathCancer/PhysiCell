@@ -85,25 +85,11 @@ using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
+	// read arguments
+	argument_parser.parse(argc, argv);
+
 	// load and parse settings file(s)
-	
-	bool XML_status = false; 
-	char copy_command [1024]; 
-	if( argc > 1 )
-	{
-		XML_status = load_PhysiCell_config_file( argv[1] ); 
-		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
-	}
-	else
-	{
-		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
-		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
-	}
-	if( !XML_status )
-	{ exit(-1); }
-	
-	// copy config file to output directry 
-	system( copy_command ); 
+	load_PhysiCell_config_file();
 	
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);

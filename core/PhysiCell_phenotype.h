@@ -123,8 +123,6 @@ class Phase_Link
 	int start_phase_index;
 	int end_phase_index; 
 	
-	bool fixed_duration; 
-	
 	bool (*arrest_function)( Cell* pCell, Phenotype& phenotype, double dt ); 
 		// return true if arrested, false if not 
 		
@@ -152,6 +150,13 @@ class Cycle_Data
 	
 	std::vector< std::vector<double> > transition_rates; 
 	
+	// Whether each transition is a fixed duration rather than a Poisson rate.
+	// Indexed exactly like transition_rates. char rather than bool so that
+	// fixed_duration() can hand back a reference (std::vector<bool> is a proxy
+	// container and cannot). Lives here, not in Phase_Link, because Cycle_Model
+	// objects are shared by pointer between cell definitions -- see #199.
+	std::vector< std::vector<char> > fixed_durations; 
+	
 	int current_phase_index; 
 	double elapsed_time_in_phase; 
 	
@@ -169,6 +174,10 @@ class Cycle_Data
 	double& exit_rate(int phase_index ); // This returns the first transition rate out of 
 		// phase # phase_index. It is only relevant if the phase has only one phase link 
 		// (true for many cycle models). 
+
+	// as transition_rate / exit_rate, for the fixed-duration flag 
+	char& fixed_duration(int start_phase_index, int end_phase_index ); // done 
+	char& exit_fixed_duration(int phase_index ); // done 
 };
 
 class Cycle_Model
@@ -213,31 +222,25 @@ class Cycle_Model
 	std::ostream& display( std::ostream& os ); // done 
 };
 
-// A hash function for pairs of ints as keys for extended_asymmetric_division_probabilities.
-// Should follow upper-triangular variant of Cantor set to prevent collisions.
-struct pair_hash {
-	
-	std::size_t operator () (const std::pair<int, int>& pair) const
-	{
-		int lower = std::min(pair.first, pair.second);
-		int upper = std::max(pair.first, pair.second);
-		int UT = upper * (upper + 1) / 2 + lower;
-		auto hash = std::hash<int>{}(UT);
-		return hash; 
-	}
-};
-
-struct equality_function {
+// Orders the (i,j) daughter type pairs, which are unordered: (i,j) and (j,i) are the same
+// pair, so keys are compared by their (min,max) form.
+struct pair_compare {
 	bool operator()(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) const
 	{
-		return ((lhs.first == rhs.first && lhs.second == rhs.second) || (lhs.first == rhs.second && lhs.second == rhs.first));
+		int lhs_lower = std::min(lhs.first, lhs.second);
+		int rhs_lower = std::min(rhs.first, rhs.second);
+		if( lhs_lower != rhs_lower )
+		{ return lhs_lower < rhs_lower; }
+		return std::max(lhs.first, lhs.second) < std::max(rhs.first, rhs.second);
 	}
 };
 
 class Asymmetric_Division
 {
 public:
-	std::unordered_map<std::pair<int, int>, double, pair_hash, equality_function> asymmetric_division_probabilities;
+	// std::map, not unordered_map: select_daughter_types() walks this container, so the order
+	// has to be reproducible from the seed alone rather than depending on the hash table.
+	std::map<std::pair<int, int>, double, pair_compare> asymmetric_division_probabilities;
 
 	void set_asymmetric_division_probability(std::pair<int, int> types, double probability);
 	void set_asymmetric_division_probability(int upper_triangular_index, double probability);
@@ -249,9 +252,13 @@ public:
 	double asymmetric_division_probability(int type_1, int type_2);
 	double asymmetric_division_probability(std::string type_name_1, std::string type_name_2);
 
-	double probabilities_total();
+	double probabilities_total( void );
 
-	std::pair<int, int> select_daughter_types(int type_1, int type_2);
+
+	// total_weight scales the draw. Leave it at 1.0 and the stored values are read as absolute
+	// probabilities, so whatever they leave short of 1 falls through to symmetric division; pass the
+	// map's own total and they are read as relative weights, normalized by that total.
+	std::pair<int, int> select_daughter_types(int type_1, int type_2, double total_weight = 1.0);
 };
 
 std::pair<int, int> extended_asym_index_to_upper_triangle(int index);
@@ -274,6 +281,10 @@ class Cycle
 	int& current_phase_index( void ); // done 
 	
 	void sync_to_cycle_model( Cycle_Model& cm ); // done 
+	// as above, but take the parameters from cd rather than from cm.data. Needed
+	// because death Cycle_Models are shared between cell definitions, so the
+	// per-definition parameters live elsewhere -- see Death::model_data (#199). 
+	void sync_to_cycle_model( Cycle_Model& cm , const Cycle_Data& cd ); // done 
 
 	Asymmetric_Division asymmetric_division;
 };
@@ -302,6 +313,11 @@ class Death
  public:
 	std::vector<double> rates; 
 	std::vector<Cycle_Model*> models; 
+	// Per-definition cycle parameters for each death model. models[] are shared
+	// Cycle_Model objects, so their own .data cannot hold per-cell-definition
+	// durations or fixed-duration flags -- see #199. Seeded from the model at
+	// add_death_model(), overridden by the XML, applied at start_death().
+	std::vector<Cycle_Data> model_data; 
 	std::vector<Death_Parameters> parameters; 
 	
 	bool dead; 
@@ -319,6 +335,7 @@ class Death
 	void trigger_death( int death_model_index ); // done 
 	
 	Cycle_Model& current_model( void ); // done
+	Cycle_Data& current_model_data( void ); // done 
 	Death_Parameters& current_parameters( void ); // done '
 
 	// ease of access

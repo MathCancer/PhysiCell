@@ -2114,8 +2114,8 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
 
         if (create_cells)
 		{
+			// no reserve(): asymmetric_division_probabilities is a std::map
 			pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.clear();
-			pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.reserve(n_cell_types * (n_cell_types + 1) / 2);
 		}
 		for ( int i1 = 0; i1 < n_cell_types; i1++ )
 		{
@@ -2215,7 +2215,10 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
             {
                 if (cell->ID == pair.second)
                 {
-                    (pair.first)->phenotype.cell_interactions.pAttackTarget = cell;
+                    // restore all three records, not just the pointer: the spring
+                    // is not serialised, so without this a resumed run starts with
+                    // an attack that has no spring behind it
+                    begin_attack( pair.first , cell );
                     if (debug_print)
                     { std::cout << "    cell ID=" << (pair.first)->ID << " attacking  cell ID=" << cell->ID << std::endl; }
                     break;

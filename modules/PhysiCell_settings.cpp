@@ -162,9 +162,9 @@ void setup_random_seed_from_config( void )
 	}
 	else
 	{
-		unsigned int seed;
+		std::uint64_t seed;
 		try
-		{ seed = std::stoul(random_seed); }
+		{ seed = std::stoull(random_seed); }
 		catch(const std::exception& e)
 		{
 			std::cout << "ERROR: " << random_seed << " is not a valid random seed. It must be an integer. Fix this within <options>." << std::endl;
@@ -332,6 +332,51 @@ void PhysiCell_Settings::read_from_pugixml( void )
 		{
 			std::cout << "Disabling automated spring adhesions and detachments!" << std::endl;
 			PhysiCell_settings.disable_automated_spring_adhesions = true;
+		}
+
+		// Read the asymmetric division mode before the tolerance so the tolerance can reject the
+		// combination: the two options answer the same question in incompatible ways.
+		pugi::xml_node node_asym_div_mode = node_options.child( "asymmetric_division_mode" );
+		if( node_asym_div_mode )
+		{
+			std::string mode = xml_get_my_string_value( node_asym_div_mode );
+			if( mode == "weights" )
+			{
+				PhysiCell_settings.asymmetric_division_uses_weights = true;
+				std::cout << "Using weights for asymmetric division: the values set per cell type are relative weights," << std::endl
+					<< "\tnormalized by their sum at each division, not probabilities." << std::endl
+					<< "\tSymmetric division is not the leftover of 1 here; give it its own weight if you want it." << std::endl;
+			}
+			else if( mode != "probabilities" )
+			{
+				// A string rather than a bool so a typo lands here instead of quietly reading as false
+				// and running the model in the other mode.
+				std::cerr << "Error: <asymmetric_division_mode> is \"" << mode
+					<< "\", but it must be either \"probabilities\" or \"weights\"." << std::endl;
+				exit(-1);
+			}
+		}
+
+		if( node_options.child( "asymmetric_division_probability_tolerance" ) )
+		{
+			if( PhysiCell_settings.asymmetric_division_uses_weights )
+			{
+				std::cerr << "Error: <asymmetric_division_probability_tolerance> cannot be set together with" << std::endl
+					<< "\t<asymmetric_division_mode>weights</asymmetric_division_mode>." << std::endl
+					<< "\tThe tolerance bounds how far asymmetric division probabilities may sum past 1." << std::endl
+					<< "\tWeights are normalized by their own sum instead of being bounded, so there is nothing" << std::endl
+					<< "\tfor the tolerance to do. Remove whichever of the two you did not mean." << std::endl;
+				exit(-1);
+			}
+			double tol = xml_get_double_value( node_options, "asymmetric_division_probability_tolerance" );
+			if( tol < 0.0 )
+			{
+				std::cerr << "Error: <asymmetric_division_probability_tolerance> is " << tol
+					<< ", but it must not be negative." << std::endl;
+				exit(-1);
+			}
+			PhysiCell_settings.asymmetric_division_probability_tolerance = tol;
+			std::cout << "Using asymmetric division probability tolerance " << tol << std::endl;
 		}
 
 		// NOTE: the random seed is read in setup_random_seed_from_config(), which runs

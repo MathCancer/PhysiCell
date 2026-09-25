@@ -47,6 +47,8 @@
 */
 
 #include "BioFVM_vector.h" 
+#include <cctype>
+#include <limits>
 
 /* some global BioFVM strings */ 
 
@@ -376,100 +378,52 @@ void csv_to_vector( const char* buffer , std::vector<double>& vect )
 	return; 
 }
 
-void substrate_csv_to_vector(const char* buffer, std::vector<double>& vect)
+// Parse one row of a substrate initial-condition csv into vect. A row of n commas always yields
+// n+1 values, so that a caller can hold every row to the same column count.
+//
+// A field that is empty or all whitespace yields NaN, which lets a caller tell an entry the row
+// omitted from one it set to zero. Every other field must parse completely as a finite number, so
+// that a typo cannot pass silently as a value: "1.5abc", "NA" and "inf" are all rejected.
+//
+// Returns the 1-based index of the first field that is neither, or 0 if the whole row is well formed.
+unsigned int substrate_csv_to_vector(const char* buffer, std::vector<double>& vect)
 {
-    vect.clear();
+	vect.clear();
 
-    const char* start = buffer;
-    const char* end   = buffer;
+	const char* start = buffer;
+	unsigned int field_number = 0;
 
-    while (*end != '\0')
-    {
-        if (*end == ',')
-        {
-            if (start == end) 
-            {
-                // Empty field: treat as 0
-                vect.push_back(0.0);
-            }
-            else
-            {
-                vect.push_back(strtod(start, nullptr));
-            }
-            end++;
-            start = end;
-        }
-        else
-        {
-            end++;
-        }
-    }
-
-    // Handle the last field (could be empty at end of line)
-    if (start == end)
-    {
-        vect.push_back(0.0);
-    }
-    else
-    {
-        vect.push_back(strtod(start, nullptr));
-    }
-}
-
-void dirichlet_csv_to_vector( const char* buffer , std::vector<bool>& is_missing , std::vector<double>& data )
-{
-	size_t ind = 0;
-    unsigned int i=0;
-    std::string entry;
-    while( i < strlen( buffer ) )
-    {
-        if(buffer[i] == ',')
-        {
-            if(entry.empty())
-            {
-				is_missing[ind] = true;
-            }
-            else
-            {
-				data[ind] = std::stod(entry);
-				is_missing[ind] = false;
-            }
-            entry.clear();
-			ind++;
-        }
-        else
-        {
-            entry += buffer[i];
-        }
-        i++;
-    }
-    // Handle the last entry
-    if(entry.empty())
-    {
-		is_missing[ind] = true;
-    }
-    else
-    {
-		data[ind] = std::stod(entry);
-		is_missing[ind] = false;
-    }
-
-	if (is_missing[0] || is_missing[1] || is_missing[2])
+	while (true)
 	{
-		std::cerr << "Error: x, y, and z data must be provided for each row in the .csv file specifying BioFVM dirichlet conditions." << std::endl;
-		exit(-1);
-	}
+		const char* end = start;
+		while (*end != '\0' && *end != ',')
+		{ end++; }
+		field_number++;
 
-	if (ind < is_missing.size() - 1)
-	{
-		std::cerr << "Error: Wrong number of data supplied in a row of the .csv file specifying BioFVM dirichlet conditions." << std::endl;
-		std::cerr << "\tExpected: " << is_missing.size() << ". Found: " << ind + 1 << std::endl;
-		std::cerr << "\tRow: " << buffer << std::endl;
-		exit(-1);
+		// trim the field, so that " 1.5 " reads as 1.5 and " " reads as omitted
+		const char* first = start;
+		const char* last = end;
+		while (first < last && isspace((unsigned char) *first))
+		{ first++; }
+		while (last > first && isspace((unsigned char) *(last - 1)))
+		{ last--; }
+
+		if (first == last) // the row omitted this entry
+		{ vect.push_back(std::numeric_limits<double>::quiet_NaN()); }
+		else
+		{
+			char* parse_end;
+			double value = strtod(first, &parse_end);
+			if (parse_end != last || !std::isfinite(value)) // trailing garbage, not a number, or not finite
+			{ return field_number; }
+			vect.push_back(value);
+		}
+
+		if (*end == '\0')
+		{ return 0; }
+		start = end + 1;
 	}
-    return; 
 }
-
 
 char* vector_to_csv( const std::vector<double>& vect )
 { 
