@@ -1645,11 +1645,15 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
 
         // cell cycle
         // e.g., phenotype.cycle.model().find_phase_index( PhysiCell_constants::quiescent )
-        int phase_index = pCell->phenotype.cycle.model().find_phase_index(current_phase_code);
-        if (debug_print)
+        int phase_index = -1;
+        if (create_cells)
         {
-            std::cout << "------ cycle:\n";
-            std::cout << "  --- phase_index =" << phase_index  << std::endl;
+            phase_index = pCell->phenotype.cycle.model().find_phase_index(current_phase_code);
+            if (debug_print)
+            {
+                std::cout << "------ cycle:\n";
+                std::cout << "  --- phase_index =" << phase_index  << std::endl;
+            }
         }
 
         fread(&dTemp, sizeof(double), 1, fp);
@@ -2140,21 +2144,24 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
                 if (debug_print)
                 { std::cout << "custom var: " << pair.first << " = " << dTemp << std::endl; }
 
-                // find the variable 
-                // int n = pCD->custom_data.find_variable_index( name ); 
-                int idx_var = pCell->custom_data.find_variable_index( pair.first ); 
-                // if it exists, overwrite 
-                if( idx_var > -1 )
-                { 
-                    // pCell->custom_data.variables[idx_var].value = pair.second; 
-                    pCell->custom_data.variables[idx_var].value = dTemp; 
-                    if (debug_print)
-                    { std::cout << "   ----   pCell->custom_data[" << pair.first << "] = " <<pCell->custom_data[pair.first] << std::endl; }
-                }
-                else
+                if (create_cells)
                 {
-                    std::cout << __FUNCTION__ << "   Error: got an invalid custom data var name: " << pair.first << " . Exiting! " << std::endl;
-                    std::exit(-1);
+                    // find the variable
+                    // int n = pCD->custom_data.find_variable_index( name );
+                    int idx_var = pCell->custom_data.find_variable_index( pair.first );
+                    // if it exists, overwrite
+                    if( idx_var > -1 )
+                    {
+                        // pCell->custom_data.variables[idx_var].value = pair.second;
+                        pCell->custom_data.variables[idx_var].value = dTemp;
+                        if (debug_print)
+                        { std::cout << "   ----   pCell->custom_data[" << pair.first << "] = " <<pCell->custom_data[pair.first] << std::endl; }
+                    }
+                    else
+                    {
+                        std::cout << __FUNCTION__ << "   Error: got an invalid custom data var name: " << pair.first << " . Exiting! " << std::endl;
+                        std::exit(-1);
+                    }
                 }
             }
 
@@ -2167,18 +2174,21 @@ int recreate_sim_state(std::string filename, Microenvironment& M,
                     if (debug_print)
                     { std::cout << "custom vector var: " << pair.first << "[" << jj << "] = " << dTemp << std::endl; }
 
-                    // find the variable 
-                    // int n = pCD->custom_data.find_variable_index( name ); 
-                    int idx_var = pCell->custom_data.find_vector_variable_index( pair.first ); 
-                    // if it exists, overwrite 
-                    if( idx_var > -1 )
-                    { 
-                        pCell->custom_data.vector_variables[idx_var].value[jj] = pair.second;
-                    }
-                    else
+                    if (create_cells)
                     {
-                        std::cout << __FUNCTION__ << "   Error: got an invalid custom data vector name: " << pair.first << " . Exiting! " << std::endl;
-                        std::exit(-1);
+                        // find the variable
+                        // int n = pCD->custom_data.find_variable_index( name );
+                        int idx_var = pCell->custom_data.find_vector_variable_index( pair.first );
+                        // if it exists, overwrite
+                        if( idx_var > -1 )
+                        {
+                            pCell->custom_data.vector_variables[idx_var].value[jj] = pair.second;
+                        }
+                        else
+                        {
+                            std::cout << __FUNCTION__ << "   Error: got an invalid custom data vector name: " << pair.first << " . Exiting! " << std::endl;
+                            std::exit(-1);
+                        }
                     }
                 }
             }
