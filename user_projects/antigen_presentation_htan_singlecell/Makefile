@@ -11,6 +11,10 @@ ifdef PHYSICELL_CPP
 	CC := $(PHYSICELL_CPP)
 endif
 
+ifndef STATIC_OPENMP
+	STATIC_OPENMP = -fopenmp
+endif
+
 ARCH := native # best auto-tuning
 # ARCH := core2 # a reasonably safe default for most CPUs since 2007
 # ARCH := corei7
@@ -44,14 +48,16 @@ else
 	endif
 endif
 
-COMPILE_COMMAND := $(CC) $(CFLAGS)
+CFLAGS_LINK := $(shell echo $(CFLAGS) | sed -e "s/-fopenmp//g")
+COMPILE_COMMAND := $(CC) $(CFLAGS)  $(EXTRA_FLAGS)
+LINK_COMMAND := $(CC) $(CFLAGS_LINK) $(EXTRA_FLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o
 
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
 PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o \
-PhysiCell_signal_behavior.o PhysiCell_rules.o
+PhysiCell_signal_behavior.o PhysiCell_rules_extended.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
@@ -70,6 +76,9 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp
 	make name
+
+static: main.cpp $(ALL_OBJECTS) $(MaBoSS)
+	$(LINK_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIB) -static-libgcc -static-libstdc++ $(STATIC_OPENMP)
 
 name:
 	@echo ""
@@ -105,8 +114,8 @@ PhysiCell_constants.o: ./core/PhysiCell_constants.cpp
 PhysiCell_signal_behavior.o: ./core/PhysiCell_signal_behavior.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_signal_behavior.cpp
 
-PhysiCell_rules.o: ./core/PhysiCell_rules.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_rules.cpp
+PhysiCell_rules_extended.o: ./core/PhysiCell_rules_extended.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_rules_extended.cpp
 
 # BioFVM core components (needed by PhysiCell)
 
@@ -184,17 +193,15 @@ reset:
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
 	touch ./config/empty.csv
 	rm -f ./config/*.csv
-	rm -rf ./config/ics
-	rm -f ./config/PhysiCell_settings_coculture.xml ./config/PhysiCell_settings_PDAC.xml
 
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 
 data-cleanup:
-	rm -rf ./$(OUTPUT)
-	mkdir ./$(OUTPUT)
-	touch ./$(OUTPUT)/empty.txt
+	rm -rf ./output
+	mkdir ./output
+	touch ./output/empty.txt
 
 # archival
 
@@ -224,35 +231,21 @@ untar:
 # easier animation
 
 FRAMERATE := 24
-OUTPUT := outputs/epi_caf_invasion
-TYPE :=
-TYPE_OUTPUT = $(if $(strip $(TYPE)),$(OUTPUT)/$(TYPE),$(OUTPUT))
-MOVIENAME := out
+OUTPUT := output
 
-explain_type_output:
-	@echo "This project uses the variable TYPE to define the output directory."
-	@echo "The default value of TYPE is coculture."
-	@echo "To target the PDAC output, use TYPE=PDAC in your command."
-	@echo "For example, to make a movie of the PDAC output, use make movie TYPE=PDAC."
-	@echo "For now, continuing on with TYPE=$(TYPE)..."
+MAGICK_DENSITY := 96
+MAGICK_RESIZE_X := 1024
+MAGICK_RESIZE_Y := 1024
+MAGICK_RESIZE := $(MAGICK_RESIZE_X)x$(MAGICK_RESIZE_Y)
 
 jpeg:
-	make explain_type_output
-	@magick identify -format "%h" $(TYPE_OUTPUT)/initial.svg > __H.txt
-	@magick identify -format "%w" $(TYPE_OUTPUT)/initial.svg > __W.txt
-	@expr 2 \* \( $$(grep . __H.txt) / 2 \) > __H1.txt
-	@expr 2 \* \( $$(grep . __W.txt) / 2 \) > __W1.txt
-	@echo "$$(grep . __W1.txt)!x$$(grep . __H1.txt)!" > __resize.txt
-	@magick mogrify -format jpg -resize $$(grep . __resize.txt) $(TYPE_OUTPUT)/s*.svg
-	rm -f __H*.txt __W*.txt __resize.txt
+	magick mogrify -density $(MAGICK_DENSITY) -format jpg -resize $(MAGICK_RESIZE) $(OUTPUT)/s*.svg
 
 gif:
-	make explain_type_output
-	magick convert $(TYPE_OUTPUT)/s*.svg $(TYPE_OUTPUT)/$(MOVIENAME).gif
+	magick -density $(MAGICK_DENSITY) $(OUTPUT)/s*.svg -resize $(MAGICK_RESIZE) $(OUTPUT)/out.gif
 
 movie:
-	make explain_type_output
-	ffmpeg -r $(FRAMERATE) -f image2 -i $(TYPE_OUTPUT)/snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(TYPE_OUTPUT)/$(MOVIENAME).mp4
+	ffmpeg -r $(FRAMERATE) -f image2 -i $(OUTPUT)/snapshot%08d.jpg -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec none $(OUTPUT)/out.mp4
 
 # upgrade rules
 
@@ -284,7 +277,7 @@ upgrade: $(SOURCE)
 	rm -f $(SOURCE)
 
 # use: make save PROJ=your_project_name
-PROJ := epi-fib-mes
+PROJ := my_project
 
 save:
 	echo "Saving project as $(PROJ) ... "
@@ -302,8 +295,27 @@ load:
 	echo "Loading project from $(PROJ) ... "
 	cp ./user_projects/$(PROJ)/main.cpp .
 	cp ./user_projects/$(PROJ)/Makefile .
-	cp -r ./user_projects/$(PROJ)/config/* ./config/
-	cp -r ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/
+	cp ./user_projects/$(PROJ)/config/* ./config/
+	cp ./user_projects/$(PROJ)/custom_modules/* ./custom_modules/
+
+pack:
+	@echo " "
+	@echo "Preparing project $(PROJ) for sharing ... "
+	@echo " "
+	cd ./user_projects && zip -r $(PROJ).zip $(PROJ)
+	@echo " "
+	@echo "Share ./user_projects/$(PROJ).zip ... "
+	@echo "Other users can unzip $(PROJ).zip in their ./user_projects, compile, and run."
+	@echo " "
+
+unpack:
+	@echo " "
+	@echo "Preparing shared project $(PROJ).zip for use ... "
+	@echo " "
+	cd ./user_projects && unzip $(PROJ).zip
+	@echo " "
+	@echo "Load this project via make load PROJ=$(PROJ) ... "
+	@echo " "
 
 list-user-projects:
 	@echo "user projects::"

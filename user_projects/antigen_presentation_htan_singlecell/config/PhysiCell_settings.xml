@@ -23,11 +23,11 @@
     </overall>
 
     <parallel>
-        <omp_num_threads>8</omp_num_threads>
+        <omp_num_threads>1</omp_num_threads>
     </parallel>
 
     <save>
-        <folder>outputs/HT115_S1H6_wellmixed</folder>
+        <folder>output</folder>
         <full_data>
             <interval units="min">60</interval>
             <enable>true</enable>
@@ -171,7 +171,7 @@
             <calculate_gradients>true</calculate_gradients>
             <track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
             <initial_condition type="csv" enabled="false">
-                <filename>/Users/jeanette.johnson/PDACAntigenPresentationABMs/PhysiCell/config/collagen387ROI1.csv</filename>
+                <filename></filename>
             </initial_condition>
             <dirichlet_nodes type="matlab" enabled="false">
                 <filename>./config/dirichlet.mat</filename>
@@ -5819,15 +5819,15 @@
 
     <initial_conditions>
         <cell_positions type="csv" enabled="true">
-            <folder>/Users/jeanette.johnson/PDACAntigenPresentationABMs/PhysiCell/config/ics/htan_singlecell</folder>
-            <filename>HT115_S1H6_wellmixed.csv</filename>
+            <folder>config/ics/htan_singlecell</folder>
+            <filename>HT061_S1PA_wellmixed.csv</filename>
         </cell_positions>
     </initial_conditions>
 
     <cell_rules>
         <rulesets>
             <ruleset protocol="CBHG" version="3.0" format="csv" enabled="true">
-                <folder>/Users/jeanette.johnson/PDACAntigenPresentationABMs/PhysiCell/config</folder>
+                <folder>user_projects/antigen_presentation_htan_singlecell/config</folder>
                 <filename>cell_rules.csv</filename>
             </ruleset>
         </rulesets>
@@ -5836,5 +5836,6 @@
 
     <user_parameters>
         <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">0</number_of_cells>
+        <spatial_config_index type="int" units="none" description="geometry configuration index (1-6) encoding TME spatial arrangement of immune, CAF, and tumor annuli">0</spatial_config_index>
     </user_parameters>
 </PhysiCell_settings>

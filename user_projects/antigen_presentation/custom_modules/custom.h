@@ -75,7 +75,7 @@ using namespace PhysiCell;
 
 void create_cell_types();
 void setup_tissue();
-void setup_tissue_domain(void);
+// void setup_tissue_domain(void); // disabled, see custom.cpp
 
 // set up the BioFVM microenvironment
 void setup_microenvironment();
