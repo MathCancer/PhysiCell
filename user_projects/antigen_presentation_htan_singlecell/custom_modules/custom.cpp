@@ -84,7 +84,13 @@ void create_cell_types(void)
 	   This is a good place to set default functions.
 	*/
 
-	initialize_default_cell_definition(); // in cell_ecm_interactions.cpp. Sets custom velocity function (cell-ECM motility interaction) and custom cell rule (ECM remodeling).cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	// PhysiCell's default cell definition (standard cycle and death models, default
+	// functions, SVG plotting). Required; the lines below override some of it.
+	initialize_default_cell_definition();
+	// Inactive: this sync sat after the comment on the line above and never ran.
+	// It is redundant, since initialize_default_cell_definition() already syncs
+	// secretion to the microenvironment.
+	// cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
@@ -156,7 +162,9 @@ void setup_microenvironment(void)
 
 void setup_tissue()
 {
-	setup_tissue_domain();
+	// Disabled: setup_tissue_domain() read the domain bounds into locals and never
+	// used them.
+	// setup_tissue_domain();
 	// load cells from your CSV file (if enabled)
 	// load_initial_cells() honors a -i path when PCMM passes one, and otherwise
 	// falls through to the config's <cell_positions> block.
@@ -165,6 +173,9 @@ void setup_tissue()
 	return;
 }
 
+// Disabled, kept for reference: computed the domain bounds and ranges but never
+// used them. See setup_tissue().
+/*
 void setup_tissue_domain(void)
 {
 	double Xmin = microenvironment.mesh.bounding_box[0];
@@ -185,6 +196,7 @@ void setup_tissue_domain(void)
 	double Yrange = Ymax - Ymin;
 	double Zrange = Zmax - Zmin;
 }
+*/
 
 // Model-specific SVG palette, keyed by cell type NAME.
 //
