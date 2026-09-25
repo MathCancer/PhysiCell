@@ -29,11 +29,11 @@
     <save>
         <folder>outputs/HT115_S1H6_wellmixed</folder>
         <full_data>
-            <interval units="min">30</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">30</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
             <plot_substrate enabled="true" limits="true">
                 <substrate>ecm</substrate>
