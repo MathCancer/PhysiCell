@@ -92,7 +92,7 @@ template:
 	cp Makefile Makefile-backup
 	cp ./sample_projects/template/Makefile .
 	cp -r ./sample_projects/template/config/* ./config 
-	
+
 # sample projects 
 
 # ---- non-intracellular projects 
@@ -238,6 +238,14 @@ episode-sample:
 	cp ./sample_projects/episode/Makefile .
 	cp -r ./sample_projects/episode/config/* ./config
 
+dirichlet-from-file-sample:
+	cp -r ./sample_projects/dirichlet_from_file/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/dirichlet_from_file/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/dirichlet_from_file/Makefile .
+	cp -r ./sample_projects/dirichlet_from_file/config/* ./config 
+	
 # ---- intracellular projects 
 ode-energy-sample:
 	cp ./sample_projects_intracellular/ode/ode_energy/custom_modules/* ./custom_modules/

@@ -47,6 +47,8 @@
 */
 
 #include "BioFVM_vector.h" 
+#include <stdexcept>
+#include <string>
 
 /* some global BioFVM strings */ 
 
@@ -375,6 +377,88 @@ void csv_to_vector( const char* buffer , std::vector<double>& vect )
 	}			
 	return; 
 }
+
+// store one field of a dirichlet-condition csv row. The bounds check matters: a row carrying more
+// fields than the header established would otherwise write past the end of both vectors.
+static void store_dirichlet_csv_entry( const char* buffer , const std::string& entry , std::vector<bool>& is_missing , std::vector<double>& data , const size_t ind )
+{
+	if (ind >= is_missing.size())
+	{
+		std::cerr << "Error: Too many data supplied in a row of the .csv file specifying BioFVM dirichlet conditions." << std::endl;
+		std::cerr << "\tExpected: " << is_missing.size() << ". Found: " << ind + 1 << " or more." << std::endl;
+		std::cerr << "\tRow: " << buffer << std::endl;
+		exit(-1);
+	}
+
+	// a field holding nothing but whitespace is omitted, so that " , " reads the same as ","
+	size_t first = entry.find_first_not_of(" \t\r");
+	if (first == std::string::npos)
+	{
+		is_missing[ind] = true;
+		return;
+	}
+	std::string trimmed = entry.substr(first, entry.find_last_not_of(" \t\r") - first + 1);
+
+	double value = 0.0;
+	size_t parsed = 0;
+	try
+	{
+		value = std::stod(trimmed, &parsed);
+	}
+	catch (const std::logic_error&) // std::stod throws invalid_argument on no conversion, out_of_range on overflow
+	{
+		parsed = 0;
+	}
+	if (parsed != trimmed.size()) // no conversion, or trailing garbage as in "1.5abc"
+	{
+		std::cerr << "Error: Column " << ind + 1 << " of a row of the .csv file specifying BioFVM dirichlet conditions is not a number." << std::endl;
+		std::cerr << "\tOffending value: " << trimmed << std::endl;
+		std::cerr << "\tRow: " << buffer << std::endl;
+		exit(-1);
+	}
+
+	data[ind] = value;
+	is_missing[ind] = false;
+}
+
+void dirichlet_csv_to_vector( const char* buffer , std::vector<bool>& is_missing , std::vector<double>& data )
+{
+	size_t ind = 0;
+    unsigned int i=0;
+    std::string entry;
+    while( i < strlen( buffer ) )
+    {
+        if(buffer[i] == ',')
+        {
+			store_dirichlet_csv_entry(buffer, entry, is_missing, data, ind);
+            entry.clear();
+			ind++;
+        }
+        else
+        {
+            entry += buffer[i];
+        }
+        i++;
+    }
+    // Handle the last entry
+	store_dirichlet_csv_entry(buffer, entry, is_missing, data, ind);
+
+	if (is_missing[0] || is_missing[1] || is_missing[2])
+	{
+		std::cerr << "Error: x, y, and z data must be provided for each row in the .csv file specifying BioFVM dirichlet conditions." << std::endl;
+		exit(-1);
+	}
+
+	if (ind < is_missing.size() - 1)
+	{
+		std::cerr << "Error: Wrong number of data supplied in a row of the .csv file specifying BioFVM dirichlet conditions." << std::endl;
+		std::cerr << "\tExpected: " << is_missing.size() << ". Found: " << ind + 1 << std::endl;
+		std::cerr << "\tRow: " << buffer << std::endl;
+		exit(-1);
+	}
+    return; 
+}
+
 
 char* vector_to_csv( const std::vector<double>& vect )
 { 
