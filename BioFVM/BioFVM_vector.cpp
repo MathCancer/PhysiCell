@@ -47,6 +47,8 @@
 */
 
 #include "BioFVM_vector.h" 
+#include <cctype>
+#include <limits>
 
 /* some global BioFVM strings */ 
 
@@ -374,6 +376,53 @@ void csv_to_vector( const char* buffer , std::vector<double>& vect )
 		}
 	}			
 	return; 
+}
+
+// Parse one row of a substrate initial-condition csv into vect. A row of n commas always yields
+// n+1 values, so that a caller can hold every row to the same column count.
+//
+// A field that is empty or all whitespace yields NaN, which lets a caller tell an entry the row
+// omitted from one it set to zero. Every other field must parse completely as a finite number, so
+// that a typo cannot pass silently as a value: "1.5abc", "NA" and "inf" are all rejected.
+//
+// Returns the 1-based index of the first field that is neither, or 0 if the whole row is well formed.
+unsigned int substrate_csv_to_vector(const char* buffer, std::vector<double>& vect)
+{
+	vect.clear();
+
+	const char* start = buffer;
+	unsigned int field_number = 0;
+
+	while (true)
+	{
+		const char* end = start;
+		while (*end != '\0' && *end != ',')
+		{ end++; }
+		field_number++;
+
+		// trim the field, so that " 1.5 " reads as 1.5 and " " reads as omitted
+		const char* first = start;
+		const char* last = end;
+		while (first < last && isspace((unsigned char) *first))
+		{ first++; }
+		while (last > first && isspace((unsigned char) *(last - 1)))
+		{ last--; }
+
+		if (first == last) // the row omitted this entry
+		{ vect.push_back(std::numeric_limits<double>::quiet_NaN()); }
+		else
+		{
+			char* parse_end;
+			double value = strtod(first, &parse_end);
+			if (parse_end != last || !std::isfinite(value)) // trailing garbage, not a number, or not finite
+			{ return field_number; }
+			vect.push_back(value);
+		}
+
+		if (*end == '\0')
+		{ return 0; }
+		start = end + 1;
+	}
 }
 
 char* vector_to_csv( const std::vector<double>& vect )
