@@ -75,6 +75,7 @@
 #include <vector>
 #include <random>
 #include <chrono>
+#include <map>
 #include <unordered_map>
 
 #include "./PhysiCell_pugixml.h"
@@ -115,8 +116,11 @@ class PhysiCell_Settings
 
 	bool disable_automated_spring_adhesions = false; 
 	
-	double SVG_save_interval = 60; 
-	bool enable_SVG_saves = true; 
+	double SVG_save_interval = 60;
+	bool enable_SVG_saves = true;
+
+	bool svg_cell_colors_specified = false;
+	std::map<std::string, std::string> svg_cell_colors_by_name;
 
 	bool enable_substrate_plot = false;
 	std::string substrate_to_monitor = "oxygen"; 
