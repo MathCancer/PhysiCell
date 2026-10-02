@@ -121,18 +121,10 @@ class Microenvironment
 	
 	// on "resize density" type operations, need to extend all of these 
 	
-	/*
-	std::vector<int> dirichlet_indices; 
 	std::vector< std::vector<double> > dirichlet_value_vectors; 
-	std::vector<bool> dirichlet_node_map; 
-	*/
-	std::vector< std::vector<double> > dirichlet_value_vectors; 
-	std::vector<bool> dirichlet_activation_vector; 
 	
-	/* new in Version 1.7.0 -- activation vectors can be specified 
-	   on a voxel-by-voxel basis */ 
-	   
 	std::vector< std::vector<bool> > dirichlet_activation_vectors; 
+	std::vector<bool> dirichlet_activation_vector; // whether a given substrate has a DC set somewhere
 	
  public:
 	
@@ -190,6 +182,7 @@ class Microenvironment
 	void set_density( int index , std::string name , std::string units , double diffusion_constant , double decay_rate ); 
 
 	int find_density_index( std::string name ); 
+	int find_existing_density_index( std::string name ); 
 	
 	int voxel_index( int i, int j, int k ); 
 	std::vector<unsigned int> cartesian_indices( int n ); 
@@ -237,7 +230,29 @@ class Microenvironment
 	void simulate_cell_sources_and_sinks( double dt ); 
 	
 	void display_information( std::ostream& os ); 
-	
+
+	// Dirichlet setters/clearers: invalid input (unknown substrate name, mismatched vector sizes) is fatal
+	void fix_substrate_at_voxel( std::string substrate, int voxel_index, double new_value );
+	void fix_substrate_at_voxel( std::string substrate, int voxel_index );
+	void fix_substrate_at_voxels( std::string substrate, std::vector<int>& voxel_indices, double new_value );
+	void fix_substrate_at_voxels( std::string substrate, std::vector<int>& voxel_indices, std::vector<double>& new_values );
+	void fix_substrate_at_voxels( std::string substrate, std::vector<int>& voxel_indices );
+	void fix_substrate_at_voxel( int substrate_index, int voxel_index, double new_value );
+	void fix_substrate_at_voxel( int substrate_index, int voxel_index );
+	void fix_substrate_at_voxels( int substrate_index, std::vector<int>& voxel_indices, double new_value );
+	void fix_substrate_at_voxels( int substrate_index, std::vector<int>& voxel_indices, std::vector<double>& new_values );
+	void fix_substrate_at_voxels( int substrate_index, std::vector<int>& voxel_indices );
+	void fix_substrates_at_voxel( int voxel_index, std::vector<double>& new_values );
+	void fix_substrates_at_voxel( int voxel_index );
+
+	void unfix_substrate_at_voxel( std::string substrate, int voxel_index );
+	void unfix_substrate_at_voxels( std::string substrate, std::vector<int>& voxel_indices );
+	void unfix_substrate_at_voxel( int substrate_index, int voxel_index );
+	void unfix_substrate_at_voxels( int substrate_index, std::vector<int>& voxel_indices );
+	void unfix_substrates_at_voxel( int voxel_index );
+
+	void sync_substrate_dirichlet_activation( int substrate_index );
+
 	void add_dirichlet_node( int voxel_index, std::vector<double>& value ); 
 	void update_dirichlet_node( int voxel_index , std::vector<double>& new_value ); 
 	void update_dirichlet_node( int voxel_index , int substrate_index , double new_value );
