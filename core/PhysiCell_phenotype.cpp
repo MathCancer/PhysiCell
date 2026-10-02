@@ -94,7 +94,6 @@ Phase_Link::Phase_Link()
 	start_phase_index = 0; 
 	end_phase_index = 0; 
 	
-	fixed_duration = false; 
 	
 	arrest_function = NULL; 
 	exit_function = NULL; 
@@ -126,16 +125,18 @@ void Cycle_Data::sync_to_cycle_model( void )
 	// querying the phase_links 
 
 	transition_rates.resize( n );
+	fixed_durations.resize( n );
 	
 	// also make sure the transition_rates[] are the right size 
 	
 	for( int i=0 ; i < pCycle_Model->phase_links.size() ; i++ )
 	{
 		inverse_index_maps[i].clear(); 
+		transition_rates[i].resize( pCycle_Model->phase_links[i].size() ); 
+		fixed_durations[i].resize( pCycle_Model->phase_links[i].size() , (char) 0 ); 
 		for( int j=0 ; j < pCycle_Model->phase_links[i].size() ; j++ )
 		{
 			inverse_index_maps[i][ pCycle_Model->phase_links[i][j].end_phase_index ] = j;
-			transition_rates[i].resize( pCycle_Model->phase_links[i].size() ); 
 		}
 	}
 
@@ -150,6 +151,16 @@ double& Cycle_Data::transition_rate( int start_phase_index , int end_phase_index
 double& Cycle_Data::exit_rate(int phase_index )
 {
 	return transition_rates[phase_index][0]; 
+}
+
+char& Cycle_Data::fixed_duration( int start_phase_index , int end_phase_index )
+{
+	return fixed_durations[ start_phase_index ][ inverse_index_maps[start_phase_index][end_phase_index] ]; 
+}
+
+char& Cycle_Data::exit_fixed_duration( int phase_index )
+{
+	return fixed_durations[phase_index][0]; 
 }
 	
 Cycle_Model::Cycle_Model()
@@ -301,7 +312,7 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 		{
 			// check to see if we should transition 
 			bool continue_transition = false; 
-			if( phase_links[i][k].fixed_duration )
+			if( phenotype.cycle.data.fixed_durations[i][k] )
 			{
 				if( phenotype.cycle.data.elapsed_time_in_phase > ((1.0/phenotype.cycle.data.transition_rates[i][k]) - 0.5 * dt) )
 				{
@@ -398,6 +409,7 @@ int Death::add_death_model( double rate , Cycle_Model* pModel )
 {
 	rates.push_back( rate );
 	models.push_back( pModel ); 
+	model_data.push_back( pModel->data );   // seed per-definition params from the model 
 	
 	parameters.resize( rates.size() ); 
 	
@@ -408,6 +420,7 @@ int Death::add_death_model( double rate, Cycle_Model* pModel, Death_Parameters& 
 {
 	rates.push_back( rate );
 	models.push_back( pModel ); 
+	model_data.push_back( pModel->data );   // seed per-definition params from the model 
 	parameters.push_back( death_parameters ); 
 	
 	return rates.size() - 1; 
@@ -496,6 +509,11 @@ Cycle_Model& Death::current_model( void )
 	return *models[current_death_model_index]; 
 }
 
+Cycle_Data& Death::current_model_data( void )
+{
+	return model_data[ current_death_model_index ]; 
+}
+
 double& Death::apoptosis_rate(void)
 {
 	static int nApoptosis = find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
@@ -538,8 +556,15 @@ int& Cycle::current_phase_index( void )
 
 void Cycle::sync_to_cycle_model( Cycle_Model& cm )
 {
+	sync_to_cycle_model( cm , cm.data ); 
+	return; 
+}	
+
+void Cycle::sync_to_cycle_model( Cycle_Model& cm , const Cycle_Data& cd )
+{
 	pCycle_Model = &cm; 
-	data = cm.data; 
+	data = cd; 
+	data.pCycle_Model = &cm; // cd may have been seeded from a different instance 
 	return; 
 }	
 
