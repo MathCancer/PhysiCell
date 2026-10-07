@@ -465,7 +465,7 @@ void Parameter<T>::operator=( T rhs )
 } 
 
 template <class T>
-void Parameter<T>::operator=( Parameter& p )
+void Parameter<T>::operator=( const Parameter& p )
 {
 	name = p.name; 
 	units = p.units; 

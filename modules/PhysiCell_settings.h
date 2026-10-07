@@ -174,7 +174,7 @@ class Parameter
 	
 	void operator=( T& rhs ); 
 	void operator=( T rhs ); 
-	void operator=( Parameter& p ); 
+	void operator=( const Parameter& p ); 
 };
 
 template <class T>
