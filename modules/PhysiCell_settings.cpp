@@ -109,9 +109,9 @@ bool load_PhysiCell_config_file( std::string filename )
 	if (!read_PhysiCell_config_file( filename ))
 	{ return false; }
 
-	PhysiCell_settings.read_from_pugixml(); 
+	PhysiCell_settings.read_from_pugixml();
 	
-	// now read the microenvironment (optional) 
+	// now read the microenvironment (optional)
 	
 	if( !setup_microenvironment_from_XML( physicell_config_root ) )
 	{
@@ -126,7 +126,10 @@ bool load_PhysiCell_config_file( std::string filename )
 
 	create_output_directory( PhysiCell_settings.folder );
 
-	return true; 	
+	std::string default_basename = "PhysiCell_settings.xml";
+	copy_file_to_output( filename, default_basename ); // copy the settings file to the output folder
+
+	return true;
 }
 
 PhysiCell_Settings::PhysiCell_Settings()
@@ -983,7 +986,8 @@ bool setup_microenvironment_from_XML( pugi::xml_node root_node )
 			default_microenvironment_options.initial_condition_file_type = node.attribute("type").as_string();
 			default_microenvironment_options.initial_condition_file = xml_get_string_value(node, "filename");
 
-			copy_file_to_output(default_microenvironment_options.initial_condition_file);
+			std::string default_basename = default_microenvironment_options.initial_condition_file_type == "matlab" ? "substrates.mat" : "substrates.csv"; // when loading the file, we check that it is one of these two types
+			copy_file_to_output(default_microenvironment_options.initial_condition_file, default_basename);
 		}
 	}
 

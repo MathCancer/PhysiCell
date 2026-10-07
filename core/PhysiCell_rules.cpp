@@ -1956,8 +1956,10 @@ void parse_rules_from_pugixml( void )
 			if( done == false )
 			{ std::cout << "\tWarning: Ruleset had unknown format (" << format << "). Skipping!" << std::endl; }
 			else
-			{ copy_file_to_output( input_filename ); }
-
+			{
+				std::string default_basename = "cell_rules.csv";
+				copy_file_to_output(input_filename, default_basename);
+			}
 		}
 		else
 		{ std::cout << "\tRuleset disabled ... " << std::endl; }
