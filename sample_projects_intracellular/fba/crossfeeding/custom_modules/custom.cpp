@@ -70,6 +70,7 @@
 #include <sbml/SBMLTypes.h>
 
 #include "custom.h"
+#include <set>   // for the one-time warning in set_custom_data
 #include <cmath>
 #include "../addons/dFBA/src/dfba_intracellular.h"
 
@@ -155,6 +156,38 @@ void apply_legacy_nutrient_reintroduction_window(void)
 
 } // namespace
 
+
+// ---------------------------------------------------------------------------
+// Safe custom_data write.
+//
+// PhysiCell's Custom_Cell_Data::operator[](std::string) resolves a name via
+// std::map::operator[], which INSERTS a missing key with value 0 -- so writing
+// to a name that is not declared in the XML silently lands in variables[0] and
+// corrupts whatever variable happens to be first. Use this instead: an
+// undeclared name is reported once and skipped rather than clobbering data.
+//
+// The report is guarded because this runs on the OpenMP-parallel update path.
+// ---------------------------------------------------------------------------
+static void set_custom_data(PhysiCell::Cell* pCell, const std::string& name, double value)
+{
+	const int index = pCell->custom_data.find_variable_index(name);
+	if (index < 0)
+	{
+		static std::set<std::string> reported;
+		#pragma omp critical(dfba_custom_data_warn)
+		{
+			if (reported.insert(name).second)
+			{
+				std::cout << "WARNING: custom_data variable \"" << name
+				          << "\" is written from custom.cpp but not declared in the"
+				          << " XML cell definition; the write is being skipped."
+				          << std::endl;
+			}
+		}
+		return;
+	}
+	pCell->custom_data.variables[index].value = value;
+}
 
 void create_cell_types(void)
 {
@@ -420,10 +453,12 @@ void post_update_intracellular(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phe
 	} else if (pCell->type_name == "m_barkeri") {
 		post_update_intracellular_m_barkeri(pCell, phenotype, dt);
 	} else {
-		// Default behavior for unknown cell types
+		// Default behavior for unknown cell types.
+		// Deliberately records nothing: there is no per-type custom_data variable
+		// for an unknown type, and the previous write to an undeclared
+		// "growth_rate" resolved to variables[0] and overwrote glucose_flux.
 		std::cout << "Warning: Unknown cell type '" << pCell->type_name 
 				  << "' in post_update_intracellular" << std::endl;
-		pCell->custom_data["growth_rate"] = pCell->phenotype.intracellular->get_growth_rate();
 	}
 	
 	return;
