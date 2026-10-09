@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 
 /* Default dFBAModel used to initialize the initial cell */
 dFBAModel default_dFBAModel;
@@ -972,7 +973,30 @@ dFBASolution dFBAModel::optimizeParsimonious(double stage_one_objective)
         this->pfba_problem.setColumnLower(i, std::min(target, ub));
     }
 
-    this->pfba_problem.dual();
+    // Primal simplex by default, and the choice barely matters.
+    //
+    // Theory favours the dual: between timesteps only this problem's bounds
+    // move -- the mirrored Michaelis-Menten bounds and the objective floor that
+    // tracks the stage-one optimum -- and a bound change leaves the previous
+    // basis dual-feasible, which is the textbook dual-simplex case. Measured
+    // over 1000 consecutive steps, 11 repetitions, median ms per stage-two
+    // solve (addons/dFBA/test, `make bench_pfba`):
+    //
+    //                  primal     dual     spread within one mode
+    //   E.coli core     0.121     0.137      0.088 - 0.531
+    //   MCF7 core       0.438     0.462      0.343 - 0.964
+    //
+    // Primal is ahead on the median of both models, but by less than the
+    // run-to-run spread, so this is not a measured win for either simplex --
+    // only evidence that neither is a trap here. Both return the same flux
+    // distribution to the last digit, so correctness does not turn on it.
+    // Set DFBA_PFBA_DUAL=1 to switch, and re-measure on a genome-scale model
+    // before assuming this still holds: that is where a real difference, if
+    // there is one, would show up.
+    static const bool force_dual = (getenv("DFBA_PFBA_DUAL") != NULL
+                                    && std::string(getenv("DFBA_PFBA_DUAL")) == "1");
+    if (force_dual) this->pfba_problem.dual();
+    else            this->pfba_problem.primal();
 
     if (!this->pfba_problem.isProvenOptimal())
     {

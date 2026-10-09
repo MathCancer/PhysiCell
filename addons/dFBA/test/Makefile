@@ -84,6 +84,13 @@ test_pfba: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_test_pfba.cpp ./dfba_test.h
 	@echo created $@
 	@echo
 
+# Stage-two warm-start benchmark. Backs the primal-vs-dual choice documented in
+# dFBAModel::optimizeParsimonious(); run it with DFBA_PFBA_DUAL=1 to compare.
+bench_pfba: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_bench_pfba.cpp
+	$(COMPILE_COMMAND) -o $@ $(ALL_OBJECTS) main_bench_pfba.cpp $(LD_PATH) $(WIN_LD_FLAG) $(RPATH) $(LIBS)
+	@echo created $@
+	@echo
+
 # --- Build dependencies once (creates headers and libs under ../ext) ---
 libFBA: $(LIBFBA_SENTINEL)
 

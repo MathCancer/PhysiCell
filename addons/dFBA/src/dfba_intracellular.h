@@ -73,6 +73,22 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 
 	bool skip_standard_optimization = false;
 
+	/**
+	 * \brief Optional second optimisation stage, run after the objective has
+	 * been maximised, to resolve alternative optima.
+	 *
+	 * Standard FBA fixes the objective value but not the flux distribution,
+	 * and in dFBA the flux distribution is what couples the cell to BioFVM.
+	 * When enabled, the second stage holds the objective at its optimum and
+	 * selects one distribution among the equally optimal ones.
+	 *
+	 * Off unless configured, so an existing configuration behaves exactly as
+	 * before. "parsimonious" is the only type implemented.
+	 */
+	bool use_secondary_objective = false;
+	std::string secondary_objective_type = "parsimonious";
+	double secondary_fraction_of_optimum = 1.0;
+
 	double liter_micron_cubes_conversion = 1e15; // 1 liter = 1e15 micron^3
 
 	/** \brief map between density IDs and exchange reactions */
@@ -187,6 +203,19 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	int parse_transport_model(pugi::xml_node& node);
 	void parse_growth_model(pugi::xml_node& node);
 	void parse_death_model(pugi::xml_node& node);
+	void parse_secondary_objective(pugi::xml_node& node);
+
+	/**
+	 * \brief Run the configured second stage, if any.
+	 *
+	 * Call after a successful first-stage solve. Safe to call when no second
+	 * stage is configured, which makes it usable from a custom_optimization
+	 * function without that function needing to know the configuration.
+	 *
+	 * current_growth_rate is NOT touched here: the second stage's objective is
+	 * total flux, not growth, so growth must keep the value stage one gave it.
+	 */
+	void run_secondary_objective();
 	void initLpSolver();
 
 	void setObjectiveCoefficient(std::string reaction_id, double coefficient) {
