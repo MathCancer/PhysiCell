@@ -35,6 +35,7 @@ dFBAModel::dFBAModel(const dFBAModel& copy) {
     // Copy primitive members
     this->id = copy.id;
     this->is_initialized = copy.is_initialized;
+    this->track_flux_map = copy.track_flux_map;
 
     // Deep copy metabolites
     for (auto original_metabolite : copy.metabolites) {
@@ -91,6 +92,7 @@ dFBAModel& dFBAModel::operator=(const dFBAModel& other) {
     // Copy primitive members
     this->id = other.id;
     this->is_initialized = other.is_initialized;
+    this->track_flux_map = other.track_flux_map;
 
     // Deep copy metabolites
     for (auto original_metabolite : other.metabolites) {
@@ -131,6 +133,7 @@ void dFBAModel::clear(){
 
     this->id = "none";
     this->is_initialized = false;
+    this->track_flux_map = false;
     this->reactions.clear();
     this->metabolites.clear();
     this->reactionsIndexer.clear();
@@ -591,12 +594,22 @@ dFBASolution dFBAModel::optimize()
 
         double fopt =  problem.getObjValue();
 
-        for(dFBAReaction* reaction: this->reactions)
+        // Column i of the LP is reactions[i]: addReaction() appends to both the
+        // vector and the indexer together, so the index equals the position and
+        // the string lookup this used to do was redundant.
+        //
+        // The string-keyed flux map is only populated on request. Building it
+        // here meant clearing and re-inserting one node per reaction on every
+        // solve -- for a cell solving every intracellular_dt, that was the
+        // majority of the cost of optimize() and nothing in the addon reads it.
+        const int n_rxn = (int)this->reactions.size();
+        for(int i = 0; i < n_rxn; i++)
+            this->reactions[i]->setFluxValue(columnPrimal[i]);
+
+        if (this->track_flux_map)
         {
-            int column_idx = this->reactionsIndexer[reaction->getId()];
-            double flux = columnPrimal[column_idx];
-            solution.fluxes[reaction->getId()] = flux;
-            reaction->setFluxValue(flux);
+            for(int i = 0; i < n_rxn; i++)
+                solution.fluxes[this->reactions[i]->getId()] = columnPrimal[i];
         }
 
         solution.objective_value = fopt;
@@ -613,6 +626,8 @@ dFBASolution dFBAModel::optimize()
         for (auto &reaction : this->reactions)
         {
             reaction->setFluxValue(0.0);
+            if (this->track_flux_map)
+                solution.fluxes[reaction->getId()] = 0.0;
         }
         this->solution.objective_value = 0.0;
     }
@@ -700,6 +715,7 @@ void dFBAModel::deepCopy(const dFBAModel& source) {
     // Copy primitive members
     id = source.id;
     is_initialized = source.is_initialized;
+    track_flux_map = source.track_flux_map;
 
     // Deep copy metabolites
     for (auto original_metabolite : source.metabolites)
@@ -741,4 +757,26 @@ void dFBAModel::restoreObjectiveState() {
     for (const auto& pair : original_objective_coefficients) {
         setObjectiveCoefficient(pair.first, pair.second);
     }
+}
+
+
+bool dFBAModel::getTrackFluxMap() const
+{
+    return this->track_flux_map;
+}
+
+void dFBAModel::setTrackFluxMap(bool value)
+{
+    this->track_flux_map = value;
+}
+
+std::map<std::string, double> dFBAModel::getFluxDistribution() const
+{
+    // Built on demand from the reactions, which always hold the last solution.
+    // Prefer this to dFBASolution::getFluxes(), which is only filled when flux
+    // tracking is enabled.
+    std::map<std::string, double> out;
+    for (dFBAReaction* rxn : this->reactions)
+        out[rxn->getId()] = rxn->getFluxValue();
+    return out;
 }
