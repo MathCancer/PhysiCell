@@ -14,7 +14,11 @@ EXT_DIR = $(CUR_DIR)/addons/dFBA/ext
 
 
 LIB := -L$(EXT_DIR)/libsbml/lib  $(EXT_DIR)/coin-or/lib/libClp.a $(EXT_DIR)/coin-or/lib/libCoinUtils.a -lsbml-static -lxml2 -lbz2 -lz -ggdb -llapack
-INC := -DADDON_PHYSIDFBA -I$(EXT_DIR)/libsbml/include -I$(EXT_DIR)/coin-or/include -I$(CUR_DIR)/addons/dFBA/src
+# The vendored libSBML and Clp headers are included with -isystem, not -I.
+# Two reasons: they are third-party code that is never edited here, so -MMD
+# should not record them as prerequisites (they were 304 of the 328 entries in
+# custom.d), and -isystem also silences warnings originating inside them.
+INC := -DADDON_PHYSIDFBA -isystem $(EXT_DIR)/libsbml/include -isystem $(EXT_DIR)/coin-or/include -I$(CUR_DIR)/addons/dFBA/src
 
 
 ## "linux-x64", "linux-x86", "win64", "win32", "osx"
@@ -57,7 +61,20 @@ else
 endif
 
 CFLAGS_LINK := $(shell echo $(CFLAGS) | sed -e "s/-fopenmp//g")
-COMPILE_COMMAND := $(CC) $(CFLAGS)  $(EXTRA_FLAGS) 
+# Header dependency tracking.
+#
+# Without this, a .o is rebuilt only when its own .cpp changes. Editing a
+# header -- say addons/dFBA/src/dfba_intracellular.h -- rebuilt nothing, so an
+# incremental `make` produced a binary whose translation units disagreed about
+# class layout: one object allocated a dFBAIntracellular of one size while
+# another read its members at offsets from a different version of the header.
+# The result was reads past the end of the object, a corrupted std::map, and a
+# segfault that vanished on any clean rebuild and so looked like a latent bug
+# in the source. -MMD writes a .d file of each object's header prerequisites
+# and -MP keeps a removed header from breaking the build.
+DEPFLAGS := -MMD -MP
+
+COMPILE_COMMAND := $(CC) $(CFLAGS)  $(EXTRA_FLAGS) $(DEPFLAGS)
 LINK_COMMAND := $(CC) $(CFLAGS_LINK) $(EXTRA_FLAGS)
 
 
@@ -240,6 +257,7 @@ dfba-clean:
 
 clean:
 	rm -f *.o
+	rm -f *.d
 	rm -f $(PROGRAM_NAME)*
 
 data-cleanup:
@@ -367,3 +385,7 @@ unpack:
 list-user-projects:
 	@echo "user projects::"
 	@cd ./user_projects && ls -dt1 * | grep . | sed 's!empty.txt!!'
+
+# Pull in the header prerequisites recorded by -MMD on the previous build.
+# Wrapped in wildcard so a first build, with no .d files yet, is not an error.
+-include $(wildcard *.d)

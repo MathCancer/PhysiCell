@@ -12,7 +12,11 @@ CFLAGS      := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m
 
 # Dependencies
 DEPS_DIR    := ../ext
-DEPS_CFLAGS := -I$(DEPS_DIR)/libsbml/include -I$(DEPS_DIR)/coin-or/include -I../src
+# Vendored libSBML and Clp come in with -isystem, not -I: they are never edited
+# here, so -MMD should not record them as prerequisites, and -isystem also
+# silences warnings originating inside them. ../src stays -I -- those headers
+# are the ones that do change, and are exactly what the .d files must track.
+DEPS_CFLAGS := -isystem $(DEPS_DIR)/libsbml/include -isystem $(DEPS_DIR)/coin-or/include -I../src
 LD_PATH     := -L$(DEPS_DIR)/libsbml/lib -L$(DEPS_DIR)/coin-or/lib
 
 # Runtime rpath (so you don’t need LD_LIBRARY_PATH)
@@ -44,7 +48,20 @@ else
   endif
 endif
 
-COMPILE_COMMAND := $(CC) $(CFLAGS) $(DEPS_CFLAGS)
+# Header dependency tracking.
+#
+# Without this, a .o is rebuilt only when its own .cpp changes. Editing a
+# header -- say addons/dFBA/src/dfba_intracellular.h -- rebuilt nothing, so an
+# incremental `make` produced a binary whose translation units disagreed about
+# class layout: one object allocated a dFBAIntracellular of one size while
+# another read its members at offsets from a different version of the header.
+# The result was reads past the end of the object, a corrupted std::map, and a
+# segfault that vanished on any clean rebuild and so looked like a latent bug
+# in the source. -MMD writes a .d file of each object's header prerequisites
+# and -MP keeps a removed header from breaking the build.
+DEPFLAGS := -MMD -MP
+
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(DEPS_CFLAGS) $(DEPFLAGS)
 
 SRC_DIR := "./"
 
@@ -122,4 +139,9 @@ dfba_Solution.o: ../src/dfba_Solution.cpp
 
 clean:
 	rm -f *.o
+	rm -f *.d
 	rm -f ./test_*
+
+# Pull in the header prerequisites recorded by -MMD on the previous build.
+# Wrapped in wildcard so a first build, with no .d files yet, is not an error.
+-include $(wildcard *.d)

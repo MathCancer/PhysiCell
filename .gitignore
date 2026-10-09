@@ -77,3 +77,6 @@ addons/dFBA/test/bench_pfba
 addons/dFBA/test/bench_warmstart
 addons/dFBA/test/*.o
 addons/dFBA/test/pfba_dump.tsv
+
+# compiler-generated header dependency files (-MMD)
+*.d
