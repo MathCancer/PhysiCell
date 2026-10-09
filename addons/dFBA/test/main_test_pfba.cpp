@@ -35,12 +35,13 @@ int main(int argc, char** argv)
     pf.enableParsimonious(1.0);
     pf.setReactionLowerBound("R_EX_glc__D_e", GLC);
     pf.setReactionLowerBound("R_EX_o2_e", O2);
+    // ONE call. The second stage is run by optimize() itself, so this is also
+    // the test that a caller cannot forget to apply pFBA.
     dFBASolution a = pf.optimize();
     CHECK(a.status == "optimal", "stage one solves");
-    CHECK_NEAR(a.objective_value, mu_plain, 1e-9, "stage one matches plain FBA exactly");
-
-    dFBASolution b = pf.optimizeParsimonious(a.objective_value);
-    CHECK(b.status == "optimal", "stage two solves");
+    CHECK(a.secondary_status == "optimal", "optimize() ran the second stage by itself");
+    CHECK_NEAR(a.objective_value, mu_plain, 1e-9,
+               "objective_value is stage one's growth, not stage two's total flux");
 
     double mu_after = 0.0;
     for (auto r : pf.getListOfReactions())
@@ -55,13 +56,22 @@ int main(int argc, char** argv)
                100.0 * (1.0 - tot_pfba / tot_plain));
     else
         printf("   no reduction: the FBA optimum was already unique at these bounds\n");
-    CHECK_NEAR(b.objective_value, tot_pfba, 1e-6,
-               "reported stage-two objective equals the realised total flux");
+    CHECK_NEAR(a.total_absolute_flux, tot_pfba, 1e-6,
+               "total_absolute_flux describes the distribution being returned");
+
+    // The unified reversible flux. Each split reaction's original column is
+    // constrained by v - p + m = 0, so Sum(p+m) from the LP can only equal
+    // Sum|v| read back off the reactions if every column really does hold
+    // p - m with at most one of the pair nonzero. This is what makes reading v
+    // directly correct, rather than subtracting p and m by hand.
+    CHECK_NEAR(pf.getTotalAbsoluteFlux(), tot_pfba, 1e-9,
+               "reversible fluxes are the unified p - m, consistent with Sum(p+m)");
 
     DFBA_TEST_SECTION("pFBA is idempotent");
-    dFBASolution c = pf.optimizeParsimonious(a.objective_value);
-    CHECK_NEAR(c.objective_value, b.objective_value, 1e-9,
-               "re-running stage two changes nothing");
+    dFBASolution c = pf.optimize();
+    CHECK_NEAR(c.total_absolute_flux, a.total_absolute_flux, 1e-9,
+               "re-solving changes nothing");
+    CHECK_NEAR(c.objective_value, a.objective_value, 1e-12, "growth is stable too");
 
     DFBA_TEST_SECTION("a deep copy carries the pFBA setting and solves independently");
     dFBAModel clone; clone.deepCopy(pf);
@@ -69,15 +79,53 @@ int main(int argc, char** argv)
     clone.setReactionLowerBound("R_EX_glc__D_e", GLC);
     clone.setReactionLowerBound("R_EX_o2_e", O2);
     dFBASolution d = clone.optimize();
-    dFBASolution e = clone.optimizeParsimonious(d.objective_value);
-    CHECK(e.status == "optimal", "clone's stage two solves");
-    CHECK_NEAR(e.objective_value, b.objective_value, 1e-6, "clone agrees with the original");
+    CHECK(d.secondary_status == "optimal", "clone's second stage ran");
+    CHECK_NEAR(d.total_absolute_flux, a.total_absolute_flux, 1e-6,
+               "clone agrees with the original");
+    CHECK_NEAR(d.objective_value, mu_plain, 1e-6, "clone's growth matches too");
 
-    DFBA_TEST_SECTION("disabled by default");
+    DFBA_TEST_SECTION("disabled by default, and then nothing changes");
     dFBAModel off; off.readSBMLModel(f.c_str()); off.initProblem();
     CHECK(!off.isParsimoniousEnabled(), "pFBA is off unless asked for");
-    CHECK(off.optimizeParsimonious(1.0).status == "disabled",
-          "calling stage two while disabled is a no-op, not a crash");
+    off.setReactionLowerBound("R_EX_glc__D_e", GLC);
+    off.setReactionLowerBound("R_EX_o2_e", O2);
+    dFBASolution g = off.optimize();
+    CHECK(g.secondary_status == "none", "no second stage is reported when none is configured");
+    CHECK_NEAR(g.objective_value, mu_plain, 1e-12,
+               "a pFBA-free model still solves exactly the problem it always did");
+    CHECK_NEAR(off.getTotalAbsoluteFlux(), tot_plain, 1e-9,
+               "and returns the same, unreduced flux distribution");
+
+    DFBA_TEST_SECTION("a reused model stays healthy across many bound changes");
+    // Regression test for a real failure. The second-stage problem is
+    // warm-started across timesteps, and after many re-solves with moving
+    // bounds Clp returned status 4 -- "stopped due to errors" -- on problems
+    // that solve fine from a fresh model. Before the retry-from-clean-basis
+    // in solveParsimoniousStage(), 3 of these 81 combinations failed, and the
+    // affected cells silently kept stage-one fluxes 256x less parsimonious
+    // than the ones pFBA would have given them.
+    {
+        dFBAModel sweep;
+        sweep.readSBMLModel(f.c_str()); sweep.initProblem();
+        sweep.enableParsimonious(1.0);
+        const double gs[] = {0.0, -1e-9, -1e-6, -1e-3, -0.01, -0.1, -1.0, -5.0, -10.0};
+        const double os[] = {0.0, -1e-9, -1e-6, -1e-3, -0.01, -0.1, -1.0, -5.0, -20.0};
+        int solved = 0, stage_two_failed = 0;
+        for (size_t i = 0; i < sizeof(gs)/sizeof(*gs); i++)
+          for (size_t j = 0; j < sizeof(os)/sizeof(*os); j++)
+          {
+            sweep.setReactionLowerBound("R_EX_glc__D_e", gs[i]);
+            sweep.setReactionLowerBound("R_EX_o2_e", os[j]);
+            dFBASolution s = sweep.optimize();
+            if (s.status != "optimal") continue;
+            solved++;
+            if (s.secondary_status != "optimal") stage_two_failed++;
+          }
+        printf("   %d of %d feasible bound sets reached stage two\n",
+               solved - stage_two_failed, solved);
+        CHECK_EQ(stage_two_failed, 0,
+                 "the second stage solves for every feasible bound set on a reused model");
+    }
 
     // Dump the COMPLETE problem, not just the two bounds the test tried to set:
     // the reaction ids differ between models (R_EX_glc__D_e vs R_EX_glc_e), so

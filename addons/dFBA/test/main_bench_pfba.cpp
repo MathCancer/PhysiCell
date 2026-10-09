@@ -7,7 +7,7 @@
  * dual-feasible, which favours the dual simplex -- but that is an argument, not
  * a measurement, so measure it.
  *
- * The simplex actually used is chosen inside dFBAModel::optimizeParsimonious()
+ * The simplex actually used is chosen inside dFBAModel::solveParsimoniousStage()
  * from DFBA_PFBA_DUAL, so this program reads the SAME variable for its label.
  * Do not introduce a second switch here: a benchmark whose label and whose
  * subject disagree is worse than no benchmark.
@@ -50,6 +50,11 @@ int main(int argc, char** argv)
     model.initProblem();
     model.enableParsimonious(1.0);
 
+    // the same model without pFBA, walking the same trajectory, as the baseline
+    dFBAModel plain;
+    plain.readSBMLModel(path);
+    plain.initProblem();
+
     double t_stage1 = 0.0, t_stage2 = 0.0, total_flux = 0.0;
     int non_optimal = 0, counted = 0;
 
@@ -58,17 +63,25 @@ int main(int argc, char** argv)
         model.setReactionLowerBound(glc, gl[i]);
         model.setReactionLowerBound(o2,  ox[i]);
 
+        // optimize() now runs both stages, so stage two cannot be timed in
+        // isolation from here. Time the whole call against a pFBA-free model
+        // solving the same trajectory, and report the difference as stage two.
         auto t0 = high_resolution_clock::now();
-        dFBASolution one = model.optimize();
-        t_stage1 += duration<double>(high_resolution_clock::now() - t0).count();
-        if (one.status != "optimal") { non_optimal++; continue; }
+        dFBASolution both = model.optimize();
+        const double t_both = duration<double>(high_resolution_clock::now() - t0).count();
 
+        plain.setReactionLowerBound(glc, gl[i]);
+        plain.setReactionLowerBound(o2,  ox[i]);
         auto t1 = high_resolution_clock::now();
-        dFBASolution two = model.optimizeParsimonious(one.objective_value);
-        t_stage2 += duration<double>(high_resolution_clock::now() - t1).count();
+        dFBASolution one = plain.optimize();
+        const double t_one = duration<double>(high_resolution_clock::now() - t1).count();
 
-        if (two.status != "optimal") { non_optimal++; continue; }
-        total_flux += two.objective_value;
+        if (both.status != "optimal" || one.status != "optimal") { non_optimal++; continue; }
+        if (both.secondary_status != "optimal") { non_optimal++; continue; }
+
+        t_stage1 += t_one;
+        t_stage2 += (t_both - t_one > 0.0) ? (t_both - t_one) : 0.0;
+        total_flux += both.total_absolute_flux;
         counted++;
     }
 

@@ -593,6 +593,14 @@ dFBASolution dFBAModel::optimize()
 
     solution.fluxes.clear();
 
+    // Reset the second-stage fields here, for EVERY outcome. They used to be
+    // set only inside the optimal branch, so an infeasible or unknown solve
+    // left whatever the previous call had put there -- a cell that failed
+    // stage one still reported secondary_status "optimal" and a stale
+    // total_absolute_flux from an earlier timestep.
+    solution.secondary_status = "none";
+    solution.total_absolute_flux = 0.0;
+
     std::string status;
     switch (this->problem.status()) {
         case 0:
@@ -634,6 +642,43 @@ dFBASolution dFBAModel::optimize()
 
         solution.objective_value = fopt;
         solution.status = status;
+
+        // The second optimisation stage, if one is configured, runs HERE --
+        // inside optimize() -- and not in the caller.
+        //
+        // The reason is that the choice of flux distribution among equally
+        // optimal ones is a property of how this model is asked to be solved,
+        // not a step a caller should have to orchestrate. dFBAIntracellular,
+        // a custom_optimization function and the standalone tests all just call
+        // optimize() and get back the distribution the model was configured to
+        // produce. Nothing outside dFBAModel needs to know that two LPs were
+        // solved, which also means pFBA cannot be silently skipped by a code
+        // path that forgot to ask for it.
+        //
+        // What "consolidated" means precisely:
+        //   objective_value   stage one -- the growth rate. Never stage two's,
+        //                     which is a total flux.
+        //   fluxes / reactions  stage two, when it succeeded.
+        //   secondary_status  what the second stage did, so the caller CAN
+        //                     tell, even though it does not need to.
+        if (this->pfba_enabled)
+        {
+            this->solveParsimoniousStage(fopt);
+
+            // total_absolute_flux always describes the distribution actually
+            // being returned, whether that came from stage two or -- when stage
+            // two failed -- from stage one. It is not "stage two's objective",
+            // which would be meaningless on the failure path.
+            solution.total_absolute_flux = this->getTotalAbsoluteFlux();
+
+            if (this->track_flux_map)
+            {
+                solution.fluxes.clear();
+                for (int i = 0; i < n_rxn; i++)
+                    solution.fluxes[this->reactions[i]->getId()]
+                        = this->reactions[i]->getFluxValue();
+            }
+        }
 
         // Debugging info
         //std::cout << "Optimal solution found: Objective = " << fopt << "\n";
@@ -941,10 +986,9 @@ void dFBAModel::buildParsimoniousProblem()
     this->pfba_built = true;
 }
 
-dFBASolution dFBAModel::optimizeParsimonious(double stage_one_objective)
+bool dFBAModel::solveParsimoniousStage(double stage_one_objective)
 {
-    dFBASolution out;
-    if (!this->pfba_enabled) { out.status = "disabled"; return out; }
+    if (!this->pfba_enabled) { this->solution.secondary_status = "none"; return false; }
     if (!this->pfba_built) this->buildParsimoniousProblem();
 
     const int n_rxn = (int)this->reactions.size();
@@ -998,23 +1042,70 @@ dFBASolution dFBAModel::optimizeParsimonious(double stage_one_objective)
     if (force_dual) this->pfba_problem.dual();
     else            this->pfba_problem.primal();
 
+    // Retry once from a clean basis before giving up.
+    //
+    // This problem is warm-started across timesteps, and after many re-solves
+    // with moving bounds Clp can fail with status 4 -- "stopped due to errors",
+    // a numerical failure in the factorization -- on a problem that is
+    // perfectly well posed. Measured on MCF7 core: 3 of 81 bound combinations
+    // failed when one model was reused across all of them, and 0 of 81 when
+    // each was given a fresh model. Same bounds, same fraction_of_optimum, so
+    // the cause is accumulated basis state, not the model or the constraint.
+    //
+    // Discarding the basis and re-solving is the standard remedy. It costs a
+    // cold solve, but only on the rare failure, and the alternative is a cell
+    // silently keeping its degenerate stage-one fluxes -- which is exactly the
+    // cell most in need of pFBA, since these failures cluster where the flux
+    // distribution is worst conditioned.
     if (!this->pfba_problem.isProvenOptimal())
     {
-        out.status = (this->pfba_problem.status() == 1) ? "infeasible" : "unknown";
-        out.objective_value = 0.0;
-        return out;   // stage-one fluxes are left untouched on purpose
+        this->pfba_problem.allSlackBasis(true);
+        if (force_dual) this->pfba_problem.dual();
+        else            this->pfba_problem.primal();
     }
 
+    if (!this->pfba_problem.isProvenOptimal())
+    {
+        // Still no. The stage-one fluxes are left untouched on purpose: they
+        // are still optimal, so the cell carries on with them. The status is
+        // kept so the failure is visible to whoever is debugging.
+        this->solution.secondary_status =
+            (this->pfba_problem.status() == 1) ? "infeasible" : "unknown";
+
+        // Warned ONCE per process, not once per cell per timestep. This runs
+        // inside the OpenMP-parallel per-cell update, where routine output is
+        // forbidden -- a per-occurrence message would be both a race and a
+        // flood. The same once-only-under-critical idiom is used for undeclared
+        // custom_data names in the sample projects.
+        static bool warned = false;
+        #pragma omp critical(dfba_pfba_stage_two_warn)
+        {
+            if (!warned)
+            {
+                warned = true;
+                std::cout << "WARNING: the parsimonious second stage did not solve ("
+                          << this->solution.secondary_status << ")." << std::endl
+                          << "         The cell keeps its stage-one fluxes, which are"
+                          << " still optimal, and growth is unaffected." << std::endl
+                          << "         This is a solver outcome, not cell death."
+                          << " Reported once per run; dFBASolution::secondary_status"
+                          << " carries it per cell." << std::endl;
+            }
+        }
+        return false;
+    }
+
+    // The original columns already hold the unified flux: the linking row
+    // v - p + m = 0 forces column i to equal p - m at every feasible point, so
+    // there is nothing to subtract here. Reading v directly is also immune to
+    // the degenerate case where perturbation leaves both p and m slightly
+    // nonzero, which an explicit p - m would inherit.
     const double* primal = this->pfba_problem.getColSolution();
     for (int i = 0; i < n_rxn; i++)
         this->reactions[i]->setFluxValue(primal[i]);
 
-    out.status = "optimal";
-    out.objective_value = this->pfba_problem.objectiveValue();   // total |flux|
-    if (this->track_flux_map)
-        for (int i = 0; i < n_rxn; i++)
-            out.fluxes[this->reactions[i]->getId()] = primal[i];
-    return out;
+    this->solution.secondary_status = "optimal";
+    return true;
 }
 
 double dFBAModel::getTotalAbsoluteFlux() const

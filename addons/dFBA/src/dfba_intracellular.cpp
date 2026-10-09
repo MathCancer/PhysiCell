@@ -583,13 +583,12 @@ void dFBAIntracellular::update(){
     dFBASolution solution = this->sbml_model.optimize();
     //next_dfba_run = PhysiCell::PhysiCell_globals.current_time + dfba_time_step;
     if (solution.status == "optimal"){
-        // Growth comes from stage one and is recorded BEFORE the second stage
-        // runs. The second stage's objective is total flux, not growth, so
-        // reading its objective here would silently replace the growth rate
-        // with a sum of fluxes.
+        // One call, whatever the model is configured to do. When a second
+        // optimisation stage is configured, optimize() has already run it and
+        // the fluxes below are the parsimonious ones; objective_value is the
+        // stage-one growth rate either way. See dFBAModel::optimize().
         this->current_growth_rate = solution.getObjectiveValue();
         this->flag_for_death = false;
-        this->run_secondary_objective();
     }
     else if(solution.status == "unknown"){
         std::cout << "ERROR: Unknown status for the FBA problem!" << std::endl;
@@ -920,21 +919,6 @@ void dFBAIntracellular::parse_secondary_objective(pugi::xml_node& parent)
     this->use_secondary_objective = true;
     this->secondary_objective_type = type;
     this->secondary_fraction_of_optimum = fraction;
-}
-
-void dFBAIntracellular::run_secondary_objective()
-{
-    if (!this->use_secondary_objective)
-        return;
-
-    // The return value is deliberately discarded. A second stage that does not
-    // solve is a numerical outcome, not a biological one: the stage-one fluxes
-    // are still in place and still optimal, so the cell carries on with them.
-    // Turning this into death would kill cells for solver reasons, and reporting
-    // it is not an option either, because this runs inside the OpenMP-parallel
-    // update path. optimizeParsimonious() leaves the stage-one fluxes untouched
-    // when it fails, which is what makes silence safe here.
-    this->sbml_model.optimizeParsimonious(this->current_growth_rate);
 }
 
 }

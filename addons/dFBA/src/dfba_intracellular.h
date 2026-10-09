@@ -84,6 +84,13 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	 *
 	 * Off unless configured, so an existing configuration behaves exactly as
 	 * before. "parsimonious" is the only type implemented.
+	 *
+	 * These fields only record what was configured. They are applied once, by
+	 * calling dFBAModel::enableParsimonious() after the model is loaded, and
+	 * the second stage is then run by dFBAModel::optimize() itself -- not from
+	 * here. update() and any custom_optimization function call optimize() and
+	 * get the configured flux distribution back, with no stage handling of
+	 * their own, so a code path cannot forget to apply pFBA.
 	 */
 	bool use_secondary_objective = false;
 	std::string secondary_objective_type = "parsimonious";
@@ -204,18 +211,6 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	void parse_growth_model(pugi::xml_node& node);
 	void parse_death_model(pugi::xml_node& node);
 	void parse_secondary_objective(pugi::xml_node& node);
-
-	/**
-	 * \brief Run the configured second stage, if any.
-	 *
-	 * Call after a successful first-stage solve. Safe to call when no second
-	 * stage is configured, which makes it usable from a custom_optimization
-	 * function without that function needing to know the configuration.
-	 *
-	 * current_growth_rate is NOT touched here: the second stage's objective is
-	 * total flux, not growth, so growth must keep the value stage one gave it.
-	 */
-	void run_secondary_objective();
 	void initLpSolver();
 
 	void setObjectiveCoefficient(std::string reaction_id, double coefficient) {
