@@ -91,6 +91,12 @@ bench_pfba: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_bench_pfba.cpp
 	@echo created $@
 	@echo
 
+# Warm-start evidence: simplex iterations with a reused basis vs a rebuilt one.
+bench_warmstart: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_bench_warmstart.cpp
+	$(COMPILE_COMMAND) -o $@ $(ALL_OBJECTS) main_bench_warmstart.cpp $(LD_PATH) $(WIN_LD_FLAG) $(RPATH) $(LIBS)
+	@echo created $@
+	@echo
+
 # --- Build dependencies once (creates headers and libs under ../ext) ---
 libFBA: $(LIBFBA_SENTINEL)
 
