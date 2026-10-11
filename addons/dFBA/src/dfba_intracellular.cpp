@@ -522,9 +522,11 @@ void dFBAIntracellular::update_dfba_inputs( PhysiCell::Cell* pCell, PhysiCell::P
         // (picograms to grams conversion) 
         total_uptake *= mass_scaling; // mmol
 
-        // correct scaling that takes into account the volume units (um³) in BioFVM
-        // we are getting the total substrate of the voxel
-        double total_substrate = substrate_conc * dV * liter_micron_cubes_conversion; // mmol
+        // Total substrate held by the voxel. substrate_conc is mmol/L and dV is
+        // um^3; 1 L = 1e15 um^3, so mmol = mM * um^3 / 1e15. This must be a
+        // division: it was a multiplication, which made the cap larger than the
+        // request by ~1e30 so it never engaged.
+        double total_substrate = substrate_conc * dV / liter_micron_cubes_conversion; // mmol
         // check if the we are taking more than what is stored in the voxel
 
         // std::cout << "Substrate: " << substrate_name << " -- Total substrate in voxel: " << total_substrate << " mmol," << "Total concentration: " << substrate_conc << " mM, Total uptake requested: " << total_uptake << " mmol. Uptake rate: " << uptake_rate << " mmol/gDW/h" << std::endl;
