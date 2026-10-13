@@ -6,9 +6,98 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <atomic>
+#include <algorithm>
 
 
 namespace PhysiCelldFBA {
+
+// ---------------------------------------------------------------------------
+// Per-voxel uptake demand, used to share a voxel's substrate between the cells in it.
+//
+// Each cell's uptake bound is capped by what its voxel holds, but several cells
+// can share one diffusion voxel, and BioFVM applies the sum of their net export
+// rates. Capping every cell against the whole voxel therefore lets n cells draw
+// n times its content and drives the concentration negative. The cap is made
+// proportional instead: every cell is scaled by
+//
+//         min(1, content / sum over live cells in the voxel of their request),
+//
+// so the voxel's total uptake over one dFBA window cannot exceed its content.
+// Cells that cannot take the substrate (Vmax = 0) request nothing and so do not
+// dilute the others. With one cell this reduces to the previous per-cell cap.
+//
+// The table is shared by all cells, so it is built once per simulated time by
+// the first cell to need it, under a named critical section, and is read-only
+// afterwards. No cell can write its own rates before it has passed the check
+// at the top of update_dfba_inputs, so the build sees a consistent snapshot.
+//
+// It assumes every live cell updates at every step, i.e. intracellular_dt equals
+// the diffusion dt. If it does not, cells that are not updating still draw on
+// their persisted rates, which the request sum does not include.
+// ---------------------------------------------------------------------------
+namespace {
+
+// Dry weight of a cell in grams, from its current volume.
+inline double dry_mass_in_grams(const dFBAIntracellular& model, const PhysiCell::Phenotype& phenotype)
+{
+    const double solid_volume = phenotype.volume.total * (1.0 - phenotype.volume.fluid_fraction); // um^3
+    return solid_volume * model.cell_density * 1e-12; // um^3 * pg/um^3 -> pg -> g
+}
+
+// Michaelis-Menten uptake bound, mmol / gDW / h, for a non-negative concentration in mM.
+inline double michaelis_menten_uptake_rate(const ExchangeFluxData& exchange, double concentration)
+{
+    return (exchange.Vmax.value * concentration) / (exchange.Km.value + concentration);
+}
+
+// Amount that rate would remove over one dFBA window for a cell of the given dry weight, in mmol.
+inline double uptake_over_window_mmol(const dFBAIntracellular& model, double rate_mmol_per_gdw_per_h, double dry_mass_g)
+{
+    return rate_mmol_per_gdw_per_h * model.dfba_time_step * hours_to_minutes * dry_mass_g;
+}
+
+struct VoxelUptakeDemand
+{
+    std::vector<double> mmol;           // [voxel * n_densities + density_index]
+    std::size_t n_densities = 0;
+    std::atomic<double> built_at{-1.0}; // simulated time the table describes
+};
+
+VoxelUptakeDemand g_voxel_demand;
+
+// Caller must hold the named critical section.
+void rebuild_voxel_demand()
+{
+    const std::size_t n_voxels = BioFVM::microenvironment.number_of_voxels();
+    const std::size_t n_dens   = BioFVM::microenvironment.number_of_densities();
+    g_voxel_demand.n_densities = n_dens;
+    g_voxel_demand.mmol.assign(n_voxels * n_dens, 0.0);
+
+    for (PhysiCell::Cell* cell : *PhysiCell::all_cells)
+    {
+        if (cell == NULL || cell->is_out_of_domain || cell->phenotype.death.dead)
+            continue;
+        dFBAIntracellular* model = dynamic_cast<dFBAIntracellular*>(cell->phenotype.intracellular);
+        if (model == NULL)
+            continue;
+        const int voxel = cell->get_current_voxel_index();
+        if (voxel < 0 || static_cast<std::size_t>(voxel) >= n_voxels)
+            continue;
+
+        const std::vector<double>& density = BioFVM::microenvironment.nearest_density_vector(voxel);
+        const double dry_mass = dry_mass_in_grams(*model, cell->phenotype);
+        for (const auto& entry : model->substrate_exchanges)
+        {
+            const ExchangeFluxData& exchange = entry.second;
+            const double concentration = std::max(density[exchange.density_index], 0.0);
+            g_voxel_demand.mmol[voxel * n_dens + exchange.density_index] +=
+                uptake_over_window_mmol(*model, michaelis_menten_uptake_rate(exchange, concentration), dry_mass);
+        }
+    }
+}
+
+} // namespace
 
 dFBAIntracellular::dFBAIntracellular() : Intracellular()
 {
@@ -472,19 +561,30 @@ void dFBAIntracellular::update_dfba_inputs( PhysiCell::Cell* pCell, PhysiCell::P
  
     // Cell Volume
     double current_volume = phenotype.volume.total;
-    // unitless ~30%
-    double solid_fraction = 1 - phenotype.volume.fluid_fraction;     
-    // um³ = um³
-    double solid_volume = current_volume * solid_fraction;   
-    // um³ * pg / um³ = pg
-    double cell_dry_weight = solid_volume * this->cell_density ; 
-    // pg * 1e-12 = g
-    double mass_scaling = cell_dry_weight * 1e-12;
-    
+    // dry weight in grams (solid volume * cell_density, pg -> g); same helper as the voxel demand
+    double mass_scaling = dry_mass_in_grams(*this, phenotype);
+
     // r = (3V / 4π))^1/3 (um)
-    double radius = cbrt((3.0 * current_volume) / (4.0 * PI)); 
+    double radius = cbrt((3.0 * current_volume) / (4.0 * PI));
     // um * um = um²
     double cell_surface = 4 * PI * pow(radius, 2);
+
+    // The voxel demand table describes the whole population at this simulated
+    // time. Build it on first use; the unguarded atomic read keeps the common
+    // path to one load, and the check is repeated inside the critical section.
+    const double now = PhysiCell::PhysiCell_globals.current_time;
+    if (g_voxel_demand.built_at.load() != now)
+    {
+        #pragma omp critical(dfba_voxel_demand)
+        {
+            if (g_voxel_demand.built_at.load() != now)
+            {
+                rebuild_voxel_demand();
+                g_voxel_demand.built_at.store(now);
+            }
+        }
+    }
+    const int voxel_index = pCell->get_current_voxel_index();
 
     // Setp 1 - Update exchange fluxes lower
     //  Standard FBA fluxes units:  mmol /  gDW cell / h
@@ -506,36 +606,28 @@ void dFBAIntracellular::update_dfba_inputs( PhysiCell::Cell* pCell, PhysiCell::P
         // geting the amount of substrate
         double substrate_conc = density_vector[ex_strut.density_index];
         substrate_conc = max(substrate_conc, 0.0); // mM 
-        // scaling Vmax based on cell volume
-        double Vmax = ex_strut.Vmax.value; // mmol / gDWcell / hours
-        double Km   = ex_strut.Km.value; // mM 
-        
-        // using irreversible Michaelis Menten kinetics to estimate the flux bound; should be calculated from density
-        double uptake_rate = (Vmax * substrate_conc) / (Km + substrate_conc); //  mmol / gDWcell / hours shoudl 
-        
+        // Irreversible Michaelis-Menten kinetics gives the flux bound, mmol / gDWcell / hours.
+        double uptake_rate = michaelis_menten_uptake_rate(ex_strut, substrate_conc);
 
-        // Here we are simulating what is going to happen in BioFVM after we plug the Net Export Rate (we will rescale it later)
+        // What this bound would remove from the voxel over one dFBA window (mmol),
+        // i.e. what BioFVM will apply once the rate is turned into a net export rate.
+        double total_uptake = uptake_over_window_mmol(*this, uptake_rate, mass_scaling);
 
-        // max_rate = mmol/g DW cell/hours
-        double total_uptake = uptake_rate * dfba_time_step * hours_to_minutes; // mmol/g DW cell
+        // Total substrate held by the voxel. substrate_conc is mmol/L and dV is
+        // um^3; 1 L = 1e15 um^3, so mmol = mM * um^3 / 1e15. This must be a
+        // division: it was a multiplication, which made the cap larger than the
+        // request by ~1e30 so it never engaged.
+        double total_substrate = substrate_conc * dV / liter_micron_cubes_conversion; // mmol
 
-        // (picograms to grams conversion) 
-        total_uptake *= mass_scaling; // mmol
-
-        // correct scaling that takes into account the volume units (um³) in BioFVM
-        // we are getting the total substrate of the voxel
-        double total_substrate = substrate_conc * dV * liter_micron_cubes_conversion; // mmol
-        // check if the we are taking more than what is stored in the voxel
-
-        // std::cout << "Substrate: " << substrate_name << " -- Total substrate in voxel: " << total_substrate << " mmol," << "Total concentration: " << substrate_conc << " mM, Total uptake requested: " << total_uptake << " mmol. Uptake rate: " << uptake_rate << " mmol/gDW/h" << std::endl;
-
+        // Share the voxel between the cells that draw on it. The table sum already
+        // contains this cell's own request, so with one cell this is the plain cap.
         const double epsilon = 1e-18;
-        if (total_uptake > 0.0 && total_uptake > total_substrate + epsilon) {
-            //std::cout << "Warning: limiting uptake rate for substrate " << substrate_name << " to available amount in the voxel." << std::endl;
-            //std::cout << "\t Total substrate in voxel: " << total_substrate << " mmol, Total uptake requested: " << total_uptake << " mmol." << std::endl;
-            uptake_rate = total_substrate / mass_scaling; // mmol/gDW
-            uptake_rate /= (dfba_time_step * hours_to_minutes); // mmol/gDW/hours
-            //std::cout << "\t New uptake rate: " << uptake_rate << " mmol/gDW/h" << std::endl;
+        if (total_uptake > 0.0) {
+            const double voxel_demand =
+                g_voxel_demand.mmol[static_cast<std::size_t>(voxel_index) * g_voxel_demand.n_densities + ex_strut.density_index];
+            if (voxel_demand > total_substrate + epsilon) {
+                uptake_rate *= total_substrate / voxel_demand;
+            }
         }
 
         // Change sign to use as lower bound of the exchange flux
