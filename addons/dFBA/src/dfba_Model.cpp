@@ -380,7 +380,7 @@ void dFBAModel::readSBMLModel(const char* sbmlFileName)
         Reaction* sbml_reaction = listOfReactions->get(i);
 
         dFBAReaction* reaction = new dFBAReaction(sbml_reaction->getId());
-        std::cout << "Adding reaction with ID: " << reaction->getId() << std::endl;
+        // std::cout << "Adding reaction with ID: " << reaction->getId() << std::endl;
         reaction->setName(sbml_reaction->getName());
 
         FbcReactionPlugin* rxnFbc = static_cast<FbcReactionPlugin*> (sbml_reaction->getPlugin("fbc"));
@@ -482,7 +482,7 @@ void dFBAModel::initProblem()
     int n_cols = this->getNumReactions();
 
     this->handler = new CoinMessageHandler(nullptr);
-    std::cout << "Initilizing LP problem n=" << n_rows << std::endl;
+    // std::cout << "Initilizing LP problem n=" << n_rows << std::endl;
     this->handler->setLogLevel(0);
     this->problem.passInMessageHandler(this->handler);
 
@@ -549,7 +549,7 @@ void dFBAModel::initProblem()
 void dFBAModel::initModel(const char* sbmlFileName)
 {
     this->readSBMLModel(sbmlFileName);
-    std::cout << "SBML model correctly loeaded: " << sbmlFileName << std::endl;
+    std::cout << "SBML model correctly loaded: " << sbmlFileName << std::endl;
     this->initProblem();
 }
 
@@ -658,4 +658,87 @@ bool dFBAModel::isInitialized(){
     return this->is_initialized;
 }
 
+void dFBAModel::setObjectiveCoefficient(std::string rId, double coefficient)
+{
+    dFBAReaction* rxn = this->getReaction(rId);
+    if (rxn)
+    {
+        rxn->setObjectiveCoefficient(coefficient);
+        if (this->is_initialized)
+        {
+            int colIdx = this->reactionsIndexer[rId];
+            this->problem.setObjectiveCoefficient(colIdx, coefficient);
+        }
+    }
+    else
+    {
+        std::cerr << "Reaction with ID " << rId << " not found in setObjectiveCoefficient." << std::endl;
+    }
+}
 
+void dFBAModel::clearObjective()
+{
+    for(dFBAReaction* rxn: this->reactions)
+    {
+        rxn->setObjectiveCoefficient(0.0);
+        if (this->is_initialized)
+        {
+            int colIdx = this->reactionsIndexer[rxn->getId()];
+            this->problem.setObjectiveCoefficient(colIdx, 0.0);
+        }
+    }
+}
+
+void dFBAModel::deepCopy(const dFBAModel& source) {
+    // Clean up existing resources
+    for (auto met : metabolites) delete met;
+    metabolites.clear();
+    for (auto rxn : reactions) delete rxn;
+    reactions.clear();
+    if (handler != nullptr) { delete handler; handler = nullptr; }
+
+    // Copy primitive members
+    id = source.id;
+    is_initialized = source.is_initialized;
+
+    // Deep copy metabolites
+    for (auto original_metabolite : source.metabolites)
+        metabolites.push_back(new dFBAMetabolite(*original_metabolite));
+
+    // Deep copy reactions
+    for (auto original_reaction : source.reactions)
+        reactions.push_back(new dFBAReaction(*original_reaction));
+
+    // Copy indexers and solution
+    metaboliteIndexer = source.metaboliteIndexer;
+    reactionsIndexer = source.reactionsIndexer;
+    solution = source.solution;
+
+    // Copy saved objective state
+    original_objective_reaction = source.original_objective_reaction;
+    original_objective_coefficients = source.original_objective_coefficients;
+
+    // Reinitialize LP problem if source was initialized
+    if (source.is_initialized)
+        initProblem();
+
+    // Copy message handler
+    if (source.handler != nullptr)
+        handler = new CoinMessageHandler(*source.handler);
+}
+
+void dFBAModel::saveObjectiveState() {
+    original_objective_coefficients.clear();
+    for (const auto* reaction : reactions) {
+        if (reaction->getObjectiveCoefficient() != 0.0) {
+            original_objective_coefficients[reaction->getId()] = reaction->getObjectiveCoefficient();
+        }
+    }
+}
+
+void dFBAModel::restoreObjectiveState() {
+    clearObjective();
+    for (const auto& pair : original_objective_coefficients) {
+        setObjectiveCoefficient(pair.first, pair.second);
+    }
+}

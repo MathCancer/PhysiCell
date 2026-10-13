@@ -1,0 +1,85 @@
+# dFBA Configuration File for M. barkeri
+# This YAML file configures the M. barkeri model, its SBML file, exchanges, and cell parameters
+#
+# Structure:
+#   substrates: List of substrate configurations for the microenvironment
+#     Each substrate contains:
+#       - name: Substrate name (must match substrate names in exchanges)
+#       - diffusion_coefficient: Diffusion coefficient (micron^2/min)
+#       - decay_rate: Decay rate (1/min)
+#       - initial_condition: Initial concentration (mM, optional, defaults to 0.0)
+#
+#   models: Dictionary of model configurations, keyed by model name
+#     Each model contains:
+#       - sbml_path: Path to SBML file (relative to --sbml-folder or absolute)
+#       - exchanges: List of exchange reaction configurations
+#       - growth_model: Growth model parameters (optional, uses hardcoded defaults if not specified)
+#       - settings: Intracellular settings (optional, uses hardcoded defaults if not specified)
+#       - death_model: Death model configuration (optional, uses hardcoded defaults if not specified)
+#
+
+# Substrate configuration
+# Define physical properties for each substrate in the microenvironment
+substrates:
+  - name: "glucose"
+    diffusion_coefficient: 48000.0  # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 300.0         # mM
+  
+  - name: "methane"
+    diffusion_coefficient: 5233.0    # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 0.0            # mM
+  
+  - name: "CO2"
+    diffusion_coefficient: 48000.0    # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 300.0         # mM
+  
+  - name: "H2"
+    diffusion_coefficient: 5233.0     # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 100.0         # mM
+
+models:
+  # Model: M. barkeri (iMG746)
+  m_barkeri:
+    # Path to SBML file (can be relative to --sbml-folder or absolute)
+    sbml_path: "M_barkeri_model_iMG746_trimmed.xml"
+    
+    # Exchange reactions configuration
+    # Each exchange defines how a substrate is transported between the cell and microenvironment
+    exchanges:
+      - substrate: "CO2"               # Substrate name (must match microenvironment variable)
+        fba_flux: "R_EX_co2_e"        # Exchange reaction ID from SBML model
+        Km: 0.02                       # Michaelis-Menten constant (mM)
+        Vmax: 8.0                      # Maximum velocity (mol/(L·min))
+      
+      - substrate: "H2"
+        fba_flux: "R_EX_h2_e"
+        Km: 0.002                      # mM
+        Vmax: 18.0                     # mol/(L·min)
+      
+      - substrate: "methane"
+        fba_flux: "R_EX_ch4_e"
+        Km: 0.8                        # mM
+        Vmax: 10.0                     # mol/(L·min)
+    
+    # Growth model parameters
+    growth_model:
+      cell_density: 1.04              # Cell density (g/ml)
+      reference_volume: 1.8           # Reference volume for cell division (micron^3)
+      max_growth_rate: 48.0            # Maximum growth rate (1/h)
+      objective_reaction: "R_Mb_biomass_65"  # Objective reaction ID from SBML model
+    
+    # Intracellular settings (optional - will use hardcoded defaults if not specified)
+    # Note: No settings specified in XML, so using defaults
+    
+    # Death model configuration
+    death_model:
+      enabled: false
+      death_type: ""                   # death type string (empty in XML)
+      death_trigger_flux: 0.0         # 1/min
+      death_flux_threshold: 0.0       # dimensionless
+      death_rate_increase: 0.0        # rate increase
+

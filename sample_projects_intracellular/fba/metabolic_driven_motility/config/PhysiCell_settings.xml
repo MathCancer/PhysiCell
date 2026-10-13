@@ -1,0 +1,367 @@
+<PhysiCell_settings version="devel-version">
+
+    <cell_rules>
+        <rulesets>
+            <ruleset protocol="CBHG" version="3.0" format="csv" enabled="false">
+                <folder>config</folder>
+                <filename>rules.csv</filename>
+            </ruleset>
+        </rulesets>
+    </cell_rules>
+
+    <domain>
+        <x_min>-150.0</x_min>
+        <x_max>150.0</x_max>
+        <y_min>-150.0</y_min>
+        <y_max>150.0</y_max>
+        <z_min>-5.0</z_min>
+        <z_max>5.0</z_max>
+        <dx>10.0</dx>
+        <dy>10.0</dy>
+        <dz>10.0</dz>
+        <use_2D>true</use_2D>
+    </domain>
+
+    <overall>
+        <max_time units="min">600</max_time>
+        <time_units>min</time_units>
+        <space_units>micron</space_units>
+        <dt_diffusion units="min">0.01</dt_diffusion>
+        <dt_mechanics units="min">0.1</dt_mechanics>
+        <dt_phenotype units="min">6</dt_phenotype>
+    </overall>
+
+    <parallel>
+        <omp_num_threads>10</omp_num_threads>
+    </parallel>
+
+    <save>
+        <folder>output</folder>
+        <full_data>
+            <interval units="min">5</interval>
+            <enable>true</enable>
+        </full_data>
+        <SVG>
+            <interval units="min">5</interval>
+            <enable>true</enable>
+            <plot_substrate enabled="true" limits="false">
+                <substrate>oxygen</substrate>
+                <min_conc>0.0</min_conc>
+                <max_conc>0.1</max_conc>
+                <colormap>YlOrRd</colormap>
+            </plot_substrate>
+        </SVG>
+        <legacy_data>
+            <enable>false</enable>
+        </legacy_data>
+    </save>
+
+    <options>
+        <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
+        <disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
+        <random_seed>50</random_seed>
+    </options>
+
+    <microenvironment_setup>
+        <variable name="oxygen" units="dimensionless" ID="0">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">12000.0</diffusion_coefficient>
+                <decay_rate units="1/min">0.0</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="mM">8</initial_condition>
+            <Dirichlet_boundary_condition units="mM" enabled="True">8</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="True">8</boundary_value>
+                <boundary_value ID="xmax" enabled="True">8</boundary_value>
+                <boundary_value ID="ymin" enabled="True">8</boundary_value>
+                <boundary_value ID="ymax" enabled="True">8</boundary_value>
+                <boundary_value ID="zmin" enabled="False">8</boundary_value>
+                <boundary_value ID="zmax" enabled="False">8</boundary_value>
+            </Dirichlet_options>
+        </variable>
+        <variable name="glucose" units="dimensionless" ID="1">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">4000.0</diffusion_coefficient>
+                <decay_rate units="1/min">0.0</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="mM">20</initial_condition>
+            <Dirichlet_boundary_condition units="mM" enabled="True">0</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="True">0</boundary_value>
+                <boundary_value ID="xmax" enabled="True">0</boundary_value>
+                <boundary_value ID="ymin" enabled="True">0</boundary_value>
+                <boundary_value ID="ymax" enabled="True">0</boundary_value>
+                <boundary_value ID="zmin" enabled="False">0</boundary_value>
+                <boundary_value ID="zmax" enabled="False">0</boundary_value>
+            </Dirichlet_options>
+        </variable>
+        <variable name="acetate" units="dimensionless" ID="2">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">6500.00</diffusion_coefficient>
+                <decay_rate units="1/min">0.0</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="mmol">0.0</initial_condition>
+            <Dirichlet_boundary_condition units="mmol" enabled="False">0.0</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="False">0</boundary_value>
+                <boundary_value ID="xmax" enabled="False">0</boundary_value>
+                <boundary_value ID="ymin" enabled="False">0</boundary_value>
+                <boundary_value ID="ymax" enabled="False">0</boundary_value>
+                <boundary_value ID="zmin" enabled="False">0</boundary_value>
+                <boundary_value ID="zmax" enabled="False">0</boundary_value>
+            </Dirichlet_options>
+        </variable>
+        <variable name="CO2" units="dimensionless" ID="3">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">2233</diffusion_coefficient>
+                <decay_rate units="1/min">0.0</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="dimensionless">0.0</initial_condition>
+            <Dirichlet_boundary_condition units="dimensionless" enabled="False">0.0</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="False" />
+                <boundary_value ID="xmax" enabled="False" />
+                <boundary_value ID="ymin" enabled="False" />
+                <boundary_value ID="ymax" enabled="False" />
+                <boundary_value ID="zmin" enabled="False" />
+                <boundary_value ID="zmax" enabled="False" />
+            </Dirichlet_options>
+        </variable>
+        <options>
+            <calculate_gradients>false</calculate_gradients>
+            <track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
+            <initial_condition type="csv" enabled="false">
+                <filename>/home/mruscone/Desktop/github/PhysiCelldFBA/config/glucose.csv</filename>
+            </initial_condition>
+            <dirichlet_nodes type="matlab" enabled="false">
+                <filename>./config/dirichlet.mat</filename>
+            </dirichlet_nodes>
+        </options>
+    </microenvironment_setup>
+
+    <cell_definitions>
+        <cell_definition name="ecoli" ID="0">
+            <phenotype>
+                <cycle code="5" name="live">
+                    <phase_transition_rates units="1/min">
+                        <rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
+                    </phase_transition_rates>
+                    <standard_asymmetric_division enabled="False">
+                        <asymmetric_division_probability name="ecoli" units="dimensionless">1.0</asymmetric_division_probability>
+                    </standard_asymmetric_division>
+                </cycle>
+                <death>
+                    <model code="100" name="apoptosis">
+                        <death_rate units="1/min">0</death_rate>
+                        <phase_durations units="min">
+                            <duration index="0" fixed_duration="true">516</duration>
+                        </phase_durations>
+                        <parameters>
+                            <unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                        </parameters>
+                    </model>
+                    <model code="101" name="necrosis">
+                        <death_rate units="1/min">0.0</death_rate>
+                        <phase_transition_rates units="1/min">
+                            <rate start_index="0" end_index="1" fixed_duration="false">9000000000.0</rate>
+                            <rate start_index="1" end_index="2" fixed_duration="true">1.15741e-05</rate>
+                        </phase_transition_rates>
+                        <parameters>
+                            <unlysed_fluid_change_rate units="1/min">1.11667e-2</unlysed_fluid_change_rate>
+                            <lysed_fluid_change_rate units="1/min">8.33333e-4</lysed_fluid_change_rate>
+                            <cytoplasmic_biomass_change_rate units="1/min">5.33333e-5</cytoplasmic_biomass_change_rate>
+                            <nuclear_biomass_change_rate units="1/min">2.16667e-3</nuclear_biomass_change_rate>
+                            <calcification_rate units="1/min">0</calcification_rate>
+                            <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                        </parameters>
+                    </model>
+                </death>
+                <volume>
+                    <total units="micron^3">10</total>
+                    <fluid_fraction units="dimensionless">0.75</fluid_fraction>
+                    <nuclear units="micron^3">0</nuclear>
+                    <fluid_change_rate units="1/min">0.05</fluid_change_rate>
+                    <cytoplasmic_biomass_change_rate units="1/min">0.0045</cytoplasmic_biomass_change_rate>
+                    <nuclear_biomass_change_rate units="1/min">0</nuclear_biomass_change_rate>
+                    <calcified_fraction units="dimensionless">0</calcified_fraction>
+                    <calcification_rate units="1/min">0</calcification_rate>
+                    <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+                </volume>
+                <mechanics>
+                    <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+                    <cell_cell_repulsion_strength units="micron/min">100.0</cell_cell_repulsion_strength>
+                    <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
+                    <cell_adhesion_affinities>
+                        <cell_adhesion_affinity name="ecoli">1.0</cell_adhesion_affinity>
+                    </cell_adhesion_affinities>
+                    <options>
+                        <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+                        <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
+                    </options>
+                    <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
+                    <attachment_rate units="1/min">0.0</attachment_rate>
+                    <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments>12</maximum_number_of_attachments>
+                </mechanics>
+                <motility>
+                    <speed units="micron/min">0</speed>
+                    <persistence_time units="min">1</persistence_time>
+                    <migration_bias units="dimensionless">1</migration_bias>
+                    <options>
+                        <enabled>true</enabled>
+                        <use_2D>true</use_2D>
+                        <chemotaxis>
+                            <enabled>true</enabled>
+                            <substrate>glucose</substrate>
+                            <direction>1</direction>
+                        </chemotaxis>
+                        <advanced_chemotaxis>
+                            <enabled>false</enabled>
+                            <normalize_each_gradient>false</normalize_each_gradient>
+                            <chemotactic_sensitivities>
+                                <chemotactic_sensitivity substrate="oxygen">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="glucose">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="acetate">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="CO2">0.0</chemotactic_sensitivity>
+                            </chemotactic_sensitivities>
+                        </advanced_chemotaxis>
+                    </options>
+                </motility>
+                <secretion>
+                    <substrate name="oxygen">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">0</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="glucose">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">0</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="acetate">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">0</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="CO2">
+                        <secretion_rate units="1/min">0.0</secretion_rate>
+                        <secretion_target units="substrate density">0.0</secretion_target>
+                        <uptake_rate units="1/min">0.0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0.0</net_export_rate>
+                    </substrate>
+                </secretion>
+                <cell_interactions>
+                    <apoptotic_phagocytosis_rate units="1/min">0.0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0.0</necrotic_phagocytosis_rate>
+                    <other_dead_phagocytosis_rate units="1/min">0.0</other_dead_phagocytosis_rate>
+                    <live_phagocytosis_rates>
+                        <phagocytosis_rate name="ecoli" units="1/min">0.0</phagocytosis_rate>
+                    </live_phagocytosis_rates>
+                    <attack_rates>
+                        <attack_rate name="ecoli" units="1/min">0.0</attack_rate>
+                    </attack_rates>
+                    <attack_damage_rate units="1/min">1.0</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
+                    <fusion_rates>
+                        <fusion_rate name="ecoli" units="1/min">0.0</fusion_rate>
+                    </fusion_rates>
+                </cell_interactions>
+                <cell_transformations>
+                    <transformation_rates>
+                        <transformation_rate name="ecoli" units="1/min">0.0</transformation_rate>
+                    </transformation_rates>
+                </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>
+                <intracellular type="dfba">
+                    <settings>
+                        <sbml_filename>config/Ecoli_core.xml</sbml_filename>
+                        <intracellular_dt units="min">0.01</intracellular_dt>
+                    </settings>
+                    <transport_model>
+                        <exchange substrate="glucose">
+                            <fba_flux>R_EX_glc__D_e</fba_flux>
+                            <Km units="mM">0.02</Km>
+                            <Vmax units="mmol/gDW cell/h">8.0</Vmax>
+                        </exchange>
+                        <exchange substrate="acetate">
+                            <fba_flux>R_EX_ac_e</fba_flux>
+                            <Km units="mM">1</Km>
+                            <Vmax units="mmol/gDW cell/h">5.0</Vmax>
+                        </exchange>
+                        <exchange substrate="oxygen">
+                            <fba_flux>R_EX_o2_e</fba_flux>
+                            <Km units="mM">0.002</Km>
+                            <Vmax units="mmol/gDW cell/h">18</Vmax>
+                        </exchange>
+                        <exchange substrate="CO2">
+                            <fba_flux>R_EX_co2_e</fba_flux>
+                            <Km units="mM">1</Km>
+                            <Vmax units="mmol/gDW cell/h">0.0</Vmax>
+                        </exchange>
+                    </transport_model>
+                    <growth_model>
+                        <cell_density units="g/ml">1.04</cell_density>
+                        <reference_volume units="pg">10</reference_volume>
+                        <max_growth_rate units="1/min">0.86</max_growth_rate>
+                        <objective_reaction>R_Biomass_Ecoli_core</objective_reaction>
+                    </growth_model>
+                    <death_model enabled="false">
+                        <death_type units="g/ml">necrosis</death_type>
+                        <death_trigger_flux units="1/min" />
+                        <death_flux_threshold />
+                        <death_rate_increase>1.67e-5</death_rate_increase>
+                    </death_model>
+                </intracellular>
+            </phenotype>
+            <custom_data>
+                <oxygen_flux conserved="false" units="mM/min" description="">0.0</oxygen_flux>
+                <glucose_flux conserved="false" units="mM/min" description="">0.0</glucose_flux>
+                <acetate_flux conserved="false" units="mM/min" description="">0.0</acetate_flux>
+                <co2_flux conserved="false" units="mM/min" description="">0.0</co2_flux>
+                <growth_rate conserved="false" units="1/min" description="">0.0</growth_rate>
+                <growth_factor conserved="false" units="1/min" description="">0.0</growth_factor>
+                <metabolic_mode conserved="false" units="dimensionless" description="0 = biomass mode, 1 = ATP maintenance mode">0.0</metabolic_mode>
+                <atp_flux conserved="false" units="mmol/gDW/h" description="ATP maintenance objective value from ATP-optimized FBA solution">0.0</atp_flux>
+                <motility_atp_flux conserved="false" units="mmol/gDW/h" description="ATP-equivalent flux allocated to motility after subtracting basal ATP demand">0.0</motility_atp_flux>
+                <motility_atp_rate_cell conserved="false" units="mmol/cell/h" description="ATP-equivalent rate allocated to motility at the cell level">0.0</motility_atp_rate_cell>
+                <motility_atp_used_this_step conserved="false" units="mmol/cell" description="ATP-equivalent amount used for motility during the current step">0.0</motility_atp_used_this_step>
+                <motility_speed_fraction conserved="false" units="dimensionless" description="Current migration speed divided by maximum migration speed">0.0</motility_speed_fraction>
+            </custom_data>
+            <initial_parameter_distributions enabled="false">
+          </initial_parameter_distributions>
+        </cell_definition>
+    </cell_definitions>
+
+    <initial_conditions>
+        <cell_positions type="csv" enabled="true">
+            <folder>./config/</folder>
+            <filename>cells.csv</filename>
+        </cell_positions>
+    </initial_conditions>
+
+    <user_parameters>
+        <random_seed type="int" units="dimensionless" description="">60</random_seed>
+        <colony_radius type="double" units="micron" description="">30.0</colony_radius>
+        <number_of_cells type="int" units="" description="">0</number_of_cells>
+        <nutrient_reintroduction type="bool" units="dimensionless" description="">True</nutrient_reintroduction>
+        <reintroduced_nutrient type="string" units="dimensionless" description="">oxygen</reintroduced_nutrient>
+        <reintroduction_start_time type="double" units="minutes" description="">9000</reintroduction_start_time>
+        <reintroduction_duration type="double" units="minutes" description="">10</reintroduction_duration>
+        <glucose_threshold_low type="double" units="mM" description="">0.5</glucose_threshold_low>
+        <glucose_threshold_high type="double" units="mM" description="">0.6</glucose_threshold_high>
+        <ecoli_vmax type="double" units="micron/min" description="Maximum swimming speed in ATP maintenance mode">1.0</ecoli_vmax>
+        <basal_atp_flux type="double" units="mmol/gDW/h" description="ATP-equivalent flux reserved for non-motility processes">0.5</basal_atp_flux>
+        <motility_cost_at_vmax type="double" units="mmol/gDW/h" description="ATP-equivalent flux required to sustain maximum swimming speed">1.0</motility_cost_at_vmax>
+    </user_parameters>
+</PhysiCell_settings>

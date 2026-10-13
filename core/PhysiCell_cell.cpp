@@ -3185,16 +3185,9 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 
 #ifdef ADDON_PHYSIDFBA
 		if (model_type == "dfba") {
-			// If it has already be copied
-			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
-				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
-				//((PhysiCelldFBA::dFBAIntracellular*)pParent->phenotype.intracellular)->print_model();
-				//((PhysiCelldFBA::dFBAIntracellular*)pCD->phenotype.intracellular)->print_model();
-			// Otherwise we need to create a new one
-			} else {
-				PhysiCelldFBA::dFBAIntracellular* pIntra = new PhysiCelldFBA::dFBAIntracellular(node);
-				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
-			}
+			// Always create a new instance per cell definition
+			PhysiCelldFBA::dFBAIntracellular* pIntra = new PhysiCelldFBA::dFBAIntracellular(node);
+			pCD->phenotype.intracellular = pIntra->getIntracellularModel();
 		}
 #endif
 

@@ -56,7 +56,7 @@ class dFBAReaction
 		double getUpperBound();
 
 		void setObjectiveCoefficient(double ojectiveCoefficient);
-		double getObjectiveCoefficient();
+		double getObjectiveCoefficient() const;
 
 		void setFluxValue(double flux_value);
 		double getFluxValue();

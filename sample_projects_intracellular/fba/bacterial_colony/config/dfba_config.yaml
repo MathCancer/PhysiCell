@@ -1,0 +1,108 @@
+# dFBA Configuration File
+# This YAML file configures individual models, their SBML files, exchanges, and cell parameters
+#
+# Structure:
+#   substrates: List of substrate configurations for the microenvironment
+#     Each substrate contains:
+#       - name: Substrate name (must match substrate names in exchanges)
+#       - diffusion_coefficient: Diffusion coefficient (micron^2/min)
+#       - decay_rate: Decay rate (1/min)
+#       - initial_condition: Initial concentration (mM, optional, defaults to 0.0)
+#
+#   models: Dictionary of model configurations, keyed by model name
+#     Each model contains:
+#       - sbml_path: Path to SBML file (relative to --sbml-folder or absolute)
+#       - exchanges: List of exchange reaction configurations
+#       - growth_model: Growth model parameters (optional, uses hardcoded defaults if not specified)
+#       - settings: Intracellular settings (optional, uses hardcoded defaults if not specified)
+#       - death_model: Death model configuration (optional, uses hardcoded defaults if not specified)
+#
+
+# Substrate configuration
+# Define physical properties for each substrate in the microenvironment
+substrates:
+  - name: "glucose"
+    diffusion_coefficient: 50000.0  # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 0.0            # mM (optional, defaults to 0.0)
+  
+  - name: "acetate"
+    diffusion_coefficient: 50000.0
+    decay_rate: 0.0
+    initial_condition: 0.0
+  
+  - name: "oxygen"
+    diffusion_coefficient: 100000.0
+    decay_rate: 0.1
+    initial_condition: 0.0
+  
+  - name: "CO2"
+    diffusion_coefficient: 100000.0
+    decay_rate: 0.0
+    initial_condition: 0.0
+
+models:
+  # Model 1: iML1515
+  iML1515:
+    # Path to SBML file (can be relative to --sbml-folder or absolute)
+    sbml_path: "iML1515.xml"
+    
+    # Exchange reactions configuration
+    # Each exchange defines how a substrate is transported between the cell and microenvironment
+    exchanges:
+      - substrate: "glucose"           # Substrate name (must match microenvironment variable)
+        fba_flux: "R_EX_glc__D_e"     # Exchange reaction ID from SBML model
+        Km: 0.01                      # Michaelis-Menten constant (mM)
+        Vmax: 10.0                      # Maximum velocity (fmol/pg DW cell/min)
+      
+      - substrate: "acetate"
+        fba_flux: "R_EX_ac_e"
+        Km: 0.01
+        Vmax: 10.0
+      
+      - substrate: "oxygen"
+        fba_flux: "R_EX_o2_e"
+        Km: 0.01
+        Vmax: 10.0
+      
+      - substrate: "CO2"
+        fba_flux: "R_EX_co2_e"
+        Km: 0.01
+        Vmax: 10.0
+    
+    # Growth model parameters (optional - will use hardcoded defaults if not specified)
+    growth_model:
+      cell_density: 1.04              # Cell density (g/ml)
+      reference_volume: 1.3          # Reference volume for cell division (pg)
+      nuclear_volume: 0.0            # Nuclear volume (pg)
+      max_growth_rate: 0.95           # Maximum growth rate (1/min)
+      objective_reaction: "R_BIOMASS_Ec_iML1515_core_75p37M"  # Objective reaction ID from SBML model
+    
+    # Intracellular settings (optional - will use hardcoded defaults if not specified)
+    settings:
+      intracellular_dt: 0.01          # Intracellular time step (min)
+    
+    # Death model (optional - will use hardcoded defaults if not specified)
+    death_model:
+      enabled: true
+      death_type: necrosis          # death type string
+      death_trigger_flux: "R_ATPM"  # 1/min
+      death_flux_threshold: 8.4     # dimensionless
+      death_rate_increase: 1.67e-5  # rate increase
+
+  # Example: Add more models here
+  # model2:
+  #   sbml_path: "model2.xml"
+  #   exchanges:
+  #     - substrate: "glucose"
+  #       fba_flux: "R_EX_glc__D_e"
+  #       Km: 0.001
+  #       Vmax: 10.0
+  #   growth_model:
+  #     cell_density: 1.05
+  #     reference_volume: 2500
+  #     max_growth_rate: 0.90
+  #     objective_reaction: "R_Biomass"
+
+
+

@@ -23,7 +23,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">600</max_time>
+        <max_time units="min">240</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -140,7 +140,7 @@
     </microenvironment_setup>
 
     <cell_definitions>
-        <cell_definition name="ecoli_1" ID="0">
+        <cell_definition name="ecoli1" ID="0">
             <phenotype>
                 <cycle code="5" name="live">
                     <phase_transition_rates units="1/min">
@@ -281,36 +281,36 @@
                     <damage_repair_rate units="1/min">0.0</damage_repair_rate>
                 </cell_integrity>
                 <intracellular type="dfba">
-                    <sbml_filename>./config/Ecoli_core.xml</sbml_filename>
                     <settings>
+                        <sbml_filename>./config/Ecoli_core.xml</sbml_filename>
                         <intracellular_dt>0.01</intracellular_dt>
                     </settings>
                     <transport_model>
                         <exchange substrate="glucose">
                             <fba_flux>R_EX_glc__D_e</fba_flux>
                             <Km units="mM">0.02</Km>
-                            <Vmax units="fmol/pg DW cell/min">8.0</Vmax>
+                            <Vmax units="mmol/gDW cell/h">8.0</Vmax>
                         </exchange>
                         <exchange substrate="acetate">
                             <fba_flux>R_EX_ac_e</fba_flux>
                             <Km units="mM">1</Km>
-                            <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
+                            <Vmax units="mmol/gDW cell/h">0.0</Vmax>
                         </exchange>
                         <exchange substrate="oxygen">
                             <fba_flux>R_EX_o2_e</fba_flux>
                             <Km units="mM">0.002</Km>
-                            <Vmax units="fmol/pg DW cell/min">18</Vmax>
+                            <Vmax units="mmol/gDW cell/h">18</Vmax>
                         </exchange>
                         <exchange substrate="CO2">
                             <fba_flux>R_EX_co2_e</fba_flux>
                             <Km units="mM">1</Km>
-                            <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
+                            <Vmax units="mmol/gDW cell/h">0.0</Vmax>
                         </exchange>
                     </transport_model>
                     <growth_model>
                         <cell_density units="g/ml">1.04</cell_density>
                         <reference_volume units="micron^3">1.3</reference_volume>
-                        <max_growth_rate units="1/min">0.8</max_growth_rate>
+                        <max_growth_rate units="1/h">0.8</max_growth_rate>
                         <objective_reaction>R_BIOMASS_Ecoli_core_w_GAM</objective_reaction>
                     </growth_model>
                 </intracellular>

@@ -62,16 +62,15 @@ dFBAIntracellular::dFBAIntracellular(const dFBAIntracellular& copy) : Intracellu
     max_growth_rate = copy.max_growth_rate;
     current_growth_rate = copy.current_growth_rate;
     next_dfba_run = copy.next_dfba_run;
-    dfba_time_step = copy.dfba_time_step; // Copy the time step
+    dfba_time_step = copy.dfba_time_step;
 
-    // Copy sbml_model
-    sbml_model = copy.sbml_model;
+    // Deep copy the model instead of shallow copy
+    sbml_model.deepCopy(copy.sbml_model);
 
-    // Copy substrate_exchanges (map is copied by value, which is fine here)
     substrate_exchanges = copy.substrate_exchanges;
 
-    // Copy the initialization flag
     is_initialized = copy.is_initialized;
+    // Copy death-related parameters
     use_metabolic_death = copy.use_metabolic_death;
 	death_type = copy.death_type;
 	death_trigger_flux = copy.death_trigger_flux;
@@ -434,6 +433,9 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
         }
     }
 
+    // Save original objective state after model is loaded
+    this->sbml_model.saveObjectiveState();
+
     std::cout << "Done!" << std::endl;
     std::cout << "===================================================" << std::endl;
 }
@@ -546,22 +548,28 @@ void dFBAIntracellular::update_dfba_inputs( PhysiCell::Cell* pCell, PhysiCell::P
 }
 
 void dFBAIntracellular::update(){
+    // Check if we should skip standard biomass optimization
+    if (this->skip_standard_optimization) {
+        this->skip_standard_optimization = false; // Reset for next round
+        return;
+    }
     // Only run dFBA if current_time >= next_dfba_run
     dFBASolution solution = this->sbml_model.optimize();
     //next_dfba_run = PhysiCell::PhysiCell_globals.current_time + dfba_time_step;
-    if (solution.status == "infeasible"){
-        //std::cout << "I'm dead from the metabolic point of view" << std::endl;
-        this->flag_for_death = true;
-        this->current_growth_rate = 0.0;
+    if (solution.status == "optimal"){
+        this->current_growth_rate = solution.getObjectiveValue();
+        this->flag_for_death = false;
     }
     else if(solution.status == "unknown"){
         std::cout << "ERROR: Unknown status for the FBA problem!" << std::endl;
         exit(1);
     }
-    else{
-        this->current_growth_rate = solution.getObjectiveValue();
-        this->flag_for_death = false;
+    else {
+        //std::cout << "I'm dead from the metabolic point of view" << std::endl;
+        this->flag_for_death = true;
+        this->current_growth_rate = 0.0;
     }
+    
 }
 
 void dFBAIntracellular::update_dfba_outputs(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt )
@@ -569,8 +577,9 @@ void dFBAIntracellular::update_dfba_outputs(PhysiCell::Cell* pCell, PhysiCell::P
     // Metabolic-dependent death check
     //std::cout << "Cell ready to die? --> " << this->flag_for_death << std::endl;
     //std::cout << "Death parameters: " << this->use_metabolic_death << " " << this->death_trigger_flux << " " << this->death_flux_threshold << " " << this->death_rate_increase << std::endl;
-    static int nApoptosis = phenotype.death.find_death_model_index(PhysiCell::PhysiCell_constants::apoptosis_death_model );
-    static int nNecrosis = phenotype.death.find_death_model_index(PhysiCell::PhysiCell_constants::necrosis_death_model );
+    // Recalculate per cell (not static) to avoid stale indices
+    int nApoptosis = phenotype.death.find_death_model_index(PhysiCell::PhysiCell_constants::apoptosis_death_model );
+    int nNecrosis = phenotype.death.find_death_model_index(PhysiCell::PhysiCell_constants::necrosis_death_model );
 
     if(this->flag_for_death && this->use_metabolic_death)
     {
@@ -712,6 +721,21 @@ void dFBAIntracellular::update_dfba_outputs(PhysiCell::Cell* pCell, PhysiCell::P
 
     return;
 }
+
+dFBASolution dFBAIntracellular::optimize_for_objective(std::string reaction_id, double coefficient) {
+    // Temporarily switch objective
+    this->sbml_model.clearObjective();
+    this->sbml_model.setObjectiveCoefficient(reaction_id, coefficient);
+    
+    // Run optimization
+    dFBASolution solution = this->sbml_model.optimize();
+    
+    // Restore original objective immediately
+    this->sbml_model.restoreObjectiveState();
+    
+    return solution;  // Return full solution (includes status!)
+}
+
 
 double dFBAIntracellular::get_flux_value(std::string reaction_name)
 {

@@ -77,7 +77,7 @@ list-projects:
 	@echo "                 asymmetric-division-sample immune-function-sample episode-sample"
 	@echo ""
 	@echo "Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample"
-	@echo "                 cancer-metabolism-sample physiboss-tutorial physiboss-tutorial-invasion"
+	@echo "                 cancer-metabolism-sample crossfeeding physiboss-tutorial physiboss-tutorial-invasion bacterial-colony metabolic_driven_motility"
 	@echo ""
 	
 template:
@@ -312,6 +312,41 @@ cancer-core-metabolism:
 	mkdir ./scripts/
 	cp ./sample_projects_intracellular/fba/cancer_core_metabolism/scripts/* ./scripts/
 	
+bacterial-colony:
+	cp ./sample_projects_intracellular/fba/bacterial_colony/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/fba/bacterial_colony/main.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/fba/bacterial_colony/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects_intracellular/fba/bacterial_colony/config/* ./config/
+		mkdir ./scripts/
+	cp ./sample_projects_intracellular/fba/bacterial_colony/scripts/* ./scripts/
+
+crossfeeding:
+	cp ./sample_projects_intracellular/fba/crossfeeding/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/fba/crossfeeding/main.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/fba/crossfeeding/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp -r ./sample_projects_intracellular/fba/crossfeeding/config/* ./config/
+		mkdir ./scripts/
+	cp -r ./sample_projects_intracellular/fba/crossfeeding/scripts/* ./scripts/
+	cp ./config/PhysiCell_settings_crossfeeding.xml ./config/PhysiCell_settings.xml
+
+
+metabolic_driven_motility:
+	cp ./sample_projects_intracellular/fba/metabolic_driven_motility/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects_intracellular/fba/metabolic_driven_motility/main.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects_intracellular/fba/metabolic_driven_motility/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects_intracellular/fba/metabolic_driven_motility/config/* ./config/
+		mkdir ./scripts/
+	cp ./sample_projects_intracellular/fba/metabolic_driven_motility/scripts/* ./scripts/
+
 template_BM:
 	cp ./sample_projects_intracellular/boolean/template_BM/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp

@@ -30,14 +30,18 @@ class dFBAReaction;
 
 class dFBAModel
 {
-	public:
-		/** \brief Constraint-Based Model Class to perform FBA*/
-		bool initialized =false;
-
+	private:
+		/** \brief Model ID */
 		std::string id;
 
 		/** \brief vector of metabolite objects*/
 		std::vector<dFBAMetabolite*> metabolites;
+
+		/** \brief Saved objective reaction ID for restore */
+		std::string original_objective_reaction;
+
+		/** \brief Saved objective coefficients for restore */
+		std::map<std::string, double> original_objective_coefficients;
 
 		/** \brief map between metabolites' ids and metabolites' references **/
 		std::map<std::string, int> metaboliteIndexer;
@@ -158,8 +162,16 @@ class dFBAModel
 		double getObjectiveValue();
 
 		dFBASolution getSolution(){ return this->solution; }
+
+		void setObjectiveCoefficient(std::string rId, double coefficient);
+		void clearObjective();
+
+		// Deep copy from another model (cleans up existing data first)
+		void deepCopy(const dFBAModel& source);
+
+		// Save/restore objective function state
+		void saveObjectiveState();
+		void restoreObjectiveState();
 };
-
-
 
 #endif

@@ -292,28 +292,28 @@
                         <exchange substrate="glucose">
                             <fba_flux>R_EX_glc__D_e</fba_flux>
                             <Km units="mM">0.02</Km>
-                            <Vmax units="fmol/pg DW cell/min">8.0</Vmax>
+                            <Vmax units="mmol/gDW cell/h">8.0</Vmax>
                         </exchange>
                         <exchange substrate="acetate">
                             <fba_flux>R_EX_ac_e</fba_flux>
                             <Km units="mM">1</Km>
-                            <Vmax units="fmol/pg DW cell/min">5.0</Vmax>
+                            <Vmax units="mmol/gDW cell/h">5.0</Vmax>
                         </exchange>
                         <exchange substrate="oxygen">
                             <fba_flux>R_EX_o2_e</fba_flux>
                             <Km units="mM">0.001</Km>
-                            <Vmax units="fmol/pg DW cell/min">18</Vmax>
+                            <Vmax units="mmol/gDW cell/h">18</Vmax>
                         </exchange>
                         <exchange substrate="CO2">
                             <fba_flux>R_EX_co2_e</fba_flux>
                             <Km units="mM">1</Km>
-                            <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
+                            <Vmax units="mmol/gDW cell/h">0.0</Vmax>
                         </exchange>
                     </transport_model>
                     <growth_model>
                         <cell_density units="g/ml">1.08</cell_density>
                         <reference_volume units="pg">2494</reference_volume>
-                        <max_growth_rate units="1/min">0.8</max_growth_rate>
+                        <max_growth_rate units="1/h">0.8</max_growth_rate>
                         <objective_reaction>R_BIOMASS_Ec_iML1515_core_75p37M</objective_reaction>
                     </growth_model>
                     <death_model enabled="false">
@@ -339,7 +339,7 @@
     <initial_conditions>
         <cell_positions type="csv" enabled="true">
             <folder>./config</folder>
-            <filename>cells_2.csv</filename>
+            <filename>cells_large_scale.csv</filename>
         </cell_positions>
     </initial_conditions>
 

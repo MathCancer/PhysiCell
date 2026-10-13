@@ -1,0 +1,243 @@
+substrates:
+- name: L-Alanine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 0.0
+- name: L-Arginine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Asparagine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Aspartate
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: Choline
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: Citrate
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 0.0
+- name: CO2
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 0.0
+- name: D-Glucose
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Glutamine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Glutamate
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: Glycine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Isoleucine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Lactate
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 0.0
+- name: L-Leucine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Lysine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: Ammonium
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: O2
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: Ornithine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Phenylalanine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: Phosphate
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Proline
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Serine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Threonine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Tryptophan
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Tyrosine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: Urea
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 0.0
+- name: L-Valine
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 5.0
+- name: L-Malate
+  diffusion_coefficient: 50000.0
+  decay_rate: 0.0
+  initial_condition: 0.0
+models:
+  MCF7_core:
+    settings:
+      sbml_path: ../config/MCF7_Zielinski_2017_core.sbml
+      intracellular_dt: 0.01
+    growth_model:
+      cell_density: 1.04
+      reference_volume: 2494.0
+      nuclear_volume: 540
+      max_growth_rate: 0.026802255698138648
+      objective_reaction: R_biomass_reaction
+    death_model:
+      enabled: false
+      death_type: necrosis
+      death_trigger_flux: 0.0
+      death_flux_threshold: 0.0
+      death_rate_increase: 1.67e-05
+    exchanges:
+    - substrate: L-Alanine
+      fba_flux: R_EX_ala_L_e
+      Km: 0.001
+      Vmax: 0.0
+    - substrate: L-Arginine
+      fba_flux: R_EX_arg_L_e
+      Km: 0.001
+      Vmax: 0.01014
+    - substrate: L-Asparagine
+      fba_flux: R_EX_asn_L_e
+      Km: 0.001
+      Vmax: 0.00583
+    - substrate: L-Aspartate
+      fba_flux: R_EX_asp_L_e
+      Km: 0.001
+      Vmax: 0.00959
+    - substrate: Choline
+      fba_flux: R_EX_chol_e
+      Km: 0.001
+      Vmax: 0.00095
+    - substrate: Citrate
+      fba_flux: R_EX_cit_e
+      Km: 0.001
+      Vmax: 0.0
+    - substrate: CO2
+      fba_flux: R_EX_co2_e
+      Km: 0.001
+      Vmax: 0.0
+    - substrate: D-Glucose
+      fba_flux: R_EX_glc_e
+      Km: 0.001
+      Vmax: 0.28863
+    - substrate: L-Glutamine
+      fba_flux: R_EX_gln_L_e
+      Km: 0.001
+      Vmax: 0.08788
+    - substrate: L-Glutamate
+      fba_flux: R_EX_glu_L_e
+      Km: 0.001
+      Vmax: 0.00669
+    - substrate: Glycine
+      fba_flux: R_EX_gly_e
+      Km: 0.001
+      Vmax: 0.00738
+    - substrate: L-Isoleucine
+      fba_flux: R_EX_ile_L_e
+      Km: 0.001
+      Vmax: 0.02126
+    - substrate: L-Lactate
+      fba_flux: R_EX_lac_L_e
+      Km: 0.001
+      Vmax: 0.0
+    - substrate: L-Leucine
+      fba_flux: R_EX_leu_L_e
+      Km: 0.001
+      Vmax: 0.02262
+    - substrate: L-Lysine
+      fba_flux: R_EX_lys_L_e
+      Km: 0.001
+      Vmax: 0.01884
+    - substrate: Ammonium
+      fba_flux: R_EX_nh4_e
+      Km: 0.001
+      Vmax: 0.0126
+    - substrate: O2
+      fba_flux: R_EX_o2_e
+      Km: 0.001
+      Vmax: 2.13595
+    - substrate: Ornithine
+      fba_flux: R_EX_orn_e
+      Km: 0.001
+      Vmax: 0.0009
+    - substrate: L-Phenylalanine
+      fba_flux: R_EX_phe_L_e
+      Km: 0.001
+      Vmax: 0.0059
+    - substrate: Phosphate
+      fba_flux: R_EX_pi_e
+      Km: 0.001
+      Vmax: 0.01963
+    - substrate: L-Proline
+      fba_flux: R_EX_pro_L_e
+      Km: 0.001
+      Vmax: 0.00162
+    - substrate: L-Serine
+      fba_flux: R_EX_ser_L_e
+      Km: 0.001
+      Vmax: 0.0176
+    - substrate: L-Threonine
+      fba_flux: R_EX_thr_L_e
+      Km: 0.001
+      Vmax: 0.01013
+    - substrate: L-Tryptophan
+      fba_flux: R_EX_trp_L_e
+      Km: 0.001
+      Vmax: 0.00143
+    - substrate: L-Tyrosine
+      fba_flux: R_EX_tyr_L_e
+      Km: 0.001
+      Vmax: 0.00804
+    - substrate: Urea
+      fba_flux: R_EX_urea_e
+      Km: 0.001
+      Vmax: 0.0
+    - substrate: L-Valine
+      fba_flux: R_EX_val_L_e
+      Km: 0.001
+      Vmax: 0.01196
+    - substrate: L-Malate
+      fba_flux: R_EX_mal_L_e
+      Km: 0.001
+      Vmax: 0.0

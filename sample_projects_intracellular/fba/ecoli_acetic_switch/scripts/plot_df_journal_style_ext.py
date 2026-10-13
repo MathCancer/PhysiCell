@@ -38,6 +38,20 @@ JOURNAL_RC = {
 }
 
 
+SERIES_COLORS = {
+    "glucose": "#f1c232ff",
+    "oxygen": "#4285f4ff",
+    "acetate": "#cc0000ff",
+    "total_biomass": "#000000",
+    "n_cells": "#000000",
+}
+
+SERIES_LINESTYLES = {
+    "total_biomass": "-",
+    "n_cells": ":",
+}
+
+
 def _ensure_columns(df: pd.DataFrame, cols: Iterable[str], df_name: str) -> None:
     missing = [c for c in cols if c is not None and c not in df.columns]
     if missing:
@@ -111,9 +125,15 @@ def plot_panels(
             raise ValueError("substrates_color_mode must be 'auto' or 'distinct'")
         left_kwargs = {"lw": 2.0}
         right_kwargs = {"lw": 2.0, "ls": "--"}
+        if s_left in SERIES_COLORS:
+            left_kwargs["color"] = SERIES_COLORS[s_left]
+        if s_right in SERIES_COLORS:
+            right_kwargs["color"] = SERIES_COLORS[s_right]
         if substrates_color_mode == "distinct":
             # Ensure different colors
-            if len(colors) < 2:
+            if "color" in left_kwargs and "color" in right_kwargs:
+                pass
+            elif len(colors) < 2:
                 # fallback: force different basic colors
                 left_kwargs["color"] = "tab:blue"
                 right_kwargs["color"] = "tab:orange"
@@ -141,8 +161,9 @@ def plot_panels(
         # single axis for all substrates
         for i, s in enumerate(substrates_cols):
             kw = {"lw": 2.0}
-            # give each a distinct color along the cycle
-            if i < len(colors):
+            if s in SERIES_COLORS:
+                kw["color"] = SERIES_COLORS[s]
+            elif i < len(colors):
                 kw["color"] = colors[i]
             h = _plot_series(ax_top_left, d_substrates.index.values, d_substrates[s].values,
                              labels.get(s, s), **kw)
@@ -165,8 +186,13 @@ def plot_panels(
     h_bottom, n_bottom = [], []
 
     # left
+    left_kwargs = {"lw": 2.0}
+    if cell_left_col in SERIES_COLORS:
+        left_kwargs["color"] = SERIES_COLORS[cell_left_col]
+    if cell_left_col in SERIES_LINESTYLES:
+        left_kwargs["ls"] = SERIES_LINESTYLES[cell_left_col]
     hL = _plot_series(ax_bot_left, d_cells.index.values, d_cells[cell_left_col].values,
-                      labels.get(cell_left_col, cell_left_col), lw=2.0)
+                      labels.get(cell_left_col, cell_left_col), **left_kwargs)
     h_bottom.append(hL); n_bottom.append(hL.get_label())
     ax_bot_left.set_ylabel(ylabel_bottom_left)
 
@@ -177,8 +203,12 @@ def plot_panels(
         ax_bot_right.spines["right"].set_visible(True)
         # different color from left if possible
         kw = {"lw": 2.0, "ls": "--"}
-        if len(colors) >= 2:
+        if cell_right_col in SERIES_COLORS:
+            kw["color"] = SERIES_COLORS[cell_right_col]
+        elif len(colors) >= 2:
             kw["color"] = colors[1]
+        if cell_right_col in SERIES_LINESTYLES:
+            kw["ls"] = SERIES_LINESTYLES[cell_right_col]
         hR = _plot_series(ax_bot_right, d_cells.index.values, d_cells[cell_right_col].values,
                           labels.get(cell_right_col, cell_right_col), **kw)
         h_bottom.append(hR); n_bottom.append(hR.get_label())

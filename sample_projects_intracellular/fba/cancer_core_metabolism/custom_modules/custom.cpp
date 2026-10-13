@@ -111,7 +111,16 @@ void setup_tissue(void)
 }
 
 void post_update_intracellular(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
- 
+
+	PhysiCelldFBA::dFBAIntracellular* dfba_model = static_cast<PhysiCelldFBA::dFBAIntracellular*>(phenotype.intracellular);
+
+		pCell->custom_data["growth_rate"] = dfba_model->get_growth_rate();
+		std::vector<double>& density_vector = pCell->nearest_density_vector();
+	    for (const auto& exchange : dfba_model->substrate_exchanges) {
+        	const PhysiCelldFBA::ExchangeFluxData& ex = exchange.second;
+			pCell->custom_data[ex.fba_flux_id] = dfba_model->get_flux_value(ex.fba_flux_id);
+		}
+
 	return;
 }
 
@@ -197,21 +206,57 @@ std::vector<std::vector<double>> create_cell_disc_positions(double cell_radius, 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	// colors cells according to dfba flux values
+
+	PhysiCelldFBA::dFBAIntracellular* dfba_model = static_cast<PhysiCelldFBA::dFBAIntracellular*>(pCell->phenotype.intracellular);
+
+	float max_growth_rate = dfba_model->max_growth_rate;
+	assert(max_growth_rate > 0.0);
+
 	std::vector<std::string> output(4);
+	
+	output[0] = "rgb(255, 255, 255)"; 
+	output[1] = "black"; // black border
+	output[2] = "rgb(255, 255, 255)";
 	output[3] = "black"; // black border
+
+
+
 	if( pCell->phenotype.death.dead == true )
 	{
-		output[0] = "rgb(0,0,255)"; output[1] = "rgb(0,0,255)"; output[2] = "rgb(0,0,255)";
+		output[0] = "rgb(56, 38, 0)"; 
+		output[2] = "rgb(56,38,0)";
 		return output;
 	}
-	double growth_rate = 1.0;
-	if (growth_rate > 0.0)
+	if (pCell->phenotype.death.necrosis_rate() > 0.0)
 	{
-		output[0] = "rgb(0,255,0)"; output[1] = "rgb(0,255,0)"; output[2] = "rgb(0,255,0)";
+		output[0] = "rgb(222, 170, 0)"; 
+		output[2] = "rgb(222, 170, 0)";
+		return output;
 	}
-	else
+	if (pCell->phenotype.death.apoptosis_rate() > 0.0)
 	{
-		output[0] = "rgb(255,0,0)"; output[1] = "rgb(255,0,0)"; output[2] = "rgb(255,0,0)";
+		output[0] = "rgb(255, 0, 0)";  
+		output[2] = "rgb(255, 0, 0)";
+		return output;
 	}
-	return output;
+
+	if (pCell->custom_data["growth_rate"] > 0.0)
+	{
+		double normalized_growth_rate = dfba_model->get_growth_rate() / max_growth_rate;	
+		int red_blue = (int)(255.0 * (1.0 - normalized_growth_rate));
+		int green = 255;
+
+		std::string color = "rgb(" + std::to_string(red_blue) + ", " + 
+								std::to_string(green) + ", " + 
+								std::to_string(red_blue) + ")";
+
+		output[0] = color;
+		output[2] = color;
+		return output;
+	}else{
+		
+		return output;
+	}
+	
+
 }

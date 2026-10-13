@@ -77,7 +77,7 @@ void dFBAReaction::setObjectiveCoefficient(double ojectiveCoefficient)
     this->objectiveCoefficient = ojectiveCoefficient;
 }
 
-double dFBAReaction::getObjectiveCoefficient()
+double dFBAReaction::getObjectiveCoefficient() const
 {
     return this->objectiveCoefficient;
 }

@@ -70,6 +70,7 @@
 #include "../BioFVM/BioFVM.h"
 #include "./PhysiCell_constants.h"
 #include "./PhysiCell_utilities.h"
+#include "./PhysiCell_cell.h"
 
 using namespace BioFVM; 
 
@@ -1151,8 +1152,9 @@ Cell_Functions::Cell_Functions()
 	
 	pre_update_intracellular = NULL;
 	post_update_intracellular = NULL;
+	custom_optimization = NULL;
 
-	update_velocity = NULL; 
+	update_velocity = NULL;
 	add_cell_basement_membrane_interactions = NULL; 
 	calculate_distance_to_membrane = NULL; 
 	

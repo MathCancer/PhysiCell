@@ -12,16 +12,13 @@ Usage example:
 Requirements:
     pip install lxml pandas pyyaml physicell-settings
 """
-
-import argparse
 import os
-import sys
-import math
-import pandas as pd
-import glob
-from lxml import etree
-import copy
+import argparse
 import yaml
+
+from pathlib import Path
+from lxml import etree
+
 from physicell_config import PhysiCellConfig
 
 # ----------------------
@@ -123,12 +120,17 @@ def add_intracellular_dfba(cell_def, sbml_path, model_config):
             phenotype.remove(old)
 
     intracellular = etree.SubElement(phenotype, "intracellular", type="dfba")
-    sbml_node = etree.SubElement(intracellular, "sbml_filename")
-    sbml_node.text = sbml_path
+
+    settings_dict = model_config.get("settings", {})
 
     # Settings
     settings = etree.SubElement(intracellular, "settings")
-    dt = model_config.get("settings", {}).get("intracellular_dt") if model_config.get("settings") else None
+
+    sbml_node = etree.SubElement(settings, "sbml_filename")
+    sbml_node.text = sbml_path.as_posix()
+
+    
+    dt = settings_dict.get("intracellular_dt")
     if dt is None:
         dt = "0.01"
     etree.SubElement(settings, "intracellular_dt", units="min").text = str(dt)
@@ -145,9 +147,9 @@ def add_intracellular_dfba(cell_def, sbml_path, model_config):
     
     cell_density = growth_config.get("cell_density", "1.04")
     reference_volume = growth_config.get("reference_volume", "2494")
-    nuclear_volume = growth_config.get("nuclear_volume", 0.0)
-    max_growth_rate = growth_config.get("max_growth_rate", "0.86")
-    objective_reaction = growth_config.get("objective_reaction", "R_Biomass")
+    nuclear_volume = growth_config.get("nuclear_volume", "540")
+    max_growth_rate = growth_config.get("max_growth_rate", "0.01")
+    objective_reaction = growth_config.get("objective_reaction", "R_biomass_reactions")
     
     etree.SubElement(growth, "cell_density", units="g/ml").text = str(cell_density)
     etree.SubElement(growth, "reference_volume", units="pg").text = str(reference_volume)
@@ -188,17 +190,24 @@ def validate_yaml_config(config, config_yaml_path, sbml_folder):
     # Validate models and files
     for model_name, model_config in config["models"].items():
         # Check SBML file existence
-        sbml_path_rel = model_config.get("sbml_path")
+        settings_dict = model_config.get("settings", {})
+        settings_dict = model_config.get("settings", {})
+        sbml_path_rel = settings_dict.get("sbml_path")
+
         if not sbml_path_rel:
             raise ValueError(f"Model '{model_name}': missing 'sbml_path'")
-        
-        if os.path.isabs(sbml_path_rel):
-            sbml_path = sbml_path_rel
-        else:
-            sbml_path = os.path.join(sbml_folder, sbml_path_rel)
-        
-        if not os.path.exists(sbml_path):
-            raise ValueError(f"Model '{model_name}': SBML file not found: {sbml_path}")
+
+        sbml_path = Path(sbml_path_rel)
+        sbml_folder = Path(sbml_folder)
+
+        # Only prepend sbml_folder if needed
+        if not sbml_path.is_absolute() and sbml_path.parts[0] != sbml_folder.name:
+            sbml_path = sbml_folder / sbml_path
+
+        if not sbml_path.exists():
+            raise ValueError(
+                f"Model '{model_name}': SBML file not found: {sbml_path.as_posix()}"
+            )
 
         # Check exchanges existence
         if "exchanges" not in model_config:
@@ -330,16 +339,21 @@ def update_config_with_dfba(output_xml_path,
         
         if model_key:
             model_config = models[model_key]
-            
+
+            settings_dict = model_config.get("settings", None)
+            if not settings_dict:
+                print(f"[WARNING] Model '{model_key}' missing 'settings' section; using defaults.")
+                continue
+
+            sbml_path = Path(settings_dict.get("sbml_path"))
+            sbml_folder = Path(sbml_folder)
+
+            if not sbml_path.is_absolute() and sbml_path.parts[0] != sbml_folder.name:
+                sbml_path = sbml_folder / sbml_path
+
             # Resolve SBML path
-            sbml_path_rel = model_config.get("sbml_path")
-            if os.path.isabs(sbml_path_rel):
-                sbml_path = sbml_path_rel
-            else:
-                sbml_path = os.path.join(sbml_folder, sbml_path_rel)
-            sbml_path_abs = os.path.abspath(sbml_path)
-            
-            add_intracellular_dfba(cell_def, sbml_path_abs, model_config)
+            print((f"DEBUGG: {sbml_path}"))
+            add_intracellular_dfba(cell_def, sbml_path, model_config)
             
             # Ensure volume (redundant but safe)
             growth_cfg = model_config.get("growth_model", {})
@@ -347,7 +361,8 @@ def update_config_with_dfba(output_xml_path,
             nuclear_volume = growth_cfg.get("nuclear_volume", 0.0)
             if total_volume is not None:
                 set_cell_volume(cell_def, total_volume=total_volume, nuclear_volume=nuclear_volume)
-
+        else:
+            print(f"[WARNING] Skipping dFBA injection for cell_definition '{name}' (no matching model)")
     # Write final output
     tree = etree.ElementTree(root)
     xml_pretty_write(tree, output_xml_path)
@@ -363,7 +378,7 @@ def main():
     parser.add_argument("--output", "-o", required=True, help="Path to write updated PhysiCell XML.")
     parser.add_argument("--config", "-c", required=True,
                         help="YAML configuration file with models, SBML paths, exchanges, and parameters.")
-    parser.add_argument("--sbml-folder", "-s", default="config", help="Folder containing SBML files (for resolving relative paths).")
+    parser.add_argument("--sbml-folder", "-s", default="", help="Folder containing SBML files (for resolving relative paths).")
     parser.add_argument("--cell-prefix", default="", help="Optional prefix to prepend to new cell_definition names.")
     parser.add_argument("--verbose", action="store_true",
                         help="Enable verbose debug output.")

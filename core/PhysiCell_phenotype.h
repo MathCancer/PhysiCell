@@ -505,8 +505,9 @@ class Cell_Functions
 	
 	void (*pre_update_intracellular) ( Cell* pCell, Phenotype& phenotype, double dt );
 	void (*post_update_intracellular) ( Cell* pCell, Phenotype& phenotype, double dt );
+	void (*custom_optimization) ( Cell* pCell, Phenotype& phenotype, double dt );
 
-	void (*update_velocity)( Cell* pCell, Phenotype& phenotype, double dt ); 
+	void (*update_velocity)( Cell* pCell, Phenotype& phenotype, double dt );
 	
 	void (*add_cell_basement_membrane_interactions)(Cell* pCell, Phenotype& phenotype, double dt );
 	double (*calculate_distance_to_membrane)( Cell* pCell, Phenotype& phenotype, double dt );

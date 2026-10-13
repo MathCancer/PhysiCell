@@ -71,6 +71,8 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	dFBAModel sbml_model;
 	bool is_initialized = false;
 
+	bool skip_standard_optimization = false;
+
 	double liter_micron_cubes_conversion = 1e15; // 1 liter = 1e15 micron^3
 
 	/** \brief map between density IDs and exchange reactions */
@@ -115,23 +117,25 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	void display(std::ostream& os){ return; }
 
 	void start();
-	
-	void update();
+
+	virtual void update();
 
 	void update(PhysiCell::Cell* cell, PhysiCell::Phenotype& phenotype, double dt){
-		 // STEP 1. 
-		// date exchange fluxes lower bound using concentration values of the 
+		 // STEP 1.
+		// date exchange fluxes lower bound using concentration values of the
 		// corresponding densities at the agent voxel
 		if (cell->phenotype.death.dead == false)
-		{ 
+		{
 			this->update_dfba_inputs(cell, phenotype, dt);
 
-			// STEP 2. 
-			// Run FBA and retrive the solution
-			// dFBASolution solution = this->model.optimize();
-			// this->current_growth_rate = solution.getObjectiveValue();
-
-			this->update();		
+			// STEP 2: Run optimization (custom or standard)
+			if (cell->functions.custom_optimization != NULL) {
+				// Use custom optimization function if set
+				cell->functions.custom_optimization(cell, phenotype, dt);
+			} else {
+				// Standard biomass optimization
+				this->update();
+			}
 
 			// STEP 3. Update the cell volumne using the growth rate from FBA
 			// STEP 4. rescale exchange fluxes from the dfba model and use them to update the net_export_rates
@@ -175,6 +179,8 @@ class dFBAIntracellular : public PhysiCell::Intracellular
  	void update_dfba_inputs( PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt );
 	void update_dfba_outputs( PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt );
 
+	dFBASolution optimize_for_objective(std::string reaction_id, double coefficient);
+
 	// =============== dFBA specific functions ===============
 
 	
@@ -183,6 +189,17 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	void parse_death_model(pugi::xml_node& node);
 	void initLpSolver();
 
+	void setObjectiveCoefficient(std::string reaction_id, double coefficient) {
+		this->sbml_model.setObjectiveCoefficient(reaction_id, coefficient);
+	}
+
+	void clearObjective() {
+		this->sbml_model.clearObjective();
+	}
+
+	void restoreObjectiveState() {
+		this->sbml_model.restoreObjectiveState();
+	}
 
 	// libroadrunner specifics
 		

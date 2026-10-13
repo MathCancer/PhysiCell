@@ -9,19 +9,19 @@
     </rulesets>
   </cell_rules>
   <domain>
-    <x_min>-45.0</x_min>
-    <x_max>45.0</x_max>
-    <y_min>-45.0</y_min>
-    <y_max>45.0</y_max>
-    <z_min>-45.0</z_min>
-    <z_max>45.0</z_max>
+    <x_min>0.0</x_min>
+    <x_max>360.0</x_max>
+    <y_min>-60.0</y_min>
+    <y_max>60.0</y_max>
+    <z_min>-15.0</z_min>
+    <z_max>15.0</z_max>
     <dx>15.0</dx>
     <dy>15.0</dy>
     <dz>15.0</dz>
     <use_2D>false</use_2D>
   </domain>
   <overall>
-    <max_time units="min">20.0</max_time>
+    <max_time units="min">4320</max_time>
     <time_units>min</time_units>
     <space_units>micron</space_units>
     <dt_diffusion units="min">0.01</dt_diffusion>
@@ -29,21 +29,21 @@
     <dt_phenotype units="min">6</dt_phenotype>
   </overall>
   <parallel>
-    <omp_num_threads>10</omp_num_threads>
+    <omp_num_threads>112</omp_num_threads>
   </parallel>
   <save>
     <folder>output</folder>
     <full_data>
-      <interval units="min">1</interval>
+      <interval units="min">60</interval>
       <enable>true</enable>
     </full_data>
     <SVG>
       <interval units="min">10</interval>
-      <enable>false</enable>
+      <enable>true</enable>
       <plot_substrate enabled="true" limits="false">
             <substrate>O2</substrate>
             <min_conc>0.0</min_conc>
-            <max_conc>0.1</max_conc>
+            <max_conc>3.0</max_conc>
             <colormap>YlOrRd</colormap>
       </plot_substrate>
     </SVG>
@@ -56,7 +56,7 @@
     <disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
     <random_seed>50</random_seed>
   </options>
-  <microenvironment_setup>
+ <microenvironment_setup>
     <options>
       <calculate_gradients>false</calculate_gradients>
       <track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
@@ -69,462 +69,405 @@
     </options>
     <variable name="Ammonium" units="dimensionless" ID="0">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
       <initial_condition units="mM">0.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="false">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="CO2" units="dimensionless" ID="1">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Aqueous (membrane-permeable; Cole hindrance not applied) -->
+        <diffusion_coefficient units="micron^2/min">115000</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
       <initial_condition units="mM">0.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="false">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="Choline" units="dimensionless" ID="2">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">1.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
-      </Dirichlet_options>
-    </variable>
-    <variable name="Citrate" units="dimensionless" ID="3">
-      <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
-        <decay_rate units="1/min">0.0</decay_rate>
-      </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
-      <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="D-Glucose" units="dimensionless" ID="4">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Cole Deff: (1-rho)/(1+rho/2)*D_water; rho~0.74, D_water,Glc=46800 -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">0.5</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="Glycine" units="dimensionless" ID="5">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
-      </Dirichlet_options>
-    </variable>
-    <variable name="L-Alanine" units="dimensionless" ID="6">
-      <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
-        <decay_rate units="1/min">0.0</decay_rate>
-      </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
-      <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Arginine" units="dimensionless" ID="7">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Asparagine" units="dimensionless" ID="8">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Aspartate" units="dimensionless" ID="9">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="false">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Glutamate" units="dimensionless" ID="10">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Glutamine" units="dimensionless" ID="11">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Isoleucine" units="dimensionless" ID="12">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Lactate" units="dimensionless" ID="13">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="false">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Leucine" units="dimensionless" ID="14">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Lysine" units="dimensionless" ID="15">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
-      </Dirichlet_options>
-    </variable>
-    <variable name="L-Malate" units="dimensionless" ID="16">
-      <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
-        <decay_rate units="1/min">0.0</decay_rate>
-      </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
-      <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Phenylalanine" units="dimensionless" ID="17">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
-      </Dirichlet_options>
-    </variable>
-    <variable name="L-Proline" units="dimensionless" ID="18">
-      <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
-        <decay_rate units="1/min">0.0</decay_rate>
-      </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
-      <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Serine" units="dimensionless" ID="19">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Threonine" units="dimensionless" ID="20">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Tryptophan" units="dimensionless" ID="21">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Tyrosine" units="dimensionless" ID="22">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="L-Valine" units="dimensionless" ID="23">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="O2" units="dimensionless" ID="24">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Aqueous (membrane-permeable; Cole hindrance not applied) -->
+        <diffusion_coefficient units="micron^2/min">100000</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">0.5</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="Ornithine" units="dimensionless" ID="25">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
     <variable name="Phosphate" units="dimensionless" ID="26">
       <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
+        <!-- Matched to Cole D_eff,Glc (membrane-impermeable) -->
+        <diffusion_coefficient units="micron^2/min">8921</diffusion_coefficient>
         <decay_rate units="1/min">0.0</decay_rate>
       </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
+      <initial_condition units="mM">0.0</initial_condition>
+      <Dirichlet_boundary_condition units="mM" enabled="true">0.0</Dirichlet_boundary_condition>
       <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
-      </Dirichlet_options>
-    </variable>
-    <variable name="Urea" units="dimensionless" ID="27">
-      <physical_parameter_set>
-        <diffusion_coefficient units="micron^2/min">50000.0</diffusion_coefficient>
-        <decay_rate units="1/min">0.0</decay_rate>
-      </physical_parameter_set>
-      <initial_condition units="mM">1.0</initial_condition>
-      <Dirichlet_boundary_condition units="mM" enabled="False">0.0</Dirichlet_boundary_condition>
-      <Dirichlet_options>
-        <boundary_value ID="xmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="xmax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="ymax" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmin" enabled="False">0.0</boundary_value>
-        <boundary_value ID="zmax" enabled="False">0.0</boundary_value>
+        <boundary_value ID="xmin" enabled="true">1.0</boundary_value>
+        <boundary_value ID="xmax" enabled="true">0.0</boundary_value>
+        <boundary_value ID="ymin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="ymax" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmin" enabled="false">0.0</boundary_value>
+        <boundary_value ID="zmax" enabled="false">0.0</boundary_value>
       </Dirichlet_options>
     </variable>
   </microenvironment_setup>
   <cell_definitions>
-    <cell_definition name="MCF7_Zielinski_2017_core" ID="0">
+    <cell_definition name="MCF7_core" ID="0">
       <phenotype>
         <cycle code="5" name="live">
           <phase_transition_rates units="1/min">
             <rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
           </phase_transition_rates>
-          <standard_asymmetric_division enabled="False">
-            <asymmetric_division_probability name="cancer" units="dimensionless">1.0</asymmetric_division_probability>
+          <standard_asymmetric_division enabled="false">
+            <asymmetric_division_probability name="MCF7_core" units="dimensionless">1.0</asymmetric_division_probability>
           </standard_asymmetric_division>
         </cycle>
         <death>
@@ -582,7 +525,7 @@
           <detachment_rate units="1/min">0.0</detachment_rate>
           <maximum_number_of_attachments>12</maximum_number_of_attachments>
           <cell_adhesion_affinities>
-            <cell_adhesion_affinity name="MCF7_Zielinski_2017_core">1</cell_adhesion_affinity>
+            <cell_adhesion_affinity name="MCF7_core">1</cell_adhesion_affinity>
           </cell_adhesion_affinities>
         </mechanics>
         <motility>
@@ -604,10 +547,8 @@
                 <chemotactic_sensitivity substrate="CO2">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="Ammonium">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="Choline">0.0</chemotactic_sensitivity>
-                <chemotactic_sensitivity substrate="Citrate">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="D-Glucose">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="Glycine">0.0</chemotactic_sensitivity>
-                <chemotactic_sensitivity substrate="L-Alanine">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Arginine">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Asparagine">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Aspartate">0.0</chemotactic_sensitivity>
@@ -617,9 +558,7 @@
                 <chemotactic_sensitivity substrate="L-Lactate">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Leucine">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Lysine">0.0</chemotactic_sensitivity>
-                <chemotactic_sensitivity substrate="L-Malate">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Phenylalanine">0.0</chemotactic_sensitivity>
-                <chemotactic_sensitivity substrate="L-Proline">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Serine">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Threonine">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="L-Tryptophan">0.0</chemotactic_sensitivity>
@@ -628,7 +567,6 @@
                 <chemotactic_sensitivity substrate="O2">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="Ornithine">0.0</chemotactic_sensitivity>
                 <chemotactic_sensitivity substrate="Phosphate">0.0</chemotactic_sensitivity>
-                <chemotactic_sensitivity substrate="Urea">0.0</chemotactic_sensitivity>
               </chemotactic_sensitivities>
             </advanced_chemotaxis>
           </options>
@@ -652,12 +590,6 @@
             <uptake_rate units="1/min">0.0</uptake_rate>
             <net_export_rate units="total substrate/min">0.0</net_export_rate>
           </substrate>
-          <substrate name="Citrate">
-            <secretion_rate units="1/min">0.0</secretion_rate>
-            <secretion_target units="substrate density">0.0</secretion_target>
-            <uptake_rate units="1/min">0.0</uptake_rate>
-            <net_export_rate units="total substrate/min">0.0</net_export_rate>
-          </substrate>
           <substrate name="D-Glucose">
             <secretion_rate units="1/min">0.0</secretion_rate>
             <secretion_target units="substrate density">0.0</secretion_target>
@@ -665,12 +597,6 @@
             <net_export_rate units="total substrate/min">0.0</net_export_rate>
           </substrate>
           <substrate name="Glycine">
-            <secretion_rate units="1/min">0.0</secretion_rate>
-            <secretion_target units="substrate density">0.0</secretion_target>
-            <uptake_rate units="1/min">0.0</uptake_rate>
-            <net_export_rate units="total substrate/min">0.0</net_export_rate>
-          </substrate>
-          <substrate name="L-Alanine">
             <secretion_rate units="1/min">0.0</secretion_rate>
             <secretion_target units="substrate density">0.0</secretion_target>
             <uptake_rate units="1/min">0.0</uptake_rate>
@@ -730,19 +656,7 @@
             <uptake_rate units="1/min">0.0</uptake_rate>
             <net_export_rate units="total substrate/min">0.0</net_export_rate>
           </substrate>
-          <substrate name="L-Malate">
-            <secretion_rate units="1/min">0.0</secretion_rate>
-            <secretion_target units="substrate density">0.0</secretion_target>
-            <uptake_rate units="1/min">0.0</uptake_rate>
-            <net_export_rate units="total substrate/min">0.0</net_export_rate>
-          </substrate>
           <substrate name="L-Phenylalanine">
-            <secretion_rate units="1/min">0.0</secretion_rate>
-            <secretion_target units="substrate density">0.0</secretion_target>
-            <uptake_rate units="1/min">0.0</uptake_rate>
-            <net_export_rate units="total substrate/min">0.0</net_export_rate>
-          </substrate>
-          <substrate name="L-Proline">
             <secretion_rate units="1/min">0.0</secretion_rate>
             <secretion_target units="substrate density">0.0</secretion_target>
             <uptake_rate units="1/min">0.0</uptake_rate>
@@ -796,179 +710,172 @@
             <uptake_rate units="1/min">0.0</uptake_rate>
             <net_export_rate units="total substrate/min">0.0</net_export_rate>
           </substrate>
-          <substrate name="Urea">
-            <secretion_rate units="1/min">0.0</secretion_rate>
-            <secretion_target units="substrate density">0.0</secretion_target>
-            <uptake_rate units="1/min">0.0</uptake_rate>
-            <net_export_rate units="total substrate/min">0.0</net_export_rate>
-          </substrate>
         </secretion>
         <cell_integrity>
           <damage_rate units="1/min">0.0</damage_rate>
           <damage_repair_rate units="1/min">0.0</damage_repair_rate>
         </cell_integrity>
         <intracellular type="dfba">
-          <settings>
-            <sbml_filename>config/MCF7_Zielinski_2017_core.sbml</sbml_filename>
+	        <settings>
+            <sbml_filename>config/MCF7_Zielinski_2017_core_trimmed.sbml</sbml_filename>
             <intracellular_dt units="min">0.01</intracellular_dt>
           </settings>
           <transport_model>
-            <exchange substrate="L-Alanine">
-              <fba_flux>R_EX_ala_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
-            </exchange>
             <exchange substrate="L-Arginine">
               <fba_flux>R_EX_arg_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0101373438224108</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Asparagine">
               <fba_flux>R_EX_asn_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.00583359256589797</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Aspartate">
               <fba_flux>R_EX_asp_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.00959405479991621</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="Choline">
               <fba_flux>R_EX_chol_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0009478504142272782</Vmax>
-            </exchange>
-            <exchange substrate="Citrate">
-              <fba_flux>R_EX_cit_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="CO2">
               <fba_flux>R_EX_co2_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="D-Glucose">
               <fba_flux>R_EX_glc_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">4.0</Vmax>
+              <Km units="mM">5.0</Km>
+              <Vmax units="mmol/gDW cell/h">1.0</Vmax>
             </exchange>
             <exchange substrate="L-Glutamine">
               <fba_flux>R_EX_gln_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0878815507948709</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.1</Vmax>
             </exchange>
             <exchange substrate="L-Glutamate">
               <fba_flux>R_EX_glu_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.00669482376697556</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="Glycine">
               <fba_flux>R_EX_gly_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.00738205614816154</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Isoleucine">
               <fba_flux>R_EX_ile_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0212556395653472</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Lactate">
               <fba_flux>R_EX_lac_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Leucine">
               <fba_flux>R_EX_leu_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0226239513340666</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Lysine">
               <fba_flux>R_EX_lys_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0188433023673326</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="Ammonium">
               <fba_flux>R_EX_nh4_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.048813709823188244</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="O2">
               <fba_flux>R_EX_o2_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">8.0</Vmax>
+              <Km units="mM">0.5</Km>
+              <Vmax units="mmol/gDW cell/h">1.0</Vmax>
             </exchange>
             <exchange substrate="Ornithine">
               <fba_flux>R_EX_orn_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.000901866820618997</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Phenylalanine">
               <fba_flux>R_EX_phe_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.00590380298884837</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="Phosphate">
               <fba_flux>R_EX_pi_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.019630904454742935</Vmax>
-            </exchange>
-            <exchange substrate="L-Proline">
-              <fba_flux>R_EX_pro_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.00161876212983099</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Serine">
               <fba_flux>R_EX_ser_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0175987045718589</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Threonine">
               <fba_flux>R_EX_thr_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0101313639875666</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Tryptophan">
               <fba_flux>R_EX_trp_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.00143239849592226</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Tyrosine">
               <fba_flux>R_EX_tyr_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.00804113830444889</Vmax>
-            </exchange>
-            <exchange substrate="Urea">
-              <fba_flux>R_EX_urea_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
             <exchange substrate="L-Valine">
               <fba_flux>R_EX_val_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0119642163334375</Vmax>
-            </exchange>
-            <exchange substrate="L-Malate">
-              <fba_flux>R_EX_mal_L_e</fba_flux>
-              <Km units="mM">0.001</Km>
-              <Vmax units="fmol/pg DW cell/min">0.0</Vmax>
+              <Km units="mM">1.0</Km>
+              <Vmax units="mmol/gDW cell/h">0.02</Vmax>
             </exchange>
           </transport_model>
           <growth_model>
             <cell_density units="g/ml">1.04</cell_density>
             <reference_volume units="pg">2494</reference_volume>
-            <max_growth_rate units="1/min">0.027</max_growth_rate>
+            <max_growth_rate units="1/min">0.026803</max_growth_rate>
             <objective_reaction>R_biomass_reaction</objective_reaction>
           </growth_model>
-          <death_model enabled="false">
-            <death_type units="g/ml">necrosis</death_type>
-            <death_trigger_flux units="1/min">0.0</death_trigger_flux>
-            <death_flux_threshold>0.0</death_flux_threshold>
-            <death_rate_increase>1.67e-05</death_rate_increase>
+          <death_model enabled="true">
+            <death_type units="unitless">necrosis</death_type>
+            <death_trigger_flux units="unitless">R_ATPM</death_trigger_flux>
+            <death_flux_threshold units="1/min">1.07</death_flux_threshold>
+            <death_rate_increase units="unitless">1.67e-07</death_rate_increase>
           </death_model>
         </intracellular>
       </phenotype>
       <custom_data>
+        <growth_rate units="1/min">0.0</growth_rate>
+        <R_EX_arg_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_arg_L_e>
+        <R_EX_asn_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_asn_L_e>
+        <R_EX_asp_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_asp_L_e>
+        <R_EX_chol_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_chol_e>
+        <R_EX_co2_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_co2_e>
+        <R_EX_glc_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_glc_e>
+        <R_EX_gln_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_gln_L_e>
+        <R_EX_glu_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_glu_L_e>
+        <R_EX_gly_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_gly_e>
+        <R_EX_ile_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_ile_L_e>
+        <R_EX_lac_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_lac_L_e>
+        <R_EX_leu_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_leu_L_e>
+        <R_EX_lys_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_lys_L_e>
+        <R_EX_nh4_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_nh4_e>
+        <R_EX_o2_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_o2_e>
+        <R_EX_orn_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_orn_e>
+        <R_EX_phe_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_phe_L_e>
+        <R_EX_pi_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_pi_e>
+        <R_EX_ser_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_ser_L_e>
+        <R_EX_thr_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_thr_L_e>
+        <R_EX_trp_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_trp_L_e>
+        <R_EX_tyr_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_tyr_L_e>
+        <R_EX_val_L_e conserved="false" units="mmol/g DW cell/min" description="FBA exchange flux">0.0</R_EX_val_L_e>
       </custom_data>
       <initial_parameter_distributions enabled="false">
           </initial_parameter_distributions>
@@ -977,18 +884,18 @@
         <necrotic_phagocytosis_rate units="1/min">0.0</necrotic_phagocytosis_rate>
         <other_dead_phagocytosis_rate units="1/min">0.0</other_dead_phagocytosis_rate>
         <live_phagocytosis_rates>
-          <phagocytosis_rate name="MCF7_Zielinski_2017_core" units="1/min">0.0</phagocytosis_rate>
+          <phagocytosis_rate name="MCF7_core" units="1/min">0.0</phagocytosis_rate>
         </live_phagocytosis_rates>
         <attack_rates>
-          <attack_rate name="MCF7_Zielinski_2017_core" units="1/min">0.0</attack_rate>
+          <attack_rate name="MCF7_core" units="1/min">0.0</attack_rate>
         </attack_rates>
         <fusion_rates>
-          <fusion_rate name="MCF7_Zielinski_2017_core" units="1/min">0.0</fusion_rate>
+          <fusion_rate name="MCF7_core" units="1/min">0.0</fusion_rate>
         </fusion_rates>
       </cell_interactions>
       <cell_transformations>
         <transformation_rates>
-          <transformation_rate name="MCF7_Zielinski_2017_core" units="1/min">0.0</transformation_rate>
+          <transformation_rate name="MCF7_core" units="1/min">0.0</transformation_rate>
         </transformation_rates>
       </cell_transformations>
     </cell_definition>
@@ -996,12 +903,12 @@
     <initial_conditions>
         <cell_positions type="csv" enabled="true">
             <folder>./config</folder>
-            <filename>cells.csv</filename>
+            <filename>cells_column.csv</filename>
         </cell_positions>
     </initial_conditions>
   <user_parameters>
     <random_seed type="int" units="dimensionless" description="">50</random_seed>
-    <colony_radius type="double" units="micron" description="">30.0</colony_radius>
     <number_of_cells type="int" units="" description="">0</number_of_cells>
+    <diffusion_steps type="int" units="" description="">300</diffusion_steps>
   </user_parameters>
 </PhysiCell_settings>

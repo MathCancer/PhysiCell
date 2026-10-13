@@ -1,0 +1,81 @@
+# dFBA Configuration File for C. beijerinckii
+# This YAML file configures the C. beijerinckii model, its SBML file, exchanges, and cell parameters
+#
+# Structure:
+#   substrates: List of substrate configurations for the microenvironment
+#     Each substrate contains:
+#       - name: Substrate name (must match substrate names in exchanges)
+#       - diffusion_coefficient: Diffusion coefficient (micron^2/min)
+#       - decay_rate: Decay rate (1/min)
+#       - initial_condition: Initial concentration (mM, optional, defaults to 0.0)
+#
+#   models: Dictionary of model configurations, keyed by model name
+#     Each model contains:
+#       - sbml_path: Path to SBML file (relative to --sbml-folder or absolute)
+#       - exchanges: List of exchange reaction configurations
+#       - growth_model: Growth model parameters (optional, uses hardcoded defaults if not specified)
+#       - settings: Intracellular settings (optional, uses hardcoded defaults if not specified)
+#       - death_model: Death model configuration (optional, uses hardcoded defaults if not specified)
+#
+
+# Substrate configuration
+# Define physical properties for each substrate in the microenvironment
+substrates:
+  - name: "glucose"
+    diffusion_coefficient: 48000.0  # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 300.0         # mM
+  
+  - name: "methane"
+    diffusion_coefficient: 5233.0    # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 0.0            # mM
+  
+  - name: "CO2"
+    diffusion_coefficient: 48000.0    # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 300.0         # mM
+  
+  - name: "H2"
+    diffusion_coefficient: 5233.0    # micron^2/min
+    decay_rate: 0.0                  # 1/min
+    initial_condition: 100.0         # mM
+
+models:
+  # Model: C. beijerinckii (iCB925)
+  c_beijerinckii:
+    # Path to SBML file (can be relative to --sbml-folder or absolute)
+    sbml_path: "C_beijerinckii_model_iCB925_trimmed.xml"
+    
+    # Exchange reactions configuration
+    # Each exchange defines how a substrate is transported between the cell and microenvironment
+    exchanges:
+      - substrate: "glucose"           # Substrate name (must match microenvironment variable)
+        fba_flux: "R_EX_glc_D_e"      # Exchange reaction ID from SBML model
+        Km: 0.01                       # Michaelis-Menten constant (mM) - increased for more gradual kinetics
+        Vmax: 0.05                     # Maximum velocity (mol/(L·min)) - reduced from 0.5 to prevent immediate consumption
+      
+      - substrate: "H2"
+        fba_flux: "R_EX_h2_e"
+        Km: 0.01                       # mM - increased for more gradual kinetics
+        Vmax: 18.0                     # mol/(L·min) - reduced from 180.0 to prevent immediate production (matches M. barkeri H2 consumption rate)
+    
+    # Growth model parameters
+    growth_model:
+      cell_density: 1.04              # Cell density (g/ml)
+      reference_volume: 1.3           # Reference volume for cell division (micron^3)
+      max_growth_rate: 48.0            # Maximum growth rate (1/h)
+      objective_reaction: "R_biomass"  # Objective reaction ID from SBML model
+    
+    # Intracellular settings
+    settings:
+      intracellular_dt: 6             # Intracellular time step (min)
+    
+    # Death model configuration
+    death_model:
+      enabled: true
+      death_type: "necrosis"           # death type string
+      death_trigger_flux: 0.0          # 1/min
+      death_flux_threshold: 0.0       # dimensionless
+      death_rate_increase: 1.67e-5     # rate increase
+
