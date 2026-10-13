@@ -62,6 +62,17 @@ class dFBAModel
 
 		bool is_initialized = false;
 
+		/**
+		 * \brief whether optimize() also fills dFBASolution::fluxes.
+		 *
+		 * Off by default. Populating that string-keyed map costs one map
+		 * insertion per reaction on every solve, which dominated optimize()
+		 * for cells solving at every intracellular step. Nothing in the addon
+		 * reads it; use getFluxDistribution() instead, which builds the same
+		 * map on demand from the reactions.
+		 */
+		bool track_flux_map = false;
+
 	public:
 
 		/** \brief Constructor */
@@ -162,6 +173,13 @@ class dFBAModel
 		double getObjectiveValue();
 
 		dFBASolution getSolution(){ return this->solution; }
+
+		/** \brief Flux of every reaction from the last solve, built on demand */
+		std::map<std::string, double> getFluxDistribution() const;
+
+		/** \brief Whether optimize() also fills dFBASolution::fluxes (default false) */
+		bool getTrackFluxMap() const;
+		void setTrackFluxMap(bool value);
 
 		void setObjectiveCoefficient(std::string rId, double coefficient);
 		void clearObjective();

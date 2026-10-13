@@ -66,8 +66,41 @@
 */
 
 #include "custom.h"
+#include <set>   // for the one-time warning in set_custom_data
 //#include "../addons/dFBA/src/dfba_intracellular.h"
 
+
+// ---------------------------------------------------------------------------
+// Safe custom_data write.
+//
+// PhysiCell's Custom_Cell_Data::operator[](std::string) resolves a name via
+// std::map::operator[], which INSERTS a missing key with value 0 -- so writing
+// to a name that is not declared in the XML silently lands in variables[0] and
+// corrupts whatever variable happens to be first. Use this instead: an
+// undeclared name is reported once and skipped rather than clobbering data.
+//
+// The report is guarded because this runs on the OpenMP-parallel update path.
+// ---------------------------------------------------------------------------
+static void set_custom_data(PhysiCell::Cell* pCell, const std::string& name, double value)
+{
+	const int index = pCell->custom_data.find_variable_index(name);
+	if (index < 0)
+	{
+		static std::set<std::string> reported;
+		#pragma omp critical(dfba_custom_data_warn)
+		{
+			if (reported.insert(name).second)
+			{
+				std::cout << "WARNING: custom_data variable \"" << name
+				          << "\" is written from custom.cpp but not declared in the"
+				          << " XML cell definition; the write is being skipped."
+				          << std::endl;
+			}
+		}
+		return;
+	}
+	pCell->custom_data.variables[index].value = value;
+}
 
 void create_cell_types(void)
 {
@@ -114,11 +147,11 @@ void post_update_intracellular(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phe
 
 	PhysiCelldFBA::dFBAIntracellular* dfba_model = static_cast<PhysiCelldFBA::dFBAIntracellular*>(phenotype.intracellular);
 
-		pCell->custom_data["growth_rate"] = dfba_model->get_growth_rate();
+		set_custom_data(pCell, "growth_rate", dfba_model->get_growth_rate());
 		std::vector<double>& density_vector = pCell->nearest_density_vector();
 	    for (const auto& exchange : dfba_model->substrate_exchanges) {
         	const PhysiCelldFBA::ExchangeFluxData& ex = exchange.second;
-			pCell->custom_data[ex.fba_flux_id] = dfba_model->get_flux_value(ex.fba_flux_id);
+			set_custom_data(pCell, ex.fba_flux_id, dfba_model->get_flux_value(ex.fba_flux_id));
 		}
 
 	return;
