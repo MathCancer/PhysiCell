@@ -138,7 +138,6 @@ void setup_microenvironment(void)
 void setup_tissue(void)
 {
 
-	// load cells from your CSV file
 	load_cells_from_pugixml();
 	
 	return; 
