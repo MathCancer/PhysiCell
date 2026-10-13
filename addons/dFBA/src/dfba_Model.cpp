@@ -8,6 +8,8 @@
 #include "dfba_Model.h"
 #include "dfba_Reaction.h"  // Include the full definition
 
+#include <cstdlib>
+
 /* Default dFBAModel used to initialize the initial cell */
 dFBAModel default_dFBAModel;
 
@@ -483,6 +485,26 @@ void dFBAModel::initProblem()
 {
     int n_rows = this->getNumMetabolites();
     int n_cols = this->getNumReactions();
+
+    // LP column i must be reaction i. Three places rely on it: the bounds and
+    // objective below are written at the indexer's position, the matrix columns
+    // are appended in vector order, and optimize() reads fluxes as
+    // columnPrimal[i] for reactions[i]. addReaction() keeps the two in step, so
+    // this only fires if something reorders or removes reactions without
+    // rebuilding the indexer, which would otherwise assign fluxes to the wrong
+    // reactions without any error.
+    for (size_t i = 0; i < this->reactions.size(); ++i)
+    {
+        std::map<std::string, int>::const_iterator it = this->reactionsIndexer.find(this->reactions[i]->getId());
+        if (it == this->reactionsIndexer.end() || it->second != static_cast<int>(i))
+        {
+            std::cerr << "ERROR: dFBAModel reaction order is inconsistent with its indexer at position "
+                      << i << " (reaction '" << this->reactions[i]->getId() << "', indexer says "
+                      << (it == this->reactionsIndexer.end() ? -1 : it->second)
+                      << "). LP columns would no longer match reactions." << std::endl;
+            std::exit(1);
+        }
+    }
 
     this->handler = new CoinMessageHandler(nullptr);
     // std::cout << "Initilizing LP problem n=" << n_rows << std::endl;
