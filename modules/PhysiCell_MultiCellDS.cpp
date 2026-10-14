@@ -199,7 +199,7 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 	// get number of cell types
 	static int n = cell_definition_indices_by_name.size(); // number_of_cell_types
 	// get number of death models 
-	static int nd = (*all_cells)[0]->phenotype.death.rates.size(); // 
+	static int nd = cell_defaults.phenotype.death.rates.size(); // 
 	// get number of custom data 
 	static int nc = 0; // 
 	static int nc_scalar = 0; 
@@ -587,7 +587,7 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 			"damage_repair_rate" , "1/min" , 1 ); 
 
 // custom 
-		for( int j=0 ; j < (*all_cells)[0]->custom_data.variables.size(); j++ )
+		for( int j=0 ; j < cell_defaults.custom_data.variables.size(); j++ )
 		{		
 			name = (*all_cells)[0]->custom_data.variables[j].name; 
 			units = (*all_cells)[0]->custom_data.variables[j].units; 
@@ -596,7 +596,7 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		}
 		
 		// custom vector variables 
-		for( int j=0 ; j < (*all_cells)[0]->custom_data.vector_variables.size(); j++ )
+		for( int j=0 ; j < cell_defaults.custom_data.vector_variables.size(); j++ )
 		{
 			name = (*all_cells)[0]->custom_data.vector_variables[j].name; 
 			units = (*all_cells)[0]->custom_data.vector_variables[j].units; 
@@ -995,11 +995,11 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 
 // custom 
 		// custom scalar variables 
-		for( int j=0 ; j < (*all_cells)[0]->custom_data.variables.size(); j++ )
+		for( int j=0 ; j < cell_defaults.custom_data.variables.size(); j++ )
 		{ std::fwrite( &( pCell->custom_data.variables[j].value ) , sizeof(double) , 1 , fp ); }
 
 		// custom vector variables 
-		for( int j=0 ; j < (*all_cells)[0]->custom_data.vector_variables.size(); j++ )
+		for( int j=0 ; j < cell_defaults.custom_data.vector_variables.size(); j++ )
 		{
 			int size_temp = pCell->custom_data.vector_variables[j].value.size(); 
 			std::fwrite( pCell->custom_data.vector_variables[j].value.data() , sizeof(double) , size_temp , fp );
