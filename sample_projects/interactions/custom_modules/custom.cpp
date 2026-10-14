@@ -680,7 +680,7 @@ void stem_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		{ 
 			if( pC->type == stem_type )
 			{ num_stem++; }
-			if( pC->type == num_differentiated )
+			if( pC->type == diff_type )
 			{ num_differentiated++; }
 			if( pC->type == bacteria_type )
 			{ num_bacteria++; }

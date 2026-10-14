@@ -1096,64 +1096,8 @@ double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dummy)
 			min_distance = temp_distance; 
 			nearest_boundary = 5; 
 		}			
-		
-		// check for 3D exceptions 
-		
-		// lines 
-		if( fabs( (pCell->position[0]) - (pCell->position[1]) ) < tolerance && 
-			fabs( (pCell->position[1]) - (pCell->position[2]) ) < tolerance && 
-			fabs( (pCell->position[0]) - (pCell->position[2]) ) < tolerance )
-		{
-			if( pCell->position[0] > 0 )
-			{
-				if( pCell->position[0] > 0 && pCell->position[1] > 0 )
-				{ pCell->displacement = { -one_over_sqrt_3 , -one_over_sqrt_3 , -one_over_sqrt_3 }; }
-				if( pCell->position[0] < 0 && pCell->position[1] > 0 )
-				{ pCell->displacement = { one_over_sqrt_3 , -one_over_sqrt_3 , -one_over_sqrt_3 }; }
-				
-				if( pCell->position[0] > 0 && pCell->position[1] < 0 )
-				{ pCell->displacement = { -one_over_sqrt_3 , one_over_sqrt_3 , -one_over_sqrt_3 }; }
-				if( pCell->position[0] < 0 && pCell->position[1] < 0 )
-				{ pCell->displacement = { one_over_sqrt_3 , one_over_sqrt_3 , -one_over_sqrt_3 }; }
-			} 
-			else
-			{
-				if( pCell->position[0] > 0 && pCell->position[1] > 0 )
-				{ pCell->displacement = { -one_over_sqrt_3 , -one_over_sqrt_3 , one_over_sqrt_3 }; }
-				if( pCell->position[0] < 0 && pCell->position[1] > 0 )
-				{ pCell->displacement = { one_over_sqrt_3 , -one_over_sqrt_3 , one_over_sqrt_3 }; }
-				
-				if( pCell->position[0] > 0 && pCell->position[1] < 0 )
-				{ pCell->displacement = { -one_over_sqrt_3 , one_over_sqrt_3 , one_over_sqrt_3 }; }
-				if( pCell->position[0] < 0 && pCell->position[1] < 0 )
-				{ pCell->displacement = { one_over_sqrt_3 , one_over_sqrt_3 , one_over_sqrt_3 }; }				
-			}
-			return min_distance; 
-		}
-		
-		// planes - let's not worry for today 
-		
-	}
-	else
-	{
-		// check for 2D  exceptions 
-		
-		if( fabs( (pCell->position[0]) - (pCell->position[1]) ) < tolerance )
-		{
-			if( pCell->position[0] > 0 && pCell->position[1] > 0 )
-			{ pCell->displacement = { -one_over_sqrt_2 , -one_over_sqrt_2 , 0 }; }
-			if( pCell->position[0] < 0 && pCell->position[1] > 0 )
-			{ pCell->displacement = { one_over_sqrt_2 , -one_over_sqrt_2 , 0 }; }
-			
-			if( pCell->position[0] > 0 && pCell->position[1] < 0 )
-			{ pCell->displacement = { -one_over_sqrt_2 , one_over_sqrt_2 , 0 }; }
-			if( pCell->position[0] < 0 && pCell->position[1] < 0 )
-			{ pCell->displacement = { one_over_sqrt_2 , one_over_sqrt_2 , 0 }; }
-			return min_distance; 
-		}
 	}
 	
-	// no exceptions 
 	switch(nearest_boundary)
 	{
 		case 0:
@@ -1265,7 +1209,9 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			{
 				if( UniformRandom() < probability ) 
 				{				
-					pCell->phenotype.cell_interactions.pAttackTarget = pTarget; 
+					// sets pAttackTarget, registers pCell in pTarget's
+					// attacked_by, and spring-links the two
+					begin_attack( pCell , pTarget );
 					attacked = true; 
 					/*					
 					std::cout << "*********   *********  ********  start atack **** " << PhysiCell_globals.current_time << std::endl; 
@@ -1273,8 +1219,6 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 					<< "attack duration: " << pCell->phenotype.cell_interactions.attack_duration << " "  
 					<< "attack damage rate: " << pCell->phenotype.cell_interactions.attack_damage_rate <<  std::endl; 
 					*/
-					// spring-link these cells 
-					attach_cells_as_spring(pCell,pTarget); 
 				} 
 			}
 
@@ -1316,11 +1260,14 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 
 	// move effector attack here. 
 
-		if( pCell->phenotype.cell_interactions.pAttackTarget != NULL ) 
+		// read the target once. attack_cell() dereferences without a null check, so
+		// testing this field and then reloading it would let any concurrent clear
+		// hand it a NULL. One load is free and does not depend on which teardown
+		// paths currently run inside this loop. 
+		Cell* pAttackTarget = pCell->phenotype.cell_interactions.pAttackTarget; 
+		if( pAttackTarget != NULL ) 
 		{
-			Cell* pTarget = pCell->phenotype.cell_interactions.pAttackTarget; 
-
-			pCell->attack_cell(pTarget,dt); 
+			pCell->attack_cell(pAttackTarget,dt); 
 			attacked = true; // attacked at least one cell in this time step 
 
 			// attack_cell
@@ -1330,20 +1277,18 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			probability = dt / (1e-15 + pCell->phenotype.cell_interactions.attack_duration); 
 
 
-			if( UniformRandom() < probability || pTarget->phenotype.death.dead ) 
+			if( UniformRandom() < probability || pAttackTarget->phenotype.death.dead ) 
 			{
 				/*
 				std::cout << "*********   *********  ********  attack done **** " << PhysiCell_globals.current_time << " " 
 				<< probability << " "
-				<< "attack time: " << pTarget->state.total_attack_time << " " 		
-				<< "damage: " << pTarget->phenotype.cell_integrity.damage <<  " " 		
-				<< "dead? " << (int) pTarget->phenotype.death.dead << " " 
+				<< "attack time: " << pAttackTarget->state.total_attack_time << " " 		
+				<< "damage: " << pAttackTarget->phenotype.cell_integrity.damage <<  " " 		
+				<< "dead? " << (int) pAttackTarget->phenotype.death.dead << " " 
 				<< "damage delivered: " << pCell->phenotype.cell_interactions.total_damage_delivered << std::endl; 
 				*/
 
-				detach_cells_as_spring(pCell,pTarget); 
-
-				pCell->phenotype.cell_interactions.pAttackTarget = NULL; 
+				end_attack( pCell , pAttackTarget );
 			} 
 		} 
 
@@ -1381,7 +1326,8 @@ void standard_asymmetric_division_function( Cell* pCell_parent, Cell* pCell_daug
 		double sym_div_prob = pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_parent->type] + 1.0 - total;
 		if (sym_div_prob < 0.0)
 		{ 
-			throw std::runtime_error("Error: Asymmetric division probabilities for " + pCD_parent->name + " sum to greater than 1.0 and cannot be normalized.");
+			std::cerr << "Error: Asymmetric division probabilities for " + pCD_parent->name + " sum to greater than 1.0 and cannot be normalized." << std::endl;
+			exit(-1);
 		}
 		pCell_parent->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_parent->type] = sym_div_prob;
 		pCell_daughter->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[pCell_daughter->type] = sym_div_prob;
@@ -1465,10 +1411,25 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
 {
     // check for detachments 
     double detachment_probability = phenotype.mechanics.detachment_rate * dt; 
+
+	// This runs inside the mechanics parallel-for, and this loop is not the only
+	// thing touching pCell's spring list: another thread running this same function
+	// for a neighbor calls attach_cells_as_spring(), which reaches into THIS cell's
+	// spring_attachments and push_back()s. Those writers serialize on the unnamed
+	// critical in Cell::attach_cell_as_spring() / detach_cell_as_spring(); reading
+	// here without it means a concurrent push_back that reallocates leaves the loop
+	// indexing a freed buffer and dereferencing garbage. Copy under the same lock
+	// and walk the copy.
+	// The lock is not held across the loop body: detach_cells_as_spring() takes the
+	// same unnamed critical, and OpenMP criticals are not reentrant.
+	std::vector<Cell*> spring_attachments_snapshot;
+	#pragma omp critical
+	{ spring_attachments_snapshot = pCell->state.spring_attachments; }
+
 	// detach_cells_as_spring swaps the detached cell with the last cell in the vector, so we need to iterate backwards
-    for( int j=pCell->state.spring_attachments.size()-1; j >= 0; j-- )
+    for( int j=spring_attachments_snapshot.size()-1; j >= 0; j-- )
     {
-        Cell* pTest = pCell->state.spring_attachments[j];
+        Cell* pTest = spring_attachments_snapshot[j];
 		if (phenotype.cell_interactions.pAttackTarget==pTest || pTest->phenotype.cell_interactions.pAttackTarget==pCell) // do not let attackers detach randomly
 		{ continue; }
         if( UniformRandom() <= detachment_probability )
