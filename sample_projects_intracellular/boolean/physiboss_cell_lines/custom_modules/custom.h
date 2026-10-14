@@ -84,8 +84,8 @@ void setup_microenvironment( void );
 std::vector<std::string> my_coloring_function( Cell* );
 
 // custom cell phenotype functions could go here 
-void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt );
-void post_update_intracellular( Cell* pCell, Phenotype& phenotype, double dt );
-void color_node(Cell* pCell);
+void pre_update_intracellular( Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt );
+void post_update_intracellular( Cell* pCell, Phenotype& phenotype, Intracellular* intracellular, double dt );
+void color_node(Cell* pCell, Intracellular* intracellular);
 
 #endif

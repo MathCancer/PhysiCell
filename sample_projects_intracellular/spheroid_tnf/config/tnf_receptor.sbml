@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version2/core" level="3" version="2">
+  <model>
+    <listOfCompartments>
+      <compartment id="cell" name="Cell" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="unbound_external_tnfr" name="unbound_external_TNFR" compartment="cell" initialAmount="5" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="bound_external_tnfr" name="bound_external_TNFR" compartment="cell" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="bound_internal_tnfr" name="bound_internal_TNFR" compartment="cell" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="tnf_uptake_rate" name="TNF uptake rate" compartment="cell" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter id="tnfr_binding_rate" name="TNFR_binding_rate" value="0.5" constant="false"/>
+      <parameter id="tnfr_endocytosis_rate" name="TNFR_endocytosis_rate" value="0.5" constant="false"/>
+      <parameter id="tnfr_recycling_rate" name="TNFR_recycling_rate" value="0.5" constant="false"/>
+    </listOfParameters>
+    <listOfRules>
+      <assignmentRule variable="tnf_uptake_rate">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <minus/>
+            <apply>
+              <times/>
+              <ci> unbound_external_tnfr </ci>
+              <ci> tnfr_endocytosis_rate </ci>
+            </apply>
+            <apply>
+              <times/>
+              <ci> bound_internal_tnfr </ci>
+              <ci> tnfr_recycling_rate </ci>
+            </apply>
+          </apply>
+        </math>
+      </assignmentRule>
+    </listOfRules>
+    <listOfReactions>
+      <reaction id="binding" name="Binding" reversible="false">
+        <listOfReactants>
+          <speciesReference species="unbound_external_tnfr" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="bound_external_tnfr" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> unbound_external_tnfr </ci>
+              <ci> tnfr_endocytosis_rate </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="endocytosis" name="Endocytosis" reversible="false">
+        <listOfReactants>
+          <speciesReference species="bound_external_tnfr" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="bound_internal_tnfr" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> bound_external_tnfr </ci>
+              <ci> tnfr_endocytosis_rate </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="recycling" name="Recycling" reversible="false">
+        <listOfReactants>
+          <speciesReference species="bound_internal_tnfr" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="unbound_external_tnfr" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> bound_internal_tnfr </ci>
+              <ci> tnfr_recycling_rate </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>

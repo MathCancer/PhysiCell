@@ -286,20 +286,27 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 void Cell_Container::update_all_cells_intracellular( void )
 {
 	bool anything_to_update = false; // Use a simple boolean for reduction
-	std::vector<bool> ready_to_update_intracellular = std::vector<bool>( (*all_cells).size(), false );
+	std::vector<std::vector<int> > ready_to_update_intracellular = std::vector<std::vector<int> >( (*all_cells).size() );
 
 	#pragma omp parallel for reduction(||:anything_to_update)
 	for( int i=0; i < (*all_cells).size(); i++ )
 	{
-		if( (*all_cells)[i]->is_out_of_domain == false ) {
-			if( (*all_cells)[i]->phenotype.intracellular != NULL  && (*all_cells)[i]->phenotype.intracellular->need_update())
+		if( (*all_cells)[i]->is_out_of_domain == false && (*all_cells)[i]->phenotype.intracellulars.size() > 0) 
+		{
+			int j=0;
+			for (auto * intracellular: (*all_cells)[i]->phenotype.intracellulars) 
 			{
-				ready_to_update_intracellular[i] = true;
-				anything_to_update = true; // Set to true if any cell needs an update
-				if ((*all_cells)[i]->functions.pre_update_intracellular != NULL)
+				if (intracellular->need_update())
 				{
-					(*all_cells)[i]->functions.pre_update_intracellular((*all_cells)[i], (*all_cells)[i]->phenotype, diffusion_dt);
+					ready_to_update_intracellular[i].push_back(j); // Mark this cell for update
+					
+					anything_to_update = true; // Set to true if any cell needs an update
+					if (intracellular->pre_update_intracellular != NULL)
+					{
+						intracellular->pre_update_intracellular((*all_cells)[i], (*all_cells)[i]->phenotype, diffusion_dt);
+					}
 				}
+				j++;
 			}
 		}
 	}
@@ -310,18 +317,21 @@ void Cell_Container::update_all_cells_intracellular( void )
 	#pragma omp parallel for
 	for ( int i=0; i < (*all_cells).size(); i++ )
 	{
-		if (ready_to_update_intracellular[i])
+		for (int j : ready_to_update_intracellular[i])
 		{
-			(*all_cells)[i]->phenotype.intracellular->update((*all_cells)[i], (*all_cells)[i]->phenotype, diffusion_dt);
+			(*all_cells)[i]->phenotype.intracellulars[j]->update((*all_cells)[i], (*all_cells)[i]->phenotype, diffusion_dt);
 		}
 	}
 	
 	#pragma omp parallel for
 	for ( int i=0; i < (*all_cells).size(); i++ )
 	{
-		if (ready_to_update_intracellular[i] && (*all_cells)[i]->functions.post_update_intracellular != NULL)
+		for (int j : ready_to_update_intracellular[i])
 		{
-			(*all_cells)[i]->functions.post_update_intracellular((*all_cells)[i], (*all_cells)[i]->phenotype, diffusion_dt);
+			if ((*all_cells)[i]->phenotype.intracellulars[j]->post_update_intracellular != NULL)
+			{
+				(*all_cells)[i]->phenotype.intracellulars[j]->post_update_intracellular((*all_cells)[i], (*all_cells)[i]->phenotype, diffusion_dt);
+			}
 		}
 	}
 }

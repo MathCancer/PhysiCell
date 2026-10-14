@@ -51,10 +51,10 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	MaBoSSIntracellular(MaBoSSIntracellular* copy);
 	
 	Intracellular* clone() {
-		return static_cast<Intracellular*>(new MaBoSSIntracellular(this));
+		return static_cast<PhysiCell::Intracellular*>(new MaBoSSIntracellular(this));
 	}
 	Intracellular* getIntracellularModel() {
-		return static_cast<Intracellular*>(this);
+		return static_cast<PhysiCell::Intracellular*>(this);
 	}
 	
 	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
@@ -80,9 +80,9 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		return PhysiCell::PhysiCell_globals.current_time >= this->next_physiboss_run;
 	}
 	
-	void inherit(PhysiCell::Cell * cell) {
+	void inherit(PhysiCell::Intracellular* intracellular) {
 		maboss.inherit_state(
-			static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->maboss.get_maboss_state(), 
+			static_cast<MaBoSSIntracellular*>(intracellular)->maboss.get_maboss_state(), 
 			inherit_state, inherit_nodes
 		);
 	}
