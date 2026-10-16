@@ -73,6 +73,66 @@ class dFBAModel
 		 */
 		bool track_flux_map = false;
 
+		// ---------------- parsimonious FBA (second stage) ----------------
+		//
+		// pFBA answers the alternative-optima problem: standard FBA fixes the
+		// objective value but not the flux distribution, and in dFBA the flux
+		// distribution is what couples the cell to BioFVM. The second stage
+		// pins the objective at its optimum and then minimises total flux,
+		// which selects the enzyme-parsimonious solution among the equally
+		// optimal ones.
+		//
+		// It is held as a SEPARATE ClpSimplex rather than by reformulating the
+		// existing one, so that a run with pFBA disabled solves exactly the
+		// problem it solved before: byte-identical results, no silent change
+		// to anyone's existing simulations.
+
+		/** \brief true once the second-stage problem has been built */
+		bool pfba_enabled = false;
+
+		/** \brief objective must stay at least this fraction of its optimum */
+		double pfba_fraction_of_optimum = 1.0;
+
+		/** \brief the second-stage LP: original columns plus split columns */
+		ClpSimplex pfba_problem;
+		CoinMessageHandler* pfba_handler = nullptr;
+		bool pfba_built = false;
+
+		/**
+		 * \brief for each reaction, its two split columns in the second-stage
+		 * problem, or -1 when the reaction is not split.
+		 *
+		 * Only reversible INTERNAL reactions are split. Exchange reactions are
+		 * excluded deliberately: they are auxiliary constructs linking the model
+		 * to BioFVM rather than enzymatic steps, they carry no gene and no
+		 * enzyme cost, and leaving them unsplit keeps the flux-to-net_export
+		 * mapping reading the same single column it always did.
+		 */
+		std::vector<int> pfba_pos_col;
+		std::vector<int> pfba_neg_col;
+
+		/** \brief build the second-stage problem from the current model */
+		void buildParsimoniousProblem();
+
+		/**
+		 * \brief Run the second stage: minimise total flux with the objective
+		 *        held at stage_one_objective.
+		 *
+		 * Private, and optimize() is the only caller. There is deliberately no
+		 * second dFBASolution: this writes the parsimonious fluxes onto the
+		 * reactions and sets solution.secondary_status in place, so there is
+		 * only ever one solution object and it can only mean one thing. An
+		 * earlier version returned its own solution whose objective_value was a
+		 * total flux rather than a growth rate, which was a trap for any caller
+		 * that read it as growth.
+		 *
+		 * \return true if the second stage solved. On false the stage-one
+		 *         fluxes are left in place -- they are still optimal -- and
+		 *         secondary_status records why. A solver failure here is not a
+		 *         biological outcome and must never be read as cell death.
+		 */
+		bool solveParsimoniousStage(double stage_one_objective);
+
 	public:
 
 		/** \brief Constructor */
@@ -160,7 +220,35 @@ class dFBAModel
 		/** \brief Write problem in LP format */
 		void writeProblem(const char *filename);
 
-		/** \brief Run FBA using primal method */
+		/**
+		 * \brief Solve the model and return its flux distribution.
+		 *
+		 * This is the ONE entry point callers need. If a second optimisation
+		 * stage has been configured with enableParsimonious(), optimize()
+		 * performs both stages and returns a consolidated solution; nothing
+		 * outside this class has to know, or can forget, that it happened.
+		 *
+		 * The consolidated solution:
+		 *
+		 *   status            stage one's. A cell lives or dies on whether the
+		 *                     FBA problem itself was feasible.
+		 *   objective_value   stage one's -- the growth rate. Stage two
+		 *                     minimises total flux, so its objective is NOT a
+		 *                     growth rate and never lands here.
+		 *   fluxes, and the flux value on every reaction
+		 *                     stage two's, when it succeeded; otherwise stage
+		 *                     one's, which are still optimal.
+		 *   secondary_status  "none" when no second stage is configured, else
+		 *                     what it did.
+		 *   total_absolute_flux  total |flux| over the internal reactions of
+		 *                     the distribution actually being returned -- stage
+		 *                     two's when it solved, stage one's when it did
+		 *                     not. Never "stage two's objective", which would
+		 *                     be meaningless on the failure path.
+		 *
+		 * With no second stage configured this solves exactly the problem it
+		 * always solved, and returns bit-identical results.
+		 */
 		dFBASolution optimize();
 
 		/** \brief Get solution status */
@@ -180,6 +268,22 @@ class dFBAModel
 		/** \brief Whether optimize() also fills dFBASolution::fluxes (default false) */
 		bool getTrackFluxMap() const;
 		void setTrackFluxMap(bool value);
+
+		// ================ parsimonious FBA ================
+
+		/**
+		 * \brief Enable the parsimonious second stage.
+		 *
+		 * \param fraction_of_optimum the objective is held at or above this
+		 *        fraction of its stage-one optimum while total flux is
+		 *        minimised. 1.0 asks for the exact optimal face.
+		 */
+		void enableParsimonious(double fraction_of_optimum = 1.0);
+		bool isParsimoniousEnabled() const { return this->pfba_enabled; }
+		double getParsimoniousFraction() const { return this->pfba_fraction_of_optimum; }
+
+		/** \brief Sum of absolute fluxes over the reactions pFBA minimises */
+		double getTotalAbsoluteFlux() const;
 
 		void setObjectiveCoefficient(std::string rId, double coefficient);
 		void clearObjective();
