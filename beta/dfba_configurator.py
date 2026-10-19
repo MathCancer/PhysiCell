@@ -108,6 +108,9 @@ def add_intracellular_dfba(cell_def, sbml_path, model_config):
             - exchanges: list of exchange dictionaries
             - growth_model: dict with cell_density, reference_volume, max_growth_rate, objective_reaction
             - settings: dict with intracellular_dt
+            - secondary_objective: dict with enabled, type, fraction_of_optimum
+              (optional; omitted from the XML entirely when absent, so an
+              existing YAML produces exactly the XML it produced before)
             - death_model: dict with enabled flag
     """
     phenotype = cell_def.find("./phenotype")
@@ -155,6 +158,18 @@ def add_intracellular_dfba(cell_def, sbml_path, model_config):
     etree.SubElement(growth, "reference_volume", units="pg").text = str(reference_volume)
     etree.SubElement(growth, "max_growth_rate", units="1/min").text = str(max_growth_rate)
     etree.SubElement(growth, "objective_reaction").text = str(objective_reaction)
+
+    # Secondary objective (optional second optimisation stage, e.g. pFBA).
+    # Written only when the YAML asks for it: standard FBA stays the default.
+    secondary_config = model_config.get("secondary_objective")
+    if secondary_config:
+        etree.SubElement(
+            intracellular,
+            "secondary_objective",
+            type=str(secondary_config.get("type", "parsimonious")),
+            enabled=str(secondary_config.get("enabled", True)).lower(),
+            fraction_of_optimum=str(secondary_config.get("fraction_of_optimum", 1.0)),
+        )
 
     # Death model
     death_config = model_config.get("death_model", {})

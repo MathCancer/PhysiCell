@@ -75,7 +75,7 @@ ALL_OBJECTS := dfba_Metabolite.o dfba_Reaction.o dfba_Solution.o dfba_Model.o
 # Use a concrete header as the sentinel that setup_fba.py produced deps
 LIBFBA_SENTINEL := $(DEPS_DIR)/coin-or/include/coin/CoinPackedMatrix.hpp
 
-.PHONY: all make_lib clean libFBA test_sbml test_clp test_fba
+.PHONY: all make_lib clean libFBA test_sbml test_clp test_fba test_pfba
 
 make_lib: libFBA $(ALL_OBJECTS)
 all: make_lib test_sbml test_clp test_fba
@@ -93,6 +93,24 @@ test_clp: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_test_clp.cpp
 
 test_fba: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_test_fba.cpp
 	$(COMPILE_COMMAND) -o $@ $(ALL_OBJECTS) main_test_fba.cpp $(LD_PATH) $(WIN_LD_FLAG) $(RPATH) $(LIBS)
+	@echo created $@
+	@echo
+
+test_pfba: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_test_pfba.cpp ./dfba_test.h
+	$(COMPILE_COMMAND) -o $@ $(ALL_OBJECTS) main_test_pfba.cpp $(LD_PATH) $(WIN_LD_FLAG) $(RPATH) $(LIBS)
+	@echo created $@
+	@echo
+
+# Stage-two warm-start benchmark. Backs the primal-vs-dual choice documented in
+# dFBAModel::optimizeParsimonious(); run it with DFBA_PFBA_DUAL=1 to compare.
+bench_pfba: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_bench_pfba.cpp
+	$(COMPILE_COMMAND) -o $@ $(ALL_OBJECTS) main_bench_pfba.cpp $(LD_PATH) $(WIN_LD_FLAG) $(RPATH) $(LIBS)
+	@echo created $@
+	@echo
+
+# Warm-start evidence: simplex iterations with a reused basis vs a rebuilt one.
+bench_warmstart: $(LIBFBA_SENTINEL) $(ALL_OBJECTS) ./main_bench_warmstart.cpp
+	$(COMPILE_COMMAND) -o $@ $(ALL_OBJECTS) main_bench_warmstart.cpp $(LD_PATH) $(WIN_LD_FLAG) $(RPATH) $(LIBS)
 	@echo created $@
 	@echo
 

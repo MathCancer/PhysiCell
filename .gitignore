@@ -67,5 +67,16 @@ output/cells.csv
 __pycache__/
 *.py[cod]
 
+# dFBA standalone test binaries and generated artifacts
+addons/dFBA/test/test_sbml
+addons/dFBA/test/test_clp
+addons/dFBA/test/test_fba
+addons/dFBA/test/test_pfba
+addons/dFBA/test/bench_solve
+addons/dFBA/test/bench_pfba
+addons/dFBA/test/bench_warmstart
+addons/dFBA/test/*.o
+addons/dFBA/test/pfba_dump.tsv
+
 # compiler-generated header dependency files (-MMD)
 *.d
