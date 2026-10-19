@@ -24,8 +24,8 @@ jobs:
           {project: "physimess-sample", name: "PhysiMeSS Sample", binary: "project", config: "config/Fibre_Degradation/mymodel_matrix_degradation.xml", max_time: 120, output_folder: ""},
           {project: "physiboss-tutorial", name: "PhysiBoSS Tutorial", binary: "project", config: "config/cell_cycle/PhysiCell_settings.xml", max_time: 300, output_folder: "output"},
           {project: "worm-sample", name: "PhysiCell worm", binary: "worm", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
-          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
-          {project: "mechano-sample", name: "PhysiCell Mechano", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: "output"},
+          {project: "virus-macrophage-sample", name: "Virus Macrophage", binary: "virus-sample", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
+          {project: "mechano-sample", name: "PhysiCell Mechano", binary: "project", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "cancer-biorobots-sample", name: "PhysiCell Cancer Biorobots", binary: "cancer_biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "biorobots-sample", name: "PhysiCell Biorobots", binary: "biorobots", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
           {project: "celltypes3-sample", name: "PhysiCell Celltypes3", binary: "celltypes3", config: "config/PhysiCell_settings.xml", max_time: 120, output_folder: ""},
@@ -52,17 +52,15 @@ jobs:
     - if: matrix.os.name == 'Ubuntu'
       run: sudo apt-get update && sudo apt-get install -y liblapack-dev libbz2-dev
     
-    - if: matrix.os.name == 'MacOS 13'
+    - if: runner.os == 'macOS'
       run: brew install lapack bzip2
       
-    - if: matrix.os.name == 'MacOS 14 (M1)'
-      run: brew install lapack bzip2
         
     - if: matrix.os.name == 'Windows'
       uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 mingw-w64-x86_64-python mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-python-cffi make bison flex mingw-w64-x86_64-ca-certificates mingw-w64-x86_64-diffutils
+        install: mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-headers-git mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-libwinpthread-git mingw-w64-x86_64-lapack mingw-w64-x86_64-openblas mingw-w64-x86_64-libxml2 mingw-w64-x86_64-bzip2 mingw-w64-x86_64-python mingw-w64-x86_64-python-zstandard mingw-w64-x86_64-python-cffi make bison flex mingw-w64-x86_64-ca-certificates diffutils
     
     - name: Build ${{ matrix.projects.name }} project 
       run: |

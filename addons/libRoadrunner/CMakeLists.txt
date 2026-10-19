@@ -36,7 +36,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(roadrunner)
 
 target_include_directories(libRoadrunner
-                           PUBLIC ${roadrunner_SOURCE_DIR}/include/rr/C)
+                           PUBLIC ${roadrunner_SOURCE_DIR}/include/rr)
 target_link_directories(libRoadrunner PUBLIC ${roadrunner_SOURCE_DIR}/lib)
 target_link_libraries(libRoadrunner PUBLIC roadrunner_c_api)
 target_compile_definitions(libRoadrunner PUBLIC ADDON_ROADRUNNER)

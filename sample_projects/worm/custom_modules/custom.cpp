@@ -284,6 +284,7 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 		else
 		{ pCell->functions.update_migration_bias = tail_migration_direction; }
 		phenotype.secretion.secretion_rates[nSignal] = 100; 
+		pCell->set_internal_uptake_constants(diffusion_dt);
 	} 
 	
 	// if 2 or more attachments, use middle 
@@ -291,6 +292,7 @@ void custom_function( Cell* pCell, Phenotype& phenotype , double dt )
 	{
 		pCell->functions.update_migration_bias = middle_migration_direction;
 		phenotype.secretion.secretion_rates[nSignal] = 1; 
+		pCell->set_internal_uptake_constants(diffusion_dt);
 	} 
 	
 	return; 

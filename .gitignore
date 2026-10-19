@@ -48,6 +48,9 @@ output/cells.csv
 /worm
 /*.exe
 
+# generated header-dependency files (-MMD)
+*.d
+
 # boolean intracellular project executables
 /invasion_model
 /PhysiBoSS_Cell_Lines

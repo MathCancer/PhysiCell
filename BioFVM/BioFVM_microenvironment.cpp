@@ -47,6 +47,7 @@
 */
 
 #include "BioFVM_microenvironment.h"
+#include "BioFVM_utilities.h"
 #include "BioFVM_solvers.h"
 #include "BioFVM_vector.h"
 #include <cmath>
@@ -1467,6 +1468,7 @@ void load_initial_conditions_from_csv(std::string filename)
 	// determine if header row exists 
 	std::string line; 
 	std::getline( file , line );
+	trim_cr(line);
 	char c = line.c_str()[0];
 	std::vector<int> substrate_indices;
 	bool header_provided = false;
@@ -1515,6 +1517,7 @@ void load_initial_conditions_from_csv(std::string filename)
 		file.close();
 		std::ifstream file(filename, std::ios::in);
 		std::getline(file, line);
+		trim_cr(line);
 	}
 
 	std::cout << "Loading substrate initial conditions from CSV file " << filename << " ... " << std::endl;
@@ -1522,6 +1525,7 @@ void load_initial_conditions_from_csv(std::string filename)
 	
 	while (std::getline(file, line))
 	{
+		trim_cr(line);
 		get_row_from_substrate_initial_condition_csv(voxel_set, line, substrate_indices, header_provided);
 	}
 	

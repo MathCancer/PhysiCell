@@ -27,7 +27,7 @@ jobs:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
-            build_physiboss: "OFF"
+            build_physiboss: "ON"
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
