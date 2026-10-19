@@ -27,7 +27,7 @@
         <max_time units="min">600</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
-        <dt_diffusion units="min">0.01</dt_diffusion>
+        <dt_diffusion units="min">0.001</dt_diffusion>
         <dt_mechanics units="min">0.1</dt_mechanics>
         <dt_phenotype units="min">6</dt_phenotype>
     </overall>
@@ -87,7 +87,7 @@
             <Dirichlet_boundary_condition units="mM" enabled="True">0.0</Dirichlet_boundary_condition>
             <Dirichlet_options>
                 <boundary_value ID="xmin" enabled="True">0</boundary_value>  
-                <boundary_value ID="xmax" enabled="True">0.55</boundary_value>  
+                <boundary_value ID="xmax" enabled="True">0.65</boundary_value>  
                 <boundary_value ID="ymin" enabled="False">0</boundary_value>
                 <boundary_value ID="ymax" enabled="False">0</boundary_value>
                 <boundary_value ID="zmin" enabled="False">0</boundary_value>
@@ -285,12 +285,12 @@
                 <intracellular type="dfba">
                     <settings>
                         <sbml_filename>config/Ecoli_core.xml</sbml_filename>
-                        <intracellular_dt units="min">0.01</intracellular_dt>
+                        <intracellular_dt units="min">0.001</intracellular_dt>
                     </settings>
                     <transport_model>
                         <exchange substrate="glucose">
                             <fba_flux>R_EX_glc__D_e</fba_flux>
-                            <Km units="mM">0.8</Km>
+                            <Km units="mM">0.5</Km>
                             <Vmax units="mmol/gDW cell/h">8.0</Vmax>
                         </exchange>
                         <exchange substrate="acetate">

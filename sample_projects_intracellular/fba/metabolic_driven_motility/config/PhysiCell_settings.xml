@@ -27,7 +27,7 @@
         <max_time units="min">600</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
-        <dt_diffusion units="min">0.01</dt_diffusion>
+        <dt_diffusion units="min">0.001</dt_diffusion>
         <dt_mechanics units="min">0.1</dt_mechanics>
         <dt_phenotype units="min">6</dt_phenotype>
     </overall>
@@ -285,7 +285,7 @@
                 <intracellular type="dfba">
                     <settings>
                         <sbml_filename>config/Ecoli_core.xml</sbml_filename>
-                        <intracellular_dt units="min">0.01</intracellular_dt>
+                        <intracellular_dt units="min">0.001</intracellular_dt>
                     </settings>
                     <transport_model>
                         <exchange substrate="glucose">
