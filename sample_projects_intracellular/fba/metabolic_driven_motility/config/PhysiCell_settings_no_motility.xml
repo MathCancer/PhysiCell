@@ -356,6 +356,7 @@
         <reintroduced_nutrient type="string" units="dimensionless" description="">oxygen</reintroduced_nutrient>
         <reintroduction_start_time type="double" units="minutes" description="">9000</reintroduction_start_time>
         <reintroduction_duration type="double" units="minutes" description="">10</reintroduction_duration>
+        <glucose_sources_enabled type="bool" units="dimensionless" description="Glucose source patches are for the multiple-sources example; off here">false</glucose_sources_enabled>
         <glucose_source_concentration type="double" units="mM" description="Target glucose concentration maintained at bulk source voxels">6.0</glucose_source_concentration>
         <glucose_source_radius type="int" units="voxels" description="Source neighbourhood radius: 1=single voxel, 2=Moore (3x3), 3=5x5, ...">2</glucose_source_radius>
         <glucose_threshold_low type="double" units="mM" description="">0.5</glucose_threshold_low>

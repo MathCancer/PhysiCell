@@ -223,8 +223,22 @@ static double                  _src_glucose_supply_rate = 0.0;
 // Target concentration (mM) and supply rate (1/min) are set separately so
 // patches can be held near target even when surrounded by uptake.
 // Call this from main.cpp AFTER setup_microenvironment().
+//
+// The nodes are only used by the multiple-sources example, whose domain is
+// 300 x 300 um (centres at +-90 um). They are off unless the user parameter
+// glucose_sources_enabled is true; a missing parameter counts as false.
 void setup_secretion_nodes( void )
 {
+	bool enabled = false;
+	if( parameters.bools.find_index( "glucose_sources_enabled" ) != -1 )
+	{ enabled = parameters.bools( "glucose_sources_enabled" ); }
+	if( !enabled )
+	{
+		std::cout << "[setup_secretion_nodes] glucose sources disabled "
+		          << "(user parameter glucose_sources_enabled is false or absent)" << std::endl;
+		return;
+	}
+
 	_src_glucose_idx = microenvironment.find_density_index( "glucose" );
 
 	// Source centre positions
@@ -234,6 +248,26 @@ void setup_secretion_nodes( void )
 		{ 90.0,  90.0, 0.0},
 		{ 90.0, -90.0, 0.0}
 	};
+
+	// A centre outside the domain is not rejected by BioFVM: nearest_voxel_index()
+	// truncates it onto the nearest edge voxel, which silently moves the source.
+	// Warn so that a domain smaller than the centres is noticed.
+	{
+		const std::vector<double>& bb = microenvironment.mesh.bounding_box; // xmin ymin zmin xmax ymax zmax
+		for( auto& c : centers )
+		{
+			if( c[0] < bb[0] || c[0] > bb[3] || c[1] < bb[1] || c[1] > bb[4] || c[2] < bb[2] || c[2] > bb[5] )
+			{
+				std::vector<double> p = { c[0], c[1], c[2] };
+				int idx = microenvironment.nearest_voxel_index( p );
+				std::cout << "WARNING [setup_secretion_nodes]: source centre (" << c[0] << ", " << c[1] << ", " << c[2]
+				          << ") is outside the domain x[" << bb[0] << ", " << bb[3] << "] y[" << bb[1] << ", " << bb[4]
+				          << "] z[" << bb[2] << ", " << bb[5] << "]; it is truncated to the voxel centred at ("
+				          << microenvironment.voxels(idx).center[0] << ", " << microenvironment.voxels(idx).center[1]
+				          << ", " << microenvironment.voxels(idx).center[2] << ")." << std::endl;
+			}
+		}
+	}
 
 	// Neighbourhood radius: 1 = single voxel, 2 = Moore (3x3), 3 = 5x5, ...
 	int radius = parameters.ints("glucose_source_radius");
