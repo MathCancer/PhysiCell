@@ -1133,8 +1133,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 	{ return; }
 	
 	Cell* pTarget = NULL; 
-	int type = -1; 
-	std::string type_name = "none";
+	const int self_index = cell_definition_indices_by_type.at(pCell->type);
 	double probability = 0.0; 
 	
 	bool attacked = false; 
@@ -1144,8 +1143,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 	for( int n=0; n < pCell->state.neighbors.size(); n++ )
 	{
 		pTarget = pCell->state.neighbors[n]; 
-		type = pTarget->type; 
-		type_name = pTarget->type_name; 
+		const int target_index = cell_definition_indices_by_type.at(pTarget->type);
 		
 		if( pTarget->phenotype.volume.total < 1e-15 )
 		{ break; } 
@@ -1189,7 +1187,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 		{
 			// live phagocytosis
 			// assume you can only phagocytose one at a time for now 
-			probability = phenotype.cell_interactions.live_phagocytosis_rate(type_name) * dt; // s[type] * dt;  
+			probability = phenotype.cell_interactions.live_phagocytosis_rates[target_index] * dt; // s[type] * dt;
 			if( UniformRandom() < probability && phagocytosed == false ) 
 			{
 				pCell->ingest_cell(pTarget);
@@ -1198,10 +1196,10 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			
 			// attack 
 			// assume you can only attack one cell at a time 
-			// probability = phenotype.cell_interactions.attack_rate(type_name)*dt; // s[type] * dt;  
+			// probability = phenotype.cell_interactions.attack_rates[target_index]*dt; // s[type] * dt;
 
-			double attack_ij = phenotype.cell_interactions.attack_rate(type_name); 
-			double immunogenicity_ji = pTarget->phenotype.cell_interactions.immunogenicity(pCell->type_name); 
+			double attack_ij = phenotype.cell_interactions.attack_rates[target_index];
+			double immunogenicity_ji = pTarget->phenotype.cell_interactions.immunogenicities[self_index];
 
 			// probability of STARTING an attack 
 			probability = attack_ij * immunogenicity_ji * dt; 
@@ -1249,7 +1247,7 @@ void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double 
 			
 			// fusion 
 			// assume you can only fuse once cell at a time 
-			probability = phenotype.cell_interactions.fusion_rate(type_name)*dt; // s[type] * dt;  
+			probability = phenotype.cell_interactions.fusion_rates[target_index]*dt; // s[type] * dt;
 			if( UniformRandom() < probability && fused == false  ) 
 			{
 				pCell->fuse_cell(pTarget);
@@ -1451,7 +1449,7 @@ void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt )
         {
             // std::string search_string = "adhesive affinity to " + pTest->type_name; 
             // double affinity = get_single_behavior( pCell , search_string );
-			double affinity = phenotype.mechanics.cell_adhesion_affinity(pTest->type_name); 
+            double affinity = phenotype.mechanics.cell_adhesion_affinities[cell_definition_indices_by_type.at(pTest->type)];
 
             double prob = attachment_probability * affinity; 
             if( UniformRandom() <= prob )
