@@ -378,7 +378,7 @@ bool create_directory(const std::string &path)
 #else
 bool create_directory(const std::string &path)
 {
-#if defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_WIN32)
 	bool success = mkdir(path.c_str()) == 0;
 #else
 	bool success = mkdir(path.c_str(), 0755) == 0;
