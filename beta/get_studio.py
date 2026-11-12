@@ -32,7 +32,7 @@ print("unzip-ing ",local_file)
 with zipfile.ZipFile(local_file, 'r') as zip_ref:
     zip_ref.extractall(".")
 
-latest_studio_dir = "PhysiCell-Studio-" + vnum[1:]  # need to drop the 'v' as first character
+latest_studio_dir = "PhysiCell-Studio-" + vnum
 shutil.move(latest_studio_dir,"studio")
 print(f"renamed '{latest_studio_dir}' to 'studio'")
 
