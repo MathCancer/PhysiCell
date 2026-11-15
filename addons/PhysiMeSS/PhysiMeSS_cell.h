@@ -13,7 +13,14 @@ class PhysiMeSS_Cell : public PhysiMeSS_Agent
     
     int stuck_counter;
     int unstuck_counter;
-    
+
+    // Strongest fibre contact damping coefficient seen this mechanics step, and the
+    // orientation of that fibre. Applied once (not once per fibre) in
+    // physimess_update_cell_velocity, to the part of the motility vector that is
+    // perpendicular to the fibre.
+    double fibre_contact_damping;
+    std::vector<double> fibre_contact_orientation;
+
     PhysiMeSS_Cell();
     ~PhysiMeSS_Cell() {};
     

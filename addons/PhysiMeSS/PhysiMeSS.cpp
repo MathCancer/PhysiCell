@@ -73,6 +73,11 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
     }
 
     // std::cout << " AGENT " << pCell->type_name << " " << pCell->ID << " has " ;
+    if (!isFibre(pCell)) {
+        static_cast<PhysiMeSS_Cell*>(pCell)->fibre_contact_damping = 0.0;
+        static_cast<PhysiMeSS_Cell*>(pCell)->fibre_contact_orientation.assign(3, 0.0);
+    }
+
     //add potentials between pCell and its neighbors
     for (auto* neighbor : static_cast<PhysiMeSS_Agent*>(pCell)->physimess_neighbors)
     {
@@ -102,6 +107,7 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
     if (!isFibre(pCell)) {
         
         PhysiMeSS_Cell* ppCell = static_cast<PhysiMeSS_Cell*>(pCell);
+
         int stuck_threshold = 10;
         int unstuck_threshold = 1;
 
@@ -117,12 +123,27 @@ void physimess_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double d
             << PhysiCell_globals.current_time << std::endl;*/
             ppCell->unstuck_counter++;
             ppCell->force_update_motility_vector(dt);
-            ppCell->velocity += phenotype.motility.motility_vector;
         }
         else {
             pCell->update_motility_vector(dt);
-            pCell->velocity += phenotype.motility.motility_vector;
         }
+
+        // Fibre contact damping: scale the motility component perpendicular to the
+        // most strongly contacting fibre by (1 - c), c = vel_contact*(1 - xi^2) in [0,1].
+        // This acts on the active velocity only (not on v_prev or the repulsion),
+        // so it cannot feed velocity back into itself.
+        std::vector<double> motility = phenotype.motility.motility_vector;
+        double c = std::min(1.0, std::max(0.0, ppCell->fibre_contact_damping));
+        if (c > 0.0) {
+            const std::vector<double>& o = ppCell->fibre_contact_orientation;
+            double m_par = 0.0;
+            for (int j = 0; j < 3; j++) { m_par += motility[j] * o[j]; }
+            for (int j = 0; j < 3; j++) {
+                double par = m_par * o[j];
+                motility[j] = par + (1.0 - c) * (motility[j] - par);
+            }
+        }
+        pCell->velocity += motility;
 
         if(ppCell->unstuck_counter == unstuck_threshold+1){
             ppCell->unstuck_counter = 0;

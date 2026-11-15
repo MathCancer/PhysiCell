@@ -5,6 +5,8 @@ PhysiMeSS_Cell::PhysiMeSS_Cell()
 {
     stuck_counter = 0;
     unstuck_counter = 0;
+    fibre_contact_damping = 0.0;
+    fibre_contact_orientation.assign(3, 0.0);
 }
 
 
@@ -95,13 +97,22 @@ void PhysiMeSS_Cell::add_potentials_from_fibre(PhysiMeSS_Fibre* pFibre)
         double xip = pow(xi, p_exponent);
         double xiq = pow((1 - xi * xi), q_exponent);
 
+        // Clamp at 0: once |v| > cell_velocity_max the factor would go negative
+        // and grow with speed, feeding the velocity back into itself.
         fibre_adhesion = this->custom_data["vel_adhesion"] * xip *
-                            (1 - cell_velocity / this->custom_data["cell_velocity_max"]);
+                            std::max(0.0, 1 - cell_velocity / this->custom_data["cell_velocity_max"]);
 
         fibre_repulsion = this->custom_data["vel_contact"] * xiq;
 
         axpy(&(velocity), fibre_adhesion, pFibre->state.orientation);
-        naxpy(&(velocity), fibre_repulsion, previous_velocity);
+        // Don't subtract previous_velocity here. Feeding v_prev back (once per fibre)
+        // gives a gain >= ~1 on v_prev, which is unstable with the Adams-Bashforth
+        // position update. Keep the strongest contact and its fibre orientation; in
+        // physimess_update_cell_velocity it damps only the motility perpendicular to that fibre.
+        if (fibre_repulsion > fibre_contact_damping) {
+            fibre_contact_damping = fibre_repulsion;
+            fibre_contact_orientation = pFibre->state.orientation;
+        }
 
         degrade_fibre(pFibre);
     }
